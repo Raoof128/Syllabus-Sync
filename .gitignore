@@ -47,5 +47,6 @@ AGENTS.md
 # IDE
 .idea/
 .vscode/
+.agent/
 *.swp
 *.swo
