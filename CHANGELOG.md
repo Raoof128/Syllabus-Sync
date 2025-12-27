@@ -118,6 +118,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### Raouf:
+**Date:** 2025-12-27  
+**Task:** Sidebar cleanup & project configuration
+
+#### Added
+- **Development Workflow** (`.agent/workflows/development.md`)
+  - Pre-task checklist (read agent.md, CHANGELOG.md)
+  - Development and post-task documentation steps
+  - Project structure reference
+  - Tech stack summary
+
+- **Git Configuration Updates** (`.gitignore`)
+  - Added `agent.md` and `AGENTS.md` to gitignore
+  - Added `.idea/` folder (JetBrains IDE settings)
+  - Added `.vscode/` folder (VS Code settings)
+  - Added `.agent/` folder (workflow files)
+  - Added `*.swp`, `*.swo` (Vim swap files)
+
+#### Changed
+- N/A
+
+#### Fixed
+- N/A
+
+#### Removed
+- Duplicate "Map" tab from sidebar navigation in `components/layout/Sidebar.tsx`
+- Unused `Map` icon import from lucide-react (cleanup)
+
+**Notes:**
+- Consolidated map navigation to single "Map + Live" option for cleaner UX
+- Workflow file created at `.agent/workflows/development.md`
+- All agent/workflow files are gitignored to keep them local
+
+---
+
 ## [0.1.0] - 2025-01-XX (Phase 1 - Initial Setup)
 
 ### Added
