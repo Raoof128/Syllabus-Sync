@@ -33,7 +33,7 @@ export default function Header() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="gap-2">
-                            <span>Raouf</span>
+                            <span>Admin</span>
                             <User className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
