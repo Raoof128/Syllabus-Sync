@@ -13,26 +13,26 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     return (
         <html lang="en">
-        <body className={inter.className}>
-        <div className="flex h-screen bg-gray-50">
-            {/* Sidebar */}
-            <Sidebar />
+            <body className={inter.className} suppressHydrationWarning>
+                <div className="flex h-screen bg-gray-50">
+                    {/* Sidebar */}
+                    <Sidebar />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto">
-                    {children}
-                </main>
-            </div>
-        </div>
-        </body>
+                    {/* Main Content */}
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        <Header />
+                        <main className="flex-1 overflow-y-auto">
+                            {children}
+                        </main>
+                    </div>
+                </div>
+            </body>
         </html>
     );
 }

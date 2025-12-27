@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Pending
 - Unit Form component (modal dialog for Add/Edit/Delete) - Pouya
-- Placeholder pages (Map, Settings) - Raouf
+- ~~Placeholder pages (Map, Settings) - Raouf~~ ✅ DONE
 - Placeholder page (Calendar) - Kit
 - Mobile responsive design improvements - Pouya
 - FullCalendar integration - Kit (Week 5)
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Live events feed - Kit (Week 7)
 - Stress forecast algorithm - Pouya (Week 4)
 - Demo preparation materials - All (Week 8)
+- ~~Database schema design - Raouf~~ ✅ DONE (DATABASE_SCHEMA.md created)
 
 ---
 
@@ -153,6 +154,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### Raouf:
+**Date:** 2025-12-27  
+**Task:** Week 2 Complete - Placeholder Pages, Database Schema & UI Polish
+
+#### Added
+- **Map Placeholder Page** (`app/map/page.tsx`)
+  - Responsive layout matching Home page design
+  - Map placeholder with "Interactive Map Coming Soon" message
+  - Feature preview cards:
+    - Building Markers: Campus building locations and room info
+    - Turn-by-Turn Navigation: Walking directions with estimated time
+    - Live Location: Real-time GPS tracking on campus
+  - Blue info banner for development status
+  - "Week 6" badge indicating timeline
+
+- **Settings Placeholder Page** (`app/settings/page.tsx`)
+  - Two-column responsive layout matching Home page
+  - Profile section: Student Name, Student ID (Coming Soon badges)
+  - Notifications section: Deadline, Class, and Event reminders (disabled toggles)
+  - Appearance section: Dark Mode toggle, Language selector
+  - Privacy & Security section:
+    - Data Storage status (Local badge)
+    - Export Data option
+    - Clear All Data option
+  - Sidebar widgets:
+    - Data Sync card (shows localStorage status)
+    - Development status card
+    - About card (version 0.1.0, phase, last update)
+
+- **Database Schema Documentation** (`Team_Plan/DATABASE_SCHEMA.md`)
+  - Chose Supabase (PostgreSQL) as database provider
+  - Comprehensive reasons for Supabase selection
+  - 7 table designs with full SQL CREATE statements:
+    - `users`: Student profiles linked to Supabase Auth
+    - `units`: Course/subject information with user ownership
+    - `class_times`: Scheduled class times with day enum
+    - `deadlines`: Assignments with priority and type enums
+    - `events`: Public campus events with categories
+    - `user_events`: Junction table for RSVPs
+    - `settings`: User preferences and notification settings
+  - Row Level Security (RLS) policies for all tables
+  - Entity Relationship Diagram (ASCII art)
+  - Implementation roadmap (Weeks 3-5)
+  - Environment variables documentation
+  - Dependencies list (@supabase/supabase-js)
+
+#### Changed
+- **Map Page** (`app/map/page.tsx`) - Refactored to match Home page UI:
+  - Updated container to `container mx-auto p-6 max-w-7xl`
+  - Changed header to use `text-gray-900` bold styling
+  - Replaced gradient cards with clean white Cards
+  - Changed item backgrounds to `bg-gray-50 rounded-lg hover:bg-gray-100`
+
+- **Settings Page** (`app/settings/page.tsx`) - Refactored to match Home page UI:
+  - Updated container layout to match Home page
+  - Changed header styling to match app-wide design
+  - Removed gradient status cards, replaced with clean styling
+  - Standardized badge styles with existing patterns
+
+#### Fixed
+- **Hydration Error** (`app/layout.tsx`)
+  - Added `suppressHydrationWarning` to `<body>` tag
+  - Prevents React hydration mismatch errors caused by browser extensions
+  - Error was caused by extensions modifying DOM before React hydration
+  - Fix is safe and recommended for body/html elements
+
+#### Removed
+- N/A
+
+**Notes:**
+- All pages now have consistent UI matching Home page design language
+- Used existing Shadcn components only (Card, Button, Badge)
+- Pages tested and verified working at localhost:3000/map and localhost:3000/settings
+- Database schema ready for Supabase project creation in Week 3
+- Hydration warning fix applied for browser extension compatibility
+
+---
+
 ## [0.1.0] - 2025-01-XX (Phase 1 - Initial Setup)
 
 ### Added
@@ -270,5 +349,5 @@ When updating this changelog:
 
 ---
 
-*Last Updated: [DATE]*  
+*Last Updated: 2025-12-27*  
 *Current Version: 0.1.0*

@@ -27,7 +27,8 @@
 - [x] Next Deadline display
 - [x] Events Feed
 - [ ] Unit Form (Add/Edit/Delete units)
-- [ ] Placeholder pages (Map, Calendar, Settings)
+- [x] Placeholder pages (Map, Settings) - Raouf ✅
+- [ ] Placeholder page (Calendar) - Kit
 
 ### Phase 2 (Weeks 3-4) - Core Features
 - [ ] Unit Management (full CRUD)
@@ -92,7 +93,7 @@
 
 2. **Raouf (Map & Database Developer)**
    - Responsibilities: Leaflet integration, navigation routing, building markers, Database setup, Settings Tab
-   - Current Status: 🚧 Ready to start Phase 2
+   - Current Status: ✅ Week 2 Complete (Map & Settings pages, DATABASE_SCHEMA.md)
 
 3. **Kit (Calendar & Feed Developer)**
    - Responsibilities: FullCalendar integration, Calendar Tab, Live Events Feed development
@@ -259,6 +260,43 @@ syllabus-sync/
 
 ## 📝 Update Log
 
+### Raouf:
+**Date:** 2025-12-27  
+**Task:** Week 2 Tasks Complete - Placeholder Pages, Database Schema & UI Polish
+
+**Completed:**
+- ✅ Map placeholder page (`app/map/page.tsx`)
+  - Interactive Map placeholder with feature preview cards
+  - Building Markers, Navigation, Live Location previews
+  - Consistent UI matching Home page design
+- ✅ Settings placeholder page (`app/settings/page.tsx`)
+  - Profile, Notifications, Appearance, Privacy & Security sections
+  - Data Sync sidebar widget
+  - About card with version info
+  - Consistent UI matching Home page design
+- ✅ Database Schema documentation (`Team_Plan/DATABASE_SCHEMA.md`)
+  - Chose Supabase as database provider
+  - Designed 7 tables: users, units, class_times, deadlines, events, user_events, settings
+  - SQL scripts with Row Level Security policies
+  - Entity Relationship Diagram
+  - Implementation roadmap for Weeks 3-5
+- ✅ UI Consistency Refactor
+  - Updated Map and Settings pages to match Home page styling
+  - Consistent container (`container mx-auto p-6 max-w-7xl`)
+  - Consistent header styling (`text-gray-900` bold, `text-gray-600` subtitle)
+  - Consistent card items (`bg-gray-50 rounded-lg hover:bg-gray-100`)
+  - Blue info banners for development notices
+- ✅ Hydration Error Fix (`app/layout.tsx`)
+  - Added `suppressHydrationWarning` to body tag
+  - Prevents errors from browser extensions modifying DOM
+
+**Next Steps for Raouf:**
+- Week 3: Create Supabase project and run SQL scripts
+- Week 4: Migrate stores to Supabase, implement real-time subscriptions
+- Week 6: Leaflet map integration with building markers
+
+---
+
 ### Pouya:
 **Date:** 2025-12-27  
 **Task:** Phase 1 Complete - Home Tab Implementation
@@ -280,10 +318,10 @@ syllabus-sync/
 - Stress Forecast algorithm (Week 4)
 
 **Next Steps for Team:**
-- **Raouf:** Create placeholder Map and Settings pages, begin database setup
+- **Raouf:** ✅ Map & Settings pages complete. Next: Create Supabase project (Week 3)
 - **Kit:** Create placeholder Calendar page, research FullCalendar integration
 
 ---
 
-*Last Updated: [DATE]*
+*Last Updated: 2025-12-27*
 *Version: 0.1.0 (Phase 1)*
