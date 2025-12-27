@@ -257,7 +257,12 @@ syllabus-sync/
 ## 📝 Update Log
 
 ### Pouya:
-[Your updates will go here after each task]
+**Date:** 2025-12-27  
+**Task:** Removed duplicate Map tab from sidebar navigation
+
+- Removed extra "Map" navigation item from `Sidebar.tsx`
+- Kept "Map + Live" as the single map navigation option
+- Cleaned up unused `Map` icon import from lucide-react
 
 ---
 

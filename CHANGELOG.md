@@ -112,6 +112,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### Pouya:
+**Date:** 2025-12-27  
+**Task:** Sidebar navigation cleanup
+
+#### Removed
+- Duplicate "Map" tab from sidebar navigation in `components/layout/Sidebar.tsx`
+- Unused `Map` icon import from lucide-react
+
+**Notes:**
+- Consolidated map navigation to single "Map + Live" option for cleaner UX
+
+---
+
 ## Version History
 
 - **[0.1.0]** - Phase 1: Initial setup and home page implementation
