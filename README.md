@@ -140,8 +140,8 @@ syllabus-sync/
 ## 📝 Documentation
 
 - **[agent.md](agent.md)** - Complete project documentation
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
-- **[TEAM_ROADMAP.md](TEAM_ROADMAP.md)** - Team tasks and timeline
+- **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
+- **[TEAM_ROADMAP.md](Team_Plan/TEAM_ROADMAP.md)** - Team tasks and timeline
 - **[GIT_WORKFLOW.md](GIT_WORKFLOW.md)** - Git collaboration guide
 
 ---
