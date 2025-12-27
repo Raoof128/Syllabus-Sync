@@ -23,6 +23,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+### Raouf:
+**Date:** 2025-12-27  
+**Task:** Quick Fixes - Welcome Message & Map Route
+
+#### Changed
+- **Welcome Message** (`app/page.tsx`)
+  - Changed "Welcome, Raouf!" to "Welcome, Admin!"
+
+- **Map Page Route** (`app/map` → `app/map-live`)
+  - Renamed folder from `map` to `map-live` to match sidebar navigation
+  - Route now correctly matches `/map-live` link in Sidebar
+
+#### Fixed
+- **Map Tab 404 Error**
+  - Map page was at `/map` but sidebar linked to `/map-live`
+  - Renamed folder to resolve 404 error
+
+**Notes:**
+- Map + Live tab now works correctly
+- Welcome message is now generic for any user
+
+---
+
 ### Pouya:
 **Date:** 2025-12-27  
 **Task:** Phase 1 Complete - Home Tab Implementation & GitHub Push

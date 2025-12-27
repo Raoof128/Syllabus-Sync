@@ -129,7 +129,7 @@ syllabus-sync/
 ├── app/
 │   ├── layout.tsx           # Root layout with Sidebar + Header
 │   ├── page.tsx             # Home page
-│   ├── map/                 # Map page (placeholder)
+│   ├── map-live/            # Map + Live page (placeholder)
 │   ├── calendar/            # Calendar page (placeholder)
 │   ├── settings/            # Settings page (placeholder)
 │   └── globals.css
@@ -265,10 +265,11 @@ syllabus-sync/
 **Task:** Week 2 Tasks Complete - Placeholder Pages, Database Schema & UI Polish
 
 **Completed:**
-- ✅ Map placeholder page (`app/map/page.tsx`)
+- ✅ Map placeholder page (`app/map-live/page.tsx`)
   - Interactive Map placeholder with feature preview cards
   - Building Markers, Navigation, Live Location previews
   - Consistent UI matching Home page design
+  - Route: `/map-live` (matches Sidebar "Map + Live" tab)
 - ✅ Settings placeholder page (`app/settings/page.tsx`)
   - Profile, Notifications, Appearance, Privacy & Security sections
   - Data Sync sidebar widget
@@ -289,6 +290,9 @@ syllabus-sync/
 - ✅ Hydration Error Fix (`app/layout.tsx`)
   - Added `suppressHydrationWarning` to body tag
   - Prevents errors from browser extensions modifying DOM
+- ✅ Quick Fixes
+  - Changed welcome message from "Raouf" to "Admin" (`app/page.tsx`)
+  - Fixed Map tab 404 error by renaming `app/map` to `app/map-live`
 
 **Next Steps for Raouf:**
 - Week 3: Create Supabase project and run SQL scripts
