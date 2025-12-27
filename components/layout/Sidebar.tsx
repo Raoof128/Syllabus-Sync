@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, MapPin, Calendar, MessageSquare, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 const navigation = [
     { name: 'Home', href: '/', icon: Home },
