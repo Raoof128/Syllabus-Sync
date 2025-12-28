@@ -85,6 +85,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Verification:** Not run (docs-only update)  
 **Follow-ups:** None.  
 
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Documentation + gitignore improvements  
+**Summary:** Added a Mermaid architecture diagram to README and expanded gitignore for common tooling artifacts.  
+**Files Changed:** `README.md`, `.gitignore`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.  
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Architecture diagram  
+**Summary:** Added a Mermaid architecture diagram to the architecture overview.  
+**Files Changed:** `docs/ARCHITECTURE.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.  
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Git hygiene  
+**Summary:** Expanded gitignore patterns to exclude common local, cache, and IDE artifacts.  
+**Files Changed:** `.gitignore`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** Consider removing tracked `*.DS_Store` and `.idea` files if present.  
+
 ---
 
 ## [0.1.1] - 2025-12-28

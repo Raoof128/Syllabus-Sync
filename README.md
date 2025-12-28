@@ -17,6 +17,38 @@ This project is being developed as a demo for presentation to Macquarie Universi
 
 ---
 
+## 🧭 Architecture Diagram
+
+```mermaid
+flowchart LR
+  subgraph UI
+    Home[Home Page]
+    Map[Map Page]
+    Calendar[Calendar Page]
+    Feed[Feed Page]
+    Settings[Settings Page]
+  end
+
+  subgraph Stores
+    UnitsStore[unitsStore]
+    DeadlinesStore[deadlinesStore]
+  end
+
+  subgraph Data
+    SampleUnits[data/sampleUnits.ts]
+    SampleEvents[data/sampleEvents.ts]
+  end
+
+  Home --> UnitsStore
+  Home --> DeadlinesStore
+  Feed --> SampleEvents
+  UnitsStore --> LocalStorage[(localStorage)]
+  DeadlinesStore --> LocalStorage
+  LocalStorage -.-> Future[Supabase (planned)]
+```
+
+---
+
 ## ✨ Features
 
 ### 🏠 **Home Dashboard**
