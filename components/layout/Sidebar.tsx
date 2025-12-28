@@ -7,9 +7,9 @@ import { Home, MapPin, Calendar, MessageSquare, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
 
 const navigation = [
-    { name: 'Home', href: '/', icon: Home },
+    { name: 'Home', href: '/home', icon: Home },
     { name: 'Map', href: '/map', icon: MapPin },
-    { name: 'Calendar', href: '/calendar', icon: Calendar },
+    { name: 'Calendar', href: '/calender', icon: Calendar },
     { name: 'Feed', href: '/feed', icon: MessageSquare },
     { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -25,7 +25,7 @@ export default function Sidebar() {
 
             <nav className="space-y-1">
                 {navigation.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
                     const Icon = item.icon;
 
                     return (
