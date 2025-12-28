@@ -167,7 +167,7 @@ syllabus-sync/
 │   ├── page.tsx             # Root redirect
 │   ├── home/                # Home page
 │   ├── map/                 # Map page
-│   ├── calender/            # Calendar page
+│   ├── calendar/            # Calendar page
 │   ├── feed/                # Feed page
 │   └── settings/            # Settings page
 ├── components/

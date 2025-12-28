@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Pending
-- Unit Form component (modal dialog for Add/Edit/Delete) - Pouya
+- ~~Unit Form component (modal dialog for Add/Edit/Delete) - Pouya~~ ✅ DONE
 - ~~Placeholder pages (Map, Settings) - Raouf~~ ✅ DONE
 - ~~Placeholder page (Calendar, Feed) - Kit~~ ✅ DONE
 - Mobile responsive design improvements - Pouya
@@ -21,13 +21,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo preparation materials - All (Week 8)
 - ~~Database schema design - Raouf~~ ✅ DONE (DATABASE_SCHEMA.md created)
 
+---
+
+## [0.2.0] - 2025-12-28
+
+### Added
+- **Error Handling Components**
+  - `app/error.tsx` - Error boundary for runtime errors
+  - `app/loading.tsx` - Loading state for page transitions
+  - `app/not-found.tsx` - Custom 404 page with home navigation
+
+- **Utility Files**
+  - `lib/constants.ts` - App-wide constants (routes, colors, formats)
+  - `lib/hooks/index.ts` - Hooks barrel export
+  - `lib/hooks/useHydration.ts` - Client hydration tracking hook
+  - `lib/hooks/useLocalStorage.ts` - localStorage sync hook
+  - `.env.example` - Environment variables template
+
+- **Test Coverage Expansion**
+  - `tests/TodaySchedule.test.tsx` - Tests for TodaySchedule component
+  - `tests/NextDeadline.test.tsx` - Tests for NextDeadline component
+  - Total: 5 tests passing
+
+### Changed
+- **Calendar Route Fix** - Renamed `app/calender/` to `app/calendar/` (spelling fix)
+- **Navigation Updates**
+  - `components/layout/Sidebar.tsx` - Updated route to `/calendar`
+  - `components/home/QuickActions.tsx` - Updated route to `/calendar`
+
+- **TypeScript Configuration**
+  - `tsconfig.json` - Added `"types": ["vitest/globals"]` for test type support
+
+- **Documentation Updates**
+  - `README.md` - Fixed calender → calendar in project structure
+  - `docs/API_REFERENCE.md` - Fixed calender → calendar in routes
+
+### Fixed
+- **Critical Typo:** `/calender` route renamed to `/calendar` across entire codebase
+- **TypeScript Errors:** Fixed missing Vitest global types in test files
+- **Navigation:** All sidebar and quick action links now point to correct routes
+
+### Project Status
+- ✅ Build passing
+- ✅ Lint passing  
+- ✅ TypeScript passing
+- ✅ 5 tests passing
+- ✅ Ready for Phase 2 expansion
+
+---
+
+### Pouya:
+**Date:** 2025-12-28  
+**Scope:** Repository audit, bug fixes, and project completion  
+**Summary:** Comprehensive repository audit to prepare for project expansion. Fixed critical typo, added error handling, created utility files, expanded test coverage.  
+**Files Changed:** 15+ files (see [0.2.0] section above)  
+**Verification:** `npm run build` ✅, `npm run lint` ✅, `npm run test` ✅  
+**Follow-ups:** Project is now ready for Phase 2 expansion.
+
+---
+
 ### Raouf:
 **Date:** 2025-12-28  
 **Scope:** Data seeding, stress algorithm, documentation alignment  
 **Summary:** Prevented duplicate sample seeding after hydration, updated stress scoring to weighted/time-decay model, and aligned docs/routes/versions to the current codebase.  
 **Files Changed:** `app/home/page.tsx`, `lib/store/deadlinesStore.ts`, `data/sampleUnits.ts`, `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`  
 **Verification:** Not run (not requested)  
-**Follow-ups:** Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.
+**Follow-ups:** ~~Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.~~ ✅ DONE
 
 ### Raouf:
 **Date:** 2025-12-28  

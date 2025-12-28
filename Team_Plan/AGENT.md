@@ -26,9 +26,14 @@
 - [x] Home page with Today's Schedule
 - [x] Next Deadline display
 - [x] Events Feed
-- [ ] Unit Form (Add/Edit/Delete units)
+- [x] Unit Form (Add/Edit/Delete units)
+- [x] Unit Card component
 - [x] Placeholder pages (Map, Settings) - Raouf ✅
-- [ ] Placeholder page (Calendar) - Kit
+- [x] Placeholder page (Calendar) - Kit ✅
+- [x] Feed page - Kit ✅
+- [x] Error handling (error.tsx, loading.tsx, not-found.tsx)
+- [x] Constants & custom hooks setup
+- [x] Test infrastructure (Vitest + 5 tests)
 
 ### Phase 2 (Weeks 3-4) - Core Features
 - [ ] Unit Management (full CRUD)
@@ -129,8 +134,13 @@ syllabus-sync/
 ├── app/
 │   ├── layout.tsx           # Root layout with Sidebar + Header
 │   ├── page.tsx             # Root redirect
+│   ├── error.tsx            # Error boundary component
+│   ├── loading.tsx          # Loading state component
+│   ├── not-found.tsx        # Custom 404 page
+│   ├── home/                # Home page
 │   ├── map/                 # Map page (placeholder)
-│   ├── calender/            # Calendar page (placeholder)
+│   ├── calendar/            # Calendar page (placeholder) ✅ Fixed spelling
+│   ├── feed/                # Feed page
 │   ├── settings/            # Settings page (placeholder)
 │   └── globals.css
 ├── components/
@@ -144,18 +154,38 @@ syllabus-sync/
 │   │   ├── Sidebar.tsx
 │   │   └── Header.tsx
 │   └── units/               # Unit management components
-│       ├── UnitForm.tsx     # (Pending)
-│       └── UnitCard.tsx     # (Pending)
+│       ├── UnitForm.tsx
+│       └── UnitCard.tsx
 ├── lib/
+│   ├── constants.ts         # App-wide constants
 │   ├── store/               # Zustand stores
 │   │   ├── unitsStore.ts    # Units state management
 │   │   └── deadlinesStore.ts # Deadlines state management
+│   ├── hooks/               # Custom React hooks
+│   │   ├── index.ts
+│   │   ├── useHydration.ts
+│   │   └── useLocalStorage.ts
 │   ├── types/
 │   │   └── index.ts         # TypeScript type definitions
-│   └── utils.ts             # Utility functions
+│   └── utils/
+│       └── utils.ts         # Utility functions (cn helper)
 ├── data/
 │   ├── sampleUnits.ts       # Sample unit data
 │   └── sampleEvents.ts      # Sample event data
+├── tests/                   # Test files
+│   ├── setup.ts
+│   ├── EventsFeed.test.tsx
+│   ├── TodaySchedule.test.tsx
+│   └── NextDeadline.test.tsx
+├── docs/                    # Documentation
+│   ├── API_REFERENCE.md
+│   └── ARCHITECTURE.md
+├── Team_Plan/               # Team planning docs
+│   ├── AGENT.md
+│   ├── CHANGELOG.md
+│   ├── TEAM_ROADMAP.md
+│   ├── DATABASE_SCHEMA.md
+│   └── AUDIT_REPORT.md
 └── public/
     └── images/              # Static images
 ```
@@ -164,7 +194,7 @@ syllabus-sync/
 
 ## 🔧 Current Status
 
-### ✅ Completed (as of 2025-12-27)
+### ✅ Completed (as of 2025-12-28)
 - Project initialization with Next.js 16 + TypeScript
 - Tailwind CSS + Shadcn UI setup
 - Zustand stores (unitsStore, deadlinesStore)
@@ -172,12 +202,19 @@ syllabus-sync/
 - Layout components (Sidebar, Header)
 - Home page components (TodaySchedule, NextDeadline, EventsFeed, QuickActions)
 - Sample data creation
-- **ALL PUSHED TO GITHUB BY POUYA** ✅
+- Placeholder pages (Map, Settings, Calendar, Feed)
+- Error handling (error.tsx, not-found.tsx, loading.tsx)
+- Constants file (lib/constants.ts)
+- Custom hooks (useHydration, useLocalStorage)
+- Test setup with Vitest (5 tests passing)
+- Fixed `/calender` typo → `/calendar`
+- Unit components (UnitCard, UnitForm)
+- **ALL PUSHED TO GITHUB** ✅
 
 ### 🚧 In Progress (Team Assignments)
-- **Pouya:** Unit Form component, Mobile responsive design
-- **Raouf:** Placeholder pages (Map, Settings), Database setup
-- **Kit:** Placeholder page (Calendar), FullCalendar research
+- **Pouya:** Mobile responsive design improvements
+- **Raouf:** Leaflet map integration, Database setup
+- **Kit:** FullCalendar integration, Live events feed
 
 ### ⏳ Pending
 - FullCalendar integration (Kit - Week 5)
@@ -263,13 +300,37 @@ syllabus-sync/
 
 ## 📝 Update Log
 
+### Pouya:
+**Date:** 2025-12-28  
+**Scope:** Repository audit, bug fixes, and project completion  
+**Summary:** Comprehensive repository audit and fixes to prepare for project expansion. Fixed critical typo `/calender` → `/calendar`, added missing error handling components, created utility files, expanded test coverage, and updated documentation.  
+**Files Changed:**
+- `app/calendar/page.tsx` - Renamed from `calender`, fixed comment header
+- `app/error.tsx` - NEW: Error boundary component
+- `app/loading.tsx` - NEW: Loading state component  
+- `app/not-found.tsx` - NEW: Custom 404 page
+- `lib/constants.ts` - NEW: App-wide constants
+- `lib/hooks/index.ts` - NEW: Hooks barrel export
+- `lib/hooks/useHydration.ts` - NEW: Client hydration hook
+- `lib/hooks/useLocalStorage.ts` - NEW: localStorage sync hook
+- `tests/TodaySchedule.test.tsx` - NEW: Component tests
+- `tests/NextDeadline.test.tsx` - NEW: Component tests
+- `tsconfig.json` - Added Vitest types
+- `components/layout/Sidebar.tsx` - Fixed calendar route
+- `components/home/QuickActions.tsx` - Fixed calendar route
+- `README.md` - Fixed calender typo
+- `docs/API_REFERENCE.md` - Fixed calender typo
+- `.env.example` - NEW: Environment variables template
+**Verification:** `npm run build` ✅, `npm run lint` ✅, `npm run test` ✅ (5 tests passing)  
+**Follow-ups:** Project is now ready for Phase 2 expansion.
+
 ### Raouf:
 **Date:** 2025-12-28  
 **Scope:** Data seeding, stress algorithm, documentation alignment  
 **Summary:** Guarded sample data seeding until Zustand hydration, updated stress scoring to weighted/time-decay logic, and synced docs/routes/versions with current code.  
 **Files Changed:** `app/home/page.tsx`, `lib/store/deadlinesStore.ts`, `data/sampleUnits.ts`, `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`  
 **Verification:** Not run (not requested)  
-**Follow-ups:** Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.
+**Follow-ups:** ~~Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.~~ ✅ DONE
 
 ### Raouf:
 **Date:** 2025-12-28  

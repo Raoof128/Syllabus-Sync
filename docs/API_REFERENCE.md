@@ -10,7 +10,7 @@ Pages are defined under `app/` and follow Next.js App Router conventions:
 
 - `/home`
 - `/map`
-- `/calender`
+- `/calendar`
 - `/feed`
 - `/settings`
 
