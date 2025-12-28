@@ -23,12 +23,7 @@ const DAY_SHORT: { [key: string]: string } = {
   Sunday: 'Sun',
 };
 
-export default function UnitCard({
-  unit,
-  onEdit,
-  onDelete,
-  showActions = true,
-}: UnitCardProps) {
+export default function UnitCard({ unit, onEdit, onDelete, showActions = true }: UnitCardProps) {
   // Get unique days
   const getUniqueDays = () => {
     const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));
@@ -38,10 +33,7 @@ export default function UnitCard({
   return (
     <Card className="hover:shadow-lg transition-shadow">
       {/* Color indicator bar */}
-      <div
-        className="h-2 rounded-t-lg"
-        style={{ backgroundColor: unit.color }}
-      />
+      <div className="h-2 rounded-t-lg" style={{ backgroundColor: unit.color }} />
 
       <CardHeader>
         <div className="flex items-start justify-between">
@@ -98,10 +90,7 @@ export default function UnitCard({
           </div>
           <div className="space-y-1 pl-6">
             {unit.schedule.map((ct) => (
-              <div
-                key={ct.id}
-                className="text-sm flex items-center justify-between"
-              >
+              <div key={ct.id} className="text-sm flex items-center justify-between">
                 <span className="font-medium">{ct.day}</span>
                 <span className="text-gray-600">
                   {ct.startTime} - {ct.endTime}
@@ -113,10 +102,7 @@ export default function UnitCard({
 
         {/* Color indicator */}
         <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: unit.color }}
-          />
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: unit.color }} />
           <span>Color coding for calendar</span>
         </div>
       </CardContent>

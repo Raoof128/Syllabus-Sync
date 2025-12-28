@@ -57,6 +57,7 @@ docs: update lint instructions
 ## Reporting Issues
 
 Please include:
+
 - Steps to reproduce
 - Expected vs actual behavior
 - Screenshots or logs if helpful

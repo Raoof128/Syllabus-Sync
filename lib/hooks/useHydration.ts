@@ -9,14 +9,13 @@ import { useState, useEffect } from 'react';
  * Useful for avoiding hydration mismatches with localStorage-based stores.
  */
 export function useHydration(): boolean {
-    const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-    /* eslint-disable react-hooks/set-state-in-effect */
-    useEffect(() => {
-        setHydrated(true);
-    }, []);
-    /* eslint-enable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-    return hydrated;
+  return hydrated;
 }
-

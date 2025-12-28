@@ -8,41 +8,40 @@ import { useState, useEffect, useCallback } from 'react';
  * Handles SSR gracefully by only reading from localStorage on client.
  */
 export function useLocalStorage<T>(
-    key: string,
-    initialValue: T
+  key: string,
+  initialValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void] {
-    // State to store our value
-    const [storedValue, setStoredValue] = useState<T>(initialValue);
+  // State to store our value
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-    // Read from localStorage on mount
-    /* eslint-disable react-hooks/set-state-in-effect */
-    useEffect(() => {
-        try {
-            const item = window.localStorage.getItem(key);
-            if (item) {
-                setStoredValue(JSON.parse(item));
-            }
-        } catch (error) {
-            console.warn(`Error reading localStorage key "${key}":`, error);
-        }
-    }, [key]);
-    /* eslint-enable react-hooks/set-state-in-effect */
+  // Read from localStorage on mount
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
+    } catch (error) {
+      console.warn(`Error reading localStorage key "${key}":`, error);
+    }
+  }, [key]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-    // Return a wrapped version of useState's setter function
-    const setValue = useCallback(
-        (value: T | ((prev: T) => T)) => {
-            try {
-                // Allow value to be a function so we have same API as useState
-                const valueToStore = value instanceof Function ? value(storedValue) : value;
-                setStoredValue(valueToStore);
-                window.localStorage.setItem(key, JSON.stringify(valueToStore));
-            } catch (error) {
-                console.warn(`Error setting localStorage key "${key}":`, error);
-            }
-        },
-        [key, storedValue]
-    );
+  // Return a wrapped version of useState's setter function
+  const setValue = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      try {
+        // Allow value to be a function so we have same API as useState
+        const valueToStore = value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch (error) {
+        console.warn(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key, storedValue],
+  );
 
-    return [storedValue, setValue];
+  return [storedValue, setValue];
 }
-

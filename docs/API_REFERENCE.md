@@ -46,15 +46,15 @@ Defined in `lib/types/index.ts`:
 ## Usage Example
 
 ```ts
-import { useUnitsStore } from "@/lib/store/unitsStore";
+import { useUnitsStore } from '@/lib/store/unitsStore';
 
 const addUnit = useUnitsStore((state) => state.addUnit);
 addUnit({
-  id: "unit-1",
-  code: "COMP1000",
-  name: "Intro to CS",
-  color: "#A6192E",
-  location: { building: "C5C", room: "101" },
+  id: 'unit-1',
+  code: 'COMP1000',
+  name: 'Intro to CS',
+  color: '#A6192E',
+  location: { building: 'C5C', room: '101' },
   schedule: [],
   createdAt: new Date(),
 });

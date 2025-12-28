@@ -158,6 +158,7 @@ syllabus-sync/
 │       └── UnitCard.tsx
 ├── lib/
 │   ├── constants.ts         # App-wide constants
+│   ├── utils.ts             # Utility functions (cn helper)
 │   ├── store/               # Zustand stores
 │   │   ├── unitsStore.ts    # Units state management
 │   │   └── deadlinesStore.ts # Deadlines state management
@@ -165,10 +166,8 @@ syllabus-sync/
 │   │   ├── index.ts
 │   │   ├── useHydration.ts
 │   │   └── useLocalStorage.ts
-│   ├── types/
-│   │   └── index.ts         # TypeScript type definitions
-│   └── utils/
-│       └── utils.ts         # Utility functions (cn helper)
+│   └── types/
+│       └── index.ts         # TypeScript type definitions
 ├── data/
 │   ├── sampleUnits.ts       # Sample unit data
 │   └── sampleEvents.ts      # Sample event data
@@ -488,4 +487,4 @@ syllabus-sync/
 ---
 
 *Last Updated: 2025-12-28*  
-*Version: 0.1.0 (Phase 1)*
+*Version: 0.2.0 (Phase 1 Complete)*

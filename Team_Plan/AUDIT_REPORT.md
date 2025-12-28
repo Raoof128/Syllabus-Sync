@@ -4,6 +4,8 @@
 
 A complete audit was performed on The Syllabus Sync project, covering all components, data files, libraries, and documentation. Multiple critical issues were identified and fixed, including type mismatches, broken navigation, incorrect imports, and missing dependencies.
 
+> **Note:** This document describes issues that were found and fixed. All issues listed below have been resolved. The `/calender` route has been renamed to `/calendar`.
+
 ---
 
 ## 📊 Files Audited
@@ -12,7 +14,7 @@ A complete audit was performed on The Syllabus Sync project, covering all compon
 - `app/page.tsx` - Root redirect
 - `app/layout.tsx` - Root layout
 - `app/home/page.tsx` - Homepage
-- `app/calender/page.tsx` - Calendar view
+- `app/calendar/page.tsx` - Calendar view ✅ (renamed from `calender`)
 - `app/feed/page.tsx` - Event feed (NEW)
 - `app/map/page.tsx` - Campus map
 - `app/settings/page.tsx` - Settings

@@ -52,24 +52,28 @@ flowchart LR
 ## ✨ Features
 
 ### 🏠 **Home Dashboard**
+
 - **Today's Schedule:** View your classes for the day with location details
 - **Next Deadline:** Track upcoming assignments and exams
 - **Events Feed:** Discover campus events (Career, Social, Academic, Free Food)
 - **Quick Actions:** Fast access to Map and Calendar
 
 ### 📅 **Smart Calendar** (In Development)
+
 - Visual calendar with class schedules
 - Deadline integration with priority levels
 - Event management
 - Multiple views (month/week/day)
 
 ### 🗺️ **Interactive Campus Map** (In Development)
+
 - Leaflet-powered campus navigation
 - Building markers with room numbers
 - Step-by-step directions between buildings
 - Current location tracking
 
 ### ⚡ **Advanced Features** (Planned)
+
 - Stress Forecast algorithm
 - Study plan suggestions
 - Building crowdedness heatmap
@@ -80,6 +84,7 @@ flowchart LR
 ## ✅ Usage Examples
 
 ### Add a Unit
+
 ```ts
 import { useUnitsStore } from '@/lib/store/unitsStore';
 
@@ -96,6 +101,7 @@ addUnit({
 ```
 
 ### Get Upcoming Deadlines
+
 ```ts
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 
@@ -107,6 +113,7 @@ const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
 ## 🚀 Tech Stack
 
 ### Frontend
+
 - **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
@@ -114,15 +121,18 @@ const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
 - **Icons:** [Lucide React](https://lucide.dev/)
 
 ### Libraries
+
 - **Maps:** [Leaflet](https://leafletjs.com/) + React Leaflet
 - **Calendar:** [FullCalendar](https://fullcalendar.io/)
 - **Date Handling:** [date-fns](https://date-fns.org/)
 
 ### Storage
+
 - **MVP:** localStorage
 - **Production:** [Supabase](https://supabase.com/) (PostgreSQL)
 
 ### Deployment
+
 - **Platform:** [Vercel](https://vercel.com/)
 
 ---
@@ -130,23 +140,27 @@ const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
 ## 📥 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ and npm
 - Git
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/[YOUR-USERNAME]/syllabus-sync.git
    cd syllabus-sync
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Run development server**
+
    ```bash
    npm run dev
    ```
@@ -213,6 +227,7 @@ syllabus-sync/
 ## 🎯 Roadmap
 
 ### ✅ Phase 1 (Weeks 1-2) - COMPLETE
+
 - [x] Project setup (Next.js 16 + TypeScript)
 - [x] Layout components (Sidebar + Header)
 - [x] Home page with Today's Schedule
@@ -221,30 +236,35 @@ syllabus-sync/
 - [x] State management (Zustand)
 
 ### 🚧 Phase 2 (Weeks 3-4) - IN PROGRESS
+
 - [ ] Unit Form (Add/Edit/Delete)
 - [ ] Deadline management
 - [ ] Stress Forecast algorithm
 - [ ] Database setup (Supabase)
 
 ### ⏳ Phase 3 (Week 5) - Calendar
+
 - [ ] FullCalendar integration
 - [ ] Class schedule visualization
 - [ ] Deadline integration
 - [ ] Event management
 
 ### ⏳ Phase 4 (Week 6) - Map
+
 - [ ] Leaflet map setup
 - [ ] Building markers
 - [ ] Navigation routing
 - [ ] Current location tracking
 
 ### ⏳ Phase 5 (Week 7) - Events & Polish
+
 - [ ] Live events feed
 - [ ] Event interactivity (RSVP, reminders)
 - [ ] UI refinements
 - [ ] Mobile optimization
 
 ### ⏳ Phase 6 (Week 8) - Demo Preparation
+
 - [ ] Demo script
 - [ ] Pitch deck (9 slides)
 - [ ] Demo video
@@ -255,11 +275,13 @@ syllabus-sync/
 ## 🎨 Design System
 
 ### Macquarie University Branding
+
 - **Primary Red:** `#A6192E`
 - **Primary Blue:** `#002A45`
 - **Accent Gold:** `#FFB81C`
 
 ### UI Components
+
 - Built with [Shadcn UI](https://ui.shadcn.com/)
 - Responsive design (mobile-first)
 - Accessible (WCAG 2.1 AA)
@@ -271,6 +293,7 @@ syllabus-sync/
 We're currently a closed team working on the demo, but we welcome feedback and suggestions!
 
 ### Development Workflow
+
 1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 2. Create feature branch
 3. Make changes
@@ -281,20 +304,24 @@ We're currently a closed team working on the demo, but we welcome feedback and s
 8. Create Pull Request
 
 ### Code Style
+
 - TypeScript strict mode
 - ESLint + Prettier
 - Conventional Commits
 
 ### Linting & CI
+
 - Local lint: `npm run lint` (prints `Lint OK` on success)
 - CI lint: GitHub Actions workflow at `.github/workflows/lint.yml`
 - CI tests: GitHub Actions workflow at `.github/workflows/test.yml`
 
 ### Testing
+
 - Run tests: `npm run test`
 - Watch mode: `npm run test:watch`
 
 ### Formatting
+
 - Format code: `npm run format`
 - Check formatting: `npm run format:check`
 

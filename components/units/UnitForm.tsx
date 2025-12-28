@@ -104,11 +104,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   };
 
   const updateClassTime = (id: string, field: keyof ClassTime, value: string) => {
-    setSchedule(
-      schedule.map((ct) =>
-        ct.id === id ? { ...ct, [field]: value } : ct
-      )
-    );
+    setSchedule(schedule.map((ct) => (ct.id === id ? { ...ct, [field]: value } : ct)));
   };
 
   const validateForm = (): boolean => {
@@ -206,9 +202,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               onChange={(e) => setCode(e.target.value)}
               className={errors.code ? 'border-red-500' : ''}
             />
-            {errors.code && (
-              <p className="text-sm text-red-500">{errors.code}</p>
-            )}
+            {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
           </div>
 
           {/* Unit Name */}
@@ -223,9 +217,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               onChange={(e) => setName(e.target.value)}
               className={errors.name ? 'border-red-500' : ''}
             />
-            {errors.name && (
-              <p className="text-sm text-red-500">{errors.name}</p>
-            )}
+            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
           </div>
 
           {/* Location */}
@@ -241,9 +233,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 onChange={(e) => setBuilding(e.target.value)}
                 className={errors.building ? 'border-red-500' : ''}
               />
-              {errors.building && (
-                <p className="text-sm text-red-500">{errors.building}</p>
-              )}
+              {errors.building && <p className="text-sm text-red-500">{errors.building}</p>}
             </div>
 
             <div className="space-y-2">
@@ -257,9 +247,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 onChange={(e) => setRoom(e.target.value)}
                 className={errors.room ? 'border-red-500' : ''}
               />
-              {errors.room && (
-                <p className="text-sm text-red-500">{errors.room}</p>
-              )}
+              {errors.room && <p className="text-sm text-red-500">{errors.room}</p>}
             </div>
           </div>
 
@@ -269,10 +257,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger>
                 <div className="flex items-center gap-2">
-                  <div
-                    className="w-4 h-4 rounded"
-                    style={{ backgroundColor: color }}
-                  />
+                  <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
                   <SelectValue />
                 </div>
               </SelectTrigger>
@@ -280,10 +265,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 {COLORS.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded"
-                        style={{ backgroundColor: c.value }}
-                      />
+                      <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />
                       {c.name}
                     </div>
                   </SelectItem>
@@ -298,12 +280,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               <Label>
                 Class Times <span className="text-red-500">*</span>
               </Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addClassTime}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={addClassTime}>
                 <Plus className="w-4 h-4 mr-1" />
                 Add Class Time
               </Button>
@@ -315,19 +292,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
             <div className="space-y-3">
               {schedule.map((ct, index) => (
-                <div
-                  key={ct.id}
-                  className="flex items-start gap-2 p-3 border rounded-lg"
-                >
+                <div key={ct.id} className="flex items-start gap-2 p-3 border rounded-lg">
                   <div className="flex-1 grid grid-cols-3 gap-2">
                     {/* Day */}
                     <div className="space-y-1">
                       <Label className="text-xs">Day</Label>
                       <Select
                         value={ct.day}
-                        onValueChange={(value) =>
-                          updateClassTime(ct.id, 'day', value)
-                        }
+                        onValueChange={(value) => updateClassTime(ct.id, 'day', value)}
                       >
                         <SelectTrigger className="h-9">
                           <SelectValue />
@@ -348,9 +320,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                       <Input
                         type="time"
                         value={ct.startTime}
-                        onChange={(e) =>
-                          updateClassTime(ct.id, 'startTime', e.target.value)
-                        }
+                        onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
                         className="h-9"
                       />
                     </div>
@@ -361,9 +331,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                       <Input
                         type="time"
                         value={ct.endTime}
-                        onChange={(e) =>
-                          updateClassTime(ct.id, 'endTime', e.target.value)
-                        }
+                        onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
                         className="h-9"
                       />
                     </div>
@@ -395,11 +363,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         <DialogFooter className="flex justify-between">
           <div>
             {editUnit && (
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-              >
+              <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete Unit
               </Button>

@@ -64,8 +64,7 @@ export const sampleEvents: Event[] = [
   {
     id: 'event-7',
     title: 'Breakfast Club - Free Breakfast',
-    description:
-      'Start your day right with a free healthy breakfast! First 100 students only.',
+    description: 'Start your day right with a free healthy breakfast! First 100 students only.',
     date: new Date('2025-01-31T08:00:00'),
     time: '8:00 AM',
     location: 'Student Dining Hall',
@@ -74,8 +73,7 @@ export const sampleEvents: Event[] = [
   {
     id: 'event-8',
     title: 'Board Games Night',
-    description:
-      'Unwind with board games, card games, and good company. All skill levels welcome!',
+    description: 'Unwind with board games, card games, and good company. All skill levels welcome!',
     date: new Date('2025-01-31T19:00:00'),
     time: '7:00 PM',
     location: 'Student Recreation Room',
