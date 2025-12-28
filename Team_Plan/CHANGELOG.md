@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Pending
 - Unit Form component (modal dialog for Add/Edit/Delete) - Pouya
 - ~~Placeholder pages (Map, Settings) - Raouf~~ ✅ DONE
-- Placeholder page (Calendar) - Kit
+- ~~Placeholder page (Calendar, Feed) - Kit~~ ✅ DONE
 - Mobile responsive design improvements - Pouya
 - FullCalendar integration - Kit (Week 5)
 - Leaflet map integration - Raouf (Week 6)
@@ -20,6 +20,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stress forecast algorithm - Pouya (Week 4)
 - Demo preparation materials - All (Week 8)
 - ~~Database schema design - Raouf~~ ✅ DONE (DATABASE_SCHEMA.md created)
+
+---
+
+## [0.1.1] - 2025-12-28
+
+### Added
+- **Feed Page** (`app/feed/page.tsx`) - Full event feed implementation
+  - Interactive filtering by category (All, Academic, Career, Social, Free Food)
+  - Event cards with descriptions, dates, times, and locations
+  - Quick stats sidebar showing event counts
+  - Announcements section for project updates
+  - Category legend for easy reference
+  - "Remind Me" buttons for each event (UI only)
+
+- **Label Component** (`components/ui/label.tsx`)
+  - Shadcn UI Label component using @radix-ui/react-label
+  - Required for UnitForm component functionality
+
+- **DayOfWeek Type** (`lib/types/index.ts`)
+  - Exported DayOfWeek type for better type safety
+  - Now includes Saturday and Sunday for full week coverage
+
+### Changed
+- **Calendar Page** (`app/calender/page.tsx`)
+  - Complete redesign matching Map and Settings page patterns
+  - Added Card-based layout with consistent styling
+  - Feature preview cards for upcoming functionality
+  - Planned features section with detailed descriptions
+  - Development notice banner
+  - Changed from centered placeholder to full-page layout
+
+- **Sample Events Data** (`data/sampleEvents.ts`) - **CRITICAL FIX**
+  - Fixed type mismatch: Changed date strings to Date objects
+  - Updated time format from 24-hour (14:00) to 12-hour (2:00 PM)
+  - Removed `imageUrl: null` properties (using optional typing)
+  - Now properly matches Event interface type definition
+
+- **EventsFeed Component** (`components/home/EventsFeed.tsx`) - **CRITICAL FIX**
+  - Fixed incorrect import from `@/data/sampleUnits` to `@/data/sampleEvents`
+  - Events now display correctly on home page
+
+- **QuickActions Component** (`components/home/QuickActions.tsx`) - **NAVIGATION FIX**
+  - Fixed Map link from `/map-live` to `/map`
+  - Fixed Calendar link from `/calendar` to `/calender`
+  - Navigation buttons now work correctly
+
+- **UnitForm Component** (`components/units/UnitForm.tsx`)
+  - Fixed createdAt field to use Date instead of string
+  - Now matches Unit interface type definition
+
+- **Home Page** (`app/home/page.tsx`)
+  - Fixed file path comment from `// app/page.tsx` to `// app/home/page.tsx`
+
+- **Settings Page** (`app/settings/page.tsx`)
+  - Updated "Last Update" date to Dec 28, 2025
+
+- **Types** (`lib/types/index.ts`)
+  - Updated ClassTime.day to use DayOfWeek type
+  - Added Saturday and Sunday to day options
+
+### Fixed
+- **404 Errors:** All navigation routes now work correctly
+- **Type Safety:** All data types now match interface definitions
+- **Import Paths:** Fixed incorrect import statements
+- **Component Dependencies:** Resolved missing Label component
+
+### Dependencies
+- **Added:** `@radix-ui/react-label` (v1.x)
 
 ---
 

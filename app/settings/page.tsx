@@ -250,7 +250,7 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Last Update</span>
-                                    <span className="text-gray-900">Dec 27, 2025</span>
+                                    <span className="text-gray-900">Dec 28, 2025</span>
                                 </div>
                             </div>
                         </CardContent>

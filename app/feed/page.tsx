@@ -125,11 +125,18 @@ export default function FeedPage() {
                                             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                                                 <div className="flex items-center gap-1">
                                                     <Calendar className="h-4 w-4" />
-                                                    {new Date(event.date).toLocaleDateString('en-AU', {
-                                                        weekday: 'short',
-                                                        month: 'short',
-                                                        day: 'numeric'
-                                                    })}
+                                                    {event.date instanceof Date
+                                                        ? event.date.toLocaleDateString('en-AU', {
+                                                            weekday: 'short',
+                                                            month: 'short',
+                                                            day: 'numeric'
+                                                        })
+                                                        : new Date(event.date).toLocaleDateString('en-AU', {
+                                                            weekday: 'short',
+                                                            month: 'short',
+                                                            day: 'numeric'
+                                                        })
+                                                    }
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <Clock className="h-4 w-4" />

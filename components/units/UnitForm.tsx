@@ -153,7 +153,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         room: room.trim(),
       },
       schedule,
-      createdAt: editUnit?.createdAt || new Date().toISOString(),
+      createdAt: editUnit?.createdAt || new Date(),
     };
 
     if (editUnit) {

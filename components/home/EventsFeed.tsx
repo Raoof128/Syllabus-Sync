@@ -4,7 +4,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock } from 'lucide-react';
-import { sampleEvents } from '@/data/sampleUnits';
+import { sampleEvents } from '@/data/sampleEvents';
 
 const categoryColors = {
     Career: 'bg-blue-100 text-blue-800',

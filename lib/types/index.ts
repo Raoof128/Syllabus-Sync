@@ -1,5 +1,7 @@
 // lib/types/index.ts
 
+export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
 export interface Unit {
     id: string;
     code: string;              // "COMP2310"
@@ -15,7 +17,7 @@ export interface Unit {
 
 export interface ClassTime {
     id: string;
-    day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
+    day: DayOfWeek;
     startTime: string;         // "09:00"
     endTime: string;           // "11:00"
 }
