@@ -45,6 +45,33 @@ This project is being developed as a demo for presentation to Macquarie Universi
 
 ---
 
+## ✅ Usage Examples
+
+### Add a Unit
+```ts
+import { useUnitsStore } from '@/lib/store/unitsStore';
+
+const addUnit = useUnitsStore((state) => state.addUnit);
+addUnit({
+  id: 'unit-1',
+  code: 'COMP1000',
+  name: 'Intro to CS',
+  color: '#A6192E',
+  location: { building: 'C5C', room: '101' },
+  schedule: [],
+  createdAt: new Date(),
+});
+```
+
+### Get Upcoming Deadlines
+```ts
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+
+const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
+```
+
+---
+
 ## 🚀 Tech Stack
 
 ### Frontend
@@ -143,6 +170,11 @@ syllabus-sync/
 - **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
 - **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
 - **[TEAM_ROADMAP.md](Team_Plan/TEAM_ROADMAP.md)** - Team tasks and timeline
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Architecture overview
+- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Type and store reference
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
+- **[SECURITY.md](SECURITY.md)** - Security reporting
 
 ---
 
@@ -207,11 +239,14 @@ syllabus-sync/
 We're currently a closed team working on the demo, but we welcome feedback and suggestions!
 
 ### Development Workflow
-1. Read [GIT_WORKFLOW.md](GIT_WORKFLOW.md)
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 2. Create feature branch
 3. Make changes
-4. Test locally
-5. Create Pull Request
+4. Run `npm run lint` and confirm `Lint OK`
+5. Run `npm run test`
+6. Run `npm run format:check`
+7. Test locally
+8. Create Pull Request
 
 ### Code Style
 - TypeScript strict mode
@@ -221,6 +256,15 @@ We're currently a closed team working on the demo, but we welcome feedback and s
 ### Linting & CI
 - Local lint: `npm run lint` (prints `Lint OK` on success)
 - CI lint: GitHub Actions workflow at `.github/workflows/lint.yml`
+- CI tests: GitHub Actions workflow at `.github/workflows/test.yml`
+
+### Testing
+- Run tests: `npm run test`
+- Watch mode: `npm run test:watch`
+
+### Formatting
+- Format code: `npm run format`
+- Check formatting: `npm run format:check`
 
 ---
 
@@ -264,6 +308,18 @@ npm start
 
 # Run linter
 npm run lint
+
+# Run tests
+npm run test
+
+# Watch tests
+npm run test:watch
+
+# Format code
+npm run format
+
+# Check formatting
+npm run format:check
 ```
 
 ---
@@ -271,7 +327,7 @@ npm run lint
 ## 📊 Project Status
 
 **Current Version:** 0.1.0 (Phase 1)  
-**Last Updated:** December 27, 2025  
+**Last Updated:** December 28, 2025  
 **Status:** 🚧 Active Development
 
 ---

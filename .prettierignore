@@ -1,0 +1,9 @@
+.next
+node_modules
+out
+dist
+coverage
+.idea
+.vscode
+public
+Team_Plan

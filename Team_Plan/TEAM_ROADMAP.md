@@ -653,10 +653,12 @@ git push origin main
 
 ### **Before Pushing Code**
 1. Run lint after each edit (`npm run lint`) and confirm `Lint OK`
-2. Test locally (`npm run dev`)
-3. Check for console errors
-4. Test on mobile (if UI changes)
-5. Write clear commit message
+2. Run tests (`npm run test`)
+3. Run format check (`npm run format:check`)
+4. Test locally (`npm run dev`)
+5. Check for console errors
+6. Test on mobile (if UI changes)
+7. Write clear commit message
 
 ### **Merge Conflicts**
 - Don't panic
