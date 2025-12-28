@@ -1,4 +1,4 @@
-// app/calender/page.tsx
+// app/calendar/page.tsx
 "use client";
 
 import { Calendar, Filter, Clock, Bell, Grid3x3, List, Info } from "lucide-react";

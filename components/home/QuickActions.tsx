@@ -14,7 +14,7 @@ export default function QuickActions() {
             </Button>
 
             <Button asChild variant="outline" size="lg">
-                <Link href="/calender" className="gap-2">
+                <Link href="/calendar" className="gap-2">
                     <Calendar className="h-5 w-5" />
                     View Calendar
                 </Link>

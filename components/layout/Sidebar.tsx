@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils/utils';
 const navigation = [
     { name: 'Home', href: '/home', icon: Home },
     { name: 'Map', href: '/map', icon: MapPin },
-    { name: 'Calendar', href: '/calender', icon: Calendar },
+    { name: 'Calendar', href: '/calendar', icon: Calendar },
     { name: 'Feed', href: '/feed', icon: MessageSquare },
     { name: 'Settings', href: '/settings', icon: Settings },
 ];
