@@ -58,16 +58,29 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             },
 
             getStressLevel: (): StressLevel => {
-                const upcoming = get().getUpcoming(10);
-                const nextWeek = new Date();
-                nextWeek.setDate(nextWeek.getDate() + 7);
+                const upcoming = get().getUpcoming(20);
+                const now = new Date();
+                const priorityPoints: Record<Deadline['priority'], number> = {
+                    Urgent: 4,
+                    High: 3,
+                    Medium: 2,
+                    Low: 1,
+                };
 
-                const urgentCount = upcoming.filter(
-                    (d) => new Date(d.dueDate) <= nextWeek
-                ).length;
+                const totalPoints = upcoming.reduce((sum, deadline) => {
+                    const dueDate = new Date(deadline.dueDate);
+                    const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    const timeWeight =
+                        daysUntil <= 1 ? 1.5 :
+                            daysUntil <= 3 ? 1.25 :
+                                daysUntil <= 7 ? 1 :
+                                    daysUntil <= 14 ? 0.75 : 0.5;
 
-                if (urgentCount >= 4) return 'High';
-                if (urgentCount >= 2) return 'Busy';
+                    return sum + priorityPoints[deadline.priority] * timeWeight;
+                }, 0);
+
+                if (totalPoints >= 12) return 'High';
+                if (totalPoints >= 6) return 'Busy';
                 return 'Low';
             },
         }),

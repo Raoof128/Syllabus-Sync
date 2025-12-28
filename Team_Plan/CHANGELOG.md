@@ -21,6 +21,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo preparation materials - All (Week 8)
 - ~~Database schema design - Raouf~~ ✅ DONE (DATABASE_SCHEMA.md created)
 
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Data seeding, stress algorithm, documentation alignment  
+**Summary:** Prevented duplicate sample seeding after hydration, updated stress scoring to weighted/time-decay model, and aligned docs/routes/versions to the current codebase.  
+**Files Changed:** `app/home/page.tsx`, `lib/store/deadlinesStore.ts`, `data/sampleUnits.ts`, `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`  
+**Verification:** Not run (not requested)  
+**Follow-ups:** Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint fixes for UI copy, UnitForm effect, and Tailwind config  
+**Summary:** Escaped apostrophes, removed unused imports, adjusted UnitForm initialization for lint, and switched Tailwind plugin import to ESM.  
+**Files Changed:** `app/home/page.tsx`, `components/home/TodaySchedule.tsx`, `components/units/UnitCard.tsx`, `components/units/UnitForm.tsx`, `tailwind.config.ts`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint` (timed out), `npx eslint app/home/page.tsx components/home/TodaySchedule.tsx components/units/UnitCard.tsx components/units/UnitForm.tsx tailwind.config.ts` (timed out)  
+**Follow-ups:** Re-run lint with a longer timeout or investigate eslint performance.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint configuration and CI workflow  
+**Summary:** Scoped lint targets, added ignore paths for non-source directories, and created a GitHub Actions lint workflow.  
+**Files Changed:** `eslint.config.mjs`, `package.json`, `.github/workflows/lint.yml`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint`  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint documentation  
+**Summary:** Documented local lint command and CI lint workflow in project docs.  
+**Files Changed:** `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/CHANGELOG.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint success message  
+**Summary:** Added a success message to the lint script and documented it.  
+**Files Changed:** `package.json`, `README.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint`  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Team lint workflow guidance  
+**Summary:** Documented running lint after each edit in the team workflow checklist.  
+**Files Changed:** `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.
+
 ---
 
 ## [0.1.1] - 2025-12-28
@@ -99,17 +147,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Welcome Message** (`app/page.tsx`)
   - Changed "Welcome, Raouf!" to "Welcome, Admin!"
 
-- **Map Page Route** (`app/map` → `app/map-live`)
-  - Renamed folder from `map` to `map-live` to match sidebar navigation
-  - Route now correctly matches `/map-live` link in Sidebar
+- **Map Page Route** (`app/map-live` → `app/map`)
+  - Aligned folder name and sidebar navigation to `/map`
+  - Route now correctly matches the Map link in Sidebar
 
 #### Fixed
 - **Map Tab 404 Error**
-  - Map page was at `/map` but sidebar linked to `/map-live`
-  - Renamed folder to resolve 404 error
+  - Sidebar and page route are aligned to `/map`
+  - Navigation no longer hits a missing route
 
 **Notes:**
-- Map + Live tab now works correctly
+- Map tab now works correctly
 - Welcome message is now generic for any user
 
 ---
@@ -177,8 +225,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Time and location with icons
     - Hover effects
   - `QuickActions.tsx`: Two action buttons
-    - "Open Map" (primary) - links to /map-live
-    - "View Calendar" (outline) - links to /calendar
+  - "Open Map" (primary) - links to /map
+  - "View Calendar" (outline) - links to /calender
 
 - **Home Page Assembly** (`app/page.tsx`)
   - 'use client' directive for state hooks

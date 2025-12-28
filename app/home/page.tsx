@@ -1,7 +1,7 @@
 // app/home/page.tsx
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
@@ -9,7 +9,6 @@ import QuickActions from '@/components/home/QuickActions';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
-import { Button } from '@/components/ui/button';
 import { Info } from 'lucide-react';
 
 export default function HomePage() {
@@ -17,16 +16,40 @@ export default function HomePage() {
     const addUnit = useUnitsStore((state) => state.addUnit);
     const deadlines = useDeadlinesStore((state) => state.deadlines);
     const addDeadline = useDeadlinesStore((state) => state.addDeadline);
+    const [hasHydrated, setHasHydrated] = useState(false);
+    const hasSeededRef = useRef(false);
+
+    useEffect(() => {
+        const checkHydration = () => {
+            const unitsHydrated = useUnitsStore.persist.hasHydrated();
+            const deadlinesHydrated = useDeadlinesStore.persist.hasHydrated();
+            setHasHydrated(unitsHydrated && deadlinesHydrated);
+        };
+
+        checkHydration();
+        const unsubscribeUnits = useUnitsStore.persist.onFinishHydration(checkHydration);
+        const unsubscribeDeadlines = useDeadlinesStore.persist.onFinishHydration(checkHydration);
+
+        return () => {
+            unsubscribeUnits();
+            unsubscribeDeadlines();
+        };
+    }, []);
 
     // Load sample data on first visit
     useEffect(() => {
+        if (!hasHydrated || hasSeededRef.current) {
+            return;
+        }
+
         if (units.length === 0) {
             sampleUnits.forEach(addUnit);
         }
         if (deadlines.length === 0) {
             sampleDeadlines.forEach(addDeadline);
         }
-    }, []);
+        hasSeededRef.current = true;
+    }, [addDeadline, addUnit, deadlines.length, hasHydrated, units.length]);
 
     const hasUnits = units.length > 0;
 
@@ -38,7 +61,7 @@ export default function HomePage() {
                     Welcome, Admin!
                 </h1>
                 <p className="text-gray-600">
-                    Here's your day at a glance.
+                    Here&apos;s your day at a glance.
                 </p>
             </div>
 

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface UnitCardProps {
   unit: Unit;
@@ -30,17 +29,6 @@ export default function UnitCard({
   onDelete,
   showActions = true,
 }: UnitCardProps) {
-  // Format class times for display
-  const formatClassTimes = () => {
-    return unit.schedule
-      .map((ct) => {
-        const start = ct.startTime;
-        const end = ct.endTime;
-        return `${DAY_SHORT[ct.day]} ${start}-${end}`;
-      })
-      .join(', ');
-  };
-
   // Get unique days
   const getUniqueDays = () => {
     const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));

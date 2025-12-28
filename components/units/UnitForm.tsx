@@ -63,7 +63,18 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  const resetForm = () => {
+    setCode('');
+    setName('');
+    setBuilding('');
+    setRoom('');
+    setColor(COLORS[0].value);
+    setSchedule([]);
+    setErrors({});
+  };
+
   // Initialize form with edit data
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editUnit) {
       setCode(editUnit.code);
@@ -76,16 +87,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       resetForm();
     }
   }, [editUnit, open]);
-
-  const resetForm = () => {
-    setCode('');
-    setName('');
-    setBuilding('');
-    setRoom('');
-    setColor(COLORS[0].value);
-    setSchedule([]);
-    setErrors({});
-  };
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const addClassTime = () => {
     const newClassTime: ClassTime = {

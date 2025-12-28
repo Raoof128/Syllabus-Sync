@@ -4,7 +4,6 @@
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, MapPin } from 'lucide-react';
-import { format } from 'date-fns';
 
 export default function TodaySchedule() {
     const getTodayClasses = useUnitsStore((state) => state.getTodayClasses);
@@ -14,7 +13,7 @@ export default function TodaySchedule() {
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Today's Classes</CardTitle>
+                    <CardTitle>Today&apos;s Classes</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-gray-500 text-center py-8">
@@ -28,7 +27,7 @@ export default function TodaySchedule() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Today's Classes</CardTitle>
+                <CardTitle>Today&apos;s Classes</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                 {todayClasses.map((cls, idx) => (

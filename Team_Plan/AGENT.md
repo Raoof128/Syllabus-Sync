@@ -21,7 +21,7 @@
 ## 🚀 Core Features
 
 ### Phase 1 (Weeks 1-2) - MVP Setup ✅
-- [x] Project initialization (Next.js 14 + TypeScript)
+- [x] Project initialization (Next.js 16 + TypeScript)
 - [x] Basic layout (Sidebar + Header)
 - [x] Home page with Today's Schedule
 - [x] Next Deadline display
@@ -65,7 +65,7 @@
 ## 💻 Tech Stack
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS + Shadcn UI
 - **State Management:** Zustand
@@ -88,7 +88,7 @@
 
 ### Team Members
 1. **Pouya (Frontend Lead)**
-   - Responsibilities: Next.js 14 + TypeScript, Zustand state management, Home Tab
+   - Responsibilities: Next.js 16 + TypeScript, Zustand state management, Home Tab
    - Current Status: ✅ Phase 1 Complete (pushed to GitHub)
 
 2. **Raouf (Map & Database Developer)**
@@ -128,9 +128,9 @@
 syllabus-sync/
 ├── app/
 │   ├── layout.tsx           # Root layout with Sidebar + Header
-│   ├── page.tsx             # Home page
-│   ├── map-live/            # Map + Live page (placeholder)
-│   ├── calendar/            # Calendar page (placeholder)
+│   ├── page.tsx             # Root redirect
+│   ├── map/                 # Map page (placeholder)
+│   ├── calender/            # Calendar page (placeholder)
 │   ├── settings/            # Settings page (placeholder)
 │   └── globals.css
 ├── components/
@@ -165,7 +165,7 @@ syllabus-sync/
 ## 🔧 Current Status
 
 ### ✅ Completed (as of 2025-12-27)
-- Project initialization with Next.js 14 + TypeScript
+- Project initialization with Next.js 16 + TypeScript
 - Tailwind CSS + Shadcn UI setup
 - Zustand stores (unitsStore, deadlinesStore)
 - TypeScript type definitions
@@ -199,7 +199,8 @@ syllabus-sync/
 1. Create feature branch: `git checkout -b feature/[feature-name]`
 2. Implement feature
 3. Test locally: `npm run dev`
-4. Commit changes: `git commit -m "feat: [description]"`
+4. Run lint: `npm run lint`
+5. Commit changes: `git commit -m "feat: [description]"`
 
 ### After Completing Task
 1. Update this `agent.md` file with header **"Pouya:"**
@@ -246,7 +247,7 @@ syllabus-sync/
 - **GitHub:** `https://github.com/[USERNAME]/syllabus-sync`
 
 ### Documentation
-- **Next.js 14 Docs:** https://nextjs.org/docs
+- **Next.js Docs:** https://nextjs.org/docs
 - **Shadcn UI Docs:** https://ui.shadcn.com/docs
 - **Zustand Docs:** https://docs.pmnd.rs/zustand
 - **Leaflet Docs:** https://leafletjs.com/reference.html
@@ -261,15 +262,63 @@ syllabus-sync/
 ## 📝 Update Log
 
 ### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Data seeding, stress algorithm, documentation alignment  
+**Summary:** Guarded sample data seeding until Zustand hydration, updated stress scoring to weighted/time-decay logic, and synced docs/routes/versions with current code.  
+**Files Changed:** `app/home/page.tsx`, `lib/store/deadlinesStore.ts`, `data/sampleUnits.ts`, `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`  
+**Verification:** Not run (not requested)  
+**Follow-ups:** Consider renaming `/calender` to `/calendar` when ready to avoid misspelling.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint fixes for UI copy, UnitForm effect, and Tailwind config  
+**Summary:** Escaped apostrophes, removed unused imports, adjusted UnitForm initialization for lint, and switched Tailwind plugin import to ESM.  
+**Files Changed:** `app/home/page.tsx`, `components/home/TodaySchedule.tsx`, `components/units/UnitCard.tsx`, `components/units/UnitForm.tsx`, `tailwind.config.ts`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint` (timed out), `npx eslint app/home/page.tsx components/home/TodaySchedule.tsx components/units/UnitCard.tsx components/units/UnitForm.tsx tailwind.config.ts` (timed out)  
+**Follow-ups:** Re-run lint with a longer timeout or investigate eslint performance.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint configuration and CI workflow  
+**Summary:** Scoped lint targets, added ignore paths for non-source directories, and created a GitHub Actions lint workflow.  
+**Files Changed:** `eslint.config.mjs`, `package.json`, `.github/workflows/lint.yml`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint`  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint documentation  
+**Summary:** Documented local lint command and CI lint workflow in project docs.  
+**Files Changed:** `README.md`, `Team_Plan/AGENT.md`, `Team_Plan/CHANGELOG.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Lint success message  
+**Summary:** Added a success message to the lint script and documented it.  
+**Files Changed:** `package.json`, `README.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** `npm run lint`  
+**Follow-ups:** None.
+
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Team lint workflow guidance  
+**Summary:** Documented running lint after each edit in the team workflow checklist.  
+**Files Changed:** `Team_Plan/TEAM_ROADMAP.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.
+
+### Raouf:
 **Date:** 2025-12-27  
 **Task:** Week 2 Tasks Complete - Placeholder Pages, Database Schema & UI Polish
 
 **Completed:**
-- ✅ Map placeholder page (`app/map-live/page.tsx`)
+- ✅ Map placeholder page (`app/map/page.tsx`)
   - Interactive Map placeholder with feature preview cards
   - Building Markers, Navigation, Live Location previews
   - Consistent UI matching Home page design
-  - Route: `/map-live` (matches Sidebar "Map + Live" tab)
+  - Route: `/map` (matches Sidebar "Map" tab)
 - ✅ Settings placeholder page (`app/settings/page.tsx`)
   - Profile, Notifications, Appearance, Privacy & Security sections
   - Data Sync sidebar widget
@@ -292,7 +341,7 @@ syllabus-sync/
   - Prevents errors from browser extensions modifying DOM
 - ✅ Quick Fixes
   - Changed welcome message from "Raouf" to "Admin" (`app/page.tsx`)
-  - Fixed Map tab 404 error by renaming `app/map` to `app/map-live`
+  - Fixed Map tab 404 error by aligning Map route and sidebar link to `/map`
 
 **Next Steps for Raouf:**
 - Week 3: Create Supabase project and run SQL scripts
@@ -306,7 +355,7 @@ syllabus-sync/
 **Task:** Phase 1 Complete - Home Tab Implementation
 
 **Completed:**
-- ✅ Next.js 14 + TypeScript project initialization
+- ✅ Next.js 16 + TypeScript project initialization
 - ✅ Tailwind CSS + Shadcn UI setup
 - ✅ Zustand state management (unitsStore, deadlinesStore)
 - ✅ TypeScript type definitions (Unit, ClassTime, Deadline, Event, StressLevel)

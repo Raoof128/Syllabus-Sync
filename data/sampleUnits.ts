@@ -1,5 +1,5 @@
 // data/sampleUnits.ts
-import { Unit, Deadline, Event } from '@/lib/types';
+import { Unit, Deadline } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 export const sampleUnits: Unit[] = [
@@ -98,35 +98,5 @@ export const sampleDeadlines: Deadline[] = [
         type: 'Presentation',
         completed: false,
         createdAt: new Date(),
-    },
-];
-
-export const sampleEvents: Event[] = [
-    {
-        id: uuidv4(),
-        title: 'Study Workshop',
-        description: 'Learn effective study techniques',
-        date: new Date(),
-        time: '2:00 PM',
-        location: 'Library Room 204',
-        category: 'Academic',
-    },
-    {
-        id: uuidv4(),
-        title: 'Free Pizza',
-        description: 'Free pizza for all students!',
-        date: new Date(),
-        time: '6:00 PM',
-        location: 'Student Lounge',
-        category: 'Free Food',
-    },
-    {
-        id: uuidv4(),
-        title: 'Career Fair - Tech Companies',
-        description: 'Meet recruiters from top tech companies',
-        date: new Date(),
-        time: '12:00 PM',
-        location: 'Hub Courtyard',
-        category: 'Career',
     },
 ];

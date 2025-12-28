@@ -2,7 +2,7 @@
 
 **Campus navigation and schedule management for Macquarie University**
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -48,7 +48,7 @@ This project is being developed as a demo for presentation to Macquarie Universi
 ## 🚀 Tech Stack
 
 ### Frontend
-- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
 - **State Management:** [Zustand](https://docs.pmnd.rs/zustand)
@@ -103,11 +103,13 @@ This project is being developed as a demo for presentation to Macquarie Universi
 
 ```
 syllabus-sync/
-├── app/                      # Next.js 14 App Router
+├── app/                      # Next.js App Router
 │   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Home page
+│   ├── page.tsx             # Root redirect
+│   ├── home/                # Home page
 │   ├── map/                 # Map page
-│   ├── calendar/            # Calendar page
+│   ├── calender/            # Calendar page
+│   ├── feed/                # Feed page
 │   └── settings/            # Settings page
 ├── components/
 │   ├── ui/                  # Shadcn UI components
@@ -119,8 +121,7 @@ syllabus-sync/
 ├── lib/
 │   ├── store/               # Zustand stores
 │   │   ├── unitsStore.ts
-│   │   ├── deadlinesStore.ts
-│   │   └── eventsStore.ts
+│   │   └── deadlinesStore.ts
 │   ├── types/               # TypeScript types
 │   └── utils.ts             # Utility functions
 ├── data/                     # Sample data
@@ -139,17 +140,16 @@ syllabus-sync/
 
 ## 📝 Documentation
 
-- **[agent.md](agent.md)** - Complete project documentation
+- **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
 - **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
 - **[TEAM_ROADMAP.md](Team_Plan/TEAM_ROADMAP.md)** - Team tasks and timeline
-- **[GIT_WORKFLOW.md](GIT_WORKFLOW.md)** - Git collaboration guide
 
 ---
 
 ## 🎯 Roadmap
 
 ### ✅ Phase 1 (Weeks 1-2) - COMPLETE
-- [x] Project setup (Next.js 14 + TypeScript)
+- [x] Project setup (Next.js 16 + TypeScript)
 - [x] Layout components (Sidebar + Header)
 - [x] Home page with Today's Schedule
 - [x] Next Deadline widget
@@ -217,6 +217,10 @@ We're currently a closed team working on the demo, but we welcome feedback and s
 - TypeScript strict mode
 - ESLint + Prettier
 - Conventional Commits
+
+### Linting & CI
+- Local lint: `npm run lint` (prints `Lint OK` on success)
+- CI lint: GitHub Actions workflow at `.github/workflows/lint.yml`
 
 ---
 

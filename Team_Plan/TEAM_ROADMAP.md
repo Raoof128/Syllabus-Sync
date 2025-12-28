@@ -155,21 +155,16 @@ npm run dev
 
 **Current Algorithm:**
 ```typescript
-// Count urgent deadlines in next 7 days
-≥4 urgent = High stress
-2-3 urgent = Busy
-<2 urgent = Low stress
+// Weighted points by priority with time decay
+totalPoints >= 12 = High stress
+totalPoints >= 6 = Busy
+otherwise = Low stress
 ```
 
-**Enhanced Algorithm:**
-- Consider ALL deadlines (not just urgent)
-- Weight by priority:
-  - Urgent: 4 points
-  - High: 3 points
-  - Medium: 2 points
-  - Low: 1 point
-- Time decay: deadlines tomorrow worth more than next week
-- Display on Home page with color indicator
+**Notes:**
+- Uses all upcoming deadlines (not just urgent)
+- Priority weights: Urgent 4, High 3, Medium 2, Low 1
+- Time decay: nearer deadlines carry more weight
 
 **Estimated Time:** 2-3 hours
 
@@ -368,7 +363,7 @@ const buildings = [
 
 #### 1️⃣ **Create Placeholder Calendar Page (Priority: CRITICAL)**
 
-**File:** `app/calendar/page.tsx`
+**File:** `app/calender/page.tsx`
 
 ```typescript
 export default function Page() {
@@ -385,7 +380,7 @@ export default function Page() {
 
 **Commit & Push:**
 ```bash
-git add app/calendar/page.tsx
+git add app/calender/page.tsx
 git commit -m "feat: Add placeholder page for Calendar"
 git push origin main
 ```
@@ -657,10 +652,11 @@ git push origin main
 4. Schedule quick call if needed
 
 ### **Before Pushing Code**
-1. Test locally (`npm run dev`)
-2. Check for console errors
-3. Test on mobile (if UI changes)
-4. Write clear commit message
+1. Run lint after each edit (`npm run lint`) and confirm `Lint OK`
+2. Test locally (`npm run dev`)
+3. Check for console errors
+4. Test on mobile (if UI changes)
+5. Write clear commit message
 
 ### **Merge Conflicts**
 - Don't panic
