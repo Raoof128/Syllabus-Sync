@@ -29,7 +29,7 @@ flowchart TB
 
   subgraph Persistence[Persistence]
     LocalStorage[(localStorage)]
-    Supabase[(Supabase - planned)]
+    Supabase[(Supabase planned)]
   end
 
   UI --> Components

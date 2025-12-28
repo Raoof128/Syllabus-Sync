@@ -168,6 +168,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Verification:** Not run (docs-only update)  
 **Follow-ups:** Consider removing tracked `*.DS_Store` and `.idea` files if present.  
 
+### Raouf:
+**Date:** 2025-12-28  
+**Scope:** Mermaid diagram fix  
+**Summary:** Fixed Mermaid labels to render correctly in README and architecture docs.  
+**Files Changed:** `README.md`, `docs/ARCHITECTURE.md`, `Team_Plan/CHANGELOG.md`, `Team_Plan/AGENT.md`  
+**Verification:** Not run (docs-only update)  
+**Follow-ups:** None.  
+
 ---
 
 ## [0.1.1] - 2025-12-28

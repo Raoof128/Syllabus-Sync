@@ -44,7 +44,7 @@ flowchart LR
   Feed --> SampleEvents
   UnitsStore --> LocalStorage[(localStorage)]
   DeadlinesStore --> LocalStorage
-  LocalStorage -.-> Future[Supabase (planned)]
+  LocalStorage -.-> Future[Supabase planned]
 ```
 
 ---
