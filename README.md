@@ -244,7 +244,7 @@ Built with ❤️ for Macquarie University students
 
 ## 📊 Project Status
 
-**Current Version:** 0.1.0 (Phase 1 Complete)  
+**Current Version:** 0.2.0 (Phase 1 Complete)  
 **Last Updated:** December 30, 2025  
 **Status:** 🚧 Active Development - Phase 2 In Progress
 
