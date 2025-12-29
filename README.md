@@ -135,9 +135,8 @@ syllabus-sync/
 
 ## 👥 Team
 
-- **[Pouya](https://github.com/[POUYA-USERNAME])** - Frontend Lead, State Management, Home Tab
-- **[Raouf](https://github.com/[RAOUF-USERNAME])** - Map Integration, Database, Settings
-- **[Kit](https://github.com/[KIT-USERNAME])** - Calendar Integration, Events Feed
+- **Pouya** - Frontend Lead, UI/UX, State Management, Home Dashboard
+- **Raouf** - Backend Lead, Database Integration, API Development, Map & Settings
 
 ---
 
@@ -240,25 +239,14 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ---
 
 Built with ❤️ for Macquarie University students
-npm run test
-
-# Watch tests
-npm run test:watch
-
-# Format code
-npm run format
-
-# Check formatting
-npm run format:check
-```
 
 ---
 
 ## 📊 Project Status
 
-**Current Version:** 0.1.0 (Phase 1)  
-**Last Updated:** December 28, 2025  
-**Status:** 🚧 Active Development
+**Current Version:** 0.1.0 (Phase 1 Complete)  
+**Last Updated:** December 30, 2025  
+**Status:** 🚧 Active Development - Phase 2 In Progress
 
 ---
 
