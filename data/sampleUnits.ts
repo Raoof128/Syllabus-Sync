@@ -1,6 +1,13 @@
 // data/sampleUnits.ts
 import { Unit, Deadline } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
+import { addDays, setHours, setMinutes } from 'date-fns';
+
+// Helper to create dates relative to today for demo purposes
+const today = new Date();
+const createDate = (daysFromNow: number, hours: number, minutes: number = 0): Date => {
+  return setMinutes(setHours(addDays(today, daysFromNow), hours), minutes);
+};
 
 export const sampleUnits: Unit[] = [
   {
@@ -73,7 +80,7 @@ export const sampleDeadlines: Deadline[] = [
     id: uuidv4(),
     title: 'Assignment 1',
     unitCode: 'COMP2310',
-    dueDate: new Date('2025-04-16T23:59:00'),
+    dueDate: createDate(2, 23, 59), // In 2 days at 11:59 PM
     priority: 'Urgent',
     type: 'Assignment',
     completed: false,
@@ -83,7 +90,7 @@ export const sampleDeadlines: Deadline[] = [
     id: uuidv4(),
     title: 'Quiz Week 4',
     unitCode: 'COMP3300',
-    dueDate: new Date('2025-04-18T14:00:00'),
+    dueDate: createDate(5, 14, 0), // In 5 days at 2:00 PM
     priority: 'High',
     type: 'Quiz',
     completed: false,
@@ -93,9 +100,19 @@ export const sampleDeadlines: Deadline[] = [
     id: uuidv4(),
     title: 'Presentation',
     unitCode: 'ENGL100',
-    dueDate: new Date('2025-04-24T09:00:00'),
+    dueDate: createDate(10, 9, 0), // In 10 days at 9:00 AM
     priority: 'Medium',
     type: 'Presentation',
+    completed: false,
+    createdAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    title: 'Final Report',
+    unitCode: 'COMP2310',
+    dueDate: createDate(21, 23, 59), // In 3 weeks at 11:59 PM
+    priority: 'Low',
+    type: 'Assignment',
     completed: false,
     createdAt: new Date(),
   },

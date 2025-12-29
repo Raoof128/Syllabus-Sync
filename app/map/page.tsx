@@ -4,6 +4,7 @@
 import { MapPin, Navigation, Building2, Clock, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { UNIVERSITY_CONFIG } from '@/lib/config';
 
 export default function MapPage() {
   return (
@@ -11,7 +12,7 @@ export default function MapPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Map</h1>
-        <p className="text-gray-600">Navigate Macquarie University campus with ease.</p>
+        <p className="text-gray-600">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
       </div>
 
       {/* Development Notice */}

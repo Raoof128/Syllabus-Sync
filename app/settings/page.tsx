@@ -4,6 +4,7 @@
 import { Settings, User, Bell, Palette, Shield, Database, Clock, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { UNIVERSITY_CONFIG } from '@/lib/config';
 
 export default function SettingsPage() {
   return (
@@ -50,7 +51,7 @@ export default function SettingsPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h4 className="font-semibold text-gray-900">Student ID</h4>
-                    <p className="text-sm text-gray-600 mt-1">Your Macquarie University ID</p>
+                    <p className="text-sm text-gray-600 mt-1">Your {UNIVERSITY_CONFIG.name} ID</p>
                   </div>
                   <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
                 </div>

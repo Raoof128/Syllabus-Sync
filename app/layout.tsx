@@ -4,12 +4,13 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'The Syllabus Sync - Macquarie University',
-  description: 'Campus navigation and schedule management',
+  title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+  description: APP_CONFIG.fullDescription,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

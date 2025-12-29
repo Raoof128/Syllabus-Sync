@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, MapPin, Calendar, MessageSquare, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { APP_CONFIG } from '@/lib/config';
 
 const navigation = [
   { name: 'Home', href: '/home', icon: Home },
@@ -20,7 +21,7 @@ export default function Sidebar() {
   return (
     <div className="w-48 bg-gray-50 border-r border-gray-200 min-h-screen p-4">
       <div className="mb-8">
-        <h1 className="text-xl font-bold">The Syllabus Sync</h1>
+        <h1 className="text-xl font-bold">{APP_CONFIG.name}</h1>
       </div>
 
       <nav className="space-y-1">

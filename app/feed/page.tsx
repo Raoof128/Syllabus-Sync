@@ -17,8 +17,9 @@ import {
   Info,
 } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
+import { UNIVERSITY_CONFIG } from '@/lib/config';
 
-const categoryColors = {
+const categoryColors: Record<string, string> = {
   Career: 'bg-blue-100 text-blue-800',
   Social: 'bg-purple-100 text-purple-800',
   Academic: 'bg-green-100 text-green-800',
@@ -44,7 +45,7 @@ export default function FeedPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Feed</h1>
         <p className="text-gray-600">
-          Stay updated with campus events, announcements, and opportunities at Macquarie University.
+          Stay updated with campus events, announcements, and opportunities at {UNIVERSITY_CONFIG.name}.
         </p>
       </div>
 

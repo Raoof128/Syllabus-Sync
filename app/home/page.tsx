@@ -9,6 +9,7 @@ import QuickActions from '@/components/home/QuickActions';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
+import { DEMO_USER } from '@/lib/config';
 import { Info } from 'lucide-react';
 
 export default function HomePage() {
@@ -57,7 +58,7 @@ export default function HomePage() {
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, Admin!</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
         <p className="text-gray-600">Here&apos;s your day at a glance.</p>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
+import { UNIT_COLORS } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
@@ -40,15 +41,6 @@ const DAYS: DayOfWeek[] = [
   'Sunday',
 ];
 
-const COLORS = [
-  { name: 'Macquarie Red', value: '#A6192E' },
-  { name: 'Macquarie Blue', value: '#002A45' },
-  { name: 'Macquarie Gold', value: '#FFB81C' },
-  { name: 'Green', value: '#10b981' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Orange', value: '#f97316' },
-];
-
 export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
   const { addUnit, updateUnit, removeUnit } = useUnitsStore();
 
@@ -57,7 +49,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const [name, setName] = useState('');
   const [building, setBuilding] = useState('');
   const [room, setRoom] = useState('');
-  const [color, setColor] = useState(COLORS[0].value);
+  const [color, setColor] = useState<string>(UNIT_COLORS[0].value);
   const [schedule, setSchedule] = useState<ClassTime[]>([]);
 
   // Errors
@@ -68,7 +60,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     setName('');
     setBuilding('');
     setRoom('');
-    setColor(COLORS[0].value);
+    setColor(UNIT_COLORS[0].value);
     setSchedule([]);
     setErrors({});
   };
@@ -262,7 +254,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 </div>
               </SelectTrigger>
               <SelectContent>
-                {COLORS.map((c) => (
+                {UNIT_COLORS.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />

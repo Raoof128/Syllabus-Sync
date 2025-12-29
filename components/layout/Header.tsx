@@ -1,51 +1,50 @@
-// components/layout/Header.tsx
 'use client';
 
-import { Search, User } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Bell, Settings, User } from 'lucide-react';
+import { APP_CONFIG, DEMO_USER, BRAND_COLORS } from '@/lib/config';
 
 export default function Header() {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3">
-      <div className="flex items-center justify-between">
-        {/* Search */}
-        <div className="flex-1 max-w-2xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Search units, events, deadlines..."
-              className="pl-10"
-            />
-          </div>
-        </div>
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+      {/* Left side - Page title */}
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900">
+          {APP_CONFIG.name}
+        </h1>
+      </div>
 
-        {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-2">
-              <span>Admin</span>
-              <User className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      {/* Right side - Actions */}
+      <div className="flex items-center gap-4">
+        {/* Notifications */}
+        <button
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Notifications"
+        >
+          <Bell className="w-5 h-5 text-gray-600" />
+        </button>
+
+        {/* Settings */}
+        <button
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Settings"
+        >
+          <Settings className="w-5 h-5 text-gray-600" />
+        </button>
+
+        {/* Profile */}
+        <button
+          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Profile"
+        >
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: BRAND_COLORS.primary }}
+          >
+            <User className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-sm font-medium text-gray-700">{DEMO_USER.name}</span>
+        </button>
       </div>
     </header>
   );

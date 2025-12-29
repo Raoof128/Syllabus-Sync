@@ -1,19 +1,18 @@
 # 🎓 The Syllabus Sync
 
-**Campus navigation and schedule management for Macquarie University**
+**Campus Navigation and Schedule Management for Macquarie University**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
 ## 📋 Overview
 
-**The Syllabus Sync** is a comprehensive web application designed to help Macquarie University students manage their campus life. It combines interactive campus navigation, smart schedule management, deadline tracking, and event discovery in one seamless experience.
+**The Syllabus Sync** is a modern web application designed to help Macquarie University students seamlessly manage their campus life. This demo showcases smart schedule management, deadline tracking, event discovery, and campus navigation - all in one unified platform.
 
-This project is being developed as a demo for presentation to Macquarie University administration with the goal of becoming an official campus tool.
+**Demo Purpose:** Presentation to Macquarie University administration as a proposed official campus tool.
 
 ---
 
@@ -49,126 +48,64 @@ flowchart LR
 
 ---
 
-## ✨ Features
+---
 
-### 🏠 **Home Dashboard**
+## ✨ Demo Features
 
-- **Today's Schedule:** View your classes for the day with location details
-- **Next Deadline:** Track upcoming assignments and exams
-- **Events Feed:** Discover campus events (Career, Social, Academic, Free Food)
-- **Quick Actions:** Fast access to Map and Calendar
+### 🏠 **Home Dashboard** (Available Now)
+- **Today's Schedule:** View your classes for the day with room locations
+- **Next Deadline:** Track upcoming assignments with priority levels
+- **Events Feed:** Discover campus events across categories (Career, Social, Academic, Free Food)
+- **Quick Actions:** Fast navigation to Map and Calendar views
 
-### 📅 **Smart Calendar** (In Development)
+### 📅 **Calendar View** (Coming Soon)
+- Visual calendar with integrated class schedules
+- Deadline tracking with color-coded priorities
+- Multiple view modes (month/week/day)
 
-- Visual calendar with class schedules
-- Deadline integration with priority levels
-- Event management
-- Multiple views (month/week/day)
+### 🗺️ **Campus Map** (Coming Soon)
+- Interactive campus navigation
+- Building locations with room numbers
+- Walking directions between locations
 
-### 🗺️ **Interactive Campus Map** (In Development)
-
-- Leaflet-powered campus navigation
-- Building markers with room numbers
-- Step-by-step directions between buildings
-- Current location tracking
-
-### ⚡ **Advanced Features** (Planned)
-
-- Stress Forecast algorithm
-- Study plan suggestions
-- Building crowdedness heatmap
-- Smart notifications
+### 📱 **Additional Features** (Roadmap)
+- Event discovery and filtering
+- Smart notifications for classes and deadlines
+- Unit management with custom schedules
+- Settings and preferences
 
 ---
 
-## ✅ Usage Examples
-
-### Add a Unit
-
-```ts
-import { useUnitsStore } from '@/lib/store/unitsStore';
-
-const addUnit = useUnitsStore((state) => state.addUnit);
-addUnit({
-  id: 'unit-1',
-  code: 'COMP1000',
-  name: 'Intro to CS',
-  color: '#A6192E',
-  location: { building: 'C5C', room: '101' },
-  schedule: [],
-  createdAt: new Date(),
-});
-```
-
-### Get Upcoming Deadlines
-
-```ts
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-
-const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
-```
-
----
-
-## 🚀 Tech Stack
-
-### Frontend
-
-- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
-- **State Management:** [Zustand](https://docs.pmnd.rs/zustand)
-- **Icons:** [Lucide React](https://lucide.dev/)
-
-### Libraries
-
-- **Maps:** [Leaflet](https://leafletjs.com/) + React Leaflet
-- **Calendar:** [FullCalendar](https://fullcalendar.io/)
-- **Date Handling:** [date-fns](https://date-fns.org/)
-
-### Storage
-
-- **MVP:** localStorage
-- **Production:** [Supabase](https://supabase.com/) (PostgreSQL)
-
-### Deployment
-
-- **Platform:** [Vercel](https://vercel.com/)
-
----
-
-## 📥 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Node.js 18+ and npm
-- Git
 
 ### Installation
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/[YOUR-USERNAME]/syllabus-sync.git
-   cd syllabus-sync
-   ```
-
-2. **Install dependencies**
-
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Run development server**
-
+2. **Run development server**
    ```bash
    npm run dev
    ```
 
-4. **Open in browser**
+3. **Open in browser**
    ```
    http://localhost:3000
    ```
+
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm test             # Run tests
+```
 
 ---
 
@@ -176,29 +113,22 @@ const upcoming = useDeadlinesStore((state) => state.getUpcoming(3));
 
 ```
 syllabus-sync/
-├── app/                      # Next.js App Router
-│   ├── layout.tsx           # Root layout
-│   ├── page.tsx             # Root redirect
-│   ├── home/                # Home page
-│   ├── map/                 # Map page
-│   ├── calendar/            # Calendar page
-│   ├── feed/                # Feed page
+├── app/                      # Next.js pages
+│   ├── home/                # Home dashboard
+│   ├── calendar/            # Calendar view
+│   ├── map/                 # Campus map
+│   ├── feed/                # Events feed
 │   └── settings/            # Settings page
 ├── components/
-│   ├── ui/                  # Shadcn UI components
-│   ├── home/                # Home page components
-│   ├── layout/              # Layout components (Sidebar, Header)
-│   ├── calendar/            # Calendar components
-│   ├── map/                 # Map components
-│   └── units/               # Unit management components
+│   ├── home/                # Dashboard components
+│   ├── layout/              # Sidebar & Header
+│   ├── ui/                  # Reusable UI components
+│   └── units/               # Unit management
 ├── lib/
-│   ├── store/               # Zustand stores
-│   │   ├── unitsStore.ts
-│   │   └── deadlinesStore.ts
-│   ├── types/               # TypeScript types
-│   └── utils.ts             # Utility functions
-├── data/                     # Sample data
-└── public/                   # Static assets
+│   ├── store/               # State management (Zustand)
+│   ├── types/               # TypeScript definitions
+│   └── hooks/               # Custom React hooks
+└── data/                     # Sample data for demo
 ```
 
 ---
@@ -268,107 +198,48 @@ syllabus-sync/
 - [ ] Demo script
 - [ ] Pitch deck (9 slides)
 - [ ] Demo video
-- [ ] Bug fixes & testing
+---
+
+## 🛠 Tech Stack
+
+- **Framework:** Next.js 16 (React 19)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + Shadcn UI
+- **State:** Zustand (localStorage)
+- **Icons:** Lucide React
+- **Date Handling:** date-fns
 
 ---
 
 ## 🎨 Design System
 
 ### Macquarie University Branding
-
 - **Primary Red:** `#A6192E`
-- **Primary Blue:** `#002A45`
+- **Primary Blue:** `#002A45`  
 - **Accent Gold:** `#FFB81C`
 
 ### UI Components
-
-- Built with [Shadcn UI](https://ui.shadcn.com/)
+- Built with Shadcn UI
 - Responsive design (mobile-first)
-- Accessible (WCAG 2.1 AA)
-
----
-
-## 🤝 Contributing
-
-We're currently a closed team working on the demo, but we welcome feedback and suggestions!
-
-### Development Workflow
-
-1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
-2. Create feature branch
-3. Make changes
-4. Run `npm run lint` and confirm `Lint OK`
-5. Run `npm run test`
-6. Run `npm run format:check`
-7. Test locally
-8. Create Pull Request
-
-### Code Style
-
-- TypeScript strict mode
-- ESLint + Prettier
-- Conventional Commits
-
-### Linting & CI
-
-- Local lint: `npm run lint` (prints `Lint OK` on success)
-- CI lint: GitHub Actions workflow at `.github/workflows/lint.yml`
-- CI tests: GitHub Actions workflow at `.github/workflows/test.yml`
-
-### Testing
-
-- Run tests: `npm run test`
-- Watch mode: `npm run test:watch`
-
-### Formatting
-
-- Format code: `npm run format`
-- Check formatting: `npm run format:check`
+- Consistent spacing and typography
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **Macquarie University** - For inspiring this project
-- **Next.js Team** - For the amazing framework
-- **Shadcn** - For the beautiful UI components
-- **Vercel** - For hosting and deployment
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 📞 Contact
 
-**Project Lead:** Pouya Alavi  
-**Email:** [your-email@example.com]  
-**Demo Date:** Late February 2025
+**Project Team:** Macquarie University Demo Project  
+**Demo Target:** University Administration  
+**Timeline:** February 2025
 
 ---
 
-## 🚀 Quick Start Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Run linter
-npm run lint
-
-# Run tests
+Built with ❤️ for Macquarie University students
 npm run test
 
 # Watch tests
