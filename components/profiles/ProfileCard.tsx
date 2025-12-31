@@ -2,19 +2,18 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  BookOpen, 
-  Settings, 
-  Edit, 
-  Trash2, 
-  Check, 
-  Plus,
+import Image from 'next/image';
+import {
+  User,
+  Mail,
+  Calendar,
+  Settings,
+  Edit,
+  Trash2,
+  Check,
   Camera
 } from 'lucide-react';
 import { UserProfile } from '@/lib/store/profilesStore';
@@ -28,12 +27,12 @@ interface ProfileCardProps {
   onSetCurrent: (id: string) => void;
 }
 
-export default function ProfileCard({ 
-  profile, 
-  isCurrent, 
-  onEdit, 
-  onDelete, 
-  onSetCurrent 
+export default function ProfileCard({
+  profile,
+  isCurrent,
+  onEdit,
+  onDelete,
+  onSetCurrent
 }: ProfileCardProps) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -60,9 +59,11 @@ export default function ProfileCard({
           <div className="relative">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
               {avatarUrl ? (
-                <img 
-                  src={avatarUrl} 
+                <Image
+                  src={avatarUrl}
                   alt={profile.name}
+                  width={64}
+                  height={64}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
@@ -75,7 +76,7 @@ export default function ProfileCard({
               </Badge>
             )}
           </div>
-          
+
           {/* Profile Info */}
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900">{profile.name}</h3>
@@ -87,7 +88,7 @@ export default function ProfileCard({
             </div>
           </div>
         </div>
-        
+
         {/* Actions */}
         <div className="flex items-center gap-2">
           <Button
@@ -98,7 +99,7 @@ export default function ProfileCard({
           >
             <Edit className="h-4 w-4" />
           </Button>
-          
+
           {!isCurrent && (
             <Button
               variant="ghost"
@@ -111,7 +112,7 @@ export default function ProfileCard({
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         {/* Preferences */}
         <div className="space-y-2">
@@ -122,12 +123,12 @@ export default function ProfileCard({
             </div>
             <div className={cn(
               'w-10 h-5 rounded-full transition-colors',
-              profile.preferences.notifications 
-                ? 'bg-green-500' 
+              profile.preferences.notifications
+                ? 'bg-green-500'
                 : 'bg-gray-300'
             )} />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-400" />
@@ -135,12 +136,12 @@ export default function ProfileCard({
             </div>
             <div className={cn(
               'w-10 h-5 rounded-full transition-colors',
-              profile.preferences.emailReminders 
-                ? 'bg-green-500' 
+              profile.preferences.emailReminders
+                ? 'bg-green-500'
                 : 'bg-gray-300'
             )} />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Settings className="h-4 w-4 text-gray-400" />
@@ -148,17 +149,17 @@ export default function ProfileCard({
             </div>
             <div className={cn(
               'w-10 h-5 rounded-full transition-colors',
-              profile.preferences.pushNotifications 
-                ? 'bg-green-500' 
+              profile.preferences.pushNotifications
+                ? 'bg-green-500'
                 : 'bg-gray-300'
             )} />
           </div>
         </div>
-        
+
         {/* Action Buttons */}
         <div className="flex gap-2 mt-4">
           {!isCurrent && (
-            <Button 
+            <Button
               onClick={() => onSetCurrent(profile.id)}
               className="flex-1"
             >
@@ -166,7 +167,7 @@ export default function ProfileCard({
               Use This Profile
             </Button>
           )}
-          
+
           {/* Avatar Upload */}
           <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
             <Camera className="h-4 w-4" />
@@ -179,7 +180,7 @@ export default function ProfileCard({
             />
           </label>
         </div>
-        
+
         {/* Delete Confirmation */}
         {deleteConfirm && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -187,14 +188,14 @@ export default function ProfileCard({
               Are you sure you want to delete this profile? This action cannot be undone.
             </p>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setDeleteConfirm(false)}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={() => {
                   onDelete(profile.id);
                   setDeleteConfirm(false);
