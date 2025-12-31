@@ -138,6 +138,7 @@ vitest.config.ts               # Test configuration
 - [x] Implement notifications store and dropdown
 - [x] Add cross-page navigation (deadlines→calendar, events→map)
 - [x] Fix hydration errors
+- [x] Fix ESLint `react-hooks/set-state-in-effect` violations in Header.tsx and useHydration.ts
 - [x] Write component tests
 
 ### 🚀 Pouya's Next Tasks
