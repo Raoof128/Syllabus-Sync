@@ -210,7 +210,6 @@ app/api/
 └── events/
     └── route.ts               # 🔨 Events API
 ```
-```
 
 ---
 
@@ -385,7 +384,7 @@ app/api/
 
 ---
 
-**Last Updated:** December 30, 2025  
-**Version:** 0.2.0  
+**Last Updated:** December 31, 2025  
+**Version:** 0.3.0  
 **Status:** Phase 1 Complete, Phase 2 In Progress
 
