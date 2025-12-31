@@ -60,7 +60,6 @@ export const useThemeStore = create<ThemeState>()(
 
 // Hook to apply theme to document
 export const useThemeEffect = () => {
-  const theme = useThemeStore((state) => state.resolvedTheme);
   const storedTheme = useThemeStore((state) => state.theme);
 
   React.useEffect(() => {

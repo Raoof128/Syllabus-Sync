@@ -45,7 +45,7 @@ import {
 } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
 
-const priorityColors = {
+const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
   Low: 'bg-green-100 text-green-800',
   Medium: 'bg-yellow-100 text-yellow-800',
   High: 'bg-orange-100 text-orange-800',
@@ -83,8 +83,8 @@ export default function CalendarPage() {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
 
-  const incompleteDeadlines = sortedDeadlines.filter(d => !d.completed);
-  const completedDeadlines = sortedDeadlines.filter(d => d.completed);
+  const incompleteDeadlines = sortedDeadlines.filter((d) => !d.completed);
+  const completedDeadlines = sortedDeadlines.filter((d) => d.completed);
   const overdueDeadlines = incompleteDeadlines.filter((d) => {
     const dueDate = new Date(d.dueDate);
     return isValid(dueDate) && isPast(dueDate);
@@ -98,7 +98,7 @@ export default function CalendarPage() {
   };
 
   const getUnitColor = (unitCode: string) => {
-    const unit = units.find(u => u.code === unitCode);
+    const unit = units.find((u) => u.code === unitCode);
     return unit?.color || '#6b7280';
   };
 
@@ -177,7 +177,8 @@ export default function CalendarPage() {
           <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm text-yellow-900">
-              <strong>Note:</strong> Add some units on the Home page first before you can create deadlines.
+              <strong>Note:</strong> Add some units on the Home page first before you can create
+              deadlines.
             </p>
           </div>
         </div>
@@ -229,7 +230,9 @@ export default function CalendarPage() {
                       <p className="text-sm text-gray-500">Stress</p>
                       <Badge className={stressColors[stressLevel]}>{stressLevel}</Badge>
                     </div>
-                    <span className="text-xl">{stressLevel === 'High' ? '😰' : stressLevel === 'Busy' ? '😅' : '😊'}</span>
+                    <span className="text-xl">
+                      {stressLevel === 'High' ? '😰' : stressLevel === 'Busy' ? '😅' : '😊'}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -254,7 +257,11 @@ export default function CalendarPage() {
                   <p className="text-gray-600 mb-4">
                     Add your first deadline to start tracking your assignments.
                   </p>
-                  <Button onClick={handleAddDeadline} className="gap-2" disabled={units.length === 0}>
+                  <Button
+                    onClick={handleAddDeadline}
+                    className="gap-2"
+                    disabled={units.length === 0}
+                  >
                     <Plus className="h-4 w-4" />
                     Add Your First Deadline
                   </Button>
@@ -308,13 +315,17 @@ export default function CalendarPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
-                                    <h4 className="font-semibold text-gray-900">{deadline.title}</h4>
+                                    <h4 className="font-semibold text-gray-900">
+                                      {deadline.title}
+                                    </h4>
                                     <div className="flex items-center gap-2 mt-1">
                                       <div
                                         className="w-3 h-3 rounded-full"
                                         style={{ backgroundColor: getUnitColor(deadline.unitCode) }}
                                       />
-                                      <span className="text-sm text-gray-600">{deadline.unitCode}</span>
+                                      <span className="text-sm text-gray-600">
+                                        {deadline.unitCode}
+                                      </span>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -489,7 +500,9 @@ export default function CalendarPage() {
                       } ${isSelected ? 'border-blue-400 ring-1 ring-blue-200' : 'border-gray-200'}`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`text-xs font-semibold ${isToday(day) ? 'text-blue-600' : ''}`}>
+                        <span
+                          className={`text-xs font-semibold ${isToday(day) ? 'text-blue-600' : ''}`}
+                        >
                           {format(day, 'd')}
                         </span>
                         {isToday(day) && <span className="text-[10px] text-blue-500">Today</span>}

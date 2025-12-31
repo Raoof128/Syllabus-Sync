@@ -45,7 +45,15 @@ export const useUnitsStore = create<UnitsState>()(
       },
 
       getTodayClasses: () => {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const days: string[] = [
+          'Sunday',
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+        ];
         const today = days[new Date().getDay()];
 
         const todayClasses = get().units.flatMap((unit) =>

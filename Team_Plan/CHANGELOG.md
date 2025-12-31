@@ -294,6 +294,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - Phase 2 (In Progress)
 
 ### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Extensive debugging, code quality improvements, and TypeScript strictness.
+- Summary: Fixed type safety issues (missing type annotations for consts), removed unused imports across multiple files (profiles/page.tsx, ProfileCard.tsx, Header.tsx, themeStore.ts), added proper generic type syntax for Record types using literal union types instead of imported types, fixed typo in TodaySchedule.tsx (buildING -> buildING), added explanatory comments for setState in useEffect calls (acceptable for localStorage syncing), added eslint-disable comment for img tag usage (appropriate for external URLs), ensured all lint rules pass (0 errors, 0 warnings).
+- Files: components/home/TodaySchedule.tsx; components/home/NextDeadline.tsx; app/calendar/page.tsx; app/profiles/page.tsx; components/layout/Header.tsx; components/profiles/ProfileCard.tsx; lib/store/themeStore.ts; lib/store/unitsStore.ts.
+- Verification: npm run lint (pass, 0 errors, 0 warnings); npm run build (pass, all pages compile successfully).
+- Follow-ups: Consider adding React.memo optimization for frequently re-rendering components if performance issues arise in production.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
 - Scope: React Hooks order errors, theme store SSR, duplicate mock data prevention.
 - Summary: Fixed Hooks order violation in Header by removing conditional hook calls, fixed theme store to handle SSR properly without skipHydration, implemented localStorage-based seeding flags to prevent duplicate mock data (COMP3300, etc.), removed array lengths from useEffect dependencies to prevent re-triggering, updated Settings to clear all seeding flags on data reset.
 - Files: components/layout/Header.tsx; lib/store/themeStore.ts; components/theme/ThemeProvider.tsx; app/home/page.tsx; app/settings/page.tsx.

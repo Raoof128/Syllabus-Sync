@@ -10,7 +10,7 @@ import { formatDistanceToNow, format, isValid } from 'date-fns';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 
-const priorityColors = {
+const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
   Low: 'bg-green-100 text-green-800',
   Medium: 'bg-yellow-100 text-yellow-800',
   High: 'bg-orange-100 text-orange-800',
@@ -50,7 +50,10 @@ export default function NextDeadline() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Next Deadline</CardTitle>
-        <Link href="/calendar" className="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+        <Link
+          href="/calendar"
+          className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+        >
           View all →
         </Link>
       </CardHeader>
@@ -62,7 +65,10 @@ export default function NextDeadline() {
         ) : !nextDeadline ? (
           <p className="text-gray-500 text-center py-8">No upcoming deadlines</p>
         ) : (
-          <Link href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'} className="block">
+          <Link
+            href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'}
+            className="block"
+          >
             <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-gray-50 transition-colors">
               {/* Deadline info */}
               <div>
@@ -89,12 +95,12 @@ export default function NextDeadline() {
                 )}
                 <span
                   className={
-                    nextDeadline.priority === 'Urgent' ? 'text-red-600 font-medium' : 'text-gray-600'
+                    nextDeadline.priority === 'Urgent'
+                      ? 'text-red-600 font-medium'
+                      : 'text-gray-600'
                   }
                 >
-                  {hasValidDate
-                    ? formatDistanceToNow(dueDate as Date, { addSuffix: true })
-                    : ''}
+                  {hasValidDate ? formatDistanceToNow(dueDate as Date, { addSuffix: true }) : ''}
                 </span>
               </div>
             </div>

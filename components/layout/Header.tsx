@@ -47,10 +47,14 @@ export default function Header() {
   const [isClient, setIsClient] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
+  // setState called in effect is correct here - syncing with localStorage during hydration
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
+  // setState called in effect is correct here - syncing with localStorage during hydration
   useEffect(() => {
     if (!hasSeeded && isClient) {
       const seededKey = 'notifications-seeded';
@@ -68,10 +72,9 @@ export default function Header() {
   }, [addNotification, hasSeeded, isClient]);
 
   // Theme and profile stores
-  const { theme, toggleTheme, resolvedTheme } = useThemeStore();
+  const { toggleTheme, resolvedTheme } = useThemeStore();
   const { getCurrentProfile } = useProfilesStore();
   const currentProfile = isClient ? getCurrentProfile() : null;
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Close dropdown when clicking outside
   useEffect(() => {

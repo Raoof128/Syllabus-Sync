@@ -4,30 +4,13 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  Users, 
-  Plus, 
-  User, 
-  Mail, 
-  BookOpen, 
-  Calendar,
-  X,
-  Check,
-  Settings
-} from 'lucide-react';
+import { Users, Plus, User, Mail, Calendar, BookOpen, Check, Settings } from 'lucide-react';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { UserProfile } from '@/lib/store/profilesStore';
 import ProfileCard from '@/components/profiles/ProfileCard';
-import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function ProfilesPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -61,7 +44,7 @@ export default function ProfilesPage() {
           pushNotifications: false,
         },
       });
-      
+
       // Reset form
       setFormData({
         name: '',
@@ -91,7 +74,7 @@ export default function ProfilesPage() {
         ...formData,
         preferences: editingProfile.preferences,
       });
-      
+
       setEditingProfile(null);
       setFormData({
         name: '',
@@ -111,20 +94,12 @@ export default function ProfilesPage() {
     setCurrentProfile(id);
   };
 
-  const themeOptions = [
-    { value: 'light', label: 'Light', icon: '☀️' },
-    { value: 'dark', label: 'Dark', icon: '🌙' },
-    { value: 'system', label: 'System', icon: '💻' },
-  ] as const;
-
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Profiles</h1>
-        <p className="text-gray-600">
-          Manage user profiles and application settings.
-        </p>
+        <p className="text-gray-600">Manage user profiles and application settings.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -153,7 +128,7 @@ export default function ProfilesPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-gray-500">Student ID:</span>
@@ -171,9 +146,7 @@ export default function ProfilesPage() {
                 <div className="text-center py-8">
                   <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No Profile Selected</h3>
-                  <p className="text-gray-600 mb-4">
-                    Create or select a profile to get started.
-                  </p>
+                  <p className="text-gray-600 mb-4">Create or select a profile to get started.</p>
                   <Button onClick={() => setShowAddDialog(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Create Your First Profile
@@ -244,7 +217,7 @@ export default function ProfilesPage() {
                 </div>
                 <span className="text-lg font-bold text-blue-600">{profiles.length}</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-600" />
@@ -254,7 +227,7 @@ export default function ProfilesPage() {
                   {currentProfile ? currentProfile.name : 'None'}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-purple-600" />
@@ -267,8 +240,7 @@ export default function ProfilesPage() {
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-            </CardContent>
+            <CardContent className="space-y-2"></CardContent>
           </Card>
           <Card>
             <CardHeader>
@@ -289,15 +261,16 @@ export default function ProfilesPage() {
       </div>
 
       {/* Add/Edit Profile Dialog */}
-      <Dialog open={showAddDialog || !!editingProfile} onOpenChange={(open) => {
-        setShowAddDialog(open);
-        if (!open) setEditingProfile(null);
-      }}>
+      <Dialog
+        open={showAddDialog || !!editingProfile}
+        onOpenChange={(open) => {
+          setShowAddDialog(open);
+          if (!open) setEditingProfile(null);
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {editingProfile ? 'Edit Profile' : 'Create New Profile'}
-            </DialogTitle>
+            <DialogTitle>{editingProfile ? 'Edit Profile' : 'Create New Profile'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -309,7 +282,7 @@ export default function ProfilesPage() {
                 placeholder="Enter your full name"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -320,7 +293,7 @@ export default function ProfilesPage() {
                 placeholder="your.email@mq.edu.au"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="studentId">Student ID</Label>
               <Input
@@ -330,7 +303,7 @@ export default function ProfilesPage() {
                 placeholder="12345678"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="course">Course</Label>
@@ -341,7 +314,7 @@ export default function ProfilesPage() {
                   placeholder="e.g., Bachelor of IT"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="year">Year</Label>
                 <Input
@@ -352,12 +325,15 @@ export default function ProfilesPage() {
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" onClick={() => {
-                setShowAddDialog(false);
-                setEditingProfile(null);
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddDialog(false);
+                  setEditingProfile(null);
+                }}
+              >
                 Cancel
               </Button>
               <Button onClick={editingProfile ? handleUpdateProfile : handleAddProfile}>
