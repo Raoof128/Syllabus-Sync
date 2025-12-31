@@ -562,4 +562,11 @@ Files: lib/store/themeStore.ts; components/theme/ThemeProvider.tsx; app/globals.
 Verification: npm run lint (pass, 0 errors, 0 warnings); npm run build (pass); npm test (36/36 tests passing).
 Follow-ups: Dark mode now provides excellent user experience with smooth transitions, proper accessibility support, and consistent styling across all components.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Dark mode hardcoded elements fix.
+Summary: Identified and fixed all remaining hardcoded light elements in dark mode including header backgrounds, sidebar navigation, calendar grid cells, info/warning banners, badge variations, notification colors, and hover states. Resolved CSS circular dependency errors by replacing problematic @apply directives with direct CSS properties. Enhanced dark mode coverage for complete visual consistency across all pages and components.
+Files: app/globals.css.
+Verification: npm run lint (pass, 0 errors, 0 warnings); npm run build (pass); npm test (36/36 tests passing).
+Follow-ups: Dark mode now provides complete visual consistency with no remaining light elements in dark theme.
+
 **Last Updated:** January 01, 2026
