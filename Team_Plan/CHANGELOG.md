@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2025-12-31
+
+### Added
+
+#### Notifications System (NEW)
+- **Notification type** (`lib/types/index.ts`) - New `Notification` interface with types: deadline, event, class, system
+- **Notifications store** (`lib/store/notificationsStore.ts`) - Zustand store with CRUD operations and read status
+- **Sample notifications** (`data/sampleNotifications.ts`) - 7 sample notifications for demo
+- **Header notifications dropdown** - Click bell icon to see all notifications
+  - Unread count badge with dynamic number
+  - Color-coded notification types (orange for deadline, purple for event, blue for class)
+  - "Mark all read" functionality
+  - Click notification to navigate and mark as read
+  - Time ago display using date-fns
+
+#### Cross-Page Navigation
+- **NextDeadline → Calendar** - Click deadline to view all deadlines on Calendar page
+- **EventsFeed → Map** - "Navigate to [Building]" button on each event
+- **Feed page → Map** - "Navigate" button for events with building info
+- **Map page query params** - Accepts `?building=XXX` to highlight selected building
+- **Notifications → Pages** - Click notification to navigate to relevant page
+
+#### Event Building Information
+- Added `building` field to Event type for map navigation
+- Updated all sample events with building codes (C5C, C7A, W3A, W6A, etc.)
+
+### Changed
+
+#### Data Cleanup
+- Reduced `sampleEvents.ts` from 15 to 10 events (removed duplicates)
+- Each event now has unique timing to avoid conflicts
+- Events now include `building` field for map navigation
+
+#### Map Page Enhancements
+- Reads `?building=XXX` query parameter from URL
+- Shows "Navigating to: [Building Name]" banner when building selected
+- Highlights selected building in the buildings grid with green border
+- "Clear" button to reset navigation state
+
+#### Header Component
+- Added full notifications dropdown with icons and styling
+- Fixed hydration error with `isClient` state check
+- Notifications seeding only happens client-side
+
+#### Component Links
+- `NextDeadline.tsx` - Added "View all →" link to Calendar page
+- `NextDeadline.tsx` - Entire deadline card is now clickable
+- `EventsFeed.tsx` - Added "Navigate to [Building]" button per event
+- `Feed page` - Added "Navigate" button next to "Remind Me"
+
+### Fixed
+- **Hydration error** in Header - Added `isClient` state to prevent SSR mismatch
+- Notification count only calculated client-side to match server render
+
+### File Ownership
+
+#### Frontend Files (Pouya)
+- `lib/store/notificationsStore.ts` - NEW notifications store
+- `components/layout/Header.tsx` - Notifications dropdown
+- `components/home/NextDeadline.tsx` - Calendar navigation
+- `components/home/EventsFeed.tsx` - Map navigation buttons
+
+#### Backend Files (Raouf)
+- `lib/types/index.ts` - Added Notification interface
+- `data/sampleNotifications.ts` - NEW sample notifications
+- `data/sampleEvents.ts` - Added building field, reduced duplicates
+- `app/map/page.tsx` - Building query parameter handling
+
+---
+
 ## [0.3.0] - 2025-12-31
 
 ### Added
@@ -20,7 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **University branding** - GraduationCap logo in Header and Sidebar
 - **Campus buildings list** - Quick reference on Map page
 - **Google Maps embed** - Preview map of Macquarie University campus
-- **Notification indicator** - Red dot on bell icon in header
 
 #### New Tests
 - `tests/UnitForm.test.tsx` - Unit form component tests (Frontend)
@@ -42,32 +111,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed constants.ts duplication - now re-exports from config.ts
 - Removed unused imports across multiple files
 
-#### UI/UX Improvements
-- Removed internal labels ("Week 6", "Phase 2") - replaced with "Coming Soon"
-- Header settings icon now links to `/settings` page
-- Demo user updated to "Alex Chen" for realistic demo
-- Improved mobile responsiveness throughout
-
 ### Removed
 - `app/units/page.tsx` - Merged into Home page
 - `app/deadlines/page.tsx` - Merged into Calendar page
-- Removed "Units" and "Deadlines" from sidebar navigation
-
-### File Ownership (Frontend/Backend)
-
-#### Frontend Files (Pouya)
-- `app/home/page.tsx` - Home dashboard with units
-- `app/calendar/page.tsx` - Calendar with deadlines
-- `components/deadlines/DeadlineForm.tsx` - Deadline form dialog
-- `components/layout/Header.tsx` - Updated with branding
-- `components/layout/Sidebar.tsx` - Mobile responsive
-- All test files in `tests/`
-
-#### Backend Files (Raouf)
-- `lib/config.ts` - App configuration
-- `data/sampleUnits.ts` - Sample data with stable IDs
-- `app/map/page.tsx` - Map page with Google Maps
-- `app/settings/page.tsx` - Settings with clear data
 
 ---
 

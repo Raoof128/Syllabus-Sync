@@ -2,7 +2,8 @@
 
 **Syllabus Sync - Frontend/Backend Division**
 
-Last Updated: December 31, 2025
+Last Updated: December 31, 2025  
+Version: 0.4.0
 
 ---
 
@@ -18,6 +19,7 @@ Responsible for all user-facing features, UI/UX implementation, component develo
 - ✅ Responsive design & styling
 - ✅ Frontend testing
 - ✅ User interactions & animations
+- ✅ Cross-page navigation
 
 ---
 
@@ -41,8 +43,8 @@ app/
 #### **Home Dashboard Components**
 ```
 components/home/
-├── EventsFeed.tsx             # ⭐ Today's events widget
-├── NextDeadline.tsx           # ⭐ Next deadline tracker
+├── EventsFeed.tsx             # ⭐ Events widget + Map navigation
+├── NextDeadline.tsx           # ⭐ Deadline tracker + Calendar link
 ├── QuickActions.tsx           # ⭐ Navigation buttons
 └── TodaySchedule.tsx          # ⭐ Today's classes widget
 ```
@@ -50,7 +52,7 @@ components/home/
 #### **Layout Components**
 ```
 components/layout/
-├── Header.tsx                 # ⭐ Top navigation bar (with branding)
+├── Header.tsx                 # ⭐ Header + Notifications dropdown
 └── Sidebar.tsx                # ⭐ Side navigation (mobile responsive)
 ```
 
@@ -84,7 +86,8 @@ components/ui/
 ```
 lib/store/
 ├── unitsStore.ts              # ⭐ Units state (CRUD, selectors)
-└── deadlinesStore.ts          # ⭐ Deadlines state (CRUD, stress level)
+├── deadlinesStore.ts          # ⭐ Deadlines state (CRUD, stress level)
+└── notificationsStore.ts      # ⭐ Notifications state (NEW)
 ```
 
 #### **Custom Hooks**
@@ -120,25 +123,27 @@ vitest.config.ts               # Test configuration
 
 - [x] Build home dashboard layout
 - [x] Implement TodaySchedule widget
-- [x] Implement NextDeadline widget
-- [x] Implement EventsFeed widget
+- [x] Implement NextDeadline widget with Calendar link
+- [x] Implement EventsFeed widget with Map navigation
 - [x] Create QuickActions component
-- [x] Setup Zustand stores (units, deadlines)
+- [x] Setup Zustand stores (units, deadlines, notifications)
 - [x] Implement Unit CRUD operations
 - [x] Create UnitCard and UnitForm components
 - [x] Create DeadlineForm component
 - [x] Integrate Units into Home page
 - [x] Integrate Deadlines into Calendar page
 - [x] Setup Sidebar navigation (mobile responsive)
-- [x] Setup Header with branding
+- [x] Setup Header with branding and notifications dropdown
 - [x] Add stress level indicator
-- [x] Implement error and loading states
+- [x] Implement notifications store and dropdown
+- [x] Add cross-page navigation (deadlines→calendar, events→map)
+- [x] Fix hydration errors
 - [x] Write component tests
 
 ### 🚀 Pouya's Next Tasks
 
 - [ ] Add loading skeletons
-- [ ] Implement toast notifications
+- [ ] Implement toast notifications for actions
 - [ ] Add form animations
 - [ ] Optimize performance
 - [ ] FullCalendar integration (Phase 3)
@@ -174,25 +179,26 @@ lib/
 #### **Type Definitions**
 ```
 lib/types/
-└── index.ts                   # ⭐ TypeScript interfaces (Unit, Deadline, Event)
+└── index.ts                   # ⭐ TypeScript interfaces (Unit, Deadline, Event, Notification)
 ```
 
 #### **Sample Data**
 ```
 data/
 ├── sampleUnits.ts             # ⭐ Sample units & deadlines
-└── sampleEvents.ts            # ⭐ Sample campus events
+├── sampleEvents.ts            # ⭐ Sample campus events (with building info)
+└── sampleNotifications.ts     # ⭐ Sample notifications (NEW)
 ```
 
 #### **Pages (Backend Logic)**
 ```
 app/
 ├── map/
-│   └── page.tsx               # ⭐ Campus map (Google Maps embed)
+│   └── page.tsx               # ⭐ Campus map (with ?building param)
 ├── settings/
 │   └── page.tsx               # ⭐ Settings page (clear data, info)
 └── feed/
-    └── page.tsx               # Events feed
+    └── page.tsx               # Events feed (with map navigation)
 ```
 
 #### **Future Backend Files (Phase 2+)**
@@ -207,15 +213,17 @@ app/api/
 │   └── route.ts               # 🔨 Units API
 ├── deadlines/
 │   └── route.ts               # 🔨 Deadlines API
-└── events/
-    └── route.ts               # 🔨 Events API
+├── events/
+│   └── route.ts               # 🔨 Events API
+└── notifications/
+    └── route.ts               # 🔨 Notifications API
 ```
 
 ---
 
-### 🎯 Raouf's Current Tasks (Phase 1 - Complete ✅)
+### 🎯 Raouf's Completed Tasks ✅
 
-- [x] Define TypeScript types (Unit, Deadline, Event)
+- [x] Define TypeScript types (Unit, Deadline, Event, Notification)
 - [x] Create app configuration system
 - [x] Define constants and enums
 - [x] Generate sample units data
@@ -374,6 +382,9 @@ app/api/
 - [x] Raouf: Type definitions
 - [x] Raouf: Configuration system
 - [x] Raouf: Sample data
+- [x] Pouya: Notifications system
+- [x] Raouf: Sample notifications data
+- [x] Pouya: Cross-page navigation
 
 ### Phase 2 🚧 (In Progress)
 - [ ] Pouya: Enhanced forms & validation
@@ -385,6 +396,6 @@ app/api/
 ---
 
 **Last Updated:** December 31, 2025  
-**Version:** 0.3.0  
+**Version:** 0.4.0  
 **Status:** Phase 1 Complete, Phase 2 In Progress
 

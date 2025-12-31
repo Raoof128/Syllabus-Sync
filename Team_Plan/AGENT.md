@@ -2,6 +2,8 @@
 
 **Complete Technical Reference & Team Guide**
 
+Version: 0.4.0 | Last Updated: December 31, 2025
+
 ---
 
 ## 📋 Table of Contents
@@ -31,6 +33,15 @@
 
 ### Demo Target
 Macquarie University Administration - February 2025
+
+### Current Features (v0.4.0)
+- ✅ Home Dashboard with Units Management
+- ✅ Calendar with Deadlines Management
+- ✅ Notifications System (bell icon dropdown)
+- ✅ Cross-page Navigation (events → map, deadlines → calendar)
+- ✅ Campus Map with Building Navigation
+- ✅ Events Feed with Filtering
+- ✅ Mobile Responsive Sidebar
 
 ---
 
@@ -105,6 +116,7 @@ Macquarie University Administration - February 2025
 - State management integration
 - Responsive design
 - Frontend testing
+- Cross-page navigation
 
 **Primary Files:**
 ```
@@ -119,32 +131,33 @@ app/
 
 components/
   ├── home/
-  │   ├── EventsFeed.tsx
-  │   ├── NextDeadline.tsx
+  │   ├── EventsFeed.tsx      # With map navigation buttons
+  │   ├── NextDeadline.tsx    # With calendar link
   │   ├── QuickActions.tsx
   │   └── TodaySchedule.tsx
   ├── layout/
-  │   ├── Header.tsx          # With university branding
+  │   ├── Header.tsx          # With notifications dropdown
   │   └── Sidebar.tsx         # Mobile responsive
   ├── ui/* (all UI components)
   ├── units/
   │   ├── UnitCard.tsx
   │   └── UnitForm.tsx
   └── deadlines/
-      └── DeadlineForm.tsx    # NEW
+      └── DeadlineForm.tsx
 
 lib/
   ├── store/
   │   ├── unitsStore.ts
-  │   └── deadlinesStore.ts
+  │   ├── deadlinesStore.ts
+  │   └── notificationsStore.ts  # NEW - notifications state
   └── hooks/
       ├── useHydration.ts
       └── useLocalStorage.ts
 
 tests/
-  ├── UnitForm.test.tsx       # NEW
-  ├── UnitCard.test.tsx       # NEW
-  └── stores.test.ts          # NEW
+  ├── UnitForm.test.tsx
+  ├── UnitCard.test.tsx
+  └── stores.test.ts
 
 app/globals.css
 tailwind.config.ts
@@ -158,6 +171,7 @@ tailwind.config.ts
 - Data models & types
 - Configuration management
 - Map & Settings features
+- Sample data creation
 
 **Primary Files:**
 ```
@@ -165,9 +179,17 @@ lib/
   ├── config.ts
   ├── constants.ts
   ├── utils.ts
-  └── types/index.ts
+  └── types/index.ts           # Includes Notification type
 
 data/
+  ├── sampleUnits.ts           # Units & deadlines
+  ├── sampleEvents.ts          # Events with building info
+  └── sampleNotifications.ts   # NEW - sample notifications
+
+app/
+  ├── map/page.tsx             # With ?building query param
+  ├── feed/page.tsx            # With map navigation
+  └── settings/page.tsx
   ├── sampleUnits.ts          # With stable IDs
   └── sampleEvents.ts
 

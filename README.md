@@ -237,7 +237,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 Project Status
 
-**Current Version:** 0.3.0  
+**Current Version:** 0.4.0  
 **Last Updated:** December 31, 2025  
 **Status:** 🚧 Active Development
 
