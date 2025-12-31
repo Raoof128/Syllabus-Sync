@@ -47,8 +47,20 @@ export interface Event {
   date: Date;
   time: string; // "2:00 PM"
   location: string; // "Library Room 204"
+  building?: string; // "C5C" - for map navigation
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   imageUrl?: string;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'deadline' | 'event' | 'class' | 'system';
+  read: boolean;
+  createdAt: Date;
+  link?: string; // Navigation link
+  relatedId?: string; // Related deadline/event/unit ID
 }
 
 export type StressLevel = 'Low' | 'Busy' | 'High';

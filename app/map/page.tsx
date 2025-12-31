@@ -1,12 +1,23 @@
 // app/map/page.tsx
 'use client';
 
-import { MapPin, Navigation, Building2, Clock, Info, ExternalLink } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { MapPin, Navigation, Building2, Clock, Info, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
+import Link from 'next/link';
 
 export default function MapPage() {
+  const searchParams = useSearchParams();
+  const selectedBuilding = searchParams.get('building');
+
+  // Find building details if one is selected
+  const buildingDetails = selectedBuilding
+    ? CAMPUS_BUILDINGS.find(b => b.code === selectedBuilding)
+    : null;
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
@@ -15,15 +26,38 @@ export default function MapPage() {
         <p className="text-gray-600">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
       </div>
 
-      {/* Development Notice */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div className="flex-1">
-          <p className="text-sm text-blue-900">
-            <strong>Preview:</strong> View the campus on Google Maps below. Interactive building markers and navigation coming soon!
-          </p>
+      {/* Selected Building Banner */}
+      {selectedBuilding && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Navigation className="h-5 w-5 text-green-600" />
+            <div>
+              <p className="text-sm font-medium text-green-900">
+                Navigating to: <strong>{buildingDetails?.name || selectedBuilding}</strong>
+              </p>
+              <p className="text-xs text-green-700">Building {selectedBuilding}</p>
+            </div>
+          </div>
+          <Link href="/map">
+            <Button variant="outline" size="sm" className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              Clear
+            </Button>
+          </Link>
         </div>
-      </div>
+      )}
+
+      {/* Development Notice */}
+      {!selectedBuilding && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-blue-900">
+              <strong>Preview:</strong> View the campus on Google Maps below. Interactive building markers and navigation coming soon!
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Map with Google Maps Embed */}
       <Card className="mb-6">
@@ -70,9 +104,18 @@ export default function MapPage() {
             {CAMPUS_BUILDINGS.map((building) => (
               <div
                 key={building.code}
-                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                className={`p-3 rounded-lg transition-colors cursor-pointer ${
+                  selectedBuilding === building.code
+                    ? 'bg-green-100 border-2 border-green-500'
+                    : 'bg-gray-50 hover:bg-gray-100'
+                }`}
               >
-                <div className="font-semibold text-gray-900">{building.code}</div>
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-gray-900">{building.code}</div>
+                  {selectedBuilding === building.code && (
+                    <Badge className="bg-green-500 text-white text-xs">Selected</Badge>
+                  )}
+                </div>
                 <div className="text-sm text-gray-600">{building.name}</div>
               </div>
             ))}

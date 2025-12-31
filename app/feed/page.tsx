@@ -15,9 +15,11 @@ import {
   Users,
   Megaphone,
   Info,
+  Navigation,
 } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
+import Link from 'next/link';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-blue-100 text-blue-800',
@@ -124,17 +126,11 @@ export default function FeedPage() {
                       <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          {event.date instanceof Date
-                            ? event.date.toLocaleDateString('en-AU', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                              })
-                            : new Date(event.date).toLocaleDateString('en-AU', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
+                          {new Date(event.date).toLocaleDateString('en-AU', {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric',
+                          })}
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
@@ -147,11 +143,19 @@ export default function FeedPage() {
                       </div>
 
                       {/* Action Button */}
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                      <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2 flex-wrap">
+                        <Button variant="outline" size="sm">
                           <Bell className="h-4 w-4 mr-2" />
                           Remind Me
                         </Button>
+                        {event.building && (
+                          <Link href={`/map?building=${event.building}`}>
+                            <Button variant="outline" size="sm">
+                              <Navigation className="h-4 w-4 mr-2" />
+                              Navigate
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
                   ))

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import Link from 'next/link';
 
 const priorityColors = {
   Low: 'bg-green-100 text-green-800',
@@ -30,8 +31,11 @@ export default function NextDeadline() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Next Deadline</CardTitle>
+        <Link href="/calendar" className="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+          View all →
+        </Link>
       </CardHeader>
       <CardContent>
         {!isClient ? (
@@ -41,39 +45,41 @@ export default function NextDeadline() {
         ) : !nextDeadline ? (
           <p className="text-gray-500 text-center py-8">No upcoming deadlines 🎯</p>
         ) : (
-          <div className="space-y-3">
-            {/* Deadline info */}
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-gray-900">
-                  {nextDeadline.unitCode} — {nextDeadline.title}
-                </h3>
-                <Badge className={priorityColors[nextDeadline.priority]}>
-                  {nextDeadline.priority}
-                </Badge>
+          <Link href="/calendar" className="block">
+            <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-gray-50 transition-colors">
+              {/* Deadline info */}
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-semibold text-gray-900">
+                    {nextDeadline.unitCode} — {nextDeadline.title}
+                  </h3>
+                  <Badge className={priorityColors[nextDeadline.priority]}>
+                    {nextDeadline.priority}
+                  </Badge>
+                </div>
+
+                <p className="text-sm text-gray-600 mt-1">
+                  Due {format(new Date(nextDeadline.dueDate), 'MMM dd, h:mm a')}
+                </p>
               </div>
 
-              <p className="text-sm text-gray-600 mt-1">
-                Due {format(new Date(nextDeadline.dueDate), 'MMM dd, h:mm a')}
-              </p>
+              {/* Time warning */}
+              <div className="flex items-center gap-2 text-sm">
+                {nextDeadline.priority === 'Urgent' ? (
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                ) : (
+                  <Clock className="h-4 w-4 text-gray-400" />
+                )}
+                <span
+                  className={
+                    nextDeadline.priority === 'Urgent' ? 'text-red-600 font-medium' : 'text-gray-600'
+                  }
+                >
+                  {formatDistanceToNow(new Date(nextDeadline.dueDate), { addSuffix: true })}
+                </span>
+              </div>
             </div>
-
-            {/* Time warning */}
-            <div className="flex items-center gap-2 text-sm">
-              {nextDeadline.priority === 'Urgent' ? (
-                <AlertCircle className="h-4 w-4 text-red-600" />
-              ) : (
-                <Clock className="h-4 w-4 text-gray-400" />
-              )}
-              <span
-                className={
-                  nextDeadline.priority === 'Urgent' ? 'text-red-600 font-medium' : 'text-gray-600'
-                }
-              >
-                {formatDistanceToNow(new Date(nextDeadline.dueDate), { addSuffix: true })}
-              </span>
-            </div>
-          </div>
+          </Link>
         )}
       </CardContent>
     </Card>

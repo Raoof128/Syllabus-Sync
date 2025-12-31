@@ -4,10 +4,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, Navigation } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { isToday } from 'date-fns';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-blue-100 text-blue-800',
@@ -36,7 +37,7 @@ export default function EventsFeed() {
             {todayEvents.map((event) => (
               <div
                 key={event.id}
-                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-gray-900">{event.title}</h3>
@@ -53,6 +54,18 @@ export default function EventsFeed() {
                     {event.location}
                   </div>
                 </div>
+
+                {/* Navigation to Map */}
+                {event.building && (
+                  <div className="mt-2">
+                    <Link href={`/map?building=${event.building}`}>
+                      <Button variant="outline" size="sm" className="gap-1 text-xs h-7">
+                        <Navigation className="h-3 w-3" />
+                        Navigate to {event.building}
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             ))}
           </div>
