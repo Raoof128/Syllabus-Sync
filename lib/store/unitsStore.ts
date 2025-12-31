@@ -20,9 +20,12 @@ export const useUnitsStore = create<UnitsState>()(
       units: [],
 
       addUnit: (unit) => {
-        set((state) => ({
-          units: [...state.units, unit],
-        }));
+        set((state) => {
+          if (state.units.some((existing) => existing.id === unit.id)) {
+            return state;
+          }
+          return { units: [...state.units, unit] };
+        });
       },
 
       removeUnit: (id) => {
@@ -61,6 +64,18 @@ export const useUnitsStore = create<UnitsState>()(
     {
       name: 'units-storage',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        if (!state?.units?.length) return;
+        const seen = new Set<string>();
+        const deduped = state.units.filter((unit) => {
+          if (seen.has(unit.id)) return false;
+          seen.add(unit.id);
+          return true;
+        });
+        if (deduped.length !== state.units.length) {
+          state.units = deduped;
+        }
+      },
     },
   ),
 );

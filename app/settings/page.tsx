@@ -27,6 +27,11 @@ export default function SettingsPage() {
       // Clear localStorage directly as well
       localStorage.removeItem('units-storage');
       localStorage.removeItem('deadlines-storage');
+      localStorage.removeItem('notifications-storage');
+      localStorage.removeItem('notifications-seeded');
+      localStorage.removeItem('units-seeded');
+      localStorage.removeItem('deadlines-seeded');
+      localStorage.setItem('seed-disabled', 'true');
       setClearing(false);
       alert('All data has been cleared successfully!');
     }

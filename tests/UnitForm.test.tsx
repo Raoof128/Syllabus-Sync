@@ -12,7 +12,6 @@ vi.mock('@/lib/store/unitsStore', () => ({
 describe('UnitForm', () => {
   const mockAddUnit = vi.fn();
   const mockUpdateUnit = vi.fn();
-  const mockRemoveUnit = vi.fn();
   const mockOnOpenChange = vi.fn();
 
   beforeEach(() => {
@@ -20,7 +19,6 @@ describe('UnitForm', () => {
     (useUnitsStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       addUnit: mockAddUnit,
       updateUnit: mockUpdateUnit,
-      removeUnit: mockRemoveUnit,
     });
   });
 
@@ -60,4 +58,3 @@ describe('UnitForm', () => {
     expect(screen.getByRole('button', { name: /Add Unit/i })).toBeInTheDocument();
   });
 });
-

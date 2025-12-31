@@ -101,24 +101,29 @@ export default function MapPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {CAMPUS_BUILDINGS.map((building) => (
-              <div
-                key={building.code}
-                className={`p-3 rounded-lg transition-colors cursor-pointer ${
-                  selectedBuilding === building.code
-                    ? 'bg-green-100 border-2 border-green-500'
-                    : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold text-gray-900">{building.code}</div>
-                  {selectedBuilding === building.code && (
-                    <Badge className="bg-green-500 text-white text-xs">Selected</Badge>
-                  )}
-                </div>
-                <div className="text-sm text-gray-600">{building.name}</div>
-              </div>
-            ))}
+            {CAMPUS_BUILDINGS.map((building) => {
+              const isSelected = selectedBuilding === building.code;
+              return (
+                <Link
+                  key={building.code}
+                  href={`/map?building=${building.code}`}
+                  aria-current={isSelected ? 'page' : undefined}
+                  className={`p-3 rounded-lg transition-colors ${
+                    isSelected
+                      ? 'bg-green-100 border-2 border-green-500'
+                      : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-gray-900">{building.code}</div>
+                    {isSelected && (
+                      <Badge className="bg-green-500 text-white text-xs">Selected</Badge>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-600">{building.name}</div>
+                </Link>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

@@ -297,6 +297,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Phase 2 (In Progress)
 
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: React Hooks order errors, theme store SSR, duplicate mock data prevention.
+- Summary: Fixed Hooks order violation in Header by removing conditional hook calls, fixed theme store to handle SSR properly without skipHydration, implemented localStorage-based seeding flags to prevent duplicate mock data (COMP3300, etc.), removed array lengths from useEffect dependencies to prevent re-triggering, updated Settings to clear all seeding flags on data reset.
+- Files: components/layout/Header.tsx; lib/store/themeStore.ts; components/theme/ThemeProvider.tsx; app/home/page.tsx; app/settings/page.tsx.
+- Verification: npm run build (pass); npm run dev (runs successfully).
+- Follow-ups: Monitor for any remaining hydration issues; verify seeding works correctly after browser storage clear.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Home NextDeadline, Calendar page, Deadline/Unit forms, Header profile menu, tests.
+- Summary: Fix Next Deadline hydration/date linking, add calendar view with month/week and deadline clicks, fix deadline edit date/time/completed handling, remove duplicate unit delete action from edit form, add accessible profile menu.
+- Files: app/calendar/page.tsx; components/home/NextDeadline.tsx; components/deadlines/DeadlineForm.tsx; components/units/UnitForm.tsx; components/layout/Header.tsx; tests/DeadlineForm.test.tsx; tests/NextDeadline.test.tsx; tests/UnitForm.test.tsx; tests/setup.ts.
+- Verification: npm test (pass, warning about --localstorage-file); npm run lint (pass).
+- Follow-ups: Consider removing the Vitest --localstorage-file warning if it becomes noisy; wire Sign out once auth is available.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: TodaySchedule widget, Home sample seeding, Events navigation links, Deadline time parsing, Settings clear data.
+- Summary: Make TodaySchedule reactive to store changes, stop demo reseeding after clear, fix nested link/button interactions, harden deadline time parsing, and persist seed-disable flag on clear.
+- Files: components/home/TodaySchedule.tsx; app/home/page.tsx; components/home/EventsFeed.tsx; app/feed/page.tsx; components/deadlines/DeadlineForm.tsx; app/settings/page.tsx.
+- Verification: npm test (pass, warning about --localstorage-file); npm run lint (pass).
+- Follow-ups: Consider adding a user-facing toggle to re-enable demo seeding if needed.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Calendar robustness, map building links, feed card UX, campus building data.
+- Summary: Guard calendar rendering against invalid dates, make map building cards navigable, remove misleading cursor on feed cards, and align campus buildings with sample event codes.
+- Files: app/calendar/page.tsx; app/map/page.tsx; app/feed/page.tsx; lib/config.ts.
+- Verification: npm test (pass, warning about --localstorage-file); npm run lint (pass).
+- Follow-ups: Consider adding unit tests for calendar invalid-date handling.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Calendar accessibility, NextDeadline date safety, UnitCard actions.
+- Summary: Add keyboard accessibility to calendar list items, guard NextDeadline date formatting against invalid dates, and improve UnitCard action button accessibility.
+- Files: app/calendar/page.tsx; components/home/NextDeadline.tsx; components/units/UnitCard.tsx.
+- Verification: npm test (pass, warning about --localstorage-file); npm run lint (pass).
+- Follow-ups: Consider adding tests for calendar keyboard interactions.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Calendar and NextDeadline tests.
+- Summary: Add regression tests for calendar keyboard edit activation and NextDeadline invalid-date handling.
+- Files: tests/CalendarPage.test.tsx; tests/NextDeadline.test.tsx.
+- Verification: npm test (pass, warning about --localstorage-file).
+- Follow-ups: Consider adding coverage for calendar grid deadline buttons if needed.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: CalendarPage test stability.
+- Summary: Stabilize calendar grid click test by using a stable search params mock and targeting the grid button directly to avoid rerender loops.
+- Files: tests/CalendarPage.test.tsx.
+- Verification: npm test (pass); npm run lint (pass).
+- Follow-ups: None.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: TodaySchedule hydration loop.
+- Summary: Avoid useSyncExternalStore loop by deriving today’s classes from units in-component with memoized selectors.
+- Files: components/home/TodaySchedule.tsx.
+- Verification: npm test (pass); npm run lint (pass).
+- Follow-ups: None.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: NextDeadline hydration loop and Home quick actions.
+- Summary: Remove selector-based getUpcoming call to avoid getServerSnapshot loop; compute next deadline from store data and hide QuickActions buttons on Home.
+- Files: components/home/NextDeadline.tsx; tests/NextDeadline.test.tsx; app/home/page.tsx.
+- Verification: npm test (pass); npm run lint (pass).
+- Follow-ups: None.
+
+### Raouf: 2025-12-31 (Australia/Sydney)
+- Scope: Mock data duplication and store hygiene.
+- Summary: Deduplicate units, deadlines, and notifications on add and rehydrate to prevent repeated sample data and reduce render churn.
+- Files: lib/store/unitsStore.ts; lib/store/deadlinesStore.ts; lib/store/notificationsStore.ts.
+- Verification: npm test (pass); npm run lint (pass).
+- Follow-ups: None.
+
 ### Planned - Phase 2 (Weeks 3-4)
 
 #### Database Integration
@@ -445,5 +515,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note:** This project is under active development. Features and dates are subject to change.
 
-**Last Updated:** December 30, 2025
+---
 
+Raouf: 2025-12-31 (Australia/Sydney)
+Scope: Team_Plan documentation audit and project polish.
+Summary: Fixed documentation inconsistencies (version dates, feature flags), updated AGENT.md and CHANGELOG.md dates to December 31, 2025, enabled all feature flags to match current implementation, added missing professional documentation files (CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md), updated README.md to reference new docs, verified all tests and linting pass.
+Files changed: Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md; lib/config.ts; CONTRIBUTING.md; CODE_OF_CONDUCT.md; SECURITY.md; README.md.
+Verification: npm test (pass, 36/36 tests); npm run lint (pass).
+Follow-ups: None - project documentation is now production-ready and consistent.
+
+**Last Updated:** December 31, 2025

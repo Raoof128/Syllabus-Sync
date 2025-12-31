@@ -1,13 +1,14 @@
 // components/home/NextDeadline.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle } from 'lucide-react';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow, format, isValid } from 'date-fns';
 import Link from 'next/link';
+import { useHydration } from '@/lib/hooks';
 
 const priorityColors = {
   Low: 'bg-green-100 text-green-800',
@@ -17,17 +18,33 @@ const priorityColors = {
 };
 
 export default function NextDeadline() {
-  const getUpcoming = useDeadlinesStore((state) => state.getUpcoming);
-  const [nextDeadline, setNextDeadline] = useState<ReturnType<typeof getUpcoming>[0] | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const isHydrated = useHydration();
+  const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const nextDeadline = useMemo(() => {
+    const now = new Date();
+    const validUpcoming = deadlines
+      .filter((deadline) => {
+        if (deadline.completed) return false;
+        const dueDate = new Date(deadline.dueDate);
+        return isValid(dueDate) && dueDate > now;
+      })
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    setIsClient(true);
-    const upcomingDeadlines = getUpcoming(1);
-    setNextDeadline(upcomingDeadlines[0] || null);
-  }, [getUpcoming]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+    if (validUpcoming.length > 0) {
+      return validUpcoming[0];
+    }
+
+    const invalid = deadlines.filter((deadline) => {
+      if (deadline.completed) return false;
+      const dueDate = new Date(deadline.dueDate);
+      return !isValid(dueDate);
+    });
+
+    return invalid[0] ?? null;
+  }, [deadlines]);
+  const dueDate = nextDeadline ? new Date(nextDeadline.dueDate) : null;
+  const hasValidDate = dueDate ? isValid(dueDate) : false;
+  const calendarDate = hasValidDate ? format(dueDate as Date, 'yyyy-MM-dd') : null;
 
   return (
     <Card>
@@ -38,14 +55,14 @@ export default function NextDeadline() {
         </Link>
       </CardHeader>
       <CardContent>
-        {!isClient ? (
+        {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
             <p className="text-gray-400">Loading...</p>
           </div>
         ) : !nextDeadline ? (
-          <p className="text-gray-500 text-center py-8">No upcoming deadlines 🎯</p>
+          <p className="text-gray-500 text-center py-8">No upcoming deadlines</p>
         ) : (
-          <Link href="/calendar" className="block">
+          <Link href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'} className="block">
             <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-gray-50 transition-colors">
               {/* Deadline info */}
               <div>
@@ -59,7 +76,7 @@ export default function NextDeadline() {
                 </div>
 
                 <p className="text-sm text-gray-600 mt-1">
-                  Due {format(new Date(nextDeadline.dueDate), 'MMM dd, h:mm a')}
+                  Due {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a') : 'Invalid date'}
                 </p>
               </div>
 
@@ -75,7 +92,9 @@ export default function NextDeadline() {
                     nextDeadline.priority === 'Urgent' ? 'text-red-600 font-medium' : 'text-gray-600'
                   }
                 >
-                  {formatDistanceToNow(new Date(nextDeadline.dueDate), { addSuffix: true })}
+                  {hasValidDate
+                    ? formatDistanceToNow(dueDate as Date, { addSuffix: true })
+                    : ''}
                 </span>
               </div>
             </div>

@@ -19,9 +19,12 @@ export const useNotificationsStore = create<NotificationsState>()(
       notifications: [],
 
       addNotification: (notification) =>
-        set((state) => ({
-          notifications: [notification, ...state.notifications],
-        })),
+        set((state) => {
+          if (state.notifications.some((existing) => existing.id === notification.id)) {
+            return state;
+          }
+          return { notifications: [notification, ...state.notifications] };
+        }),
 
       markAsRead: (id) =>
         set((state) => ({
@@ -48,7 +51,18 @@ export const useNotificationsStore = create<NotificationsState>()(
     }),
     {
       name: 'notifications-storage',
+      onRehydrateStorage: () => (state) => {
+        if (!state?.notifications?.length) return;
+        const seen = new Set<string>();
+        const deduped = state.notifications.filter((notification) => {
+          if (seen.has(notification.id)) return false;
+          seen.add(notification.id);
+          return true;
+        });
+        if (deduped.length !== state.notifications.length) {
+          state.notifications = deduped;
+        }
+      },
     }
   )
 );
-

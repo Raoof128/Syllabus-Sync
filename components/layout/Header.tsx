@@ -2,11 +2,32 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { Bell, Settings, User, GraduationCap, Clock, Calendar, BookOpen, Info } from 'lucide-react';
+import {
+  Bell,
+  Settings,
+  User,
+  GraduationCap,
+  Clock,
+  Calendar,
+  BookOpen,
+  Info,
+  LogOut,
+  Moon,
+  Sun,
+} from 'lucide-react';
 import { APP_CONFIG, DEMO_USER, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useThemeStore } from '@/lib/store/themeStore';
+import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleNotifications } from '@/data/sampleNotifications';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const notificationIcons = {
   deadline: Clock,
@@ -26,18 +47,30 @@ export default function Header() {
   const [isClient, setIsClient] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Set client-side flag after hydration
   useEffect(() => {
     setTimeout(() => setIsClient(true), 0);
   }, []);
 
-  // Seed sample notifications on first load
   useEffect(() => {
-    if (!hasSeeded && notifications.length === 0 && isClient) {
-      sampleNotifications.forEach(addNotification);
+    if (!hasSeeded && isClient) {
+      const seededKey = 'notifications-seeded';
+      try {
+        const alreadySeeded = localStorage.getItem(seededKey) === 'true';
+        if (!alreadySeeded) {
+          sampleNotifications.forEach(addNotification);
+          localStorage.setItem(seededKey, 'true');
+        }
+      } catch {
+        sampleNotifications.forEach(addNotification);
+      }
       setTimeout(() => setHasSeeded(true), 0);
     }
-  }, [addNotification, hasSeeded, notifications.length, isClient]);
+  }, [addNotification, hasSeeded, isClient]);
+
+  // Theme and profile stores
+  const { toggleTheme, resolvedTheme } = useThemeStore();
+  const { getCurrentProfile } = useProfilesStore();
+  const currentProfile = isClient ? getCurrentProfile() : null;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -64,9 +97,7 @@ export default function Header() {
           <GraduationCap className="w-6 h-6 text-white" />
         </div>
         <div className="hidden sm:block">
-          <h1 className="text-lg font-semibold text-gray-900">
-            {APP_CONFIG.name}
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-900">{APP_CONFIG.name}</h1>
           <p className="text-xs text-gray-500">{UNIVERSITY_CONFIG.shortName}</p>
         </div>
       </div>
@@ -104,9 +135,7 @@ export default function Header() {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500 text-sm">
-                    No notifications yet
-                  </div>
+                  <div className="p-4 text-center text-gray-500 text-sm">No notifications yet</div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
@@ -123,24 +152,42 @@ export default function Header() {
                         }`}
                       >
                         <div className="flex gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            notification.type === 'deadline' ? 'bg-orange-100' :
-                            notification.type === 'event' ? 'bg-purple-100' :
-                            notification.type === 'class' ? 'bg-blue-100' : 'bg-gray-100'
-                          }`}>
-                            <Icon className={`w-4 h-4 ${
-                              notification.type === 'deadline' ? 'text-orange-600' :
-                              notification.type === 'event' ? 'text-purple-600' :
-                              notification.type === 'class' ? 'text-blue-600' : 'text-gray-600'
-                            }`} />
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              notification.type === 'deadline'
+                                ? 'bg-orange-100'
+                                : notification.type === 'event'
+                                  ? 'bg-purple-100'
+                                  : notification.type === 'class'
+                                    ? 'bg-blue-100'
+                                    : 'bg-gray-100'
+                            }`}
+                          >
+                            <Icon
+                              className={`w-4 h-4 ${
+                                notification.type === 'deadline'
+                                  ? 'text-orange-600'
+                                  : notification.type === 'event'
+                                    ? 'text-purple-600'
+                                    : notification.type === 'class'
+                                      ? 'text-blue-600'
+                                      : 'text-gray-600'
+                              }`}
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-gray-900 truncate`}>
+                            <p
+                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-gray-900 truncate`}
+                            >
                               {notification.title}
                             </p>
-                            <p className="text-xs text-gray-600 line-clamp-2">{notification.message}</p>
+                            <p className="text-xs text-gray-600 line-clamp-2">
+                              {notification.message}
+                            </p>
                             <p className="text-xs text-gray-400 mt-1">
-                              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                              {formatDistanceToNow(new Date(notification.createdAt), {
+                                addSuffix: true,
+                              })}
                             </p>
                           </div>
                           {!notification.read && (
@@ -156,28 +203,73 @@ export default function Header() {
           )}
         </div>
 
-        {/* Settings */}
-        <Link
-          href="/settings"
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          aria-label="Settings"
-        >
-          <Settings className="w-5 h-5 text-gray-600" />
-        </Link>
+        {/* Theme Toggle */}
+        {isClient && (
+          <button
+            onClick={toggleTheme}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            aria-label="Toggle theme"
+          >
+            {resolvedTheme === 'dark' ? (
+              <Sun className="w-5 h-5 text-gray-600" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+        )}
 
         {/* Profile */}
-        <button
-          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          aria-label="Profile"
-        >
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: BRAND_COLORS.primary }}
-          >
-            <User className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-sm font-medium text-gray-700 hidden sm:inline">{DEMO_USER.name}</span>
-        </button>
+        {isClient && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label="Open profile menu"
+              >
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: BRAND_COLORS.primary }}
+                >
+                  {currentProfile ? (
+                    <span className="text-white font-bold text-sm">
+                      {currentProfile.name.charAt(0).toUpperCase()}
+                    </span>
+                  ) : (
+                    <User className="w-5 h-5 text-white" />
+                  )}
+                </div>
+                <div className="text-sm font-medium text-gray-700 hidden sm:inline">
+                  {currentProfile ? currentProfile.name : DEMO_USER.name}
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link href="/profiles" className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Manage Profiles
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings" className="flex items-center gap-2">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/calendar" className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Calendar
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem disabled className="flex items-center gap-2">
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );

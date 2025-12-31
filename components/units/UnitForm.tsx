@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 
 interface UnitFormProps {
   open: boolean;
@@ -42,7 +42,7 @@ const DAYS: DayOfWeek[] = [
 ];
 
 export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
-  const { addUnit, updateUnit, removeUnit } = useUnitsStore();
+  const { addUnit, updateUnit } = useUnitsStore();
 
   // Form state
   const [code, setCode] = useState('');
@@ -154,14 +154,6 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
     onOpenChange(false);
     resetForm();
-  };
-
-  const handleDelete = () => {
-    if (editUnit && confirm('Are you sure you want to delete this unit?')) {
-      removeUnit(editUnit.id);
-      onOpenChange(false);
-      resetForm();
-    }
   };
 
   const handleCancel = () => {
@@ -352,15 +344,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           </div>
         </div>
 
-        <DialogFooter className="flex justify-between">
-          <div>
-            {editUnit && (
-              <Button type="button" variant="destructive" onClick={handleDelete}>
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Unit
-              </Button>
-            )}
-          </div>
+        <DialogFooter className="flex justify-end">
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel

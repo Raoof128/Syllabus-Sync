@@ -55,6 +55,7 @@ export default function UnitCard({ unit, onEdit, onDelete, showActions = true }:
                   size="sm"
                   onClick={() => onEdit(unit)}
                   className="h-8 w-8 p-0"
+                  aria-label={`Edit ${unit.code}`}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>
@@ -65,6 +66,7 @@ export default function UnitCard({ unit, onEdit, onDelete, showActions = true }:
                   size="sm"
                   onClick={() => onDelete(unit)}
                   className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                  aria-label={`Delete ${unit.code}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>

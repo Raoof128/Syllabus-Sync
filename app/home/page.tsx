@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
-import QuickActions from '@/components/home/QuickActions';
 import UnitForm from '@/components/units/UnitForm';
 import UnitCard from '@/components/units/UnitCard';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
@@ -33,6 +32,14 @@ export default function HomePage() {
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [seedDisabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('seed-disabled') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const hasSeededRef = useRef(false);
   const [unitFormOpen, setUnitFormOpen] = useState(false);
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
@@ -58,18 +65,31 @@ export default function HomePage() {
 
   // Load sample data on first visit
   useEffect(() => {
-    if (!hasHydrated || hasSeededRef.current) {
+    if (!hasHydrated || hasSeededRef.current || seedDisabled) {
       return;
     }
 
-    if (units.length === 0) {
+    const unitsSeededKey = 'units-seeded';
+    const deadlinesSeededKey = 'deadlines-seeded';
+
+    try {
+      const unitsSeeded = localStorage.getItem(unitsSeededKey) === 'true';
+      const deadlinesSeeded = localStorage.getItem(deadlinesSeededKey) === 'true';
+
+      if (!unitsSeeded) {
+        sampleUnits.forEach(addUnit);
+        localStorage.setItem(unitsSeededKey, 'true');
+      }
+      if (!deadlinesSeeded) {
+        sampleDeadlines.forEach(addDeadline);
+        localStorage.setItem(deadlinesSeededKey, 'true');
+      }
+    } catch {
       sampleUnits.forEach(addUnit);
-    }
-    if (deadlines.length === 0) {
       sampleDeadlines.forEach(addDeadline);
     }
     hasSeededRef.current = true;
-  }, [addDeadline, addUnit, deadlines.length, hasHydrated, units.length]);
+  }, [addDeadline, addUnit, hasHydrated, seedDisabled]);
 
   const hasUnits = units.length > 0;
   const stressLevel = hasHydrated ? getStressLevel() : 'Low';
@@ -210,13 +230,19 @@ export default function HomePage() {
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-gray-900">
-                    {units.reduce((acc, u) => {
-                      return acc + u.schedule.reduce((hours, s) => {
-                        const [startH, startM] = s.startTime.split(':').map(Number);
-                        const [endH, endM] = s.endTime.split(':').map(Number);
-                        return hours + (endH - startH) + (endM - startM) / 60;
-                      }, 0);
-                    }, 0).toFixed(0)}h
+                    {units
+                      .reduce((acc, u) => {
+                        return (
+                          acc +
+                          u.schedule.reduce((hours, s) => {
+                            const [startH, startM] = s.startTime.split(':').map(Number);
+                            const [endH, endM] = s.endTime.split(':').map(Number);
+                            return hours + (endH - startH) + (endM - startM) / 60;
+                          }, 0)
+                        );
+                      }, 0)
+                      .toFixed(0)}
+                    h
                   </p>
                   <p className="text-xs text-gray-500">Study Hours</p>
                 </div>
@@ -243,15 +269,8 @@ export default function HomePage() {
         <EventsFeed />
       </div>
 
-      {/* Quick Actions */}
-      <QuickActions />
-
       {/* Unit Form Dialog */}
-      <UnitForm
-        open={unitFormOpen}
-        onOpenChange={setUnitFormOpen}
-        editUnit={editingUnit}
-      />
+      <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />
 
       {/* Deadline Form Dialog */}
       <DeadlineForm
