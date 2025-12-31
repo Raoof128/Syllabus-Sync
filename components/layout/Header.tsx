@@ -7,6 +7,7 @@ import { APP_CONFIG, DEMO_USER, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/co
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { sampleNotifications } from '@/data/sampleNotifications';
 import { formatDistanceToNow } from 'date-fns';
+import { useHydration } from '@/lib/hooks/useHydration';
 
 const notificationIcons = {
   deadline: Clock,
@@ -22,22 +23,23 @@ export default function Header() {
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [hasSeeded, setHasSeeded] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Set client-side flag after hydration
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // Use proper hydration hook
+  const isHydrated = useHydration();
+  const hasSeedRef = useRef(false);
 
-  // Seed sample notifications on first load
+  // Seed sample notifications on first mount - using external system pattern
   useEffect(() => {
-    if (!hasSeeded && notifications.length === 0 && isClient) {
-      sampleNotifications.forEach(addNotification);
-      setHasSeeded(true);
+    if (hasSeedRef.current || notifications.length > 0 || !isHydrated) {
+      return;
     }
-  }, [addNotification, hasSeeded, notifications.length, isClient]);
+
+    hasSeedRef.current = true;
+    // Seed notifications - this is updating an external system (zustand store)
+    // which is the correct use of useEffect
+    sampleNotifications.forEach(addNotification);
+  }, [addNotification, notifications.length, isHydrated]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function Header() {
   }, []);
 
   // Only calculate unread count on client to avoid hydration mismatch
-  const unreadCount = isClient ? getUnreadCount() : 0;
+  const unreadCount = isHydrated ? getUnreadCount() : 0;
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
