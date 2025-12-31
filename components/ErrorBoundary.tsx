@@ -1,53 +1,216 @@
 // components/ErrorBoundary.tsx
 'use client';
 
-import { Component, ReactNode } from 'react';
+import { Component, ReactNode, ErrorInfo } from 'react';
+import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  showErrorDetails?: boolean;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
+  errorInfo: ErrorInfo | null;
+  retryCount: number;
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
+  private retryTimeout: NodeJS.Timeout | null = null;
+
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      retryCount: 0,
+    };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return {
       hasError: true,
       error,
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error for monitoring/debugging
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Call optional error handler
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+
+    // Report to error tracking service (when implemented)
+    this.reportError(error, errorInfo);
+
+    this.setState({ errorInfo });
   }
+
+  componentWillUnmount() {
+    if (this.retryTimeout) {
+      clearTimeout(this.retryTimeout);
+    }
+  }
+
+  private reportError = (error: Error, errorInfo: ErrorInfo) => {
+    // Placeholder for error reporting service
+    // In a real app, this would send to services like Sentry, LogRocket, etc.
+    const errorReport = {
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    };
+
+    // Store in localStorage for debugging (in development)
+    if (process.env.NODE_ENV === 'development') {
+      const existingReports = JSON.parse(localStorage.getItem('errorReports') || '[]');
+      existingReports.push(errorReport);
+      localStorage.setItem('errorReports', JSON.stringify(existingReports.slice(-10))); // Keep last 10
+    }
+
+    // TODO: Send to error tracking service
+    // Example: Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+  };
+
+  private handleRetry = () => {
+    const { retryCount } = this.state;
+    const maxRetries = 3;
+
+    if (retryCount < maxRetries) {
+      // Implement exponential backoff
+      const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+
+      this.retryTimeout = setTimeout(() => {
+        this.setState({
+          hasError: false,
+          error: null,
+          errorInfo: null,
+          retryCount: retryCount + 1,
+        });
+      }, delay);
+    } else {
+      // Max retries reached, redirect to home
+      window.location.href = '/';
+    }
+  };
+
+  private handleReset = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+      retryCount: 0,
+    });
+  };
 
   render() {
     if (this.state.hasError) {
+      // Custom fallback if provided
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      const { error, errorInfo, retryCount } = this.state;
+      const maxRetries = 3;
+      const canRetry = retryCount < maxRetries;
+
       return (
-        <div className="flex items-center justify-center min-h-[60vh] px-4">
-          <div className="text-center max-w-md">
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-red-600 text-2xl">⚠️</span>
+        <div className="flex items-center justify-center min-h-[60vh] px-4 animate-fade-in">
+          <div className="text-center max-w-lg mx-auto">
+            {/* Error Icon */}
+            <div className="mx-auto w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6">
+              <AlertTriangle className="w-10 h-10 text-red-600 dark:text-red-400" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-            <p className="text-gray-600 mb-4">
-              An unexpected error occurred. Please try refreshing the page.
+
+            {/* Error Title */}
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-3">
+              Oops! Something went wrong
+            </h1>
+
+            {/* Error Description */}
+            <p className="text-gray-600 dark:text-slate-300 mb-6 text-lg">
+              We encountered an unexpected error. This has been automatically reported and
+              we&apos;re working to fix it.
             </p>
-            <button
-              onClick={() => this.setState({ hasError: false, error: null })}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Try Again
-            </button>
+
+            {/* Retry Counter */}
+            {retryCount > 0 && (
+              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  Retry attempt {retryCount} of {maxRetries}
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+              {canRetry ? (
+                <Button onClick={this.handleRetry} className="gap-2" size="lg">
+                  <RefreshCcw className="w-4 h-4" />
+                  Try Again
+                </Button>
+              ) : (
+                <Button onClick={() => (window.location.href = '/')} className="gap-2" size="lg">
+                  <Home className="w-4 h-4" />
+                  Go Home
+                </Button>
+              )}
+
+              <Button variant="outline" onClick={this.handleReset} className="gap-2" size="lg">
+                <Bug className="w-4 h-4" />
+                Reset
+              </Button>
+            </div>
+
+            {/* Development Error Details */}
+            {(this.props.showErrorDetails || process.env.NODE_ENV === 'development') && error && (
+              <details className="mt-8 text-left bg-gray-50 dark:bg-slate-800 p-4 rounded-lg border">
+                <summary className="cursor-pointer font-medium text-gray-900 dark:text-slate-100 mb-2">
+                  🔧 Error Details (Development)
+                </summary>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                      Error Message:
+                    </h4>
+                    <code className="text-sm bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-2 rounded block">
+                      {error.message}
+                    </code>
+                  </div>
+
+                  {errorInfo && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                        Component Stack:
+                      </h4>
+                      <pre className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 p-3 rounded overflow-auto max-h-48 whitespace-pre-wrap">
+                        {errorInfo.componentStack}
+                      </pre>
+                    </div>
+                  )}
+
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                      Stack Trace:
+                    </h4>
+                    <pre className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 p-3 rounded overflow-auto max-h-48">
+                      {error.stack}
+                    </pre>
+                  </div>
+                </div>
+              </details>
+            )}
           </div>
         </div>
       );

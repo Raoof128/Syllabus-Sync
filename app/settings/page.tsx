@@ -19,16 +19,30 @@ import { Button } from '@/components/ui/button';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import ProfileCard from '@/components/ProfileCard';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import dynamic from 'next/dynamic';
+
+// Dynamically import ProfileCard for better code splitting
+const ProfileCard = dynamic(() => import('@/components/ProfileCard'), {
+  loading: () => <div className="flex items-center justify-center p-4">Loading profile...</div>,
+});
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserProfile } from '@/lib/store/profilesStore';
+import { toastUtils } from '@/lib/utils/toast';
 
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<UserProfile | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,20 +68,26 @@ export default function SettingsPage() {
   const currentProfile = profiles.find((profile) => profile.id === currentProfileId);
 
   const handleClearAllData = () => {
-    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
-      setClearing(true);
-      units.forEach((unit) => removeUnit(unit.id));
-      deadlines.forEach((deadline) => removeDeadline(deadline.id));
-      localStorage.removeItem('units-storage');
-      localStorage.removeItem('deadlines-storage');
-      localStorage.removeItem('notifications-storage');
-      localStorage.removeItem('notifications-seeded');
-      localStorage.removeItem('units-seeded');
-      localStorage.removeItem('deadlines-seeded');
-      localStorage.setItem('seed-disabled', 'true');
-      setClearing(false);
-      alert('All data has been cleared successfully!');
-    }
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearAllData = () => {
+    setClearing(true);
+    units.forEach((unit) => removeUnit(unit.id));
+    deadlines.forEach((deadline) => removeDeadline(deadline.id));
+    localStorage.removeItem('units-storage');
+    localStorage.removeItem('deadlines-storage');
+    localStorage.removeItem('notifications-storage');
+    localStorage.removeItem('seed-disabled');
+    localStorage.removeItem('units-seeded');
+    localStorage.removeItem('deadlines-seeded');
+    localStorage.setItem('seed-disabled', 'true');
+    setClearing(false);
+    setShowClearConfirm(false);
+    toastUtils.success(
+      'Data Cleared',
+      'All units, deadlines, and data have been cleared successfully.',
+    );
   };
 
   const handleAddProfile = () => {
@@ -299,7 +319,7 @@ export default function SettingsPage() {
                   <h4 className="font-semibold text-gray-900">Dark Mode</h4>
                   <p className="text-sm text-gray-600">Switch to dark theme</p>
                 </div>
-                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
+                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50" />
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
@@ -308,7 +328,7 @@ export default function SettingsPage() {
                   <h4 className="font-semibold text-gray-900">Language</h4>
                   <p className="text-sm text-gray-600">Choose your preferred language</p>
                 </div>
-                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
+                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50" />
               </div>
             </div>
           </CardContent>
@@ -328,7 +348,7 @@ export default function SettingsPage() {
                   <h4 className="font-semibold text-gray-900">Data Storage</h4>
                   <p className="text-sm text-gray-600">Currently using local storage</p>
                 </div>
-                <div className="w-10 h-5 bg-green-500 rounded-full opacity-50"></div>
+                <div className="w-10 h-5 bg-green-500 rounded-full opacity-50" />
               </div>
             </div>
             <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
@@ -506,6 +526,27 @@ export default function SettingsPage() {
               <Button type="submit">{editingProfile ? 'Update Profile' : 'Create Profile'}</Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Clear Data Confirmation Dialog */}
+      <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Clear All Data</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all data? This action cannot be undone and will remove
+              all units, deadlines, and profiles.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmClearAllData} disabled={clearing}>
+              {clearing ? 'Clearing...' : 'Clear All Data'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -24,12 +24,7 @@ const DAY_SHORT: { [key: string]: string } = {
   Sunday: 'Sun',
 };
 
-export default React.memo(function UnitCard({
-  unit,
-  onEdit,
-  onDelete,
-  showActions = true,
-}: UnitCardProps) {
+const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: UnitCardProps) => {
   // Get unique days
   const getUniqueDays = () => {
     const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));
@@ -117,3 +112,7 @@ export default React.memo(function UnitCard({
     </Card>
   );
 });
+
+UnitCard.displayName = 'UnitCard';
+
+export default UnitCard;

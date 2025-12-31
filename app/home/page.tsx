@@ -5,17 +5,33 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
-import UnitForm from '@/components/units/UnitForm';
 import UnitCard from '@/components/units/UnitCard';
-import DeadlineForm from '@/components/deadlines/DeadlineForm';
+import dynamic from 'next/dynamic';
+
+// Dynamically import forms for better code splitting
+const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
+  loading: () => <div className="flex items-center justify-center p-8">Loading...</div>,
+});
+const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
+  loading: () => <div className="flex items-center justify-center p-8">Loading...</div>,
+});
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toastUtils } from '@/lib/utils/toast';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Unit, Deadline } from '@/lib/types';
 import {
   DropdownMenu,
@@ -45,6 +61,7 @@ export default function HomePage() {
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
+  const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
 
   useEffect(() => {
     const checkHydration = () => {
@@ -138,8 +155,17 @@ export default function HomePage() {
   };
 
   const handleDeleteUnit = (unit: Unit) => {
-    if (confirm(`Are you sure you want to delete ${unit.code} - ${unit.name}?`)) {
-      removeUnit(unit.id);
+    setDeleteUnitConfirm(unit);
+  };
+
+  const confirmDeleteUnit = () => {
+    if (deleteUnitConfirm) {
+      removeUnit(deleteUnitConfirm.id);
+      toastUtils.success(
+        'Unit Deleted',
+        `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} has been deleted.`,
+      );
+      setDeleteUnitConfirm(null);
     }
   };
 
@@ -235,9 +261,9 @@ export default function HomePage() {
           {!hasHydrated ? (
             <div className="h-32 flex items-center justify-center">
               <div className="animate-pulse space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-16 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-16 bg-gray-200 rounded w-full" />
               </div>
             </div>
           ) : units.length === 0 ? (
@@ -301,6 +327,30 @@ export default function HomePage() {
         onOpenChange={setDeadlineFormOpen}
         editDeadline={editingDeadline}
       />
+
+      {/* Delete Unit Confirmation Dialog */}
+      <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Unit</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{' '}
+              <strong>
+                {deleteUnitConfirm?.code} - {deleteUnitConfirm?.name}
+              </strong>
+              ? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setDeleteUnitConfirm(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteUnit}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

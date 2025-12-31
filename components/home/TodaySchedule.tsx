@@ -36,17 +36,17 @@ export default function TodaySchedule() {
         {!isHydrated ? (
           <div className="space-y-4 p-2">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-3/4 mb-3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-3/4 mb-3" />
               <div className="space-y-2">
-                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-5/6"></div>
+                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-full" />
+                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-5/6" />
               </div>
             </div>
             <div className="animate-pulse animation-delay-100">
-              <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-2/3 mb-3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-slate-600 rounded w-2/3 mb-3" />
               <div className="space-y-2">
-                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-4/5"></div>
+                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-full" />
+                <div className="h-3 bg-gray-200 dark:bg-slate-600 rounded w-4/5" />
               </div>
             </div>
           </div>
