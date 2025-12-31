@@ -13,7 +13,6 @@ const navigation = [
   { name: 'Calendar', href: '/calendar', icon: Calendar },
   { name: 'Map', href: '/map', icon: MapPin },
   { name: 'Feed', href: '/feed', icon: MessageSquare },
-  { name: 'Profiles', href: '/profiles', icon: User },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
@@ -60,29 +59,31 @@ export default function Sidebar() {
           </Link>
         </div>
 
-        <nav className="space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
-            const Icon = item.icon;
+          <nav className="space-y-1" role="navigation" aria-label="Main navigation">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
+              const Icon = item.icon;
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:bg-white hover:text-gray-900',
-                )}
-              >
-                <Icon className="h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:bg-white hover:text-gray-900',
+                  )}
+                  aria-current={isActive ? 'page' : undefined}
+                  aria-label={`Navigate to ${item.name}`}
+                >
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
       </div>
     </>
   );

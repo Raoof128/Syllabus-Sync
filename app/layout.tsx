@@ -5,6 +5,7 @@ import './globals.css';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import ThemeProvider from '@/components/theme/ThemeProvider';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -26,7 +27,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
               <Header />
-              <main className="flex-1 overflow-y-auto pt-16 md:pt-0">{children}</main>
+              <main className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
+                <ErrorBoundary>{children}</ErrorBoundary>
+              </main>
             </div>
           </div>
         </ThemeProvider>

@@ -4,7 +4,7 @@
 import React, { useMemo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin } from 'lucide-react';
+import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 
 export default function TodaySchedule() {
@@ -38,7 +38,20 @@ export default function TodaySchedule() {
             <p className="text-gray-400">Loading...</p>
           </div>
         ) : todayClasses.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No classes today 🎉</p>
+          <div className="text-center py-8">
+            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No classes today</h3>
+            <p className="text-gray-600 mb-4">
+              You&apos;re all caught up! Enjoy your free time.
+            </p>
+            <button
+              onClick={() => window.location.href = '/profiles'}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              Add Unit
+            </button>
+          </div>
         ) : (
           todayClasses.map((cls) => (
             <div

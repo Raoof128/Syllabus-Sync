@@ -1,3 +1,4 @@
+// components/deadlines/DeadlineForm.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -36,7 +37,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
-  // Form state
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -45,7 +45,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const [type, setType] = useState<Deadline['type']>('Assignment');
   const [completed, setCompleted] = useState(false);
 
-  // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const resetForm = () => {
@@ -59,7 +58,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     setErrors({});
   };
 
-  // Initialize form with edit data
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editDeadline) {
@@ -151,13 +149,12 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <DialogTitle>{editDeadline ? 'Edit Deadline' : 'Add New Deadline'}</DialogTitle>
           <DialogDescription>
             {editDeadline
-              ? 'Update the details of your deadline.'
-              : 'Fill in the details to add a new deadline.'}
+              ? 'Update details of your deadline.'
+              : 'Fill in details to add a new deadline.'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">
               Title <span className="text-red-500">*</span>
@@ -167,19 +164,16 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               placeholder="e.g., Assignment 1"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className={errors.title ? 'border-red-500' : ''}
             />
-            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
           </div>
 
-          {/* Unit */}
           <div className="space-y-2">
             <Label htmlFor="unitCode">
-              Unit <span className="text-red-500">*</span>
+              Unit Code <span className="text-red-500">*</span>
             </Label>
             <Select value={unitCode} onValueChange={setUnitCode}>
-              <SelectTrigger className={errors.unitCode ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select a unit" />
+              <SelectTrigger>
+                <SelectValue placeholder="Select unit" />
               </SelectTrigger>
               <SelectContent>
                 {units.map((unit) => (
@@ -189,61 +183,37 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 ))}
               </SelectContent>
             </Select>
-            {errors.unitCode && <p className="text-sm text-red-500">{errors.unitCode}</p>}
-            {units.length === 0 && (
-              <p className="text-sm text-yellow-600">Please add a unit first.</p>
-            )}
           </div>
 
-          {/* Due Date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dueDate">
-                Due Date <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className={errors.dueDate ? 'border-red-500' : ''}
-              />
-              {errors.dueDate && <p className="text-sm text-red-500">{errors.dueDate}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dueTime">Due Time</Label>
-              <Input
-                id="dueTime"
-                type="time"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Type */}
           <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
-            <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {DEADLINE_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="dueDate">
+              Due Date <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="dueDate"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
           </div>
 
-          {/* Priority */}
+          <div className="space-y-2">
+            <Label htmlFor="dueTime">
+              Due Time <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="dueTime"
+              type="time"
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="priority">Priority</Label>
             <Select value={priority} onValueChange={(v) => setPriority(v as Deadline['priority'])}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
                 {PRIORITY_LEVELS.map((p) => (
@@ -255,7 +225,38 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
             </Select>
           </div>
 
-          {/* Completed */}
+          <div className="space-y-2">
+            <Label htmlFor="type">Type</Label>
+            <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {DEADLINE_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type">Type</Label>
+            <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {DEADLINE_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex items-center gap-2">
             <input
               id="completed"
@@ -264,8 +265,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               onChange={(e) => setCompleted(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             />
-            <Label htmlFor="completed">Mark as completed</Label>
+            <Label htmlFor="completed" className="text-sm font-medium">
+              Mark as completed
+            </Label>
           </div>
+
+          {Object.keys(errors).length > 0 && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {Object.values(errors).map((error, index) => (
+                <div key={index}>• {error}</div>
+              ))}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex gap-2">

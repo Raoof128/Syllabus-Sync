@@ -17,12 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Unit, Deadline } from '@/lib/types';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export default function HomePage() {
   const units = useUnitsStore((state) => state.units);
@@ -202,26 +197,49 @@ export default function HomePage() {
             <div className="h-32 flex items-center justify-center">
               <p className="text-gray-400">Loading units...</p>
             </div>
-          ) : units.length === 0 ? (
-            <div className="text-center py-8">
-              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
-              <p className="text-gray-600 mb-4">
-                Add your first unit to start tracking your schedule.
-              </p>
-              <Button onClick={handleAddUnit} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Your First Unit
-              </Button>
-            </div>
-          ) : (
+           ) : units.length === 0 ? (
+             <div className="text-center py-12">
+               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+               <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
+               <p className="text-gray-600 mb-4 max-w-md mx-auto">
+                 Add your first unit to start tracking your schedule. It&apos;s yours calendar and today&apos;s schedule.
+               </p>
+               <Button onClick={handleAddUnit} className="gap-2">
+                 <Plus className="h-4 w-4" />
+                 Add Your First Unit
+               </Button>
+             </div>
+           ) : (
             <>
               {/* Unit Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{units.length}</p>
-                  <p className="text-xs text-gray-500">Units</p>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-3 bg-gray-50 rounded-lg">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-gray-900">{units.length}</p>
+          <p className="text-xs text-gray-500">Units</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-gray-900">
+            {units.reduce((acc, u) => acc + u.schedule.length, 0)}
+          </p>
+          <p className="text-xs text-gray-500">Classes/Week</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-gray-900">
+            {units
+              .reduce((acc, u) => {
+                return (
+                  acc +
+                  u.schedule.reduce((hours, s) => {
+                    const [startH, startM] = s.startTime.split(':').map(Number);
+                    const [endH, endM] = s.endTime.split(':').map(Number);
+                    return hours + (endH - startH) + (endM - startM) / 60;
+                  }, 0)
+                );
+              }, 0)
+              .toFixed(0)}
+          </p>
+          <p className="text-xs text-gray-500">Study Hours</p>
+        </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-gray-900">
                     {units.reduce((acc, u) => acc + u.schedule.length, 0)}

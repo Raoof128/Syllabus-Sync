@@ -54,6 +54,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
   // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
     setCode('');
@@ -133,6 +134,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const handleSave = () => {
     if (!validateForm()) return;
 
+    setIsSaving(true);
+
     const unitData: Unit = {
       id: editUnit?.id || uuidv4(),
       code: code.trim().toUpperCase(),
@@ -154,6 +157,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
     onOpenChange(false);
     resetForm();
+    setIsSaving(false);
   };
 
   const handleCancel = () => {
@@ -349,8 +353,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="button" onClick={handleSave}>
-              {editUnit ? 'Update' : 'Add'} Unit
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : editUnit ? 'Update' : 'Add'} Unit
             </Button>
           </div>
         </DialogFooter>
