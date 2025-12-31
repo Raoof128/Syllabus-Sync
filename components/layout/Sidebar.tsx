@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X, GraduationCap, User } from 'lucide-react';
+import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { APP_CONFIG, BRAND_COLORS } from '@/lib/config';
 

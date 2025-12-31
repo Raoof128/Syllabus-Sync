@@ -5,10 +5,9 @@ import { Settings, User, Bell, Palette, Shield, Database, Clock, Info, Mail, Cal
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { UNIVERSITY_CONFIG, APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@/lib/config';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import ProfileCard from '@/components/ProfileCard';
 
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);

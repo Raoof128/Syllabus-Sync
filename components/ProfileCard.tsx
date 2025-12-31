@@ -1,8 +1,10 @@
 // components/ProfileCard.tsx
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'lucide-react';
@@ -47,7 +49,6 @@ export default function ProfileCard({
     >
       <CardHeader className="flex flex-row items-start justify-between">
         <div className="flex items-center gap-3">
-          {/* Avatar */}
           <div className="relative">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
               {avatarUrl ? (
@@ -67,7 +68,6 @@ export default function ProfileCard({
             )}
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900">{profile.name}</h3>
             <p className="text-sm text-gray-600">{profile.email}</p>
@@ -81,7 +81,6 @@ export default function ProfileCard({
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-1">
           {!isCurrent && (
             <Button
@@ -158,7 +157,6 @@ export default function ProfileCard({
         </div>
       </CardContent>
 
-      {/* Avatar Upload */}
       <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
         <Camera className="h-4 w-4" />
         <span>Change Avatar</span>
@@ -170,7 +168,6 @@ export default function ProfileCard({
         />
       </label>
 
-      {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-900 mb-3">
