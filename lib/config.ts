@@ -41,11 +41,11 @@ export const APP_CONFIG = {
  */
 export const DEMO_USER = {
   // Display name
-  name: 'Demo User',
+  name: 'Alex Chen',
   // Student ID (optional, for display)
-  studentId: '12345678',
+  studentId: '46892315',
   // Email
-  email: 'demo@students.mq.edu.au',
+  email: 'alex.chen@students.mq.edu.au',
 } as const;
 
 /**
@@ -115,7 +115,7 @@ export const FEATURES = {
  * Links to university social media (optional)
  */
 export const SOCIAL_LINKS = {
-  twitter: 'https://twitter.com/Macquaborieuni',
+  twitter: 'https://twitter.com/macquarieuni',
   facebook: 'https://facebook.com/macquarieuniversity',
   instagram: 'https://instagram.com/macquarieuni',
   linkedin: 'https://linkedin.com/school/macquarie-university',

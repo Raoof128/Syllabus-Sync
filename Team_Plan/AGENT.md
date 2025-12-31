@@ -109,7 +109,8 @@ Macquarie University Administration - February 2025
 **Primary Files:**
 ```
 app/
-  ├── home/page.tsx
+  ├── home/page.tsx           # Home dashboard (with Units)
+  ├── calendar/page.tsx       # Calendar (with Deadlines)
   ├── layout.tsx
   ├── page.tsx
   ├── loading.tsx
@@ -123,12 +124,14 @@ components/
   │   ├── QuickActions.tsx
   │   └── TodaySchedule.tsx
   ├── layout/
-  │   ├── Header.tsx
-  │   └── Sidebar.tsx
+  │   ├── Header.tsx          # With university branding
+  │   └── Sidebar.tsx         # Mobile responsive
   ├── ui/* (all UI components)
-  └── units/
-      ├── UnitCard.tsx
-      └── UnitForm.tsx
+  ├── units/
+  │   ├── UnitCard.tsx
+  │   └── UnitForm.tsx
+  └── deadlines/
+      └── DeadlineForm.tsx    # NEW
 
 lib/
   ├── store/
@@ -137,6 +140,11 @@ lib/
   └── hooks/
       ├── useHydration.ts
       └── useLocalStorage.ts
+
+tests/
+  ├── UnitForm.test.tsx       # NEW
+  ├── UnitCard.test.tsx       # NEW
+  └── stores.test.ts          # NEW
 
 app/globals.css
 tailwind.config.ts
@@ -160,12 +168,13 @@ lib/
   └── types/index.ts
 
 data/
-  ├── sampleUnits.ts
+  ├── sampleUnits.ts          # With stable IDs
   └── sampleEvents.ts
 
 app/
-  ├── map/page.tsx
-  └── settings/page.tsx
+  ├── map/page.tsx            # Google Maps embed
+  ├── settings/page.tsx       # Clear data functionality
+  └── feed/page.tsx
 
 # Phase 2+
 lib/supabase/
@@ -195,9 +204,9 @@ syllabus-sync/
 │   ├── error.tsx                # Error boundary
 │   ├── not-found.tsx            # 404 page
 │   ├── home/
-│   │   └── page.tsx             # ✅ Home Dashboard (Pouya)
+│   │   └── page.tsx             # ✅ Home Dashboard + Units (Pouya)
 │   ├── calendar/
-│   │   └── page.tsx             # 🚧 Calendar view (Phase 3)
+│   │   └── page.tsx             # ✅ Calendar + Deadlines (Pouya)
 │   ├── map/
 │   │   └── page.tsx             # 🚧 Campus map (Raouf - Phase 4)
 │   ├── feed/

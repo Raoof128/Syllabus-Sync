@@ -22,8 +22,8 @@
 flowchart LR
   subgraph UI
     Home[Home Page]
-    Map[Map Page]
     Calendar[Calendar Page]
+    Map[Map Page]
     Feed[Feed Page]
     Settings[Settings Page]
   end
@@ -40,6 +40,8 @@ flowchart LR
 
   Home --> UnitsStore
   Home --> DeadlinesStore
+  Calendar --> DeadlinesStore
+  Calendar --> UnitsStore
   Feed --> SampleEvents
   UnitsStore --> LocalStorage[(localStorage)]
   DeadlinesStore --> LocalStorage
@@ -48,31 +50,39 @@ flowchart LR
 
 ---
 
----
-
 ## ✨ Demo Features
 
 ### 🏠 **Home Dashboard** (Available Now)
 - **Today's Schedule:** View your classes for the day with room locations
 - **Next Deadline:** Track upcoming assignments with priority levels
-- **Events Feed:** Discover campus events across categories (Career, Social, Academic, Free Food)
-- **Quick Actions:** Fast navigation to Map and Calendar views
+- **My Units:** Full unit management with add/edit/delete functionality
+- **Unit Stats:** Total units, classes per week, and study hours
+- **Events Feed:** Discover campus events across categories
+- **Stress Indicator:** Visual workload indicator based on deadlines
 
-### 📅 **Calendar View** (Coming Soon)
-- Visual calendar with integrated class schedules
-- Deadline tracking with color-coded priorities
-- Multiple view modes (month/week/day)
+### 📅 **Calendar & Deadlines** (Available Now)
+- **Full Deadline Management:** Add, edit, complete, delete deadlines
+- **Stats Overview:** Upcoming, completed, overdue counts
+- **Completion Toggle:** Mark deadlines as complete/incomplete
+- **Stress Level Indicator:** Visual indicator based on workload
+- **Priority & Type Badges:** Color-coded priority and deadline types
+- **Overdue Detection:** Highlights overdue deadlines
+- **Calendar Preview:** Coming soon - interactive calendar view
 
-### 🗺️ **Campus Map** (Coming Soon)
-- Interactive campus navigation
-- Building locations with room numbers
-- Walking directions between locations
+### 🗺️ **Campus Map** (Preview Available)
+- Google Maps embed with Macquarie University location
+- Campus buildings quick reference
+- Interactive features coming soon
 
-### 📱 **Additional Features** (Roadmap)
-- Event discovery and filtering
-- Smart notifications for classes and deadlines
-- Unit management with custom schedules
-- Settings and preferences
+### 📱 **Feed & Events** (Available Now)
+- Event discovery and filtering by category
+- Career, Social, Academic, and Free Food events
+- Time and location details for each event
+
+### ⚙️ **Settings** (Partially Available)
+- Clear all data functionality
+- Data storage status
+- App version and information
 
 ---
 
@@ -114,8 +124,8 @@ npm test             # Run tests
 ```
 syllabus-sync/
 ├── app/                      # Next.js pages
-│   ├── home/                # Home dashboard
-│   ├── calendar/            # Calendar view
+│   ├── home/                # Home dashboard (Units + Schedule)
+│   ├── calendar/            # Calendar view (Deadlines)
 │   ├── map/                 # Campus map
 │   ├── feed/                # Events feed
 │   └── settings/            # Settings page
@@ -123,20 +133,26 @@ syllabus-sync/
 │   ├── home/                # Dashboard components
 │   ├── layout/              # Sidebar & Header
 │   ├── ui/                  # Reusable UI components
-│   └── units/               # Unit management
+│   ├── units/               # Unit management
+│   └── deadlines/           # Deadline management
 ├── lib/
 │   ├── store/               # State management (Zustand)
 │   ├── types/               # TypeScript definitions
 │   └── hooks/               # Custom React hooks
-└── data/                     # Sample data for demo
+├── data/                    # Sample data for demo
+└── tests/                   # Unit tests
 ```
 
 ---
 
 ## 👥 Team
 
-- **Pouya** - Frontend Lead, UI/UX, State Management, Home Dashboard
-- **Raouf** - Backend Lead, Database Integration, API Development, Map & Settings
+| Role | Member | Responsibilities |
+|------|--------|------------------|
+| **Frontend Lead** | Pouya | UI/UX, Components, State Management |
+| **Backend Lead** | Raouf | Database, API, Configuration |
+
+See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
 
 ---
 
@@ -144,12 +160,7 @@ syllabus-sync/
 
 - **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
 - **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
-- **[TEAM_ROADMAP.md](Team_Plan/TEAM_ROADMAP.md)** - Team tasks and timeline
-- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Architecture overview
-- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Type and store reference
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
-- **[SECURITY.md](SECURITY.md)** - Security reporting
+- **[TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md)** - Team responsibilities
 
 ---
 
@@ -163,50 +174,49 @@ syllabus-sync/
 - [x] Next Deadline widget
 - [x] Events Feed preview
 - [x] State management (Zustand)
+- [x] Unit management (add/edit/delete)
+- [x] Deadline management
+- [x] Mobile responsive sidebar
+- [x] Stress level indicator
 
 ### 🚧 Phase 2 (Weeks 3-4) - IN PROGRESS
 
-- [ ] Unit Form (Add/Edit/Delete)
-- [ ] Deadline management
-- [ ] Stress Forecast algorithm
 - [ ] Database setup (Supabase)
+- [ ] User authentication
+- [ ] Cloud sync for data
+- [ ] Push notifications
 
 ### ⏳ Phase 3 (Week 5) - Calendar
 
 - [ ] FullCalendar integration
 - [ ] Class schedule visualization
-- [ ] Deadline integration
-- [ ] Event management
+- [ ] Deadline integration on calendar
 
 ### ⏳ Phase 4 (Week 6) - Map
 
-- [ ] Leaflet map setup
+- [ ] Interactive campus map
 - [ ] Building markers
 - [ ] Navigation routing
-- [ ] Current location tracking
 
-### ⏳ Phase 5 (Week 7) - Events & Polish
+### ⏳ Phase 5-6 (Weeks 7-8) - Polish & Demo
 
-- [ ] Live events feed
-- [ ] Event interactivity (RSVP, reminders)
 - [ ] UI refinements
-- [ ] Mobile optimization
+- [ ] Performance optimization
+- [ ] Demo preparation
 
-### ⏳ Phase 6 (Week 8) - Demo Preparation
-
-- [ ] Demo script
-- [ ] Pitch deck (9 slides)
-- [ ] Demo video
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework:** Next.js 16 (React 19)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS + Shadcn UI
-- **State:** Zustand (localStorage)
-- **Icons:** Lucide React
-- **Date Handling:** date-fns
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 16 (React 19) |
+| Language | TypeScript 5.x |
+| Styling | Tailwind CSS + Shadcn UI |
+| State | Zustand (localStorage) |
+| Icons | Lucide React |
+| Date Handling | date-fns |
+| Testing | Vitest + Testing Library |
 
 ---
 
@@ -217,11 +227,6 @@ syllabus-sync/
 - **Primary Blue:** `#002A45`  
 - **Accent Gold:** `#FFB81C`
 
-### UI Components
-- Built with Shadcn UI
-- Responsive design (mobile-first)
-- Consistent spacing and typography
-
 ---
 
 ## 📄 License
@@ -230,23 +235,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📞 Contact
-
-**Project Team:** Macquarie University Demo Project  
-**Demo Target:** University Administration  
-**Timeline:** February 2025
-
----
-
-Built with ❤️ for Macquarie University students
-
----
-
 ## 📊 Project Status
 
-**Current Version:** 0.2.0 (Phase 1 Complete)  
-**Last Updated:** December 30, 2025  
-**Status:** 🚧 Active Development - Phase 2 In Progress
+**Current Version:** 0.3.0  
+**Last Updated:** December 31, 2025  
+**Status:** 🚧 Active Development
 
 ---
 

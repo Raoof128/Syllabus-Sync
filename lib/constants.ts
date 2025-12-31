@@ -1,8 +1,12 @@
 // lib/constants.ts
 
-// App configuration
-export const APP_NAME = 'Syllabus Sync';
-export const APP_DESCRIPTION = 'Campus navigation and schedule management for Macquarie University';
+// Re-export app configuration from config.ts to maintain single source of truth
+export { APP_CONFIG, UNIT_COLORS } from './config';
+
+// Derive APP_NAME and APP_DESCRIPTION from config for backward compatibility
+import { APP_CONFIG, UNIVERSITY_CONFIG } from './config';
+export const APP_NAME = APP_CONFIG.name;
+export const APP_DESCRIPTION = `${APP_CONFIG.description} for ${UNIVERSITY_CONFIG.name}`;
 
 // Routes
 export const ROUTES = {
@@ -43,17 +47,6 @@ export const DEADLINE_TYPES = ['Assignment', 'Exam', 'Quiz', 'Presentation'] as 
 // Event categories
 export const EVENT_CATEGORIES = ['Career', 'Social', 'Academic', 'Free Food'] as const;
 
-// Color palette for units
-export const UNIT_COLORS = [
-  { name: 'Macquarie Red', value: '#A6192E' },
-  { name: 'Macquarie Blue', value: '#002A45' },
-  { name: 'Macquarie Gold', value: '#FFB81C' },
-  { name: 'Green', value: '#10b981' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Pink', value: '#ec4899' },
-  { name: 'Cyan', value: '#06b6d4' },
-] as const;
 
 // Priority colors for badges
 export const PRIORITY_COLORS: Record<string, string> = {

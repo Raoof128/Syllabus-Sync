@@ -1,12 +1,37 @@
 // app/settings/page.tsx
 'use client';
 
-import { Settings, User, Bell, Palette, Shield, Database, Clock, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, User, Bell, Palette, Shield, Database, Clock, Info, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UNIVERSITY_CONFIG } from '@/lib/config';
+import { Button } from '@/components/ui/button';
+import { UNIVERSITY_CONFIG, APP_CONFIG } from '@/lib/config';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 
 export default function SettingsPage() {
+  const [clearing, setClearing] = useState(false);
+  const units = useUnitsStore((state) => state.units);
+  const removeUnit = useUnitsStore((state) => state.removeUnit);
+  const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
+
+  const handleClearAllData = () => {
+    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+      setClearing(true);
+      // Clear all units
+      units.forEach((unit) => removeUnit(unit.id));
+      // Clear all deadlines
+      deadlines.forEach((deadline) => removeDeadline(deadline.id));
+      // Clear localStorage directly as well
+      localStorage.removeItem('units-storage');
+      localStorage.removeItem('deadlines-storage');
+      setClearing(false);
+      alert('All data has been cleared successfully!');
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
@@ -167,7 +192,16 @@ export default function SettingsPage() {
                       Delete all stored data from the app
                     </p>
                   </div>
-                  <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleClearAllData}
+                    disabled={clearing}
+                    className="gap-1"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {clearing ? 'Clearing...' : 'Clear'}
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -237,7 +271,7 @@ export default function SettingsPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Version</span>
-                  <span className="font-mono text-gray-900">0.1.0</span>
+                  <span className="font-mono text-gray-900">{APP_CONFIG.version}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Phase</span>
@@ -245,7 +279,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Last Update</span>
-                  <span className="text-gray-900">Dec 28, 2025</span>
+                  <span className="text-gray-900">Dec 31, 2025</span>
                 </div>
               </div>
             </CardContent>

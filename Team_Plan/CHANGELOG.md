@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2025-12-31
+
+### Added
+
+#### New Features
+- **DeadlineForm component** (`components/deadlines/DeadlineForm.tsx`) - Full deadline management dialog
+- **Units list on Home page** - My Units section with stats and full CRUD
+- **Deadlines on Calendar page** - Full deadline management integrated into calendar
+- **Stress level indicator** - Shows on Home page header with emoji
+- **Mobile responsive sidebar** - Hamburger menu for mobile devices
+- **University branding** - GraduationCap logo in Header and Sidebar
+- **Campus buildings list** - Quick reference on Map page
+- **Google Maps embed** - Preview map of Macquarie University campus
+- **Notification indicator** - Red dot on bell icon in header
+
+#### New Tests
+- `tests/UnitForm.test.tsx` - Unit form component tests (Frontend)
+- `tests/UnitCard.test.tsx` - Unit card component tests (Frontend)
+- `tests/stores.test.ts` - Store unit tests (Frontend)
+
+### Changed
+
+#### Page Restructuring
+- **Home page** now includes full Units management (was separate page)
+- **Calendar page** now includes full Deadlines management (was separate page)
+- Removed standalone `/units` and `/deadlines` pages
+- Simplified navigation: Home → Calendar → Map → Feed → Settings
+
+#### Bug Fixes
+- Fixed UUID hydration issues in `sampleUnits.ts` - now uses stable IDs
+- Fixed version mismatch in settings page - now uses `APP_CONFIG.version`
+- Fixed Twitter typo in config.ts - "Macquaborieuni" → "macquarieuni"
+- Fixed constants.ts duplication - now re-exports from config.ts
+- Removed unused imports across multiple files
+
+#### UI/UX Improvements
+- Removed internal labels ("Week 6", "Phase 2") - replaced with "Coming Soon"
+- Header settings icon now links to `/settings` page
+- Demo user updated to "Alex Chen" for realistic demo
+- Improved mobile responsiveness throughout
+
+### Removed
+- `app/units/page.tsx` - Merged into Home page
+- `app/deadlines/page.tsx` - Merged into Calendar page
+- Removed "Units" and "Deadlines" from sidebar navigation
+
+### File Ownership (Frontend/Backend)
+
+#### Frontend Files (Pouya)
+- `app/home/page.tsx` - Home dashboard with units
+- `app/calendar/page.tsx` - Calendar with deadlines
+- `components/deadlines/DeadlineForm.tsx` - Deadline form dialog
+- `components/layout/Header.tsx` - Updated with branding
+- `components/layout/Sidebar.tsx` - Mobile responsive
+- All test files in `tests/`
+
+#### Backend Files (Raouf)
+- `lib/config.ts` - App configuration
+- `data/sampleUnits.ts` - Sample data with stable IDs
+- `app/map/page.tsx` - Map page with Google Maps
+- `app/settings/page.tsx` - Settings with clear data
+
+---
+
 ## [0.2.0] - 2025-12-30
 
 ### Added

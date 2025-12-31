@@ -1,10 +1,10 @@
 // app/map/page.tsx
 'use client';
 
-import { MapPin, Navigation, Building2, Clock, Info } from 'lucide-react';
+import { MapPin, Navigation, Building2, Clock, Info, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { UNIVERSITY_CONFIG } from '@/lib/config';
+import { Button } from '@/components/ui/button';
+import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
 
 export default function MapPage() {
   return (
@@ -20,22 +20,62 @@ export default function MapPage() {
         <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-sm text-blue-900">
-            <strong>Coming soon:</strong> Interactive campus map with building locations and
-            navigation is under development.
+            <strong>Preview:</strong> View the campus on Google Maps below. Interactive building markers and navigation coming soon!
           </p>
         </div>
       </div>
 
-      {/* Map Placeholder */}
+      {/* Map with Google Maps Embed */}
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Interactive Map</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Campus Overview</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="https://www.google.com/maps/place/Macquarie+University/@-33.7738,151.1126,16z"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Open in Google Maps
+            </a>
+          </Button>
         </CardHeader>
         <CardContent>
-          <div className="bg-gray-50 h-80 rounded-lg flex flex-col items-center justify-center">
-            <MapPin className="h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-500 text-center">Map view coming soon...</p>
-            <Badge className="mt-4 bg-yellow-100 text-yellow-800">Week 6</Badge>
+          <div className="rounded-lg overflow-hidden border border-gray-200">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3316.0!2d151.1126!3d-33.7738!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12a5f0c1b3f0e5%3A0x8e0c3f8f0e0f0e0f!2sMacquarie%20University!5e0!3m2!1sen!2sau!4v1640000000000"
+              width="100%"
+              height="400"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Macquarie University Campus Map"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Campus Buildings Quick Reference */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Campus Buildings
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {CAMPUS_BUILDINGS.map((building) => (
+              <div
+                key={building.code}
+                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+              >
+                <div className="font-semibold text-gray-900">{building.code}</div>
+                <div className="text-sm text-gray-600">{building.name}</div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -60,7 +100,7 @@ export default function MapPage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Clock className="h-4 w-4" />
-                <span>Coming in Week 6</span>
+                <span>Coming Soon</span>
               </div>
             </div>
           </CardContent>
@@ -84,7 +124,7 @@ export default function MapPage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Clock className="h-4 w-4" />
-                <span>Coming in Week 6</span>
+                <span>Coming Soon</span>
               </div>
             </div>
           </CardContent>
@@ -108,7 +148,7 @@ export default function MapPage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Clock className="h-4 w-4" />
-                <span>Coming in Week 6</span>
+                <span>Coming Soon</span>
               </div>
             </div>
           </CardContent>

@@ -22,9 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
             <Header />
-            <main className="flex-1 overflow-y-auto">{children}</main>
+            <main className="flex-1 overflow-y-auto pt-16 md:pt-0">{children}</main>
           </div>
         </div>
       </body>

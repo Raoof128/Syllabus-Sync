@@ -2,6 +2,8 @@
 
 **Syllabus Sync - Frontend/Backend Division**
 
+Last Updated: December 31, 2025
+
 ---
 
 ## 🎨 POUYA - Frontend Lead
@@ -30,8 +32,10 @@ app/
 ├── error.tsx                   # Error boundaries
 ├── not-found.tsx               # 404 page
 ├── globals.css                 # Global styles
-└── home/
-    └── page.tsx                # ⭐ Home dashboard
+├── home/
+│   └── page.tsx                # ⭐ Home dashboard (includes Units)
+└── calendar/
+    └── page.tsx                # ⭐ Calendar page (includes Deadlines)
 ```
 
 #### **Home Dashboard Components**
@@ -46,15 +50,21 @@ components/home/
 #### **Layout Components**
 ```
 components/layout/
-├── Header.tsx                 # ⭐ Top navigation bar
-└── Sidebar.tsx                # ⭐ Side navigation menu
+├── Header.tsx                 # ⭐ Top navigation bar (with branding)
+└── Sidebar.tsx                # ⭐ Side navigation (mobile responsive)
 ```
 
 #### **Unit Management Components**
 ```
 components/units/
 ├── UnitCard.tsx               # ⭐ Unit display card
-└── UnitForm.tsx               # ⭐ Add/Edit unit form
+└── UnitForm.tsx               # ⭐ Add/Edit unit dialog
+```
+
+#### **Deadline Management Components**
+```
+components/deadlines/
+└── DeadlineForm.tsx           # ⭐ Add/Edit deadline dialog
 ```
 
 #### **UI Components (Shadcn)**
@@ -89,9 +99,12 @@ lib/hooks/
 ```
 tests/
 ├── setup.ts                   # Test setup
-├── EventsFeed.test.tsx        # EventsFeed tests
-├── NextDeadline.test.tsx      # NextDeadline tests
-└── TodaySchedule.test.tsx     # TodaySchedule tests
+├── EventsFeed.spec.tsx        # ⭐ EventsFeed tests
+├── NextDeadline.test.tsx      # ⭐ NextDeadline tests
+├── TodaySchedule.test.tsx     # ⭐ TodaySchedule tests
+├── UnitForm.test.tsx          # ⭐ UnitForm tests
+├── UnitCard.test.tsx          # ⭐ UnitCard tests
+└── stores.test.ts             # ⭐ Store tests
 ```
 
 #### **Configuration Files**
@@ -103,7 +116,7 @@ vitest.config.ts               # Test configuration
 
 ---
 
-### 🎯 Pouya's Current Tasks (Phase 1 - Complete ✅)
+### 🎯 Pouya's Completed Tasks ✅
 
 - [x] Build home dashboard layout
 - [x] Implement TodaySchedule widget
@@ -113,21 +126,22 @@ vitest.config.ts               # Test configuration
 - [x] Setup Zustand stores (units, deadlines)
 - [x] Implement Unit CRUD operations
 - [x] Create UnitCard and UnitForm components
-- [x] Setup Sidebar navigation
-- [x] Setup Header with profile
+- [x] Create DeadlineForm component
+- [x] Integrate Units into Home page
+- [x] Integrate Deadlines into Calendar page
+- [x] Setup Sidebar navigation (mobile responsive)
+- [x] Setup Header with branding
+- [x] Add stress level indicator
 - [x] Implement error and loading states
 - [x] Write component tests
 
-### 🚀 Pouya's Next Tasks (Phase 2)
+### 🚀 Pouya's Next Tasks
 
-- [ ] Enhance UnitForm validation
-- [ ] Add deadline form component
-- [ ] Create stress forecast visualization
-- [ ] Improve mobile responsiveness
 - [ ] Add loading skeletons
 - [ ] Implement toast notifications
 - [ ] Add form animations
 - [ ] Optimize performance
+- [ ] FullCalendar integration (Phase 3)
 
 ---
 
@@ -142,8 +156,8 @@ Responsible for data architecture, database design, API development, configurati
 - ✅ Data models & TypeScript types
 - ✅ Configuration management
 - ✅ Sample data creation
-- ✅ Map integration (Phase 4)
-- ✅ Settings implementation (Phase 2)
+- ✅ Map integration
+- ✅ Settings implementation
 
 ---
 
@@ -173,14 +187,12 @@ data/
 #### **Pages (Backend Logic)**
 ```
 app/
-├── calendar/
-│   └── page.tsx               # Calendar view (Phase 3)
-├── feed/
-│   └── page.tsx               # Events feed
 ├── map/
-│   └── page.tsx               # ⭐ Campus map (Phase 4)
-└── settings/
-    └── page.tsx               # ⭐ Settings page (Phase 2)
+│   └── page.tsx               # ⭐ Campus map (Google Maps embed)
+├── settings/
+│   └── page.tsx               # ⭐ Settings page (clear data, info)
+└── feed/
+    └── page.tsx               # Events feed
 ```
 
 #### **Future Backend Files (Phase 2+)**
@@ -197,8 +209,7 @@ app/api/
 │   └── route.ts               # 🔨 Deadlines API
 └── events/
     └── route.ts               # 🔨 Events API
-
-.env.local                     # 🔨 Environment variables (use .env.example as template)
+```
 ```
 
 ---
