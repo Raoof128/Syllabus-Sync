@@ -158,8 +158,8 @@ export default function CalendarPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-        <div>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Calendar & Deadlines</h1>
           <p className="text-gray-600">
             View and manage your academic schedule, assignments, and important dates.
@@ -169,7 +169,7 @@ export default function CalendarPage() {
           <Plus className="h-4 w-4" />
           Add Deadline
         </Button>
-      </div>
+      </header>
 
       {/* Info Banner when no units */}
       {units.length === 0 && (
@@ -191,14 +191,39 @@ export default function CalendarPage() {
           {isHydrated && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Upcoming</p>
-                      <p className="text-2xl font-bold">{incompleteDeadlines.length}</p>
-                    </div>
-                    <Clock className="h-6 w-6 text-blue-400" />
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Upcoming</p>
+                    <p className="text-2xl font-bold">{incompleteDeadlines.length}</p>
                   </div>
+                  <Clock className="h-6 w-6 text-blue-400" />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Overdue</p>
+                    <p className="text-2xl font-bold">{overdueDeadlines.length}</p>
+                  </div>
+                  <AlertCircle className="h-6 w-6 text-red-400" />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Completed</p>
+                    <p className="text-2xl font-bold">{completedDeadlines.length}</p>
+                  </div>
+                  <CheckCircle2 className="h-6 w-6 text-green-400" />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Total</p>
+                    <p className="text-2xl font-bold">{deadlines.length}</p>
+                  </div>
+                  <CalendarDays className="h-6 w-6 text-purple-400" />
                 </CardContent>
               </Card>
               <Card>

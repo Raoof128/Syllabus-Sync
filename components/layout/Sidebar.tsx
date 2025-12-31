@@ -33,7 +33,7 @@ export default function Sidebar() {
     <>
       {/* Mobile menu button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl active:scale-95 transition-all duration-200 touch-manipulation"
+        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl active:scale-95 transition-all duration-200 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       >
@@ -80,10 +80,10 @@ export default function Sidebar() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors touch-manipulation min-h-[48px]',
                   isActive
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:bg-white hover:text-gray-900',
+                    ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm'
+                    : 'text-gray-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-slate-100',
                 )}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={`Navigate to ${item.name}`}

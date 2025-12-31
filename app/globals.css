@@ -14,8 +14,38 @@
   }
 }
 
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
 }
 
 .animation-delay-100 {
@@ -24,6 +54,10 @@
 
 .animation-delay-200 {
   animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
 }
 
 @layer base {
@@ -109,6 +143,19 @@
 /* Base elements */
 .dark body {
   @apply bg-slate-900 text-slate-100;
+}
+
+/* Improve text contrast in dark mode */
+.dark .text-gray-600 {
+  @apply text-slate-300;
+}
+
+.dark .text-gray-500 {
+  @apply text-slate-400;
+}
+
+.dark .text-gray-400 {
+  @apply text-slate-500;
 }
 
 /* Layout background */

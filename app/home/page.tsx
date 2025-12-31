@@ -151,15 +151,21 @@ export default function HomePage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {DEMO_USER.name}!
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">Here&apos;s your day at a glance.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
+          <p className="text-gray-600">Here&apos;s your day at a glance.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Stress Level Indicator */}
+          {/* Stress Level Indicator - Show compact version on mobile */}
+          {hasHydrated && deadlines.length > 0 && (
+            <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-gray-50 rounded-md border border-gray-200">
+              <TrendingUp className="h-3 w-3 text-gray-500" />
+              <Badge className={`${stressColors[stressLevel]} text-xs px-1.5 py-0.5`}>
+                {stressEmoji[stressLevel]}
+              </Badge>
+            </div>
+          )}
           {hasHydrated && deadlines.length > 0 && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
               <TrendingUp className="h-4 w-4 text-gray-500" />
@@ -171,7 +177,7 @@ export default function HomePage() {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="gap-2 touch-manipulation">
+              <Button className="gap-2 touch-manipulation" size="default">
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add New</span>
                 <span className="sm:hidden">Add</span>
@@ -189,7 +195,7 @@ export default function HomePage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </header>
 
       {/* Get Started Banner */}
       {!hasUnits && (
@@ -205,8 +211,12 @@ export default function HomePage() {
 
       {/* Main Grid - Today's Schedule & Next Deadline */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6">
-        <TodaySchedule />
-        <NextDeadline />
+        <div className="animate-slide-up">
+          <TodaySchedule />
+        </div>
+        <div className="animate-slide-up animation-delay-100">
+          <NextDeadline />
+        </div>
       </div>
 
       {/* My Units Section */}

@@ -133,9 +133,11 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-        <p className="text-gray-600">Manage your preferences and account settings.</p>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+          <p className="text-gray-600">Manage your preferences and account settings.</p>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

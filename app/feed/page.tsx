@@ -44,12 +44,15 @@ export default function FeedPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Feed</h1>
-        <p className="text-gray-600">
-          Stay updated with campus events, announcements, and opportunities at {UNIVERSITY_CONFIG.name}.
-        </p>
-      </div>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Feed</h1>
+          <p className="text-gray-600">
+            Stay updated with campus events, announcements, and opportunities at{' '}
+            {UNIVERSITY_CONFIG.name}.
+          </p>
+        </div>
+      </header>
 
       {/* Info Banner */}
       <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">

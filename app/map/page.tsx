@@ -15,16 +15,18 @@ export default function MapPage() {
 
   // Find building details if one is selected
   const buildingDetails = selectedBuilding
-    ? CAMPUS_BUILDINGS.find(b => b.code === selectedBuilding)
+    ? CAMPUS_BUILDINGS.find((b) => b.code === selectedBuilding)
     : null;
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Map</h1>
-        <p className="text-gray-600">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
-      </div>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Map</h1>
+          <p className="text-gray-600">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
+        </div>
+      </header>
 
       {/* Selected Building Banner */}
       {selectedBuilding && (
@@ -53,7 +55,8 @@ export default function MapPage() {
           <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm text-blue-900">
-              <strong>Preview:</strong> View the campus on Google Maps below. Interactive building markers and navigation coming soon!
+              <strong>Preview:</strong> View the campus on Google Maps below. Interactive building
+              markers and navigation coming soon!
             </p>
           </div>
         </div>
