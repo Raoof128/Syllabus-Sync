@@ -1,21 +1,33 @@
 // tests/TodaySchedule.test.tsx
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import TodaySchedule from '@/components/home/TodaySchedule';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
+// Use vi.hoisted to create stable mock state that survives vi.mock hoisting
+const { mockState } = vi.hoisted(() => {
+  const mockGetTodayClasses = () => [];
+  return {
+    mockState: {
+      units: [],
+      getTodayClasses: mockGetTodayClasses,
+    },
+  };
+});
 
 // Mock the zustand store
 vi.mock('@/lib/store/unitsStore', () => ({
-  useUnitsStore: vi.fn((selector: (state: any) => any) => {
-    const state = {
-      units: [],
-      getTodayClasses: () => [],
-    };
-    return selector(state);
-  }),
+  useUnitsStore: (selector: (state: typeof mockState) => unknown) => {
+    return selector(mockState);
+  },
 }));
 
+import TodaySchedule from '@/components/home/TodaySchedule';
+
 describe('TodaySchedule', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it('renders the component header', () => {
     render(<TodaySchedule />);
     expect(screen.getByText("Today's Classes")).toBeInTheDocument();

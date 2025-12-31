@@ -1,21 +1,33 @@
 // tests/NextDeadline.test.tsx
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import NextDeadline from '@/components/home/NextDeadline';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
+// Use vi.hoisted to create stable mock state that survives vi.mock hoisting
+const { mockState } = vi.hoisted(() => {
+  const mockGetUpcoming = () => [];
+  return {
+    mockState: {
+      deadlines: [],
+      getUpcoming: mockGetUpcoming,
+    },
+  };
+});
 
 // Mock the zustand store
 vi.mock('@/lib/store/deadlinesStore', () => ({
-  useDeadlinesStore: vi.fn((selector: (state: any) => any) => {
-    const state = {
-      deadlines: [],
-      getUpcoming: () => [],
-    };
-    return selector(state);
-  }),
+  useDeadlinesStore: (selector: (state: typeof mockState) => unknown) => {
+    return selector(mockState);
+  },
 }));
 
+import NextDeadline from '@/components/home/NextDeadline';
+
 describe('NextDeadline', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it('renders the component header', () => {
     render(<NextDeadline />);
     expect(screen.getByText('Next Deadline')).toBeInTheDocument();
