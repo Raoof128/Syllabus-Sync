@@ -211,14 +211,18 @@ export default function Header() {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            aria-label="Toggle theme"
+            className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {resolvedTheme === 'dark' ? (
-              <Sun className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
+            <div className="relative w-5 h-5">
+              <Sun
+                className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
+              />
+              <Moon
+                className={`absolute inset-0 w-5 h-5 text-blue-400 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
+              />
+            </div>
           </button>
         )}
 

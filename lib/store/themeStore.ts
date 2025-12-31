@@ -39,7 +39,8 @@ export const useThemeStore = create<ThemeState>()(
         toggleTheme: () => {
           const currentTheme = get().theme;
           let newTheme: Theme;
-          if (typeof window !== 'undefined' && currentTheme === 'system') {
+          if (currentTheme === 'system') {
+            // When in system mode, toggle to the opposite of current system preference
             newTheme = getSystemTheme() === 'dark' ? 'light' : 'dark';
           } else if (currentTheme === 'light') {
             newTheme = 'dark';
@@ -48,37 +49,61 @@ export const useThemeStore = create<ThemeState>()(
           }
           set({ theme: newTheme, resolvedTheme: getResolvedTheme(newTheme) });
         },
-        resolvedTheme: 'light',
+        resolvedTheme: typeof window !== 'undefined' ? getResolvedTheme('system') : 'light',
       };
     },
     {
       name: 'theme-storage',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        // Ensure resolvedTheme is correctly set after hydration
+        if (state) {
+          state.resolvedTheme = getResolvedTheme(state.theme);
+        }
+      },
     },
   ),
 );
 
 // Hook to apply theme to document
 export const useThemeEffect = () => {
-  const storedTheme = useThemeStore((state) => state.theme);
+  const { theme, resolvedTheme } = useThemeStore();
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const root = document.documentElement;
-      const currentResolvedTheme =
-        storedTheme === 'system'
-          ? window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light'
-          : storedTheme;
 
-      if (currentResolvedTheme === 'dark') {
+      // Apply theme class
+      if (resolvedTheme === 'dark') {
         root.classList.add('dark');
         root.classList.remove('light');
+        root.style.colorScheme = 'dark';
       } else {
         root.classList.add('light');
         root.classList.remove('dark');
+        root.style.colorScheme = 'light';
+      }
+
+      // Update meta theme-color for mobile browsers
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#1f2937' : '#ffffff');
       }
     }
-  }, [storedTheme]);
+  }, [resolvedTheme]);
+
+  // Listen for system theme changes when in system mode
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        const newResolvedTheme = e.matches ? 'dark' : 'light';
+        useThemeStore.setState({ resolvedTheme: newResolvedTheme });
+      };
+
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
 };
