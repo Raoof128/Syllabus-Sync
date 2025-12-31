@@ -133,24 +133,24 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
+      <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
         <p className="text-gray-600">Manage your preferences and account settings.</p>
-      </div>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+            <h2 className="flex items-center justify-between text-lg font-semibold">
               <div className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5" aria-hidden="true" />
                 Profiles ({profiles.length})
               </div>
-              <Button size="sm" onClick={() => setShowAddDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button size="sm" onClick={() => setShowAddDialog(true)} aria-label="Add new profile">
+                <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
                 Add Profile
               </Button>
-            </CardTitle>
+            </h2>
           </CardHeader>
           <CardContent>
             {profiles.length === 0 ? (
@@ -184,10 +184,10 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Check className="h-5 w-5" />
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <Check className="h-5 w-5" aria-hidden="true" />
               Current Profile
-            </CardTitle>
+            </h2>
           </CardHeader>
           <CardContent>
             {currentProfile ? (
@@ -389,67 +389,111 @@ export default function SettingsPage() {
           if (!open) setEditingProfile(null);
         }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" aria-describedby="profile-form-description">
           <DialogHeader>
             <DialogTitle>{editingProfile ? 'Edit Profile' : 'Create New Profile'}</DialogTitle>
+            <p id="profile-form-description" className="text-sm text-gray-600">
+              {editingProfile
+                ? 'Update your profile information.'
+                : 'Fill in your details to create a new profile.'}
+            </p>
           </DialogHeader>
-          <div className="space-y-4">
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (editingProfile) {
+                handleUpdateProfile();
+              } else {
+                handleAddProfile();
+              }
+            }}
+          >
             <div>
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="profile-name">Full Name</Label>
               <Input
-                id="name"
+                id="profile-name"
+                name="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your full name"
+                required
+                aria-describedby="name-help"
               />
+              <p id="name-help" className="sr-only">
+                Enter your full legal name
+              </p>
             </div>
 
             <div>
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="profile-email">Email Address</Label>
               <Input
-                id="email"
+                id="profile-email"
+                name="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="your.email@mq.edu.au"
+                required
+                aria-describedby="email-help"
               />
+              <p id="email-help" className="sr-only">
+                Enter your university email address
+              </p>
             </div>
 
             <div>
-              <Label htmlFor="studentId">Student ID</Label>
+              <Label htmlFor="profile-student-id">Student ID</Label>
               <Input
-                id="studentId"
+                id="profile-student-id"
+                name="studentId"
                 value={formData.studentId}
                 onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
                 placeholder="12345678"
+                required
+                aria-describedby="student-id-help"
               />
+              <p id="student-id-help" className="sr-only">
+                Enter your 8-digit student ID number
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="course">Course</Label>
+                <Label htmlFor="profile-course">Course</Label>
                 <Input
-                  id="course"
+                  id="profile-course"
+                  name="course"
                   value={formData.course}
                   onChange={(e) => setFormData({ ...formData, course: e.target.value })}
                   placeholder="e.g., Bachelor of IT"
+                  aria-describedby="course-help"
                 />
+                <p id="course-help" className="sr-only">
+                  Enter your degree program name
+                </p>
               </div>
 
               <div>
-                <Label htmlFor="year">Year</Label>
+                <Label htmlFor="profile-year">Year</Label>
                 <Input
-                  id="year"
+                  id="profile-year"
+                  name="year"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                   placeholder="e.g., 2nd Year"
+                  aria-describedby="year-help"
                 />
+                <p id="year-help" className="sr-only">
+                  Enter your current year of study
+                </p>
               </div>
             </div>
 
             <div className="flex gap-2 pt-4">
               <Button
                 variant="outline"
+                type="button"
                 onClick={() => {
                   setShowAddDialog(false);
                   setEditingProfile(null);
@@ -457,11 +501,9 @@ export default function SettingsPage() {
               >
                 Cancel
               </Button>
-              <Button onClick={editingProfile ? handleUpdateProfile : handleAddProfile}>
-                {editingProfile ? 'Update Profile' : 'Create Profile'}
-              </Button>
+              <Button type="submit">{editingProfile ? 'Update Profile' : 'Create Profile'}</Button>
             </div>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

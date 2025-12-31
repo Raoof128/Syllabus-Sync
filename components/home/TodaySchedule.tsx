@@ -35,17 +35,18 @@ export default function TodaySchedule() {
       <CardContent className="space-y-3">
         {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
-            <p className="text-gray-400">Loading...</p>
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            </div>
           </div>
         ) : todayClasses.length === 0 ? (
           <div className="text-center py-8">
             <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No classes today</h3>
-            <p className="text-gray-600 mb-4">
-              You&apos;re all caught up! Enjoy your free time.
-            </p>
+            <p className="text-gray-600 mb-4">You&apos;re all caught up! Enjoy your free time.</p>
             <button
-              onClick={() => window.location.href = '/home'}
+              onClick={() => (window.location.href = '/home')}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <BookOpen className="h-4 w-4" />

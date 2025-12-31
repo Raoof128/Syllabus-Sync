@@ -1,7 +1,7 @@
 // app/home/page.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
@@ -17,7 +17,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Unit, Deadline } from '@/lib/types';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function HomePage() {
   const units = useUnitsStore((state) => state.units);
@@ -89,6 +94,27 @@ export default function HomePage() {
   const hasUnits = units.length > 0;
   const stressLevel = hasHydrated ? getStressLevel() : 'Low';
 
+  // Memoized unit stats calculation for better performance
+  const unitStats = useMemo(() => {
+    const totalClasses = units.reduce((acc, u) => acc + u.schedule.length, 0);
+    const totalStudyHours = units.reduce((acc, u) => {
+      return (
+        acc +
+        u.schedule.reduce((hours, s) => {
+          const [startH, startM] = s.startTime.split(':').map(Number);
+          const [endH, endM] = s.endTime.split(':').map(Number);
+          return hours + (endH - startH) + (endM - startM) / 60;
+        }, 0)
+      );
+    }, 0);
+
+    return {
+      unitCount: units.length,
+      totalClasses,
+      studyHours: Math.round(totalStudyHours),
+    };
+  }, [units]);
+
   const stressColors = {
     Low: 'bg-green-100 text-green-800',
     Busy: 'bg-yellow-100 text-yellow-800',
@@ -126,14 +152,16 @@ export default function HomePage() {
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
-          <p className="text-gray-600">Here&apos;s your day at a glance.</p>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            Welcome, {DEMO_USER.name}!
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base">Here&apos;s your day at a glance.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Stress Level Indicator */}
           {hasHydrated && deadlines.length > 0 && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
               <TrendingUp className="h-4 w-4 text-gray-500" />
               <span className="text-sm text-gray-600">Workload:</span>
               <Badge className={stressColors[stressLevel]}>
@@ -143,9 +171,10 @@ export default function HomePage() {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 touch-manipulation">
                 <Plus className="h-4 w-4" />
-                Add New
+                <span className="hidden sm:inline">Add New</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -175,7 +204,7 @@ export default function HomePage() {
       )}
 
       {/* Main Grid - Today's Schedule & Next Deadline */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6">
         <TodaySchedule />
         <NextDeadline />
       </div>
@@ -195,79 +224,45 @@ export default function HomePage() {
         <CardContent>
           {!hasHydrated ? (
             <div className="h-32 flex items-center justify-center">
-              <p className="text-gray-400">Loading units...</p>
+              <div className="animate-pulse space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-16 bg-gray-200 rounded w-full"></div>
+              </div>
             </div>
-           ) : units.length === 0 ? (
-             <div className="text-center py-12">
-               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-               <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
-               <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                 Add your first unit to start tracking your schedule. It&apos;s yours calendar and today&apos;s schedule.
-               </p>
-               <Button onClick={handleAddUnit} className="gap-2">
-                 <Plus className="h-4 w-4" />
-                 Add Your First Unit
-               </Button>
-             </div>
-           ) : (
+          ) : units.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
+              <p className="text-gray-600 mb-4 max-w-md mx-auto">
+                Add your first unit to start tracking your schedule. It&apos;ll sync your calendar
+                and today&apos;s schedule.
+              </p>
+              <Button onClick={handleAddUnit} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Your First Unit
+              </Button>
+            </div>
+          ) : (
             <>
               {/* Unit Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-3 bg-gray-50 rounded-lg">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">{units.length}</p>
-          <p className="text-xs text-gray-500">Units</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {units.reduce((acc, u) => acc + u.schedule.length, 0)}
-          </p>
-          <p className="text-xs text-gray-500">Classes/Week</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {units
-              .reduce((acc, u) => {
-                return (
-                  acc +
-                  u.schedule.reduce((hours, s) => {
-                    const [startH, startM] = s.startTime.split(':').map(Number);
-                    const [endH, endM] = s.endTime.split(':').map(Number);
-                    return hours + (endH - startH) + (endM - startM) / 60;
-                  }, 0)
-                );
-              }, 0)
-              .toFixed(0)}
-          </p>
-          <p className="text-xs text-gray-500">Study Hours</p>
-        </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {units.reduce((acc, u) => acc + u.schedule.length, 0)}
-                  </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg mb-6">
+                <div className="text-center animate-fade-in">
+                  <p className="text-2xl font-bold text-gray-900">{unitStats.unitCount}</p>
+                  <p className="text-xs text-gray-500">Units</p>
+                </div>
+                <div className="text-center animate-fade-in animation-delay-100">
+                  <p className="text-2xl font-bold text-gray-900">{unitStats.totalClasses}</p>
                   <p className="text-xs text-gray-500">Classes/Week</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {units
-                      .reduce((acc, u) => {
-                        return (
-                          acc +
-                          u.schedule.reduce((hours, s) => {
-                            const [startH, startM] = s.startTime.split(':').map(Number);
-                            const [endH, endM] = s.endTime.split(':').map(Number);
-                            return hours + (endH - startH) + (endM - startM) / 60;
-                          }, 0)
-                        );
-                      }, 0)
-                      .toFixed(0)}
-                    h
-                  </p>
+                <div className="text-center animate-fade-in animation-delay-200">
+                  <p className="text-2xl font-bold text-gray-900">{unitStats.studyHours}h</p>
                   <p className="text-xs text-gray-500">Study Hours</p>
                 </div>
               </div>
 
               {/* Units Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {units.map((unit) => (
                   <UnitCard
                     key={unit.id}

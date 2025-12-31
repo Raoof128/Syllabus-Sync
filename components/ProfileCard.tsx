@@ -3,7 +3,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,7 @@ interface ProfileCardProps {
   onSetCurrent: (id: string) => void;
 }
 
-export default function ProfileCard({
+export default React.memo(function ProfileCard({
   profile,
   isCurrent,
   onEdit,
@@ -43,8 +43,10 @@ export default function ProfileCard({
   return (
     <Card
       className={cn(
-        'relative transition-all duration-200',
-        isCurrent ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:shadow-md'
+        'relative transition-all duration-300',
+        isCurrent
+          ? 'ring-2 ring-blue-500 bg-blue-50 shadow-lg'
+          : 'hover:shadow-lg hover:-translate-y-1',
       )}
     >
       <CardHeader className="flex flex-row items-start justify-between">
@@ -126,7 +128,7 @@ export default function ProfileCard({
             <div
               className={cn(
                 'w-10 h-5 rounded-full transition-colors',
-                profile.preferences.notifications ? 'bg-green-500' : 'bg-gray-300'
+                profile.preferences.notifications ? 'bg-green-500' : 'bg-gray-300',
               )}
             />
           </div>
@@ -138,7 +140,7 @@ export default function ProfileCard({
             <div
               className={cn(
                 'w-10 h-5 rounded-full transition-colors',
-                profile.preferences.emailReminders ? 'bg-green-500' : 'bg-gray-300'
+                profile.preferences.emailReminders ? 'bg-green-500' : 'bg-gray-300',
               )}
             />
           </div>
@@ -150,7 +152,7 @@ export default function ProfileCard({
             <div
               className={cn(
                 'w-10 h-5 rounded-full transition-colors',
-                profile.preferences.pushNotifications ? 'bg-green-500' : 'bg-gray-300'
+                profile.preferences.pushNotifications ? 'bg-green-500' : 'bg-gray-300',
               )}
             />
           </div>
@@ -160,12 +162,7 @@ export default function ProfileCard({
       <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
         <Camera className="h-4 w-4" />
         <span>Change Avatar</span>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleAvatarChange}
-          className="hidden"
-        />
+        <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
       </label>
 
       {deleteConfirm && (
@@ -174,10 +171,7 @@ export default function ProfileCard({
             Are you sure you want to delete this profile? This action cannot be undone.
           </p>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteConfirm(false)}
-            >
+            <Button variant="outline" onClick={() => setDeleteConfirm(false)}>
               Cancel
             </Button>
             <Button
@@ -194,4 +188,4 @@ export default function ProfileCard({
       )}
     </Card>
   );
-}
+});

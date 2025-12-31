@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Unit } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +24,12 @@ const DAY_SHORT: { [key: string]: string } = {
   Sunday: 'Sun',
 };
 
-export default function UnitCard({ unit, onEdit, onDelete, showActions = true }: UnitCardProps) {
+export default React.memo(function UnitCard({
+  unit,
+  onEdit,
+  onDelete,
+  showActions = true,
+}: UnitCardProps) {
   // Get unique days
   const getUniqueDays = () => {
     const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));
@@ -31,7 +37,7 @@ export default function UnitCard({ unit, onEdit, onDelete, showActions = true }:
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
       {/* Color indicator bar */}
       <div className="h-2 rounded-t-lg" style={{ backgroundColor: unit.color }} />
 
@@ -110,4 +116,4 @@ export default function UnitCard({ unit, onEdit, onDelete, showActions = true }:
       </CardContent>
     </Card>
   );
-}
+});

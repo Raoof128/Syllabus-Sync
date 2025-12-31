@@ -125,7 +125,7 @@ export default function Header() {
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
               <div className="p-3 border-b border-gray-200 flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900">Notifications</h3>
                 {unreadCount > 0 && (
