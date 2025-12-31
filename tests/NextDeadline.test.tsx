@@ -4,21 +4,15 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 // Use vi.hoisted to create stable mock state that survives vi.mock hoisting
-const { mockState } = vi.hoisted(() => {
-  const mockGetUpcoming = () => [];
-  return {
-    mockState: {
-      deadlines: [],
-      getUpcoming: mockGetUpcoming,
-    },
-  };
-});
+const { mockState } = vi.hoisted(() => ({
+  mockState: {
+    deadlines: [],
+  },
+}));
 
 // Mock the zustand store
 vi.mock('@/lib/store/deadlinesStore', () => ({
-  useDeadlinesStore: (selector: (state: typeof mockState) => unknown) => {
-    return selector(mockState);
-  },
+  useDeadlinesStore: (selector: (state: typeof mockState) => unknown) => selector(mockState),
 }));
 
 import NextDeadline from '@/components/home/NextDeadline';
@@ -38,7 +32,7 @@ describe('NextDeadline', () => {
     // The component may show loading briefly or move directly to empty state
     await waitFor(() => {
       const hasLoading = screen.queryByText('Loading...');
-      const hasEmpty = screen.queryByText('No upcoming deadlines 🎯');
+      const hasEmpty = screen.queryByText('No upcoming deadlines');
       expect(hasLoading || hasEmpty).toBeTruthy();
     });
   });
@@ -46,7 +40,32 @@ describe('NextDeadline', () => {
   it('shows empty state when no upcoming deadlines', async () => {
     render(<NextDeadline />);
     await waitFor(() => {
-      expect(screen.getByText('No upcoming deadlines 🎯')).toBeInTheDocument();
+      expect(screen.getByText('No upcoming deadlines')).toBeInTheDocument();
     });
+  });
+
+  it('falls back gracefully on invalid dates', async () => {
+    mockState.deadlines = [
+      {
+        id: 'deadline-invalid',
+        title: 'Broken Date',
+        unitCode: 'COMP0000',
+        dueDate: 'invalid-date',
+        priority: 'High',
+        type: 'Assignment',
+        completed: false,
+        createdAt: new Date(),
+      },
+    ];
+
+    render(<NextDeadline />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Invalid date/i)).toBeInTheDocument();
+    });
+
+    const invalidDateText = screen.getByText(/Invalid date/i);
+    const cardLink = invalidDateText.closest('a');
+    expect(cardLink?.getAttribute('href')).toBe('/calendar');
   });
 });

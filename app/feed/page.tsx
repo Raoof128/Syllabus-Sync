@@ -107,7 +107,7 @@ export default function FeedPage() {
                   filteredEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:shadow-md cursor-pointer border border-transparent hover:border-gray-200"
+                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:shadow-md border border-transparent hover:border-gray-200"
                     >
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
@@ -149,12 +149,12 @@ export default function FeedPage() {
                           Remind Me
                         </Button>
                         {event.building && (
-                          <Link href={`/map?building=${event.building}`}>
-                            <Button variant="outline" size="sm">
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/map?building=${event.building}`}>
                               <Navigation className="h-4 w-4 mr-2" />
                               Navigate
-                            </Button>
-                          </Link>
+                            </Link>
+                          </Button>
                         )}
                       </div>
                     </div>

@@ -84,6 +84,8 @@ export const UNIT_COLORS = [
  */
 export const CAMPUS_BUILDINGS = [
   { code: 'C5C', name: 'Computer Science Building' },
+  { code: 'C3C', name: 'Library' },
+  { code: 'C7A', name: 'Campus Hub' },
   { code: 'W6A', name: 'Wallumattagal Building' },
   { code: 'E7A', name: 'Engineering Building' },
   { code: 'E7B', name: 'Engineering Building B' },
@@ -91,23 +93,24 @@ export const CAMPUS_BUILDINGS = [
   { code: '12WW', name: '12 Wally\'s Walk' },
   { code: '4WW', name: '4 Wally\'s Walk' },
   { code: 'LIB', name: 'Library' },
+  { code: 'Sports', name: 'Sports Precinct' },
 ] as const;
 
 /**
  * Feature Flags
- * Enable or disable features for the demo
+ * Enable or disable features for demo
  */
 export const FEATURES = {
   // Show "Coming Soon" badges on incomplete features
   showComingSoonBadges: true,
-  // Enable the map feature
-  mapEnabled: false,
-  // Enable the calendar feature
-  calendarEnabled: false,
+  // Enable map feature
+  mapEnabled: true,
+  // Enable calendar feature
+  calendarEnabled: true,
   // Enable notifications
-  notificationsEnabled: false,
+  notificationsEnabled: true,
   // Enable user settings
-  settingsEnabled: false,
+  settingsEnabled: true,
 } as const;
 
 /**
@@ -120,4 +123,3 @@ export const SOCIAL_LINKS = {
   instagram: 'https://instagram.com/macquarieuni',
   linkedin: 'https://linkedin.com/school/macquarie-university',
 } as const;
-

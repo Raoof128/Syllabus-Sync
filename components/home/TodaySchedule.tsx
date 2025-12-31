@@ -1,22 +1,31 @@
 // components/home/TodaySchedule.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, MapPin } from 'lucide-react';
+import { useHydration } from '@/lib/hooks';
 
 export default function TodaySchedule() {
-  const getTodayClasses = useUnitsStore((state) => state.getTodayClasses);
-  const [todayClasses, setTodayClasses] = useState<ReturnType<typeof getTodayClasses>>([]);
-  const [isClient, setIsClient] = useState(false);
+  const isHydrated = useHydration();
+  const units = useUnitsStore((state) => state.units);
+  const todayLabel = useMemo(() => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[new Date().getDay()];
+  }, []);
+  const todayClasses = useMemo(() => {
+    const classes = units.flatMap((unit) =>
+      unit.schedule
+        .filter((schedule) => schedule.day === todayLabel)
+        .map((schedule) => ({
+          ...unit,
+          ...schedule,
+        })),
+    );
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    setIsClient(true);
-    setTodayClasses(getTodayClasses());
-  }, [getTodayClasses]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+    return classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }, [todayLabel, units]);
 
   return (
     <Card>
@@ -24,16 +33,16 @@ export default function TodaySchedule() {
         <CardTitle>Today&apos;s Classes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {!isClient ? (
+        {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
             <p className="text-gray-400">Loading...</p>
           </div>
         ) : todayClasses.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No classes today 🎉</p>
         ) : (
-          todayClasses.map((cls, idx) => (
+          todayClasses.map((cls) => (
             <div
-              key={idx}
+              key={`${cls.id}-${cls.code}`}
               className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
             >
               {/* Color indicator */}

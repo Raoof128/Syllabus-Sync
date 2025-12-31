@@ -21,9 +21,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       deadlines: [],
 
       addDeadline: (deadline) => {
-        set((state) => ({
-          deadlines: [...state.deadlines, deadline],
-        }));
+        set((state) => {
+          if (state.deadlines.some((existing) => existing.id === deadline.id)) {
+            return state;
+          }
+          return { deadlines: [...state.deadlines, deadline] };
+        });
       },
 
       removeDeadline: (id) => {
@@ -89,6 +92,18 @@ export const useDeadlinesStore = create<DeadlinesState>()(
     {
       name: 'deadlines-storage',
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        if (!state?.deadlines?.length) return;
+        const seen = new Set<string>();
+        const deduped = state.deadlines.filter((deadline) => {
+          if (seen.has(deadline.id)) return false;
+          seen.add(deadline.id);
+          return true;
+        });
+        if (deduped.length !== state.deadlines.length) {
+          state.deadlines = deduped;
+        }
+      },
     },
   ),
 );

@@ -161,6 +161,9 @@ See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
 - **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
 - **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
 - **[TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md)** - Team responsibilities
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributing guidelines
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community guidelines
+- **[SECURITY.md](SECURITY.md)** - Security policy
 
 ---
 

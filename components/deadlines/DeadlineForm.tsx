@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PRIORITY_LEVELS, DEADLINE_TYPES } from '@/lib/constants';
+import { format, isValid } from 'date-fns';
 
 interface DeadlineFormProps {
   open: boolean;
@@ -42,6 +43,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const [dueTime, setDueTime] = useState('23:59');
   const [priority, setPriority] = useState<Deadline['priority']>('Medium');
   const [type, setType] = useState<Deadline['type']>('Assignment');
+  const [completed, setCompleted] = useState(false);
 
   // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -53,6 +55,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     setDueTime('23:59');
     setPriority('Medium');
     setType('Assignment');
+    setCompleted(false);
     setErrors({});
   };
 
@@ -62,11 +65,17 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     if (editDeadline) {
       setTitle(editDeadline.title);
       setUnitCode(editDeadline.unitCode);
-      const date = new Date(editDeadline.dueDate);
-      setDueDate(date.toISOString().split('T')[0]);
-      setDueTime(date.toTimeString().slice(0, 5));
+      const parsedDate = new Date(editDeadline.dueDate);
+      if (isValid(parsedDate)) {
+        setDueDate(format(parsedDate, 'yyyy-MM-dd'));
+        setDueTime(format(parsedDate, 'HH:mm'));
+      } else {
+        setDueDate('');
+        setDueTime('23:59');
+      }
       setPriority(editDeadline.priority);
       setType(editDeadline.type);
+      setCompleted(editDeadline.completed);
     } else {
       resetForm();
     }
@@ -88,8 +97,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     if (!validateForm()) return;
 
     const [year, month, day] = dueDate.split('-').map(Number);
-    const [hours, minutes] = dueTime.split(':').map(Number);
-    const dueDateObj = new Date(year, month - 1, day, hours, minutes);
+    const timeParts = dueTime ? dueTime.split(':') : [];
+    const parsedHours = Number(timeParts[0]);
+    const parsedMinutes = Number(timeParts[1]);
+    const hasValidTime =
+      timeParts.length === 2 && !Number.isNaN(parsedHours) && !Number.isNaN(parsedMinutes);
+    const dueDateObj = new Date(
+      year,
+      month - 1,
+      day,
+      hasValidTime ? parsedHours : 23,
+      hasValidTime ? parsedMinutes : 59,
+    );
 
     const deadlineData: Deadline = {
       id: editDeadline?.id || uuidv4(),
@@ -98,7 +117,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       dueDate: dueDateObj,
       priority,
       type,
-      completed: editDeadline?.completed || false,
+      completed,
       createdAt: editDeadline?.createdAt || new Date(),
     };
 
@@ -235,6 +254,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               </SelectContent>
             </Select>
           </div>
+
+          {/* Completed */}
+          <div className="flex items-center gap-2">
+            <input
+              id="completed"
+              type="checkbox"
+              checked={completed}
+              onChange={(e) => setCompleted(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            />
+            <Label htmlFor="completed">Mark as completed</Label>
+          </div>
         </div>
 
         <DialogFooter className="flex gap-2">
@@ -255,4 +286,3 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     </Dialog>
   );
 }
-

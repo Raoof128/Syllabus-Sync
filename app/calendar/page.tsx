@@ -1,8 +1,21 @@
 // app/calendar/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { Calendar, Filter, Clock, Bell, Grid3x3, List, Plus, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  Filter,
+  Clock,
+  Bell,
+  Grid3x3,
+  List,
+  Plus,
+  CheckCircle2,
+  Circle,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,7 +24,26 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
-import { format, formatDistanceToNow, isPast } from 'date-fns';
+import {
+  addMonths,
+  addWeeks,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  formatDistanceToNow,
+  isPast,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  isValid,
+  parseISO,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  subWeeks,
+} from 'date-fns';
+import { useSearchParams } from 'next/navigation';
 
 const priorityColors = {
   Low: 'bg-green-100 text-green-800',
@@ -27,7 +59,11 @@ export default function CalendarPage() {
   const units = useUnitsStore((state) => state.units);
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
+  const [view, setView] = useState<'month' | 'week'>('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const isHydrated = useHydration();
+  const searchParams = useSearchParams();
 
   const handleAddDeadline = () => {
     setEditingDeadline(null);
@@ -49,7 +85,10 @@ export default function CalendarPage() {
 
   const incompleteDeadlines = sortedDeadlines.filter(d => !d.completed);
   const completedDeadlines = sortedDeadlines.filter(d => d.completed);
-  const overdueDeadlines = incompleteDeadlines.filter(d => isPast(new Date(d.dueDate)));
+  const overdueDeadlines = incompleteDeadlines.filter((d) => {
+    const dueDate = new Date(d.dueDate);
+    return isValid(dueDate) && isPast(dueDate);
+  });
   const stressLevel = isHydrated ? getStressLevel() : 'Low';
 
   const stressColors = {
@@ -61,6 +100,59 @@ export default function CalendarPage() {
   const getUnitColor = (unitCode: string) => {
     const unit = units.find(u => u.code === unitCode);
     return unit?.color || '#6b7280';
+  };
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (!dateParam) return;
+    const parsed = parseISO(dateParam);
+    if (!Number.isNaN(parsed.getTime())) {
+      setCurrentDate(parsed);
+      setSelectedDate(parsed);
+    }
+  }, [searchParams]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const calendarRange = useMemo(() => {
+    if (view === 'week') {
+      const start = startOfWeek(currentDate, { weekStartsOn: 1 });
+      const end = endOfWeek(currentDate, { weekStartsOn: 1 });
+      return { start, end };
+    }
+    const start = startOfWeek(startOfMonth(currentDate), { weekStartsOn: 1 });
+    const end = endOfWeek(endOfMonth(currentDate), { weekStartsOn: 1 });
+    return { start, end };
+  }, [currentDate, view]);
+
+  const calendarDays = useMemo(
+    () => eachDayOfInterval({ start: calendarRange.start, end: calendarRange.end }),
+    [calendarRange],
+  );
+
+  const deadlinesByDay = useMemo(() => {
+    return deadlines.reduce<Record<string, Deadline[]>>((acc, deadline) => {
+      const dueDate = new Date(deadline.dueDate);
+      if (!isValid(dueDate)) return acc;
+      const key = format(dueDate, 'yyyy-MM-dd');
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(deadline);
+      return acc;
+    }, {});
+  }, [deadlines]);
+
+  const jumpToToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setSelectedDate(today);
+  };
+
+  const goToPrevious = () => {
+    setCurrentDate((prev) => (view === 'week' ? subWeeks(prev, 1) : subMonths(prev, 1)));
+  };
+
+  const goToNext = () => {
+    setCurrentDate((prev) => (view === 'week' ? addWeeks(prev, 1) : addMonths(prev, 1)));
   };
 
   return (
@@ -183,14 +275,24 @@ export default function CalendarPage() {
                   <CardContent>
                     <div className="space-y-3">
                       {incompleteDeadlines.map((deadline) => {
-                        const isOverdue = isPast(new Date(deadline.dueDate));
+                        const dueDate = new Date(deadline.dueDate);
+                        const hasValidDate = isValid(dueDate);
+                        const isOverdue = hasValidDate ? isPast(dueDate) : false;
                         return (
                           <div
                             key={deadline.id}
-                            className={`p-4 rounded-lg border transition-colors cursor-pointer hover:bg-gray-50 ${
+                            role="button"
+                            tabIndex={0}
+                            className={`p-4 rounded-lg border transition-colors cursor-pointer hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
                               isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
                             }`}
                             onClick={() => handleEditDeadline(deadline)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                handleEditDeadline(deadline);
+                              }
+                            }}
                           >
                             <div className="flex items-start gap-3">
                               <button
@@ -198,6 +300,7 @@ export default function CalendarPage() {
                                   e.stopPropagation();
                                   toggleComplete(deadline.id);
                                 }}
+                                aria-label={`Mark ${deadline.title} as completed`}
                                 className="mt-0.5"
                               >
                                 <Circle className="h-5 w-5 text-gray-400 hover:text-blue-500" />
@@ -223,10 +326,17 @@ export default function CalendarPage() {
                                 </div>
                                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                                   <span>
-                                    Due: {format(new Date(deadline.dueDate), 'MMM dd, h:mm a')}
+                                    Due:{' '}
+                                    {hasValidDate
+                                      ? format(dueDate, 'MMM dd, h:mm a')
+                                      : 'Invalid date'}
                                   </span>
                                   <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                                    {isOverdue ? 'Overdue!' : formatDistanceToNow(new Date(deadline.dueDate), { addSuffix: true })}
+                                    {isOverdue
+                                      ? 'Overdue!'
+                                      : hasValidDate
+                                        ? formatDistanceToNow(dueDate, { addSuffix: true })
+                                        : ''}
                                   </span>
                                 </div>
                               </div>
@@ -250,34 +360,50 @@ export default function CalendarPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {completedDeadlines.map((deadline) => (
-                        <div
-                          key={deadline.id}
-                          className="p-4 bg-gray-50 rounded-lg border border-gray-200 opacity-60 cursor-pointer hover:opacity-80"
-                          onClick={() => handleEditDeadline(deadline)}
-                        >
-                          <div className="flex items-start gap-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleComplete(deadline.id);
-                              }}
-                              className="mt-0.5"
-                            >
-                              <CheckCircle2 className="h-5 w-5 text-green-500" />
-                            </button>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-gray-700 line-through">
-                                {deadline.title}
-                              </h4>
-                              <span className="text-sm text-gray-500">{deadline.unitCode}</span>
+                      {completedDeadlines.map((deadline) => {
+                        const dueDate = new Date(deadline.dueDate);
+                        const hasValidDate = isValid(dueDate);
+                        return (
+                          <div
+                            key={deadline.id}
+                            role="button"
+                            tabIndex={0}
+                            className="p-4 bg-gray-50 rounded-lg border border-gray-200 opacity-60 cursor-pointer hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            onClick={() => handleEditDeadline(deadline)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                handleEditDeadline(deadline);
+                              }
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleComplete(deadline.id);
+                                }}
+                                aria-label={`Mark ${deadline.title} as incomplete`}
+                                className="mt-0.5"
+                              >
+                                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                              </button>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-gray-700 line-through">
+                                  {deadline.title}
+                                </h4>
+                                <span className="text-sm text-gray-500">{deadline.unitCode}</span>
+                                {!hasValidDate && (
+                                  <p className="text-xs text-gray-400 mt-1">Invalid date</p>
+                                )}
+                              </div>
+                              <Badge variant="outline" className="opacity-50">
+                                {deadline.type}
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className="opacity-50">
-                              {deadline.type}
-                            </Badge>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
@@ -286,21 +412,117 @@ export default function CalendarPage() {
           )}
         </div>
 
-        {/* Right Column - Calendar Preview & Features */}
+        {/* Right Column - Calendar & Features */}
         <div className="space-y-6">
-          {/* Calendar Preview */}
+          {/* Calendar View */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Calendar View
+                <CalendarDays className="h-5 w-5" />
+                Calendar
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 h-48 rounded-lg flex flex-col items-center justify-center">
-                <Calendar className="h-10 w-10 text-gray-400 mb-3" />
-                <p className="text-gray-500 text-center text-sm">Interactive calendar</p>
-                <Badge className="mt-2 bg-yellow-100 text-yellow-800">Coming Soon</Badge>
+              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={goToPrevious} aria-label="Previous">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={jumpToToday}>
+                    Today
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={goToNext} aria-label="Next">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  {view === 'week'
+                    ? `${format(calendarRange.start, 'MMM d')} - ${format(calendarRange.end, 'MMM d')}`
+                    : format(currentDate, 'MMMM yyyy')}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={view === 'month' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setView('month')}
+                  >
+                    Month
+                  </Button>
+                  <Button
+                    variant={view === 'week' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setView('week')}
+                  >
+                    Week
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-7 gap-2 text-xs text-gray-500 mb-2">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label) => (
+                  <div key={label} className="text-center font-medium">
+                    {label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-2">
+                {calendarDays.map((day) => {
+                  const dayKey = format(day, 'yyyy-MM-dd');
+                  const dayDeadlines = deadlinesByDay[dayKey] ?? [];
+                  const isOutside = view === 'month' && !isSameMonth(day, currentDate);
+                  const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
+                  return (
+                    <div
+                      key={dayKey}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedDate(day)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setSelectedDate(day);
+                        }
+                      }}
+                      className={`min-h-[120px] rounded-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                        isOutside ? 'bg-gray-50 text-gray-400' : 'bg-white'
+                      } ${isSelected ? 'border-blue-400 ring-1 ring-blue-200' : 'border-gray-200'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-semibold ${isToday(day) ? 'text-blue-600' : ''}`}>
+                          {format(day, 'd')}
+                        </span>
+                        {isToday(day) && <span className="text-[10px] text-blue-500">Today</span>}
+                      </div>
+                      <div className="mt-2 space-y-1">
+                        {dayDeadlines.slice(0, 3).map((deadline) => (
+                          <button
+                            key={deadline.id}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleEditDeadline(deadline);
+                            }}
+                            className={`w-full rounded px-2 py-1 text-left text-[11px] font-medium text-gray-800 hover:bg-gray-100 ${
+                              deadline.completed ? 'line-through text-gray-400' : ''
+                            }`}
+                            style={{ borderLeft: `3px solid ${getUnitColor(deadline.unitCode)}` }}
+                            title={`${deadline.title} (${format(new Date(deadline.dueDate), 'h:mm a')})`}
+                          >
+                            <div className="truncate">{deadline.title}</div>
+                            <div className="text-[10px] text-gray-500">
+                              {format(new Date(deadline.dueDate), 'h:mm a')}
+                            </div>
+                          </button>
+                        ))}
+                        {dayDeadlines.length > 3 && (
+                          <div className="text-[10px] text-gray-500">
+                            +{dayDeadlines.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

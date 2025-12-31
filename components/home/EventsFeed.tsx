@@ -58,12 +58,12 @@ export default function EventsFeed() {
                 {/* Navigation to Map */}
                 {event.building && (
                   <div className="mt-2">
-                    <Link href={`/map?building=${event.building}`}>
-                      <Button variant="outline" size="sm" className="gap-1 text-xs h-7">
+                    <Button asChild variant="outline" size="sm" className="gap-1 text-xs h-7">
+                      <Link href={`/map?building=${event.building}`}>
                         <Navigation className="h-3 w-3" />
                         Navigate to {event.building}
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>
