@@ -7,6 +7,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['tests/setup.ts'],
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['tests/e2e.spec.ts', 'tests/accessibility.spec.ts'],
     globals: true,
     // Run tests sequentially to avoid memory issues
     sequence: {

@@ -901,3 +901,10 @@ Summary: Complete UI/UX overhaul focusing on visual design consistency, user exp
 Files: app/home/page.tsx; app/calendar/page.tsx; app/feed/page.tsx; app/map/page.tsx; app/settings/page.tsx; components/layout/Sidebar.tsx; components/layout/Header.tsx; components/ErrorBoundary.tsx; components/home/TodaySchedule.tsx; app/globals.css; components/ProfileCard.tsx; components/units/UnitCard.tsx.
 Verification: npm run lint (pass, 0 errors, 0 warnings); npm run build (pass); npm test (36/36 tests passing).
 Follow-ups: Application now provides exceptional user experience with consistent design, smooth interactions, comprehensive accessibility, and polished visual aesthetics across all devices and themes.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Testing optimizations and workflow improvements.
+Summary: Optimized local development by reducing Playwright workers from 10 to 6, added load waits to e2e and accessibility tests for reliability on laptops, removed slow tests from prepush script to prevent timeouts, and updated team documentation with workflow reminders.
+Files changed: package.json; playwright.config.ts; tests/e2e.spec.ts; tests/accessibility.spec.ts; Team_Plan/TEAM_ROLES.md; Team_Plan/CHANGELOG.md; Team_Plan/AGENT.md.
+Verification: npm run prepush (pass); npm run test:e2e (fixed); npm run test:accessibility (works locally).
+Follow-ups: Local development is now faster and more reliable; CI can handle full test suite.

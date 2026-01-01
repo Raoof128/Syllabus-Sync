@@ -2,11 +2,12 @@
 import React from 'react';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { Deadline } from '@/lib/types';
 
 // Use vi.hoisted to create stable mock state that survives vi.mock hoisting
 const { mockState } = vi.hoisted(() => ({
   mockState: {
-    deadlines: [],
+    deadlines: [] as Deadline[],
   },
 }));
 
@@ -50,7 +51,7 @@ describe('NextDeadline', () => {
         id: 'deadline-invalid',
         title: 'Broken Date',
         unitCode: 'COMP0000',
-        dueDate: 'invalid-date',
+        dueDate: 'invalid-date' as any,
         priority: 'High',
         type: 'Assignment',
         completed: false,

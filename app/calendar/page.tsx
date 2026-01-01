@@ -202,7 +202,7 @@ export default function CalendarPage() {
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-500">Overdue</p>
+                    <p className="text-sm text-gray-900">Overdue</p>
                     <p className="text-2xl font-bold">{overdueDeadlines.length}</p>
                   </div>
                   <AlertCircle className="h-6 w-6 text-red-400" />
@@ -211,7 +211,7 @@ export default function CalendarPage() {
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-500">Completed</p>
+                    <p className="text-sm text-gray-900">Completed</p>
                     <p className="text-2xl font-bold">{completedDeadlines.length}</p>
                   </div>
                   <CheckCircle2 className="h-6 w-6 text-green-400" />
@@ -220,7 +220,7 @@ export default function CalendarPage() {
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-500">Total</p>
+                    <p className="text-sm text-gray-900">Total</p>
                     <p className="text-2xl font-bold">{deadlines.length}</p>
                   </div>
                   <CalendarDays className="h-6 w-6 text-purple-400" />
@@ -230,7 +230,7 @@ export default function CalendarPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-500">Completed</p>
+                      <p className="text-sm text-gray-900">Completed</p>
                       <p className="text-2xl font-bold">{completedDeadlines.length}</p>
                     </div>
                     <CheckCircle2 className="h-6 w-6 text-green-400" />
@@ -241,7 +241,7 @@ export default function CalendarPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-500">Overdue</p>
+                      <p className="text-sm text-gray-900">Overdue</p>
                       <p className="text-2xl font-bold text-red-600">{overdueDeadlines.length}</p>
                     </div>
                     <AlertCircle className="h-6 w-6 text-red-400" />
@@ -269,7 +269,7 @@ export default function CalendarPage() {
             <Card>
               <CardContent className="py-12">
                 <div className="h-32 flex items-center justify-center">
-                  <p className="text-gray-400">Loading deadlines...</p>
+                  <p className="text-gray-900">Loading deadlines...</p>
                 </div>
               </CardContent>
             </Card>
@@ -521,7 +521,7 @@ export default function CalendarPage() {
                         }
                       }}
                       className={`min-h-[120px] rounded-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                        isOutside ? 'bg-gray-50 text-gray-400' : 'bg-white'
+                        isOutside ? 'bg-gray-50 text-gray-600' : 'bg-white'
                       } ${isSelected ? 'border-blue-400 ring-1 ring-blue-200' : 'border-gray-200'}`}
                     >
                       <div className="flex items-center justify-between">
@@ -547,7 +547,7 @@ export default function CalendarPage() {
                             title={`${deadline.title} (${format(new Date(deadline.dueDate), 'h:mm a')})`}
                           >
                             <div className="truncate">{deadline.title}</div>
-                            <div className="text-[10px] text-gray-500">
+                            <div className="text-[10px] text-gray-800">
                               {format(new Date(deadline.dueDate), 'h:mm a')}
                             </div>
                           </button>

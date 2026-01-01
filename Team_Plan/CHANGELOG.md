@@ -29,8 +29,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Retry Hook (`useRetry`)**: Custom hook providing automatic retry functionality with configurable options and loading states
 - **Service Worker**: Offline support with caching strategies for improved performance and offline functionality
 - **Bundle Analysis**: Webpack Bundle Analyzer integration for monitoring bundle sizes and optimization opportunities
-- **Dynamic Imports**: Code splitting for forms and components to reduce initial bundle size
+- **Dynamic Imports**: Code splitting for forms and heavy components to reduce initial bundle size
 - **Toast System**: Complete notification system with variants, positioning, and accessibility features
+
+### Changed
+
+#### Testing Optimization
+- **Worker Configuration**: Reduced Playwright workers from 10 to 6 locally for better resource management on laptops
+- **Prepush Script**: Streamlined to focus on core quality checks (build, typecheck, lint, unit tests) for faster local development
+- **Test Execution**: Added load waits to e2e and accessibility tests to prevent timeouts on slower machines
+- **Team Workflow**: Added reminder in TEAM_ROLES.md for Pouya to run prepush after each task
 
 ### Changed
 
@@ -52,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Type Safety**: Eliminated all `any` types and implemented proper TypeScript types
 - **Performance Issues**: Optimized bundle sizes and loading performance
 - **User Experience**: Replaced browser dialogs with proper UI components
+- **E2e Test Reliability**: Added networkidle and URL waits to prevent flaky navigation tests on slower machines
 
 ### Technical Debt
 - **Code Quality**: Achieved 100% ESLint compliance (0 errors, 0 warnings)

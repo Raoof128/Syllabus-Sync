@@ -52,7 +52,7 @@ export default function NextDeadline() {
         <CardTitle>Next Deadline</CardTitle>
         <Link
           href="/calendar"
-          className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+          className="text-sm text-blue-800 hover:text-blue-900 hover:underline"
         >
           View all →
         </Link>
@@ -60,24 +60,24 @@ export default function NextDeadline() {
       <CardContent>
         {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-gray-600">Loading...</p>
           </div>
-         ) : !nextDeadline ? (
-           <div className="text-center py-8">
-             <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-             <h3 className="text-lg font-semibold text-gray-900 mb-2">No upcoming deadlines</h3>
-             <p className="text-gray-600 mb-4">
-               All caught up! Add your first deadline to stay on top of your work.
-             </p>
-             <Link
-               href="/calendar"
-               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-             >
-               <Clock className="h-4 w-4" />
-               Add Deadline
-             </Link>
-           </div>
-         ) : (
+        ) : !nextDeadline ? (
+          <div className="text-center py-8">
+            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No upcoming deadlines</h3>
+            <p className="text-gray-600 mb-4">
+              All caught up! Add your first deadline to stay on top of your work.
+            </p>
+            <Link
+              href="/calendar"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Clock className="h-4 w-4" />
+              Add Deadline
+            </Link>
+          </div>
+        ) : (
           <Link
             href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'}
             className="block"
@@ -109,7 +109,7 @@ export default function NextDeadline() {
                 <span
                   className={
                     nextDeadline.priority === 'Urgent'
-                      ? 'text-red-600 font-medium'
+                      ? 'text-red-800 font-medium'
                       : 'text-gray-600'
                   }
                 >

@@ -509,6 +509,9 @@ app/api/
 - [x] **Build System Optimization**: Production-ready compilation, server/client separation
 - [x] **Performance Infrastructure**: Bundle analysis setup, code splitting, caching strategies
 
+#### **🚨 CRITICAL WORKFLOW REMINDER FOR POUYA 🚨**
+Hey Pouya! Don't forget to run `npm run prepush` after every single task you complete! If you skip it, the commit gremlins will sneak into your code and turn all your semicolons into commas! 😈 Run it religiously, or your PRs will be rejected faster than a bad pun at a comedy show! 💀 This is your daily reminder to keep the codebase clean and the CI pipeline happy! 🎉
+
 #### **Phase 2: Advanced Features & Performance**
 - [x] **Retry Mechanisms**: Automatic error recovery with exponential backoff and configurable options
 - [x] **Service Worker**: Offline support with comprehensive caching strategies and PWA features

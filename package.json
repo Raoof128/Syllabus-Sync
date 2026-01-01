@@ -12,7 +12,14 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "analyze": "ANALYZE=true npm run build"
+    "analyze": "ANALYZE=true npm run build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:accessibility": "playwright test --grep accessibility",
+    "test:ci": "npm run test && npm run test:e2e",
+    "typecheck": "tsc --noEmit",
+    "prepush": "npm run build && npm run typecheck && npm run lint && npm run test",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -35,7 +42,9 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@next/bundle-analyzer": "^16.1.1",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
@@ -52,6 +61,7 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "jsdom": "^24.1.3",
+    "lhci": "^4.1.1",
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.19",
