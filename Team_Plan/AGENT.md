@@ -1036,6 +1036,13 @@ Verification: Avatar backgrounds display consistently without gradients in both 
 Follow-ups: User avatars now have uniform, professional appearance.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Fixed blue-grey background around header text.
+Summary: Resolved header background inheritance issue by changing main layout container from bg-gray-50 to bg-white/dark:bg-slate-900, preventing grey background bleed-through and ensuring clean header appearance.
+Files changed: app/client-layout.tsx; components/layout/Header.tsx.
+Verification: Header displays with clean white/dark background without grey artifacts.
+Follow-ups: Header now has proper background isolation from parent containers.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.

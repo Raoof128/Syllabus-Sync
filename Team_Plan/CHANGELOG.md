@@ -773,4 +773,11 @@ Files changed: app/manage-profiles/page.tsx; components/ProfileCard.tsx; app/glo
 Verification: Avatar backgrounds display consistently without gradients in both themes.
 Follow-ups: User avatars now have uniform, professional appearance.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Fixed blue-grey background around header text.
+Summary: Resolved header background inheritance issue by changing main layout container from bg-gray-50 to bg-white/dark:bg-slate-900, preventing grey background bleed-through and ensuring clean header appearance.
+Files changed: app/client-layout.tsx; components/layout/Header.tsx.
+Verification: Header displays with clean white/dark background without grey artifacts.
+Follow-ups: Header now has proper background isolation from parent containers.
+
 **Last Updated:** January 01, 2026
