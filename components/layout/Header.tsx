@@ -255,28 +255,40 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+              className="w-48 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 shadow-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
             >
               <DropdownMenuItem asChild>
-                <Link href="/manage-profiles" className="flex items-center gap-2">
+                <Link
+                  href="/manage-profiles"
+                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                >
                   <User className="w-4 h-4" />
                   Manage Profiles
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2">
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                >
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/calendar" className="flex items-center gap-2">
+                <Link
+                  href="/calendar"
+                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                >
                   <Calendar className="w-4 h-4" />
                   Calendar
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem disabled className="flex items-center gap-2">
+              <DropdownMenuItem
+                disabled
+                className="flex items-center gap-2 text-gray-400 dark:text-slate-500"
+              >
                 <LogOut className="w-4 h-4" />
                 Sign out
               </DropdownMenuItem>
