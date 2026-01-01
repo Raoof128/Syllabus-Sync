@@ -973,6 +973,13 @@ Verification: npm run build (successful); CSS syntax validated.
 Follow-ups: Application now builds successfully without CSS compilation errors.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added comprehensive dark mode styling to info boxes and stats sections.
+Summary: Implemented dark mode variants for all blue info boxes and colored stats sections across home, map, and feed pages. Added proper background colors, borders, and text colors for seamless dark theme experience.
+Files changed: app/home/page.tsx; app/map/page.tsx; app/feed/page.tsx.
+Verification: All info boxes and stats sections now display correctly in both light and dark modes.
+Follow-ups: Application now has consistent dark mode styling across all informational UI components.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: GitHub CI performance optimization for accessibility tests.
 Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
 Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
