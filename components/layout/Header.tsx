@@ -50,7 +50,7 @@ const Header = memo(() => {
   /* eslint-disable react-hooks/set-state-in-effect */
   // setState called in effect is correct here - syncing with localStorage during hydration
   useEffect(() => {
-    setTimeout(() => setIsClient(true), 0);
+    setIsClient(true);
   }, []);
 
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -67,7 +67,7 @@ const Header = memo(() => {
       } catch {
         sampleNotifications.forEach(addNotification);
       }
-      setTimeout(() => setHasSeeded(true), 0);
+      setHasSeeded(true);
     }
   }, [addNotification, hasSeeded, isClient]);
 

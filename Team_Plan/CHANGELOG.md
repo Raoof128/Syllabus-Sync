@@ -183,10 +183,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Hydration error** in Header - Added `isClient` state to prevent SSR mismatch
 - Notification count only calculated client-side to match server render
-- **ESLint `react-hooks/set-state-in-effect` errors** - Refactored Header.tsx to avoid calling setState in useEffect
-  - Replaced `useState` with `useRef` for `hasSeeded` tracking
-  - Updated `useHydration` hook to use `useSyncExternalStore` instead of `useState`/`useEffect`
-  - Removed all ESLint suppressions from useHydration.ts
 
 ### File Ownership
 

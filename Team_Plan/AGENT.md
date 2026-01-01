@@ -365,9 +365,6 @@ npm run format
 - Keep components small and focused
 - Extract reusable logic into custom hooks
 - Use proper key props in lists
-- **Avoid calling `setState` synchronously inside `useEffect`** - use `useSyncExternalStore` for hydration detection
-- Use `useRef` for flags that don't affect rendering (e.g., `hasSeedRef` instead of `hasSeeded` state)
-- For client/server detection, use the `useHydration()` hook from `lib/hooks`
 
 **Styling:**
 - Use Tailwind CSS utility classes

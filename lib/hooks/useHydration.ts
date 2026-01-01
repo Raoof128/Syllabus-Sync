@@ -1,18 +1,21 @@
 // lib/hooks/useHydration.ts
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Hook to track client-side hydration status.
  * Returns true once the component has mounted on the client.
  * Useful for avoiding hydration mismatches with localStorage-based stores.
- * Uses useSyncExternalStore for proper React 18+ compatibility.
  */
 export function useHydration(): boolean {
-  return useSyncExternalStore(
-    () => () => {}, // subscribe - no-op since this never changes
-    () => true,     // getSnapshot (client) - always true on client
-    () => false     // getServerSnapshot - always false on server
-  );
+  const [hydrated, setHydrated] = useState(false);
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  return hydrated;
 }
