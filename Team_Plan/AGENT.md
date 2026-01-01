@@ -1029,6 +1029,13 @@ Verification: Hero section displays correctly in both light and dark modes with 
 Follow-ups: Home page hero section now provides seamless experience across themes.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Replaced gradient avatar backgrounds with uniform styling.
+Summary: Removed blue-to-purple gradient backgrounds from user avatars and replaced with uniform bg-slate-900 for cleaner, more consistent appearance across profile cards and manage-profiles page.
+Files changed: app/manage-profiles/page.tsx; components/ProfileCard.tsx; app/globals.css.
+Verification: Avatar backgrounds display consistently without gradients in both themes.
+Follow-ups: User avatars now have uniform, professional appearance.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
