@@ -143,7 +143,7 @@ jobs:
     name: Accessibility Testing
     runs-on: ubuntu-latest
     needs: build
-
+    timeout-minutes: 36
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -161,7 +161,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run accessibility tests
-        run: npx playwright test --grep "accessibility"
+        run: npx playwright test --grep "accessibility" --workers=2
         continue-on-error: true
 
   deploy-preview:
