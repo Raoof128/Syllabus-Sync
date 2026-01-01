@@ -738,4 +738,11 @@ Files changed: components/layout/Header.tsx.
 Verification: Header buttons no longer show grey hover backgrounds; functionality preserved.
 Follow-ups: Header now has clean button interactions without distracting grey highlights.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed grey highlights from dropdown menu items.
+Summary: Eliminated CSS variable-based grey backgrounds (bg-accent) from dropdown menu items by overriding focus and hover states with transparent backgrounds in the header profile menu.
+Files changed: components/layout/Header.tsx.
+Verification: Dropdown menu items no longer show grey highlights on interaction.
+Follow-ups: Profile dropdown menu now has clean, highlight-free appearance.
+
 **Last Updated:** January 01, 2026

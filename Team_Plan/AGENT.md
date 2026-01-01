@@ -1001,6 +1001,13 @@ Verification: Header buttons no longer show grey hover backgrounds; functionalit
 Follow-ups: Header now has clean button interactions without distracting grey highlights.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed grey highlights from dropdown menu items.
+Summary: Eliminated CSS variable-based grey backgrounds (bg-accent) from dropdown menu items by overriding focus and hover states with transparent backgrounds in the header profile menu.
+Files changed: components/layout/Header.tsx.
+Verification: Dropdown menu items no longer show grey highlights on interaction.
+Follow-ups: Profile dropdown menu now has clean, highlight-free appearance.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
