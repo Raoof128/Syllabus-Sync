@@ -65,9 +65,9 @@ export default function FeedPage() {
 
       {/* Info Banner */}
       <div className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-mq-navy-600 flex-shrink-0 mt-0.5" />
+        <Info className="h-5 w-5 text-mq-content-secondary flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-mq-sm text-mq-navy-900">
+          <p className="text-mq-sm text-mq-content">
             <strong>Stay connected:</strong> Discover workshops, career fairs, social events, and
             free food opportunities happening on campus.
           </p>
