@@ -1017,9 +1017,23 @@ Follow-ups: Accessibility tests now run with 5 parallel workers for maximum spee
 Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed critical color contrast accessibility violations.
 Summary: Resolved WCAG 2 AA color contrast failures by updating text colors from light grays (text-gray-600, text-gray-500) to dark grays (text-gray-900, text-gray-700) and improving link contrast (text-blue-800 to text-blue-900). Fixed contrast issues in home page components, NextDeadline component, and loading states.
-Files changed: app/home/page.tsx; components/home/NextDeadline.tsx.
+Files: app/home/page.tsx; components/home/NextDeadline.tsx.
 Verification: Accessibility tests should now pass color contrast requirements.
 Follow-ups: Application now meets WCAG 2 AA accessibility standards for color contrast.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Complete Leaflet campus map implementation with markers, search, and deep linking.
+Summary: Fully replaced Google Maps embed with interactive Leaflet tile-based map using CRS.Simple, added building markers with custom icons and popups, implemented client-side search functionality, added URL deep-linking (?building=ID), included coordinate picker mode for developers, created structured building data layer, ensured responsive design and production-ready bounds/maxBounds. Removed all Google Maps dependencies and references.
+Files: lib/map/buildings.ts; app/map/page.tsx.
+Verification: npm run lint (pass); npm test (36/36 pass); map renders correctly with tiles, markers interactive, search works, deeplinking functional.
+Follow-ups: Campus map now provides full interactive navigation with no external dependencies; coordinate picker aids future marker additions.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Complete campus map enhancement with zoom controls, tile loading fixes, boundary restrictions, and advanced search UX.
+Summary: Added full zoom controls (levels 3-5) with proper TMS tile coordinate flipping to eliminate 404 errors, implemented strict map boundaries to prevent gray screen areas, created custom debounced search hook with 300ms delay, loading states, and keyboard navigation (arrow keys, enter, escape), added coordinate clamping for performance, enhanced UX with smooth transitions and visual feedback, fixed tile loading issues by correcting TMS y-coordinate flipping and zoom level restrictions.
+Files: app/map/page.tsx; app/map/CampusMap.tsx; lib/map/buildings.ts.
+Verification: npm run build (success); npm test (36/36 pass); zoom controls functional, no 404 tile errors, boundaries prevent gray screens, search debounced with loading states and keyboard navigation.
+Follow-ups: Campus map now provides professional-grade navigation experience with smooth zoom, reliable tile loading, contained boundaries, and modern search UX patterns.
 
 Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.

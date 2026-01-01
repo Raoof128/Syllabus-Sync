@@ -32,6 +32,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dynamic Imports**: Code splitting for forms and heavy components to reduce initial bundle size
 - **Toast System**: Complete notification system with variants, positioning, and accessibility features
 
+#### Campus Map Implementation
+- **Leaflet Integration**: Complete replacement of Google Maps with custom Leaflet tile-based campus map
+- **Building Markers**: Interactive markers for all campus buildings with custom icons and popups
+- **Search Functionality**: Client-side search with filtering by name, code, tags, and description
+- **Deep Linking**: URL parameter support (`?building=ID`) for direct navigation to buildings
+- **Coordinate Picker**: Developer tool to click map and copy pixel coordinates for adding new markers
+- **Responsive Design**: Mobile-optimized layout with proper touch interactions and responsive map sizing
+- **Map Data Layer**: Structured building data with positions, descriptions, and tags in `lib/map/buildings.ts`
+- **Zoom Controls**: Full zoom functionality with levels 3-5, proper tile loading at all zoom levels
+- **TMS Tile Support**: Corrected tile coordinate system for TMS (Tile Map Service) format with y-flipping
+- **Map Boundaries**: Strict bounds enforcement to prevent gray screen areas outside campus
+- **Enhanced Search UX**: Debounced search (300ms), loading states, keyboard navigation (arrow keys, enter, escape), visual feedback
+- **Performance Optimizations**: Coordinate clamping, dynamic bounds, smooth animations
+
 ### Changed
 
 #### Testing Optimization
