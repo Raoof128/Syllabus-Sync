@@ -40,6 +40,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Test Execution**: Added load waits to e2e and accessibility tests to prevent timeouts on slower machines
 - **Team Workflow**: Added reminder in TEAM_ROLES.md for Pouya to run prepush after each task
 
+#### Node.js Version Requirements
+- **Engine Update**: Updated minimum Node.js version from 18.x to 20.9.0 to support Next.js 16.1.1
+- **CI Matrix**: Removed Node.js 18.x from GitHub Actions test matrix
+
+#### Security Updates
+- **Vitest Upgrade**: Updated Vitest from 2.1.1 to 4.0.16 to fix moderate esbuild security vulnerabilities
+- **Configuration Update**: Removed deprecated poolOptions configuration for Vitest 4 compatibility
+
 ### Changed
 
 #### Code Quality Improvements

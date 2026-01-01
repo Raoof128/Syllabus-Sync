@@ -908,3 +908,17 @@ Summary: Optimized local development by reducing Playwright workers from 10 to 6
 Files changed: package.json; playwright.config.ts; tests/e2e.spec.ts; tests/accessibility.spec.ts; Team_Plan/TEAM_ROLES.md; Team_Plan/CHANGELOG.md; Team_Plan/AGENT.md.
 Verification: npm run prepush (pass); npm run test:e2e (fixed); npm run test:accessibility (works locally).
 Follow-ups: Local development is now faster and more reliable; CI can handle full test suite.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Node.js version requirement update.
+Summary: Updated minimum Node.js version to 20.9.0 to support Next.js 16.1.1, added engines field to package.json, and updated CI matrix to remove Node.js 18.x.
+Files changed: package.json; .github/workflows/ci-cd.yml.
+Verification: npm run build (pass).
+Follow-ups: Project now requires Node.js 20.9.0+ for development and deployment.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Security vulnerabilities fix.
+Summary: Applied npm audit fix to resolve moderate esbuild vulnerabilities, upgraded Vitest from 2.1.1 to 4.0.16, and updated configuration for Vitest 4 compatibility.
+Files changed: package.json; vitest.config.ts; Team_Plan/CHANGELOG.md; Team_Plan/AGENT.md.
+Verification: npm test (pass, 36/36); npm audit (0 vulnerabilities).
+Follow-ups: Project security improved; Vitest 4 provides better performance and features.

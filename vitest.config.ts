@@ -9,18 +9,6 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/e2e.spec.ts', 'tests/accessibility.spec.ts'],
     globals: true,
-    // Run tests sequentially to avoid memory issues
-    sequence: {
-      shuffle: false,
-    },
-    // Use threads pool with single thread for stability
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
-    // Increase timeout for slower systems
     testTimeout: 10000,
   },
 });
