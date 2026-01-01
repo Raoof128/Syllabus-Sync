@@ -65,7 +65,7 @@ export default function NextDeadline() {
           </div>
         ) : !nextDeadline ? (
           <div className="text-center py-8">
-            <Clock className="h-12 w-12 text-mq-slate-400 mx-auto mb-4" />
+            <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-mq-content mb-2">No upcoming deadlines</h3>
             <p className="text-mq-content mb-4">
               All caught up! Add your first deadline to stay on top of your work.

@@ -53,7 +53,7 @@ export default function TodaySchedule() {
           </div>
         ) : todayClasses.length === 0 ? (
           <div className="text-center py-8">
-            <Clock className="h-12 w-12 text-mq-slate-400 mx-auto mb-4" />
+            <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-mq-content mb-2">No classes today</h3>
             <p className="text-mq-content-secondary mb-4">You&apos;re all caught up! Enjoy your free time.</p>
              <Button onClick={() => (window.location.href = '/home')} className="gap-2">

@@ -119,6 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **E2e Test Reliability**: Added networkidle and URL waits to prevent flaky navigation tests on slower machines
 - **MQ Token System**: Fixed missing dark mode MQ token aliases (--mq-success, --mq-warning, --mq-error, --mq-info) causing home page widgets to display incorrectly in dark mode
 - **Hardcoded Colors**: Replaced all remaining hardcoded Tailwind colors in home page components (NextDeadline, TodaySchedule, EventsFeed) with semantic MQ tokens for complete theme consistency
+- **Empty State Icons**: Fixed hardcoded slate-400 color on empty state icons in TodaySchedule and NextDeadline to use semantic content-tertiary token for proper dark mode visibility
 
 ### Technical Debt
 - **Code Quality**: Achieved 100% ESLint compliance (0 errors, 0 warnings)
