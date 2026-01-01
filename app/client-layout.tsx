@@ -51,7 +51,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         Skip to main content
       </a>
 
-      <div className="flex h-screen bg-white dark:bg-slate-900">
+      <div className="flex h-screen bg-mq-background">
         {/* Sidebar */}
         <Sidebar />
 

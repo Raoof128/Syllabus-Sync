@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Plus, Users, Check, ArrowLeft } from 'lucide-react';
+import { User, Plus, Users, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import { Button } from '@/components/ui/mq/button';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 // Dynamically import ProfileCard for better code splitting
 const ProfileCard = dynamic(() => import('@/components/ProfileCard'), {
@@ -106,27 +105,13 @@ export default function ManageProfilesPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-4">
-          <Link href="/settings">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Settings
-            </Button>
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
-              Manage Profiles
-            </h1>
-            <p className="text-gray-900 dark:text-slate-100">Edit and manage your user profiles.</p>
-          </div>
-        </div>
-        <Button onClick={() => setShowAddDialog(true)} aria-label="Create new profile">
-          <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
-          Add Profile
-        </Button>
-      </header>
+      <div className="container mx-auto p-6 max-w-7xl">
+        <header className="mb-8">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
+            Manage Profiles
+          </h1>
+          <p className="text-mq-content">Edit and manage your user profiles.</p>
+        </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -142,11 +127,11 @@ export default function ManageProfilesPage() {
             <CardContent>
               {profiles.length === 0 ? (
                 <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
+                  <Users className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                     No Profiles Yet
                   </h3>
-                  <p className="text-gray-600 dark:text-slate-400 mb-4">
+                  <p className="text-mq-content-secondary mb-4">
                     Create your first profile to get started.
                   </p>
                   <Button onClick={() => setShowAddDialog(true)}>
@@ -195,26 +180,26 @@ export default function ManageProfilesPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 text-sm">
-                  <div>
-                    <span className="text-gray-500 dark:text-slate-500">Student ID:</span>
-                    <p className="font-medium">{currentProfile.studentId}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 dark:text-slate-500">Member Since:</span>
-                    <p className="font-medium">
-                      {new Date(currentProfile.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+                 <div className="grid grid-cols-1 gap-3 text-mq-sm">
+                   <div>
+                     <span className="text-mq-content-tertiary">Student ID:</span>
+                     <p className="font-medium text-mq-content">{currentProfile.studentId}</p>
+                   </div>
+                   <div>
+                     <span className="text-mq-content-tertiary">Member Since:</span>
+                     <p className="font-medium text-mq-content">
+                       {new Date(currentProfile.createdAt).toLocaleDateString()}
+                     </p>
+                   </div>
+                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <User className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
+                <User className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                   No Profile Selected
                 </h3>
-                <p className="text-gray-600 dark:text-slate-400 mb-4">
+                <p className="text-mq-content-secondary mb-4">
                   Select or create a profile to get started.
                 </p>
                 <Button onClick={() => setShowAddDialog(true)}>
@@ -237,7 +222,7 @@ export default function ManageProfilesPage() {
         <DialogContent className="sm:max-w-md" aria-describedby="profile-form-description">
           <DialogHeader>
             <DialogTitle>{editingProfile ? 'Edit Profile' : 'Create New Profile'}</DialogTitle>
-            <p id="profile-form-description" className="text-sm text-gray-600 dark:text-slate-400">
+            <p id="profile-form-description" className="text-mq-sm text-mq-content-secondary">
               {editingProfile
                 ? 'Update your profile information.'
                 : 'Fill in your details to create a new profile.'}

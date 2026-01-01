@@ -147,20 +147,20 @@ export default function MapPage() {
     <div className="container mx-auto p-4 max-w-7xl">
       {/* Header */}
       <header className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Campus Map</h1>
-        <p className="text-gray-600 dark:text-gray-400">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Campus Map</h1>
+        <p className="text-mq-content-secondary">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
       </header>
 
       {/* Selected Building Banner */}
       {selectedBuilding && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
+        <div className="mb-4 p-4 bg-mq-success/10 border border-mq-success/20 rounded-mq-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Navigation className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <Navigation className="h-5 w-5 text-mq-success" />
             <div>
-              <p className="text-sm font-medium text-green-900 dark:text-green-100">
+              <p className="text-mq-sm font-medium text-mq-success">
                 Navigating to: <strong>{selectedBuilding.name}</strong>
               </p>
-              <p className="text-xs text-green-700 dark:text-green-300">Building {selectedBuilding.id}</p>
+              <p className="text-mq-xs text-mq-success">Building {selectedBuilding.id}</p>
             </div>
           </div>
           <Link href="/map">
@@ -198,21 +198,21 @@ export default function MapPage() {
             </button>
           )}
           {hasSearched && searchQuery && filteredBuildings.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-              {filteredBuildings.map((building: Building, index: number) => (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto">
+              {filteredBuildings.map((building, index: number) => (
                 <button
                   key={building.id}
                   onClick={() => handleBuildingSelect(building)}
-                  className={`w-full text-left px-4 py-3 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors ${
+                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
                     index === selectedResultIndex
-                      ? 'bg-blue-50 dark:bg-blue-900/20'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? 'bg-mq-info/10'
+                      : 'hover:bg-mq-hover-background'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 dark:text-gray-100 truncate">{building.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{building.id}</div>
+                      <div className="font-semibold text-mq-content truncate">{building.name}</div>
+                      <div className="text-mq-sm text-mq-content-secondary">{building.id}</div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
                       {building.tags?.[0] || 'building'}
@@ -223,28 +223,28 @@ export default function MapPage() {
             </div>
           )}
           {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 p-4 text-center text-gray-500 dark:text-gray-400">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
               No buildings found matching &quot;{searchQuery}&quot;
             </div>
           )}
         </div>
 
         {/* Coordinate Picker */}
-        <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg">
           <div className="flex items-center gap-3">
-            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Info className="h-5 w-5 text-mq-info" />
             <div>
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              <p className="text-mq-sm font-medium text-mq-info">
                 Coordinate Picker Mode
               </p>
-              <p className="text-xs text-blue-700 dark:text-blue-300">
+              <p className="text-mq-xs text-mq-info">
                 Click on the map to copy pixel coordinates for adding new markers
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {copiedCoords && (
-              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <div className="flex items-center gap-2 text-mq-sm text-mq-success">
                 <Copy className="h-4 w-4" />
                 Copied: {copiedCoords}
               </div>
@@ -277,7 +277,7 @@ export default function MapPage() {
           <CardTitle>Interactive Campus Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-96 md:h-[500px] rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          <div className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border">
             <CampusMap
               selectedBuilding={selectedBuilding}
               coordPickerMode={coordPickerMode}
@@ -305,19 +305,19 @@ export default function MapPage() {
                   key={building.code}
                   href={`/map?building=${building.code}`}
                   aria-current={isSelected ? 'page' : undefined}
-                  className={`p-3 rounded-lg transition-colors ${
+                  className={`p-3 rounded-mq-lg transition-colors ${
                     isSelected
-                      ? 'bg-green-100 dark:bg-green-900/20 border-2 border-green-500'
-                      : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-mq-success/10 border-2 border-mq-success'
+                      : 'bg-mq-background-secondary hover:bg-mq-hover-background'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">{building.code}</div>
+                    <div className="font-semibold text-mq-content">{building.code}</div>
                     {isSelected && (
-                      <Badge className="bg-green-500 text-white text-xs">Selected</Badge>
+                      <Badge className="bg-mq-success text-white text-mq-xs">Selected</Badge>
                     )}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{building.name}</div>
+                  <div className="text-mq-sm text-mq-content-secondary">{building.name}</div>
                   {buildingData?.tags && buildingData.tags.length > 0 && (
                     <div className="mt-1">
                       <Badge variant="neutral" className="text-xs">
@@ -343,9 +343,9 @@ export default function MapPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">Walking Directions</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                <h4 className="font-semibold text-mq-content">Walking Directions</h4>
+                <p className="text-mq-sm text-mq-content-secondary mt-1">
                   Get directions between buildings with estimated walking time.
                 </p>
               </div>
@@ -366,9 +366,9 @@ export default function MapPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">Real-time Tracking</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                <h4 className="font-semibold text-mq-content">Real-time Tracking</h4>
+                <p className="text-mq-sm text-mq-content-secondary mt-1">
                   Track your current location on campus in real-time.
                 </p>
               </div>
@@ -389,9 +389,9 @@ export default function MapPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">Filter & Find</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                <h4 className="font-semibold text-mq-content">Filter & Find</h4>
+                <p className="text-mq-sm text-mq-content-secondary mt-1">
                   Search by facilities, accessibility features, and more.
                 </p>
               </div>

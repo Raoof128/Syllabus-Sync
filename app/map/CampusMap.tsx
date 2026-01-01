@@ -165,8 +165,8 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                   >
                     <Popup>
                       <div className="p-2 min-w-[200px]">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{building.name}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Building {building.id}</p>
+                        <h3 className="font-semibold text-mq-content">{building.name}</h3>
+                        <p className="text-mq-sm text-mq-content-secondary mb-2">Building {building.id}</p>
                         {building.description && (
                           <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{building.description}</p>
                         )}
