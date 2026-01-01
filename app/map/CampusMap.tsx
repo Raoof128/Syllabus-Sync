@@ -2,27 +2,23 @@
 
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
 import { buildings, Building } from '@/lib/map/buildings';
 
-// Function to generate tile URL with bounds checking and y-flipping for TMS
-const getTileUrl = (coords: L.Coords) => {
-  const z = coords.z;
-  let x = coords.x;
-  let y = coords.y;
+// Convert pixel coordinates to lat/lng for markers
+const pixelToLatLng = (x: number, y: number) => {
+  const latLngBounds = L.latLngBounds(CAMPUS_BOUNDS);
 
-  // Get the max coordinates for this zoom level
-  const [maxX, maxY] = TILE_RANGES[z] || [18, 12];
+  // Convert pixel coordinates to normalized position (0-1)
+  const xNorm = x / MAP_WIDTH;
+  const yNorm = (MAP_HEIGHT - y) / MAP_HEIGHT; // Flip Y since image Y=0 is top
 
-  // For TMS tiles (y=0 is top), flip y-coordinate for CRS.Simple (y=0 is bottom)
-  y = maxY - y;  // Flip the y-coordinate
+  // Convert to lat/lng within campus bounds
+  const lat = latLngBounds.getSouth() + (latLngBounds.getNorth() - latLngBounds.getSouth()) * yNorm;
+  const lng = latLngBounds.getWest() + (latLngBounds.getEast() - latLngBounds.getWest()) * xNorm;
 
-  // Clamp coordinates to valid range for this zoom level
-  x = Math.max(0, Math.min(maxX, x));
-  y = Math.max(0, Math.min(maxY, y));
-
-  return `/tiles/${z}/${x}/${y}.png`;
+  return L.latLng(lat, lng);
 };
 
 // Import Leaflet CSS
@@ -39,15 +35,15 @@ L.Icon.Default.mergeOptions({
 // Map dimensions (image size)
 const MAP_WIDTH = 4678;
 const MAP_HEIGHT = 3307;
-const TILE_SIZE = 256;
 
-// Tile ranges for each zoom level (based on actual tiles)
-// Zoom level -> [maxX, maxY]
-const TILE_RANGES: Record<number, [number, number]> = {
-  3: [4, 3],    // 5x4 tiles - Minimum zoom
-  4: [9, 6],    // 10x7 tiles
-  5: [18, 12],  // 19x13 tiles - Maximum zoom
-};
+// Campus image path
+const CAMPUS_IMAGE_URL = '/maps/raster/mq-campus.png';
+
+// Macquarie University coordinates (approximate bounds for campus)
+const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
+  [-33.783, 151.105], // bottom-left
+  [-33.770, 151.125], // top-right
+];
 
 // Custom marker icon
 const createMarkerIcon = (isSelected: boolean) => new L.Icon({
@@ -71,7 +67,7 @@ const createMarkerIcon = (isSelected: boolean) => new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Component to handle map centering, popup opening, click events, and tile layer
+// Component to handle map setup and image overlay
 function MapController({
   selectedBuilding,
   coordPickerMode,
@@ -89,39 +85,22 @@ function MapController({
   });
 
   useEffect(() => {
-    // Add tile layer using a custom tile layer that overrides getTileUrl
-    const tileLayer = L.tileLayer('', {
-      noWrap: true,
-    });
+    // Center on Macquarie University
+    const center: [number, number] = [-33.7767, 151.1134];
+    map.setView(center, 16);
 
-    // Override the getTileUrl method
-    tileLayer.getTileUrl = getTileUrl;
-
-    tileLayer.addTo(map);
-
-    // Set more restrictive bounds to prevent gray areas
-    // Add inward padding to make bounds more restrictive
-    const paddingX = 100; // horizontal padding in pixels
-    const paddingY = 200; // vertical padding in pixels (more for top to prevent gray screen)
-
-    const bounds = new L.LatLngBounds(
-      map.unproject([paddingX, MAP_HEIGHT - paddingY/2], 5),     // bottom-left: inset from edges
-      map.unproject([MAP_WIDTH - paddingX, paddingY], 5)          // top-right: more inset on top
-    );
-    map.setMaxBounds(bounds);
-
-    // Center the map on the image center at default zoom
-    map.setView(map.unproject([MAP_WIDTH / 2, MAP_HEIGHT / 2], 5), 5);
-
-    // Cleanup function to remove the layer
-    return () => {
-      map.removeLayer(tileLayer);
-    };
+    // Set bounds to campus area
+    map.setMaxBounds(CAMPUS_BOUNDS);
+    map.setMinZoom(16);
+    map.setMaxZoom(20);  // Increased max zoom for more detail
   }, [map]);
 
   useEffect(() => {
     if (selectedBuilding) {
-      map.setView(selectedBuilding.position, 3);
+      // Convert building pixel coordinates to lat/lng
+      const buildingLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
+      map.setView(buildingLatLng, 17);
+
       // Find and open the popup for this building
       map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
@@ -155,51 +134,56 @@ interface CampusMapProps {
 export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
   return (
             <MapContainer
-              center={[0, 0]}
-              zoom={5}
-              minZoom={3}
-              maxZoom={5}
+              center={[-33.77, 151.115]}
+              zoom={16}
               zoomControl={true}
-              maxBoundsViscosity={1.0}
-              bounceAtZoomLimits={false}
-              crs={L.CRS.Simple}
               style={{
                 height: '100%',
                 width: '100%',
-                backgroundColor: '#f1f5f9' // Pleasant light background
               }}
             >
+              {/* Campus image overlay */}
+              <ImageOverlay
+                url={CAMPUS_IMAGE_URL}
+                bounds={CAMPUS_BOUNDS}
+              />
+
               <MapController
                 selectedBuilding={selectedBuilding}
                 coordPickerMode={coordPickerMode}
                 onMapClick={onMapClick}
               />
-      {buildings.map((building) => (
-        <Marker
-          key={building.id}
-          position={building.position}
-          icon={createMarkerIcon(selectedBuilding?.id === building.id)}
-        >
-          <Popup>
-            <div className="p-2 min-w-[200px]">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{building.name}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Building {building.id}</p>
-              {building.description && (
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{building.description}</p>
-              )}
-              {building.tags && building.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {building.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+
+              {/* Building markers */}
+              {buildings.map((building) => {
+                const buildingLatLng = pixelToLatLng(building.position[0], building.position[1]);
+                return (
+                  <Marker
+                    key={building.id}
+                    position={buildingLatLng}
+                    icon={createMarkerIcon(selectedBuilding?.id === building.id)}
+                  >
+                    <Popup>
+                      <div className="p-2 min-w-[200px]">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{building.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Building {building.id}</p>
+                        {building.description && (
+                          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{building.description}</p>
+                        )}
+                        {building.tags && building.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {building.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+            </MapContainer>
   );
 }

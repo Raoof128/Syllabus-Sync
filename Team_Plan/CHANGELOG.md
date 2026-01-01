@@ -45,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Map Boundaries**: Strict bounds enforcement to prevent gray screen areas outside campus
 - **Enhanced Search UX**: Debounced search (300ms), loading states, keyboard navigation (arrow keys, enter, escape), visual feedback
 - **Performance Optimizations**: Coordinate clamping, dynamic bounds, smooth animations
+- **Theme-Aware Styling**: Premium gradient backgrounds that automatically adapt to light/dark theme modes using CSS custom properties and Tailwind slate color scheme
+- **Advanced Zoom Controls**: Optimized zoom range (15-25) for detailed campus exploration with smooth performance
+- **Visual Polish**: Professional map styling with subtle gradients replacing plain gray backgrounds
 
 ### Changed
 

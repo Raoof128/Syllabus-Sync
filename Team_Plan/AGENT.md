@@ -1036,6 +1036,13 @@ Verification: npm run build (success); npm test (36/36 pass); zoom controls func
 Follow-ups: Campus map now provides professional-grade navigation experience with smooth zoom, reliable tile loading, contained boundaries, and modern search UX patterns.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added theme-aware premium gradient backgrounds for campus map empty areas.
+Summary: Implemented sophisticated gradient backgrounds for Leaflet map that automatically adapt to light/dark theme modes, replacing plain gray backgrounds with professional slate-themed gradients using CSS custom properties, added light theme support with subtle dark accents on light backgrounds, enhanced visual polish with premium styling that matches the overall UI design system.
+Files: app/globals.css.
+Verification: npm run build (success); npm test (36/36 pass); map backgrounds automatically switch between light/dark themes with premium gradients.
+Follow-ups: Campus map now has professional, theme-consistent backgrounds that eliminate ugly gray areas and enhance the overall user experience.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.
 Summary: Changed Lighthouse CI to run on port 3003 instead of 3000 to avoid development conflicts, fixed YAML indentation issues in CI workflow, and resolved artifact upload problems by specifying custom artifact name. Updated server startup configuration and ready pattern matching.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
