@@ -703,4 +703,11 @@ Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
 Verification: YAML validation passed; CI workflow syntax correct.
 Follow-ups: Accessibility tests should now complete faster with parallel execution and adequate timeout.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Further optimized GitHub CI test performance with 5 workers.
+Summary: Increased Playwright workers from 2 to 5 for maximum parallel test execution in CI environment. Updated both Playwright configuration and GitHub Actions workflow to utilize 5 workers, significantly reducing test execution time.
+Files changed: playwright.config.ts; .github/workflows/ci-cd.yml.
+Verification: Configuration updated and validated.
+Follow-ups: Accessibility tests now run with 5 parallel workers for maximum speed.
+
 **Last Updated:** January 01, 2026
