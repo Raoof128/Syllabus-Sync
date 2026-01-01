@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { APP_CONFIG } from '@/lib/config';
 
 const navigation = [
   { name: 'Home', href: '/home', icon: Home },
@@ -66,7 +65,6 @@ const Sidebar = memo(() => {
               height={128}
               style={{ objectFit: 'contain', borderRadius: '8px' }}
             />
-            <span className="text-lg font-bold text-gray-900">{APP_CONFIG.name}</span>
           </Link>
         </div>
 

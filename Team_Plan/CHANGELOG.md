@@ -58,6 +58,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Component Memoization**: Added `React.memo()` to Header and Sidebar components for improved performance
 - **Code Quality**: Fixed ESLint warnings by converting function expressions to arrow functions in memoized components
 
+#### UI/Branding Updates
+- **Sidebar Simplification**: Removed text branding from sidebar, now displays logo-only for cleaner design
+- **Header Enhancement**: Updated university name display from "Macquarie" to "Macquarie University" for complete branding
+
 ### Changed
 
 #### Testing Optimization
@@ -764,4 +768,4 @@ Files changed: app/feed/page.tsx.
 Verification: All badges and event text now display with proper contrast and styling in both light and dark modes.
 Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
 
-**Last Updated:** January 01, 2026 (Logo & Performance Updates)
+**Last Updated:** January 01, 2026 (UI/Branding Updates)
