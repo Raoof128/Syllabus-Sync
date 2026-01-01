@@ -22,10 +22,10 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 
 const categoryColors: Record<string, string> = {
-  Career: 'bg-blue-100 text-blue-800',
-  Social: 'bg-purple-100 text-purple-800',
-  Academic: 'bg-green-100 text-green-800',
-  'Free Food': 'bg-orange-100 text-orange-800',
+  Career: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
+  Social: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
+  Academic: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+  'Free Food': 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300',
 };
 
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
@@ -114,7 +114,9 @@ export default function FeedPage() {
                     >
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <h3 className="font-semibold text-gray-900 text-lg">{event.title}</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-slate-100 text-lg">
+                          {event.title}
+                        </h3>
                         <Badge
                           className={categoryColors[event.category as keyof typeof categoryColors]}
                         >
@@ -123,10 +125,12 @@ export default function FeedPage() {
                       </div>
 
                       {/* Event Description */}
-                      <p className="text-sm text-gray-600 mb-3">{event.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+                        {event.description}
+                      </p>
 
                       {/* Event Details */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-slate-400">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date(event.date).toLocaleDateString('en-AU', {
@@ -229,12 +233,14 @@ export default function FeedPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-green-600 text-white">New</Badge>
+                  <Badge className="bg-green-600 dark:bg-green-700 text-white">New</Badge>
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">Phase 2 Updates</h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 text-sm">
+                      Phase 2 Updates
+                    </h4>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
                       Calendar and map features coming soon!
                     </p>
                   </div>
@@ -263,20 +269,30 @@ export default function FeedPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge className="bg-green-100 text-green-800">Academic</Badge>
-                <span className="text-sm text-gray-600">Workshops & Study</span>
+                <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+                  Academic
+                </Badge>
+                <span className="text-sm text-gray-600 dark:text-slate-400">Workshops & Study</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-blue-100 text-blue-800">Career</Badge>
-                <span className="text-sm text-gray-600">Job & Internship</span>
+                <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
+                  Career
+                </Badge>
+                <span className="text-sm text-gray-600 dark:text-slate-400">Job & Internship</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-purple-100 text-purple-800">Social</Badge>
-                <span className="text-sm text-gray-600">Meetups & Networking</span>
+                <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300">
+                  Social
+                </Badge>
+                <span className="text-sm text-gray-600 dark:text-slate-400">
+                  Meetups & Networking
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-orange-100 text-orange-800">Free Food</Badge>
-                <span className="text-sm text-gray-600">Meals & Snacks</span>
+                <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300">
+                  Free Food
+                </Badge>
+                <span className="text-sm text-gray-600 dark:text-slate-400">Meals & Snacks</span>
               </div>
             </CardContent>
           </Card>
