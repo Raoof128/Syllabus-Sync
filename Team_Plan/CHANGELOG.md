@@ -759,4 +759,11 @@ Files changed: components/layout/Header.tsx.
 Verification: Header displays correctly in both light and dark modes with appropriate color schemes.
 Follow-ups: Header now provides consistent experience across light and dark themes.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Improved hero section dark mode styling in home page.
+Summary: Enhanced welcome header section with proper dark mode text colors for title, subtitle, and workload indicators, plus improved dropdown menu styling for dark theme consistency.
+Files changed: app/home/page.tsx.
+Verification: Hero section displays correctly in both light and dark modes with proper contrast.
+Follow-ups: Home page hero section now provides seamless experience across themes.
+
 **Last Updated:** January 01, 2026
