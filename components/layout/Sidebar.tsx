@@ -32,7 +32,7 @@ const Sidebar = memo(() => {
     <>
       {/* Mobile menu button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl active:scale-95 transition-all duration-200 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl active:scale-95 transition-all duration-mq-fast touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       >
@@ -42,7 +42,7 @@ const Sidebar = memo(() => {
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-mq-content/60 z-40 backdrop-blur-sm"
           onClick={() => setMobileMenuOpen(false)}
           role="presentation"
         />
@@ -51,7 +51,7 @@ const Sidebar = memo(() => {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed md:relative z-40 w-48 bg-mq-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast',
+          'fixed md:relative z-40 w-48 bg-mq-card-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
         )}
       >

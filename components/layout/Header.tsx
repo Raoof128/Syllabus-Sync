@@ -130,7 +130,7 @@ const Header = memo(() => {
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
                 <h3 className="font-semibold text-mq-content">Notifications</h3>
                 {unreadCount > 0 && (
@@ -156,32 +156,32 @@ const Header = memo(() => {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                        className={`block p-3 border-b border-gray-100 last:border-0 ${
-                          !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                        }`}
+                         className={`block p-3 border-b border-mq-border last:border-0 ${
+                           !notification.read ? 'bg-mq-info/10' : ''
+                         }`}
                       >
                         <div className="flex gap-3">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              notification.type === 'deadline'
-                                ? 'bg-orange-100 dark:bg-orange-900/20'
-                                : notification.type === 'event'
-                                  ? 'bg-purple-100 dark:bg-purple-900/20'
-                                  : notification.type === 'class'
-                                    ? 'bg-blue-100 dark:bg-blue-900/20'
-                                    : 'bg-gray-100 dark:bg-gray-800'
-                            }`}
-                          >
+                           <div
+                             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                               notification.type === 'deadline'
+                                 ? 'bg-mq-warning/20'
+                                 : notification.type === 'event'
+                                   ? 'bg-mq-purple/20'
+                                   : notification.type === 'class'
+                                     ? 'bg-mq-info/20'
+                                     : 'bg-mq-background-secondary'
+                             }`}
+                           >
                             <Icon
-                              className={`w-4 h-4 ${
-                                notification.type === 'deadline'
-                                  ? 'text-orange-600 dark:text-orange-400'
-                                  : notification.type === 'event'
-                                    ? 'text-purple-600 dark:text-purple-400'
-                                    : notification.type === 'class'
-                                      ? 'text-blue-600 dark:text-blue-400'
-                                      : 'text-gray-600 dark:text-gray-400'
-                              }`}
+                             className={`w-4 h-4 ${
+                               notification.type === 'deadline'
+                                 ? 'text-mq-warning'
+                                 : notification.type === 'event'
+                                   ? 'text-mq-purple'
+                                   : notification.type === 'class'
+                                     ? 'text-mq-info'
+                                     : 'text-mq-content-secondary'
+                             }`}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -199,9 +199,9 @@ const Header = memo(() => {
                               })}
                             </p>
                           </div>
-                          {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0 mt-2" />
-                          )}
+                           {!notification.read && (
+                             <div className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2" />
+                           )}
                         </div>
                       </Link>
                     );

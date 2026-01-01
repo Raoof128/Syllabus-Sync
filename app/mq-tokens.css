@@ -85,15 +85,45 @@
 
 /* Dark Mode Overrides - mq-dark variants */
 .dark {
+  /* Base semantic tokens */
   --c-background: var(--c-charcoal-900);
+  --c-background-secondary: var(--c-charcoal-800);
+  --c-background-tertiary: var(--c-navy-800);
   --c-background-invert: #ffffff;
-  --c-content: #ffffff;
-  --c-content-faded: var(--c-charcoal-400);
-  --c-border: var(--c-charcoal-700);
 
-  /* mq-dark brand colors */
-  --c-red: #d6001c; /* mq-dark-red */
-  --c-purple: #c6007e; /* mq-dark-purple */
+  --c-content: #ffffff;
+  --c-content-secondary: var(--c-charcoal-300);
+  --c-content-tertiary: var(--c-charcoal-400);
+  --c-content-faded: var(--c-charcoal-400);
+
+  --c-border: var(--c-charcoal-700);
+  --c-border-secondary: var(--c-charcoal-600);
+
+  --c-focus: var(--c-red);
+
+  /* mq-dark brand colors for enhanced contrast */
+  --c-red: #d6001c; /* mq-dark-red - brighter for dark backgrounds */
+  --c-bright-red: #ff1a1a; /* enhanced bright red */
+  --c-purple: #c6007e; /* mq-dark-purple - brighter for dark backgrounds */
+  --c-magenta: #e600b3; /* enhanced magenta */
+
+  /* Neutral adjustments for dark mode */
+  --c-charcoal-100: var(--c-charcoal-800); /* lighter charcoal becomes darker */
+  --c-sand-100: var(--c-charcoal-700);
+  --c-sand-200: var(--c-charcoal-600);
+  --c-slate-100: var(--c-navy-800);
+
+  /* UI state colors for dark mode */
+  --c-success: #10b981; /* green-500 */
+  --c-warning: #f59e0b; /* amber-500 */
+  --c-error: #ef4444; /* red-500 */
+  --c-info: #3b82f6; /* blue-500 */
+
+  /* Background variations for components */
+  --c-card-background: var(--c-charcoal-800);
+  --c-input-background: var(--c-charcoal-800);
+  --c-button-secondary: var(--c-charcoal-700);
+  --c-hover-background: var(--c-charcoal-700);
 }
 
 /* Focus and Interaction States */

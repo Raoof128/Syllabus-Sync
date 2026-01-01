@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual Polish**: Professional map styling with subtle gradients replacing plain gray backgrounds
 - **Zoom Control Theming**: Complete dark mode styling for Leaflet zoom controls with theme-aware colors, hover effects, and seamless integration with the design system
 
-#### Macquarie University Design System - Specification-Perfect Implementation
+#### Macquarie University Design System - Unified Dark Mode Implementation
 - **Exact Token Compliance**: Implemented MQ design tokens using precise `--c-[name]-[weight]`, `--f-*`, `--t-*`, `--fs-*` naming conventions
 - **Brand Colors**: All MQ brand colors (--c-red, --c-bright-red, --c-deep-red, --c-magenta, --c-purple) with exact hex values
 - **Neutral Palettes**: Complete charcoal (600-900), sand (100-500), navy (600-900), slate (100-500) ranges
@@ -58,11 +58,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Font Scale**: Complete --fs-small to --fs-x-mega scale (.875rem to 3rem)
 - **Motion**: Exact MQ timing functions (--t-ease-slow/fast, --t-snap-slow/fast) with specified durations and cubic-bezier curves
 - **Semantic Mappings**: --c-brand-primary (--c-red), --c-brand-secondary (--c-sand-200), background/content relationships
-- **Dark Mode**: mq-dark variants for brand colors in dark theme (--c-red → bright red, --c-purple → magenta)
-- **Tailwind Integration**: mq.* namespace perfectly mapped to --c-, --f-, --t-, --fs- tokens
-- **Component Library**: 10 professional components using exact MQ token references
-- **Website Transformation**: Complete redesign of all pages with MQ design system
-- **Cross-Reference Validation**: Every element validated against provided specifications
+- **Unified Dark Mode System**: Comprehensive dark mode token expansion with semantic overrides for all UI states
+- **Enhanced Dark Tokens**: Extended dark mode variants including backgrounds, borders, content colors, and component-specific states
+- **Consistent Dark Theming**: Eliminated hardcoded dark: classes, replaced with MQ semantic tokens across all components
+- **Component Dark Mode Updates**: Button, Card, Input, Alert, Header, Sidebar now use MQ tokens for consistent dark mode
+- **mq-dark Brand Variants**: Enhanced brand colors for dark backgrounds (--c-red → brighter red, --c-purple → brighter purple)
+- **UI State Colors**: Added success, warning, error, info tokens with dark mode variants
+- **Component-Specific Tokens**: card-background, input-background, button-secondary, hover-background for precise theming
+- **Tailwind Integration**: mq.* namespace with full dark mode support and semantic color mapping
+- **Cross-Reference Validation**: Every element validated against provided specifications with unified dark mode
+- **Component Library**: 10 professional components with consistent MQ token usage in both light and dark modes
+- **Website Transformation**: Complete redesign of all pages with MQ design system and unified dark mode
 - **Performance & Quality**: 0 lint errors/warnings, TypeScript strict compliance, production-ready build
 
 #### UI/Branding Updates
@@ -775,4 +781,4 @@ Files changed: app/feed/page.tsx.
 Verification: All badges and event text now display with proper contrast and styling in both light and dark modes.
 Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
 
-**Last Updated:** January 01, 2026 (MQ Token Specification Alignment)
+**Last Updated:** January 01, 2026 (Unified Dark Mode Implementation)

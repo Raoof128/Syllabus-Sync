@@ -7,10 +7,10 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        info: 'border-mq-slate-300 bg-mq-slate-100 text-mq-slate-800',
-        warning: 'border-yellow-200 bg-yellow-50 text-yellow-800',
-        success: 'border-green-200 bg-green-50 text-green-800',
-        error: 'border-red-200 bg-red-50 text-red-800',
+        info: 'border-mq-info bg-mq-info/10 text-mq-info',
+        warning: 'border-mq-warning bg-mq-warning/10 text-mq-warning',
+        success: 'border-mq-success bg-mq-success/10 text-mq-success',
+        error: 'border-mq-error bg-mq-error/10 text-mq-error',
       },
     },
     defaultVariants: {
