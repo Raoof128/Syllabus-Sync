@@ -1,0 +1,131 @@
+/* Macquarie University Design Tokens */
+/* Source: MQ variables.css - Adopted for The Syllabus Sync */
+
+:root {
+  /* Brand Colors */
+  --mq-red: #a6192e;
+  --mq-red-bright: #d6001c;
+  --mq-red-deep: #76232f;
+  --mq-magenta: #c6007e;
+  --mq-purple: #80225f;
+
+  /* Neutral Palettes */
+  --mq-charcoal-100: #f8f9f8;
+  --mq-charcoal-200: #e8e9e8;
+  --mq-charcoal-300: #d1d2d1;
+  --mq-charcoal-400: #b8b9b8;
+  --mq-charcoal-500: #a0a1a0;
+  --mq-charcoal-600: #71736b;
+  --mq-charcoal-700: #5a5c55;
+  --mq-charcoal-800: #43453f;
+  --mq-charcoal-900: #262826;
+
+  --mq-sand-100: #f7f6f3;
+  --mq-sand-200: #e8e6e2;
+  --mq-sand-300: #d9d4cb;
+  --mq-sand-400: #cac2b4;
+  --mq-sand-500: #919288;
+
+  --mq-navy-100: #f0f2f4;
+  --mq-navy-200: #d9dfe4;
+  --mq-navy-300: #c2cbd4;
+  --mq-navy-400: #abb7c4;
+  --mq-navy-500: #8d9fb1;
+  --mq-navy-600: #73808c;
+  --mq-navy-700: #5c6873;
+  --mq-navy-800: #45505a;
+  --mq-navy-900: #2d3945;
+
+  --mq-slate-100: #ecf2f6;
+  --mq-slate-200: #d9e5ed;
+  --mq-slate-300: #c6d8e4;
+  --mq-slate-400: #b3cbdb;
+  --mq-slate-500: #8d98a1;
+
+  /* Semantic Color Tokens */
+  --mq-primary: var(--mq-red);
+  --mq-secondary: var(--mq-sand-200);
+
+  --mq-background: #ffffff;
+  --mq-background-secondary: var(--mq-charcoal-100);
+  --mq-background-tertiary: var(--mq-slate-100);
+
+  --mq-content: var(--mq-charcoal-900);
+  --mq-content-secondary: var(--mq-charcoal-700);
+  --mq-content-tertiary: var(--mq-charcoal-500);
+
+  --mq-border: var(--mq-charcoal-200);
+  --mq-border-secondary: var(--mq-charcoal-300);
+
+  --mq-focus: var(--mq-red);
+
+  /* Typography */
+  --mq-font-primary: "Work Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mq-font-secondary: "Source Serif Pro", Georgia, "Times New Roman", serif;
+
+  /* Font Sizes (rem) */
+  --mq-font-size-xs: 0.75rem;
+  --mq-font-size-sm: 0.875rem;
+  --mq-font-size-base: 1rem;
+  --mq-font-size-lg: 1.125rem;
+  --mq-font-size-xl: 1.25rem;
+  --mq-font-size-2xl: 1.5rem;
+  --mq-font-size-3xl: 1.875rem;
+  --mq-font-size-4xl: 2.25rem;
+  --mq-font-size-5xl: 3rem;
+
+  /* Motion */
+  --mq-ease-slow: 0.6s cubic-bezier(0.5, 0.5, 0, 1);
+  --mq-ease-fast: 0.3s cubic-bezier(0.5, 0.5, 0, 1);
+  --mq-snap-slow: 0.3s cubic-bezier(0, 0, 0, 1);
+  --mq-snap-fast: 0.15s cubic-bezier(0, 0, 0, 1);
+
+  /* Spacing */
+  --mq-space-1: 0.25rem;
+  --mq-space-2: 0.5rem;
+  --mq-space-3: 0.75rem;
+  --mq-space-4: 1rem;
+  --mq-space-5: 1.25rem;
+  --mq-space-6: 1.5rem;
+  --mq-space-8: 2rem;
+  --mq-space-10: 2.5rem;
+  --mq-space-12: 3rem;
+  --mq-space-16: 4rem;
+
+  /* Border Radius */
+  --mq-radius-sm: 0.125rem;
+  --mq-radius: 0.25rem;
+  --mq-radius-md: 0.375rem;
+  --mq-radius-lg: 0.5rem;
+  --mq-radius-xl: 0.75rem;
+
+  /* Shadows */
+  --mq-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --mq-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --mq-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --mq-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --mq-background: var(--mq-charcoal-900);
+  --mq-background-secondary: var(--mq-charcoal-800);
+  --mq-background-tertiary: var(--mq-navy-800);
+
+  --mq-content: var(--mq-charcoal-100);
+  --mq-content-secondary: var(--mq-charcoal-300);
+  --mq-content-tertiary: var(--mq-charcoal-400);
+
+  --mq-border: var(--mq-charcoal-700);
+  --mq-border-secondary: var(--mq-charcoal-600);
+}
+
+/* Focus and Interaction States */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mq-ease-slow: 0.01s linear;
+    --mq-ease-fast: 0.01s linear;
+    --mq-snap-slow: 0.01s linear;
+    --mq-snap-fast: 0.01s linear;
+  }
+}

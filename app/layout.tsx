@@ -1,11 +1,24 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Work_Sans, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
+import './mq-tokens.css';
 import ClientLayout from './client-layout';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
-const inter = Inter({ subsets: ['latin'] });
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-work-sans',
+  display: 'swap',
+});
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['300', '400', '600'],
+  variable: '--font-source-serif-4',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
@@ -21,11 +34,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${workSans.variable} ${sourceSerif4.variable}`}>
       <head>
         <meta name="theme-color" content="#ffffff" />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className="font-sans" suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
