@@ -980,6 +980,13 @@ Verification: All info boxes and stats sections now display correctly in both li
 Follow-ups: Application now has consistent dark mode styling across all informational UI components.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added dark mode styling to yellow warning/info boxes.
+Summary: Implemented dark mode variants for yellow informational boxes in calendar and feed pages, including unit setup warnings and demo preparation notices with appropriate background, border, and text colors.
+Files changed: app/calendar/page.tsx; app/feed/page.tsx.
+Verification: Yellow info/warning boxes now display correctly in both light and dark modes.
+Follow-ups: All colored informational UI components now support dark mode consistently.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: GitHub CI performance optimization for accessibility tests.
 Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
 Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.

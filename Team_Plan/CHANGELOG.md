@@ -717,4 +717,11 @@ Files changed: app/home/page.tsx; app/map/page.tsx; app/feed/page.tsx.
 Verification: All info boxes and stats sections now display correctly in both light and dark modes.
 Follow-ups: Application now has consistent dark mode styling across all informational UI components.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added dark mode styling to yellow warning/info boxes.
+Summary: Implemented dark mode variants for yellow informational boxes in calendar and feed pages, including unit setup warnings and demo preparation notices with appropriate background, border, and text colors.
+Files changed: app/calendar/page.tsx; app/feed/page.tsx.
+Verification: Yellow info/warning boxes now display correctly in both light and dark modes.
+Follow-ups: All colored informational UI components now support dark mode consistently.
+
 **Last Updated:** January 01, 2026
