@@ -731,4 +731,11 @@ Files changed: components/layout/Header.tsx.
 Verification: Profile dropdown now displays with solid background and proper text contrast in both themes.
 Follow-ups: All header dropdown menus now have consistent solid background styling.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added comprehensive dark mode styling to feed page badges and event elements.
+Summary: Implemented dark mode variants for all badge types (category badges, status badges, event badges) and updated text colors for event titles, descriptions, and details throughout the feed page.
+Files changed: app/feed/page.tsx.
+Verification: All badges and event text now display with proper contrast and styling in both light and dark modes.
+Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
+
 **Last Updated:** January 01, 2026

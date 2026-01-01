@@ -994,6 +994,13 @@ Verification: Profile dropdown now displays with solid background and proper tex
 Follow-ups: All header dropdown menus now have consistent solid background styling.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added comprehensive dark mode styling to feed page badges and event elements.
+Summary: Implemented dark mode variants for all badge types (category badges, status badges, event badges) and updated text colors for event titles, descriptions, and details throughout the feed page.
+Files changed: app/feed/page.tsx.
+Verification: All badges and event text now display with proper contrast and styling in both light and dark modes.
+Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: GitHub CI performance optimization for accessibility tests.
 Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
 Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
