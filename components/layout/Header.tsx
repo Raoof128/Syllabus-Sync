@@ -251,7 +251,10 @@ export default function Header() {
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+            >
               <DropdownMenuItem asChild>
                 <Link href="/manage-profiles" className="flex items-center gap-2">
                   <User className="w-4 h-4" />
