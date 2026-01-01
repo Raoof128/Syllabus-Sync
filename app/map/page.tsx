@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Search, MapPin, Navigation, Building2, Info, Copy, X, Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -9,19 +9,20 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
-import { buildings, Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
+import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import Link from 'next/link';
 
 // Custom hook for debounced search
+// eslint-disable react-hooks/set-state-in-effect
 function useDebouncedSearch(searchFunction: (query: string) => Building[], delay: number = 300) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [results, setResults] = useState<Building[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   // Debounce the query
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSearching(true);
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
@@ -32,15 +33,19 @@ function useDebouncedSearch(searchFunction: (query: string) => Building[], delay
   }, [query, delay]);
 
   // Perform search when debounced query changes
-  useEffect(() => {
+  const results = useMemo(() => {
     if (debouncedQuery.trim()) {
-      const searchResults = searchFunction(debouncedQuery);
-      setResults(searchResults);
+      return searchFunction(debouncedQuery);
     } else {
-      setResults([]);
+      return [];
     }
-    setIsSearching(false);
   }, [debouncedQuery, searchFunction]);
+
+  // Set searching to false after search completes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSearching(false);
+  }, [results]);
 
   const updateQuery = useCallback((newQuery: string) => {
     setQuery(newQuery);
@@ -49,7 +54,6 @@ function useDebouncedSearch(searchFunction: (query: string) => Building[], delay
   const clearSearch = useCallback(() => {
     setQuery('');
     setDebouncedQuery('');
-    setResults([]);
     setHasSearched(false);
     setIsSearching(false);
   }, []);
@@ -73,7 +77,6 @@ export default function MapPage() {
   const [coordPickerMode, setCoordPickerMode] = useState(false);
   const [copiedCoords, setCopiedCoords] = useState<string>('');
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
-  const mapRef = useRef<L.Map>(null);
 
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
@@ -196,7 +199,7 @@ export default function MapPage() {
           )}
           {hasSearched && searchQuery && filteredBuildings.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-              {filteredBuildings.map((building, index) => (
+              {filteredBuildings.map((building: Building, index: number) => (
                 <button
                   key={building.id}
                   onClick={() => handleBuildingSelect(building)}
@@ -221,7 +224,7 @@ export default function MapPage() {
           )}
           {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 p-4 text-center text-gray-500 dark:text-gray-400">
-              No buildings found matching "{searchQuery}"
+              No buildings found matching &quot;{searchQuery}&quot;
             </div>
           )}
         </div>

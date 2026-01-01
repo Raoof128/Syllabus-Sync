@@ -1,8 +1,9 @@
 // components/layout/Sidebar.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Home,
@@ -12,10 +13,9 @@ import {
   Settings,
   Menu,
   X,
-  GraduationCap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { APP_CONFIG, BRAND_COLORS } from '@/lib/config';
+import { APP_CONFIG } from '@/lib/config';
 
 const navigation = [
   { name: 'Home', href: '/home', icon: Home },
@@ -25,7 +25,7 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
-export default function Sidebar() {
+const Sidebar = memo(() => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -59,12 +59,13 @@ export default function Sidebar() {
         {/* Logo and branding */}
         <div className="mb-8">
           <Link href="/home" className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: BRAND_COLORS.primary }}
-            >
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
+            <Image
+              src="/MQ_Logo_Final.png"
+              alt="Macquarie University Logo"
+              width={128}
+              height={128}
+              style={{ objectFit: 'contain', borderRadius: '8px' }}
+            />
             <span className="text-lg font-bold text-gray-900">{APP_CONFIG.name}</span>
           </Link>
         </div>
@@ -97,4 +98,8 @@ export default function Sidebar() {
       </div>
     </>
   );
-}
+});
+
+Sidebar.displayName = 'Sidebar';
+
+export default Sidebar;

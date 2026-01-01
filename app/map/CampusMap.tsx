@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import L from 'leaflet';
 import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
@@ -136,7 +136,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
             <MapContainer
               center={[-33.77, 151.115]}
               zoom={16}
-              zoomControl={true}
+              zoomControl
               style={{
                 height: '100%',
                 width: '100%',

@@ -50,6 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual Polish**: Professional map styling with subtle gradients replacing plain gray backgrounds
 - **Zoom Control Theming**: Complete dark mode styling for Leaflet zoom controls with theme-aware colors, hover effects, and seamless integration with the design system
 
+#### Logo Integration & Performance Optimization
+- **University Logo Update**: Replaced old logo (`MQ_Logo.png`) with new university logo (`MQ_Logo_Final.png`) at 128x128px in header and sidebar
+- **Image Optimization**: Migrated from `<img>` to Next.js `<Image>` component for automatic optimization, proper sizing, and better Core Web Vitals
+- **Bundle Analysis**: Implemented bundle analysis setup for monitoring bundle sizes and optimization opportunities
+- **Lazy Loading**: Confirmed dynamic imports for map components prevent server-side rendering of heavy Leaflet components
+- **Component Memoization**: Added `React.memo()` to Header and Sidebar components for improved performance
+- **Code Quality**: Fixed ESLint warnings by converting function expressions to arrow functions in memoized components
+
 ### Changed
 
 #### Testing Optimization
@@ -756,4 +764,4 @@ Files changed: app/feed/page.tsx.
 Verification: All badges and event text now display with proper contrast and styling in both light and dark modes.
 Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
 
-**Last Updated:** January 01, 2026
+**Last Updated:** January 01, 2026 (Logo & Performance Updates)

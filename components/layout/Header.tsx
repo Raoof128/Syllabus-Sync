@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Bell,
   Settings,
   User,
-  GraduationCap,
   Clock,
   Calendar,
   BookOpen,
@@ -36,7 +36,7 @@ const notificationIcons = {
   system: Info,
 };
 
-export default function Header() {
+const Header = memo(() => {
   const notifications = useNotificationsStore((state) => state.notifications);
   const addNotification = useNotificationsStore((state) => state.addNotification);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
@@ -94,18 +94,21 @@ export default function Header() {
     <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-6 relative z-10">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: BRAND_COLORS.primary }}
-        >
-          <GraduationCap className="w-6 h-6 text-white" />
-        </div>
-        <div className="hidden sm:block">
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-            {APP_CONFIG.name}
-          </h1>
-          <p className="text-xs text-gray-500 dark:text-slate-400">{UNIVERSITY_CONFIG.shortName}</p>
-        </div>
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/MQ_Logo_Final.png"
+            alt="Macquarie University Logo"
+            width={128}
+            height={128}
+            style={{ objectFit: 'contain' }}
+          />
+          <div className="hidden sm:block">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+              {APP_CONFIG.name}
+            </h1>
+            <p className="text-xs text-gray-500 dark:text-slate-400">{UNIVERSITY_CONFIG.shortName}</p>
+          </div>
+        </Link>
       </div>
 
       {/* Right side - Actions */}
@@ -298,4 +301,8 @@ export default function Header() {
       </div>
     </header>
   );
-}
+});
+
+Header.displayName = 'Header';
+
+export default Header;
