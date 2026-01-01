@@ -1043,6 +1043,13 @@ Verification: npm run build (success); npm test (36/36 pass); map backgrounds au
 Follow-ups: Campus map now has professional, theme-consistent backgrounds that eliminate ugly gray areas and enhance the overall user experience.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added complete dark mode styling for Leaflet zoom controls.
+Summary: Implemented comprehensive theme-aware styling for Leaflet zoom in/out controls with proper dark mode colors, hover effects, and seamless integration with the slate color design system, ensuring zoom controls match both light and dark themes perfectly without breaking the professional appearance.
+Files: app/globals.css.
+Verification: npm run build (success); npm test (36/36 pass); zoom controls automatically adapt to light/dark theme changes with proper contrast and hover effects.
+Follow-ups: All map UI elements now have consistent theme-aware styling for a polished, professional user experience.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.
 Summary: Changed Lighthouse CI to run on port 3003 instead of 3000 to avoid development conflicts, fixed YAML indentation issues in CI workflow, and resolved artifact upload problems by specifying custom artifact name. Updated server startup configuration and ready pattern matching.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.

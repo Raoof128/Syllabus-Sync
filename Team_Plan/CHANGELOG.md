@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Theme-Aware Styling**: Premium gradient backgrounds that automatically adapt to light/dark theme modes using CSS custom properties and Tailwind slate color scheme
 - **Advanced Zoom Controls**: Optimized zoom range (15-25) for detailed campus exploration with smooth performance
 - **Visual Polish**: Professional map styling with subtle gradients replacing plain gray backgrounds
+- **Zoom Control Theming**: Complete dark mode styling for Leaflet zoom controls with theme-aware colors, hover effects, and seamless integration with the design system
 
 ### Changed
 
