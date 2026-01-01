@@ -122,10 +122,11 @@ jobs:
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10
         with:
-          urls: http://localhost:3000
+          urls: http://localhost:3003
           configPath: .lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
+          artifactName: lhci-results
 
   accessibility:
     name: Accessibility Testing

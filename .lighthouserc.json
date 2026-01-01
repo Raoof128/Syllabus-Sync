@@ -2,15 +2,15 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "npm run start",
-      "startServerReadyPattern": "ready - started server on 0.0.0.0:3000",
+      "startServerCommand": "PORT=3003 npm run start",
+      "startServerReadyPattern": "ready - started server on 0.0.0.0:3003",
       "startServerReadyTimeout": 120000,
       "url": [
-        "http://localhost:3000",
-        "http://localhost:3000/home",
-        "http://localhost:3000/calendar",
-        "http://localhost:3000/manage-profiles",
-        "http://localhost:3000/settings"
+        "http://localhost:3003",
+        "http://localhost:3003/home",
+        "http://localhost:3003/calendar",
+        "http://localhost:3003/manage-profiles",
+        "http://localhost:3003/settings"
       ]
     },
     "assert": {
