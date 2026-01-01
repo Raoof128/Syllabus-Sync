@@ -12,14 +12,14 @@ import dynamic from 'next/dynamic';
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
   loading: () => (
     <div className="flex items-center justify-center p-8">
-      <p className="text-gray-600">Loading...</p>
+      <p className="text-gray-900">Loading...</p>
     </div>
   ),
 });
 const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
   loading: () => (
     <div className="flex items-center justify-center p-8">
-      <p className="text-gray-600">Loading...</p>
+      <p className="text-gray-900">Loading...</p>
     </div>
   ),
 });
@@ -188,13 +188,13 @@ export default function HomePage() {
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
-          <p className="text-gray-600">Here&apos;s your day at a glance.</p>
+          <p className="text-gray-900">Here&apos;s your day at a glance.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Stress Level Indicator - Show compact version on mobile */}
           {hasHydrated && deadlines.length > 0 && (
             <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-gray-200 rounded-md border border-gray-200">
-              <TrendingUp className="h-3 w-3 text-gray-500" />
+              <TrendingUp className="h-3 w-3 text-gray-700" />
               <Badge className={`${stressColors[stressLevel]} text-xs px-1.5 py-0.5`}>
                 {stressEmoji[stressLevel]}
               </Badge>
@@ -202,8 +202,8 @@ export default function HomePage() {
           )}
           {hasHydrated && deadlines.length > 0 && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-200 rounded-lg border border-gray-200">
-              <TrendingUp className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">Workload:</span>
+              <TrendingUp className="h-4 w-4 text-gray-700" />
+              <span className="text-sm text-gray-900">Workload:</span>
               <Badge className={stressColors[stressLevel]}>
                 {stressEmoji[stressLevel]} {stressLevel}
               </Badge>
@@ -278,7 +278,7 @@ export default function HomePage() {
             <div className="text-center py-12">
               <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
-              <p className="text-gray-600 mb-4 max-w-md mx-auto">
+              <p className="text-gray-900 mb-4 max-w-md mx-auto">
                 Add your first unit to start tracking your schedule. It&apos;ll sync your calendar
                 and today&apos;s schedule.
               </p>

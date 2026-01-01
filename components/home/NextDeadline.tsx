@@ -52,7 +52,7 @@ export default function NextDeadline() {
         <CardTitle>Next Deadline</CardTitle>
         <Link
           href="/calendar"
-          className="text-sm text-blue-800 hover:text-blue-900 hover:underline"
+          className="text-sm text-blue-900 hover:text-blue-950 hover:underline"
         >
           View all →
         </Link>
@@ -60,13 +60,13 @@ export default function NextDeadline() {
       <CardContent>
         {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
-            <p className="text-gray-600">Loading...</p>
+            <p className="text-gray-900">Loading...</p>
           </div>
         ) : !nextDeadline ? (
           <div className="text-center py-8">
             <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No upcoming deadlines</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-900 mb-4">
               All caught up! Add your first deadline to stay on top of your work.
             </p>
             <Link
@@ -94,7 +94,7 @@ export default function NextDeadline() {
                   </Badge>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-700 mt-1">
                   Due {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a') : 'Invalid date'}
                 </p>
               </div>
