@@ -177,9 +177,9 @@ export default function MapPage() {
         {/* Search */}
         <div className="relative">
           {isSearching ? (
-            <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 animate-spin" />
+            <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary animate-spin" />
           ) : (
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
           )}
           <Input
             type="text"
@@ -192,7 +192,7 @@ export default function MapPage() {
           {searchQuery && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
             >
               <X className="h-4 w-4" />
             </button>
@@ -346,13 +346,13 @@ export default function MapPage() {
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
                 <h4 className="font-semibold text-mq-content">Walking Directions</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  Get directions between buildings with estimated walking time.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Info className="h-4 w-4" />
-                <span>Coming Soon</span>
-              </div>
+                   Get directions between buildings with estimated walking time.
+                 </p>
+               </div>
+               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                 <Info className="h-4 w-4" />
+                 <span>Coming Soon</span>
+               </div>
             </div>
           </CardContent>
         </Card>
@@ -369,13 +369,13 @@ export default function MapPage() {
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
                 <h4 className="font-semibold text-mq-content">Real-time Tracking</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  Track your current location on campus in real-time.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Info className="h-4 w-4" />
-                <span>Coming Soon</span>
-              </div>
+                   Track your current location on campus in real-time.
+                 </p>
+               </div>
+               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                 <Info className="h-4 w-4" />
+                 <span>Coming Soon</span>
+               </div>
             </div>
           </CardContent>
         </Card>
@@ -392,13 +392,13 @@ export default function MapPage() {
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
                 <h4 className="font-semibold text-mq-content">Filter & Find</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  Search by facilities, accessibility features, and more.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Info className="h-4 w-4" />
-                <span>Coming Soon</span>
-              </div>
+                   Search by facilities, accessibility features, and more.
+                 </p>
+               </div>
+               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                 <Info className="h-4 w-4" />
+                 <span>Coming Soon</span>
+               </div>
             </div>
           </CardContent>
         </Card>

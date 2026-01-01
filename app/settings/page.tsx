@@ -48,13 +48,11 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-gray-600">Manage your preferences and account settings.</p>
-        </div>
-      </header>
+      <div className="container mx-auto p-6 max-w-7xl">
+        <header className="mb-8">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Settings</h1>
+          <p className="text-mq-content-secondary">Manage your preferences and account settings.</p>
+        </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
@@ -65,46 +63,42 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm font-medium text-gray-900">Deadline Reminders</p>
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Deadline Reminders</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Get notified about upcoming deadlines</p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Get notified before assignments are due
-                  </p>
                 </div>
-                <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
-              </div>
-            </div>
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
+               </div>
+             </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm font-medium text-gray-900">Class Reminders</p>
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Class Reminders</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Notifications for class schedules</p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Reminder 15 minutes before each class
-                  </p>
                 </div>
-                <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
               </div>
-            </div>
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+             </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Info className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm font-medium text-gray-900">Event Updates</p>
+                <div className="flex items-center gap-3">
+                  <Info className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Event Updates</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Updates about campus events</p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">Updates about campus events</p>
                 </div>
-                <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
               </div>
-            </div>
+             </div>
           </CardContent>
         </Card>
 
@@ -116,22 +110,22 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900">Dark Mode</h4>
-                  <p className="text-sm text-gray-600">Switch to dark theme</p>
+                  <h4 className="font-semibold text-mq-content">Dark Mode</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Switch to dark theme</p>
                 </div>
-                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50" />
+                <div className="w-10 h-5 bg-mq-border rounded-full opacity-50" />
               </div>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900">Language</h4>
-                  <p className="text-sm text-gray-600">Choose your preferred language</p>
+                  <h4 className="font-semibold text-mq-content">Language</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Choose your preferred language</p>
                 </div>
-                <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50" />
+                <div className="w-10 h-5 bg-mq-border rounded-full opacity-50" />
               </div>
             </div>
           </CardContent>
@@ -145,29 +139,29 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900">Data Storage</h4>
-                  <p className="text-sm text-gray-600">Currently using local storage</p>
+                  <h4 className="font-semibold text-mq-content">Data Storage</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Currently using local storage</p>
                 </div>
-                <div className="w-10 h-5 bg-green-500 rounded-full opacity-50" />
+                <div className="w-10 h-5 bg-mq-success rounded-full opacity-50" />
               </div>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900">Export Data</h4>
-                  <p className="text-sm text-gray-600">Download all your data as JSON</p>
+                  <h4 className="font-semibold text-mq-content">Export Data</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Download all your data as JSON</p>
                 </div>
-                <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
               </div>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-gray-900">Clear All Data</h4>
-                  <p className="text-sm text-gray-600">Delete all stored data from app</p>
+                  <h4 className="font-semibold text-mq-content">Clear All Data</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Delete all stored data from app</p>
                 </div>
                 <Button
                   variant="primary"

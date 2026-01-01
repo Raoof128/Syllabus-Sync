@@ -21,10 +21,10 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 
 const categoryColors: Record<string, string> = {
-  Career: 'bg-mq-navy-100 text-mq-navy-800',
-  Social: 'bg-mq-purple text-white',
-  Academic: 'bg-green-100 text-green-800',
-  'Free Food': 'bg-orange-100 text-orange-800',
+  Career: 'bg-mq-info/10 text-mq-info',
+  Social: 'bg-mq-purple/10 text-mq-purple',
+  Academic: 'bg-mq-success/10 text-mq-success',
+  'Free Food': 'bg-mq-warning/10 text-mq-warning',
 };
 
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
@@ -55,8 +55,8 @@ export default function FeedPage() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Feed</h1>
-          <p className="text-gray-600">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Campus Feed</h1>
+          <p className="text-mq-content-secondary">
             Stay updated with campus events, announcements, and opportunities at{' '}
             {UNIVERSITY_CONFIG.name}.
           </p>
@@ -118,7 +118,7 @@ export default function FeedPage() {
                   filteredEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="p-4 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-background-tertiary transition-all duration-mq-fast ease-mq-snap hover:shadow-mq border border-mq-border hover:border-mq-border-secondary"
+                      className="p-4 bg-mq-card-background rounded-mq-lg hover:bg-mq-hover-background transition-all duration-mq-fast ease-mq-snap hover:shadow-mq border border-mq-border hover:border-mq-border-secondary"
                     >
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
@@ -158,7 +158,7 @@ export default function FeedPage() {
                       </div>
 
                       {/* Action Button */}
-                      <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2 flex-wrap">
+                      <div className="mt-3 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
                         <Button variant="secondary" size="sm">
                           Remind Me
                         </Button>
@@ -172,8 +172,8 @@ export default function FeedPage() {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                  <div className="text-center py-8 text-mq-content-secondary">
+                    <Calendar className="h-12 w-12 mx-auto mb-3 text-mq-content-tertiary" />
                     <p>No events found for this category.</p>
                   </div>
                 )}

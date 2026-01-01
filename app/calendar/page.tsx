@@ -46,10 +46,10 @@ import {
 import { useSearchParams } from 'next/navigation';
 
 const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
-  Low: 'bg-green-100 text-green-800',
-  Medium: 'bg-yellow-100 text-yellow-800',
+  Low: 'bg-mq-success/10 text-mq-success',
+  Medium: 'bg-mq-warning/10 text-mq-warning',
   High: 'bg-orange-100 text-orange-800',
-  Urgent: 'bg-red-100 text-red-800',
+  Urgent: 'bg-mq-error/10 text-mq-error',
 };
 
 export default function CalendarPage() {
@@ -92,9 +92,9 @@ export default function CalendarPage() {
   const stressLevel = isHydrated ? getStressLevel() : 'Low';
 
   const stressColors = {
-    Low: 'bg-mq-sand-200 text-mq-content',
-    Busy: 'bg-yellow-100 text-yellow-800',
-    High: 'bg-mq-red text-white',
+    Low: 'bg-mq-success/10 text-mq-success',
+    Busy: 'bg-mq-warning/10 text-mq-warning',
+    High: 'bg-mq-error/10 text-mq-error',
   };
 
   const getUnitColor = (unitCode: string) => {
@@ -173,10 +173,10 @@ export default function CalendarPage() {
 
       {/* Info Banner when no units */}
       {units.length === 0 && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-mq-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-mq-warning flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-mq-sm text-yellow-900">
+            <p className="text-mq-sm text-mq-warning">
               <strong>Note:</strong> Add some units on the Home page first before you can create
               deadlines.
             </p>
@@ -196,7 +196,7 @@ export default function CalendarPage() {
                     <p className="text-mq-sm text-mq-content-secondary">Upcoming</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{incompleteDeadlines.length}</p>
                   </div>
-                  <Clock className="h-6 w-6 text-mq-navy-500" />
+                  <Clock className="h-6 w-6 text-mq-content-secondary" />
                 </CardContent>
               </Card>
               <Card>
@@ -205,7 +205,7 @@ export default function CalendarPage() {
                     <p className="text-mq-sm text-mq-content-secondary">Overdue</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{overdueDeadlines.length}</p>
                   </div>
-                  <AlertCircle className="h-6 w-6 text-mq-red" />
+                  <AlertCircle className="h-6 w-6 text-mq-content-secondary" />
                 </CardContent>
               </Card>
               <Card>
@@ -214,7 +214,7 @@ export default function CalendarPage() {
                     <p className="text-mq-sm text-mq-content-secondary">Completed</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{completedDeadlines.length}</p>
                   </div>
-                  <CheckCircle2 className="h-6 w-6 text-green-600" />
+                  <CheckCircle2 className="h-6 w-6 text-mq-content-secondary" />
                 </CardContent>
               </Card>
               <Card>
@@ -223,7 +223,7 @@ export default function CalendarPage() {
                     <p className="text-mq-sm text-mq-content-secondary">Total</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{deadlines.length}</p>
                   </div>
-                  <CalendarDays className="h-6 w-6 text-mq-purple" />
+                  <CalendarDays className="h-6 w-6 text-mq-content-secondary" />
                 </CardContent>
               </Card>
               <Card>
@@ -255,9 +255,9 @@ export default function CalendarPage() {
             <Card>
               <CardContent className="py-12">
                 <div className="text-center">
-                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No deadlines yet</h3>
-                  <p className="text-gray-600 mb-4">
+                  <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">No deadlines yet</h3>
+                  <p className="text-mq-content-secondary mb-4">
                     Add your first deadline to start tracking your assignments.
                   </p>
                   <Button
@@ -293,8 +293,8 @@ export default function CalendarPage() {
                             key={deadline.id}
                             role="button"
                             tabIndex={0}
-                            className={`p-4 rounded-lg border transition-colors cursor-pointer hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                              isOverdue ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
+                            className={`p-4 rounded-mq-lg border transition-colors cursor-pointer hover:bg-mq-hover-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus ${
+                              isOverdue ? 'border-mq-error/20 bg-mq-error/10' : 'border-mq-border bg-mq-card-background'
                             }`}
                             onClick={() => handleEditDeadline(deadline)}
                             onKeyDown={(event) => {
@@ -313,12 +313,12 @@ export default function CalendarPage() {
                                 aria-label={`Mark ${deadline.title} as completed`}
                                 className="mt-0.5"
                               >
-                                <Circle className="h-5 w-5 text-gray-400 hover:text-blue-500" />
+                                <Circle className="h-5 w-5 text-mq-content-tertiary hover:text-mq-primary" />
                               </button>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
                                   <div>
-                                    <h4 className="font-semibold text-gray-900">
+                                    <h4 className="font-semibold text-mq-content">
                                       {deadline.title}
                                     </h4>
                                     <div className="flex items-center gap-2 mt-1">
@@ -326,7 +326,7 @@ export default function CalendarPage() {
                                         className="w-3 h-3 rounded-full"
                                         style={{ backgroundColor: getUnitColor(deadline.unitCode) }}
                                       />
-                                      <span className="text-sm text-gray-600">
+                                      <span className="text-mq-sm text-mq-content-secondary">
                                         {deadline.unitCode}
                                       </span>
                                     </div>
@@ -345,7 +345,7 @@ export default function CalendarPage() {
                                       ? format(dueDate, 'MMM dd, h:mm a')
                                       : 'Invalid date'}
                                   </span>
-                                  <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                                  <span className={isOverdue ? 'text-mq-error font-medium' : ''}>
                                     {isOverdue
                                       ? 'Overdue!'
                                       : hasValidDate
@@ -367,7 +367,7 @@ export default function CalendarPage() {
               {completedDeadlines.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-gray-500">
+                    <CardTitle className="flex items-center gap-2 text-mq-content-secondary">
                       <CheckCircle2 className="h-5 w-5" />
                       Completed ({completedDeadlines.length})
                     </CardTitle>
@@ -382,7 +382,7 @@ export default function CalendarPage() {
                             key={deadline.id}
                             role="button"
                             tabIndex={0}
-                            className="p-4 bg-gray-50 rounded-lg border border-gray-200 opacity-60 cursor-pointer hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            className="p-4 bg-mq-background-secondary rounded-mq-lg border border-mq-border opacity-60 cursor-pointer hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                             onClick={() => handleEditDeadline(deadline)}
                             onKeyDown={(event) => {
                               if (event.key === 'Enter' || event.key === ' ') {
@@ -400,15 +400,15 @@ export default function CalendarPage() {
                                 aria-label={`Mark ${deadline.title} as incomplete`}
                                 className="mt-0.5"
                               >
-                                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                <CheckCircle2 className="h-5 w-5 text-mq-success" />
                               </button>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-gray-700 line-through">
+                                <h4 className="font-semibold text-mq-content-secondary line-through">
                                   {deadline.title}
                                 </h4>
-                                <span className="text-sm text-gray-500">{deadline.unitCode}</span>
+                                <span className="text-mq-sm text-mq-content-tertiary">{deadline.unitCode}</span>
                                 {!hasValidDate && (
-                                  <p className="text-xs text-gray-400 mt-1">Invalid date</p>
+                                  <p className="text-mq-xs text-mq-content-tertiary mt-1">Invalid date</p>
                                 )}
                               </div>
                               <Badge variant="neutral" className="opacity-50">
@@ -449,7 +449,7 @@ export default function CalendarPage() {
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="text-sm font-medium text-gray-700">
+                <div className="text-mq-sm font-medium text-mq-content">
                   {view === 'week'
                     ? `${format(calendarRange.start, 'MMM d')} - ${format(calendarRange.end, 'MMM d')}`
                     : format(currentDate, 'MMMM yyyy')}
@@ -472,7 +472,7 @@ export default function CalendarPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-7 gap-2 text-xs text-gray-500 mb-2">
+              <div className="grid grid-cols-7 gap-2 text-mq-xs text-mq-content-secondary mb-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label) => (
                   <div key={label} className="text-center font-medium">
                     {label}
@@ -498,17 +498,17 @@ export default function CalendarPage() {
                           setSelectedDate(day);
                         }
                       }}
-                      className={`min-h-[120px] rounded-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                        isOutside ? 'bg-gray-50 text-gray-600' : 'bg-white'
-                      } ${isSelected ? 'border-blue-400 ring-1 ring-blue-200' : 'border-gray-200'}`}
+                      className={`min-h-[120px] rounded-mq-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus ${
+                        isOutside ? 'bg-mq-background-secondary text-mq-content-tertiary' : 'bg-mq-card-background'
+                      } ${isSelected ? 'border-mq-primary ring-1 ring-mq-primary/20' : 'border-mq-border'}`}
                     >
                       <div className="flex items-center justify-between">
                         <span
-                          className={`text-xs font-semibold ${isToday(day) ? 'text-blue-600' : ''}`}
+                          className={`text-mq-xs font-semibold ${isToday(day) ? 'text-mq-primary' : ''}`}
                         >
                           {format(day, 'd')}
                         </span>
-                        {isToday(day) && <span className="text-[10px] text-blue-500">Today</span>}
+                        {isToday(day) && <span className="text-[10px] text-mq-primary">Today</span>}
                       </div>
                       <div className="mt-2 space-y-1">
                         {dayDeadlines.slice(0, 3).map((deadline) => (
@@ -518,20 +518,20 @@ export default function CalendarPage() {
                               event.stopPropagation();
                               handleEditDeadline(deadline);
                             }}
-                            className={`w-full rounded px-2 py-1 text-left text-[11px] font-medium text-gray-800 hover:bg-gray-100 ${
-                              deadline.completed ? 'line-through text-gray-400' : ''
+                            className={`w-full rounded px-2 py-1 text-left text-[11px] font-medium text-mq-content hover:bg-mq-hover-background ${
+                              deadline.completed ? 'line-through text-mq-content-tertiary' : ''
                             }`}
                             style={{ borderLeft: `3px solid ${getUnitColor(deadline.unitCode)}` }}
                             title={`${deadline.title} (${format(new Date(deadline.dueDate), 'h:mm a')})`}
                           >
                             <div className="truncate">{deadline.title}</div>
-                            <div className="text-[10px] text-gray-800">
+                            <div className="text-[10px] text-mq-content-secondary">
                               {format(new Date(deadline.dueDate), 'h:mm a')}
                             </div>
                           </button>
                         ))}
                         {dayDeadlines.length > 3 && (
-                          <div className="text-[10px] text-gray-500">
+                            <div className="text-[10px] text-mq-content-tertiary">
                             +{dayDeadlines.length - 3} more
                           </div>
                         )}
