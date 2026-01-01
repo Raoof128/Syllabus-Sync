@@ -724,4 +724,11 @@ Files changed: app/calendar/page.tsx; app/feed/page.tsx.
 Verification: Yellow info/warning boxes now display correctly in both light and dark modes.
 Follow-ups: All colored informational UI components now support dark mode consistently.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Updated profile dropdown menu to use solid background styling.
+Summary: Replaced transparent popover background with solid white/dark-slate background to match notification dropdown styling, added proper dark mode text colors for menu items and disabled state.
+Files changed: components/layout/Header.tsx.
+Verification: Profile dropdown now displays with solid background and proper text contrast in both themes.
+Follow-ups: All header dropdown menus now have consistent solid background styling.
+
 **Last Updated:** January 01, 2026

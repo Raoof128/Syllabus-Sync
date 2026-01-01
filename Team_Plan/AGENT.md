@@ -987,6 +987,13 @@ Verification: Yellow info/warning boxes now display correctly in both light and 
 Follow-ups: All colored informational UI components now support dark mode consistently.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Updated profile dropdown menu to use solid background styling.
+Summary: Replaced transparent popover background with solid white/dark-slate background to match notification dropdown styling, added proper dark mode text colors for menu items and disabled state.
+Files changed: components/layout/Header.tsx.
+Verification: Profile dropdown now displays with solid background and proper text contrast in both themes.
+Follow-ups: All header dropdown menus now have consistent solid background styling.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: GitHub CI performance optimization for accessibility tests.
 Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
 Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
