@@ -1008,6 +1008,13 @@ Verification: Dropdown menu items no longer show grey highlights on interaction.
 Follow-ups: Profile dropdown menu now has clean, highlight-free appearance.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed grey background highlights from home page header elements.
+Summary: Eliminated grey backgrounds (bg-gray-200) from stress level indicators, stats section, and loading skeletons in home page header area, replacing with clean white/dark backgrounds and appropriate borders for visual hierarchy.
+Files changed: app/home/page.tsx; app/manage-profiles/page.tsx.
+Verification: Home page header elements no longer show unwanted grey highlights.
+Follow-ups: Home page now has clean, minimal appearance without distracting grey backgrounds.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
