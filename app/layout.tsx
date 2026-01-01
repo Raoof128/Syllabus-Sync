@@ -25,18 +25,18 @@ export const metadata: Metadata = {
   description: APP_CONFIG.fullDescription,
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
-  ],
-};
+  export const viewport: Viewport = {
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: 'var(--mq-background)' },
+      { media: '(prefers-color-scheme: dark)', color: 'var(--mq-background)' },
+    ],
+  };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${workSans.variable} ${sourceSerif4.variable}`}>
       <head>
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="var(--mq-background)" />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>

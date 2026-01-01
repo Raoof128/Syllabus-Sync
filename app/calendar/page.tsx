@@ -99,7 +99,7 @@ export default function CalendarPage() {
 
   const getUnitColor = (unitCode: string) => {
     const unit = units.find((u) => u.code === unitCode);
-    return unit?.color || '#6b7280';
+    return unit?.color || 'var(--mq-content-secondary)';
   };
 
   /* eslint-disable react-hooks/set-state-in-effect */
