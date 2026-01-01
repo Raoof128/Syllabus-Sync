@@ -187,8 +187,10 @@ export default function HomePage() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
-          <p className="text-gray-900">Here&apos;s your day at a glance.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
+            Welcome, {DEMO_USER.name}!
+          </h1>
+          <p className="text-gray-900 dark:text-slate-300">Here&apos;s your day at a glance.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Stress Level Indicator - Show compact version on mobile */}
@@ -203,7 +205,7 @@ export default function HomePage() {
           {hasHydrated && deadlines.length > 0 && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
               <TrendingUp className="h-4 w-4 text-gray-700" />
-              <span className="text-sm text-gray-900">Workload:</span>
+              <span className="text-sm text-gray-900 dark:text-slate-100">Workload:</span>
               <Badge className={stressColors[stressLevel]}>
                 {stressEmoji[stressLevel]} {stressLevel}
               </Badge>
@@ -217,7 +219,10 @@ export default function HomePage() {
                 <span className="sm:hidden">Add</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700"
+            >
               <DropdownMenuItem onClick={handleAddUnit} className="gap-2 cursor-pointer">
                 <BookOpen className="h-4 w-4" />
                 Add Unit
