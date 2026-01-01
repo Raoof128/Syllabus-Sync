@@ -85,19 +85,19 @@
 
 /* Dark Mode Overrides - mq-dark variants */
 .dark {
-  /* Base semantic tokens */
+  /* Base semantic tokens - Unified charcoal palette for consistency */
   --c-background: var(--c-charcoal-900);
   --c-background-secondary: var(--c-charcoal-800);
-  --c-background-tertiary: var(--c-navy-800);
+  --c-background-tertiary: var(--c-charcoal-700);
   --c-background-invert: #ffffff;
 
   --c-content: #ffffff;
-  --c-content-secondary: var(--c-charcoal-300);
-  --c-content-tertiary: var(--c-charcoal-400);
+  --c-content-secondary: var(--c-charcoal-200);
+  --c-content-tertiary: var(--c-charcoal-300);
   --c-content-faded: var(--c-charcoal-400);
 
-  --c-border: var(--c-charcoal-700);
-  --c-border-secondary: var(--c-charcoal-600);
+  --c-border: var(--c-charcoal-600);
+  --c-border-secondary: var(--c-charcoal-500);
 
   --c-focus: var(--c-red);
 
@@ -113,13 +113,13 @@
   --c-sand-200: var(--c-charcoal-600);
   --c-slate-100: var(--c-navy-800);
 
-  /* UI state colors for dark mode */
-  --c-success: #10b981; /* green-500 */
-  --c-warning: #f59e0b; /* amber-500 */
-  --c-error: #ef4444; /* red-500 */
-  --c-info: #3b82f6; /* blue-500 */
+  /* UI state colors for dark mode - consistent with MQ brand */
+  --c-success: #10b981; /* green-500 - keeping for accessibility */
+  --c-warning: #f59e0b; /* amber-500 - keeping for accessibility */
+  --c-error: #ef4444; /* red-500 - keeping for accessibility */
+  --c-info: #3b82f6; /* blue-500 - keeping for accessibility */
 
-  /* Background variations for components */
+  /* Background variations for components - unified charcoal palette */
   --c-card-background: var(--c-charcoal-800);
   --c-input-background: var(--c-charcoal-800);
   --c-button-secondary: var(--c-charcoal-700);

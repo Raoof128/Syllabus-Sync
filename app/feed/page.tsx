@@ -64,7 +64,7 @@ export default function FeedPage() {
       </header>
 
       {/* Info Banner */}
-      <div className="mb-6 p-4 bg-mq-slate-100 border border-mq-slate-300 rounded-mq-lg flex items-start gap-3">
+      <div className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3">
         <Info className="h-5 w-5 text-mq-navy-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-mq-sm text-mq-navy-900">
