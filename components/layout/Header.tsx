@@ -91,7 +91,7 @@ export default function Header() {
   const unreadCount = isClient ? getUnreadCount() : 0;
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-6">
+    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-6 relative z-10">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
         <div
