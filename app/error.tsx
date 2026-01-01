@@ -28,7 +28,7 @@ export default function Error({
         </p>
 
         <div className="flex gap-4 justify-center">
-          <Button onClick={reset} variant="outline" className="gap-2">
+          <Button onClick={reset} variant="secondary" className="gap-2">
             <RefreshCcw className="h-4 w-4" />
             Try Again
           </Button>

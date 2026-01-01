@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Search, MapPin, Navigation, Building2, Info, Copy, X, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
+import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
 import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import Link from 'next/link';
@@ -164,7 +164,7 @@ export default function MapPage() {
             </div>
           </div>
           <Link href="/map">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button variant="secondary" size="sm" className="gap-1">
               <X className="h-4 w-4" />
               Clear
             </Button>
@@ -250,7 +250,7 @@ export default function MapPage() {
               </div>
             )}
             <Button
-              variant={coordPickerMode ? "default" : "outline"}
+              variant={coordPickerMode ? "primary" : "secondary"}
               size="sm"
               onClick={() => setCoordPickerMode(!coordPickerMode)}
               className="gap-2"
@@ -320,7 +320,7 @@ export default function MapPage() {
                   <div className="text-sm text-gray-600 dark:text-gray-400">{building.name}</div>
                   {buildingData?.tags && buildingData.tags.length > 0 && (
                     <div className="mt-1">
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="neutral" className="text-xs">
                         {buildingData.tags[0]}
                       </Badge>
                     </div>

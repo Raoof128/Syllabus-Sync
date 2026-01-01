@@ -91,7 +91,7 @@ const Header = memo(() => {
   const unreadCount = isClient ? getUnreadCount() : 0;
 
   return (
-    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-6 relative z-10">
+    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-6 relative z-10">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3">
@@ -103,10 +103,10 @@ const Header = memo(() => {
             style={{ objectFit: 'contain' }}
           />
           <div className="hidden sm:block">
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            <h1 className="text-mq-lg font-semibold text-mq-content">
               {APP_CONFIG.name}
             </h1>
-            <p className="text-xs text-gray-500 dark:text-slate-400">{UNIVERSITY_CONFIG.shortName}</p>
+            <p className="text-mq-xs text-mq-content-secondary">{UNIVERSITY_CONFIG.shortName}</p>
           </div>
         </Link>
       </div>
@@ -116,11 +116,11 @@ const Header = memo(() => {
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
-            className="p-2 rounded-lg transition-colors relative"
+            className="p-2 rounded-mq transition-all duration-mq-fast ease-mq-snap relative hover:bg-mq-background-secondary"
             aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <Bell className="w-5 h-5 text-mq-content-secondary" />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium">
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -130,9 +130,9 @@ const Header = memo(() => {
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-              <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
+              <div className="p-3 border-b border-mq-border flex items-center justify-between">
+                <h3 className="font-semibold text-mq-content">Notifications</h3>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}

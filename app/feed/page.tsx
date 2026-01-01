@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import {
   Calendar,
   MapPin,
@@ -22,10 +22,10 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 
 const categoryColors: Record<string, string> = {
-  Career: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
-  Social: 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300',
-  Academic: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
-  'Free Food': 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300',
+  Career: 'bg-mq-navy-100 text-mq-navy-800',
+  Social: 'bg-mq-purple text-white',
+  Academic: 'bg-green-100 text-green-800',
+  'Free Food': 'bg-orange-100 text-orange-800',
 };
 
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
@@ -55,10 +55,10 @@ export default function FeedPage() {
       </header>
 
       {/* Info Banner */}
-      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+      <div className="mb-6 p-4 bg-mq-slate-100 border border-mq-slate-300 rounded-mq-lg flex items-start gap-3">
+        <Info className="h-5 w-5 text-mq-navy-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm text-blue-900 dark:text-blue-100">
+          <p className="text-mq-sm text-mq-navy-900">
             <strong>Stay connected:</strong> Discover workshops, career fairs, social events, and
             free food opportunities happening on campus.
           </p>
@@ -81,10 +81,9 @@ export default function FeedPage() {
                 {filters.map((filter) => (
                   <Button
                     key={filter}
-                    variant={activeFilter === filter ? 'default' : 'outline'}
+                    variant={activeFilter === filter ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setActiveFilter(filter)}
-                    className={activeFilter === filter ? 'bg-blue-600 hover:bg-blue-700' : ''}
                   >
                     {filter}
                   </Button>
@@ -101,7 +100,7 @@ export default function FeedPage() {
                   <Calendar className="h-5 w-5" />
                   {activeFilter === 'All' ? 'All Events' : `${activeFilter} Events`}
                 </span>
-                <Badge variant="outline">{filteredEvents.length} events</Badge>
+                <Badge variant="neutral">{filteredEvents.length} events</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -110,11 +109,11 @@ export default function FeedPage() {
                   filteredEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:shadow-md border border-transparent hover:border-gray-200"
+                      className="p-4 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-background-tertiary transition-all duration-mq-fast ease-mq-snap hover:shadow-mq border border-mq-border hover:border-mq-border-secondary"
                     >
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <h3 className="font-semibold text-gray-900 dark:text-slate-100 text-lg">
+                        <h3 className="font-semibold text-mq-content text-mq-lg">
                           {event.title}
                         </h3>
                         <Badge
@@ -125,12 +124,12 @@ export default function FeedPage() {
                       </div>
 
                       {/* Event Description */}
-                      <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">
+                      <p className="text-mq-sm text-mq-content-secondary mb-3">
                         {event.description}
                       </p>
 
                       {/* Event Details */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-slate-400">
+                      <div className="flex flex-wrap items-center gap-4 text-mq-sm text-mq-content-secondary">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date(event.date).toLocaleDateString('en-AU', {
@@ -151,18 +150,15 @@ export default function FeedPage() {
 
                       {/* Action Button */}
                       <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2 flex-wrap">
-                        <Button variant="outline" size="sm">
-                          <Bell className="h-4 w-4 mr-2" />
+                        <Button variant="secondary" size="sm">
                           Remind Me
                         </Button>
-                        {event.building && (
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={`/map?building=${event.building}`}>
-                              <Navigation className="h-4 w-4 mr-2" />
-                              Navigate
-                            </Link>
-                          </Button>
-                        )}
+                        <Button asChild variant="secondary" size="sm">
+                          <Link href={`/map?building=${event.building}`}>
+                            <Navigation className="h-4 w-4 mr-2" />
+                            Navigate
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   ))

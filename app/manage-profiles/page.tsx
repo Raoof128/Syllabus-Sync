@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { User, Plus, Users, Check, ArrowLeft } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
+import { Button } from '@/components/ui/mq/button';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ const ProfileCard = dynamic(() => import('@/components/ProfileCard'), {
   loading: () => <div className="flex items-center justify-center p-4">Loading profile...</div>,
 });
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { UserProfile } from '@/lib/store/profilesStore';
 import { toastUtils } from '@/lib/utils/toast';
@@ -337,7 +337,7 @@ export default function ManageProfilesPage() {
 
             <div className="flex gap-2 pt-4">
               <Button
-                variant="outline"
+                variant="secondary"
                 type="button"
                 onClick={() => {
                   setShowAddDialog(false);

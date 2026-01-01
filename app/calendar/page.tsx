@@ -16,9 +16,9 @@ import {
   ChevronRight,
   CalendarDays,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
@@ -92,9 +92,9 @@ export default function CalendarPage() {
   const stressLevel = isHydrated ? getStressLevel() : 'Low';
 
   const stressColors = {
-    Low: 'bg-green-100 text-green-800',
+    Low: 'bg-mq-sand-200 text-mq-content',
     Busy: 'bg-yellow-100 text-yellow-800',
-    High: 'bg-red-100 text-red-800',
+    High: 'bg-mq-red text-white',
   };
 
   const getUnitColor = (unitCode: string) => {
@@ -160,8 +160,8 @@ export default function CalendarPage() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Calendar & Deadlines</h1>
-          <p className="text-gray-600">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Calendar & Deadlines</h1>
+          <p className="text-mq-content-secondary">
             View and manage your academic schedule, assignments, and important dates.
           </p>
         </div>
@@ -173,10 +173,10 @@ export default function CalendarPage() {
 
       {/* Info Banner when no units */}
       {units.length === 0 && (
-        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-mq-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-yellow-900 dark:text-yellow-100">
+            <p className="text-mq-sm text-yellow-900">
               <strong>Note:</strong> Add some units on the Home page first before you can create
               deadlines.
             </p>
@@ -193,69 +193,47 @@ export default function CalendarPage() {
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-500">Upcoming</p>
-                    <p className="text-2xl font-bold">{incompleteDeadlines.length}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">Upcoming</p>
+                    <p className="text-mq-2xl font-bold text-mq-content">{incompleteDeadlines.length}</p>
                   </div>
-                  <Clock className="h-6 w-6 text-blue-400" />
+                  <Clock className="h-6 w-6 text-mq-navy-500" />
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-900">Overdue</p>
-                    <p className="text-2xl font-bold">{overdueDeadlines.length}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">Overdue</p>
+                    <p className="text-mq-2xl font-bold text-mq-content">{overdueDeadlines.length}</p>
                   </div>
-                  <AlertCircle className="h-6 w-6 text-red-400" />
+                  <AlertCircle className="h-6 w-6 text-mq-red" />
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-900">Completed</p>
-                    <p className="text-2xl font-bold">{completedDeadlines.length}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">Completed</p>
+                    <p className="text-mq-2xl font-bold text-mq-content">{completedDeadlines.length}</p>
                   </div>
-                  <CheckCircle2 className="h-6 w-6 text-green-400" />
+                  <CheckCircle2 className="h-6 w-6 text-green-600" />
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="flex items-center justify-between py-4">
                   <div>
-                    <p className="text-sm text-gray-900">Total</p>
-                    <p className="text-2xl font-bold">{deadlines.length}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">Total</p>
+                    <p className="text-mq-2xl font-bold text-mq-content">{deadlines.length}</p>
                   </div>
-                  <CalendarDays className="h-6 w-6 text-purple-400" />
+                  <CalendarDays className="h-6 w-6 text-mq-purple" />
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-900">Completed</p>
-                      <p className="text-2xl font-bold">{completedDeadlines.length}</p>
-                    </div>
-                    <CheckCircle2 className="h-6 w-6 text-green-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-900">Overdue</p>
-                      <p className="text-2xl font-bold text-red-600">{overdueDeadlines.length}</p>
-                    </div>
-                    <AlertCircle className="h-6 w-6 text-red-400" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Stress</p>
+                      <p className="text-mq-sm text-mq-content-secondary">Workload</p>
                       <Badge className={stressColors[stressLevel]}>{stressLevel}</Badge>
                     </div>
-                    <span className="text-xl">
+                    <span className="text-mq-xl">
                       {stressLevel === 'High' ? '😰' : stressLevel === 'Busy' ? '😅' : '😊'}
                     </span>
                   </div>
@@ -269,7 +247,7 @@ export default function CalendarPage() {
             <Card>
               <CardContent className="py-12">
                 <div className="h-32 flex items-center justify-center">
-                  <p className="text-gray-900">Loading deadlines...</p>
+                  <p className="text-mq-content">Loading deadlines...</p>
                 </div>
               </CardContent>
             </Card>
@@ -354,7 +332,7 @@ export default function CalendarPage() {
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <Badge variant="outline">{deadline.type}</Badge>
+                                    <Badge variant="neutral">{deadline.type}</Badge>
                                     <Badge className={priorityColors[deadline.priority]}>
                                       {deadline.priority}
                                     </Badge>
@@ -433,7 +411,7 @@ export default function CalendarPage() {
                                   <p className="text-xs text-gray-400 mt-1">Invalid date</p>
                                 )}
                               </div>
-                              <Badge variant="outline" className="opacity-50">
+                              <Badge variant="neutral" className="opacity-50">
                                 {deadline.type}
                               </Badge>
                             </div>
@@ -461,13 +439,13 @@ export default function CalendarPage() {
             <CardContent>
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={goToPrevious} aria-label="Previous">
+                  <Button variant="secondary" size="sm" onClick={goToPrevious} aria-label="Previous">
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={jumpToToday}>
+                  <Button variant="secondary" size="sm" onClick={jumpToToday}>
                     Today
                   </Button>
-                  <Button variant="outline" size="sm" onClick={goToNext} aria-label="Next">
+                  <Button variant="secondary" size="sm" onClick={goToNext} aria-label="Next">
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -478,14 +456,14 @@ export default function CalendarPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant={view === 'month' ? 'default' : 'outline'}
+                    variant={view === 'month' ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setView('month')}
                   >
                     Month
                   </Button>
                   <Button
-                    variant={view === 'week' ? 'default' : 'outline'}
+                    variant={view === 'week' ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setView('week')}
                   >

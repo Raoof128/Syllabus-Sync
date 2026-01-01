@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Bell, Palette, Shield, Info, Mail, Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import {
@@ -170,7 +170,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-gray-600">Delete all stored data from app</p>
                 </div>
                 <Button
-                  variant="destructive"
+                  variant="primary"
                   size="sm"
                   onClick={handleClearAllData}
                   disabled={clearing}
@@ -190,14 +190,14 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <Button
-              variant="outline"
+              variant="secondary"
               className="w-full justify-start"
               onClick={() => (window.location.href = '/home')}
             >
               Home
             </Button>
             <Button
-              variant="outline"
+              variant="secondary"
               className="w-full justify-start"
               onClick={() => (window.location.href = '/calendar')}
             >
@@ -218,10 +218,10 @@ export default function SettingsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
+            <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={confirmClearAllData} disabled={clearing}>
+            <Button variant="primary" onClick={confirmClearAllData} disabled={clearing}>
               {clearing ? 'Clearing...' : 'Clear All Data'}
             </Button>
           </DialogFooter>

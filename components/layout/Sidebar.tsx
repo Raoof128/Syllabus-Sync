@@ -51,7 +51,7 @@ const Sidebar = memo(() => {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed md:relative z-40 w-48 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 min-h-screen p-4 transition-transform duration-200',
+          'fixed md:relative z-40 w-48 bg-mq-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
         )}
       >
@@ -79,10 +79,10 @@ const Sidebar = memo(() => {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation min-h-[44px]',
+                  'flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium transition-all duration-mq-fast ease-mq-snap touch-manipulation min-h-[44px]',
                   isActive
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-sm'
-                    : 'text-gray-700 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100',
+                    ? 'bg-mq-primary text-white shadow-mq-sm'
+                    : 'text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary',
                 )}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={`Navigate to ${item.name}`}
