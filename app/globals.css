@@ -60,40 +60,176 @@
   animation-delay: 0.3s;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
+/* ============================================
+   CLEAN DARK MODE IMPLEMENTATION
+   ============================================ */
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+.dark {
+  color-scheme: dark;
+}
+
+/* Base Layout & Backgrounds - Complete isolation */
+.dark body {
+  @apply bg-slate-900 text-slate-100;
+}
+
+.dark #__next {
+  @apply bg-slate-900;
+}
+
+/* Layout Containers - Prevent inheritance issues */
+.dark .flex.h-screen {
+  @apply bg-slate-900;
+}
+
+/* Header - Complete background isolation */
+.dark header {
+  @apply bg-slate-900 border-slate-800;
+}
+
+/* Sidebar - Ensure no grey bleed-through */
+.dark .bg-white.dark\:bg-slate-900 {
+  @apply bg-slate-900;
+}
+
+/* Cards & Surfaces */
+.dark .bg-white {
+  @apply bg-slate-800;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-slate-800;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-slate-700;
+}
+
+/* Text Colors - High contrast for accessibility */
+.dark .text-gray-900 {
+  @apply text-slate-100;
+}
+
+.dark .text-gray-800 {
+  @apply text-slate-200;
+}
+
+.dark .text-gray-700 {
+  @apply text-slate-300;
+}
+
+.dark .text-gray-600 {
+  @apply text-slate-400;
+}
+
+.dark .text-gray-500 {
+  @apply text-slate-500;
+}
+
+.dark .text-gray-400 {
+  @apply text-slate-600;
+}
+
+/* Borders */
+.dark .border-gray-200 {
+  @apply border-slate-700;
+}
+
+.dark .border-gray-100 {
+  @apply border-slate-800;
+}
+
+/* Interactive Elements - Subtle hover states */
+.dark .hover\:bg-gray-50:hover {
+  @apply hover:bg-slate-800;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  @apply hover:bg-slate-700;
+}
+
+/* Focus States */
+.dark .focus\:bg-gray-100:focus {
+  @apply focus:bg-slate-700;
+}
+
+/* Form Elements */
+.dark input,
+.dark textarea,
+.dark select {
+  @apply bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-400;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  @apply border-blue-500 ring-blue-500;
+}
+
+/* Buttons */
+.dark .bg-blue-600 {
+  @apply bg-blue-700;
+}
+
+.dark .hover\:bg-blue-700:hover {
+  @apply hover:bg-blue-800;
+}
+
+.dark .bg-red-600 {
+  @apply bg-red-700;
+}
+
+.dark .hover\:bg-red-700:hover {
+  @apply hover:bg-red-800;
+}
+
+/* Status Colors - Accessible color combinations */
+.dark .bg-green-100 {
+  @apply bg-green-900/30;
+}
+
+.dark .text-green-800 {
+  @apply text-green-300;
+}
+
+.dark .bg-red-100 {
+  @apply bg-red-900/30;
+}
+
+.dark .text-red-800 {
+  @apply text-red-300;
+}
+
+.dark .bg-yellow-100 {
+  @apply bg-yellow-900/30;
+}
+
+.dark .text-yellow-800 {
+  @apply text-yellow-300;
+}
+
+.dark .bg-blue-100 {
+  @apply bg-blue-900/30;
+}
+
+.dark .text-blue-800 {
+  @apply text-blue-300;
+}
+
+/* Component Specific */
+.dark .shadow-sm {
+  @apply shadow-slate-900/20;
+}
+
+.dark .shadow-md {
+  @apply shadow-slate-900/30;
+}
+
+.dark .shadow-lg {
+  @apply shadow-slate-900/40;
+}
+
+/* Avatar backgrounds - uniform slate for consistency */
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --primary: 210 40% 98%;
@@ -115,538 +251,343 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
-
-@layer base {
+}@layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
-
-@layer base {
+}@layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+}/* ============================================
+   CLEAN DARK MODE IMPLEMENTATION
+   ============================================ */
 
-/* Enhanced Dark Mode Styles */
 .dark {
   color-scheme: dark;
-}
-
-/* Base elements */
+}/* Base Layout & Backgrounds */
 .dark body {
   @apply bg-slate-900 text-slate-100;
-}
-
-/* Improve text contrast in dark mode */
-.dark .text-gray-600 {
-  @apply text-slate-300;
-}
-
-.dark .text-gray-500 {
-  @apply text-slate-400;
-}
-
-.dark .text-gray-400 {
-  @apply text-slate-500;
-}
-
-/* Layout background */
-.dark .bg-gray-50 {
-  @apply bg-slate-800;
-}
-
-/* Header and navigation */
-.dark header {
-  @apply bg-slate-900 border-slate-700;
-}
-
-/* Dropdowns and modals */
-.dark .bg-white.rounded-lg {
-  @apply bg-slate-800;
-}
-
-/* Sidebar backgrounds */
-.dark .bg-gray-50.min-h-screen {
+}.dark #__next {
   @apply bg-slate-900;
+}/* Layout Containers */
+.dark .flex.h-screen {
+  @apply bg-slate-900;
+}/* Header - Complete isolation */
+.dark header {
+  @apply bg-slate-900 border-slate-800;
+}/* Sidebar */
+.dark .bg-white.dark\:bg-slate-900 {
+  @apply bg-slate-900;
+}/* Cards & Surfaces */
+.dark .bg-white {
+  @apply bg-slate-800;
+}.dark .bg-gray-50 {
+  @apply bg-slate-800;
+}.dark .bg-gray-100 {
+  @apply bg-slate-700;
+}/* Text Colors */
+.dark .text-gray-900 {
+  @apply text-slate-100;
+}.dark .text-gray-800 {
+  @apply text-slate-200;
+}.dark .text-gray-700 {
+  @apply text-slate-300;
+}.dark .text-gray-600 {
+  @apply text-slate-400;
+}.dark .text-gray-500 {
+  @apply text-slate-500;
+}.dark .text-gray-400 {
+  @apply text-slate-600;
+}/* Borders */
+.dark .border-gray-200 {
+  @apply border-slate-700;
+}.dark .border-gray-100 {
+  @apply border-slate-800;
+}/* Interactive Elements */
+.dark .hover\:bg-gray-50:hover {
+  @apply hover:bg-slate-800;
+}.dark .hover\:bg-gray-100:hover {
+  @apply hover:bg-slate-700;
+}/* Focus States */
+.dark .focus\:bg-gray-100:focus {
+  @apply focus:bg-slate-700;
+}/* Form Elements */
+.dark input,
+.dark textarea,
+.dark select {
+  @apply bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-400;
+}.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  @apply border-blue-500 ring-blue-500;
+}/* Buttons */
+.dark .bg-blue-600 {
+  @apply bg-blue-700;
+}.dark .hover\:bg-blue-700:hover {
+  @apply hover:bg-blue-800;
+}.dark .bg-red-600 {
+  @apply bg-red-700;
+}.dark .hover\:bg-red-700:hover {
+  @apply hover:bg-red-800;
+}/* Status Colors */
+.dark .bg-green-100 {
+  @apply bg-green-900/30;
+}.dark .text-green-800 {
+  @apply text-green-300;
+}.dark .bg-red-100 {
+  @apply bg-red-900/30;
+}.dark .text-red-800 {
+  @apply text-red-300;
+}.dark .bg-yellow-100 {
+  @apply bg-yellow-900/30;
+}.dark .text-yellow-800 {
+  @apply text-yellow-300;
+}.dark .bg-blue-100 {
+  @apply bg-blue-900/30;
+}.dark .text-blue-800 {
+  @apply text-blue-300;
+}/* Component Specific */
+.dark .shadow-sm {
+  @apply shadow-slate-900/20;
+}.dark .shadow-md {
+  @apply shadow-slate-900/30;
+}.dark .shadow-lg {
+  @apply shadow-slate-900/40;
+}
 }
 
 /* Cards and surfaces */
 .dark .bg-gray-50 {
   @apply bg-slate-700;
-}
-
-/* Specific component fixes */
+}/* Specific component fixes */
 .dark .bg-gray-100 {
   @apply bg-slate-600;
-}
-
-/* Sidebar mobile button */
+}/* Sidebar mobile button */
 .dark .fixed.bg-white {
   @apply bg-slate-800 border-slate-700;
-}
-
-/* Active navigation states */
+}/* Active navigation states */
 .dark .bg-white.text-gray-900 {
   @apply bg-slate-700 text-slate-100;
-}
-
-/* Calendar grid cells */
+}/* Calendar grid cells */
 .dark .bg-gray-50.text-gray-400 {
   @apply bg-slate-700 text-slate-500;
-}
-
-.dark .bg-white:not(.fixed) {
+}.dark .bg-white:not(.fixed) {
   @apply bg-slate-800;
-}
+}/* Avatar backgrounds - uniform slate background for consistency */
 
-/* Avatar backgrounds - uniform slate background for consistency */
 
-/* Badge variations - ensure text remains readable */
-.dark .bg-green-500 {
-  background-color: rgb(22 163 74);
-}
-
-.dark .bg-red-500 {
-  background-color: rgb(239 68 68);
-}
-
-.dark .bg-blue-600 {
-  background-color: rgb(37 99 235);
-}
-
-.dark .text-white {
-  @apply text-slate-100;
-}
-
-/* Calendar specific */
-.dark .border-gray-200.bg-white {
-  @apply border-slate-700 bg-slate-800;
-}
-
-.dark .border-red-200.bg-red-50 {
-  @apply border-red-700 bg-red-900/30;
-}
-
-/* Feed badges - keep original colors for status indicators */
-.dark .bg-green-600 {
-  background-color: rgb(22 163 74);
-}
-
-.dark .bg-yellow-600 {
-  background-color: rgb(202 138 4);
-}
-
-/* Info/Warning/Success banners */
-.dark .bg-blue-50 {
-  @apply bg-blue-900/30 border-blue-800;
-}
-
-.dark .border-blue-200 {
-  @apply border-blue-800;
-}
-
-.dark .text-blue-900 {
-  @apply text-blue-200;
-}
-
-.dark .bg-red-50 {
-  @apply bg-red-900/30 border-red-800;
-}
-
-.dark .border-red-200 {
-  @apply border-red-800;
-}
-
-.dark .text-red-700 {
-  @apply text-red-300;
-}
-
-.dark .bg-yellow-50 {
-  @apply bg-yellow-900/30 border-yellow-800;
-}
-
-.dark .border-yellow-200 {
-  @apply border-yellow-800;
-}
-
-.dark .text-yellow-800 {
-  @apply text-yellow-200;
-}
-
-.dark .bg-green-50 {
-  @apply bg-green-900/30 border-green-800;
-}
-
-.dark .border-green-200 {
-  @apply border-green-800;
-}
-
-.dark .text-green-800 {
-  @apply text-green-200;
-}
-
-.dark .bg-purple-50 {
   @apply bg-purple-900/30 border-purple-800;
-}
-
-.dark .border-purple-200 {
+}.dark .border-purple-200 {
   @apply border-purple-800;
-}
-
-.dark .text-purple-800 {
+}.dark .text-purple-800 {
   @apply text-purple-200;
-}
-
-.dark .bg-orange-50 {
+}.dark .bg-orange-50 {
   @apply bg-orange-900/30 border-orange-800;
-}
-
-.dark .border-orange-200 {
+}.dark .border-orange-200 {
   @apply border-orange-800;
-}
-
-.dark .text-orange-800 {
+}.dark .text-orange-800 {
   @apply text-orange-200;
-}
-
-/* Badge variations */
+}/* Badge variations */
 .dark .bg-yellow-100 {
   @apply bg-yellow-900/40;
-}
-
-.dark .bg-red-100 {
+}.dark .bg-red-100 {
   @apply bg-red-900/40;
-}
-
-.dark .bg-orange-100 {
+}.dark .bg-orange-100 {
   @apply bg-orange-900/40;
-}
-
-.dark .bg-purple-100 {
+}.dark .bg-purple-100 {
   @apply bg-purple-900/40;
-}
-
-.dark .bg-blue-100 {
+}.dark .bg-blue-100 {
   @apply bg-blue-900/40;
-}
-
-.dark .bg-green-100 {
+}.dark .bg-green-100 {
   @apply bg-green-900/40;
-}
-
-/* Notification dots and indicators */
+}/* Notification dots and indicators */
 .dark .bg-blue-50 {
   @apply bg-blue-900/40;
-}
-
-.dark .bg-orange-100,
+}.dark .bg-orange-100,
 .dark .bg-purple-100,
 .dark .bg-gray-100 {
   @apply bg-slate-600;
-}
-
-/* Calendar grid and cells */
+}/* Calendar grid and cells */
 .dark .bg-gray-50.text-gray-400 {
   @apply bg-slate-700 text-slate-500;
-}
-
-.dark .bg-white:not(header):not(.fixed) {
+}.dark .bg-white:not(header):not(.fixed) {
   @apply bg-slate-800;
-}
-
-.dark .border-gray-200.bg-white {
+}.dark .border-gray-200.bg-white {
   @apply border-slate-700 bg-slate-800;
-}
-
-/* Loading skeleton colors */
+}/* Loading skeleton colors */
 .dark .bg-gray-200 {
   @apply bg-slate-600;
-}
-
-/* Profile card preferences toggles */
+}/* Profile card preferences toggles */
 .dark .bg-gray-300 {
   @apply bg-slate-600;
-}
-
-/* Unit card hover states */
+}/* Unit card hover states */
 .dark .hover\:bg-red-50:hover {
   @apply hover:bg-red-900/30;
-}
-
-/* Deadline form error states */
+}/* Deadline form error states */
 .dark .bg-red-50.border-red-200 {
   @apply bg-red-900/30 border-red-800;
-}
-
-/* Map component backgrounds */
+}/* Map component backgrounds */
 .dark .bg-gray-50.hover\:bg-gray-100 {
   @apply bg-slate-700 hover:bg-slate-600;
-}
-
-.dark .bg-green-100.border-green-500 {
+}.dark .bg-green-100.border-green-500 {
   @apply bg-green-900/60 border-green-600;
-}
-
-/* Calendar deadline cards */
+}/* Calendar deadline cards */
 .dark .border-red-200.bg-red-50 {
   @apply border-red-800 bg-red-900/30;
-}
-
-.dark .bg-gray-50.opacity-60 {
+}.dark .bg-gray-50.opacity-60 {
   @apply bg-slate-700;
-}
-
-/* Events feed backgrounds */
+}/* Events feed backgrounds */
 .dark .bg-gray-50.rounded-lg {
   @apply bg-slate-700;
-}
-
-/* Feed stats backgrounds */
+}/* Feed stats backgrounds */
 .dark .bg-blue-50,
 .dark .bg-purple-50,
 .dark .bg-orange-50 {
   @apply bg-slate-700;
-}
-
-/* Settings page backgrounds */
+}/* Settings page backgrounds */
 .dark .bg-gray-50.rounded-lg:not(.mb-6) {
   @apply bg-slate-700;
-}
-
-.dark .hover\:bg-gray-50:hover {
+}.dark .hover\:bg-gray-50:hover {
   @apply hover:bg-slate-600;
-}
-
-.dark .hover\:bg-gray-100:hover {
+}.dark .hover\:bg-gray-100:hover {
   @apply hover:bg-slate-500;
-}
-
-/* Profile card label hover */
+}/* Profile card label hover */
 .dark .hover\:bg-gray-50.cursor-pointer:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Deadline card hover */
+}/* Deadline card hover */
 .dark .hover\:bg-gray-50.transition-colors:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Next deadline hover */
+}/* Next deadline hover */
 .dark .-m-3.hover\:bg-gray-50:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Calendar hover states */
+}/* Calendar hover states */
 .dark .hover\:bg-gray-50.focus-visible\:outline-none:hover {
   @apply hover:bg-slate-600;
-}
-
-.dark .hover\:bg-gray-100.text-gray-800:hover {
+}.dark .hover\:bg-gray-100.text-gray-800:hover {
   @apply hover:bg-slate-500;
-}
-
-/* Events feed hover */
+}/* Events feed hover */
 .dark .bg-gray-50.rounded-lg.hover\:bg-gray-100:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Feed card hover */
+}/* Feed card hover */
 .dark .bg-gray-50.rounded-lg.hover\:bg-gray-100.transition-all:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Header hover states */
+}/* Header hover states */
 .dark .hover\:bg-gray-100.rounded-lg:hover {
   @apply hover:bg-slate-700;
-}
-
-.dark .bg-gray-100 {
+}.dark .bg-gray-100 {
   @apply bg-slate-700;
-}
-
-/* Borders */
+}/* Borders */
 .dark .border-gray-200,
 .dark .border-gray-300 {
   @apply border-slate-700;
-}
-
-.dark .border-gray-100 {
+}.dark .border-gray-100 {
   @apply border-slate-600;
-}
-
-/* Text colors */
+}/* Text colors */
 .dark .text-gray-900,
 .dark .text-black {
   @apply text-slate-100;
-}
-
-.dark .text-gray-800 {
+}.dark .text-gray-800 {
   @apply text-slate-200;
-}
-
-.dark .text-gray-600 {
+}.dark .text-gray-600 {
   @apply text-slate-300;
-}
-
-.dark .text-gray-500 {
+}.dark .text-gray-500 {
   @apply text-slate-400;
-}
-
-.dark .text-gray-400 {
+}.dark .text-gray-400 {
   @apply text-slate-500;
-}
-
-/* Hover states */
+}/* Hover states */
 .dark .hover\:bg-gray-50:hover {
   @apply hover:bg-slate-700;
-}
-
-.dark .hover\:bg-gray-100:hover {
+}.dark .hover\:bg-gray-100:hover {
   @apply hover:bg-slate-600;
-}
-
-/* Focus states */
+}/* Focus states */
 .dark .focus\:bg-gray-100:focus {
   @apply focus:bg-slate-600;
-}
-
-/* Input styles */
+}/* Input styles */
 .dark input,
 .dark textarea,
 .dark select {
   @apply bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-400;
-}
-
-.dark input:focus,
+}.dark input:focus,
 .dark textarea:focus,
 .dark select:focus {
   @apply border-slate-500 ring-slate-500;
-}
-
-/* Button variations */
+}/* Button variations */
 .dark .bg-blue-600 {
   @apply bg-blue-700;
-}
-
-.dark .hover\:bg-blue-700:hover {
+}.dark .hover\:bg-blue-700:hover {
   @apply hover:bg-blue-800;
-}
-
-.dark .bg-red-600 {
+}.dark .bg-red-600 {
   @apply bg-red-700;
-}
-
-.dark .hover\:bg-red-700:hover {
+}.dark .hover\:bg-red-700:hover {
   @apply hover:bg-red-800;
-}
-
-/* Sidebar specific */
+}/* Sidebar specific */
 .dark .bg-gray-50 {
   @apply bg-slate-800;
-}
-
-.dark .bg-gray-100 {
+}.dark .bg-gray-100 {
   @apply bg-slate-700;
-}
-
-/* Component specific dark mode styles */
+}/* Component specific dark mode styles */
 .dark .shadow-sm {
   @apply shadow-slate-900/20;
-}
-
-.dark .shadow-md {
+}.dark .shadow-md {
   @apply shadow-slate-900/30;
-}
-
-.dark .shadow-lg {
+}.dark .shadow-lg {
   @apply shadow-slate-900/40;
-}
-
-/* Notifications dropdown */
+}/* Notifications dropdown */
 .dark .bg-white {
   @apply bg-slate-800;
-}
-
-/* Form elements */
+}/* Form elements */
 .dark input[type='text'],
 .dark input[type='email'],
 .dark input[type='password'],
 .dark textarea,
 .dark select {
   @apply bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500;
-}
-
-/* Badge variations */
+}/* Badge variations */
 .dark .bg-green-100 {
   @apply bg-green-900/30;
-}
-
-.dark .text-green-800 {
+}.dark .text-green-800 {
   @apply text-green-300;
-}
-
-.dark .bg-yellow-100 {
+}.dark .bg-yellow-100 {
   @apply bg-yellow-900/30;
-}
-
-.dark .text-yellow-800 {
+}.dark .text-yellow-800 {
   @apply text-yellow-300;
-}
-
-.dark .bg-red-100 {
+}.dark .bg-red-100 {
   @apply bg-red-900/30;
-}
-
-.dark .text-red-800 {
+}.dark .text-red-800 {
   @apply text-red-300;
-}
-
-.dark .bg-blue-100 {
+}.dark .bg-blue-100 {
   @apply bg-blue-900/30;
-}
-
-.dark .text-blue-800 {
+}.dark .text-blue-800 {
   @apply text-blue-300;
-}
-
-/* Smooth theme transitions */
+}/* Smooth theme transitions */
 * {
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
     color 0.2s ease,
     box-shadow 0.2s ease;
-}
-
-/* Focus indicators for dark mode */
+}/* Focus indicators for dark mode */
 .dark .focus-visible {
   @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-900;
-}
-
-/* High contrast mode support */
+}/* High contrast mode support */
 @media (prefers-contrast: high) {
   .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     --border: 0 0% 50%;
   }
-}
-
-/* Reduced motion support */
+}/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
-  }
-
-  .animate-fade-in {
+  }  .animate-fade-in {
     animation: none;
   }
 }
