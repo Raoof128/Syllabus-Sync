@@ -168,7 +168,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                         <h3 className="font-semibold text-mq-content">{building.name}</h3>
                         <p className="text-mq-sm text-mq-content-secondary mb-2">Building {building.id}</p>
                         {building.description && (
-                          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">{building.description}</p>
+                          <p className="text-mq-sm text-mq-content-tertiary mb-3">{building.description}</p>
                         )}
                         {building.tags && building.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-3">

@@ -168,14 +168,14 @@ export default function ManageProfilesPage() {
             {currentProfile ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-16 h-16 rounded-full bg-mq-card-background flex items-center justify-center text-mq-content font-bold text-mq-xl">
                     {currentProfile.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">{currentProfile.name}</h3>
-                    <p className="text-gray-600 dark:text-slate-400">{currentProfile.email}</p>
-                    <p className="text-sm text-gray-500 dark:text-slate-500">
-                      {currentProfile.course} • {currentProfile.year}
+                    <h2 className="text-mq-xl font-bold text-mq-content">{currentProfile.name}</h2>
+                    <p className="text-mq-content-secondary">{currentProfile.email}</p>
+                    <p className="text-mq-sm text-mq-content-tertiary">
+                      Student ID: {currentProfile.studentId}
                     </p>
                   </div>
                 </div>

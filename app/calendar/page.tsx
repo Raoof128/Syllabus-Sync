@@ -48,7 +48,7 @@ import { useSearchParams } from 'next/navigation';
 const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
   Low: 'bg-mq-success/10 text-mq-success',
   Medium: 'bg-mq-warning/10 text-mq-warning',
-  High: 'bg-orange-100 text-orange-800',
+  High: 'bg-mq-warning/10 text-mq-warning',
   Urgent: 'bg-mq-error/10 text-mq-error',
 };
 
@@ -338,21 +338,9 @@ export default function CalendarPage() {
                                     </Badge>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                  <span>
-                                    Due:{' '}
-                                    {hasValidDate
-                                      ? format(dueDate, 'MMM dd, h:mm a')
-                                      : 'Invalid date'}
-                                  </span>
-                                  <span className={isOverdue ? 'text-mq-error font-medium' : ''}>
-                                    {isOverdue
-                                      ? 'Overdue!'
-                                      : hasValidDate
-                                        ? formatDistanceToNow(dueDate, { addSuffix: true })
-                                        : ''}
-                                  </span>
-                                </div>
+               <div className="flex items-center gap-4 mt-2 text-mq-sm text-mq-content-secondary">
+                 <span>Overdue by {formatDistanceToNow(new Date(deadline.dueDate), { addSuffix: true })}</span>
+               </div>
                               </div>
                             </div>
                           </div>
@@ -552,28 +540,28 @@ export default function CalendarPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                <Grid3x3 className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-sm">Multiple Views</h4>
-                  <p className="text-xs text-gray-500">Month, week, day views</p>
+               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
+                 <Grid3x3 className="h-5 w-5 text-mq-info flex-shrink-0" />
+                 <div>
+                   <h4 className="font-semibold text-mq-content">Multiple Views</h4>
+                   <p className="text-mq-xs text-mq-content-secondary">Month, week, day views</p>
+                 </div>
+               </div>
+               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
+                 <Filter className="h-5 w-5 text-mq-purple flex-shrink-0" />
+                 <div>
+                   <h4 className="font-semibold text-mq-content">Smart Filtering</h4>
+                   <p className="text-mq-xs text-mq-content-secondary">Filter by unit or type</p>
+                 </div>
+               </div>
+               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
+                 <Bell className="h-5 w-5 text-mq-warning flex-shrink-0" />
+                 <div>
+                   <h4 className="font-semibold text-mq-content">Smart Notifications</h4>
+                   <p className="text-mq-xs text-mq-content-secondary">Get reminded at the right time</p>
+                 </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                <Filter className="h-5 w-5 text-purple-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-sm">Filtering</h4>
-                  <p className="text-xs text-gray-500">Filter by unit or type</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg">
-                <Bell className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-sm">Reminders</h4>
-                  <p className="text-xs text-gray-500">Smart notifications</p>
-                </div>
-              </div>
-            </CardContent>
+             </CardContent>
           </Card>
         </div>
       </div>

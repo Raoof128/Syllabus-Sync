@@ -142,7 +142,7 @@ export default function HomePage() {
 
   const stressColors = {
     Low: 'bg-mq-sand-200 text-mq-content',
-    Busy: 'bg-yellow-100 text-yellow-800',
+    Busy: 'bg-mq-warning/10 text-mq-warning',
     High: 'bg-mq-red text-white',
   };
 

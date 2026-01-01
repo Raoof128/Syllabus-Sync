@@ -68,54 +68,51 @@
   color-scheme: dark;
 }
 
-/* Base Layout & Backgrounds - Complete isolation */
+/* MQ Token-based Dark Mode Overrides - Fallbacks for any remaining Tailwind classes */
 .dark body {
-  @apply bg-slate-900 text-slate-100;
+  background-color: var(--mq-background);
+  color: var(--mq-content);
 }
 
 .dark #__next {
-  @apply bg-slate-900;
+  background-color: var(--mq-background);
 }
 
-/* Layout Containers - Prevent inheritance issues */
+/* Layout Containers - MQ token backgrounds */
 .dark .flex.h-screen {
-  @apply bg-slate-900;
+  background-color: var(--mq-background);
 }
 
-/* Header - Complete background isolation */
+/* Header - MQ token styling */
 .dark header {
-  @apply bg-slate-900 border-slate-800;
+  background-color: var(--mq-background);
+  border-color: var(--mq-border);
 }
 
-/* Sidebar - Ensure no grey bleed-through */
-.dark .bg-white.dark\:bg-slate-900 {
-  @apply bg-slate-900;
-}
-
-/* Cards & Surfaces */
+/* Cards & Surfaces - MQ backgrounds */
 .dark .bg-white {
-  @apply bg-slate-800;
+  background-color: var(--mq-card-background);
 }
 
 .dark .bg-gray-50 {
-  @apply bg-slate-800;
+  background-color: var(--mq-background-secondary);
 }
 
 .dark .bg-gray-100 {
-  @apply bg-slate-700;
+  background-color: var(--mq-hover-background);
 }
 
-/* Text Colors - High contrast for accessibility */
+/* Text Colors - MQ content hierarchy */
 .dark .text-gray-900 {
-  @apply text-slate-100;
+  color: var(--mq-content);
 }
 
 .dark .text-gray-800 {
-  @apply text-slate-200;
+  color: var(--mq-content-secondary);
 }
 
 .dark .text-gray-700 {
-  @apply text-slate-300;
+  color: var(--mq-content-secondary);
 }
 
 .dark .text-gray-600 {
@@ -123,34 +120,55 @@
 }
 
 .dark .text-gray-500 {
-  @apply text-slate-500;
+  color: var(--mq-content-tertiary);
 }
 
 .dark .text-gray-400 {
-  @apply text-slate-600;
+  color: var(--mq-content-tertiary);
 }
 
 /* Borders */
 .dark .border-gray-200 {
-  @apply border-slate-700;
+  border-color: var(--mq-border);
 }
 
 .dark .border-gray-100 {
-  @apply border-slate-800;
+  border-color: var(--mq-border-secondary);
 }
 
-/* Interactive Elements - Subtle hover states */
+/* Interactive Elements - MQ hover backgrounds */
 .dark .hover\:bg-gray-50:hover {
-  @apply hover:bg-slate-800;
+  background-color: var(--mq-hover-background);
 }
 
 .dark .hover\:bg-gray-100:hover {
-  @apply hover:bg-slate-700;
+  background-color: var(--mq-hover-background);
 }
 
 /* Focus States */
 .dark .focus\:bg-gray-100:focus {
-  @apply focus:bg-slate-700;
+  background-color: var(--mq-hover-background);
+}
+
+/* Form Elements - MQ styling */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--mq-input-background);
+  border-color: var(--mq-border);
+  color: var(--mq-content);
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--mq-focus);
+  --tw-ring-color: var(--mq-focus);
+}
+
+/* Buttons - MQ primary colors */
+.dark .bg-blue-600 {
+  background-color: var(--mq-primary);
 }
 
 /* Form Elements */
@@ -242,7 +260,7 @@
   background:
     radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.03), transparent 40%),
     radial-gradient(circle at 80% 30%, rgba(0, 0, 0, 0.02), transparent 45%),
-    #f8fafc !important; /* Light gray background */
+    var(--mq-background-secondary) !important; /* MQ background */
 }
 
 /* Dark theme override */
@@ -250,7 +268,7 @@
   background:
     radial-gradient(circle at 20% 20%, rgba(148, 163, 184, 0.08), transparent 40%),
     radial-gradient(circle at 80% 30%, rgba(100, 116, 139, 0.06), transparent 45%),
-    #0f172a !important; /* Matches slate-900 */
+    var(--mq-background) !important; /* MQ background */
 }
 
 /* ============================================
@@ -261,8 +279,8 @@
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
   background-color: rgba(255, 255, 255, 0.8) !important;
-  color: #374151 !important;
-  border: 1px solid #d1d5db !important;
+  color: var(--mq-content) !important;
+  border: 1px solid var(--mq-border) !important;
 }
 
 .leaflet-control-zoom-in:hover,
@@ -273,12 +291,12 @@
 /* Dark theme zoom controls */
 .dark .leaflet-control-zoom-in,
 .dark .leaflet-control-zoom-out {
-  background-color: rgba(30, 41, 59, 0.8) !important; /* slate-800 */
-  color: #e2e8f0 !important; /* slate-200 */
-  border: 1px solid #475569 !important; /* slate-600 */
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--mq-content) !important;
+  border: 1px solid var(--mq-border) !important;
 }
 
 .dark .leaflet-control-zoom-in:hover,
 .dark .leaflet-control-zoom-out:hover {
-  background-color: rgba(51, 65, 85, 0.9) !important; /* slate-700 */
+  background-color: rgba(255, 255, 255, 0.15) !important;
 }

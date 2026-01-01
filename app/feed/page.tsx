@@ -215,17 +215,17 @@ export default function FeedPage() {
                   {thisWeeksEvents.length}
                 </span>
                </div>
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-mq-lg">
+              <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg">
                 <div className="flex items-center gap-2">
-                  <span className="text-orange-600">🍕</span>
+                  <span className="text-mq-warning">🍕</span>
                   <span className="text-mq-sm font-medium text-mq-content">
                     Free Food
                   </span>
                 </div>
-                <span className="text-mq-lg font-bold text-orange-600">
+                <span className="text-mq-lg font-bold text-mq-warning">
                   {freeFoodEvents.length}
                 </span>
-               </div>
+              </div>
             </CardContent>
           </Card>
 
