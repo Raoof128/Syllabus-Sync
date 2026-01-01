@@ -119,7 +119,7 @@ export default function ManageProfilesPage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-2">
               Manage Profiles
             </h1>
-            <p className="text-gray-600 dark:text-slate-400">Edit and manage your user profiles.</p>
+            <p className="text-gray-900 dark:text-slate-100">Edit and manage your user profiles.</p>
           </div>
         </div>
         <Button onClick={() => setShowAddDialog(true)} aria-label="Create new profile">

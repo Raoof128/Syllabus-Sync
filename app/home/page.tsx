@@ -193,7 +193,7 @@ export default function HomePage() {
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Stress Level Indicator - Show compact version on mobile */}
           {hasHydrated && deadlines.length > 0 && (
-            <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-gray-200 rounded-md border border-gray-200">
+            <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-white dark:bg-slate-800 rounded-md border border-gray-200 dark:border-slate-700">
               <TrendingUp className="h-3 w-3 text-gray-700" />
               <Badge className={`${stressColors[stressLevel]} text-xs px-1.5 py-0.5`}>
                 {stressEmoji[stressLevel]}
@@ -201,7 +201,7 @@ export default function HomePage() {
             </div>
           )}
           {hasHydrated && deadlines.length > 0 && (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-gray-200 rounded-lg border border-gray-200">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700">
               <TrendingUp className="h-4 w-4 text-gray-700" />
               <span className="text-sm text-gray-900">Workload:</span>
               <Badge className={stressColors[stressLevel]}>
@@ -269,9 +269,9 @@ export default function HomePage() {
           {!hasHydrated ? (
             <div className="h-32 flex items-center justify-center">
               <div className="animate-pulse space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-                <div className="h-16 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-3/4" />
+                <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-1/2" />
+                <div className="h-16 bg-gray-100 dark:bg-slate-700 rounded w-full" />
               </div>
             </div>
           ) : units.length === 0 ? (
@@ -290,7 +290,7 @@ export default function HomePage() {
           ) : (
             <>
               {/* Unit Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-200 rounded-lg mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-lg mb-6 border border-gray-200 dark:border-slate-700">
                 <div className="text-center animate-fade-in">
                   <p className="text-2xl font-bold text-gray-900">{unitStats.unitCount}</p>
                   <p className="text-xs text-gray-800">Units</p>
