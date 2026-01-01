@@ -161,7 +161,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run accessibility tests
-        run: npx playwright test --grep "accessibility" --workers=2
+        run: npx playwright test --grep "accessibility" --workers=5
         continue-on-error: true
 
   deploy-preview:
