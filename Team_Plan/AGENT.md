@@ -1015,6 +1015,13 @@ Verification: Home page header elements no longer show unwanted grey highlights.
 Follow-ups: Home page now has clean, minimal appearance without distracting grey backgrounds.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Improved header dark mode styling and reduced prominent blue elements.
+Summary: Added proper dark mode backgrounds and text colors to header, adjusted notification colors for better dark mode appearance, and toned down bright blue focus rings to be less prominent in dark theme.
+Files changed: components/layout/Header.tsx.
+Verification: Header displays correctly in both light and dark modes with appropriate color schemes.
+Follow-ups: Header now provides consistent experience across light and dark themes.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
