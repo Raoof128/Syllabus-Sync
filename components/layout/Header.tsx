@@ -111,7 +111,7 @@ export default function Header() {
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+            className="p-2 rounded-lg transition-colors relative"
             aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
           >
@@ -231,7 +231,7 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 aria-label="Open profile menu"
               >
                 <div
