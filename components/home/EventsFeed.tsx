@@ -31,20 +31,20 @@ export default function EventsFeed() {
       </CardHeader>
       <CardContent>
         {todayEvents.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No events scheduled for today</p>
+          <p className="text-mq-content-tertiary text-center py-8">No events scheduled for today</p>
         ) : (
           <div className="space-y-3">
             {todayEvents.map((event) => (
               <div
                 key={event.id}
-                className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                  <h3 className="font-semibold text-mq-content">{event.title}</h3>
                   <Badge className={categoryColors[event.category]}>{event.category}</Badge>
                 </div>
 
-                <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
                     {event.time}

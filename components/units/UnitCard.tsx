@@ -45,7 +45,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                 {getUniqueDays()}
               </Badge>
             </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">{unit.name}</p>
+            <p className="text-sm text-mq-content-secondary mt-1">{unit.name}</p>
           </div>
 
           {showActions && (
@@ -80,14 +80,14 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
       <CardContent className="space-y-3">
         {/* Location */}
         <div className="flex items-center gap-2 text-sm">
-          <MapPin className="w-4 h-4 text-gray-500" />
+          <MapPin className="w-4 h-4 text-mq-content-tertiary" />
           <span className="font-medium">{unit.location.building}</span>
-          <span className="text-gray-500">Room {unit.location.room}</span>
+          <span className="text-mq-content-tertiary">Room {unit.location.room}</span>
         </div>
 
         {/* Class Times */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-mq-content-tertiary">
             <Clock className="w-4 h-4" />
             <span>Class Times</span>
           </div>
@@ -95,7 +95,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
             {unit.schedule.map((ct) => (
               <div key={ct.id} className="text-sm flex items-center justify-between">
                 <span className="font-medium">{ct.day}</span>
-                <span className="text-gray-600">
+                <span className="text-mq-content-secondary">
                   {ct.startTime} - {ct.endTime}
                 </span>
               </div>
@@ -104,7 +104,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
         </div>
 
         {/* Color indicator */}
-        <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
+        <div className="flex items-center gap-2 text-xs text-mq-content-tertiary pt-2 border-t">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: unit.color }} />
           <span>Color coding for calendar</span>
         </div>

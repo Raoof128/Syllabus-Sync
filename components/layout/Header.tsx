@@ -144,7 +144,7 @@ const Header = memo(() => {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500 text-sm">No notifications yet</div>
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm">No notifications yet</div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
@@ -186,14 +186,14 @@ const Header = memo(() => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p
-                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-gray-900 truncate`}
+                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
                             >
                               {notification.title}
                             </p>
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                            <p className="text-xs text-mq-content-secondary line-clamp-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-mq-slate-400 mt-1">
                               {formatDistanceToNow(new Date(notification.createdAt), {
                                 addSuffix: true,
                               })}
@@ -251,19 +251,19 @@ const Header = memo(() => {
                     <User className="w-5 h-5 text-white" />
                   )}
                 </div>
-                <div className="text-sm font-medium text-gray-700 hidden sm:inline">
+                <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
                   {currentProfile ? currentProfile.name : DEMO_USER.name}
                 </div>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 shadow-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+              className="w-48 bg-white dark:bg-slate-800 border-mq-border dark:border-slate-700 shadow-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
             >
               <DropdownMenuItem asChild>
                 <Link
                   href="/manage-profiles"
-                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
                 >
                   <User className="w-4 h-4" />
                   Manage Profiles
@@ -272,7 +272,7 @@ const Header = memo(() => {
               <DropdownMenuItem asChild>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
                 >
                   <Settings className="w-4 h-4" />
                   Settings
@@ -281,7 +281,7 @@ const Header = memo(() => {
               <DropdownMenuItem asChild>
                 <Link
                   href="/calendar"
-                  className="flex items-center gap-2 text-gray-700 dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
                 >
                   <Calendar className="w-4 h-4" />
                   Calendar
@@ -290,7 +290,7 @@ const Header = memo(() => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 disabled
-                className="flex items-center gap-2 text-gray-400 dark:text-slate-500"
+                className="flex items-center gap-2 text-mq-slate-400 dark:text-slate-500"
               >
                 <LogOut className="w-4 h-4" />
                 Sign out

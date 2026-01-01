@@ -309,7 +309,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 type="checkbox"
                 checked={completed}
                 onChange={(e) => setCompleted(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="h-4 w-4 rounded border-mq-border text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               />
               <Label htmlFor="completed" className="text-sm font-medium">
                 Mark as completed

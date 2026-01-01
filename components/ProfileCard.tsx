@@ -66,9 +66,9 @@ const ProfileCard = React.memo(
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900">{profile.name}</h3>
-              <p className="text-sm text-gray-600">{profile.email}</p>
-              <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+              <h3 className="font-semibold text-mq-content">{profile.name}</h3>
+              <p className="text-sm text-mq-content-secondary">{profile.email}</p>
+              <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
                 <span>ID: {profile.studentId}</span>
                 <span>•</span>
                 <span>
@@ -117,44 +117,44 @@ const ProfileCard = React.memo(
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">Email Notifications</span>
+                <Mail className="h-4 w-4 text-mq-slate-400" />
+                <span className="text-sm text-mq-content-secondary">Email Notifications</span>
               </div>
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.notifications ? 'bg-green-500' : 'bg-gray-300',
+                  profile.preferences.notifications ? 'bg-green-500' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">Email Reminders</span>
+                <Calendar className="h-4 w-4 text-mq-slate-400" />
+                <span className="text-sm text-mq-content-secondary">Email Reminders</span>
               </div>
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.emailReminders ? 'bg-green-500' : 'bg-gray-300',
+                  profile.preferences.emailReminders ? 'bg-green-500' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-gray-600">Push Notifications</span>
+                <Settings className="h-4 w-4 text-mq-slate-400" />
+                <span className="text-sm text-mq-content-secondary">Push Notifications</span>
               </div>
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.pushNotifications ? 'bg-green-500' : 'bg-gray-300',
+                  profile.preferences.pushNotifications ? 'bg-green-500' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
           </div>
         </CardContent>
 
-        <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
+        <label className="flex items-center gap-2 px-3 py-2 border border-mq-border rounded-lg hover:bg-mq-hover-background cursor-pointer text-sm">
           <Camera className="h-4 w-4" />
           <span>Change Avatar</span>
           <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />

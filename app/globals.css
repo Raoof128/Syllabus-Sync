@@ -68,7 +68,7 @@
   color-scheme: dark;
 }
 
-/* MQ Token-based Dark Mode Overrides - Fallbacks for any remaining Tailwind classes */
+/* MQ Token-based Dark Mode Overrides - Complete replacement of Tailwind fallbacks */
 .dark body {
   background-color: var(--mq-background);
   color: var(--mq-content);
@@ -94,63 +94,9 @@
   background-color: var(--mq-card-background);
 }
 
-.dark .bg-gray-50 {
-  background-color: var(--mq-background-secondary);
-}
 
-.dark .bg-gray-100 {
-  background-color: var(--mq-hover-background);
-}
 
-/* Text Colors - MQ content hierarchy */
-.dark .text-gray-900 {
-  color: var(--mq-content);
-}
-
-.dark .text-gray-800 {
-  color: var(--mq-content-secondary);
-}
-
-.dark .text-gray-700 {
-  color: var(--mq-content-secondary);
-}
-
-.dark .text-gray-600 {
-  @apply text-slate-400;
-}
-
-.dark .text-gray-500 {
-  color: var(--mq-content-tertiary);
-}
-
-.dark .text-gray-400 {
-  color: var(--mq-content-tertiary);
-}
-
-/* Borders */
-.dark .border-gray-200 {
-  border-color: var(--mq-border);
-}
-
-.dark .border-gray-100 {
-  border-color: var(--mq-border-secondary);
-}
-
-/* Interactive Elements - MQ hover backgrounds */
-.dark .hover\:bg-gray-50:hover {
-  background-color: var(--mq-hover-background);
-}
-
-.dark .hover\:bg-gray-100:hover {
-  background-color: var(--mq-hover-background);
-}
-
-/* Focus States */
-.dark .focus\:bg-gray-100:focus {
-  background-color: var(--mq-hover-background);
-}
-
-/* Form Elements - MQ styling */
+/* Form Elements - Complete MQ styling */
 .dark input,
 .dark textarea,
 .dark select {
@@ -171,80 +117,77 @@
   background-color: var(--mq-primary);
 }
 
-/* Form Elements */
+/* Form Elements - MQ consistent styling */
 .dark input,
 .dark textarea,
 .dark select {
-  @apply bg-slate-800 border-slate-600 text-slate-100 placeholder-slate-400;
+  background-color: var(--mq-input-background);
+  border-color: var(--mq-border);
+  color: var(--mq-content);
 }
 
+.dark input::placeholder,
+.dark textarea::placeholder,
+.dark select {
+  color: var(--mq-content-tertiary);
+}
+
+/* Focus states for form elements */
 .dark input:focus,
 .dark textarea:focus,
 .dark select:focus {
-  @apply border-blue-500 ring-blue-500;
+  border-color: var(--mq-focus);
+  --tw-ring-color: var(--mq-focus);
 }
 
-/* Buttons */
-.dark .bg-blue-600 {
-  @apply bg-blue-700;
-}
-
-.dark .hover\:bg-blue-700:hover {
-  @apply hover:bg-blue-800;
-}
-
-.dark .bg-red-600 {
-  @apply bg-red-700;
-}
-
-.dark .hover\:bg-red-700:hover {
-  @apply hover:bg-red-800;
-}
-
-/* Status Colors - Accessible color combinations */
+/* State color overrides - using MQ semantic colors */
 .dark .bg-green-100 {
-  @apply bg-green-900/30;
+  background-color: var(--mq-success);
+  opacity: 0.1;
 }
 
 .dark .text-green-800 {
-  @apply text-green-300;
+  color: var(--mq-success);
 }
 
 .dark .bg-red-100 {
-  @apply bg-red-900/30;
+  background-color: var(--mq-error);
+  opacity: 0.1;
 }
 
 .dark .text-red-800 {
-  @apply text-red-300;
+  color: var(--mq-error);
 }
 
 .dark .bg-yellow-100 {
-  @apply bg-yellow-900/30;
+  background-color: var(--mq-warning);
+  opacity: 0.1;
 }
 
 .dark .text-yellow-800 {
-  @apply text-yellow-300;
+  color: var(--mq-warning);
 }
 
 .dark .bg-blue-100 {
-  @apply bg-blue-900/30;
+  background-color: var(--mq-info);
+  opacity: 0.1;
 }
 
 .dark .text-blue-800 {
-  @apply text-blue-300;
+  color: var(--mq-info);
 }
 
 /* Component Specific */
 .dark .shadow-sm {
-  @apply shadow-slate-900/20;
+  box-shadow: var(--mq-shadow-sm);
+}
+
+.dark .shadow {
+  box-shadow: var(--mq-shadow);
 }
 
 .dark .shadow-md {
-  @apply shadow-slate-900/30;
-}
-
-.dark .shadow-lg {
-  @apply shadow-slate-900/40;
+  box-shadow: var(--mq-shadow-md);
 }
 
 /* Avatar backgrounds - uniform slate for consistency */

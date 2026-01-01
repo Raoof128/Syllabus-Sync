@@ -134,12 +134,12 @@ export default class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {/* Error Title */}
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-3">
+            <h1 className="text-3xl font-bold text-mq-content dark:text-slate-100 mb-3">
               Oops! Something went wrong
             </h1>
 
             {/* Error Description */}
-            <p className="text-gray-600 dark:text-slate-300 mb-6 text-lg">
+            <p className="text-mq-content-secondary dark:text-slate-300 mb-6 text-lg">
               We encountered an unexpected error. This has been automatically reported and
               we&apos;re working to fix it.
             </p>
@@ -175,13 +175,13 @@ export default class ErrorBoundary extends Component<Props, State> {
 
             {/* Development Error Details */}
             {(this.props.showErrorDetails || process.env.NODE_ENV === 'development') && error && (
-              <details className="mt-8 text-left bg-gray-50 dark:bg-slate-800 p-4 rounded-lg border">
-                <summary className="cursor-pointer font-medium text-gray-900 dark:text-slate-100 mb-2">
+              <details className="mt-8 text-left bg-mq-background-secondary dark:bg-slate-800 p-4 rounded-lg border">
+                <summary className="cursor-pointer font-medium text-mq-content dark:text-slate-100 mb-2">
                   🔧 Error Details (Development)
                 </summary>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                    <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
                       Error Message:
                     </h4>
                     <code className="text-sm bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-2 rounded block">
@@ -191,20 +191,20 @@ export default class ErrorBoundary extends Component<Props, State> {
 
                   {errorInfo && (
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                      <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
                         Component Stack:
                       </h4>
-                      <pre className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 p-3 rounded overflow-auto max-h-48 whitespace-pre-wrap">
+                      <pre className="text-xs bg-mq-background-secondary dark:bg-slate-700 text-mq-content dark:text-slate-200 p-3 rounded overflow-auto max-h-48 whitespace-pre-wrap">
                         {errorInfo.componentStack}
                       </pre>
                     </div>
                   )}
 
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-1">
+                    <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
                       Stack Trace:
                     </h4>
-                    <pre className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 p-3 rounded overflow-auto max-h-48">
+                    <pre className="text-xs bg-mq-background-secondary dark:bg-slate-700 text-mq-content dark:text-slate-200 p-3 rounded overflow-auto max-h-48">
                       {error.stack}
                     </pre>
                   </div>

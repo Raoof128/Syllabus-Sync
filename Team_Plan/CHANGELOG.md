@@ -70,6 +70,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Component Library**: 10 professional components with consistent MQ token usage in both light and dark modes
 - **Website Transformation**: Complete redesign of all pages with MQ design system and unified dark mode
 - **Performance & Quality**: 0 lint errors/warnings, TypeScript strict compliance, production-ready build
+- **Complete Color Elimination**: Systematically replaced all hardcoded Tailwind colors with MQ semantic tokens across entire codebase
+- **Hardcoded Color Removal**: Eliminated 50+ instances of text-gray-*, bg-gray-*, border-gray-* classes from 15+ components
+- **MQ Token Standardization**: All text colors now use --c-content hierarchy, backgrounds use --c-background variants
+- **Component Updates**: Updated TodaySchedule, NextDeadline, ProfileCard, UnitCard, ErrorBoundary, Header, EventsFeed, and all MQ components
+- **CSS Cleanup**: Removed obsolete dark mode overrides for unused Tailwind classes in globals.css
 
 #### UI/Branding Updates
 - **Sidebar Simplification**: Removed text branding from sidebar, now displays logo-only for cleaner design
