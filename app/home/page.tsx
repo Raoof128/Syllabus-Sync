@@ -141,9 +141,9 @@ export default function HomePage() {
   }, [units]);
 
   const stressColors = {
-    Low: 'bg-mq-sand-200 text-mq-content',
-    Busy: 'bg-mq-warning/10 text-mq-warning',
-    High: 'bg-mq-red text-white',
+    Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
+    Busy: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+    High: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
   };
 
   const stressEmoji = {
@@ -238,10 +238,10 @@ export default function HomePage() {
 
       {/* Get Started Banner */}
       {!hasUnits && (
-        <div className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3">
-          <Info className="h-5 w-5 text-mq-navy-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3">
+          <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-mq-sm text-mq-navy-900">
+            <p className="text-mq-sm text-mq-info">
               <strong>Get started:</strong> Add your units to sync classes to your calendar.
             </p>
           </div>

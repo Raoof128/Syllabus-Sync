@@ -12,10 +12,10 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 
 const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
-  Low: 'bg-green-100 text-green-800',
-  Medium: 'bg-yellow-100 text-yellow-800',
-  High: 'bg-orange-100 text-orange-800',
-  Urgent: 'bg-red-100 text-red-800',
+  Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
+  Medium: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+  High: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+  Urgent: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
 };
 
 export default function NextDeadline() {
@@ -53,7 +53,7 @@ export default function NextDeadline() {
         <CardTitle>Next Deadline</CardTitle>
         <Link
           href="/calendar"
-          className="text-sm text-blue-900 hover:text-blue-950 hover:underline"
+          className="text-sm text-mq-info hover:text-mq-info/80 hover:underline"
         >
           View all →
         </Link>
@@ -102,14 +102,14 @@ export default function NextDeadline() {
               {/* Time warning */}
               <div className="flex items-center gap-2 text-sm">
                 {nextDeadline.priority === 'Urgent' ? (
-                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertCircle className="h-4 w-4 text-mq-error" />
                 ) : (
-                  <Clock className="h-4 w-4 text-mq-slate-400" />
+                  <Clock className="h-4 w-4 text-mq-content-tertiary" />
                 )}
                 <span
                   className={
                     nextDeadline.priority === 'Urgent'
-                      ? 'text-red-800 font-medium'
+                      ? 'text-mq-error font-medium'
                       : 'text-mq-content-secondary'
                   }
                 >

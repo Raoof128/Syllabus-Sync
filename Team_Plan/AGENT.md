@@ -1124,3 +1124,10 @@ Summary: Complete Macquarie University design system implementation with 100% MQ
 Verification: npm run lint (0 errors, 0 warnings); npm run typecheck (0 errors); npm run build (success); all components use MQ tokens; no hardcoded colors remain in codebase.
 
 Follow-ups: MQ design system fully implemented and ready for university administration demo. All color consistency achieved with professional Macquarie branding.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Complete MQ token system unification for home page widgets.
+Summary: Fixed critical dark mode MQ token aliases missing from CSS variables, replaced all hardcoded colors in NextDeadline, TodaySchedule, and EventsFeed components with semantic MQ tokens, updated home page stress indicators and info banners to use proper MQ semantic colors, ensured complete charcoal-800 theme consistency across all home page elements.
+Files changed: app/mq-tokens.css; components/home/NextDeadline.tsx; components/home/TodaySchedule.tsx; components/home/EventsFeed.tsx; app/home/page.tsx.
+Verification: npm run build (success); npm run lint (0 errors, 0 warnings); all home page widgets now use MQ tokens and display correctly in dark mode.
+Follow-ups: Home page now has perfect MQ theme consistency with no hardcoded colors remaining.

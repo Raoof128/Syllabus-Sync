@@ -38,9 +38,30 @@
 
   /* Semantic Mappings */
   --c-background: #ffffff;
-  --c-background-invert: var(--c-charcoal-900);
-  --c-content: var(--c-charcoal-900);
+  --c-background-invert: var(--c-charcoal-800);
+  --c-content: var(--c-charcoal-800);
   --c-content-faded: var(--c-charcoal-600);
+
+   /* Tailwind CSS Variable Mappings - Light Mode */
+   --background: 0 0% 100%;
+   --foreground: 222.2 84% 4.9%;
+   --card: 0 0% 100%;
+   --card-foreground: 222.2 84% 4.9%;
+   --popover: 0 0% 100%;
+   --popover-foreground: 222.2 84% 4.9%;
+   --primary: 222.2 84% 4.9%;
+   --primary-foreground: 210 40% 98%;
+   --secondary: 210 40% 96%;
+   --secondary-foreground: 222.2 84% 4.9%;
+   --muted: 210 40% 96%;
+   --muted-foreground: 215.4 16.3% 46.9%;
+   --accent: 210 40% 96%;
+   --accent-foreground: 222.2 84% 4.9%;
+   --destructive: 0 84.2% 60.2%;
+   --destructive-foreground: 210 40% 98%;
+   --border: 214.3 31.8% 91.4%;
+   --input: 214.3 31.8% 91.4%;
+   --ring: 222.2 84% 4.9%;
 
   /* Typography - --f-[family] format */
   --f-primary: "Work Sans", sans-serif;
@@ -63,9 +84,15 @@
   --t-snap-slow: 0.3s cubic-bezier(0, 0, 0, 1);
   --t-snap-fast: 0.15s cubic-bezier(0, 0, 0, 1);
 
-  /* Additional tokens for complete UI */
-  --c-border: var(--c-charcoal-200);
-  --c-focus: var(--c-red);
+   /* Additional tokens for complete UI */
+   --c-border: var(--c-charcoal-200);
+   --c-focus: var(--c-red);
+
+   /* MQ Token aliases for globals.css compatibility */
+   --mq-background: var(--c-background);
+   --mq-content: var(--c-content);
+   --mq-border: var(--c-border);
+   --mq-focus: var(--c-focus);
 
   /* Spacing (approximated) */
   --c-space-1: 0.25rem;
@@ -86,18 +113,56 @@
 /* Dark Mode Overrides - mq-dark variants */
 .dark {
   /* Base semantic tokens - Unified charcoal palette for consistency */
-  --c-background: var(--c-charcoal-900);
-  --c-background-secondary: var(--c-charcoal-800);
-  --c-background-tertiary: var(--c-charcoal-700);
-  --c-background-invert: #ffffff;
+  --c-background: var(--c-charcoal-800);
+  --c-background-secondary: var(--c-charcoal-700);
+  --c-background-tertiary: var(--c-charcoal-600);
+   --c-background-invert: #ffffff;
 
-  --c-content: #ffffff;
-  --c-content-secondary: var(--c-charcoal-200);
-  --c-content-tertiary: var(--c-charcoal-300);
-  --c-content-faded: var(--c-charcoal-400);
+   --c-content: #ffffff;
+   --c-content-secondary: var(--c-charcoal-200);
+   --c-content-tertiary: var(--c-charcoal-300);
+   --c-content-faded: var(--c-charcoal-400);
 
-  --c-border: var(--c-charcoal-600);
-  --c-border-secondary: var(--c-charcoal-500);
+   --c-border: var(--c-charcoal-600);
+   --c-border-secondary: var(--c-charcoal-500);
+
+   /* MQ Token aliases for globals.css compatibility */
+   --mq-background: var(--c-background);
+   --mq-content: var(--c-content);
+   --mq-border: var(--c-border);
+   --mq-focus: var(--c-focus);
+   --mq-card-background: var(--c-card-background);
+   --mq-input-background: var(--c-input-background);
+   --mq-primary: var(--c-red);
+   --mq-content-secondary: var(--c-content-secondary);
+   --mq-content-tertiary: var(--c-content-tertiary);
+   --mq-success: var(--c-success);
+   --mq-error: var(--c-error);
+   --mq-warning: var(--c-warning);
+   --mq-info: var(--c-info);
+   --mq-shadow: var(--c-shadow);
+   --mq-shadow-sm: var(--c-shadow-sm);
+
+  /* Tailwind CSS Variable Mappings - Dark Mode (MQ Charcoal Theme) */
+  --background: 215 14% 24%; /* charcoal-800 */
+  --foreground: 0 0% 98%; /* white */
+  --card: 215 14% 24%; /* charcoal-800 */
+  --card-foreground: 0 0% 98%; /* white */
+  --popover: 215 14% 24%; /* charcoal-800 */
+  --popover-foreground: 0 0% 98%; /* white */
+   --primary: 0 0% 98%; /* white */
+   --primary-foreground: 215 14% 24%; /* charcoal-800 */
+   --secondary: 215 14% 24%; /* charcoal-800 */
+   --secondary-foreground: 0 0% 98%; /* white */
+   --muted: 215 14% 24%; /* charcoal-800 */
+   --muted-foreground: 215 14% 34%; /* charcoal-600 */
+   --accent: 215 14% 24%; /* charcoal-800 */
+   --accent-foreground: 0 0% 98%; /* white */
+   --destructive: 0 84.2% 60.2%; /* red-500 */
+   --destructive-foreground: 0 0% 98%; /* white */
+   --border: 215 14% 34%; /* charcoal-600 */
+   --input: 215 14% 24%; /* charcoal-800 */
+   --ring: 0 0% 98%; /* white */
 
   --c-focus: var(--c-red);
 
@@ -118,6 +183,12 @@
   --c-warning: #f59e0b; /* amber-500 - keeping for accessibility */
   --c-error: #ef4444; /* red-500 - keeping for accessibility */
   --c-info: #3b82f6; /* blue-500 - keeping for accessibility */
+
+  /* MQ Token aliases for globals.css compatibility */
+  --mq-success: var(--c-success);
+  --mq-warning: var(--c-warning);
+  --mq-error: var(--c-error);
+  --mq-info: var(--c-info);
 
   /* Background variations for components - unified charcoal palette */
   --c-card-background: var(--c-charcoal-800);
