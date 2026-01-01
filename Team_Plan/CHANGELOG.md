@@ -731,4 +731,11 @@ Files changed: components/layout/Sidebar.tsx.
 Verification: Sidebar renders without grey highlights; navigation remains functional.
 Follow-ups: Sidebar now has a clean, minimal appearance without distracting background highlights.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed grey hover highlights from header buttons.
+Summary: Eliminated unwanted grey background highlights on hover from profile button (behind "Alex Chen") and notifications button in the header to create a cleaner, more minimal interface appearance.
+Files changed: components/layout/Header.tsx.
+Verification: Header buttons no longer show grey hover backgrounds; functionality preserved.
+Follow-ups: Header now has clean button interactions without distracting grey highlights.
+
 **Last Updated:** January 01, 2026

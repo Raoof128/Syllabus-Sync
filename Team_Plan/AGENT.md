@@ -994,6 +994,13 @@ Verification: Sidebar renders without grey highlights; navigation remains functi
 Follow-ups: Sidebar now has a clean, minimal appearance without distracting background highlights.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed grey hover highlights from header buttons.
+Summary: Eliminated unwanted grey background highlights on hover from profile button (behind "Alex Chen") and notifications button in the header to create a cleaner, more minimal interface appearance.
+Files changed: components/layout/Header.tsx.
+Verification: Header buttons no longer show grey hover backgrounds; functionality preserved.
+Follow-ups: Header now has clean button interactions without distracting grey highlights.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
