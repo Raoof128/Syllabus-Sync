@@ -50,13 +50,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual Polish**: Professional map styling with subtle gradients replacing plain gray backgrounds
 - **Zoom Control Theming**: Complete dark mode styling for Leaflet zoom controls with theme-aware colors, hover effects, and seamless integration with the design system
 
-#### Logo Integration & Performance Optimization
-- **University Logo Update**: Replaced old logo (`MQ_Logo.png`) with new university logo (`MQ_Logo_Final.png`) at 128x128px in header and sidebar
-- **Image Optimization**: Migrated from `<img>` to Next.js `<Image>` component for automatic optimization, proper sizing, and better Core Web Vitals
-- **Bundle Analysis**: Implemented bundle analysis setup for monitoring bundle sizes and optimization opportunities
-- **Lazy Loading**: Confirmed dynamic imports for map components prevent server-side rendering of heavy Leaflet components
-- **Component Memoization**: Added `React.memo()` to Header and Sidebar components for improved performance
-- **Code Quality**: Fixed ESLint warnings by converting function expressions to arrow functions in memoized components
+#### Macquarie University Design System Implementation
+- **MQ Token Integration**: Implemented complete MQ design tokens using exact `--c-[name]-[weight]` naming convention
+- **Brand Colors**: Added all MQ brand colors (--c-red, --c-bright-red, --c-deep-red, --c-magenta, --c-purple)
+- **Neutral Palettes**: Implemented charcoal, sand, navy, slate palettes with proper weight ranges
+- **Typography**: Added Work Sans (--f-primary) and Source Serif Pro (--f-secondary) with correct weights
+- **Motion**: Implemented MQ timing functions (--t-ease-slow/fast, --t-snap-slow/fast)
+- **Semantic Tokens**: Mapped brand primary/secondary and background/content tokens
+- **Dark Mode**: Added mq-dark color variants for dark theme support
+- **Tailwind Integration**: Updated config to map MQ tokens to mq.* namespace
+- **Component Library**: Built complete UI library using MQ tokens (buttons, links, badges, cards, alerts, inputs, navbar, hero, etc.)
+- **Website Redesign**: Applied MQ design system across entire website (home, calendar, feed, map, settings)
+- **Logo Integration**: University logo with MQ styling and proper sizing
+- **Performance Optimizations**: React.memo, dynamic imports, bundle analysis, image optimization
+- **Code Quality**: 0 ESLint errors/warnings, TypeScript strict compliance
 
 #### UI/Branding Updates
 - **Sidebar Simplification**: Removed text branding from sidebar, now displays logo-only for cleaner design
