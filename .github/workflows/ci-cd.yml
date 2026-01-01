@@ -119,18 +119,6 @@ jobs:
       - name: Build for production
         run: npm run build
 
-      - name: Kill any existing process on port 3000
-        run: |
-          lsof -ti:3000 | xargs -r kill -9 || true
-
-      - name: Start production server
-        run: npm run start &
-        env:
-          PORT: 3000
-
-      - name: Wait for server
-        run: sleep 15
-
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10
         with:

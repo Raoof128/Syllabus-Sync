@@ -2,9 +2,9 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "pkill -f 'next start' || true; npx kill-port 3000 || true; npm run start",
-      "startServerReadyPattern": "ready - started server on",
-      "startServerReadyTimeout": 60000,
+      "startServerCommand": "npm run start",
+      "startServerReadyPattern": "ready - started server on 0.0.0.0:3000",
+      "startServerReadyTimeout": 120000,
       "url": [
         "http://localhost:3000",
         "http://localhost:3000/home",
