@@ -207,10 +207,7 @@
   @apply bg-slate-800;
 }
 
-/* Avatar backgrounds - keep gradients for branding */
-.dark .bg-gradient-to-br.from-blue-500.to-purple-600 {
-  /* Keep original gradient for branding consistency */
-}
+/* Avatar backgrounds - uniform slate background for consistency */
 
 /* Badge variations - ensure text remains readable */
 .dark .bg-green-500 {

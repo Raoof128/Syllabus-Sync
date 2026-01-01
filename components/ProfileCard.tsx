@@ -47,7 +47,7 @@ const ProfileCard = React.memo(
         <CardHeader className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-lg">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}

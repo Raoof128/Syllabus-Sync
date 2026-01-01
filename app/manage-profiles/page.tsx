@@ -183,7 +183,7 @@ export default function ManageProfilesPage() {
             {currentProfile ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-xl">
                     {currentProfile.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
