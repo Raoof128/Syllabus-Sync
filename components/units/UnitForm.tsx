@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
 import { UNIT_COLORS } from '@/lib/config';
@@ -14,6 +14,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
+import { toastUtils } from '@/lib/utils/toast';
+import { useRetry } from '@/lib/hooks/use-retry';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -54,6 +57,24 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
   // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  // Save operation with retry logic
+  const performSave = useCallback(
+    async (unitData: Unit) => {
+      if (editUnit) {
+        updateUnit(editUnit.id, unitData);
+      } else {
+        addUnit(unitData);
+      }
+    },
+    [editUnit, updateUnit, addUnit],
+  );
+
+  const { execute: saveWithRetry, isLoading: isSaving } = useRetry(performSave, {
+    maxAttempts: 3,
+    showToastOnError: false, // We'll handle toasts manually
+    errorMessage: 'Failed to save unit. Please try again.',
+  });
 
   const resetForm = () => {
     setCode('');
@@ -100,19 +121,25 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   };
 
   const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {};
+    const validator = createFormValidator({
+      code: validationRules.required('Unit code'),
+      name: validationRules.required('Unit name'),
+      building: validationRules.required('Building'),
+      room: validationRules.required('Room'),
+      schedule: (scheduleValue) =>
+        !scheduleValue || !Array.isArray(scheduleValue) || scheduleValue.length === 0
+          ? 'At least one class time is required'
+          : null,
+    });
 
-    // Required fields
-    if (!code.trim()) newErrors.code = 'Unit code is required';
-    if (!name.trim()) newErrors.name = 'Unit name is required';
-    if (!building.trim()) newErrors.building = 'Building is required';
-    if (!room.trim()) newErrors.room = 'Room is required';
-    if (schedule.length === 0) newErrors.schedule = 'At least one class time is required';
-
-    // Validate class times
+    // Validate class times separately
+    const classTimeErrors: Array<{ field: string; message: string }> = [];
     schedule.forEach((ct, index) => {
       if (ct.startTime >= ct.endTime) {
-        newErrors[`time_${index}`] = 'End time must be after start time';
+        classTimeErrors.push({
+          field: `time_${index}`,
+          message: 'End time must be after start time',
+        });
       }
     });
 
@@ -121,16 +148,25 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     schedule.forEach((ct, index) => {
       const timeKey = `${ct.day}-${ct.startTime}-${ct.endTime}`;
       if (timesSet.has(timeKey)) {
-        newErrors[`duplicate_${index}`] = 'Duplicate class time';
+        classTimeErrors.push({
+          field: `duplicate_${index}`,
+          message: 'Duplicate class time',
+        });
       }
       timesSet.add(timeKey);
     });
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const allValidationErrors = [
+      ...validator({ code, name, building, room, schedule }),
+      ...classTimeErrors,
+    ];
+    const formErrors = errorHandler.handleValidationError(allValidationErrors);
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
 
     const unitData: Unit = {
@@ -146,14 +182,23 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       createdAt: editUnit?.createdAt || new Date(),
     };
 
-    if (editUnit) {
-      updateUnit(editUnit.id, unitData);
-    } else {
-      addUnit(unitData);
+    const result = await saveWithRetry(unitData);
+    if (result !== null) {
+      // Success - show toast and close form
+      if (editUnit) {
+        toastUtils.success(
+          'Unit Updated',
+          `${unitData.code} - ${unitData.name} has been updated successfully.`,
+        );
+      } else {
+        toastUtils.success(
+          'Unit Added',
+          `${unitData.code} - ${unitData.name} has been added successfully.`,
+        );
+      }
+      onOpenChange(false);
+      resetForm();
     }
-
-    onOpenChange(false);
-    resetForm();
   };
 
   const handleCancel = () => {
@@ -349,8 +394,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="button" onClick={handleSave}>
-              {editUnit ? 'Update' : 'Add'} Unit
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : editUnit ? 'Update' : 'Add'} Unit
             </Button>
           </div>
         </DialogFooter>

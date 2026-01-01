@@ -1,21 +1,45 @@
 // app/home/page.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
-import UnitForm from '@/components/units/UnitForm';
 import UnitCard from '@/components/units/UnitCard';
-import DeadlineForm from '@/components/deadlines/DeadlineForm';
+import dynamic from 'next/dynamic';
+
+// Dynamically import forms for better code splitting
+const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
+  loading: () => (
+    <div className="flex items-center justify-center p-8">
+      <p className="text-mq-content">Loading...</p>
+    </div>
+  ),
+});
+const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
+  loading: () => (
+    <div className="flex items-center justify-center p-8">
+      <p className="text-mq-content">Loading...</p>
+    </div>
+  ),
+});
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, Clock, TrendingUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/mq/button';
+import { toastUtils } from '@/lib/utils/toast';
+import { Badge } from '@/components/ui/mq/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Unit, Deadline } from '@/lib/types';
 import {
   DropdownMenu,
@@ -45,6 +69,7 @@ export default function HomePage() {
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
+  const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
 
   useEffect(() => {
     const checkHydration = () => {
@@ -94,10 +119,31 @@ export default function HomePage() {
   const hasUnits = units.length > 0;
   const stressLevel = hasHydrated ? getStressLevel() : 'Low';
 
+  // Memoized unit stats calculation for better performance
+  const unitStats = useMemo(() => {
+    const totalClasses = units.reduce((acc, u) => acc + u.schedule.length, 0);
+    const totalStudyHours = units.reduce((acc, u) => {
+      return (
+        acc +
+        u.schedule.reduce((hours, s) => {
+          const [startH, startM] = s.startTime.split(':').map(Number);
+          const [endH, endM] = s.endTime.split(':').map(Number);
+          return hours + (endH - startH) + (endM - startM) / 60;
+        }, 0)
+      );
+    }, 0);
+
+    return {
+      unitCount: units.length,
+      totalClasses,
+      studyHours: Math.round(totalStudyHours),
+    };
+  }, [units]);
+
   const stressColors = {
-    Low: 'bg-green-100 text-green-800',
-    Busy: 'bg-yellow-100 text-yellow-800',
-    High: 'bg-red-100 text-red-800',
+    Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
+    Busy: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+    High: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
   };
 
   const stressEmoji = {
@@ -117,8 +163,17 @@ export default function HomePage() {
   };
 
   const handleDeleteUnit = (unit: Unit) => {
-    if (confirm(`Are you sure you want to delete ${unit.code} - ${unit.name}?`)) {
-      removeUnit(unit.id);
+    setDeleteUnitConfirm(unit);
+  };
+
+  const confirmDeleteUnit = () => {
+    if (deleteUnitConfirm) {
+      removeUnit(deleteUnitConfirm.id);
+      toastUtils.success(
+        'Unit Deleted',
+        `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} has been deleted.`,
+      );
+      setDeleteUnitConfirm(null);
     }
   };
 
@@ -130,17 +185,27 @@ export default function HomePage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {DEMO_USER.name}!</h1>
-          <p className="text-gray-600">Here&apos;s your day at a glance.</p>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
+            Welcome, {DEMO_USER.name}!
+          </h1>
+          <p className="text-mq-content-secondary">Here&apos;s your day at a glance.</p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Stress Level Indicator */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Stress Level Indicator - Show compact version on mobile */}
           {hasHydrated && deadlines.length > 0 && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
-              <TrendingUp className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">Workload:</span>
+            <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
+              <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
+              <Badge className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}>
+                {stressEmoji[stressLevel]}
+              </Badge>
+            </div>
+          )}
+          {hasHydrated && deadlines.length > 0 && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
+              <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
+              <span className="text-mq-sm text-mq-content">Workload:</span>
               <Badge className={stressColors[stressLevel]}>
                 {stressEmoji[stressLevel]} {stressLevel}
               </Badge>
@@ -148,12 +213,16 @@ export default function HomePage() {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 touch-manipulation" size="default">
                 <Plus className="h-4 w-4" />
-                Add New
+                <span className="hidden sm:inline">Add New</span>
+                <span className="sm:hidden">Add</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent
+              align="end"
+              className="bg-mq-background border-mq-border"
+            >
               <DropdownMenuItem onClick={handleAddUnit} className="gap-2 cursor-pointer">
                 <BookOpen className="h-4 w-4" />
                 Add Unit
@@ -165,14 +234,14 @@ export default function HomePage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </header>
 
       {/* Get Started Banner */}
       {!hasUnits && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3">
+          <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-blue-900">
+            <p className="text-mq-sm text-mq-info">
               <strong>Get started:</strong> Add your units to sync classes to your calendar.
             </p>
           </div>
@@ -180,9 +249,13 @@ export default function HomePage() {
       )}
 
       {/* Main Grid - Today's Schedule & Next Deadline */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <TodaySchedule />
-        <NextDeadline />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6">
+        <div className="animate-slide-up">
+          <TodaySchedule />
+        </div>
+        <div className="animate-slide-up animation-delay-100">
+          <NextDeadline />
+        </div>
       </div>
 
       {/* My Units Section */}
@@ -199,16 +272,21 @@ export default function HomePage() {
         </CardHeader>
         <CardContent>
           {!hasHydrated ? (
-            <div className="h-32 flex items-center justify-center">
-              <p className="text-gray-400">Loading units...</p>
-            </div>
+             <div className="h-32 flex items-center justify-center">
+               <div className="animate-pulse space-y-3">
+                 <div className="h-4 bg-mq-background-tertiary rounded w-3/4" />
+                 <div className="h-4 bg-mq-background-tertiary rounded w-1/2" />
+                 <div className="h-16 bg-mq-background-tertiary rounded w-full" />
+               </div>
+             </div>
           ) : units.length === 0 ? (
-            <div className="text-center py-8">
-              <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No units yet</h3>
-              <p className="text-gray-600 mb-4">
-                Add your first unit to start tracking your schedule.
-              </p>
+             <div className="text-center py-12">
+               <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+               <h3 className="text-mq-lg font-semibold text-mq-content mb-2">No units yet</h3>
+               <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                 Add your first unit to start tracking your schedule. It&apos;ll sync your calendar
+                 and today&apos;s schedule.
+               </p>
               <Button onClick={handleAddUnit} className="gap-2">
                 <Plus className="h-4 w-4" />
                 Add Your First Unit
@@ -217,39 +295,23 @@ export default function HomePage() {
           ) : (
             <>
               {/* Unit Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{units.length}</p>
-                  <p className="text-xs text-gray-500">Units</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                <div className="text-center animate-fade-in">
+                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
+                  <p className="text-mq-xs text-mq-content-secondary">Units</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {units.reduce((acc, u) => acc + u.schedule.length, 0)}
-                  </p>
-                  <p className="text-xs text-gray-500">Classes/Week</p>
+                <div className="text-center animate-fade-in animation-delay-100">
+                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
+                  <p className="text-mq-xs text-mq-content-secondary">Classes/Week</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">
-                    {units
-                      .reduce((acc, u) => {
-                        return (
-                          acc +
-                          u.schedule.reduce((hours, s) => {
-                            const [startH, startM] = s.startTime.split(':').map(Number);
-                            const [endH, endM] = s.endTime.split(':').map(Number);
-                            return hours + (endH - startH) + (endM - startM) / 60;
-                          }, 0)
-                        );
-                      }, 0)
-                      .toFixed(0)}
-                    h
-                  </p>
-                  <p className="text-xs text-gray-500">Study Hours</p>
+                <div className="text-center animate-fade-in animation-delay-200">
+                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
+                  <p className="text-mq-xs text-mq-content-secondary">Study Hours</p>
                 </div>
               </div>
 
               {/* Units Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {units.map((unit) => (
                   <UnitCard
                     key={unit.id}
@@ -278,6 +340,30 @@ export default function HomePage() {
         onOpenChange={setDeadlineFormOpen}
         editDeadline={editingDeadline}
       />
+
+      {/* Delete Unit Confirmation Dialog */}
+      <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Unit</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{' '}
+              <strong>
+                {deleteUnitConfirm?.code} - {deleteUnitConfirm?.name}
+              </strong>
+              ? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="secondary" onClick={() => setDeleteUnitConfirm(null)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={confirmDeleteUnit}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

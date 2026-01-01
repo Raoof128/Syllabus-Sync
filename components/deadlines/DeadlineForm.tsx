@@ -1,6 +1,7 @@
+// components/deadlines/DeadlineForm.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Deadline } from '@/lib/types';
@@ -15,6 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toastUtils } from '@/lib/utils/toast';
+import { useRetry } from '@/lib/hooks/use-retry';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -25,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { PRIORITY_LEVELS, DEADLINE_TYPES } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
+import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 
 interface DeadlineFormProps {
   open: boolean;
@@ -36,7 +40,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
-  // Form state
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -45,8 +48,26 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const [type, setType] = useState<Deadline['type']>('Assignment');
   const [completed, setCompleted] = useState(false);
 
-  // Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Save operation with retry logic
+  const performSave = useCallback(
+    async (deadlineData: Deadline) => {
+      if (editDeadline) {
+        updateDeadline(editDeadline.id, deadlineData);
+      } else {
+        addDeadline(deadlineData);
+      }
+    },
+    [editDeadline, updateDeadline, addDeadline],
+  );
+
+  const { execute: saveWithRetry } = useRetry(performSave, {
+    maxAttempts: 3,
+    showToastOnError: false, // We'll handle toasts manually
+    errorMessage: 'Failed to save deadline. Please try again.',
+  });
 
   const resetForm = () => {
     setTitle('');
@@ -59,7 +80,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     setErrors({});
   };
 
-  // Initialize form with edit data
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editDeadline) {
@@ -83,17 +103,20 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {};
+    const validator = createFormValidator({
+      title: validationRules.required('Title'),
+      unitCode: validationRules.required('Unit'),
+      dueDate: validationRules.required('Due date'),
+    });
 
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!unitCode) newErrors.unitCode = 'Unit is required';
-    if (!dueDate) newErrors.dueDate = 'Due date is required';
+    const validationErrors = validator({ title, unitCode, dueDate });
+    const formErrors = errorHandler.handleValidationError(validationErrors);
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
 
     const [year, month, day] = dueDate.split('-').map(Number);
@@ -121,22 +144,39 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       createdAt: editDeadline?.createdAt || new Date(),
     };
 
-    if (editDeadline) {
-      updateDeadline(editDeadline.id, deadlineData);
-    } else {
-      addDeadline(deadlineData);
-    }
-
-    onOpenChange(false);
-    resetForm();
-  };
-
-  const handleDelete = () => {
-    if (editDeadline && confirm('Are you sure you want to delete this deadline?')) {
-      removeDeadline(editDeadline.id);
+    const result = await saveWithRetry(deadlineData);
+    if (result !== null) {
+      // Success - show toast and close form
+      if (editDeadline) {
+        toastUtils.success(
+          'Deadline Updated',
+          `"${deadlineData.title}" has been updated successfully.`,
+        );
+      } else {
+        toastUtils.success(
+          'Deadline Added',
+          `"${deadlineData.title}" has been added successfully.`,
+        );
+      }
       onOpenChange(false);
       resetForm();
     }
+  };
+
+  const handleDelete = () => {
+    if (editDeadline) {
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (editDeadline) {
+      removeDeadline(editDeadline.id);
+      toastUtils.success('Deadline Deleted', `"${editDeadline.title}" has been deleted.`);
+      onOpenChange(false);
+      resetForm();
+    }
+    setShowDeleteConfirm(false);
   };
 
   const handleCancel = () => {
@@ -145,58 +185,49 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{editDeadline ? 'Edit Deadline' : 'Add New Deadline'}</DialogTitle>
-          <DialogDescription>
-            {editDeadline
-              ? 'Update the details of your deadline.'
-              : 'Fill in the details to add a new deadline.'}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editDeadline ? 'Edit Deadline' : 'Add New Deadline'}</DialogTitle>
+            <DialogDescription>
+              {editDeadline
+                ? 'Update details of your deadline.'
+                : 'Fill in details to add a new deadline.'}
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">
-              Title <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="title"
-              placeholder="e.g., Assignment 1"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className={errors.title ? 'border-red-500' : ''}
-            />
-            {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-          </div>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">
+                Title <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="title"
+                placeholder="e.g., Assignment 1"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
 
-          {/* Unit */}
-          <div className="space-y-2">
-            <Label htmlFor="unitCode">
-              Unit <span className="text-red-500">*</span>
-            </Label>
-            <Select value={unitCode} onValueChange={setUnitCode}>
-              <SelectTrigger className={errors.unitCode ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select a unit" />
-              </SelectTrigger>
-              <SelectContent>
-                {units.map((unit) => (
-                  <SelectItem key={unit.id} value={unit.code}>
-                    {unit.code} - {unit.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.unitCode && <p className="text-sm text-red-500">{errors.unitCode}</p>}
-            {units.length === 0 && (
-              <p className="text-sm text-yellow-600">Please add a unit first.</p>
-            )}
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="unitCode">
+                Unit Code <span className="text-red-500">*</span>
+              </Label>
+              <Select value={unitCode} onValueChange={setUnitCode}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit.id} value={unit.code}>
+                      {unit.code} - {unit.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Due Date */}
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dueDate">
                 Due Date <span className="text-red-500">*</span>
@@ -206,12 +237,13 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className={errors.dueDate ? 'border-red-500' : ''}
               />
-              {errors.dueDate && <p className="text-sm text-red-500">{errors.dueDate}</p>}
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="dueTime">Due Time</Label>
+              <Label htmlFor="dueTime">
+                Due Time <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="dueTime"
                 type="time"
@@ -219,70 +251,116 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 onChange={(e) => setDueTime(e.target.value)}
               />
             </div>
-          </div>
 
-          {/* Type */}
-          <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
-            <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {DEADLINE_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
+            <div className="space-y-2">
+              <Label htmlFor="priority">Priority</Label>
+              <Select
+                value={priority}
+                onValueChange={(v) => setPriority(v as Deadline['priority'])}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRIORITY_LEVELS.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DEADLINE_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DEADLINE_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="completed"
+                type="checkbox"
+                checked={completed}
+                onChange={(e) => setCompleted(e.target.checked)}
+                className="h-4 w-4 rounded border-mq-border text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              />
+              <Label htmlFor="completed" className="text-sm font-medium">
+                Mark as completed
+              </Label>
+            </div>
+
+            {Object.keys(errors).length > 0 && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                {Object.values(errors).map((error, index) => (
+                  <div key={index}>• {error}</div>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+            )}
           </div>
 
-          {/* Priority */}
-          <div className="space-y-2">
-            <Label htmlFor="priority">Priority</Label>
-            <Select value={priority} onValueChange={(v) => setPriority(v as Deadline['priority'])}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PRIORITY_LEVELS.map((p) => (
-                  <SelectItem key={p} value={p}>
-                    {p}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <DialogFooter className="flex gap-2">
+            {editDeadline && (
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            )}
+            <div className="flex-1" />
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={units.length === 0}>
+              {editDeadline ? 'Save Changes' : 'Add Deadline'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          {/* Completed */}
-          <div className="flex items-center gap-2">
-            <input
-              id="completed"
-              type="checkbox"
-              checked={completed}
-              onChange={(e) => setCompleted(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            />
-            <Label htmlFor="completed">Mark as completed</Label>
-          </div>
-        </div>
-
-        <DialogFooter className="flex gap-2">
-          {editDeadline && (
-            <Button variant="destructive" onClick={handleDelete}>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Deadline</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this deadline? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
               Delete
             </Button>
-          )}
-          <div className="flex-1" />
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={units.length === 0}>
-            {editDeadline ? 'Save Changes' : 'Add Deadline'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Bell,
   Settings,
   User,
-  GraduationCap,
   Clock,
   Calendar,
   BookOpen,
@@ -36,7 +36,7 @@ const notificationIcons = {
   system: Info,
 };
 
-export default function Header() {
+const Header = memo(() => {
   const notifications = useNotificationsStore((state) => state.notifications);
   const addNotification = useNotificationsStore((state) => state.addNotification);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
@@ -47,10 +47,14 @@ export default function Header() {
   const [isClient, setIsClient] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
+  // setState called in effect is correct here - syncing with localStorage during hydration
   useEffect(() => {
     setTimeout(() => setIsClient(true), 0);
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
+  // setState called in effect is correct here - syncing with localStorage during hydration
   useEffect(() => {
     if (!hasSeeded && isClient) {
       const seededKey = 'notifications-seeded';
@@ -87,19 +91,24 @@ export default function Header() {
   const unreadCount = isClient ? getUnreadCount() : 0;
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-6 relative z-10">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: BRAND_COLORS.primary }}
-        >
-          <GraduationCap className="w-6 h-6 text-white" />
-        </div>
-        <div className="hidden sm:block">
-          <h1 className="text-lg font-semibold text-gray-900">{APP_CONFIG.name}</h1>
-          <p className="text-xs text-gray-500">{UNIVERSITY_CONFIG.shortName}</p>
-        </div>
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/MQ_Logo_Final.png"
+            alt="Macquarie University Logo"
+            width={128}
+            height={128}
+            style={{ objectFit: 'contain' }}
+          />
+          <div className="hidden sm:block">
+            <h1 className="text-mq-lg font-semibold text-mq-content">
+              {APP_CONFIG.name}
+            </h1>
+            <p className="text-mq-xs text-mq-content-secondary">{UNIVERSITY_CONFIG.shortName}</p>
+          </div>
+        </Link>
       </div>
 
       {/* Right side - Actions */}
@@ -107,11 +116,11 @@ export default function Header() {
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+            className="p-2 rounded-mq transition-all duration-mq-fast ease-mq-snap relative hover:bg-mq-background-secondary"
             aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <Bell className="w-5 h-5 text-gray-600" />
+            <Bell className="w-5 h-5 text-mq-content-secondary" />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium">
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -121,13 +130,13 @@ export default function Header() {
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-              <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
+              <div className="p-3 border-b border-mq-border flex items-center justify-between">
+                <h3 className="font-semibold text-mq-content">Notifications</h3>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     Mark all read
                   </button>
@@ -135,7 +144,7 @@ export default function Header() {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-gray-500 text-sm">No notifications yet</div>
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm">No notifications yet</div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
@@ -147,52 +156,52 @@ export default function Header() {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                        className={`block p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 ${
-                          !notification.read ? 'bg-blue-50' : ''
-                        }`}
+                         className={`block p-3 border-b border-mq-border last:border-0 ${
+                           !notification.read ? 'bg-mq-info/10' : ''
+                         }`}
                       >
                         <div className="flex gap-3">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              notification.type === 'deadline'
-                                ? 'bg-orange-100'
-                                : notification.type === 'event'
-                                  ? 'bg-purple-100'
-                                  : notification.type === 'class'
-                                    ? 'bg-blue-100'
-                                    : 'bg-gray-100'
-                            }`}
-                          >
+                           <div
+                             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                               notification.type === 'deadline'
+                                 ? 'bg-mq-warning/20'
+                                 : notification.type === 'event'
+                                   ? 'bg-mq-purple/20'
+                                   : notification.type === 'class'
+                                     ? 'bg-mq-info/20'
+                                     : 'bg-mq-background-secondary'
+                             }`}
+                           >
                             <Icon
-                              className={`w-4 h-4 ${
-                                notification.type === 'deadline'
-                                  ? 'text-orange-600'
-                                  : notification.type === 'event'
-                                    ? 'text-purple-600'
-                                    : notification.type === 'class'
-                                      ? 'text-blue-600'
-                                      : 'text-gray-600'
-                              }`}
+                             className={`w-4 h-4 ${
+                               notification.type === 'deadline'
+                                 ? 'text-mq-warning'
+                                 : notification.type === 'event'
+                                   ? 'text-mq-purple'
+                                   : notification.type === 'class'
+                                     ? 'text-mq-info'
+                                     : 'text-mq-content-secondary'
+                             }`}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p
-                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-gray-900 truncate`}
+                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
                             >
                               {notification.title}
                             </p>
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                            <p className="text-xs text-mq-content-secondary line-clamp-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-mq-slate-400 mt-1">
                               {formatDistanceToNow(new Date(notification.createdAt), {
                                 addSuffix: true,
                               })}
                             </p>
                           </div>
-                          {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />
-                          )}
+                           {!notification.read && (
+                             <div className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2" />
+                           )}
                         </div>
                       </Link>
                     );
@@ -207,14 +216,18 @@ export default function Header() {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            aria-label="Toggle theme"
+            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 active:scale-95"
+            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {resolvedTheme === 'dark' ? (
-              <Sun className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
+            <div className="relative w-5 h-5">
+              <Sun
+                className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
+              />
+              <Moon
+                className={`absolute inset-0 w-5 h-5 text-blue-400 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
+              />
+            </div>
           </button>
         )}
 
@@ -223,7 +236,7 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400"
                 aria-label="Open profile menu"
               >
                 <div
@@ -238,32 +251,47 @@ export default function Header() {
                     <User className="w-5 h-5 text-white" />
                   )}
                 </div>
-                <div className="text-sm font-medium text-gray-700 hidden sm:inline">
+                <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
                   {currentProfile ? currentProfile.name : DEMO_USER.name}
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-mq-card-background border-mq-border shadow-mq-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+            >
               <DropdownMenuItem asChild>
-                <Link href="/profiles" className="flex items-center gap-2">
+                <Link
+                  href="/manage-profiles"
+                  className="flex items-center gap-2 text-mq-content-secondary"
+                >
                   <User className="w-4 h-4" />
                   Manage Profiles
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2">
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-2 text-mq-content-secondary"
+                >
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/calendar" className="flex items-center gap-2">
+                <Link
+                  href="/calendar"
+                  className="flex items-center gap-2 text-mq-content-secondary"
+                >
                   <Calendar className="w-4 h-4" />
                   Calendar
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem disabled className="flex items-center gap-2">
+              <DropdownMenuItem
+                disabled
+                className="flex items-center gap-2 text-mq-content-tertiary"
+              >
                 <LogOut className="w-4 h-4" />
                 Sign out
               </DropdownMenuItem>
@@ -273,4 +301,8 @@ export default function Header() {
       </div>
     </header>
   );
-}
+});
+
+Header.displayName = 'Header';
+
+export default Header;

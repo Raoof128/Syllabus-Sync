@@ -1,6 +1,6 @@
 // components/home/QuickActions.tsx
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/mq/button';
 import { Map, Calendar } from 'lucide-react';
 
 export default function QuickActions() {
@@ -13,7 +13,7 @@ export default function QuickActions() {
         </Link>
       </Button>
 
-      <Button asChild variant="outline" size="lg">
+      <Button asChild variant="secondary" size="lg">
         <Link href="/calendar" className="gap-2">
           <Calendar className="h-5 w-5" />
           View Calendar

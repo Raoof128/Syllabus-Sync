@@ -35,10 +35,9 @@ describe('TodaySchedule', () => {
 
   it('shows loading or empty state', async () => {
     render(<TodaySchedule />);
-    // The component may show loading briefly or move directly to empty state
     await waitFor(() => {
       const hasLoading = screen.queryByText('Loading...');
-      const hasEmpty = screen.queryByText('No classes today 🎉');
+      const hasEmpty = screen.queryByText('No classes today');
       expect(hasLoading || hasEmpty).toBeTruthy();
     });
   });
@@ -46,7 +45,7 @@ describe('TodaySchedule', () => {
   it('shows empty state when no classes today', async () => {
     render(<TodaySchedule />);
     await waitFor(() => {
-      expect(screen.getByText('No classes today 🎉')).toBeInTheDocument();
+      expect(screen.getByText('No classes today')).toBeInTheDocument();
     });
   });
 });

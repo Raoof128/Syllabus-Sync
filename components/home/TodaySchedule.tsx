@@ -4,8 +4,9 @@
 import React, { useMemo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, MapPin } from 'lucide-react';
+import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
+import { Button } from '@/components/ui/mq/button';
 
 export default function TodaySchedule() {
   const isHydrated = useHydration();
@@ -34,16 +35,37 @@ export default function TodaySchedule() {
       </CardHeader>
       <CardContent className="space-y-3">
         {!isHydrated ? (
-          <div className="h-32 flex items-center justify-center">
-            <p className="text-gray-400">Loading...</p>
+          <div className="space-y-4 p-2">
+             <div className="animate-pulse">
+               <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
+               <div className="space-y-2">
+                 <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                 <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
+               </div>
+             </div>
+             <div className="animate-pulse animation-delay-100">
+               <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
+               <div className="space-y-2">
+                 <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                 <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
+               </div>
+             </div>
           </div>
         ) : todayClasses.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No classes today 🎉</p>
+          <div className="text-center py-8">
+            <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-mq-content mb-2">No classes today</h3>
+            <p className="text-mq-content-secondary mb-4">You&apos;re all caught up! Enjoy your free time.</p>
+             <Button onClick={() => (window.location.href = '/home')} className="gap-2">
+               <BookOpen className="h-4 w-4" />
+               Add Unit
+             </Button>
+          </div>
         ) : (
           todayClasses.map((cls) => (
             <div
               key={`${cls.id}-${cls.code}`}
-              className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
             >
               {/* Color indicator */}
               <div
@@ -53,11 +75,11 @@ export default function TodaySchedule() {
 
               {/* Class info */}
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-mq-content">
                   {cls.code} — {cls.name}
                 </h3>
 
-                <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                <div className="flex items-center gap-4 mt-1 text-sm text-mq-content-secondary">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
                     {cls.startTime} - {cls.endTime}

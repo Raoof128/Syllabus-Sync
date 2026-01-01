@@ -1,296 +1,226 @@
-// app/settings/page.tsx
 'use client';
 
 import { useState } from 'react';
-import { Settings, User, Bell, Palette, Shield, Database, Clock, Info, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { UNIVERSITY_CONFIG, APP_CONFIG } from '@/lib/config';
+import { Bell, Palette, Shield, Info, Mail, Calendar } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
+import { toastUtils } from '@/lib/utils/toast';
 
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
 
   const handleClearAllData = () => {
-    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
-      setClearing(true);
-      // Clear all units
-      units.forEach((unit) => removeUnit(unit.id));
-      // Clear all deadlines
-      deadlines.forEach((deadline) => removeDeadline(deadline.id));
-      // Clear localStorage directly as well
-      localStorage.removeItem('units-storage');
-      localStorage.removeItem('deadlines-storage');
-      localStorage.removeItem('notifications-storage');
-      localStorage.removeItem('notifications-seeded');
-      localStorage.removeItem('units-seeded');
-      localStorage.removeItem('deadlines-seeded');
-      localStorage.setItem('seed-disabled', 'true');
-      setClearing(false);
-      alert('All data has been cleared successfully!');
-    }
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearAllData = () => {
+    units.forEach((unit) => removeUnit(unit.id));
+    deadlines.forEach((deadline) => removeDeadline(deadline.id));
+    localStorage.removeItem('units-storage');
+    localStorage.removeItem('deadlines-storage');
+    localStorage.removeItem('notifications-storage');
+    localStorage.removeItem('seed-disabled');
+    localStorage.removeItem('units-seeded');
+    setClearing(false);
+    setShowClearConfirm(false);
+    toastUtils.success(
+      'Data Cleared',
+      'All units, deadlines, and data have been cleared successfully.',
+    );
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-        <p className="text-gray-600">Manage your preferences and account settings.</p>
+      <div className="container mx-auto p-6 max-w-7xl">
+        <header className="mb-8">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Settings</h1>
+          <p className="text-mq-content-secondary">Manage your preferences and account settings.</p>
+        </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Deadline Reminders</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Get notified about upcoming deadlines</p>
+                  </div>
+                </div>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
+               </div>
+             </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Class Reminders</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Notifications for class schedules</p>
+                  </div>
+                </div>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
+              </div>
+             </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Info className="h-4 w-4 text-mq-content-tertiary" />
+                  <div>
+                    <p className="text-mq-sm font-medium text-mq-content">Event Updates</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">Updates about campus events</p>
+                  </div>
+                </div>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
+              </div>
+             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Appearance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-mq-content">Dark Mode</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Switch to dark theme</p>
+                </div>
+                <div className="w-10 h-5 bg-mq-border rounded-full opacity-50" />
+              </div>
+            </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-mq-content">Language</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Choose your preferred language</p>
+                </div>
+                <div className="w-10 h-5 bg-mq-border rounded-full opacity-50" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Privacy & Security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-mq-content">Data Storage</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Currently using local storage</p>
+                </div>
+                <div className="w-10 h-5 bg-mq-success rounded-full opacity-50" />
+              </div>
+            </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-mq-content">Export Data</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Download all your data as JSON</p>
+                </div>
+                <Badge className="bg-mq-warning/10 text-mq-warning">Coming Soon</Badge>
+              </div>
+            </div>
+            <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-semibold text-mq-content">Clear All Data</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">Delete all stored data from app</p>
+                </div>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleClearAllData}
+                  disabled={clearing}
+                >
+                  {clearing ? 'Clearing...' : 'Clear'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Development Notice */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div className="flex-1">
-          <p className="text-sm text-blue-900">
-            <strong>Coming soon:</strong> Full settings functionality will be available with the
-            database integration in Week 3-4.
-          </p>
-        </div>
+      <div className="space-y-6 mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button
+              variant="secondary"
+              className="w-full justify-start"
+              onClick={() => (window.location.href = '/home')}
+            >
+              Home
+            </Button>
+            <Button
+              variant="secondary"
+              className="w-full justify-start"
+              onClick={() => (window.location.href = '/calendar')}
+            >
+              Calendar
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Settings - 2 columns */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Profile */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Profile
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Student Name</h4>
-                    <p className="text-sm text-gray-600 mt-1">Your display name across the app</p>
-                  </div>
-                  <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Student ID</h4>
-                    <p className="text-sm text-gray-600 mt-1">Your {UNIVERSITY_CONFIG.name} ID</p>
-                  </div>
-                  <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notifications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Deadline Reminders</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Get notified before assignments are due
-                    </p>
-                  </div>
-                  <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Class Reminders</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Reminder 15 minutes before each class
-                    </p>
-                  </div>
-                  <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Event Updates</h4>
-                    <p className="text-sm text-gray-600 mt-1">Updates about campus events</p>
-                  </div>
-                  <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Appearance */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Appearance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Dark Mode</h4>
-                    <p className="text-sm text-gray-600 mt-1">Switch to dark theme</p>
-                  </div>
-                  <div className="w-10 h-5 bg-gray-200 rounded-full opacity-50"></div>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Language</h4>
-                    <p className="text-sm text-gray-600 mt-1">Choose your preferred language</p>
-                  </div>
-                  <span className="text-sm text-gray-500">English</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Privacy & Security */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Privacy & Security
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Data Storage</h4>
-                    <p className="text-sm text-gray-600 mt-1">Currently using local storage</p>
-                  </div>
-                  <Badge className="bg-green-100 text-green-800">Local</Badge>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Export Data</h4>
-                    <p className="text-sm text-gray-600 mt-1">Download all your data as JSON</p>
-                  </div>
-                  <Badge className="bg-yellow-100 text-yellow-800">Coming Soon</Badge>
-                </div>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Clear All Data</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Delete all stored data from the app
-                    </p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleClearAllData}
-                    disabled={clearing}
-                    className="gap-1"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    {clearing ? 'Clearing...' : 'Clear'}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar - 1 column */}
-        <div className="space-y-6">
-          {/* Data Sync */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Data Sync
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">Local Storage Active</span>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>• Units: Saved locally</p>
-                  <p>• Deadlines: Saved locally</p>
-                  <p>• Events: Sample data</p>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Clock className="h-4 w-4" />
-                  <span>Cloud sync coming soon</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Settings Status */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Development
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-900">In Progress</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Full settings functionality will be available with database integration.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* About */}
-          <Card>
-            <CardHeader>
-              <CardTitle>About</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Version</span>
-                  <span className="font-mono text-gray-900">{APP_CONFIG.version}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Phase</span>
-                  <span className="text-gray-900">Development</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Last Update</span>
-                  <span className="text-gray-900">Dec 31, 2025</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Clear Data Confirmation Dialog */}
+      <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Clear All Data</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to clear all data? This action cannot be undone and will remove
+              all units, deadlines, and profiles.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={confirmClearAllData} disabled={clearing}>
+              {clearing ? 'Clearing...' : 'Clear All Data'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

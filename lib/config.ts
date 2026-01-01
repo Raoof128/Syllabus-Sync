@@ -13,7 +13,7 @@ export const UNIVERSITY_CONFIG = {
   // Full name of the university
   name: 'Macquarie University',
   // Short name for display in tight spaces
-  shortName: 'Macquarie',
+  shortName: 'Macquarie University',
   // University website
   website: 'https://www.mq.edu.au',
   // Support email

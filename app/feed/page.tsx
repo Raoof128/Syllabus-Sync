@@ -2,15 +2,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import {
   Calendar,
   MapPin,
   Clock,
   Filter,
-  Bell,
   TrendingUp,
   Users,
   Megaphone,
@@ -22,10 +21,10 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 
 const categoryColors: Record<string, string> = {
-  Career: 'bg-blue-100 text-blue-800',
-  Social: 'bg-purple-100 text-purple-800',
-  Academic: 'bg-green-100 text-green-800',
-  'Free Food': 'bg-orange-100 text-orange-800',
+  Career: 'bg-mq-info/10 text-mq-info',
+  Social: 'bg-mq-purple/10 text-mq-purple',
+  Academic: 'bg-mq-success/10 text-mq-success',
+  'Free Food': 'bg-mq-warning/10 text-mq-warning',
 };
 
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
@@ -39,23 +38,36 @@ export default function FeedPage() {
       ? sampleEvents
       : sampleEvents.filter((event) => event.category === activeFilter);
 
+  // Calculate stats
+  const thisWeeksEvents = sampleEvents.filter((event) => {
+    const eventDate = new Date(event.date);
+    const now = new Date();
+    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return eventDate >= now && eventDate <= weekFromNow;
+  });
+
+  const freeFoodEvents = sampleEvents.filter((event) => event.category === 'Free Food');
+
   const filters: FilterType[] = ['All', 'Academic', 'Career', 'Social', 'Free Food'];
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Campus Feed</h1>
-        <p className="text-gray-600">
-          Stay updated with campus events, announcements, and opportunities at {UNIVERSITY_CONFIG.name}.
-        </p>
-      </div>
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Campus Feed</h1>
+          <p className="text-mq-content-secondary">
+            Stay updated with campus events, announcements, and opportunities at{' '}
+            {UNIVERSITY_CONFIG.name}.
+          </p>
+        </div>
+      </header>
 
       {/* Info Banner */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      <div className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3">
+        <Info className="h-5 w-5 text-mq-navy-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm text-blue-900">
+          <p className="text-mq-sm text-mq-navy-900">
             <strong>Stay connected:</strong> Discover workshops, career fairs, social events, and
             free food opportunities happening on campus.
           </p>
@@ -78,10 +90,9 @@ export default function FeedPage() {
                 {filters.map((filter) => (
                   <Button
                     key={filter}
-                    variant={activeFilter === filter ? 'default' : 'outline'}
+                    variant={activeFilter === filter ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setActiveFilter(filter)}
-                    className={activeFilter === filter ? 'bg-blue-600 hover:bg-blue-700' : ''}
                   >
                     {filter}
                   </Button>
@@ -98,7 +109,7 @@ export default function FeedPage() {
                   <Calendar className="h-5 w-5" />
                   {activeFilter === 'All' ? 'All Events' : `${activeFilter} Events`}
                 </span>
-                <Badge variant="outline">{filteredEvents.length} events</Badge>
+                <Badge variant="neutral">{filteredEvents.length} events</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -107,11 +118,13 @@ export default function FeedPage() {
                   filteredEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:shadow-md border border-transparent hover:border-gray-200"
+                      className="p-4 bg-mq-card-background rounded-mq-lg hover:bg-mq-hover-background transition-all duration-mq-fast ease-mq-snap hover:shadow-mq border border-mq-border hover:border-mq-border-secondary"
                     >
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
-                        <h3 className="font-semibold text-gray-900 text-lg">{event.title}</h3>
+                        <h3 className="font-semibold text-mq-content text-mq-lg">
+                          {event.title}
+                        </h3>
                         <Badge
                           className={categoryColors[event.category as keyof typeof categoryColors]}
                         >
@@ -120,10 +133,12 @@ export default function FeedPage() {
                       </div>
 
                       {/* Event Description */}
-                      <p className="text-sm text-gray-600 mb-3">{event.description}</p>
+                      <p className="text-mq-sm text-mq-content-secondary mb-3">
+                        {event.description}
+                      </p>
 
                       {/* Event Details */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-4 text-mq-sm text-mq-content-secondary">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date(event.date).toLocaleDateString('en-AU', {
@@ -143,25 +158,22 @@ export default function FeedPage() {
                       </div>
 
                       {/* Action Button */}
-                      <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2 flex-wrap">
-                        <Button variant="outline" size="sm">
-                          <Bell className="h-4 w-4 mr-2" />
+                      <div className="mt-3 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
+                        <Button variant="secondary" size="sm">
                           Remind Me
                         </Button>
-                        {event.building && (
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={`/map?building=${event.building}`}>
-                              <Navigation className="h-4 w-4 mr-2" />
-                              Navigate
-                            </Link>
-                          </Button>
-                        )}
+                        <Button asChild variant="secondary" size="sm">
+                          <Link href={`/map?building=${event.building}`}>
+                            <Navigation className="h-4 w-4 mr-2" />
+                            Navigate
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                  <div className="text-center py-8 text-mq-content-secondary">
+                    <Calendar className="h-12 w-12 mx-auto mb-3 text-mq-content-tertiary" />
                     <p>No events found for this category.</p>
                   </div>
                 )}
@@ -181,29 +193,37 @@ export default function FeedPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-900">Total Events</span>
+                  <Calendar className="h-4 w-4 text-mq-info" />
+                  <span className="text-mq-sm font-medium text-mq-content">
+                    Total Events
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-blue-600">{sampleEvents.length}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-900">Social Events</span>
-                </div>
-                <span className="text-lg font-bold text-purple-600">
-                  {sampleEvents.filter((e) => e.category === 'Social').length}
+                <span className="text-mq-lg font-bold text-mq-info">
+                  {sampleEvents.length}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg">
                 <div className="flex items-center gap-2">
-                  <span className="text-orange-600">🍕</span>
-                  <span className="text-sm font-medium text-gray-900">Free Food</span>
+                  <Users className="h-4 w-4 text-mq-purple" />
+                  <span className="text-mq-sm font-medium text-mq-content">
+                    This Week
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-orange-600">
-                  {sampleEvents.filter((e) => e.category === 'Free Food').length}
+                <span className="text-mq-lg font-bold text-mq-purple">
+                  {thisWeeksEvents.length}
+                </span>
+               </div>
+              <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-mq-warning">🍕</span>
+                  <span className="text-mq-sm font-medium text-mq-content">
+                    Free Food
+                  </span>
+                </div>
+                <span className="text-mq-lg font-bold text-mq-warning">
+                  {freeFoodEvents.length}
                 </span>
               </div>
             </CardContent>
@@ -218,27 +238,31 @@ export default function FeedPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+              <div className="p-3 bg-mq-success/10 rounded-mq-lg border border-mq-success/20">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-green-600 text-white">New</Badge>
+                  <Badge className="bg-mq-success text-white">New</Badge>
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">Phase 2 Updates</h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <h4 className="font-semibold text-mq-content text-mq-sm">
+                      Phase 2 Updates
+                    </h4>
+                    <p className="text-mq-xs text-mq-content-secondary mt-1">
                       Calendar and map features coming soon!
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-yellow-600 text-white">Info</Badge>
+                  <Badge className="bg-mq-warning text-white">Info</Badge>
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">Demo Preparation</h4>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Getting ready for MQU admin demo in Phase 3.
+                    <h4 className="font-semibold text-mq-content text-mq-sm">
+                      Welcome to MQ Sync
+                    </h4>
+                    <p className="text-mq-xs text-mq-content-secondary mt-1">
+                      Your Macquarie University companion app.
                     </p>
                   </div>
-                </div>
+               </div>
               </div>
             </CardContent>
           </Card>
@@ -250,20 +274,30 @@ export default function FeedPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge className="bg-green-100 text-green-800">Academic</Badge>
-                <span className="text-sm text-gray-600">Workshops & Study</span>
+                <Badge className={categoryColors.Academic}>
+                  Academic
+                </Badge>
+                <span className="text-mq-sm text-mq-content-secondary">Workshops & Study</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-blue-100 text-blue-800">Career</Badge>
-                <span className="text-sm text-gray-600">Job & Internship</span>
+                <Badge className={categoryColors.Career}>
+                  Career
+                </Badge>
+                <span className="text-mq-sm text-mq-content-secondary">Job & Internship</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-purple-100 text-purple-800">Social</Badge>
-                <span className="text-sm text-gray-600">Meetups & Networking</span>
+                <Badge className={categoryColors.Social}>
+                  Social
+                </Badge>
+                <span className="text-mq-sm text-mq-content-secondary">
+                  Meetups & Networking
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-orange-100 text-orange-800">Free Food</Badge>
-                <span className="text-sm text-gray-600">Meals & Snacks</span>
+                <Badge className={categoryColors['Free Food']}>
+                  Free Food
+                </Badge>
+                <span className="text-mq-sm text-mq-content-secondary">Meals & Snacks</span>
               </div>
             </CardContent>
           </Card>

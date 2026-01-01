@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
+import { Deadline } from '@/lib/types';
 
 vi.mock('@/lib/store/deadlinesStore', () => ({
   useDeadlinesStore: vi.fn(),
@@ -50,7 +51,7 @@ describe('DeadlineForm', () => {
   });
 
   it('pre-fills edit values including date, time, and completion', () => {
-    const editDeadline = {
+    const editDeadline: Deadline = {
       id: 'deadline-1',
       title: 'Assignment 1',
       unitCode: 'COMP2310',
@@ -62,11 +63,7 @@ describe('DeadlineForm', () => {
     };
 
     render(
-      <DeadlineForm
-        open={true}
-        onOpenChange={mockOnOpenChange}
-        editDeadline={editDeadline}
-      />,
+      <DeadlineForm open={true} onOpenChange={mockOnOpenChange} editDeadline={editDeadline} />,
     );
 
     const titleInput = screen.getByLabelText(/Title/i) as HTMLInputElement;

@@ -64,3 +64,24 @@ export interface Notification {
 }
 
 export type StressLevel = 'Low' | 'Busy' | 'High';
+
+// Error handling types
+export interface AppError {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+  timestamp: Date;
+  context?: string;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+export interface FormErrors {
+  [key: string]: string;
+}
+
+export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';

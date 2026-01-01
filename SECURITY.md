@@ -2,10 +2,11 @@
 
 ## Supported Versions
 
-| Version | Supported          | Security Updates |
-|---------|-------------------|-----------------|
+| Version | Supported          | Security Updates   |
+| ------- | ------------------ | ------------------ |
+| 0.5.x   | :white_check_mark: | :white_check_mark: |
 | 0.4.x   | :white_check_mark: | :white_check_mark: |
-| < 0.4   | :x:               | :x:               |
+| < 0.4   | :x:                | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -129,4 +130,4 @@ We thank security researchers and users who help us maintain the security of The
 
 **Thank you for helping keep The Syllabus Sync secure!** 🔒
 
-*This Security Policy is part of our commitment to transparency and security.*
+_This Security Policy is part of our commitment to transparency and security._

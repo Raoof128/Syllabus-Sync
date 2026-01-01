@@ -1,35 +1,45 @@
 // app/layout.tsx
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Work_Sans, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
-import Sidebar from '@/components/layout/Sidebar';
-import Header from '@/components/layout/Header';
-import ThemeProvider from '@/components/theme/ThemeProvider';
+import './mq-tokens.css';
+import ClientLayout from './client-layout';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
-const inter = Inter({ subsets: ['latin'] });
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-work-sans',
+  display: 'swap',
+});
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['300', '400', '600'],
+  variable: '--font-source-serif-4',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
   description: APP_CONFIG.fullDescription,
 };
 
+  export const viewport: Viewport = {
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: 'var(--mq-background)' },
+      { media: '(prefers-color-scheme: dark)', color: 'var(--mq-background)' },
+    ],
+  };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider>
-          <div className="flex h-screen bg-gray-50">
-            {/* Sidebar */}
-            <Sidebar />
-
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
-              <Header />
-              <main className="flex-1 overflow-y-auto pt-16 md:pt-0">{children}</main>
-            </div>
-          </div>
-        </ThemeProvider>
+    <html lang="en" className={`${workSans.variable} ${sourceSerif4.variable}`}>
+      <head>
+        <meta name="theme-color" content="var(--mq-background)" />
+      </head>
+      <body className="font-sans" suppressHydrationWarning>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
