@@ -55,10 +55,10 @@ export default function FeedPage() {
       </header>
 
       {/* Info Banner */}
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-start gap-3">
+        <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm text-blue-900">
+          <p className="text-sm text-blue-900 dark:text-blue-100">
             <strong>Stay connected:</strong> Discover workshops, career fairs, social events, and
             free food opportunities happening on campus.
           </p>
@@ -184,28 +184,36 @@ export default function FeedPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-900">Total Events</span>
+                  <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    Total Events
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-blue-600">{sampleEvents.length}</span>
+                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  {sampleEvents.length}
+                </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-900">Social Events</span>
+                  <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    Social Events
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
                   {sampleEvents.filter((e) => e.category === 'Social').length}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <span className="text-orange-600">🍕</span>
-                  <span className="text-sm font-medium text-gray-900">Free Food</span>
+                  <span className="text-orange-600 dark:text-orange-400">🍕</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-slate-100">
+                    Free Food
+                  </span>
                 </div>
-                <span className="text-lg font-bold text-orange-600">
+                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
                   {sampleEvents.filter((e) => e.category === 'Free Food').length}
                 </span>
               </div>
