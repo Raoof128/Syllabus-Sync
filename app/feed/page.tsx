@@ -10,7 +10,6 @@ import {
   MapPin,
   Clock,
   Filter,
-  Bell,
   TrendingUp,
   Users,
   Megaphone,

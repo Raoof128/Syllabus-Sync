@@ -42,7 +42,7 @@ export default function MQStyleGuidePage() {
       {/* Navbar Demo */}
       <Navbar
         title="Macquarie University"
-        onAction={() => alert('Apply Now clicked!')}
+        onAction={() => {}}
         actionLabel="Apply Now"
       />
 
@@ -52,7 +52,7 @@ export default function MQStyleGuidePage() {
         subtitle="Experience world-class education with cutting-edge facilities and innovative teaching methods."
         primaryAction={{
           label: 'Explore Programs',
-          onClick: () => alert('Explore Programs clicked!'),
+          onClick: () => {},
         }}
         secondaryAction={{
           label: 'Learn More',
