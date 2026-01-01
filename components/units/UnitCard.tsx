@@ -41,7 +41,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
           <div>
             <CardTitle className="text-mq-medium">
               {unit.code}
-              <Badge variant="outline" className="ml-2 font-normal">
+              <Badge variant="neutral" className="ml-2 font-normal">
                 {getUniqueDays()}
               </Badge>
             </CardTitle>

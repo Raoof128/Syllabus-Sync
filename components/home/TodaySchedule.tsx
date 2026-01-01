@@ -62,9 +62,9 @@ export default function TodaySchedule() {
              </Button>
           </div>
         ) : (
-          todayClasses.map((cls) => (
+          todayClasses.map((cls, index) => (
             <div
-              key={`${cls.id}-${cls.code}`}
+              key={`${cls.code}-${cls.day}-${cls.startTime}-${index}`}
                 className="flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
             >
               {/* Color indicator */}

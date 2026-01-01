@@ -41,11 +41,11 @@ export const APP_CONFIG = {
  */
 export const DEMO_USER = {
   // Display name
-  name: 'Alex Chen',
+  name: 'Student',
   // Student ID (optional, for display)
-  studentId: '46892315',
+  studentId: '',
   // Email
-  email: 'alex.chen@students.mq.edu.au',
+  email: '',
 } as const;
 
 /**

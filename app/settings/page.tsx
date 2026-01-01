@@ -39,6 +39,8 @@ export default function SettingsPage() {
     localStorage.removeItem('notifications-storage');
     localStorage.removeItem('seed-disabled');
     localStorage.removeItem('units-seeded');
+    localStorage.removeItem('deadlines-seeded');
+    localStorage.removeItem('notifications-seeded');
     setClearing(false);
     setShowClearConfirm(false);
     toastUtils.success(
