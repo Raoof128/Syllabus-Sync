@@ -21,45 +21,117 @@
 
 ---
 
-## 🧭 Architecture Diagram
+## 🏗️ Complete Architecture Overview
+
+This diagram illustrates the modern, scalable architecture of Syllabus Sync, featuring clean separation of concerns, comprehensive state management, and enterprise-grade error handling. The application follows React best practices with TypeScript for type safety and Zustand for predictable state management.
 
 ```mermaid
-flowchart LR
-  subgraph UI
-    Home[Home Dashboard]
-    Calendar[Calendar & Deadlines]
-    Map[Campus Map]
-    Feed[Events Feed]
-    Settings[Settings & Profile]
-    Toaster[Toast Notifications]
+flowchart TB
+  %% User Interface Layer
+  subgraph "🎨 User Interface Layer"
+    direction LR
+    Home["🏠 Home Dashboard<br/>Units & Schedule"]
+    Calendar["📅 Calendar<br/>Deadlines Management"]
+    Map["🗺️ Campus Map<br/>Building Navigation"]
+    Feed["📡 Events Feed<br/>Campus Activities"]
+    ManageProfiles["👤 Manage Profiles<br/>Profile CRUD"]
+    Settings["⚙️ Settings<br/>App Preferences"]
+    Header["📱 Header<br/>Navigation & Notifications"]
+    Sidebar["🧭 Sidebar<br/>Main Navigation"]
   end
 
-  subgraph State
-    UnitsStore[unitsStore]
-    DeadlinesStore[deadlinesStore]
-    ThemeStore[themeStore]
-    NotificationsStore[notificationsStore]
+  %% State Management Layer
+  subgraph "🔄 State Management Layer"
+    direction TB
+    UnitsStore["📚 unitsStore<br/>Unit CRUD operations"]
+    DeadlinesStore["⏰ deadlinesStore<br/>Deadline management<br/>Stress calculations"]
+    ProfilesStore["👥 profilesStore<br/>User profiles<br/>Authentication"]
+    NotificationsStore["🔔 notificationsStore<br/>System notifications"]
+    ThemeStore["🌙 themeStore<br/>Dark mode & theming"]
   end
 
-  subgraph Services
-    ErrorHandler[Error Handler]
-    RetrySystem[Retry System]
-    ServiceWorker[Offline Support]
+  %% Services & Utilities Layer
+  subgraph "🛠️ Services & Utilities Layer"
+    direction LR
+    ErrorBoundary["🚨 Error Boundary<br/>React error handling"]
+    ToastSystem["🍞 Toast Notifications<br/>User feedback"]
+    RetrySystem["🔄 Retry System<br/>Automatic retries"]
+    ServiceWorker["📱 Service Worker<br/>Offline support<br/>Caching"]
+    ErrorHandler["⚠️ Error Handler<br/>Centralized logging"]
+    Utils["🔧 Utilities<br/>Helper functions"]
   end
 
-  subgraph Data
-    SampleUnits[data/sampleUnits.ts]
-    SampleEvents[data/sampleEvents.ts]
-    LocalStorage[(localStorage)]
+  %% Data Layer
+  subgraph "💾 Data Layer"
+    direction LR
+    SampleUnits["📄 sampleUnits.ts<br/>Demo unit data"]
+    SampleEvents["📅 sampleEvents.ts<br/>Campus events"]
+    SampleNotifications["🔔 sampleNotifications.ts<br/>Demo notifications"]
+    LocalStorage[("💽 localStorage<br/>Persistent storage")]
+    Supabase[("☁️ Supabase<br/>Future cloud storage")]
   end
 
-  UI --> State
-  UI --> Services
-  State --> LocalStorage
-  ErrorHandler --> Toaster
+  %% Navigation & Layout
+  Header --> Sidebar
+  Sidebar --> Home
+  Sidebar --> Calendar
+  Sidebar --> Map
+  Sidebar --> Feed
+  Sidebar --> Settings
+
+  Header -.-> ManageProfiles
+
+  %% UI to State connections
+  Home --> UnitsStore
+  Calendar --> DeadlinesStore
+  ManageProfiles --> ProfilesStore
+  Settings --> ThemeStore
+  Header --> NotificationsStore
+
+  %% State to Data connections
+  UnitsStore --> LocalStorage
+  DeadlinesStore --> LocalStorage
+  ProfilesStore --> LocalStorage
+  NotificationsStore --> LocalStorage
+  ThemeStore --> LocalStorage
+
+  %% Services connections
+  ErrorBoundary --> ErrorHandler
+  ErrorHandler --> ToastSystem
+  ToastSystem --> Header
+  RetrySystem --> UnitsStore
+  RetrySystem --> DeadlinesStore
   ServiceWorker --> LocalStorage
-  LocalStorage -.-> Future[Supabase planned]
+
+  %% Future connections
+  LocalStorage -.-> Supabase
+
+  %% Styling
+  classDef uiLayer fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+  classDef stateLayer fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+  classDef servicesLayer fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+  classDef dataLayer fill:#fff3e0,stroke:#e65100,stroke-width:2px
+
+  class UI uiLayer
+  class State stateLayer
+  class Services servicesLayer
+  class Data dataLayer
 ```
+
+### 🏛️ Architecture Layers Explained
+
+- **🎨 User Interface Layer**: React components with TypeScript, responsive design, and accessibility features
+- **🔄 State Management Layer**: Zustand stores providing centralized, type-safe state management
+- **🛠️ Services & Utilities Layer**: Enterprise-grade error handling, offline support, and user feedback systems
+- **💾 Data Layer**: Current localStorage implementation with planned Supabase cloud migration
+
+### 🔄 Data Flow
+
+1. **User Interaction** → UI Components
+2. **State Updates** → Zustand Stores
+3. **Persistence** → localStorage (current) / Supabase (planned)
+4. **Error Handling** → Toast Notifications + Error Boundaries
+5. **Offline Support** → Service Worker + Cache Management
 
 ---
 
