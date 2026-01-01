@@ -173,10 +173,10 @@ export default function CalendarPage() {
 
       {/* Info Banner when no units */}
       {units.length === 0 && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-yellow-900">
+            <p className="text-sm text-yellow-900 dark:text-yellow-100">
               <strong>Note:</strong> Add some units on the Home page first before you can create
               deadlines.
             </p>

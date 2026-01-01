@@ -240,12 +240,14 @@ export default function FeedPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-yellow-600 text-white">Info</Badge>
+                  <Badge className="bg-yellow-600 dark:bg-yellow-700 text-white">Info</Badge>
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-sm">Demo Preparation</h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 text-sm">
+                      Demo Preparation
+                    </h4>
+                    <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
                       Getting ready for MQU admin demo in Phase 3.
                     </p>
                   </div>
