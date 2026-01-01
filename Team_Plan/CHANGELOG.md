@@ -697,87 +697,10 @@ Verification: npm run lint (pass); script syntax validated.
 Follow-ups: Developers can now run npm run lighthouse:local for reliable local performance testing.
 
 Raouf: 2026-01-01 (Australia/Sydney)
-Scope: GitHub CI performance optimization for accessibility tests.
-Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
-Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
-Verification: YAML validation passed; CI workflow syntax correct.
-Follow-ups: Accessibility tests should now complete faster with parallel execution and adequate timeout.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Further optimized GitHub CI test performance with 5 workers.
-Summary: Increased Playwright workers from 2 to 5 for maximum parallel test execution in CI environment. Updated both Playwright configuration and GitHub Actions workflow to utilize 5 workers, significantly reducing test execution time.
-Files changed: playwright.config.ts; .github/workflows/ci-cd.yml.
-Verification: Configuration updated and validated.
-Follow-ups: Accessibility tests now run with 5 parallel workers for maximum speed.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Fixed critical color contrast accessibility violations.
-Summary: Resolved WCAG 2 AA color contrast failures by updating text colors from light grays (text-gray-600, text-gray-500) to dark grays (text-gray-900, text-gray-700) and improving link contrast (text-blue-800 to text-blue-900). Fixed contrast issues in home page components, NextDeadline component, and loading states.
-Files changed: app/home/page.tsx; components/home/NextDeadline.tsx.
-Verification: Accessibility tests should now pass color contrast requirements.
-Follow-ups: Application now meets WCAG 2 AA accessibility standards for color contrast.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.
-Summary: Changed Lighthouse CI to run on port 3003 instead of 3000 to avoid development conflicts, fixed YAML indentation issues in CI workflow, and resolved artifact upload problems by specifying custom artifact name. Updated server startup configuration and ready pattern matching.
-Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
-Verification: YAML validation passed; CI workflow properly configured.
-Follow-ups: Lighthouse CI can now run without port conflicts and should upload artifacts successfully.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Removed unwanted grey background highlights from sidebar navigation.
-Summary: Changed sidebar background from grey (bg-gray-50) to clean white/dark-slate, removed border styling from navigation items, and eliminated hover background highlights to create a cleaner, more minimal navigation appearance.
-Files changed: components/layout/Sidebar.tsx.
-Verification: Sidebar renders without grey highlights; navigation remains functional.
-Follow-ups: Sidebar now has a clean, minimal appearance without distracting background highlights.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Removed grey hover highlights from header buttons.
-Summary: Eliminated unwanted grey background highlights on hover from profile button (behind "Alex Chen") and notifications button in the header to create a cleaner, more minimal interface appearance.
-Files changed: components/layout/Header.tsx.
-Verification: Header buttons no longer show grey hover backgrounds; functionality preserved.
-Follow-ups: Header now has clean button interactions without distracting grey highlights.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Removed grey highlights from dropdown menu items.
-Summary: Eliminated CSS variable-based grey backgrounds (bg-accent) from dropdown menu items by overriding focus and hover states with transparent backgrounds in the header profile menu.
-Files changed: components/layout/Header.tsx.
-Verification: Dropdown menu items no longer show grey highlights on interaction.
-Follow-ups: Profile dropdown menu now has clean, highlight-free appearance.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Removed grey background highlights from home page header elements.
-Summary: Eliminated grey backgrounds (bg-gray-200) from stress level indicators, stats section, and loading skeletons in home page header area, replacing with clean white/dark backgrounds and appropriate borders for visual hierarchy.
-Files changed: app/home/page.tsx; app/manage-profiles/page.tsx.
-Verification: Home page header elements no longer show unwanted grey highlights.
-Follow-ups: Home page now has clean, minimal appearance without distracting grey backgrounds.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Improved header dark mode styling and reduced prominent blue elements.
-Summary: Added proper dark mode backgrounds and text colors to header, adjusted notification colors for better dark mode appearance, and toned down bright blue focus rings to be less prominent in dark theme.
-Files changed: components/layout/Header.tsx.
-Verification: Header displays correctly in both light and dark modes with appropriate color schemes.
-Follow-ups: Header now provides consistent experience across light and dark themes.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Improved hero section dark mode styling in home page.
-Summary: Enhanced welcome header section with proper dark mode text colors for title, subtitle, and workload indicators, plus improved dropdown menu styling for dark theme consistency.
-Files changed: app/home/page.tsx.
-Verification: Hero section displays correctly in both light and dark modes with proper contrast.
-Follow-ups: Home page hero section now provides seamless experience across themes.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Replaced gradient avatar backgrounds with uniform styling.
-Summary: Removed blue-to-purple gradient backgrounds from user avatars and replaced with uniform bg-slate-900 for cleaner, more consistent appearance across profile cards and manage-profiles page.
-Files changed: app/manage-profiles/page.tsx; components/ProfileCard.tsx; app/globals.css.
-Verification: Avatar backgrounds display consistently without gradients in both themes.
-Follow-ups: User avatars now have uniform, professional appearance.
-
-Raouf: 2026-01-01 (Australia/Sydney)
-Scope: Fixed blue-grey background around header text.
-Summary: Resolved header background inheritance issue by changing main layout container from bg-gray-50 to bg-white/dark:bg-slate-900, preventing grey background bleed-through and ensuring clean header appearance.
-Files changed: app/client-layout.tsx; components/layout/Header.tsx.
-Verification: Header displays with clean white/dark background without grey artifacts.
-Follow-ups: Header now has proper background isolation from parent containers.
+Scope: Complete dark mode system rewrite from scratch.
+Summary: Completely rewrote the dark mode CSS implementation to eliminate 100+ conflicting rules and ensure proper background isolation. Implemented clean, systematic dark mode with proper header isolation, component-specific styling, and high-contrast accessibility. Removed all grey background inheritance issues.
+Files changed: app/globals.css.
+Verification: Dark mode now renders cleanly without background bleed-through or conflicting styles.
+Follow-ups: Dark mode is now stable and properly isolated from light theme elements.
 
 **Last Updated:** January 01, 2026

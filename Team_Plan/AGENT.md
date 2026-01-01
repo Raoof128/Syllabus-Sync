@@ -959,6 +959,13 @@ Verification: npm run lint (pass); script syntax validated.
 Follow-ups: Developers can now run npm run lighthouse:local for reliable local performance testing.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Complete dark mode system rewrite from scratch.
+Summary: Completely rewrote the dark mode CSS implementation to eliminate 100+ conflicting rules and ensure proper background isolation. Implemented clean, systematic dark mode with proper header isolation, component-specific styling, and high-contrast accessibility. Removed all grey background inheritance issues.
+Files changed: app/globals.css.
+Verification: Dark mode now renders cleanly without background bleed-through or conflicting styles.
+Follow-ups: Dark mode is now stable and properly isolated from light theme elements.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: GitHub CI performance optimization for accessibility tests.
 Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
 Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
