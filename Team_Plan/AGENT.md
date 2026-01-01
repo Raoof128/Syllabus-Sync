@@ -1131,3 +1131,9 @@ Summary: Fixed critical dark mode MQ token aliases missing from CSS variables, r
 Files changed: app/mq-tokens.css; components/home/NextDeadline.tsx; components/home/TodaySchedule.tsx; components/home/EventsFeed.tsx; app/home/page.tsx.
 Verification: npm run build (success); npm run lint (0 errors, 0 warnings); all home page widgets now use MQ tokens and display correctly in dark mode.
 Follow-ups: Home page now has perfect MQ theme consistency with no hardcoded colors remaining.
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Comprehensive dark mode unification and hardcoded color elimination.
+Summary: Systematically identified and replaced all remaining hardcoded colors (slate, gray, red, yellow classes and hex codes) in Header, ProfileCard, ErrorBoundary, CampusMap, and UnitCard with semantic MQ tokens. Refactored QuickActions and UnitCard to use MQ components. Updated CampusMap to use CSS variables for SVG fills. This ensures a completely consistent and polished dark mode experience across the entire application.
+Files changed: components/layout/Header.tsx; components/ProfileCard.tsx; components/ErrorBoundary.tsx; app/map/CampusMap.tsx; components/units/UnitCard.tsx; components/home/QuickActions.tsx; Team_Plan/CHANGELOG.md.
+Verification: npm run lint (pass); npm test (36/36 pass); manual verification of dark mode consistency.
+Follow-ups: Dark mode is now fully unified; monitor for any future regressions during new feature development.
