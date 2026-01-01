@@ -258,12 +258,12 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 bg-white dark:bg-slate-800 border-mq-border dark:border-slate-700 shadow-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+              className="w-48 bg-mq-card-background border-mq-border shadow-mq-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
             >
               <DropdownMenuItem asChild>
                 <Link
                   href="/manage-profiles"
-                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <User className="w-4 h-4" />
                   Manage Profiles
@@ -272,7 +272,7 @@ const Header = memo(() => {
               <DropdownMenuItem asChild>
                 <Link
                   href="/settings"
-                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <Settings className="w-4 h-4" />
                   Settings
@@ -281,7 +281,7 @@ const Header = memo(() => {
               <DropdownMenuItem asChild>
                 <Link
                   href="/calendar"
-                  className="flex items-center gap-2 text-mq-content-secondary dark:text-slate-200"
+                  className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <Calendar className="w-4 h-4" />
                   Calendar
@@ -290,7 +290,7 @@ const Header = memo(() => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 disabled
-                className="flex items-center gap-2 text-mq-slate-400 dark:text-slate-500"
+                className="flex items-center gap-2 text-mq-content-tertiary"
               >
                 <LogOut className="w-4 h-4" />
                 Sign out

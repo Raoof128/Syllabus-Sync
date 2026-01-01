@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Unit } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
 
 interface UnitCardProps {
@@ -32,20 +32,20 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
+    <Card className="hover:shadow-mq transition-all duration-mq-mid ease-mq-ease hover:-translate-y-1">
       {/* Color indicator bar */}
-      <div className="h-2 rounded-t-lg" style={{ backgroundColor: unit.color }} />
+      <div className="h-2 rounded-t-mq-lg" style={{ backgroundColor: unit.color }} />
 
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-lg">
+            <CardTitle className="text-mq-medium">
               {unit.code}
               <Badge variant="outline" className="ml-2 font-normal">
                 {getUniqueDays()}
               </Badge>
             </CardTitle>
-            <p className="text-sm text-mq-content-secondary mt-1">{unit.name}</p>
+            <p className="text-mq-sm text-mq-content-secondary mt-1">{unit.name}</p>
           </div>
 
           {showActions && (
@@ -66,7 +66,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                   variant="ghost"
                   size="sm"
                   onClick={() => onDelete(unit)}
-                  className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                  className="h-8 w-8 p-0 text-mq-error hover:text-mq-error hover:bg-mq-error/10"
                   aria-label={`Delete ${unit.code}`}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -79,22 +79,22 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
 
       <CardContent className="space-y-3">
         {/* Location */}
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-2 text-mq-sm">
           <MapPin className="w-4 h-4 text-mq-content-tertiary" />
-          <span className="font-medium">{unit.location.building}</span>
+          <span className="font-medium text-mq-content">{unit.location.building}</span>
           <span className="text-mq-content-tertiary">Room {unit.location.room}</span>
         </div>
 
         {/* Class Times */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-mq-content-tertiary">
+          <div className="flex items-center gap-2 text-mq-sm text-mq-content-tertiary">
             <Clock className="w-4 h-4" />
             <span>Class Times</span>
           </div>
           <div className="space-y-1 pl-6">
             {unit.schedule.map((ct) => (
-              <div key={ct.id} className="text-sm flex items-center justify-between">
-                <span className="font-medium">{ct.day}</span>
+              <div key={ct.id} className="text-mq-sm flex items-center justify-between">
+                <span className="font-medium text-mq-content">{ct.day}</span>
                 <span className="text-mq-content-secondary">
                   {ct.startTime} - {ct.endTime}
                 </span>
@@ -104,7 +104,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
         </div>
 
         {/* Color indicator */}
-        <div className="flex items-center gap-2 text-xs text-mq-content-tertiary pt-2 border-t">
+        <div className="flex items-center gap-2 text-mq-xs text-mq-content-tertiary pt-2 border-t border-mq-border">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: unit.color }} />
           <span>Color coding for calendar</span>
         </div>

@@ -47,7 +47,7 @@ const ProfileCard = React.memo(
         <CardHeader className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-slate-900 flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-16 h-16 rounded-full bg-mq-charcoal-900 flex items-center justify-center text-white font-bold text-mq-large">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -117,7 +117,7 @@ const ProfileCard = React.memo(
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-mq-slate-400" />
+                <Mail className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">Email Notifications</span>
               </div>
               <div
@@ -129,7 +129,7 @@ const ProfileCard = React.memo(
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-mq-slate-400" />
+                <Calendar className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">Email Reminders</span>
               </div>
               <div
@@ -141,7 +141,7 @@ const ProfileCard = React.memo(
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4 text-mq-slate-400" />
+                <Settings className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">Push Notifications</span>
               </div>
               <div

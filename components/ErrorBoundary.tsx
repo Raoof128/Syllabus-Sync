@@ -129,25 +129,25 @@ export default class ErrorBoundary extends Component<Props, State> {
         <div className="flex items-center justify-center min-h-[60vh] px-4 animate-fade-in">
           <div className="text-center max-w-lg mx-auto">
             {/* Error Icon */}
-            <div className="mx-auto w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6">
-              <AlertTriangle className="w-10 h-10 text-red-600 dark:text-red-400" />
+            <div className="mx-auto w-20 h-20 bg-mq-error/10 rounded-full flex items-center justify-center mb-6">
+              <AlertTriangle className="w-10 h-10 text-mq-error" />
             </div>
 
             {/* Error Title */}
-            <h1 className="text-3xl font-bold text-mq-content dark:text-slate-100 mb-3">
+            <h1 className="text-mq-3xl font-bold text-mq-content mb-3">
               Oops! Something went wrong
             </h1>
 
             {/* Error Description */}
-            <p className="text-mq-content-secondary dark:text-slate-300 mb-6 text-lg">
+            <p className="text-mq-content-secondary mb-6 text-mq-medium">
               We encountered an unexpected error. This has been automatically reported and
               we&apos;re working to fix it.
             </p>
 
             {/* Retry Counter */}
             {retryCount > 0 && (
-              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              <div className="mb-4 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
+                <p className="text-mq-sm text-mq-warning">
                   Retry attempt {retryCount} of {maxRetries}
                 </p>
               </div>
@@ -175,36 +175,36 @@ export default class ErrorBoundary extends Component<Props, State> {
 
             {/* Development Error Details */}
             {(this.props.showErrorDetails || process.env.NODE_ENV === 'development') && error && (
-              <details className="mt-8 text-left bg-mq-background-secondary dark:bg-slate-800 p-4 rounded-lg border">
-                <summary className="cursor-pointer font-medium text-mq-content dark:text-slate-100 mb-2">
+              <details className="mt-8 text-left bg-mq-background-secondary p-4 rounded-mq-lg border border-mq-border">
+                <summary className="cursor-pointer font-medium text-mq-content mb-2">
                   🔧 Error Details (Development)
                 </summary>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
+                    <h4 className="font-medium text-mq-content mb-1">
                       Error Message:
                     </h4>
-                    <code className="text-sm bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 p-2 rounded block">
+                    <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
                       {error.message}
                     </code>
                   </div>
 
                   {errorInfo && (
                     <div>
-                      <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
+                      <h4 className="font-medium text-mq-content mb-1">
                         Component Stack:
                       </h4>
-                      <pre className="text-xs bg-mq-background-secondary dark:bg-slate-700 text-mq-content dark:text-slate-200 p-3 rounded overflow-auto max-h-48 whitespace-pre-wrap">
+                      <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
                         {errorInfo.componentStack}
                       </pre>
                     </div>
                   )}
 
                   <div>
-                    <h4 className="font-medium text-mq-content dark:text-slate-100 mb-1">
+                    <h4 className="font-medium text-mq-content mb-1">
                       Stack Trace:
                     </h4>
-                    <pre className="text-xs bg-mq-background-secondary dark:bg-slate-700 text-mq-content dark:text-slate-200 p-3 rounded overflow-auto max-h-48">
+                    <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
                       {error.stack}
                     </pre>
                   </div>
