@@ -91,7 +91,7 @@ export default function Header() {
   const unreadCount = isClient ? getUnreadCount() : 0;
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-6">
       {/* Left side - Logo and title */}
       <div className="flex items-center gap-3">
         <div
@@ -101,8 +101,10 @@ export default function Header() {
           <GraduationCap className="w-6 h-6 text-white" />
         </div>
         <div className="hidden sm:block">
-          <h1 className="text-lg font-semibold text-gray-900">{APP_CONFIG.name}</h1>
-          <p className="text-xs text-gray-500">{UNIVERSITY_CONFIG.shortName}</p>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+            {APP_CONFIG.name}
+          </h1>
+          <p className="text-xs text-gray-500 dark:text-slate-400">{UNIVERSITY_CONFIG.shortName}</p>
         </div>
       </div>
 
@@ -131,7 +133,7 @@ export default function Header() {
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}
-                    className="text-xs text-blue-600 hover:text-blue-800"
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                   >
                     Mark all read
                   </button>
@@ -152,30 +154,30 @@ export default function Header() {
                           setShowNotifications(false);
                         }}
                         className={`block p-3 border-b border-gray-100 last:border-0 ${
-                          !notification.read ? 'bg-blue-50' : ''
+                          !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                         }`}
                       >
                         <div className="flex gap-3">
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                               notification.type === 'deadline'
-                                ? 'bg-orange-100'
+                                ? 'bg-orange-100 dark:bg-orange-900/20'
                                 : notification.type === 'event'
-                                  ? 'bg-purple-100'
+                                  ? 'bg-purple-100 dark:bg-purple-900/20'
                                   : notification.type === 'class'
-                                    ? 'bg-blue-100'
-                                    : 'bg-gray-100'
+                                    ? 'bg-blue-100 dark:bg-blue-900/20'
+                                    : 'bg-gray-100 dark:bg-gray-800'
                             }`}
                           >
                             <Icon
                               className={`w-4 h-4 ${
                                 notification.type === 'deadline'
-                                  ? 'text-orange-600'
+                                  ? 'text-orange-600 dark:text-orange-400'
                                   : notification.type === 'event'
-                                    ? 'text-purple-600'
+                                    ? 'text-purple-600 dark:text-purple-400'
                                     : notification.type === 'class'
-                                      ? 'text-blue-600'
-                                      : 'text-gray-600'
+                                      ? 'text-blue-600 dark:text-blue-400'
+                                      : 'text-gray-600 dark:text-gray-400'
                               }`}
                             />
                           </div>
@@ -195,7 +197,7 @@ export default function Header() {
                             </p>
                           </div>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />
+                            <div className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0 mt-2" />
                           )}
                         </div>
                       </Link>
@@ -211,7 +213,7 @@ export default function Header() {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
+            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 active:scale-95"
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
             title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
@@ -231,7 +233,7 @@ export default function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400"
                 aria-label="Open profile menu"
               >
                 <div
