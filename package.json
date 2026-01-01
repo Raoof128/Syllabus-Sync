@@ -22,7 +22,8 @@
     "test:ci": "npm run test && npm run test:e2e",
     "typecheck": "tsc --noEmit",
     "prepush": "npm run build && npm run typecheck && npm run lint && npm run test",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "lhci autorun",
+    "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
