@@ -987,6 +987,13 @@ Verification: YAML validation passed; CI workflow properly configured.
 Follow-ups: Lighthouse CI can now run without port conflicts and should upload artifacts successfully.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Removed unwanted grey background highlights from sidebar navigation.
+Summary: Changed sidebar background from grey (bg-gray-50) to clean white/dark-slate, removed border styling from navigation items, and eliminated hover background highlights to create a cleaner, more minimal navigation appearance.
+Files changed: components/layout/Sidebar.tsx.
+Verification: Sidebar renders without grey highlights; navigation remains functional.
+Follow-ups: Sidebar now has a clean, minimal appearance without distracting background highlights.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
