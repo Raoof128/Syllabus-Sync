@@ -696,4 +696,11 @@ Files changed: package.json.
 Verification: npm run lint (pass); script syntax validated.
 Follow-ups: Developers can now run npm run lighthouse:local for reliable local performance testing.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: GitHub CI performance optimization for accessibility tests.
+Summary: Increased accessibility test timeout to 36 minutes, enabled parallel workers (2 workers) for Playwright tests, and fixed YAML indentation issues in CI workflow. This addresses slow accessibility test runs and improves overall CI performance.
+Files changed: .github/workflows/ci-cd.yml; playwright.config.ts.
+Verification: YAML validation passed; CI workflow syntax correct.
+Follow-ups: Accessibility tests should now complete faster with parallel execution and adequate timeout.
+
 **Last Updated:** January 01, 2026
