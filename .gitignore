@@ -67,3 +67,6 @@ next-env.d.ts
 .agent/
 *.swp
 *.swo
+
+# ignore exported zip artifacts
+syllabus-sync_*.zip
