@@ -936,3 +936,24 @@ Summary: Successfully utilized Memory MCP system to capture and organize key acc
 Files changed: Memory system (MCP integration).
 Verification: Memory entities and relations successfully created and stored.
 Follow-ups: Memory system now contains comprehensive knowledge of recent development work for improved continuity and reference.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Enhanced and polished Mermaid architecture diagram.
+Summary: Completely redesigned the project Mermaid diagram in README.md with comprehensive coverage, professional styling, and detailed documentation. Added 25+ components across 4 architectural layers, implemented color-coded styling, included detailed component descriptions, and added architecture explanation section with data flow guide.
+Files changed: README.md.
+Verification: Mermaid diagram renders correctly in Markdown; all components properly documented.
+Follow-ups: README.md now provides comprehensive architectural overview for developers.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Fixed Lighthouse CI port conflict issue.
+Summary: Resolved Lighthouse CI action failure due to EADDRINUSE port 3000 error by implementing robust process cleanup. Added multi-layered port killing strategy with pkill and kill-port, updated server ready patterns, increased timeouts, and expanded URL test coverage to include new pages.
+Files changed: .lighthouserc.json; package.json.
+Verification: npm run lint (pass); npm install (successful); port cleanup commands tested.
+Follow-ups: Lighthouse CI should now run without port conflicts in CI environment.
+
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Added local Lighthouse testing script.
+Summary: Created lighthouse:local npm script with automatic port cleanup for reliable local Lighthouse testing. Script includes process killing, port freeing, and proper configuration usage for consistent local development experience.
+Files changed: package.json.
+Verification: npm run lint (pass); script syntax validated.
+Follow-ups: Developers can now run npm run lighthouse:local for reliable local performance testing.
