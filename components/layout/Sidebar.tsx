@@ -69,7 +69,7 @@ export default function Sidebar() {
           </Link>
         </div>
 
-        <nav className="space-y-1" role="navigation" aria-label="Main navigation">
+        <nav className="space-y-2" role="navigation" aria-label="Main navigation">
           {navigation.map((item) => {
             const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
             const Icon = item.icon;
@@ -80,15 +80,15 @@ export default function Sidebar() {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors touch-manipulation min-h-[48px]',
+                  'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation min-h-[44px] border',
                   isActive
-                    ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm'
-                    : 'text-gray-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-slate-100',
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 shadow-sm'
+                    : 'text-gray-700 dark:text-slate-300 border-transparent hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-slate-100 hover:border-gray-200 dark:hover:border-slate-700',
                 )}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={`Navigate to ${item.name}`}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <Icon className="h-4 w-4" aria-hidden="true" />
                 {item.name}
               </Link>
             );
