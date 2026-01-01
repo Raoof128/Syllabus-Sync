@@ -980,6 +980,13 @@ Verification: Accessibility tests should now pass color contrast requirements.
 Follow-ups: Application now meets WCAG 2 AA accessibility standards for color contrast.
 
 Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.
+Summary: Changed Lighthouse CI to run on port 3003 instead of 3000 to avoid development conflicts, fixed YAML indentation issues in CI workflow, and resolved artifact upload problems by specifying custom artifact name. Updated server startup configuration and ready pattern matching.
+Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
+Verification: YAML validation passed; CI workflow properly configured.
+Follow-ups: Lighthouse CI can now run without port conflicts and should upload artifacts successfully.
+
+Raouf: 2026-01-01 (Australia/Sydney)
 Scope: Fixed Lighthouse CI server startup conflict.
 Summary: Removed manual server startup from GitHub Actions workflow that was conflicting with Lighthouse CI action's built-in server management. Simplified Lighthouse configuration with proper ready patterns and extended timeouts. Fixed YAML indentation issues in CI workflow.
 Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.

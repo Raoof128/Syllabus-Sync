@@ -717,4 +717,11 @@ Files changed: app/home/page.tsx; components/home/NextDeadline.tsx.
 Verification: Accessibility tests should now pass color contrast requirements.
 Follow-ups: Application now meets WCAG 2 AA accessibility standards for color contrast.
 
+Raouf: 2026-01-01 (Australia/Sydney)
+Scope: Fixed Lighthouse CI port conflicts and artifact upload issues.
+Summary: Changed Lighthouse CI to run on port 3003 instead of 3000 to avoid development conflicts, fixed YAML indentation issues in CI workflow, and resolved artifact upload problems by specifying custom artifact name. Updated server startup configuration and ready pattern matching.
+Files changed: .github/workflows/ci-cd.yml; .lighthouserc.json.
+Verification: YAML validation passed; CI workflow properly configured.
+Follow-ups: Lighthouse CI can now run without port conflicts and should upload artifacts successfully.
+
 **Last Updated:** January 01, 2026
