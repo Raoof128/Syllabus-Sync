@@ -151,7 +151,7 @@ export default function Header() {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                        className={`block p-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 ${
+                        className={`block p-3 border-b border-gray-100 last:border-0 ${
                           !notification.read ? 'bg-blue-50' : ''
                         }`}
                       >
@@ -211,7 +211,7 @@ export default function Header() {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
+            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
             title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
