@@ -250,7 +250,7 @@ export default function FeedPage() {
                       Phase 2 Updates
                     </h4>
                     <p className="text-mq-xs text-mq-content-secondary mt-1">
-                      Calendar and map features coming soon!
+                      Interactive calendar and campus map now available!
                     </p>
                   </div>
                 </div>
