@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'lucide-react';
 import { UserProfile } from '@/lib/store/profilesStore';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 interface ProfileCardProps {
   profile: UserProfile;
@@ -21,6 +22,7 @@ interface ProfileCardProps {
 
 const ProfileCard = React.memo(
   ({ profile, isCurrent, onEdit, onDelete, onSetCurrent }: ProfileCardProps) => {
+    const { t } = useTranslation();
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
@@ -118,7 +120,7 @@ const ProfileCard = React.memo(
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-mq-content-tertiary" />
-                <span className="text-sm text-mq-content-secondary">Email Notifications</span>
+                <span className="text-sm text-mq-content-secondary">{t('emailNotifications')}</span>
               </div>
               <div
                 className={cn(
@@ -130,7 +132,7 @@ const ProfileCard = React.memo(
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-mq-content-tertiary" />
-                <span className="text-sm text-mq-content-secondary">Email Reminders</span>
+                <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
               </div>
               <div
                 className={cn(
@@ -142,7 +144,7 @@ const ProfileCard = React.memo(
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4 text-mq-content-tertiary" />
-                <span className="text-sm text-mq-content-secondary">Push Notifications</span>
+                <span className="text-sm text-mq-content-secondary">{t('pushNotifications')}</span>
               </div>
               <div
                 className={cn(
@@ -156,7 +158,7 @@ const ProfileCard = React.memo(
 
         <label className="flex items-center gap-2 px-3 py-2 border border-mq-border rounded-lg hover:bg-mq-hover-background cursor-pointer text-sm">
           <Camera className="h-4 w-4" />
-          <span>Change Avatar</span>
+          <span>{t('changeAvatar')}</span>
           <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
         </label>
 

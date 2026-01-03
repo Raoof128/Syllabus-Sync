@@ -19,6 +19,7 @@ import {
 import { sampleEvents } from '@/data/sampleEvents';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info',
@@ -30,6 +31,7 @@ const categoryColors: Record<string, string> = {
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
 
 export default function FeedPage() {
+  const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
 
   // Filter events based on selected category
@@ -55,7 +57,7 @@ export default function FeedPage() {
       {/* Header */}
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div className="flex-1 min-w-0">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Campus Feed</h1>
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('campusFeed')}</h1>
           <p className="text-mq-content-secondary">
             Stay updated with campus events, announcements, and opportunities at{' '}
             {UNIVERSITY_CONFIG.name}.
@@ -257,7 +259,7 @@ export default function FeedPage() {
               </div>
               <div className="p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-mq-warning text-white">Info</Badge>
+                  <Badge className="bg-mq-warning text-white">{t('info')}</Badge>
                   <div>
                     <h4 className="font-semibold text-mq-content text-mq-sm">
                       Welcome to MQ Sync
@@ -274,7 +276,7 @@ export default function FeedPage() {
           {/* Categories Legend */}
           <Card>
             <CardHeader>
-              <CardTitle>Event Categories</CardTitle>
+              <CardTitle>{t('eventCategories')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center gap-2">

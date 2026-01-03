@@ -11,8 +11,10 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function SignupClient() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -87,7 +89,7 @@ export default function SignupClient() {
 
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -99,7 +101,7 @@ export default function SignupClient() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -111,7 +113,7 @@ export default function SignupClient() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"

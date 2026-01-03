@@ -11,8 +11,10 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function LoginClient() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +92,7 @@ export default function LoginClient() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -102,7 +104,7 @@ export default function LoginClient() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"

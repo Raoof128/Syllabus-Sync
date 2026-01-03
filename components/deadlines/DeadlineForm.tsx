@@ -308,7 +308,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority">{t('priority')}</Label>
               <Select
                 value={priority}
                 onValueChange={(v) => setPriority(v as Deadline['priority'])}
@@ -327,7 +327,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
+              <Label htmlFor="type">{t('type')}</Label>
               <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
                 <SelectTrigger>
                   <SelectValue placeholder={t('selectType')} />
@@ -385,7 +385,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Deadline</DialogTitle>
+            <DialogTitle>{t('deleteDeadline')}</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete this deadline? This action cannot be undone.
             </DialogDescription>

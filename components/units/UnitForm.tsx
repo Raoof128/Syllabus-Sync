@@ -315,7 +315,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
           {/* Color */}
           <div className="space-y-2">
-            <Label htmlFor="color">Unit Color</Label>
+            <Label htmlFor="color">{t('unitColor')}</Label>
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger>
                 <div className="flex items-center gap-2">
@@ -378,7 +378,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
                     {/* Start Time */}
                     <div className="space-y-1">
-                      <Label className="text-xs">Start</Label>
+                      <Label className="text-xs">{t('start')}</Label>
                       <Input
                         type="time"
                         value={ct.startTime}

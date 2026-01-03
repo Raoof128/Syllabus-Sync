@@ -393,9 +393,9 @@ export default function HomeClient() {
           {/* Keyboard Shortcuts Hint */}
           <div className="hidden lg:flex items-center gap-1 px-2 py-1 bg-mq-background-secondary rounded text-mq-xs text-mq-content-tertiary border border-mq-border/50">
             <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono">Ctrl+U</kbd>
-            <span>Add Unit</span>
+            <span>{t('addUnit')}</span>
             <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono ml-2">Ctrl+D</kbd>
-            <span>Add Deadline</span>
+            <span>{t('addDeadline')}</span>
           </div>
 
           {/* Stress Level Indicator */}
@@ -477,7 +477,7 @@ export default function HomeClient() {
         <section className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3" aria-labelledby="get-started-heading">
           <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
-            <h2 id="get-started-heading" className="sr-only">Getting Started Guide</h2>
+            <h2 id="get-started-heading" className="sr-only">{t('gettingStartedGuide')}</h2>
             <p className="text-mq-sm text-mq-info">
               <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
             </p>

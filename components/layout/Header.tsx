@@ -162,7 +162,7 @@ const Header = memo(() => {
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
-                <h3 className="font-semibold text-mq-content">Notifications</h3>
+                <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}
@@ -174,7 +174,7 @@ const Header = memo(() => {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-mq-content-tertiary text-sm">No notifications yet</div>
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm">{t('noNotificationsYet')}</div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];

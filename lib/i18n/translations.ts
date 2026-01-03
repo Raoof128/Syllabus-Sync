@@ -120,6 +120,51 @@ export const translations = {
     noEventsToday: 'No events scheduled for today',
     navigateTo: 'Navigate to',
 
+    // Unit Components
+    editUnit: 'Edit',
+    deleteUnit: 'Delete',
+    classTimes: 'Class Times',
+    colorCodingForCalendar: 'Color coding for calendar',
+    room: 'Room',
+    due: 'Due',
+    invalidDate: 'Invalid date',
+    viewDeadlineDetails: 'View {{title}} deadline details in calendar',
+
+    // Form Components
+    priority: 'Priority',
+    type: 'Type',
+    deleteDeadline: 'Delete Deadline',
+    unitColor: 'Unit Color',
+    start: 'Start',
+
+    // Page Components
+    gettingStartedGuide: 'Getting Started Guide',
+    noNotificationsYet: 'No notifications yet',
+
+    // Map Page
+    interactiveCampusMap: 'Interactive Campus Map',
+    mapLoadsWhenVisible: 'Map loads when visible',
+    selected: 'Selected',
+    walkingDirections: 'Walking Directions',
+    comingSoon: 'Coming Soon',
+
+    // Feed Page
+    campusFeed: 'Campus Feed',
+    info: 'Info',
+    eventCategories: 'Event Categories',
+
+    // Auth Pages
+    email: 'Email',
+    password: 'Password',
+    confirmPassword: 'Confirm Password',
+    authenticationApiTest: 'Authentication API Test',
+
+    // Profile Components
+    emailNotifications: 'Email Notifications',
+    emailReminders: 'Email Reminders',
+    pushNotifications: 'Push Notifications',
+    changeAvatar: 'Change Avatar',
+
     // Home Page
     skipToMain: 'Skip to main content',
     welcome: 'Welcome',
@@ -348,6 +393,51 @@ export const translations = {
     addDeadline: 'Agregar Fecha Límite',
     noEventsToday: 'No hay eventos programados para hoy',
     navigateTo: 'Navegar a',
+
+    // Unit Components
+    editUnit: 'Editar',
+    deleteUnit: 'Eliminar',
+    classTimes: 'Horarios de Clase',
+    colorCodingForCalendar: 'Codificación de colores para calendario',
+    room: 'Sala',
+    due: 'Vence',
+    invalidDate: 'Fecha inválida',
+    viewDeadlineDetails: 'Ver detalles de fecha límite {{title}} en calendario',
+
+    // Form Components
+    priority: 'Prioridad',
+    type: 'Tipo',
+    deleteDeadline: 'Eliminar Fecha Límite',
+    unitColor: 'Color de Unidad',
+    start: 'Inicio',
+
+    // Page Components
+    gettingStartedGuide: 'Guía de Introducción',
+    noNotificationsYet: 'Aún no hay notificaciones',
+
+    // Map Page
+    interactiveCampusMap: 'Mapa Interactivo del Campus',
+    mapLoadsWhenVisible: 'El mapa se carga cuando es visible',
+    selected: 'Seleccionado',
+    walkingDirections: 'Direcciones para Caminar',
+    comingSoon: 'Próximamente',
+
+    // Feed Page
+    campusFeed: 'Feed del Campus',
+    info: 'Info',
+    eventCategories: 'Categorías de Eventos',
+
+    // Auth Pages
+    email: 'Correo electrónico',
+    password: 'Contraseña',
+    confirmPassword: 'Confirmar contraseña',
+    authenticationApiTest: 'Prueba de API de Autenticación',
+
+    // Profile Components
+    emailNotifications: 'Notificaciones por Correo',
+    emailReminders: 'Recordatorios por Correo',
+    pushNotifications: 'Notificaciones Push',
+    changeAvatar: 'Cambiar Avatar',
 
     // Home Page
     skipToMain: 'Saltar al contenido principal',
@@ -592,6 +682,51 @@ export const translations = {
     unitDeletedMsg: 'حذف شد.',
     deleteFailed: 'حذف ناموفق',
     deleteFailedMsg: 'واحد حذف نشد. لطفاً دوباره امتحان کنید.',
+
+    // Unit Components
+    editUnit: 'ویرایش',
+    deleteUnit: 'حذف',
+    classTimes: 'زمان‌های کلاس',
+    colorCodingForCalendar: 'کدگذاری رنگ برای تقویم',
+    room: 'اتاق',
+    due: 'موعد',
+    invalidDate: 'تاریخ نامعتبر',
+    viewDeadlineDetails: 'مشاهده جزئیات مهلت {{title}} در تقویم',
+
+    // Form Components
+    priority: 'اولویت',
+    type: 'نوع',
+    deleteDeadline: 'حذف مهلت',
+    unitColor: 'رنگ واحد',
+    start: 'شروع',
+
+    // Page Components
+    gettingStartedGuide: 'راهنمای شروع',
+    noNotificationsYet: 'هنوز اعلانی وجود ندارد',
+
+    // Map Page
+    interactiveCampusMap: 'نقشه تعاملی دانشگاه',
+    mapLoadsWhenVisible: 'نقشه هنگام نمایش بارگذاری می‌شود',
+    selected: 'انتخاب شده',
+    walkingDirections: 'راهنمای پیاده‌روی',
+    comingSoon: 'به زودی',
+
+    // Feed Page
+    campusFeed: 'فید دانشگاه',
+    info: 'اطلاعات',
+    eventCategories: 'دسته‌بندی‌های رویداد',
+
+    // Auth Pages
+    email: 'ایمیل',
+    password: 'رمز عبور',
+    confirmPassword: 'تأیید رمز عبور',
+    authenticationApiTest: 'تست API احراز هویت',
+
+    // Profile Components
+    emailNotifications: 'اعلان‌های ایمیلی',
+    emailReminders: 'یادآورهای ایمیلی',
+    pushNotifications: 'اعلان‌های فوری',
+    changeAvatar: 'تغییر آواتار',
 
     // Error Handling
     somethingWentWrong: 'چیزی اشتباه پیش رفت',

@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -38,14 +39,13 @@ function DialogOverlay({
   );
 }
 
-function DialogContent({
-  className,
-  children,
-  showCloseButton = true,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean;
-}) {
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentProps<typeof DialogPrimitive.Content> & {
+    showCloseButton?: boolean;
+  }
+>(({ className, children, showCloseButton = true, ...props }, ref) => {
+  const { t } = useTranslation();
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -64,13 +64,15 @@ function DialogContent({
             className="ring-offset-mq-background focus:ring-mq-focus data-[state=open]:bg-mq-hover-background data-[state=open]:text-mq-content-secondary absolute top-4 right-4 rounded-mq-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t('close')}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
   );
-}
+});
+
+DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (

@@ -366,7 +366,7 @@ export default function MapPage() {
       {/* Map */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Interactive Campus Map</CardTitle>
+          <CardTitle>{t('interactiveCampusMap')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div
@@ -382,7 +382,7 @@ export default function MapPage() {
             ) : (
               <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
                 <MapPin className="h-6 w-6" />
-                <p className="text-mq-sm">Map loads when visible</p>
+                <p className="text-mq-sm">{t('mapLoadsWhenVisible')}</p>
               </div>
             )}
           </div>
@@ -416,7 +416,7 @@ export default function MapPage() {
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-mq-content">{building.code}</div>
                     {isSelected && (
-                      <Badge className="bg-mq-success text-white text-mq-xs">Selected</Badge>
+                      <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
                     )}
                   </div>
                   <div className="text-mq-sm text-mq-content-secondary">{building.name}</div>
@@ -446,14 +446,14 @@ export default function MapPage() {
           <CardContent>
             <div className="space-y-3">
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">Walking Directions</h4>
+                <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
                    Get directions between buildings with estimated walking time.
                  </p>
                </div>
                <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                  <Info className="h-4 w-4" />
-                 <span>Coming Soon</span>
+                 <span>{t('comingSoon')}</span>
                </div>
             </div>
           </CardContent>
@@ -476,7 +476,7 @@ export default function MapPage() {
                </div>
                <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                  <Info className="h-4 w-4" />
-                 <span>Coming Soon</span>
+                 <span>{t('comingSoon')}</span>
                </div>
             </div>
           </CardContent>
@@ -499,7 +499,7 @@ export default function MapPage() {
                </div>
                <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                  <Info className="h-4 w-4" />
-                 <span>Coming Soon</span>
+                 <span>{t('comingSoon')}</span>
                </div>
             </div>
           </CardContent>

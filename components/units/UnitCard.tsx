@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 interface UnitCardProps {
   unit: Unit;
@@ -25,6 +26,8 @@ const DAY_SHORT: { [key: string]: string } = {
 };
 
 const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: UnitCardProps) => {
+  const { t } = useTranslation();
+
   // Get unique days
   const getUniqueDays = () => {
     const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));
@@ -62,8 +65,8 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                     }
                   }}
                   className="h-8 w-8 p-0 focus:ring-2 focus:ring-mq-primary/50"
-                  aria-label={`Edit ${unit.code} - ${unit.name}`}
-                  title={`Edit ${unit.code}`}
+                  aria-label={t('editUnit') + ` ${unit.code} - ${unit.name}`}
+                  title={t('editUnit') + ` ${unit.code}`}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>
@@ -80,8 +83,8 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                     }
                   }}
                   className="h-8 w-8 p-0 text-mq-error hover:text-mq-error hover:bg-mq-error/10 focus:ring-2 focus:ring-mq-error/50"
-                  aria-label={`Delete ${unit.code} - ${unit.name}`}
-                  title={`Delete ${unit.code}`}
+                  aria-label={t('deleteUnit') + ` ${unit.code} - ${unit.name}`}
+                  title={t('deleteUnit') + ` ${unit.code}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -96,14 +99,14 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
         <div className="flex items-center gap-2 text-mq-sm">
           <MapPin className="w-4 h-4 text-mq-content-tertiary" />
           <span className="font-medium text-mq-content">{unit.location.building}</span>
-          <span className="text-mq-content-tertiary">Room {unit.location.room}</span>
+          <span className="text-mq-content-tertiary">{t('room')} {unit.location.room}</span>
         </div>
 
         {/* Class Times */}
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-mq-sm text-mq-content-tertiary">
             <Clock className="w-4 h-4" />
-            <span>Class Times</span>
+            <span>{t('classTimes')}</span>
           </div>
           <div className="space-y-1 pl-6">
             {unit.schedule.map((ct) => (
@@ -120,7 +123,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
         {/* Color indicator */}
         <div className="flex items-center gap-2 text-mq-xs text-mq-content-tertiary pt-2 border-t border-mq-border">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: unit.color }} />
-          <span>Color coding for calendar</span>
+          <span>{t('colorCodingForCalendar')}</span>
         </div>
       </CardContent>
     </Card>

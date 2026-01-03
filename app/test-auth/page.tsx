@@ -2,8 +2,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function TestAuthPage() {
+  const { t } = useTranslation();
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +63,7 @@ export default function TestAuthPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Authentication API Test</h1>
+      <h1 className="text-2xl font-bold mb-4">{t('authenticationApiTest')}</h1>
 
       <div className="space-x-4 mb-8">
         <button

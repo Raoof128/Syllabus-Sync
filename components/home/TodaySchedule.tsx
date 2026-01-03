@@ -84,7 +84,7 @@ const TodaySchedule = memo(function TodaySchedule() {
               aria-label={t('addUnitAria')}
             >
               <BookOpen className="h-4 w-4" />
-              Add Unit
+              {t('addUnit')}
             </Button>
           </div>
         ) : (

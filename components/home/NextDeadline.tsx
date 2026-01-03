@@ -77,7 +77,7 @@ const NextDeadline = memo(function NextDeadline() {
           <Link
             href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'}
             className="block focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:rounded-lg"
-            aria-label={`View ${nextDeadline.title} deadline details in calendar`}
+            aria-label={t('viewDeadlineDetails', { title: nextDeadline.title })}
           >
             <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-mq-hover-background transition-colors">
               {/* Deadline info */}
@@ -92,7 +92,7 @@ const NextDeadline = memo(function NextDeadline() {
                 </div>
 
                 <p className="text-sm text-mq-content-secondary mt-1">
-                  Due {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a') : 'Invalid date'}
+                  {t('due')} {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a') : t('invalidDate')}
                 </p>
               </div>
 
