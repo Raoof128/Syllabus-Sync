@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
 import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents, Polyline } from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
@@ -78,17 +78,31 @@ const createMarkerIcon = (isSelected: boolean) => {
   });
 };
 
+// Google-style Blue Dot Icon
+const userIcon = L.divIcon({
+  className: "user-location-dot",
+  html: `<div class="pulse"></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
+
 // Component to handle map setup and image overlay
 function MapController({
   selectedBuilding,
   coordPickerMode,
-  onMapClick
+  onMapClick,
+  setMapInstance
 }: {
   selectedBuilding?: Building;
   coordPickerMode: boolean;
   onMapClick: (e: L.LeafletMouseEvent) => void;
+  setMapInstance: (map: L.Map) => void;
 }) {
   const map = useMap();
+
+  useEffect(() => {
+    setMapInstance(map);
+  }, [map, setMapInstance]);
 
   // Handle map clicks
   useMapEvents({
@@ -144,6 +158,7 @@ interface CampusMapProps {
 
 export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
   const [themeKey, setThemeKey] = useState<'light' | 'dark'>('light');
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
   // -- Hybrid Navigation State --
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
@@ -151,23 +166,79 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   const [preview, setPreview] = useState<RoutePreview | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
 
-  // 1. Get User Location on Mount
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const accuracyCircleRef = useRef<L.Circle | null>(null);
+
+  // 1. Live Location Tracking (The "Blue Dot")
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        },
-        (err) => {
-          console.warn('Geolocation denied or failed, using campus centre fallback.', err);
+    // Only run if map is ready and geolocation exists
+    if (!mapInstance || !navigator.geolocation) return;
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const latlng = L.latLng(
+          pos.coords.latitude,
+          pos.coords.longitude
+        );
+
+        // Update app origin for routing
+        setOrigin({ lat: latlng.lat, lng: latlng.lng });
+
+        // Marker
+        if (!userMarkerRef.current) {
+          userMarkerRef.current = L.marker(latlng, {
+            icon: userIcon,
+            zIndexOffset: 1000,
+          }).addTo(mapInstance);
+        } else {
+          userMarkerRef.current.setLatLng(latlng);
+        }
+
+        // Accuracy circle (optional but pro)
+        const accuracy = pos.coords.accuracy;
+        if (!accuracyCircleRef.current) {
+          accuracyCircleRef.current = L.circle(latlng, {
+            radius: accuracy,
+            color: "#1a73e8",
+            weight: 1,
+            opacity: 0.4,
+            fillOpacity: 0.1,
+          }).addTo(mapInstance);
+        } else {
+          accuracyCircleRef.current.setLatLng(latlng);
+          accuracyCircleRef.current.setRadius(accuracy);
+        }
+      },
+      (err) => {
+        console.warn("Location tracking disabled or failed", err);
+        // Fallback to campus centre if we haven't got a location yet
+        if (!origin) {
           setOrigin(CAMPUS_CENTRE);
-        },
-        { enableHighAccuracy: true }
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 2000,
+        timeout: 10000,
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [mapInstance]); // Depend on mapInstance being ready
+
+  // "Center on Me" Button Action
+  const centerOnUser = () => {
+    if (userMarkerRef.current && mapInstance) {
+      mapInstance.setView(
+        userMarkerRef.current.getLatLng(),
+        18, // Zoom in close for user view
+        { animate: true }
       );
     } else {
-      setOrigin(CAMPUS_CENTRE);
+      alert("Location not available yet.");
     }
-  }, []);
+  };
+
 
   // 2. Routing Logic when selectedBuilding changes
   useEffect(() => {
@@ -195,7 +266,9 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       }
     }
 
-    updateRoute();
+    // Debounce updates slightly to avoid thrashing if location jitters while selecting
+    const timer = setTimeout(updateRoute, 100);
+    return () => clearTimeout(timer);
   }, [selectedBuilding, origin]);
 
   useEffect(() => {
@@ -219,7 +292,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       <MapContainer
         center={[-33.77, 151.115]}
         zoom={16}
-        zoomControl
+        zoomControl={false} // Custom or default zoom control off if we want to place custom buttons
         style={{
           height: '100%',
           width: '100%',
@@ -235,6 +308,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
           selectedBuilding={selectedBuilding}
           coordPickerMode={coordPickerMode}
           onMapClick={onMapClick}
+          setMapInstance={setMapInstance}
         />
 
         {/* Route Polyline */}
@@ -273,6 +347,27 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
           );
         })}
       </MapContainer>
+
+      {/* Floating Action Button: Center on User */}
+      <button
+        onClick={centerOnUser}
+        className="absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-50 focus:outline-none transition-transform active:scale-95"
+        title="Center on my location"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+          <line x1="12" y1="2" x2="12" y2="4"></line>
+          <line x1="12" y1="20" x2="12" y2="22"></line>
+          <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+          <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+          <line x1="2" y1="12" x2="4" y2="12"></line>
+          <line x1="20" y1="12" x2="22" y2="12"></line>
+          <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+          <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+        </svg>
+      </button>
+
 
       {/* Hybrid Navigation Panel */}
       {selectedBuilding && (preview || routeError) && (

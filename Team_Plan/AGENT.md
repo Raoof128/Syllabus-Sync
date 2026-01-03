@@ -1775,3 +1775,15 @@ Summary:
 Files: components/ui/ScrollReveal.tsx; app/home/HomeClient.tsx.
 Verification: Verified animation timing and stagger effects.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Blue Dot Navigation.
+Summary: 
+  - Implemented correct Google-style "Blue Dot" user location tracker using `navigator.geolocation.watchPosition`.
+  - Replaced one-off location fetching with continuous tracking.
+  - Added visual "Accuracy Circle" to indicate GPS precision, increasing user trust.
+  - Added "Center on Me" Floating Action Button (FAB) for quick re-orientation.
+  - CSS Pulse Animation: Created a custom pulse effect in `globals.css` that mimics native maps.
+Files: app/globals.css; app/map/CampusMap.tsx.
+Verification: Verified location updates and "Center on Me" functionality.
+Follow-ups: None.

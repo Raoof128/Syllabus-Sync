@@ -1465,3 +1465,13 @@ Summary: Added bespoke Scroll Reveal animations to the Home Dashboard.
 Files: components/ui/ScrollReveal.tsx; app/home/HomeClient.tsx.
 Verification: Verified visual motion parity.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Blue Dot Navigation.
+Summary: Implemented a professional "Blue Dot" location tracker for the Campus Map.
+  - Live Tracking: Uses continuous `watchPosition` updates instead of static snapshots.
+  - Visual Polish: Features a pulsing blue dot and a semi-transparent accuracy halo, matching native map apps (Google/Apple).
+  - Controls: Added a "Center on Location" button to quickly snap the map back to the user.
+Files: app/globals.css; app/map/CampusMap.tsx.
+Verification: Verified tracking accuracy and UI responsiveness.
+Follow-ups: None.
