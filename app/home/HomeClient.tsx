@@ -59,7 +59,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
+
 
 export default function HomeClient() {
   const { t } = useTranslation();
@@ -402,11 +402,6 @@ export default function HomeClient() {
             <p className="text-mq-content-secondary">{t('dayAtGlance')}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Keyboard Shortcuts Hint */}
-            <div className="hidden lg:block">
-              <KeyboardShortcuts />
-            </div>
-
             {/* Stress Level Indicator */}
             {hasHydrated && deadlines.length > 0 && (
               <>
@@ -432,52 +427,6 @@ export default function HomeClient() {
                 </div>
               </>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  className="gap-2 touch-manipulation"
-                  size="default"
-                  aria-label={`${t('addNew').toLowerCase()} ${t('addUnit').toLowerCase()} ${t('addDeadline').toLowerCase()}`}
-                  aria-haspopup="menu"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t('addNew')}</span>
-                  <span className="sm:hidden">{t('add')}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="bg-mq-background border-mq-border"
-                aria-label={t('addNewItemsMenu')}
-              >
-                <DropdownMenuItem
-                  onClick={handleAddUnit}
-                  className="gap-2 cursor-pointer focus:bg-mq-primary/10"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleAddUnit();
-                    }
-                  }}
-                >
-                  <BookOpen className="h-4 w-4" />
-                  {t('addUnit')}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleAddDeadline}
-                  className="gap-2 cursor-pointer focus:bg-mq-primary/10"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleAddDeadline();
-                    }
-                  }}
-                >
-                  <Clock className="h-4 w-4" />
-                  {t('addDeadline')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </header>
       </ScrollReveal>
@@ -516,10 +465,7 @@ export default function HomeClient() {
                 <BookOpen className="h-5 w-5" aria-hidden="true" />
                 {t('myUnits')}
               </CardTitle>
-              <Button onClick={handleAddUnit} size="sm" className="gap-1">
-                <Plus className="h-4 w-4" />
-                Add Unit
-              </Button>
+
             </CardHeader>
             <CardContent>
               {!hasHydrated ? (

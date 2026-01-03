@@ -1484,3 +1484,15 @@ Summary: Improved user experience for Location Services.
 Files: app/map/CampusMap.tsx.
 Verification: Verified UX flow.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Home/Map Experience.
+Summary: Finalized core UI/UX features for "Syllabus Sync".
+  - **Scroll Animations**: Implemented bespoke scroll reveal effects on Home Dashboard.
+  - **Blue Dot Navigation**: Added Google-style user location tracking with pulsing "searching" state and accuracy circle.
+  - **Location Feedback**: Replaced generic alerts with descriptive Toasts (Permission Denied, Locating, Error).
+  - **Home UI Cleanup**: Removed duplicate action buttons, moved Keyboard Shortcuts to enhanced Header.
+  - **Bug Fixes**: Resolved `pixelToLatLng` reference error on Map; Fixed Header build error.
+Files: components/layout/Header.tsx; app/home/HomeClient.tsx; app/map/CampusMap.tsx.
+Verification: Verified full end-to-end functionality.
+Follow-ups: None.

@@ -30,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 
 const notificationIcons = {
   deadline: Clock,
@@ -106,6 +107,11 @@ const Header = memo(() => {
   const { getCurrentProfile } = useProfilesStore();
   const currentProfile = isClient ? getCurrentProfile() : null;
 
+  // Hydration mismatch fix
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -143,6 +149,11 @@ const Header = memo(() => {
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-4">
+        {/* Keyboard Shortcuts */}
+        <div className="hidden lg:block">
+          <KeyboardShortcuts />
+        </div>
+
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
@@ -186,32 +197,29 @@ const Header = memo(() => {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                         className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${
-                           !notification.read ? 'bg-mq-info/10' : ''
-                         }`}
+                        className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${!notification.read ? 'bg-mq-info/10' : ''
+                          }`}
                       >
                         <div className="flex gap-3">
-                           <div
-                             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                               notification.type === 'deadline'
-                                 ? 'bg-mq-warning/20'
-                                 : notification.type === 'event'
-                                   ? 'bg-mq-purple/20'
-                                   : notification.type === 'class'
-                                     ? 'bg-mq-info/20'
-                                     : 'bg-mq-background-secondary'
-                             }`}
-                           >
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${notification.type === 'deadline'
+                              ? 'bg-mq-warning/20'
+                              : notification.type === 'event'
+                                ? 'bg-mq-purple/20'
+                                : notification.type === 'class'
+                                  ? 'bg-mq-info/20'
+                                  : 'bg-mq-background-secondary'
+                              }`}
+                          >
                             <Icon
-                             className={`w-4 h-4 ${
-                               notification.type === 'deadline'
-                                 ? 'text-mq-warning'
-                                 : notification.type === 'event'
-                                   ? 'text-mq-purple'
-                                   : notification.type === 'class'
-                                     ? 'text-mq-info'
-                                     : 'text-mq-content-secondary'
-                             }`}
+                              className={`w-4 h-4 ${notification.type === 'deadline'
+                                ? 'text-mq-warning'
+                                : notification.type === 'event'
+                                  ? 'text-mq-purple'
+                                  : notification.type === 'class'
+                                    ? 'text-mq-info'
+                                    : 'text-mq-content-secondary'
+                                }`}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -229,9 +237,9 @@ const Header = memo(() => {
                               })}
                             </p>
                           </div>
-                           {!notification.read && (
-                             <div className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2" />
-                           )}
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2" />
+                          )}
                         </div>
                       </Link>
                     );

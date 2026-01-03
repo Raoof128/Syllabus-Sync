@@ -1798,3 +1798,24 @@ Summary:
 Files: app/map/CampusMap.tsx.
 Verification: Verified toast messages trigger correctly for each state.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Home UI Cleanup.
+Summary: 
+  - Moved `KeyboardShortcuts` from Home Header to global `Header.tsx` (next to notifications) as requested.
+  - Removed duplicate "Add Unit" & "Add New" buttons from `HomeClient.tsx` based on user screenshots.
+  - Restored "Workload/Stress Level" indicator which was accidentally removed during cleanup.
+Files: app/home/HomeClient.tsx; components/layout/Header.tsx.
+Verification: Verified button removal and shortcut relocation.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Home UI Cleanup & Optimization.
+Summary: 
+  - Restored `Header.tsx` after a syntax corruption; verified all imports (KeyboardShortcuts) and logic are intact.
+  - Finalized Home Page UI: Clean, professional, and free of duplicate buttons.
+  - Verified Blue Dot location tracking and Scroll Animations are performing optimally.
+Files: components/layout/Header.tsx.
+Verification: Verified build success and UI functionality.
+Logs: Updated CHANGELOG.md and TEAM_ROADMAP.md with latest milestones.
+Follow-ups: None.
