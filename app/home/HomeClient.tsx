@@ -405,8 +405,8 @@ export default function HomeClient() {
                 <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
                 <Badge
                   className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
-                  aria-label={`Current workload level: ${stressLevel}`}
-                  title={`Workload: ${stressLevel}`}
+                  aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
+                  title={`${t('workload')}: ${stressLevel}`}
                 >
                   {stressEmoji[stressLevel]}
                 </Badge>
@@ -416,7 +416,7 @@ export default function HomeClient() {
                 <span className="text-mq-sm text-mq-content">{t('workload')}</span>
                 <Badge
                   className={stressColors[stressLevel]}
-                  aria-label={`Current workload level: ${stressLevel}`}
+                  aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
                 >
                   {stressEmoji[stressLevel]} {stressLevel}
                 </Badge>

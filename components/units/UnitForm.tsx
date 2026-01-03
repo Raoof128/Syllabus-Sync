@@ -358,7 +358,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   <div className="flex-1 grid grid-cols-3 gap-2">
                     {/* Day */}
                     <div className="space-y-1">
-                      <Label className="text-xs">Day</Label>
+                      <Label className="text-xs">{t('day')}</Label>
                       <Select
                         value={ct.day}
                         onValueChange={(value) => updateClassTime(ct.id, 'day', value)}
@@ -389,7 +389,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
                     {/* End Time */}
                     <div className="space-y-1">
-                      <Label className="text-xs">End</Label>
+                      <Label className="text-xs">{t('end')}</Label>
                       <Input
                         type="time"
                         value={ct.endTime}

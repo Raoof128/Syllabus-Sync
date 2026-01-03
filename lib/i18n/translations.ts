@@ -136,10 +136,28 @@ export const translations = {
     deleteDeadline: 'Delete Deadline',
     unitColor: 'Unit Color',
     start: 'Start',
+    day: 'Day',
+    end: 'End',
 
     // Page Components
     gettingStartedGuide: 'Getting Started Guide',
     noNotificationsYet: 'No notifications yet',
+    pageNotFound: 'Page Not Found',
+    pageNotFoundDescription: 'Sorry, we couldn\'t find the page you\'re looking for. It might have been moved or doesn\'t exist.',
+    goHome: 'Go Home',
+    new: 'New',
+
+    // Profile Components
+    fullName: 'Full Name',
+    emailAddress: 'Email Address',
+    studentId: 'Student ID',
+    course: 'Course',
+    year: 'Year',
+
+    // Accessibility
+    skipToMainContent: 'Skip to main content',
+    currentWorkloadLevel: 'Current workload level',
+    workload: 'Workload',
 
     // Map Page
     interactiveCampusMap: 'Interactive Campus Map',
@@ -410,10 +428,28 @@ export const translations = {
     deleteDeadline: 'Eliminar Fecha Límite',
     unitColor: 'Color de Unidad',
     start: 'Inicio',
+    day: 'Día',
+    end: 'Fin',
 
     // Page Components
     gettingStartedGuide: 'Guía de Introducción',
     noNotificationsYet: 'Aún no hay notificaciones',
+    pageNotFound: 'Página No Encontrada',
+    pageNotFoundDescription: 'Lo sentimos, no pudimos encontrar la página que buscas. Puede que haya sido movida o no exista.',
+    goHome: 'Ir al Inicio',
+    new: 'Nuevo',
+
+    // Profile Components
+    fullName: 'Nombre Completo',
+    emailAddress: 'Dirección de Correo Electrónico',
+    studentId: 'ID de Estudiante',
+    course: 'Curso',
+    year: 'Año',
+
+    // Accessibility
+    skipToMainContent: 'Saltar al contenido principal',
+    currentWorkloadLevel: 'Nivel actual de carga de trabajo',
+    workload: 'Carga de trabajo',
 
     // Map Page
     interactiveCampusMap: 'Mapa Interactivo del Campus',
@@ -697,10 +733,28 @@ export const translations = {
     deleteDeadline: 'حذف مهلت',
     unitColor: 'رنگ واحد',
     start: 'شروع',
+    day: 'روز',
+    end: 'پایان',
 
     // Page Components
     gettingStartedGuide: 'راهنمای شروع',
     noNotificationsYet: 'هنوز اعلانی وجود ندارد',
+    pageNotFound: 'صفحه یافت نشد',
+    pageNotFoundDescription: 'متأسفانه، صفحه‌ای که به دنبال آن بودید را پیدا نکردیم. ممکن است منتقل شده یا وجود نداشته باشد.',
+    goHome: 'برو به خانه',
+    new: 'جدید',
+
+    // Profile Components
+    fullName: 'نام کامل',
+    emailAddress: 'آدرس ایمیل',
+    studentId: 'شناسه دانشجویی',
+    course: 'دوره',
+    year: 'سال',
+
+    // Accessibility
+    skipToMainContent: 'رفتن به محتوای اصلی',
+    currentWorkloadLevel: 'سطح فعلی بار کاری',
+    workload: 'بار کاری',
 
     // Map Page
     interactiveCampusMap: 'نقشه تعاملی دانشگاه',

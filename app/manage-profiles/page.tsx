@@ -16,8 +16,10 @@ import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { UserProfile } from '@/lib/store/profilesStore';
 import { toastUtils } from '@/lib/utils/toast';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function ManageProfilesPage() {
+  const { t } = useTranslation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({
@@ -240,7 +242,7 @@ export default function ManageProfilesPage() {
             }}
           >
             <div>
-              <Label htmlFor="profile-name">Full Name</Label>
+              <Label htmlFor="profile-name">{t('fullName')}</Label>
               <Input
                 id="profile-name"
                 name="name"
@@ -256,7 +258,7 @@ export default function ManageProfilesPage() {
             </div>
 
             <div>
-              <Label htmlFor="profile-email">Email Address</Label>
+              <Label htmlFor="profile-email">{t('emailAddress')}</Label>
               <Input
                 id="profile-email"
                 name="email"
@@ -273,7 +275,7 @@ export default function ManageProfilesPage() {
             </div>
 
             <div>
-              <Label htmlFor="profile-student-id">Student ID</Label>
+              <Label htmlFor="profile-student-id">{t('studentId')}</Label>
               <Input
                 id="profile-student-id"
                 name="studentId"
@@ -290,7 +292,7 @@ export default function ManageProfilesPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="profile-course">Course</Label>
+                <Label htmlFor="profile-course">{t('course')}</Label>
                 <Input
                   id="profile-course"
                   name="course"
@@ -305,7 +307,7 @@ export default function ManageProfilesPage() {
               </div>
 
               <div>
-                <Label htmlFor="profile-year">Year</Label>
+                <Label htmlFor="profile-year">{t('year')}</Label>
                 <Input
                   id="profile-year"
                   name="year"

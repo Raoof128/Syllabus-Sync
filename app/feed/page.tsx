@@ -246,7 +246,7 @@ export default function FeedPage() {
             <CardContent className="space-y-3">
               <div className="p-3 bg-mq-success/10 rounded-mq-lg border border-mq-success/20">
                 <div className="flex items-start gap-2">
-                  <Badge className="bg-mq-success text-white">New</Badge>
+                  <Badge className="bg-mq-success text-white">{t('new')}</Badge>
                   <div>
                     <h4 className="font-semibold text-mq-content text-mq-sm">
                       Phase 2 Updates
