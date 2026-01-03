@@ -1284,3 +1284,17 @@ Summary: Updated AGENT and CHANGELOG entries to reflect latest UI, CI, and layou
 Files changed: Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md.
 Verification: Not run (documentation update only).
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI polish, SEO metadata, and map UX.
+Summary: Unified toast surfaces with MQ background tokens, added map search highlighting with lazy map loading and reduced-motion awareness, added helper text + aria-describedby for key form fields, improved calendar grid focus rings, and introduced per-page OG tags plus organization JSON-LD schema.
+Files changed: components/ui/toast.tsx; app/map/page.tsx; components/units/UnitForm.tsx; components/deadlines/DeadlineForm.tsx; app/calendar/page.tsx; app/layout.tsx; app/home/head.tsx; app/calendar/head.tsx; app/map/head.tsx; app/feed/head.tsx; app/settings/head.tsx.
+Verification: npm run lint (pass).
+Follow-ups: Consider adding page-specific OG images if a branded set is available.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Lighthouse CI artifact upload workaround.
+Summary: Disabled treosh action artifact upload and added explicit upload-artifact step for .lighthouseci to avoid GitHub artifact name validation errors.
+Files changed: .github/workflows/ci-cd.yml.
+Verification: Not run (workflow change only).
+Follow-ups: Re-run Lighthouse CI in GitHub Actions to confirm artifact upload succeeds.

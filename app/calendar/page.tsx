@@ -279,7 +279,7 @@ export default function CalendarPage() {
                             event.stopPropagation();
                             handleEditDeadline(deadline);
                           }}
-                          className={`w-full rounded px-1 py-0.5 text-left text-[10px] sm:text-[11px] font-medium hover:opacity-80 transition-opacity ${
+                          className={`w-full rounded px-1 py-0.5 text-left text-[10px] sm:text-[11px] font-medium hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${
                             deadline.completed ? 'line-through opacity-50' : ''
                           }`}
                           style={{

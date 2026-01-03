@@ -206,6 +206,19 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     resetForm();
   };
 
+  const codeDescribedBy = [
+    errors.code ? 'unit-code-error' : '',
+    'unit-code-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const buildingDescribedBy = [
+    errors.building ? 'unit-building-error' : '',
+    'unit-building-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -229,9 +242,18 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               placeholder="e.g., COMP2310"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              aria-describedby={codeDescribedBy}
+              aria-invalid={Boolean(errors.code)}
               className={errors.code ? 'border-mq-error' : ''}
             />
-            {errors.code && <p className="text-sm text-mq-error">{errors.code}</p>}
+            <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
+              Use the official unit code (letters + numbers).
+            </p>
+            {errors.code && (
+              <p id="unit-code-error" className="text-sm text-mq-error">
+                {errors.code}
+              </p>
+            )}
           </div>
 
           {/* Unit Name */}
@@ -260,9 +282,18 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 placeholder="e.g., C5C"
                 value={building}
                 onChange={(e) => setBuilding(e.target.value)}
+                aria-describedby={buildingDescribedBy}
+                aria-invalid={Boolean(errors.building)}
                 className={errors.building ? 'border-mq-error' : ''}
               />
-              {errors.building && <p className="text-sm text-mq-error">{errors.building}</p>}
+              <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
+                Use the campus building code from the map list.
+              </p>
+              {errors.building && (
+                <p id="unit-building-error" className="text-sm text-mq-error">
+                  {errors.building}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

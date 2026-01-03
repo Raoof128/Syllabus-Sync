@@ -184,6 +184,25 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     resetForm();
   };
 
+  const titleDescribedBy = [
+    errors.title ? 'deadline-title-error' : '',
+    'deadline-title-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const unitDescribedBy = [
+    errors.unitCode ? 'deadline-unit-error' : '',
+    'deadline-unit-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const dateDescribedBy = [
+    errors.dueDate ? 'deadline-date-error' : '',
+    'deadline-date-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -207,9 +226,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 placeholder="e.g., Assignment 1"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                aria-describedby={titleDescribedBy}
+                aria-invalid={Boolean(errors.title)}
                 className={errors.title ? 'border-mq-error' : ''}
               />
-              {errors.title && <p className="text-sm text-mq-error">{errors.title}</p>}
+              <p id="deadline-title-help" className="text-xs text-mq-content-tertiary">
+                Keep titles short for calendar readability.
+              </p>
+              {errors.title && (
+                <p id="deadline-title-error" className="text-sm text-mq-error">
+                  {errors.title}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -217,7 +245,11 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 Unit Code <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
-                <SelectTrigger className={errors.unitCode ? 'border-mq-error' : ''}>
+                <SelectTrigger
+                  className={errors.unitCode ? 'border-mq-error' : ''}
+                  aria-describedby={unitDescribedBy}
+                  aria-invalid={Boolean(errors.unitCode)}
+                >
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
                 <SelectContent>
@@ -228,7 +260,14 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   ))}
                 </SelectContent>
               </Select>
-              {errors.unitCode && <p className="text-sm text-mq-error">{errors.unitCode}</p>}
+              <p id="deadline-unit-help" className="text-xs text-mq-content-tertiary">
+                Pick the unit that owns this deadline.
+              </p>
+              {errors.unitCode && (
+                <p id="deadline-unit-error" className="text-sm text-mq-error">
+                  {errors.unitCode}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -240,9 +279,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
+                aria-describedby={dateDescribedBy}
+                aria-invalid={Boolean(errors.dueDate)}
                 className={errors.dueDate ? 'border-mq-error' : ''}
               />
-              {errors.dueDate && <p className="text-sm text-mq-error">{errors.dueDate}</p>}
+              <p id="deadline-date-help" className="text-xs text-mq-content-tertiary">
+                Use the date in your local campus timezone.
+              </p>
+              {errors.dueDate && (
+                <p id="deadline-date-error" className="text-sm text-mq-error">
+                  {errors.dueDate}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

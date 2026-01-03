@@ -31,6 +31,16 @@ export const metadata: Metadata = {
     title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
     description: APP_CONFIG.fullDescription,
     type: 'website',
+    images: [
+      {
+        url: '/MQ_Logo_Final.png',
+        alt: `${APP_CONFIG.name} logo`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/MQ_Logo_Final.png'],
   },
 };
 
@@ -42,9 +52,21 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: APP_CONFIG.name,
+    url: UNIVERSITY_CONFIG.website,
+    logo: new URL('/MQ_Logo_Final.png', UNIVERSITY_CONFIG.website).toString(),
+  };
+
   return (
     <html lang="en" className={`${workSans.variable} ${sourceSerif4.variable}`}>
       <body className="font-sans" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

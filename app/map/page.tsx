@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Search, MapPin, Navigation, Building2, Info, Copy, X, Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -78,6 +78,9 @@ export default function MapPage() {
   const [coordPickerMode, setCoordPickerMode] = useState(false);
   const [copiedCoords, setCopiedCoords] = useState<string>('');
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+  const [shouldRenderMap, setShouldRenderMap] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
@@ -155,6 +158,55 @@ export default function MapPage() {
     setSelectedResultIndex(-1);
   };
 
+  const highlightMatch = useCallback(
+    (text: string) => {
+      const query = searchQuery.trim();
+      if (!query) return text;
+      const lowerText = text.toLowerCase();
+      const lowerQuery = query.toLowerCase();
+      const matchIndex = lowerText.indexOf(lowerQuery);
+      if (matchIndex === -1) return text;
+      const endIndex = matchIndex + query.length;
+      return (
+        <>
+          {text.slice(0, matchIndex)}
+          <span className="text-mq-primary font-semibold">{text.slice(matchIndex, endIndex)}</span>
+          {text.slice(endIndex)}
+        </>
+      );
+    },
+    [searchQuery],
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMotion = () => setPrefersReducedMotion(mediaQuery.matches);
+    updateMotion();
+    mediaQuery.addEventListener('change', updateMotion);
+    return () => mediaQuery.removeEventListener('change', updateMotion);
+  }, []);
+
+  useEffect(() => {
+    if (shouldRenderMap) return;
+    const node = mapContainerRef.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setShouldRenderMap(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldRenderMap(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRenderMap]);
+
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       {/* Header */}
@@ -189,7 +241,11 @@ export default function MapPage() {
         {/* Search */}
         <div className="relative">
           {isSearching ? (
-            <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary animate-spin" />
+            <Loader2
+              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
+                prefersReducedMotion ? '' : 'animate-spin'
+              }`}
+            />
           ) : (
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
           )}
@@ -241,8 +297,12 @@ export default function MapPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-mq-content truncate">{building.name}</div>
-                      <div className="text-mq-sm text-mq-content-secondary">{building.id}</div>
+                      <div className="font-semibold text-mq-content truncate">
+                        {highlightMatch(building.name)}
+                      </div>
+                      <div className="text-mq-sm text-mq-content-secondary">
+                        {highlightMatch(building.id)}
+                      </div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
                       {building.tags?.[0] || 'building'}
@@ -307,12 +367,22 @@ export default function MapPage() {
           <CardTitle>Interactive Campus Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border">
-            <CampusMap
-              selectedBuilding={selectedBuilding}
-              coordPickerMode={coordPickerMode}
-              onMapClick={handleMapClick}
-            />
+          <div
+            ref={mapContainerRef}
+            className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
+          >
+            {shouldRenderMap ? (
+              <CampusMap
+                selectedBuilding={selectedBuilding}
+                coordPickerMode={coordPickerMode}
+                onMapClick={handleMapClick}
+              />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
+                <MapPin className="h-6 w-6" />
+                <p className="text-mq-sm">Map loads when visible</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
