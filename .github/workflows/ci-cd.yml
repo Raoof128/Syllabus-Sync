@@ -124,9 +124,15 @@ jobs:
         with:
           urls: http://localhost:3003
           configPath: .lighthouserc.json
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
-          artifactName: lhci-results
+
+      - name: Upload Lighthouse artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci
 
   accessibility:
     name: Accessibility Testing

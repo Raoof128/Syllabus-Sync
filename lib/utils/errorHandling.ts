@@ -1,6 +1,6 @@
 // lib/utils/errorHandling.ts
 import { AppError, ValidationError, FormErrors, ErrorSeverity } from '@/lib/types';
-import { withRetry, RetryError } from './retry';
+import { withRetry, RetryError, type RetryOptions } from './retry';
 
 export class AppErrorHandler {
   private static instance: AppErrorHandler;
@@ -129,7 +129,7 @@ export class AppErrorHandler {
     // In a real app, this would send to Sentry, LogRocket, etc.
 
     // For now, just store in localStorage in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
       try {
         const existingErrors = JSON.parse(localStorage.getItem('appErrors') || '[]');
         existingErrors.unshift({
@@ -153,7 +153,7 @@ export class AppErrorHandler {
   async executeWithRetry<T>(
     operation: () => Promise<T>,
     context: string,
-    options = {},
+    options: Partial<RetryOptions> = {},
   ): Promise<T> {
     try {
       return await withRetry(operation, {
@@ -244,7 +244,7 @@ export const validationRules = {
       : null,
 
   numeric: (fieldName: string) => (value: unknown) =>
-    value && isNaN(Number(value)) ? `${fieldName} must be a number` : null,
+    value && Number.isNaN(Number(value)) ? `${fieldName} must be a number` : null,
 
   positive: (fieldName: string) => (value: unknown) =>
     value && Number(value) <= 0 ? `${fieldName} must be a positive number` : null,

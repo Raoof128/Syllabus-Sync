@@ -116,13 +116,13 @@ const Header = memo(() => {
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
-            className="p-2 rounded-mq transition-all duration-mq-fast ease-mq-snap relative hover:bg-mq-background-secondary"
+            className="p-2 rounded-mq transition-all duration-mq-fast ease-mq-snap relative hover:bg-mq-background-secondary min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
             aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell className="w-5 h-5 text-mq-content-secondary" />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -136,7 +136,7 @@ const Header = memo(() => {
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                    className="text-xs text-mq-info hover:text-mq-info/80 rounded-mq focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background"
                   >
                     Mark all read
                   </button>
@@ -156,7 +156,7 @@ const Header = memo(() => {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                         className={`block p-3 border-b border-mq-border last:border-0 ${
+                         className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${
                            !notification.read ? 'bg-mq-info/10' : ''
                          }`}
                       >
@@ -193,7 +193,7 @@ const Header = memo(() => {
                             <p className="text-xs text-mq-content-secondary line-clamp-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-mq-slate-400 mt-1">
+                            <p className="text-xs text-mq-content-tertiary mt-1">
                               {formatDistanceToNow(new Date(notification.createdAt), {
                                 addSuffix: true,
                               })}
@@ -216,16 +216,16 @@ const Header = memo(() => {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 active:scale-95"
+            className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background active:scale-95 hover:bg-mq-background-secondary min-h-[44px] min-w-[44px]"
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
             title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
           >
             <div className="relative w-5 h-5">
               <Sun
-                className={`absolute inset-0 w-5 h-5 text-yellow-500 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
+                className={`absolute inset-0 w-5 h-5 text-mq-warning transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
               />
               <Moon
-                className={`absolute inset-0 w-5 h-5 text-blue-400 transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
+                className={`absolute inset-0 w-5 h-5 text-mq-info transition-all duration-300 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
               />
             </div>
           </button>
@@ -236,7 +236,7 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400"
+                className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] hover:bg-mq-background-secondary"
                 aria-label="Open profile menu"
               >
                 <div

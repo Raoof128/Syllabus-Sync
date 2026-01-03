@@ -5,6 +5,7 @@ export { APP_CONFIG, UNIT_COLORS } from './config';
 
 // Derive APP_NAME and APP_DESCRIPTION from config for backward compatibility
 import { APP_CONFIG, UNIVERSITY_CONFIG } from './config';
+import type { DayOfWeek, Deadline, Event } from './types';
 export const APP_NAME = APP_CONFIG.name;
 export const APP_DESCRIPTION = `${APP_CONFIG.description} for ${UNIVERSITY_CONFIG.name}`;
 
@@ -28,7 +29,7 @@ export const DAYS_OF_WEEK = [
   'Sunday',
 ] as const;
 
-export const DAY_SHORT: Record<string, string> = {
+export const DAY_SHORT: Record<DayOfWeek, string> = {
   Monday: 'Mon',
   Tuesday: 'Tue',
   Wednesday: 'Wed',
@@ -49,19 +50,19 @@ export const EVENT_CATEGORIES = ['Career', 'Social', 'Academic', 'Free Food'] as
 
 
 // Priority colors for badges
-export const PRIORITY_COLORS: Record<string, string> = {
-  Low: 'bg-green-100 text-green-800',
-  Medium: 'bg-yellow-100 text-yellow-800',
-  High: 'bg-orange-100 text-orange-800',
-  Urgent: 'bg-red-100 text-red-800',
+export const PRIORITY_COLORS: Record<Deadline['priority'], string> = {
+  Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
+  Medium: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+  High: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
+  Urgent: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
 };
 
 // Category colors for events
-export const CATEGORY_COLORS: Record<string, string> = {
-  Career: 'bg-blue-100 text-blue-800',
-  Social: 'bg-purple-100 text-purple-800',
-  Academic: 'bg-green-100 text-green-800',
-  'Free Food': 'bg-orange-100 text-orange-800',
+export const CATEGORY_COLORS: Record<Event['category'], string> = {
+  Career: 'bg-mq-info/10 text-mq-info border border-mq-info/20',
+  Social: 'bg-mq-purple/10 text-mq-purple border border-mq-purple/20',
+  Academic: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
+  'Free Food': 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
 };
 
 // Time format options

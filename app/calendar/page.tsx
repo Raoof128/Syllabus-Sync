@@ -24,6 +24,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
+import { PRIORITY_COLORS } from '@/lib/constants';
 import {
   addMonths,
   addWeeks,
@@ -44,13 +45,6 @@ import {
   subWeeks,
 } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
-
-const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
-  Low: 'bg-mq-success/10 text-mq-success',
-  Medium: 'bg-mq-warning/10 text-mq-warning',
-  High: 'bg-mq-warning/10 text-mq-warning',
-  Urgent: 'bg-mq-error/10 text-mq-error',
-};
 
 export default function CalendarPage() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
@@ -240,14 +234,22 @@ export default function CalendarPage() {
             <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {calendarDays.map((day) => {
                 const dayKey = format(day, 'yyyy-MM-dd');
+                const dayLabel = format(day, 'EEEE, MMM d');
                 const dayDeadlines = deadlinesByDay[dayKey] ?? [];
                 const isOutside = view === 'month' && !isSameMonth(day, currentDate);
                 const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
+                const deadlineCount = dayDeadlines.length;
+                const deadlineLabel =
+                  deadlineCount === 0
+                    ? 'no deadlines'
+                    : `${deadlineCount} deadline${deadlineCount > 1 ? 's' : ''}`;
                 return (
                   <div
                     key={dayKey}
                     role="button"
                     tabIndex={0}
+                    aria-label={`${dayLabel}, ${deadlineLabel}`}
+                    aria-pressed={isSelected}
                     onClick={() => setSelectedDate(day)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
@@ -256,7 +258,9 @@ export default function CalendarPage() {
                       }
                     }}
                     className={`min-h-[80px] sm:min-h-[100px] rounded-mq border p-1 sm:p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus ${
-                      isOutside ? 'bg-mq-background-secondary/50 text-mq-content-tertiary' : 'bg-mq-background dark:bg-mq-card-background'
+                      isOutside
+                        ? 'bg-mq-background-secondary/50 text-mq-content-tertiary'
+                        : 'bg-mq-background dark:bg-mq-card-background'
                     } ${isSelected ? 'border-mq-primary ring-1 ring-mq-primary/20' : 'border-mq-border'} ${isToday(day) ? 'bg-mq-primary/5 dark:bg-mq-primary/10' : ''}`}
                   >
                     <div className="flex items-center justify-between">
@@ -275,7 +279,7 @@ export default function CalendarPage() {
                             event.stopPropagation();
                             handleEditDeadline(deadline);
                           }}
-                          className={`w-full rounded px-1 py-0.5 text-left text-[10px] sm:text-[11px] font-medium hover:opacity-80 transition-opacity ${
+                          className={`w-full rounded px-1 py-0.5 text-left text-[10px] sm:text-[11px] font-medium hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${
                             deadline.completed ? 'line-through opacity-50' : ''
                           }`}
                           style={{
@@ -305,41 +309,41 @@ export default function CalendarPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Stats */}
           {isHydrated && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Card>
-                <CardContent className="flex items-center justify-between py-4">
-                  <div>
-                    <p className="text-mq-sm text-mq-content-secondary">Upcoming</p>
+                <CardContent className="flex items-start justify-between gap-3 py-4">
+                  <div className="min-w-0">
+                    <p className="text-mq-sm text-mq-content-secondary leading-tight">Upcoming</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{incompleteDeadlines.length}</p>
                   </div>
-                  <Clock className="h-6 w-6 text-mq-content-secondary" />
+                  <Clock className="h-6 w-6 text-mq-content-secondary shrink-0" />
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="flex items-center justify-between py-4">
-                  <div>
-                    <p className="text-mq-sm text-mq-content-secondary">Overdue</p>
+                <CardContent className="flex items-start justify-between gap-3 py-4">
+                  <div className="min-w-0">
+                    <p className="text-mq-sm text-mq-content-secondary leading-tight">Overdue</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{overdueDeadlines.length}</p>
                   </div>
-                  <AlertCircle className="h-6 w-6 text-mq-content-secondary" />
+                  <AlertCircle className="h-6 w-6 text-mq-content-secondary shrink-0" />
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="flex items-center justify-between py-4">
-                  <div>
-                    <p className="text-mq-sm text-mq-content-secondary">Completed</p>
+                <CardContent className="flex items-start justify-between gap-3 py-4">
+                  <div className="min-w-0">
+                    <p className="text-mq-sm text-mq-content-secondary leading-tight">Completed</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{completedDeadlines.length}</p>
                   </div>
-                  <CheckCircle2 className="h-6 w-6 text-mq-content-secondary" />
+                  <CheckCircle2 className="h-6 w-6 text-mq-content-secondary shrink-0" />
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="flex items-center justify-between py-4">
-                  <div>
-                    <p className="text-mq-sm text-mq-content-secondary">Total</p>
+                <CardContent className="flex items-start justify-between gap-3 py-4">
+                  <div className="min-w-0">
+                    <p className="text-mq-sm text-mq-content-secondary leading-tight">Total</p>
                     <p className="text-mq-2xl font-bold text-mq-content">{deadlines.length}</p>
                   </div>
-                  <CalendarDays className="h-6 w-6 text-mq-content-secondary" />
+                  <CalendarDays className="h-6 w-6 text-mq-content-secondary shrink-0" />
                 </CardContent>
               </Card>
               <Card>
@@ -432,9 +436,9 @@ export default function CalendarPage() {
                                 <Circle className="h-5 w-5 text-mq-content-tertiary hover:text-mq-primary" />
                               </button>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div>
-                                    <h4 className="font-semibold text-mq-content">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="min-w-0">
+                                    <h4 className="font-semibold text-mq-content break-words">
                                       {deadline.title}
                                     </h4>
                                     <div className="flex items-center gap-2 mt-1">
@@ -447,9 +451,9 @@ export default function CalendarPage() {
                                       </span>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                                     <Badge variant="neutral">{deadline.type}</Badge>
-                                    <Badge className={priorityColors[deadline.priority]}>
+                                    <Badge className={PRIORITY_COLORS[deadline.priority]}>
                                       {deadline.priority}
                                     </Badge>
                                   </div>

@@ -206,6 +206,19 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     resetForm();
   };
 
+  const codeDescribedBy = [
+    errors.code ? 'unit-code-error' : '',
+    'unit-code-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const buildingDescribedBy = [
+    errors.building ? 'unit-building-error' : '',
+    'unit-building-help',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -222,61 +235,79 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           {/* Unit Code */}
           <div className="space-y-2">
             <Label htmlFor="code">
-              Unit Code <span className="text-red-500">*</span>
+              Unit Code <span className="text-mq-error">*</span>
             </Label>
             <Input
               id="code"
               placeholder="e.g., COMP2310"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className={errors.code ? 'border-red-500' : ''}
+              aria-describedby={codeDescribedBy}
+              aria-invalid={Boolean(errors.code)}
+              className={errors.code ? 'border-mq-error' : ''}
             />
-            {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
+            <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
+              Use the official unit code (letters + numbers).
+            </p>
+            {errors.code && (
+              <p id="unit-code-error" className="text-sm text-mq-error">
+                {errors.code}
+              </p>
+            )}
           </div>
 
           {/* Unit Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Unit Name <span className="text-red-500">*</span>
+              Unit Name <span className="text-mq-error">*</span>
             </Label>
             <Input
               id="name"
               placeholder="e.g., Computer Networks"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={errors.name ? 'border-red-500' : ''}
+              className={errors.name ? 'border-mq-error' : ''}
             />
-            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            {errors.name && <p className="text-sm text-mq-error">{errors.name}</p>}
           </div>
 
           {/* Location */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="building">
-                Building <span className="text-red-500">*</span>
+                Building <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="building"
                 placeholder="e.g., C5C"
                 value={building}
                 onChange={(e) => setBuilding(e.target.value)}
-                className={errors.building ? 'border-red-500' : ''}
+                aria-describedby={buildingDescribedBy}
+                aria-invalid={Boolean(errors.building)}
+                className={errors.building ? 'border-mq-error' : ''}
               />
-              {errors.building && <p className="text-sm text-red-500">{errors.building}</p>}
+              <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
+                Use the campus building code from the map list.
+              </p>
+              {errors.building && (
+                <p id="unit-building-error" className="text-sm text-mq-error">
+                  {errors.building}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="room">
-                Room <span className="text-red-500">*</span>
+                Room <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="room"
                 placeholder="e.g., 204"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                className={errors.room ? 'border-red-500' : ''}
+                className={errors.room ? 'border-mq-error' : ''}
               />
-              {errors.room && <p className="text-sm text-red-500">{errors.room}</p>}
+              {errors.room && <p className="text-sm text-mq-error">{errors.room}</p>}
             </div>
           </div>
 
@@ -307,7 +338,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>
-                Class Times <span className="text-red-500">*</span>
+                Class Times <span className="text-mq-error">*</span>
               </Label>
               <Button type="button" variant="outline" size="sm" onClick={addClassTime}>
                 <Plus className="w-4 h-4 mr-1" />
@@ -316,7 +347,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             </div>
 
             {errors.schedule && schedule.length === 0 && (
-              <p className="text-sm text-red-500">{errors.schedule}</p>
+              <p className="text-sm text-mq-error">{errors.schedule}</p>
             )}
 
             <div className="space-y-3">
@@ -373,13 +404,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                     size="sm"
                     onClick={() => removeClassTime(ct.id)}
                     className="mt-6"
+                    aria-label="Remove class time"
                   >
                     <X className="w-4 h-4" />
                   </Button>
 
                   {/* Errors for this class time */}
                   {(errors[`time_${index}`] || errors[`duplicate_${index}`]) && (
-                    <div className="col-span-4 text-xs text-red-500">
+                    <div className="col-span-4 text-xs text-mq-error">
                       {errors[`time_${index}`] || errors[`duplicate_${index}`]}
                     </div>
                   )}

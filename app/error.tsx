@@ -3,8 +3,9 @@
 
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
 export default function Error({
   error,
@@ -14,8 +15,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Application error:', error);
+    errorHandler.logError(error, 'App Error Boundary', 'high');
   }, [error]);
 
   return (

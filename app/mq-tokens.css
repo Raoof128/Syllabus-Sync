@@ -38,8 +38,10 @@
 
   /* Semantic Mappings */
   --c-background: #ffffff;
-  --c-background-invert: var(--c-charcoal-800);
-  --c-content: var(--c-charcoal-800);
+  --c-background-invert: #ffffff;
+  --c-content: var(--c-charcoal-900);
+  --c-content-secondary: var(--c-charcoal-800);
+  --c-content-tertiary: var(--c-charcoal-700);
   --c-content-faded: var(--c-charcoal-600);
 
    /* Tailwind CSS Variable Mappings - Light Mode */
@@ -87,6 +89,10 @@
    /* Additional tokens for complete UI */
    --c-border: var(--c-charcoal-200);
    --c-focus: var(--c-red);
+   --c-card-background: #ffffff;
+   --c-input-background: #ffffff;
+   --c-button-secondary: var(--c-sand-100);
+   --c-hover-background: var(--c-sand-100);
 
    /* MQ Token aliases for globals.css compatibility */
    --mq-background: var(--c-background);

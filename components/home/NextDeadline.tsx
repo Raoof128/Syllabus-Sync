@@ -3,20 +3,14 @@
 
 import React, { useMemo } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { PRIORITY_COLORS } from '@/lib/constants';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
 import { Clock, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow, format, isValid } from 'date-fns';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
-
-const priorityColors: Record<'Low' | 'Medium' | 'High' | 'Urgent', string> = {
-  Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
-  Medium: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
-  High: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
-  Urgent: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
-};
 
 export default function NextDeadline() {
   const isHydrated = useHydration();
@@ -89,7 +83,7 @@ export default function NextDeadline() {
                   <h3 className="font-semibold text-mq-content">
                     {nextDeadline.unitCode} — {nextDeadline.title}
                   </h3>
-                  <Badge className={priorityColors[nextDeadline.priority]}>
+                  <Badge className={PRIORITY_COLORS[nextDeadline.priority]}>
                     {nextDeadline.priority}
                   </Badge>
                 </div>

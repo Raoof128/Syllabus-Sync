@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Search, MapPin, Navigation, Building2, Info, Copy, X, Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
 import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import Link from 'next/link';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
 // Custom hook for debounced search
 // eslint-disable react-hooks/set-state-in-effect
@@ -77,6 +78,9 @@ export default function MapPage() {
   const [coordPickerMode, setCoordPickerMode] = useState(false);
   const [copiedCoords, setCopiedCoords] = useState<string>('');
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+  const [shouldRenderMap, setShouldRenderMap] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
@@ -92,13 +96,24 @@ export default function MapPage() {
   } = useDebouncedSearch(searchBuildings, 300);
 
   // Handle coordinate picker click
-  const handleMapClick = (e: L.LeafletMouseEvent) => {
+  const handleMapClick = async (e: L.LeafletMouseEvent) => {
     if (coordPickerMode) {
       const coords = `[${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`;
-      navigator.clipboard.writeText(coords).then(() => {
+      try {
+        if (!navigator.clipboard?.writeText) {
+          throw new Error('Clipboard API unavailable');
+        }
+        await navigator.clipboard.writeText(coords);
         setCopiedCoords(coords);
         setTimeout(() => setCopiedCoords(''), 2000);
-      });
+      } catch (error) {
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to copy coordinates'),
+          'Map Clipboard',
+          'low',
+        );
+        setCopiedCoords('');
+      }
     }
   };
 
@@ -143,6 +158,55 @@ export default function MapPage() {
     setSelectedResultIndex(-1);
   };
 
+  const highlightMatch = useCallback(
+    (text: string) => {
+      const query = searchQuery.trim();
+      if (!query) return text;
+      const lowerText = text.toLowerCase();
+      const lowerQuery = query.toLowerCase();
+      const matchIndex = lowerText.indexOf(lowerQuery);
+      if (matchIndex === -1) return text;
+      const endIndex = matchIndex + query.length;
+      return (
+        <>
+          {text.slice(0, matchIndex)}
+          <span className="text-mq-primary font-semibold">{text.slice(matchIndex, endIndex)}</span>
+          {text.slice(endIndex)}
+        </>
+      );
+    },
+    [searchQuery],
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updateMotion = () => setPrefersReducedMotion(mediaQuery.matches);
+    updateMotion();
+    mediaQuery.addEventListener('change', updateMotion);
+    return () => mediaQuery.removeEventListener('change', updateMotion);
+  }, []);
+
+  useEffect(() => {
+    if (shouldRenderMap) return;
+    const node = mapContainerRef.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setShouldRenderMap(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldRenderMap(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRenderMap]);
+
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       {/* Header */}
@@ -177,7 +241,11 @@ export default function MapPage() {
         {/* Search */}
         <div className="relative">
           {isSearching ? (
-            <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary animate-spin" />
+            <Loader2
+              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
+                prefersReducedMotion ? '' : 'animate-spin'
+              }`}
+            />
           ) : (
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
           )}
@@ -188,20 +256,38 @@ export default function MapPage() {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             className="pl-10 pr-10"
+            role="combobox"
+            aria-expanded={hasSearched && searchQuery.length > 0}
+            aria-controls="map-search-results"
+            aria-activedescendant={
+              selectedResultIndex >= 0
+                ? `map-search-option-${filteredBuildings[selectedResultIndex]?.id}`
+                : undefined
+            }
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={clearSearch}
+              aria-label="Clear search"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
             >
               <X className="h-4 w-4" />
             </button>
           )}
           {hasSearched && searchQuery && filteredBuildings.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto">
+            <div
+              id="map-search-results"
+              role="listbox"
+              aria-label="Building results"
+              className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
+            >
               {filteredBuildings.map((building, index: number) => (
                 <button
                   key={building.id}
+                  id={`map-search-option-${building.id}`}
+                  role="option"
+                  aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
                   className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
                     index === selectedResultIndex
@@ -211,8 +297,12 @@ export default function MapPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-mq-content truncate">{building.name}</div>
-                      <div className="text-mq-sm text-mq-content-secondary">{building.id}</div>
+                      <div className="font-semibold text-mq-content truncate">
+                        {highlightMatch(building.name)}
+                      </div>
+                      <div className="text-mq-sm text-mq-content-secondary">
+                        {highlightMatch(building.id)}
+                      </div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
                       {building.tags?.[0] || 'building'}
@@ -277,12 +367,22 @@ export default function MapPage() {
           <CardTitle>Interactive Campus Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border">
-            <CampusMap
-              selectedBuilding={selectedBuilding}
-              coordPickerMode={coordPickerMode}
-              onMapClick={handleMapClick}
-            />
+          <div
+            ref={mapContainerRef}
+            className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
+          >
+            {shouldRenderMap ? (
+              <CampusMap
+                selectedBuilding={selectedBuilding}
+                coordPickerMode={coordPickerMode}
+                onMapClick={handleMapClick}
+              />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
+                <MapPin className="h-6 w-6" />
+                <p className="text-mq-sm">Map loads when visible</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

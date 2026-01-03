@@ -87,16 +87,20 @@ export default function FeedPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {filters.map((filter) => (
-                  <Button
-                    key={filter}
-                    variant={activeFilter === filter ? 'primary' : 'secondary'}
-                    size="sm"
-                    onClick={() => setActiveFilter(filter)}
-                  >
-                    {filter}
-                  </Button>
-                ))}
+                {filters.map((filter) => {
+                  const isActive = activeFilter === filter;
+                  return (
+                    <Button
+                      key={filter}
+                      variant={isActive ? 'primary' : 'secondary'}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter)}
+                      aria-pressed={isActive}
+                    >
+                      {filter}
+                    </Button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

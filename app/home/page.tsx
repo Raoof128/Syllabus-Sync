@@ -32,6 +32,7 @@ import { Button } from '@/components/ui/mq/button';
 import { toastUtils } from '@/lib/utils/toast';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { useHydration } from '@/lib/hooks';
 import {
   Dialog,
   DialogContent,
@@ -55,7 +56,7 @@ export default function HomePage() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const hasHydrated = useHydration();
   const [seedDisabled] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {
@@ -70,23 +71,6 @@ export default function HomePage() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
-
-  useEffect(() => {
-    const checkHydration = () => {
-      const unitsHydrated = useUnitsStore.persist.hasHydrated();
-      const deadlinesHydrated = useDeadlinesStore.persist.hasHydrated();
-      setHasHydrated(unitsHydrated && deadlinesHydrated);
-    };
-
-    checkHydration();
-    const unsubscribeUnits = useUnitsStore.persist.onFinishHydration(checkHydration);
-    const unsubscribeDeadlines = useDeadlinesStore.persist.onFinishHydration(checkHydration);
-
-    return () => {
-      unsubscribeUnits();
-      unsubscribeDeadlines();
-    };
-  }, []);
 
   // Load sample data on first visit
   useEffect(() => {

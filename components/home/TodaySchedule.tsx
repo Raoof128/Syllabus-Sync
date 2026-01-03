@@ -2,8 +2,9 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Link from 'next/link';
 import { useUnitsStore } from '@/lib/store/unitsStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
@@ -56,16 +57,18 @@ export default function TodaySchedule() {
             <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-mq-content mb-2">No classes today</h3>
             <p className="text-mq-content-secondary mb-4">You&apos;re all caught up! Enjoy your free time.</p>
-             <Button onClick={() => (window.location.href = '/home')} className="gap-2">
-               <BookOpen className="h-4 w-4" />
-               Add Unit
-             </Button>
+            <Button asChild className="gap-2">
+              <Link href="/home">
+                <BookOpen className="h-4 w-4" />
+                Add Unit
+              </Link>
+            </Button>
           </div>
         ) : (
-          todayClasses.map((cls, index) => (
+          todayClasses.map((cls) => (
             <div
-              key={`${cls.code}-${cls.day}-${cls.startTime}-${index}`}
-                className="flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
+              key={`${cls.id}-${cls.code}`}
+              className="flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
             >
               {/* Color indicator */}
               <div

@@ -22,14 +22,14 @@ export interface Unit {
   createdAt: Date;
 }
 
-export interface ClassTime {
+export type ClassTime = {
   id: string;
   day: DayOfWeek;
   startTime: string; // "09:00"
   endTime: string; // "11:00"
-}
+};
 
-export interface Deadline {
+export type Deadline = {
   id: string;
   title: string; // "Assignment 1"
   unitCode: string; // "COMP2310"
@@ -38,9 +38,9 @@ export interface Deadline {
   type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
   completed: boolean;
   createdAt: Date;
-}
+};
 
-export interface Event {
+export type Event = {
   id: string;
   title: string;
   description: string;
@@ -50,9 +50,9 @@ export interface Event {
   building?: string; // "C5C" - for map navigation
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   imageUrl?: string;
-}
+};
 
-export interface Notification {
+export type Notification = {
   id: string;
   title: string;
   message: string;
@@ -61,27 +61,27 @@ export interface Notification {
   createdAt: Date;
   link?: string; // Navigation link
   relatedId?: string; // Related deadline/event/unit ID
-}
+};
 
 export type StressLevel = 'Low' | 'Busy' | 'High';
 
 // Error handling types
-export interface AppError {
+export type AppError = {
   code: string;
   message: string;
   details?: Record<string, unknown>;
   timestamp: Date;
   context?: string;
-}
+};
 
-export interface ValidationError {
+export type ValidationError = {
   field: string;
   message: string;
   code?: string;
-}
+};
 
-export interface FormErrors {
+export type FormErrors = {
   [key: string]: string;
-}
+};
 
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';

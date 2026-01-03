@@ -1,8 +1,16 @@
 // tests/stores.test.ts
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { Unit, Deadline } from '@/lib/types';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { Unit, Deadline, Notification } from '@/lib/types';
+import { apiRequest } from '@/lib/utils/api';
+
+vi.mock('@/lib/utils/api', () => ({
+  apiRequest: vi.fn(),
+}));
+
+const apiRequestMock = apiRequest as unknown as ReturnType<typeof vi.fn>;
 
 describe('unitsStore', () => {
   const mockUnit: Unit = {
@@ -19,33 +27,62 @@ describe('unitsStore', () => {
 
   beforeEach(() => {
     // Reset store state before each test
-    useUnitsStore.setState({ units: [] });
+    useUnitsStore.setState({ units: [], isLoading: false, hasLoaded: false });
+    apiRequestMock.mockReset();
+    const unitState: Unit[] = [];
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.endsWith('/api/units') && method === 'GET') {
+        return unitState;
+      }
+      if (url.endsWith('/api/units') && method === 'POST') {
+        const created = JSON.parse(String(init?.body));
+        unitState.push(created);
+        return created;
+      }
+      if (url.includes('/api/units/') && method === 'PUT') {
+        const id = url.split('/').pop() as string;
+        const updates = JSON.parse(String(init?.body));
+        const index = unitState.findIndex((unit) => unit.id === id);
+        if (index >= 0) {
+          unitState[index] = { ...unitState[index], ...updates };
+          return unitState[index];
+        }
+        return { id, ...updates };
+      }
+      if (url.includes('/api/units/') && method === 'DELETE') {
+        const id = url.split('/').pop() as string;
+        return { id };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
   });
 
-  it('should add a unit', () => {
+  it('should add a unit', async () => {
     const { addUnit } = useUnitsStore.getState();
-    addUnit(mockUnit);
+    await addUnit(mockUnit);
 
     const { units } = useUnitsStore.getState();
     expect(units).toHaveLength(1);
     expect(units[0].code).toBe('COMP2310');
   });
 
-  it('should remove a unit', () => {
+  it('should remove a unit', async () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { removeUnit } = useUnitsStore.getState();
-    removeUnit('test-unit-1');
+    await removeUnit('test-unit-1');
 
     const { units } = useUnitsStore.getState();
     expect(units).toHaveLength(0);
   });
 
-  it('should update a unit', () => {
+  it('should update a unit', async () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { updateUnit } = useUnitsStore.getState();
-    updateUnit('test-unit-1', { name: 'Updated Name' });
+    await updateUnit('test-unit-1', { name: 'Updated Name' });
 
     const { units } = useUnitsStore.getState();
     expect(units[0].name).toBe('Updated Name');
@@ -85,43 +122,72 @@ describe('deadlinesStore', () => {
 
   beforeEach(() => {
     // Reset store state before each test
-    useDeadlinesStore.setState({ deadlines: [] });
+    useDeadlinesStore.setState({ deadlines: [], isLoading: false, hasLoaded: false });
+    apiRequestMock.mockReset();
+    const deadlineState: Deadline[] = [];
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.endsWith('/api/deadlines') && method === 'GET') {
+        return deadlineState;
+      }
+      if (url.endsWith('/api/deadlines') && method === 'POST') {
+        const created = JSON.parse(String(init?.body));
+        deadlineState.push(created);
+        return created;
+      }
+      if (url.includes('/api/deadlines/') && method === 'PUT') {
+        const id = url.split('/').pop() as string;
+        const updates = JSON.parse(String(init?.body));
+        const index = deadlineState.findIndex((deadline) => deadline.id === id);
+        if (index >= 0) {
+          deadlineState[index] = { ...deadlineState[index], ...updates };
+          return deadlineState[index];
+        }
+        return { id, ...updates };
+      }
+      if (url.includes('/api/deadlines/') && method === 'DELETE') {
+        const id = url.split('/').pop() as string;
+        return { id };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
   });
 
-  it('should add a deadline', () => {
+  it('should add a deadline', async () => {
     const { addDeadline } = useDeadlinesStore.getState();
-    addDeadline(mockDeadline);
+    await addDeadline(mockDeadline);
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines).toHaveLength(1);
     expect(deadlines[0].title).toBe('Assignment 1');
   });
 
-  it('should remove a deadline', () => {
+  it('should remove a deadline', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { removeDeadline } = useDeadlinesStore.getState();
-    removeDeadline('test-deadline-1');
+    await removeDeadline('test-deadline-1');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines).toHaveLength(0);
   });
 
-  it('should update a deadline', () => {
+  it('should update a deadline', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { updateDeadline } = useDeadlinesStore.getState();
-    updateDeadline('test-deadline-1', { title: 'Updated Title' });
+    await updateDeadline('test-deadline-1', { title: 'Updated Title' });
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines[0].title).toBe('Updated Title');
   });
 
-  it('should toggle deadline completion', () => {
+  it('should toggle deadline completion', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { toggleComplete } = useDeadlinesStore.getState();
-    toggleComplete('test-deadline-1');
+    await toggleComplete('test-deadline-1');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines[0].completed).toBe(true);
@@ -161,3 +227,74 @@ describe('deadlinesStore', () => {
   });
 });
 
+describe('notificationsStore', () => {
+  const mockNotification: Notification = {
+    id: 'notif-1',
+    title: 'Welcome',
+    message: 'Test notification',
+    type: 'system',
+    read: false,
+    createdAt: new Date(),
+    link: '/home',
+  };
+
+  beforeEach(() => {
+    useNotificationsStore.setState({ notifications: [], isLoading: false, hasLoaded: false });
+    apiRequestMock.mockReset();
+    apiRequestMock.mockImplementation(async (input: RequestInfo) => {
+      const url = input.toString();
+      if (url.endsWith('/api/notifications')) {
+        return [];
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
+  });
+
+  it('should add a notification', () => {
+    const { addNotification } = useNotificationsStore.getState();
+    addNotification(mockNotification);
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(1);
+    expect(notifications[0].title).toBe('Welcome');
+  });
+
+  it('should mark a notification as read', () => {
+    useNotificationsStore.setState({ notifications: [mockNotification] });
+
+    const { markAsRead } = useNotificationsStore.getState();
+    markAsRead('notif-1');
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications[0].read).toBe(true);
+  });
+
+  it('should mark all notifications as read', () => {
+    const notification2 = { ...mockNotification, id: 'notif-2', read: false };
+    useNotificationsStore.setState({ notifications: [mockNotification, notification2] });
+
+    const { markAllAsRead } = useNotificationsStore.getState();
+    markAllAsRead();
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications.every((n) => n.read)).toBe(true);
+  });
+
+  it('should remove a notification', () => {
+    useNotificationsStore.setState({ notifications: [mockNotification] });
+
+    const { removeNotification } = useNotificationsStore.getState();
+    removeNotification('notif-1');
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(0);
+  });
+
+  it('should get unread count', () => {
+    const notification2 = { ...mockNotification, id: 'notif-2', read: true };
+    useNotificationsStore.setState({ notifications: [mockNotification, notification2] });
+
+    const { getUnreadCount } = useNotificationsStore.getState();
+    expect(getUnreadCount()).toBe(1);
+  });
+});

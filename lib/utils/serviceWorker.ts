@@ -1,5 +1,7 @@
 // lib/utils/serviceWorker.ts
 
+import { errorHandler } from '@/lib/utils/errorHandling';
+
 export const registerServiceWorker = async () => {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
     return;
@@ -15,18 +17,18 @@ export const registerServiceWorker = async () => {
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // New content is available, notify user
-            console.warn(
-              'New content is available and will be used when all tabs for this page are closed.',
-            );
+            // New content is available; UI notification hook can be added here.
           }
         });
       }
     });
 
-    console.warn('Service Worker registered successfully');
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    errorHandler.logError(
+      error instanceof Error ? error : new Error('Service Worker registration failed'),
+      'ServiceWorker',
+      'high',
+    );
   }
 };
 
@@ -40,6 +42,10 @@ export const unregisterServiceWorker = async () => {
     await registration.unregister();
     // Service Worker unregistered
   } catch (error) {
-    console.error('Service Worker unregistration failed:', error);
+    errorHandler.logError(
+      error instanceof Error ? error : new Error('Service Worker unregistration failed'),
+      'ServiceWorker',
+      'high',
+    );
   }
 };

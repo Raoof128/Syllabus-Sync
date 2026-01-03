@@ -32,7 +32,7 @@ export const APP_CONFIG = {
   // Full description for metadata
   fullDescription: `Campus navigation and schedule management for ${UNIVERSITY_CONFIG.name}`,
   // Version number
-  version: '0.4.0',
+  version: '0.5.2',
 } as const;
 
 /**
