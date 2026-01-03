@@ -15,6 +15,8 @@ interface DeadlinesState {
   getStressLevel: () => StressLevel;
 }
 
+type DeadlinesPersistedState = Pick<DeadlinesState, 'deadlines'>;
+
 export const useDeadlinesStore = create<DeadlinesState>()(
   persist(
     (set, get) => ({
@@ -92,17 +94,17 @@ export const useDeadlinesStore = create<DeadlinesState>()(
     {
       name: 'deadlines-storage',
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        if (!state?.deadlines?.length) return;
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as DeadlinesPersistedState;
+        if (!state?.deadlines?.length) return { deadlines: [] };
         const seen = new Set<string>();
         const deduped = state.deadlines.filter((deadline) => {
           if (seen.has(deadline.id)) return false;
           seen.add(deadline.id);
           return true;
         });
-        if (deduped.length !== state.deadlines.length) {
-          state.deadlines = deduped;
-        }
+        return { ...state, deadlines: deduped };
       },
     },
   ),

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Bell, Palette, Shield, Info, Mail, Calendar } from 'lucide-react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { toastUtils } from '@/lib/utils/toast';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
@@ -32,21 +34,38 @@ export default function SettingsPage() {
   };
 
   const confirmClearAllData = () => {
-    units.forEach((unit) => removeUnit(unit.id));
-    deadlines.forEach((deadline) => removeDeadline(deadline.id));
-    localStorage.removeItem('units-storage');
-    localStorage.removeItem('deadlines-storage');
-    localStorage.removeItem('notifications-storage');
-    localStorage.removeItem('seed-disabled');
-    localStorage.removeItem('units-seeded');
-    localStorage.removeItem('deadlines-seeded');
-    localStorage.removeItem('notifications-seeded');
-    setClearing(false);
-    setShowClearConfirm(false);
-    toastUtils.success(
-      'Data Cleared',
-      'All units, deadlines, and data have been cleared successfully.',
-    );
+    setClearing(true);
+    let cleared = false;
+    try {
+      units.forEach((unit) => removeUnit(unit.id));
+      deadlines.forEach((deadline) => removeDeadline(deadline.id));
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('units-storage');
+        localStorage.removeItem('deadlines-storage');
+        localStorage.removeItem('notifications-storage');
+        localStorage.removeItem('seed-disabled');
+        localStorage.removeItem('units-seeded');
+        localStorage.removeItem('deadlines-seeded');
+        localStorage.removeItem('notifications-seeded');
+      }
+      cleared = true;
+    } catch (error) {
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to clear data'),
+        'Settings Clear Data',
+        'medium',
+      );
+      toastUtils.error('Error', 'Failed to clear local data. Please try again.');
+    } finally {
+      setClearing(false);
+      if (cleared) {
+        setShowClearConfirm(false);
+        toastUtils.success(
+          'Data Cleared',
+          'All units, deadlines, and data have been cleared successfully.',
+        );
+      }
+    }
   };
 
   return (
@@ -185,19 +204,11 @@ export default function SettingsPage() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button
-              variant="secondary"
-              className="w-full justify-start"
-              onClick={() => (window.location.href = '/home')}
-            >
-              Home
+            <Button variant="secondary" className="w-full justify-start" asChild>
+              <Link href="/home">Home</Link>
             </Button>
-            <Button
-              variant="secondary"
-              className="w-full justify-start"
-              onClick={() => (window.location.href = '/calendar')}
-            >
-              Calendar
+            <Button variant="secondary" className="w-full justify-start" asChild>
+              <Link href="/calendar">Calendar</Link>
             </Button>
           </CardContent>
         </Card>

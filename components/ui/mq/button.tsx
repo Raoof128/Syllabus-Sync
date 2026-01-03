@@ -8,14 +8,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-mq-primary text-mq-background-invert shadow-mq-sm hover:bg-mq-red-bright hover:shadow-mq active:scale-[0.98]',
+        primary: 'bg-mq-primary text-white shadow-mq-sm hover:bg-mq-red-bright hover:shadow-mq active:scale-[0.98]',
         secondary: 'bg-mq-button-secondary text-mq-content border border-mq-border hover:bg-mq-hover-background hover:border-mq-border-secondary active:scale-[0.98]',
         ghost: 'text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content active:scale-[0.98]',
       },
       size: {
-        sm: 'h-8 px-3 text-mq-sm',
-        default: 'h-10 px-4 py-2',
-        lg: 'h-12 px-6 text-mq-lg',
+        sm: 'h-8 px-3 text-[length:var(--fs-small)]',
+        default: 'h-10 px-4 py-2 text-[length:var(--fs-regular)]',
+        lg: 'h-12 px-6 text-[length:var(--fs-large)]',
       },
     },
     defaultVariants: {

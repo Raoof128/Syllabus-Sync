@@ -16,11 +16,9 @@
 
 @keyframes slide-up {
   from {
-    opacity: 0;
     transform: translateY(20px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -95,22 +93,6 @@
 }
 
 
-
-/* Form Elements - Complete MQ styling */
-.dark input,
-.dark textarea,
-.dark select {
-  background-color: var(--mq-input-background);
-  border-color: var(--mq-border);
-  color: var(--mq-content);
-}
-
-.dark input:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: var(--mq-focus);
-  --tw-ring-color: var(--mq-focus);
-}
 
 /* Buttons - MQ primary colors */
 .dark .bg-blue-600 {

@@ -2,7 +2,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { Unit, Deadline } from '@/lib/types';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { Unit, Deadline, Notification } from '@/lib/types';
 
 describe('unitsStore', () => {
   const mockUnit: Unit = {
@@ -161,3 +162,76 @@ describe('deadlinesStore', () => {
   });
 });
 
+describe('notificationsStore', () => {
+  const mockNotification: Notification = {
+    id: 'notif-1',
+    title: 'Welcome',
+    message: 'Test notification',
+    type: 'system',
+    read: false,
+    createdAt: new Date(),
+    link: '/home',
+  };
+
+  beforeEach(() => {
+    useNotificationsStore.setState({ notifications: [] });
+  });
+
+  it('should add a notification', () => {
+    const { addNotification } = useNotificationsStore.getState();
+    addNotification(mockNotification);
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(1);
+    expect(notifications[0].title).toBe('Welcome');
+  });
+
+  it('should mark a notification as read', () => {
+    useNotificationsStore.setState({ notifications: [mockNotification] });
+
+    const { markAsRead } = useNotificationsStore.getState();
+    markAsRead('notif-1');
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications[0].read).toBe(true);
+  });
+
+  it('should mark all notifications as read', () => {
+    const notification2 = { ...mockNotification, id: 'notif-2', read: false };
+    useNotificationsStore.setState({ notifications: [mockNotification, notification2] });
+
+    const { markAllAsRead } = useNotificationsStore.getState();
+    markAllAsRead();
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications.every((notification) => notification.read)).toBe(true);
+  });
+
+  it('should remove a notification', () => {
+    useNotificationsStore.setState({ notifications: [mockNotification] });
+
+    const { removeNotification } = useNotificationsStore.getState();
+    removeNotification('notif-1');
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(0);
+  });
+
+  it('should clear all notifications', () => {
+    useNotificationsStore.setState({ notifications: [mockNotification] });
+
+    const { clearAll } = useNotificationsStore.getState();
+    clearAll();
+
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(0);
+  });
+
+  it('should return the unread count', () => {
+    const readNotification = { ...mockNotification, id: 'notif-2', read: true };
+    useNotificationsStore.setState({ notifications: [mockNotification, readNotification] });
+
+    const { getUnreadCount } = useNotificationsStore.getState();
+    expect(getUnreadCount()).toBe(1);
+  });
+});

@@ -17,6 +17,8 @@ export interface ThemeState {
   resolvedTheme: 'light' | 'dark';
 }
 
+type ThemePersistedState = Pick<ThemeState, 'theme' | 'resolvedTheme'>;
+
 const getSystemTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -55,11 +57,11 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: 'theme-storage',
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        // Ensure resolvedTheme is correctly set after hydration
-        if (state) {
-          state.resolvedTheme = getResolvedTheme(state.theme);
-        }
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as ThemePersistedState;
+        const theme = state?.theme ?? 'system';
+        return { ...state, theme, resolvedTheme: getResolvedTheme(theme) };
       },
     },
   ),
@@ -87,7 +89,11 @@ export const useThemeEffect = () => {
       // Update meta theme-color for mobile browsers
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#1f2937' : '#ffffff');
+        const computedBackground = getComputedStyle(root)
+          .getPropertyValue('--mq-background')
+          .trim();
+        const fallback = resolvedTheme === 'dark' ? '#0f172a' : '#ffffff';
+        metaThemeColor.setAttribute('content', computedBackground || fallback);
       }
     }
   }, [resolvedTheme]);

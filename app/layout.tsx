@@ -21,23 +21,29 @@ const sourceSerif4 = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+  title: {
+    default: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+    template: `%s | ${APP_CONFIG.name}`,
+  },
   description: APP_CONFIG.fullDescription,
+  metadataBase: new URL(UNIVERSITY_CONFIG.website),
+  openGraph: {
+    title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+    description: APP_CONFIG.fullDescription,
+    type: 'website',
+  },
 };
 
-  export const viewport: Viewport = {
-    themeColor: [
-      { media: '(prefers-color-scheme: light)', color: 'var(--mq-background)' },
-      { media: '(prefers-color-scheme: dark)', color: 'var(--mq-background)' },
-    ],
-  };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'var(--mq-background)' },
+    { media: '(prefers-color-scheme: dark)', color: 'var(--mq-background)' },
+  ],
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${workSans.variable} ${sourceSerif4.variable}`}>
-      <head>
-        <meta name="theme-color" content="var(--mq-background)" />
-      </head>
       <body className="font-sans" suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>
       </body>

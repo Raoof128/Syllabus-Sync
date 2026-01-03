@@ -126,7 +126,7 @@ jobs:
           configPath: .lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
-          artifactName: lhci-results
+          artifactName: lhci-results-${{ github.run_id }}-${{ github.run_attempt }}
 
   accessibility:
     name: Accessibility Testing

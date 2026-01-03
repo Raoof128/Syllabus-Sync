@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
 import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import Link from 'next/link';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
 // Custom hook for debounced search
 // eslint-disable react-hooks/set-state-in-effect
@@ -92,13 +93,24 @@ export default function MapPage() {
   } = useDebouncedSearch(searchBuildings, 300);
 
   // Handle coordinate picker click
-  const handleMapClick = (e: L.LeafletMouseEvent) => {
+  const handleMapClick = async (e: L.LeafletMouseEvent) => {
     if (coordPickerMode) {
       const coords = `[${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`;
-      navigator.clipboard.writeText(coords).then(() => {
+      try {
+        if (!navigator.clipboard?.writeText) {
+          throw new Error('Clipboard API unavailable');
+        }
+        await navigator.clipboard.writeText(coords);
         setCopiedCoords(coords);
         setTimeout(() => setCopiedCoords(''), 2000);
-      });
+      } catch (error) {
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to copy coordinates'),
+          'Map Clipboard',
+          'low',
+        );
+        setCopiedCoords('');
+      }
     }
   };
 
@@ -188,20 +200,38 @@ export default function MapPage() {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             className="pl-10 pr-10"
+            role="combobox"
+            aria-expanded={hasSearched && searchQuery.length > 0}
+            aria-controls="map-search-results"
+            aria-activedescendant={
+              selectedResultIndex >= 0
+                ? `map-search-option-${filteredBuildings[selectedResultIndex]?.id}`
+                : undefined
+            }
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={clearSearch}
+              aria-label="Clear search"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
             >
               <X className="h-4 w-4" />
             </button>
           )}
           {hasSearched && searchQuery && filteredBuildings.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto">
+            <div
+              id="map-search-results"
+              role="listbox"
+              aria-label="Building results"
+              className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
+            >
               {filteredBuildings.map((building, index: number) => (
                 <button
                   key={building.id}
+                  id={`map-search-option-${building.id}`}
+                  role="option"
+                  aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
                   className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
                     index === selectedResultIndex

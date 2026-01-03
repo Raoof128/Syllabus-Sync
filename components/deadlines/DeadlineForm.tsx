@@ -200,22 +200,24 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="title">
-                Title <span className="text-red-500">*</span>
+                Title <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="title"
                 placeholder="e.g., Assignment 1"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                className={errors.title ? 'border-mq-error' : ''}
               />
+              {errors.title && <p className="text-sm text-mq-error">{errors.title}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="unitCode">
-                Unit Code <span className="text-red-500">*</span>
+                Unit Code <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
-                <SelectTrigger>
+                <SelectTrigger className={errors.unitCode ? 'border-mq-error' : ''}>
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,23 +228,26 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   ))}
                 </SelectContent>
               </Select>
+              {errors.unitCode && <p className="text-sm text-mq-error">{errors.unitCode}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="dueDate">
-                Due Date <span className="text-red-500">*</span>
+                Due Date <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="dueDate"
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
+                className={errors.dueDate ? 'border-mq-error' : ''}
               />
+              {errors.dueDate && <p className="text-sm text-mq-error">{errors.dueDate}</p>}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="dueTime">
-                Due Time <span className="text-red-500">*</span>
+                Due Time <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="dueTime"
@@ -287,29 +292,13 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DEADLINE_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             <div className="flex items-center gap-2">
               <input
                 id="completed"
                 type="checkbox"
                 checked={completed}
                 onChange={(e) => setCompleted(e.target.checked)}
-                className="h-4 w-4 rounded border-mq-border text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
               />
               <Label htmlFor="completed" className="text-sm font-medium">
                 Mark as completed
@@ -317,7 +306,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
             </div>
 
             {Object.keys(errors).length > 0 && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              <div className="p-3 bg-mq-error/10 border border-mq-error/20 rounded-lg text-sm text-mq-error">
                 {Object.values(errors).map((error, index) => (
                   <div key={index}>• {error}</div>
                 ))}

@@ -2,13 +2,13 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, Navigation } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { isToday } from 'date-fns';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/mq/button';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info border border-mq-info/20',
@@ -58,7 +58,7 @@ export default function EventsFeed() {
                 {/* Navigation to Map */}
                 {event.building && (
                   <div className="mt-2">
-                    <Button asChild variant="outline" size="sm" className="gap-1 text-xs h-7">
+                    <Button asChild variant="secondary" size="sm" className="gap-1 text-xs h-7">
                       <Link href={`/map?building=${event.building}`}>
                         <Navigation className="h-3 w-3" />
                         Navigate to {event.building}

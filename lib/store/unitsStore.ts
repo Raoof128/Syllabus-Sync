@@ -15,6 +15,8 @@ interface UnitsState {
   getTodayClasses: () => (Unit & ClassTime)[];
 }
 
+type UnitsPersistedState = Pick<UnitsState, 'units'>;
+
 export const useUnitsStore = create<UnitsState>()(
   persist(
     (set, get) => ({
@@ -102,17 +104,17 @@ export const useUnitsStore = create<UnitsState>()(
     {
       name: 'units-storage',
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        if (!state?.units?.length) return;
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as UnitsPersistedState;
+        if (!state?.units?.length) return { units: [] };
         const seen = new Set<string>();
         const deduped = state.units.filter((unit) => {
           if (seen.has(unit.id)) return false;
           seen.add(unit.id);
           return true;
         });
-        if (deduped.length !== state.units.length) {
-          state.units = deduped;
-        }
+        return { ...state, units: deduped };
       },
     },
   ),

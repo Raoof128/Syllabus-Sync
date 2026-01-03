@@ -791,3 +791,150 @@ Verification: All badges and event text now display with proper contrast and sty
 Follow-ups: Feed page now provides complete dark mode experience for all interactive and informational elements.
 
 **Last Updated:** January 01, 2026 (Unified Dark Mode Implementation)
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 1 fixes for accessibility, metadata, error handling, and settings resilience.
+Summary: Added Open Graph metadata base, improved loading a11y status, routed app error boundary logging through centralized handler, consolidated duplicate dark mode form styles, enhanced calendar day cell ARIA labels, improved map search combobox/listbox semantics with clipboard error handling, strengthened settings clear-data flow with guards and error logging, and added ARIA pressed state to feed filters.
+Files changed: app/layout.tsx; app/loading.tsx; app/error.tsx; app/globals.css; app/calendar/page.tsx; app/map/page.tsx; app/settings/page.tsx; app/feed/page.tsx.
+Verification: npm run lint (pass); npm test (pass, 35/35 with 1 skipped).
+Follow-ups: Proceed with Phase 2 component audit.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 2 component audit fixes (MQ token alignment, a11y, and form reliability).
+Summary: Aligned home widgets with MQ card/badge/button components, replaced hardcoded header colors with MQ tokens, fixed TodaySchedule navigation and list keys, removed duplicate Deadline type field, added inline form error styling with MQ tokens and aria labels, enhanced ErrorBoundary logging via centralized handler with guarded storage access, updated toast variants to MQ semantic colors, and improved MQ input label associations.
+Files changed: components/home/EventsFeed.tsx; components/home/NextDeadline.tsx; components/home/TodaySchedule.tsx; components/layout/Header.tsx; components/units/UnitForm.tsx; components/deadlines/DeadlineForm.tsx; components/ErrorBoundary.tsx; components/ui/toast.tsx; components/ui/mq/input.tsx.
+Verification: npm run lint (pass); npm test (pass, 35/35 with 1 skipped).
+Follow-ups: Proceed to Phase 3 store/hooks/lib/data audit.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 3 stores/hooks/utils/data audit fixes and demo data restoration.
+Summary: Added client-safe persistence to notifications store, corrected toast hook subscription lifecycle, replaced hardcoded priority/category colors with MQ tokens, guarded error-reporting localStorage access, updated service worker logging to use centralized error handling, aligned theme meta color with CSS tokens, and populated sample units/deadlines with realistic stable demo data.
+Files changed: lib/store/notificationsStore.ts; lib/hooks/use-toast.ts; lib/constants.ts; lib/utils/errorHandling.ts; lib/utils/serviceWorker.ts; lib/store/themeStore.ts; data/sampleUnits.ts.
+Verification: npm run lint (pass); npm test (pass, 35/35 with 1 skipped).
+Follow-ups: Continue to Phase 4 config/tooling/testing readiness audit.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 4 tooling/config polish and dependency hygiene.
+Summary: Updated app version to 0.5.0 in config, removed unused dependencies (@supabase/supabase-js, axios, tw-animate-css), and kept build tooling consistent with current usage.
+Files changed: lib/config.ts; package.json; package-lock.json.
+Verification: npm run lint (pass); npm test (pass, 35/35 with 1 skipped).
+Follow-ups: Consider running npm run build and Lighthouse audits when ready.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Accessibility contrast stabilization and MQ button sizing cleanup.
+Summary: Adjusted MQ button font-size utilities to avoid tailwind-merge collisions, strengthened light theme content tokens, and removed opacity from slide-up animations to prevent temporary low-contrast states during accessibility scans.
+Files changed: components/ui/mq/button.tsx; app/mq-tokens.css; app/globals.css.
+Verification: npm run test:accessibility (pass; warning about --localstorage-file path).
+Follow-ups: Consider aligning slide-up animation opacity changes across other motion classes if additional a11y scans flag similar issues.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 3 store persistence migrations and immutability cleanup.
+Summary: Replaced mutation-based rehydrate logic with persist migrations to dedupe stored units/deadlines/notifications and to normalize theme persistence without direct state mutation.
+Files changed: lib/store/unitsStore.ts; lib/store/deadlinesStore.ts; lib/store/notificationsStore.ts; lib/store/themeStore.ts.
+Verification: npm test (pass, 35 passed, 1 skipped).
+Follow-ups: Consider adding migration coverage to store tests if schema changes expand.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 4 dependency hygiene for tooling.
+Summary: Removed unused Tailwind v4 PostCSS plugin and legacy React compiler Babel plugin to align tooling with current Next/Tailwind usage and reduce dependency surface.
+Files changed: package.json; package-lock.json.
+Verification: npm uninstall @tailwindcss/postcss babel-plugin-react-compiler.
+Follow-ups: Run npm run lint and npm run build if you want full tooling validation.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 4 build fix for React Compiler config.
+Summary: Disabled reactCompiler in Next.js config after removing the React compiler plugin to restore production builds without unused tooling.
+Files changed: next.config.ts.
+Verification: npm run lint (pass); npm run build (pass; warning about --localstorage-file path).
+Follow-ups: Re-enable reactCompiler only if the babel plugin is intentionally restored.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 5 backend utils typing hardening.
+Summary: Tightened constants typing to use domain unions and formalized retry option typing for error handling to improve safety and documentation quality.
+Files changed: lib/constants.ts; lib/utils/errorHandling.ts.
+Verification: npm run lint (pass).
+Follow-ups: Consider adding unit tests around constants if additional categories or priorities are introduced.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 6 sample data edge-case coverage.
+Summary: Added a third unit with evening schedule, a completed past deadline, a past event, and a long-form notification to cover past dates and longer text scenarios.
+Files changed: data/sampleUnits.ts; data/sampleEvents.ts; data/sampleNotifications.ts.
+Verification: Not run (data-only updates).
+Follow-ups: Consider extending sample data if new categories or screens are added.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 8 test suite coverage expansion.
+Summary: Added notification store tests to cover CRUD and unread counts, bringing test coverage closer to store completeness.
+Files changed: tests/stores.test.ts.
+Verification: npm test (pass, 41 passed, 1 skipped).
+Follow-ups: Consider adding persistence migration tests if future schema versions are introduced.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 9 UX polish for header interactions.
+Summary: Added consistent focus rings, hover states, and 44px touch targets for header actions and notification items to meet accessibility and mobile usability guidelines.
+Files changed: components/layout/Header.tsx.
+Verification: npm run lint (pass).
+Follow-ups: Consider applying the same focus/hover pattern to any remaining icon-only buttons if new ones are introduced.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Phase 10 production readiness SEO/security headers.
+Summary: Added App Router sitemap and robots routes and configured baseline security headers for all routes.
+Files changed: app/robots.ts; app/sitemap.ts; next.config.ts.
+Verification: npm run lint (pass).
+Follow-ups: Add CSP once external asset sources are finalized; wire analytics/error tracking when provider is selected.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Final production verification.
+Summary: Verified production build and accessibility suite after Phase 10 readiness updates.
+Files changed: None.
+Verification: npm run build (pass; warning about --localstorage-file path); npm run test:accessibility (pass; warning about --localstorage-file path).
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI polish for unit input selection, deadline badge consistency, and map markers.
+Summary: Updated input selection styling to use MQ tokens and avoid white selection blocks, centralized deadline priority badge colors to the shared constants for consistent calendar/next-deadline styling, and switched map marker SVG fills to resolved MQ red tokens to render red pins reliably.
+Files changed: components/ui/input.tsx; components/home/NextDeadline.tsx; app/calendar/page.tsx; app/map/CampusMap.tsx.
+Verification: npm run lint (pass).
+Follow-ups: Consider refreshing map marker icons on theme toggle if theme-synced pin colors are required.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Map marker theme sync.
+Summary: Added a theme observer in the campus map to refresh Leaflet marker icons when dark mode toggles, ensuring red pins stay in sync with MQ tokens.
+Files changed: app/map/CampusMap.tsx.
+Verification: npm run lint (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Calendar stats layout resilience.
+Summary: Simplified the calendar stats grid to two columns and adjusted stat card layout to prevent label overflow in narrow columns.
+Files changed: app/calendar/page.tsx.
+Verification: npm run lint (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Calendar upcoming card layout fixes.
+Summary: Adjusted upcoming deadline card header layout to wrap badge and title stacks on narrow widths to prevent badge overflow.
+Files changed: app/calendar/page.tsx.
+Verification: npm run lint (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Dark mode menu/dialog background unification.
+Summary: Switched dialog, dropdown, and select surfaces to MQ background tokens with matching borders and hover states so menus align with the site background in dark mode.
+Files changed: components/ui/dialog.tsx; components/ui/dropdown-menu.tsx; components/ui/select.tsx.
+Verification: npm run lint (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Lighthouse CI artifact upload fix.
+Summary: Added run-specific suffix to Lighthouse artifact name to satisfy GitHub Actions artifact naming constraints and avoid 400 upload failures.
+Files changed: .github/workflows/ci-cd.yml.
+Verification: Not run (workflow change only).
+Follow-ups: Re-run Lighthouse CI in GitHub Actions to confirm artifact upload succeeds.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Documentation sync.
+Summary: Updated AGENT and CHANGELOG entries to reflect latest UI, CI, and layout fixes through the current session.
+Files changed: Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md.
+Verification: Not run (documentation update only).
+Follow-ups: None.

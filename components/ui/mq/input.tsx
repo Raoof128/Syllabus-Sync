@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface InputProps
@@ -8,11 +8,13 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, ...props }, ref) => {
+  ({ className, type, label, error, id, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
     return (
       <div className="space-y-2">
         {label && (
-          <label className="text-mq-sm font-medium text-mq-content">
+          <label className="text-mq-sm font-medium text-mq-content" htmlFor={inputId}>
             {label}
           </label>
         )}
@@ -24,6 +26,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className
           )}
           ref={ref}
+          id={inputId}
           {...props}
         />
         {error && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import L from 'leaflet';
 import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
@@ -45,27 +45,34 @@ const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
   [-33.770, 151.125], // top-right
 ];
 
+const resolveCssColor = (variableName: string, fallback: string) => {
+  if (typeof window === 'undefined') {
+    return fallback;
+  }
+  const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+  return value || fallback;
+};
+
 // Custom marker icon
-const createMarkerIcon = (isSelected: boolean) => new L.Icon({
-  iconUrl: isSelected
-    ? `data:image/svg+xml;base64,${btoa(`
-      <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.7 12.5 28.5 12.5 28.5s12.5-19.8 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="var(--mq-success)"/>
-        <circle cx="12.5" cy="12.5" r="5" fill="var(--mq-background-invert)"/>
-      </svg>
-    `)}`
-    : `data:image/svg+xml;base64,${btoa(`
-      <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.7 12.5 28.5 12.5 28.5s12.5-19.8 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="var(--mq-primary)"/>
-        <circle cx="12.5" cy="12.5" r="5" fill="var(--mq-background-invert)"/>
-      </svg>
-    `)}`,
+const createMarkerIcon = (isSelected: boolean) => {
+  const baseFill = resolveCssColor('--c-red', '#a6192e');
+  const selectedFill = resolveCssColor('--c-bright-red', '#d6001c');
+  const centerFill = resolveCssColor('--c-background-invert', '#ffffff');
+  const fill = isSelected ? selectedFill : baseFill;
+  return new L.Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(`
+        <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.7 12.5 28.5 12.5 28.5s12.5-19.8 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="${fill}"/>
+          <circle cx="12.5" cy="12.5" r="5" fill="${centerFill}"/>
+        </svg>
+      `)}`,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   shadowSize: [41, 41],
-});
+  });
+};
 
 // Component to handle map setup and image overlay
 function MapController({
@@ -132,6 +139,20 @@ interface CampusMapProps {
 }
 
 export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
+  const [themeKey, setThemeKey] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const updateThemeKey = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setThemeKey(isDark ? 'dark' : 'light');
+    };
+
+    updateThemeKey();
+    const observer = new MutationObserver(updateThemeKey);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   return (
             <MapContainer
               center={[-33.77, 151.115]}
@@ -159,7 +180,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                 const buildingLatLng = pixelToLatLng(building.position[0], building.position[1]);
                 return (
                   <Marker
-                    key={building.id}
+                    key={`${building.id}-${themeKey}-${selectedBuilding?.id === building.id ? 'selected' : 'base'}`}
                     position={buildingLatLng}
                     icon={createMarkerIcon(selectedBuilding?.id === building.id)}
                   >

@@ -2,8 +2,10 @@
 'use client';
 
 import { Component, ReactNode, ErrorInfo } from 'react';
+import Link from 'next/link';
 import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
 interface Props {
   children: ReactNode;
@@ -40,8 +42,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error for monitoring/debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    errorHandler.logError(error, 'ErrorBoundary', 'high');
 
     // Call optional error handler
     if (this.props.onError) {
@@ -63,6 +64,9 @@ export default class ErrorBoundary extends Component<Props, State> {
   private reportError = (error: Error, errorInfo: ErrorInfo) => {
     // Placeholder for error reporting service
     // In a real app, this would send to services like Sentry, LogRocket, etc.
+    if (typeof window === 'undefined') {
+      return;
+    }
     const errorReport = {
       message: error.message,
       stack: error.stack,
@@ -74,9 +78,13 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     // Store in localStorage for debugging (in development)
     if (process.env.NODE_ENV === 'development') {
-      const existingReports = JSON.parse(localStorage.getItem('errorReports') || '[]');
-      existingReports.push(errorReport);
-      localStorage.setItem('errorReports', JSON.stringify(existingReports.slice(-10))); // Keep last 10
+      try {
+        const existingReports = JSON.parse(localStorage.getItem('errorReports') || '[]');
+        existingReports.push(errorReport);
+        localStorage.setItem('errorReports', JSON.stringify(existingReports.slice(-10))); // Keep last 10
+      } catch {
+        // Swallow localStorage errors in development
+      }
     }
 
     // TODO: Send to error tracking service
@@ -161,9 +169,11 @@ export default class ErrorBoundary extends Component<Props, State> {
                   Try Again
                 </Button>
               ) : (
-                <Button onClick={() => (window.location.href = '/')} className="gap-2" size="lg">
-                  <Home className="w-4 h-4" />
-                  Go Home
+                <Button asChild className="gap-2" size="lg">
+                  <Link href="/home">
+                    <Home className="w-4 h-4" />
+                    Go Home
+                  </Link>
                 </Button>
               )}
 

@@ -144,4 +144,14 @@ export const sampleNotifications: Notification[] = [
     createdAt: getDate(96),
     link: '/feed',
   },
+  {
+    id: 'notif-16',
+    title: 'Profile Update Reminder',
+    message:
+      'Please review your profile details (name, email, and units) to keep notifications accurate.',
+    type: 'system',
+    read: false,
+    createdAt: getDate(0.25),
+    link: '/settings',
+  },
 ];

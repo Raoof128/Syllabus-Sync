@@ -108,4 +108,15 @@ export const sampleEvents: Event[] = [
     building: 'C3C',
     category: 'Free Food',
   },
+  {
+    id: 'event-11',
+    title: 'Alumni Panel: Careers in Data & Policy',
+    description:
+      'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
+    date: getDate(-1),
+    time: '5:30 PM - 6:30 PM',
+    location: 'Library Seminar Room',
+    building: 'LIB',
+    category: 'Career',
+  },
 ];

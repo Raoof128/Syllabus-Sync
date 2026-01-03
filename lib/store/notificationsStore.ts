@@ -1,6 +1,8 @@
 // lib/store/notificationsStore.ts
+'use client';
+
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { Notification } from '@/lib/types';
 
 interface NotificationsState {
@@ -12,6 +14,8 @@ interface NotificationsState {
   clearAll: () => void;
   getUnreadCount: () => number;
 }
+
+type NotificationsPersistedState = Pick<NotificationsState, 'notifications'>;
 
 export const useNotificationsStore = create<NotificationsState>()(
   persist(
@@ -51,18 +55,19 @@ export const useNotificationsStore = create<NotificationsState>()(
     }),
     {
       name: 'notifications-storage',
-      onRehydrateStorage: () => (state) => {
-        if (!state?.notifications?.length) return;
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+      migrate: (persistedState) => {
+        const state = persistedState as NotificationsPersistedState;
+        if (!state?.notifications?.length) return { notifications: [] };
         const seen = new Set<string>();
         const deduped = state.notifications.filter((notification) => {
           if (seen.has(notification.id)) return false;
           seen.add(notification.id);
           return true;
         });
-        if (deduped.length !== state.notifications.length) {
-          state.notifications = deduped;
-        }
+        return { ...state, notifications: deduped };
       },
-    }
-  )
+    },
+  ),
 );
