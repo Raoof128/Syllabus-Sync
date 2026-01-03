@@ -1475,3 +1475,12 @@ Summary: Implemented a professional "Blue Dot" location tracker for the Campus M
 Files: app/globals.css; app/map/CampusMap.tsx.
 Verification: Verified tracking accuracy and UI responsiveness.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Blue Dot User Feedback.
+Summary: Improved user experience for Location Services.
+  - Replaced generic Alerts with clear Toast notifications for permissions/errors.
+  - Added visual cues to the "Center on Me" button (pulse for loading, gray for denied).
+Files: app/map/CampusMap.tsx.
+Verification: Verified UX flow.
+Follow-ups: None.

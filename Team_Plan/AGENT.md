@@ -1787,3 +1787,14 @@ Summary:
 Files: app/globals.css; app/map/CampusMap.tsx.
 Verification: Verified location updates and "Center on Me" functionality.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Blue Dot User Feedback.
+Summary: 
+  - Addressed "Location not available" error by implementing better state feedback.
+  - Added `locationStatus` state (searching, found, denied, error) to track GPS status.
+  - Replaced generic `alert` with proper Toast notifications (`toastUtils.error`/`info`) explaining exactly *why* location failed (e.g., "Permission Denied" vs "Acquiring Signal").
+  - Updated the "Center on Me" button to be visually responsive: pulses when searching, crossed-out when denied.
+Files: app/map/CampusMap.tsx.
+Verification: Verified toast messages trigger correctly for each state.
+Follow-ups: None.

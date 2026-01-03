@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { buildings, Building } from '@/lib/map/buildings';
 import { RoutePreview, formatDistance, formatDuration, openBestNavApp } from '@/lib/map/navigationHelpers';
 import { fetchORSRoute } from '@/lib/services/ors';
+import { toastUtils } from '@/lib/utils/toast';
 
 // Convert pixel coordinates to lat/lng for markers
 const pixelToLatLng = (x: number, y: number) => {
@@ -166,16 +167,25 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   const [preview, setPreview] = useState<RoutePreview | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
 
+  // Location Status State
+  const [locationStatus, setLocationStatus] = useState<'searching' | 'found' | 'denied' | 'error'>('searching');
+
   const userMarkerRef = useRef<L.Marker | null>(null);
   const accuracyCircleRef = useRef<L.Circle | null>(null);
 
   // 1. Live Location Tracking (The "Blue Dot")
   useEffect(() => {
     // Only run if map is ready and geolocation exists
-    if (!mapInstance || !navigator.geolocation) return;
+    if (!mapInstance || !navigator.geolocation) {
+      if (!navigator.geolocation) setLocationStatus('error');
+      return;
+    }
+
+    setLocationStatus('searching');
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
+        setLocationStatus('found');
         const latlng = L.latLng(
           pos.coords.latitude,
           pos.coords.longitude
@@ -211,6 +221,12 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       },
       (err) => {
         console.warn("Location tracking disabled or failed", err);
+        if (err.code === 1) { // PERMISSION_DENIED
+          setLocationStatus('denied');
+        } else {
+          setLocationStatus('error');
+        }
+
         // Fallback to campus centre if we haven't got a location yet
         if (!origin) {
           setOrigin(CAMPUS_CENTRE);
@@ -228,6 +244,21 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
 
   // "Center on Me" Button Action
   const centerOnUser = () => {
+    if (locationStatus === 'denied') {
+      toastUtils.error('Permission Denied', 'Please enable location access in your browser settings to see your position.');
+      return;
+    }
+
+    if (locationStatus === 'searching') {
+      toastUtils.info('Locating...', 'Waiting for GPS signal. Please wait a moment.');
+      return;
+    }
+
+    if (locationStatus === 'error') {
+      toastUtils.error('Location Error', 'Unable to retrieve your location. Please check your signal and try again.');
+      return;
+    }
+
     if (userMarkerRef.current && mapInstance) {
       mapInstance.setView(
         userMarkerRef.current.getLatLng(),
@@ -235,7 +266,8 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         { animate: true }
       );
     } else {
-      alert("Location not available yet.");
+      // Fallback catch-all
+      toastUtils.warning('Location unavailable', 'Your location has not been determined yet.');
     }
   };
 
@@ -351,20 +383,34 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       {/* Floating Action Button: Center on User */}
       <button
         onClick={centerOnUser}
-        className="absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-50 focus:outline-none transition-transform active:scale-95"
+        className={`absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg transition-all active:scale-95 ${locationStatus === 'denied' || locationStatus === 'error'
+          ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+          : 'bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-50'
+          }`}
         title="Center on my location"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <circle cx="12" cy="12" r="3"></circle>
-          <line x1="12" y1="2" x2="12" y2="4"></line>
-          <line x1="12" y1="20" x2="12" y2="22"></line>
-          <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
-          <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
-          <line x1="2" y1="12" x2="4" y2="12"></line>
-          <line x1="20" y1="12" x2="22" y2="12"></line>
-          <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
-          <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={locationStatus === 'searching' ? 'animate-pulse' : ''}
+        >
+          {locationStatus === 'denied' ? (
+            <>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+              <path d="M21 21l-9-9m0 0L3 3"></path>
+            </>
+          ) : (
+            <>
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+              <line x1="12" y1="2" x2="12" y2="4"></line>
+              <line x1="12" y1="20" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+              <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="4" y2="12"></line>
+              <line x1="20" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+              <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+            </>
+          )}
         </svg>
       </button>
 
