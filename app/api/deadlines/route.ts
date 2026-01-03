@@ -17,11 +17,11 @@ const deadlineSchema = z.object({
 });
 
 export async function GET() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const { data, error } = await supabase
     .from('deadlines')
     .select('*')
-    .order('due_date', { ascending: true });
+    .order('due_at', { ascending: true });
 
   if (error) {
     return jsonError(error.message, 500);

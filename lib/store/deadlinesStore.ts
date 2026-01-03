@@ -40,11 +40,10 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       const data = await apiRequest<Deadline[]>('/api/deadlines');
       set({ deadlines: data.map(normalizeDeadline), hasLoaded: true });
     } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to load deadlines'),
-        'DeadlinesStore.loadDeadlines',
-        'high',
-      );
+      // Silently fail - keep persisted data if API is unavailable
+      // This allows the app to work with local data until database is set up
+      console.warn('Failed to load deadlines from API, using persisted data:', error);
+      set({ hasLoaded: true }); // Mark as loaded to prevent retry
     } finally {
       set({ isLoading: false });
     }

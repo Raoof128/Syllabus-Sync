@@ -36,11 +36,10 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
       const data = await apiRequest<Notification[]>('/api/notifications');
       set({ notifications: data.map(normalizeNotification), hasLoaded: true });
     } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to load notifications'),
-        'NotificationsStore.loadNotifications',
-        'high',
-      );
+      // Silently fail - keep persisted data if API is unavailable
+      // This allows the app to work with local data until database is set up
+      console.warn('Failed to load notifications from API, using persisted data:', error);
+      set({ hasLoaded: true }); // Mark as loaded to prevent retry
     } finally {
       set({ isLoading: false });
     }

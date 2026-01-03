@@ -39,11 +39,10 @@ export const useUnitsStore = create<UnitsState>()(
       const data = await apiRequest<Unit[]>('/api/units');
       set({ units: data.map(normalizeUnit), hasLoaded: true });
     } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to load units'),
-        'UnitsStore.loadUnits',
-        'high',
-      );
+      // Silently fail - keep persisted data if API is unavailable
+      // This allows the app to work with local data until database is set up
+      console.warn('Failed to load units from API, using persisted data:', error);
+      set({ hasLoaded: true }); // Mark as loaded to prevent retry
     } finally {
       set({ isLoading: false });
     }

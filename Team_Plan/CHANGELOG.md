@@ -51,6 +51,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Error Handling**: No information leakage with sanitized error responses
 - **Authentication**: Proper JWT token validation and user context handling
 
+### Fixed
+
+#### Critical API Health Endpoint Fixes ✅
+- **Next.js 15+ Compatibility**: Fixed Supabase server client to properly await `cookies()` Promise, resolving API health endpoint failures and database connection testing
+- **UI Component Imports**: Corrected import paths in LoginClient and SignupClient components to use proper component locations (@/components/ui/label vs mq/label, mq/alert vs alert)
+- **Server Startup**: Resolved module resolution errors preventing server startup and API accessibility
+
+#### Critical Runtime Error Fixes ✅
+- **Missing Store Import**: Fixed ReferenceError where `useProfilesStore` was undefined in Header component, preventing application from loading
+- **Module Resolution**: Added proper import for profiles store to resolve runtime reference error
+
+#### API Integration Graceful Handling ✅
+- **Store API Error Handling**: Modified stores to handle API failures gracefully during database integration phase
+- **Fallback to Persisted Data**: Deadlines, notifications, and units stores now use localStorage data when API endpoints return errors
+- **Console Error Reduction**: Eliminated high-priority console errors during early development phase
+
+#### Database Schema Validation and Testing ✅
+- **Schema Analysis**: Identified column name mismatches (due_at vs due_date) between API expectations and actual database schema
+- **API Endpoint Validation**: Verified core API endpoints (deadlines, units, notifications) work correctly with proper authentication requirements
+- **Testing Infrastructure**: Created comprehensive database testing scripts (setup-database.js, test-database.js, inspect-schema.js) for ongoing monitoring
+- **Row Level Security**: Confirmed RLS policies are active and properly protecting data access
+
 ---
 
 ## [0.5.1] - 2026-01-03

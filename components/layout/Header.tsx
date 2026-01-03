@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   Bell,
   Settings,
@@ -15,11 +16,11 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
-import { APP_CONFIG, DEMO_USER, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
+import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import { sampleNotifications } from '@/data/sampleNotifications';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import {
   DropdownMenu,
@@ -37,39 +38,66 @@ const notificationIcons = {
 };
 
 const Header = memo(() => {
+  const router = useRouter();
+  const supabase = createBrowserClient();
+
+  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const notifications = useNotificationsStore((state) => state.notifications);
   const addNotification = useNotificationsStore((state) => state.addNotification);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  // setState called in effect is correct here - syncing with localStorage during hydration
+  // Load user authentication state
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  // setState called in effect is correct here - syncing with localStorage during hydration
-  useEffect(() => {
-    if (!hasSeeded && isClient) {
-      const seededKey = 'notifications-seeded';
+    const getUser = async () => {
       try {
-        const alreadySeeded = localStorage.getItem(seededKey) === 'true';
-        if (!alreadySeeded) {
-          sampleNotifications.forEach(addNotification);
-          localStorage.setItem(seededKey, 'true');
-        }
-      } catch {
-        sampleNotifications.forEach(addNotification);
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Failed to get user:', error);
+      } finally {
+        setIsLoading(false);
       }
-      setHasSeeded(true);
+    };
+
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  // Handle notifications seeding (only if authenticated)
+  useEffect(() => {
+    if (!user || hasSeeded) return;
+
+    const notificationsSeededKey = 'notifications-seeded';
+
+    try {
+      const notificationsSeeded = localStorage.getItem(notificationsSeededKey) === 'true';
+
+      if (!notificationsSeeded) {
+        // Note: For now, we'll rely on API data
+        // In future, we might seed some demo notifications
+        localStorage.setItem(notificationsSeededKey, 'true');
+      }
+    } catch {
+      // Ignore localStorage errors
     }
-  }, [addNotification, hasSeeded, isClient]);
+    setHasSeeded(true);
+  }, [user, hasSeeded]);
 
   // Theme and profile stores
   const { toggleTheme, resolvedTheme } = useThemeStore();
@@ -252,7 +280,7 @@ const Header = memo(() => {
                   )}
                 </div>
                 <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
-                  {currentProfile ? currentProfile.name : DEMO_USER.name}
+                  {user?.email || 'User'}
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -289,8 +317,15 @@ const Header = memo(() => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                disabled
-                className="flex items-center gap-2 text-mq-content-tertiary"
+                onClick={async () => {
+                  try {
+                    await supabase.auth.signOut();
+                    router.push('/login');
+                  } catch (error) {
+                    console.error('Logout failed:', error);
+                  }
+                }}
+                className="flex items-center gap-2 text-mq-content-secondary hover:text-mq-content cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Sign out
