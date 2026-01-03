@@ -1764,3 +1764,14 @@ Summary:
 Files: app/map/CampusMap.tsx.
 Verification: Verified correct class usage and inline style variable mapping.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Premium Scroll Animations.
+Summary: 
+  - Implemented high-quality scroll-reveal animations using `framer-motion`.
+  - Created reusable `components/ui/ScrollReveal.tsx` component with `cubic-bezier(0.5, 0.5, 0, 1)` easing to match `mq-tokens.css` design system.
+  - Applied animations to `apps/home/HomeClient.tsx` sections (Header, Grid, Units, Events).
+  - Implemented staggered entry for grid items (Unit Cards) for a luxurious feel.
+Files: components/ui/ScrollReveal.tsx; app/home/HomeClient.tsx.
+Verification: Verified animation timing and stagger effects.
+Follow-ups: None.

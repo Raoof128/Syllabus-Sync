@@ -7,6 +7,8 @@ import EventsFeed from '@/components/home/EventsFeed';
 import UnitCard from '@/components/units/UnitCard';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
+import { motion } from 'framer-motion';
 
 // Dynamically import forms for better code splitting
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
@@ -391,190 +393,201 @@ export default function HomeClient() {
       </a>
 
       {/* Header */}
-      <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-            {t('welcome')}, {DEMO_USER.name}!
-          </h1>
-          <p className="text-mq-content-secondary">{t('dayAtGlance')}</p>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Keyboard Shortcuts Hint */}
-          <div className="hidden lg:block">
-            <KeyboardShortcuts />
+      <ScrollReveal>
+        <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
+              {t('welcome')}, {DEMO_USER.name}!
+            </h1>
+            <p className="text-mq-content-secondary">{t('dayAtGlance')}</p>
           </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Keyboard Shortcuts Hint */}
+            <div className="hidden lg:block">
+              <KeyboardShortcuts />
+            </div>
 
-          {/* Stress Level Indicator */}
-          {hasHydrated && deadlines.length > 0 && (
-            <>
-              <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
-                <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
-                <Badge
-                  className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
-                  aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
-                  title={`${t('workload')}: ${stressLevel}`}
+            {/* Stress Level Indicator */}
+            {hasHydrated && deadlines.length > 0 && (
+              <>
+                <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
+                  <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
+                  <Badge
+                    className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
+                    aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
+                    title={`${t('workload')}: ${stressLevel}`}
+                  >
+                    {stressEmoji[stressLevel]}
+                  </Badge>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
+                  <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
+                  <span className="text-mq-sm text-mq-content">{t('workload')}</span>
+                  <Badge
+                    className={stressColors[stressLevel]}
+                    aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
+                  >
+                    {stressEmoji[stressLevel]} {stressLevel}
+                  </Badge>
+                </div>
+              </>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className="gap-2 touch-manipulation"
+                  size="default"
+                  aria-label={`${t('addNew').toLowerCase()} ${t('addUnit').toLowerCase()} ${t('addDeadline').toLowerCase()}`}
+                  aria-haspopup="menu"
                 >
-                  {stressEmoji[stressLevel]}
-                </Badge>
-              </div>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
-                <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
-                <span className="text-mq-sm text-mq-content">{t('workload')}</span>
-                <Badge
-                  className={stressColors[stressLevel]}
-                  aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t('addNew')}</span>
+                  <span className="sm:hidden">{t('add')}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-mq-background border-mq-border"
+                aria-label={t('addNewItemsMenu')}
+              >
+                <DropdownMenuItem
+                  onClick={handleAddUnit}
+                  className="gap-2 cursor-pointer focus:bg-mq-primary/10"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleAddUnit();
+                    }
+                  }}
                 >
-                  {stressEmoji[stressLevel]} {stressLevel}
-                </Badge>
-              </div>
-            </>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className="gap-2 touch-manipulation"
-                size="default"
-                aria-label={`${t('addNew').toLowerCase()} ${t('addUnit').toLowerCase()} ${t('addDeadline').toLowerCase()}`}
-                aria-haspopup="menu"
-              >
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('addNew')}</span>
-                <span className="sm:hidden">{t('add')}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-mq-background border-mq-border"
-              aria-label={t('addNewItemsMenu')}
-            >
-              <DropdownMenuItem
-                onClick={handleAddUnit}
-                className="gap-2 cursor-pointer focus:bg-mq-primary/10"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleAddUnit();
-                  }
-                }}
-              >
-                <BookOpen className="h-4 w-4" />
-                {t('addUnit')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleAddDeadline}
-                className="gap-2 cursor-pointer focus:bg-mq-primary/10"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleAddDeadline();
-                  }
-                }}
-              >
-                <Clock className="h-4 w-4" />
-                {t('addDeadline')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
+                  <BookOpen className="h-4 w-4" />
+                  {t('addUnit')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleAddDeadline}
+                  className="gap-2 cursor-pointer focus:bg-mq-primary/10"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleAddDeadline();
+                    }
+                  }}
+                >
+                  <Clock className="h-4 w-4" />
+                  {t('addDeadline')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+      </ScrollReveal>
 
       {/* Get Started Banner */}
       {!hasUnits && (
-        <section className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3" aria-labelledby="get-started-heading">
-          <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="flex-1">
-            <h2 id="get-started-heading" className="sr-only">{t('gettingStartedGuide')}</h2>
-            <p className="text-mq-sm text-mq-info">
-              <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
-            </p>
-          </div>
-        </section>
+        <ScrollReveal delay={0.1}>
+          <section className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3" aria-labelledby="get-started-heading">
+            <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <h2 id="get-started-heading" className="sr-only">{t('gettingStartedGuide')}</h2>
+              <p className="text-mq-sm text-mq-info">
+                <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
+              </p>
+            </div>
+          </section>
+        </ScrollReveal>
       )}
 
       {/* Main Dashboard Grid */}
       <section id="main-content" className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" role="main" aria-label={t('dashboardOverview')}>
-        <div className="animate-slide-up">
+        <ScrollReveal delay={0.1}>
           <TodaySchedule />
-        </div>
-        <div className="animate-slide-up animation-delay-100">
+        </ScrollReveal>
+        <ScrollReveal delay={0.2}>
           <NextDeadline />
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* My Units Section */}
-      <section aria-labelledby="units-section-heading">
-        <Card className="mb-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle id="units-section-heading" className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" aria-hidden="true" />
-              {t('myUnits')}
-            </CardTitle>
-            <Button onClick={handleAddUnit} size="sm" className="gap-1">
-              <Plus className="h-4 w-4" />
-              Add Unit
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {!hasHydrated ? (
-              <div className="h-32 flex items-center justify-center">
-                <div className="animate-pulse space-y-3">
-                  <div className="h-4 bg-mq-background-tertiary rounded w-3/4" />
-                  <div className="h-4 bg-mq-background-tertiary rounded w-1/2" />
-                  <div className="h-16 bg-mq-background-tertiary rounded w-full" />
-                </div>
-              </div>
-            ) : units.length === 0 ? (
-              <div className="text-center py-12">
-                <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
-                <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                  {t('addFirstUnitDesc')}
-                </p>
-                <Button onClick={handleAddUnit} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t('addYourFirstUnit')}
-                </Button>
-              </div>
-            ) : (
-              <>
-                {/* Unit Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
-                  <div className="text-center animate-fade-in">
-                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
-                    <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
-                  </div>
-                  <div className="text-center animate-fade-in animation-delay-100">
-                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
-                    <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
-                  </div>
-                  <div className="text-center animate-fade-in animation-delay-200">
-                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
-                    <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+      <ScrollReveal delay={0.3} staggerChildren={0.1}>
+        <section aria-labelledby="units-section-heading">
+          <Card className="mb-6">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle id="units-section-heading" className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" aria-hidden="true" />
+                {t('myUnits')}
+              </CardTitle>
+              <Button onClick={handleAddUnit} size="sm" className="gap-1">
+                <Plus className="h-4 w-4" />
+                Add Unit
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {!hasHydrated ? (
+                <div className="h-32 flex items-center justify-center">
+                  <div className="animate-pulse space-y-3 w-full max-w-md">
+                    <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
+                    <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
                   </div>
                 </div>
+              ) : units.length === 0 ? (
+                <div className="text-center py-12">
+                  <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
+                  <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                    {t('addFirstUnitDesc')}
+                  </p>
+                  <Button onClick={handleAddUnit} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    {t('addYourFirstUnit')}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Unit Stats */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                    <div className="text-center">
+                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
+                      <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
+                      <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
+                      <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+                    </div>
+                  </div>
 
-                {/* Units Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                  {units.map((unit) => (
-                    <UnitCard
-                      key={unit.id}
-                      unit={unit}
-                      onEdit={handleEditUnit}
-                      onDelete={handleDeleteUnit}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </section>
+                  {/* Units Grid */}
+                  <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+                    variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                  >
+                    {units.map((unit) => (
+                      <motion.div key={unit.id} variants={revealChildVariants}>
+                        <UnitCard
+                          unit={unit}
+                          onEdit={handleEditUnit}
+                          onDelete={handleDeleteUnit}
+                        />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      </ScrollReveal>
 
       {/* Events Section */}
-      <section aria-labelledby="events-section-heading" className="mb-8">
-        <h2 id="events-section-heading" className="sr-only">{t('todaysEvents')}</h2>
-        <EventsFeed />
-      </section>
+      <ScrollReveal delay={0.4}>
+        <section aria-labelledby="events-section-heading" className="mb-8">
+          <h2 id="events-section-heading" className="sr-only">{t('todaysEvents')}</h2>
+          <EventsFeed />
+        </section>
+      </ScrollReveal>
 
       {/* Unit Form Dialog */}
       <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />

@@ -1455,3 +1455,13 @@ Summary: Redesigned the Hybrid Navigation Panel to match the Macquarie Universit
 Files: app/map/CampusMap.tsx.
 Verification: Verified style integration.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Premium Scroll Animations.
+Summary: Added bespoke Scroll Reveal animations to the Home Dashboard.
+  - Technology: Powered by `framer-motion` for buttery smooth performance (60fps).
+  - Design: Uses custom easing curves that match the Macquarie design tokens.
+  - Effect: Sections now slide up and fade in elegantly as the user scrolls. Grid items (Units) cascade in with a staggered effect.
+Files: components/ui/ScrollReveal.tsx; app/home/HomeClient.tsx.
+Verification: Verified visual motion parity.
+Follow-ups: None.
