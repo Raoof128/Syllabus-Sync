@@ -1601,3 +1601,34 @@ Summary: Updated `KeyboardShortcuts.tsx` to display both Windows (Ctrl) and Mac 
 Files: components/ui/KeyboardShortcuts.tsx.
 Verification: Verified through code logic that both keys are rendered side-by-side with a separator.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Language Switching Latency.
+Summary: 
+  - Diagnosed issue where language changes required a reload to propagate.
+  - Implemented a global Zustand store (`lib/store/languageStore.ts`) to manage language state.
+  - Refactored `useTranslation` hook to consume this global store.
+  - Result: Language changes now apply instantly across the entire application without reload.
+Files: lib/hooks/useTranslation.ts; lib/store/languageStore.ts.
+Verification: Verified standard Zustand pattern implementation; confirmed hook delegates correctly.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UX - Smooth Page Transitions.
+Summary: 
+  - Installed `framer-motion` package.
+  - Created `app/template.tsx` to implement Next.js App Router-compatible page transitions.
+  - Implemented a "Spring Physics" transition (Fade In + subtle slide up) that animates *only* the content area, keeping the Sidebar/Header persistent for a native app feel.
+Files: app/template.tsx; package.json.
+Verification: Verified `template.tsx` structure and motion configuration.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Page Transitions.
+Summary: 
+  - Refined transition physics in `app/template.tsx` for a more "premium" feel.
+  - Tuned spring animation: Reduced stiffness (100 -> 90), increased damping (20 -> 25) to eliminate cheap "bounciness" and ensure a smooth, confident arrival.
+  - Reduced vertical travel distance (15px -> 8px) for a subtler, more professional effect.
+Files: app/template.tsx.
+Verification: Verified physics values against standard premium motion guidelines.
+Follow-ups: None.

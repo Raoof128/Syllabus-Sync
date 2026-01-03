@@ -1337,3 +1337,24 @@ Summary: Updated `KeyboardShortcuts.tsx` hotkey menu to explicitly show both Win
 Files: components/ui/KeyboardShortcuts.tsx.
 Verification: UI code updated to render dual key hints.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Language Switching Latency.
+Summary: Fixed "hard restart needed" issue for language switching. Replaced local state in translation hook with a global Zustand store (`languageStore`), ensuring instant, app-wide updates when switching languages.
+Files: lib/hooks/useTranslation.ts; lib/store/languageStore.ts.
+Verification: Verified store integration.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UX - Smooth Page Transitions.
+Summary: Added highly polished, smooth page transitions using `framer-motion` and Next.js `template.tsx`. Transition features a subtle spring-based slide-up and fade-in effect that animates main content while keeping navigation elements stable.
+Files: app/template.tsx.
+Verification: Verified installation and file creation.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Page Transitions.
+Summary: Fine-tuned page transition physics for a "premium" feel. Adjusted spring tension and damping to remove bounce, resulting in a smooth, confident slide-up effect (0.5s duration, 8px travel).
+Files: app/template.tsx.
+Verification: Verified updated motion values.
+Follow-ups: None.
