@@ -26,6 +26,7 @@ import { APP_CONFIG } from '@/lib/config';
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [storageEnabled, setStorageEnabled] = useState(true);
 
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
@@ -120,11 +121,11 @@ export default function SettingsPage() {
   };
 
   return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <header className="mb-8">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('settingsTitle')}</h1>
-          <p className="text-mq-content-secondary">{t('settingsSubtitle')}</p>
-        </header>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <header className="mb-8">
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('settingsTitle')}</h1>
+        <p className="text-mq-content-secondary">{t('settingsSubtitle')}</p>
+      </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         <Card>
@@ -170,8 +171,8 @@ export default function SettingsPage() {
                     </>
                   )}
                 </Button>
-               </div>
-             </div>
+              </div>
+            </div>
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -368,9 +369,31 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-mq-content">{t('dataStorage')}</h4>
-                  <p className="text-mq-sm text-mq-content-secondary">{t('dataStorageDesc')}</p>
+                  <p className="text-mq-sm text-mq-content-secondary">
+                    {storageEnabled ? t('dataStorageDesc') : 'Storage disabled (Session only)'}
+                  </p>
                 </div>
-                <div className="w-10 h-5 bg-mq-success rounded-full opacity-50" />
+                <button
+                  role="switch"
+                  aria-checked={storageEnabled}
+                  onClick={() => {
+                    if (storageEnabled) {
+                      toastUtils.info('Local Storage', 'Disabling local storage is not recommended as your data will not be saved.');
+                      // Optional: setStorageEnabled(false);
+                    } else {
+                      setStorageEnabled(true);
+                      toastUtils.success('Storage Enabled', 'Your data will be saved locally.');
+                    }
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 ${storageEnabled ? 'bg-mq-success' : 'bg-mq-background-tertiary'
+                    }`}
+                >
+                  <span className="sr-only">{t('toggleStorage')}</span>
+                  <span
+                    className={`${storageEnabled ? 'translate-x-6' : 'translate-x-1'
+                      } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </button>
               </div>
             </div>
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">

@@ -89,6 +89,7 @@ export const translations = {
 
     // Privacy & Security
     dataStorage: 'Data Storage',
+    toggleStorage: 'Toggle data storage',
     dataStorageDesc: 'Currently using local storage',
     exportData: 'Export Data',
     exportDataDesc: 'Download all your data as JSON',
@@ -632,6 +633,7 @@ export const translations = {
 
     // Privacy & Security
     dataStorage: 'Almacenamiento de Datos',
+    toggleStorage: 'Alternar almacenamiento',
     dataStorageDesc: 'Actualmente usando almacenamiento local',
     exportData: 'Exportar Datos',
     exportDataDesc: 'Descarga todos tus datos como JSON',
@@ -1062,6 +1064,7 @@ export const translations = {
 
     // Privacy & Security
     dataStorage: 'ذخیره‌سازی داده‌ها',
+    toggleStorage: 'تغییر وضعیت ذخیره‌سازی',
     dataStorageDesc: 'در حال حاضر از ذخیره‌سازی محلی استفاده می‌شود',
     exportData: 'صادرات داده‌ها',
     exportDataDesc: 'همه داده‌های خود را به صورت JSON دانلود کنید',

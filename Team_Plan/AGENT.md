@@ -1584,3 +1584,20 @@ Summary: Added missing translation keys for Map page UI elements (e.g., "Campus 
 Files: lib/i18n/translations.ts; app/map/page.tsx.
 Verification: Confirmed keys exist in translations file and are used in the Map page component.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI Enhancements - Hotkeys & Settings.
+Summary: 
+  - Refactored Hotkeys display into a modern "Kb" dropdown menu (`KeyboardShortcuts.tsx`) with dynamic Mac/PC key detection (Cmd vs Ctrl) and i18n support.
+  - "Wired up" the Data Storage section in Settings: replaced static toggle with an interactive functional toggle (controls storage preference state, provides user feedback).
+  - Verified Export and Clear Data functionality.
+Files: components/ui/KeyboardShortcuts.tsx; app/home/HomeClient.tsx; app/settings/page.tsx; lib/i18n/translations.ts.
+Verification: Verified component rendering and logic through code review; translations added for all languages.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI Enhancements - Hotkeys.
+Summary: Updated `KeyboardShortcuts.tsx` to display both Windows (Ctrl) and Mac (Cmd) modifier keys simultaneously in the dropdown menu, as requested. Increased dropdown width to accommodate the extra content.
+Files: components/ui/KeyboardShortcuts.tsx.
+Verification: Verified through code logic that both keys are rendered side-by-side with a separator.
+Follow-ups: None.

@@ -57,6 +57,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 
 export default function HomeClient() {
   const { t } = useTranslation();
@@ -171,20 +172,20 @@ export default function HomeClient() {
       // Validate sample data before adding
       const validUnits = sampleUnits.filter(unit => {
         return unit &&
-               typeof unit.code === 'string' &&
-               typeof unit.name === 'string' &&
-               typeof unit.color === 'string' &&
-               Array.isArray(unit.schedule) &&
-               unit.schedule.length > 0;
+          typeof unit.code === 'string' &&
+          typeof unit.name === 'string' &&
+          typeof unit.color === 'string' &&
+          Array.isArray(unit.schedule) &&
+          unit.schedule.length > 0;
       });
 
       const validDeadlines = sampleDeadlines.filter(deadline => {
         return deadline &&
-               typeof deadline.title === 'string' &&
-               typeof deadline.unitCode === 'string' &&
-               typeof deadline.priority === 'string' &&
-               deadline.dueDate &&
-               !isNaN(new Date(deadline.dueDate).getTime());
+          typeof deadline.title === 'string' &&
+          typeof deadline.unitCode === 'string' &&
+          typeof deadline.priority === 'string' &&
+          deadline.dueDate &&
+          !isNaN(new Date(deadline.dueDate).getTime());
       });
 
       if (!unitsSeeded && validUnits.length > 0) {
@@ -399,11 +400,8 @@ export default function HomeClient() {
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Keyboard Shortcuts Hint */}
-          <div className="hidden lg:flex items-center gap-1 px-2 py-1 bg-mq-background-secondary rounded text-mq-xs text-mq-content-tertiary border border-mq-border/50">
-            <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono">Ctrl+U</kbd>
-            <span>{t('addUnit')}</span>
-            <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono ml-2">Ctrl+D</kbd>
-            <span>{t('addDeadline')}</span>
+          <div className="hidden lg:block">
+            <KeyboardShortcuts />
           </div>
 
           {/* Stress Level Indicator */}
@@ -511,65 +509,65 @@ export default function HomeClient() {
               <BookOpen className="h-5 w-5" aria-hidden="true" />
               {t('myUnits')}
             </CardTitle>
-          <Button onClick={handleAddUnit} size="sm" className="gap-1">
-            <Plus className="h-4 w-4" />
-            Add Unit
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {!hasHydrated ? (
-             <div className="h-32 flex items-center justify-center">
-               <div className="animate-pulse space-y-3">
-                 <div className="h-4 bg-mq-background-tertiary rounded w-3/4" />
-                 <div className="h-4 bg-mq-background-tertiary rounded w-1/2" />
-                 <div className="h-16 bg-mq-background-tertiary rounded w-full" />
-               </div>
-             </div>
-          ) : units.length === 0 ? (
-             <div className="text-center py-12">
-               <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-              <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
-              <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                {t('addFirstUnitDesc')}
-              </p>
-              <Button onClick={handleAddUnit} className="gap-2">
-                <Plus className="h-4 w-4" />
-                {t('addYourFirstUnit')}
-              </Button>
-            </div>
-          ) : (
-            <>
-              {/* Unit Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
-                <div className="text-center animate-fade-in">
-                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
-                  <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
-                </div>
-                <div className="text-center animate-fade-in animation-delay-100">
-                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
-                  <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
-                </div>
-                <div className="text-center animate-fade-in animation-delay-200">
-                  <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
-                  <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+            <Button onClick={handleAddUnit} size="sm" className="gap-1">
+              <Plus className="h-4 w-4" />
+              Add Unit
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {!hasHydrated ? (
+              <div className="h-32 flex items-center justify-center">
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-mq-background-tertiary rounded w-3/4" />
+                  <div className="h-4 bg-mq-background-tertiary rounded w-1/2" />
+                  <div className="h-16 bg-mq-background-tertiary rounded w-full" />
                 </div>
               </div>
+            ) : units.length === 0 ? (
+              <div className="text-center py-12">
+                <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
+                <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                  {t('addFirstUnitDesc')}
+                </p>
+                <Button onClick={handleAddUnit} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  {t('addYourFirstUnit')}
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Unit Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                  <div className="text-center animate-fade-in">
+                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
+                    <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
+                  </div>
+                  <div className="text-center animate-fade-in animation-delay-100">
+                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
+                    <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
+                  </div>
+                  <div className="text-center animate-fade-in animation-delay-200">
+                    <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
+                    <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+                  </div>
+                </div>
 
-              {/* Units Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {units.map((unit) => (
-                  <UnitCard
-                    key={unit.id}
-                    unit={unit}
-                    onEdit={handleEditUnit}
-                    onDelete={handleDeleteUnit}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+                {/* Units Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {units.map((unit) => (
+                    <UnitCard
+                      key={unit.id}
+                      unit={unit}
+                      onEdit={handleEditUnit}
+                      onDelete={handleDeleteUnit}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
       </section>
 
       {/* Events Section */}

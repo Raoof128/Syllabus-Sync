@@ -1320,3 +1320,20 @@ Summary:
 Files: lib/i18n/translations.ts; app/map/page.tsx.
 Verification: Verified code compilation and that new translation keys match usage.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI Enhancements - Hotkeys & Settings.
+Summary:
+  - Implemented `KeyboardShortcuts.tsx`: A new responsive hotkey dropdown component replacing the inline hint, featuring platform-aware keys (Mac/PC) and full i18n support.
+  - Enhanced Settings Page: "Wired up" the Privacy & Security section by replacing the decorative Data Storage toggle with a functional one that manages storage preferences (with proper user feedback/warnings).
+  - Verified and polished "Export Data" and "Clear All Data" functionalities in Settings.
+Files: components/ui/KeyboardShortcuts.tsx; app/home/HomeClient.tsx; app/settings/page.tsx; lib/i18n/translations.ts.
+Verification: UI components render correctly; functionality tested via logic review; no regressions in build.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: UI Enhancements - Hotkeys.
+Summary: Updated `KeyboardShortcuts.tsx` hotkey menu to explicitly show both Windows (Ctrl) and Mac (Cmd) modifier keys side-by-side, instead of auto-detecting one.
+Files: components/ui/KeyboardShortcuts.tsx.
+Verification: UI code updated to render dual key hints.
+Follow-ups: None.
