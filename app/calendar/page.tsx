@@ -184,9 +184,125 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Deadlines */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-6">
+        {/* Calendar View - Full Width */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5" />
+              Calendar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" size="sm" onClick={goToPrevious} aria-label="Previous">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="secondary" size="sm" onClick={jumpToToday}>
+                  Today
+                </Button>
+                <Button variant="secondary" size="sm" onClick={goToNext} aria-label="Next">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="text-mq-sm font-medium text-mq-content">
+                {view === 'week'
+                  ? `${format(calendarRange.start, 'MMM d')} - ${format(calendarRange.end, 'MMM d')}`
+                  : format(currentDate, 'MMMM yyyy')}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={view === 'month' ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => setView('month')}
+                >
+                  Month
+                </Button>
+                <Button
+                  variant={view === 'week' ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => setView('week')}
+                >
+                  Week
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-mq-xs text-mq-content-secondary mb-2">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label) => (
+                <div key={label} className="text-center font-medium">
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
+              {calendarDays.map((day) => {
+                const dayKey = format(day, 'yyyy-MM-dd');
+                const dayDeadlines = deadlinesByDay[dayKey] ?? [];
+                const isOutside = view === 'month' && !isSameMonth(day, currentDate);
+                const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
+                return (
+                  <div
+                    key={dayKey}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedDate(day)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedDate(day);
+                      }
+                    }}
+                    className={`min-h-[80px] sm:min-h-[100px] rounded-mq border p-1 sm:p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus ${
+                      isOutside ? 'bg-mq-background-secondary/50 text-mq-content-tertiary' : 'bg-mq-background dark:bg-mq-card-background'
+                    } ${isSelected ? 'border-mq-primary ring-1 ring-mq-primary/20' : 'border-mq-border'} ${isToday(day) ? 'bg-mq-primary/5 dark:bg-mq-primary/10' : ''}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-mq-xs font-semibold ${isToday(day) ? 'text-mq-primary' : 'text-mq-content'}`}
+                      >
+                        {format(day, 'd')}
+                      </span>
+                      {isToday(day) && <span className="text-[10px] text-mq-primary font-medium">Today</span>}
+                    </div>
+                    <div className="mt-1 space-y-0.5">
+                      {dayDeadlines.slice(0, 2).map((deadline) => (
+                        <button
+                          key={deadline.id}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleEditDeadline(deadline);
+                          }}
+                          className={`w-full rounded px-1 py-0.5 text-left text-[10px] sm:text-[11px] font-medium hover:opacity-80 transition-opacity ${
+                            deadline.completed ? 'line-through opacity-50' : ''
+                          }`}
+                          style={{
+                            backgroundColor: `${getUnitColor(deadline.unitCode)}20`,
+                            borderLeft: `2px solid ${getUnitColor(deadline.unitCode)}`,
+                            color: 'var(--mq-content)'
+                          }}
+                          title={`${deadline.title} (${format(new Date(deadline.dueDate), 'h:mm a')})`}
+                        >
+                          <div className="truncate">{deadline.title}</div>
+                        </button>
+                      ))}
+                      {dayDeadlines.length > 2 && (
+                        <div className="text-[9px] sm:text-[10px] text-mq-content-tertiary pl-1">
+                          +{dayDeadlines.length - 2} more
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stats and Deadlines */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Stats */}
           {isHydrated && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -338,9 +454,13 @@ export default function CalendarPage() {
                                     </Badge>
                                   </div>
                                 </div>
-               <div className="flex items-center gap-4 mt-2 text-mq-sm text-mq-content-secondary">
-                 <span>Overdue by {formatDistanceToNow(new Date(deadline.dueDate), { addSuffix: true })}</span>
-               </div>
+                                <div className="flex items-center gap-4 mt-2 text-mq-sm text-mq-content-secondary">
+                                  {hasValidDate && (
+                                    <span className={isOverdue ? 'text-mq-error' : ''}>
+                                      {isOverdue ? 'Overdue' : 'Due'} {formatDistanceToNow(dueDate, { addSuffix: true })}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -414,123 +534,8 @@ export default function CalendarPage() {
           )}
         </div>
 
-        {/* Right Column - Calendar & Features */}
+        {/* Right Column - Features */}
         <div className="space-y-6">
-          {/* Calendar View */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="h-5 w-5" />
-                Calendar
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <Button variant="secondary" size="sm" onClick={goToPrevious} aria-label="Previous">
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button variant="secondary" size="sm" onClick={jumpToToday}>
-                    Today
-                  </Button>
-                  <Button variant="secondary" size="sm" onClick={goToNext} aria-label="Next">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="text-mq-sm font-medium text-mq-content">
-                  {view === 'week'
-                    ? `${format(calendarRange.start, 'MMM d')} - ${format(calendarRange.end, 'MMM d')}`
-                    : format(currentDate, 'MMMM yyyy')}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={view === 'month' ? 'primary' : 'secondary'}
-                    size="sm"
-                    onClick={() => setView('month')}
-                  >
-                    Month
-                  </Button>
-                  <Button
-                    variant={view === 'week' ? 'primary' : 'secondary'}
-                    size="sm"
-                    onClick={() => setView('week')}
-                  >
-                    Week
-                  </Button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-7 gap-2 text-mq-xs text-mq-content-secondary mb-2">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label) => (
-                  <div key={label} className="text-center font-medium">
-                    {label}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7 gap-2">
-                {calendarDays.map((day) => {
-                  const dayKey = format(day, 'yyyy-MM-dd');
-                  const dayDeadlines = deadlinesByDay[dayKey] ?? [];
-                  const isOutside = view === 'month' && !isSameMonth(day, currentDate);
-                  const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
-                  return (
-                    <div
-                      key={dayKey}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setSelectedDate(day)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          setSelectedDate(day);
-                        }
-                      }}
-                      className={`min-h-[120px] rounded-mq-lg border p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus ${
-                        isOutside ? 'bg-mq-background-secondary text-mq-content-tertiary' : 'bg-mq-card-background'
-                      } ${isSelected ? 'border-mq-primary ring-1 ring-mq-primary/20' : 'border-mq-border'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`text-mq-xs font-semibold ${isToday(day) ? 'text-mq-primary' : ''}`}
-                        >
-                          {format(day, 'd')}
-                        </span>
-                        {isToday(day) && <span className="text-[10px] text-mq-primary">Today</span>}
-                      </div>
-                      <div className="mt-2 space-y-1">
-                        {dayDeadlines.slice(0, 3).map((deadline) => (
-                          <button
-                            key={deadline.id}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleEditDeadline(deadline);
-                            }}
-                            className={`w-full rounded px-2 py-1 text-left text-[11px] font-medium text-mq-content hover:bg-mq-hover-background ${
-                              deadline.completed ? 'line-through text-mq-content-tertiary' : ''
-                            }`}
-                            style={{ borderLeft: `3px solid ${getUnitColor(deadline.unitCode)}` }}
-                            title={`${deadline.title} (${format(new Date(deadline.dueDate), 'h:mm a')})`}
-                          >
-                            <div className="truncate">{deadline.title}</div>
-                            <div className="text-[10px] text-mq-content-secondary">
-                              {format(new Date(deadline.dueDate), 'h:mm a')}
-                            </div>
-                          </button>
-                        ))}
-                        {dayDeadlines.length > 3 && (
-                            <div className="text-[10px] text-mq-content-tertiary">
-                            +{dayDeadlines.length - 3} more
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Features */}
           <Card>
             <CardHeader>
@@ -540,28 +545,28 @@ export default function CalendarPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
-                 <Grid3x3 className="h-5 w-5 text-mq-info flex-shrink-0" />
-                 <div>
-                   <h4 className="font-semibold text-mq-content">Multiple Views</h4>
-                   <p className="text-mq-xs text-mq-content-secondary">Month, week, day views</p>
-                 </div>
-               </div>
-               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
-                 <Filter className="h-5 w-5 text-mq-purple flex-shrink-0" />
-                 <div>
-                   <h4 className="font-semibold text-mq-content">Smart Filtering</h4>
-                   <p className="text-mq-xs text-mq-content-secondary">Filter by unit or type</p>
-                 </div>
-               </div>
-               <div className="flex items-start gap-3 p-2 bg-mq-background-secondary rounded-mq-lg">
-                 <Bell className="h-5 w-5 text-mq-warning flex-shrink-0" />
-                 <div>
-                   <h4 className="font-semibold text-mq-content">Smart Notifications</h4>
-                   <p className="text-mq-xs text-mq-content-secondary">Get reminded at the right time</p>
-                 </div>
+              <div className="flex items-start gap-3 p-2 bg-mq-background-secondary dark:bg-mq-background-tertiary rounded-mq-lg">
+                <Grid3x3 className="h-5 w-5 text-mq-info flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-mq-content">Multiple Views</h4>
+                  <p className="text-mq-xs text-mq-content-secondary">Month, week, day views</p>
                 </div>
-             </CardContent>
+              </div>
+              <div className="flex items-start gap-3 p-2 bg-mq-background-secondary dark:bg-mq-background-tertiary rounded-mq-lg">
+                <Filter className="h-5 w-5 text-mq-purple flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-mq-content">Smart Filtering</h4>
+                  <p className="text-mq-xs text-mq-content-secondary">Filter by unit or type</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-2 bg-mq-background-secondary dark:bg-mq-background-tertiary rounded-mq-lg">
+                <Bell className="h-5 w-5 text-mq-warning flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-mq-content">Smart Notifications</h4>
+                  <p className="text-mq-xs text-mq-content-secondary">Get reminded at the right time</p>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>

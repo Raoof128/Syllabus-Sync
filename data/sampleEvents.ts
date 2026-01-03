@@ -1,3 +1,111 @@
 import { Event } from '@/lib/types';
 
-export const sampleEvents: Event[] = [];
+// Helper to get dates relative to today
+const getDate = (daysFromNow: number): Date => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
+  return date;
+};
+
+export const sampleEvents: Event[] = [
+  {
+    id: 'event-1',
+    title: 'Career Fair 2026',
+    description: 'Meet top employers and explore career opportunities across various industries.',
+    date: getDate(2),
+    time: '10:00 AM - 4:00 PM',
+    location: 'Campus Hub, Main Hall',
+    building: 'C7A',
+    category: 'Career',
+  },
+  {
+    id: 'event-2',
+    title: 'Free Pizza Friday',
+    description: 'Join us for free pizza and networking with fellow students!',
+    date: getDate(0),
+    time: '12:00 PM - 2:00 PM',
+    location: 'Library Courtyard',
+    building: 'C3C',
+    category: 'Free Food',
+  },
+  {
+    id: 'event-3',
+    title: 'Study Skills Workshop',
+    description: 'Learn effective study techniques and time management strategies.',
+    date: getDate(1),
+    time: '2:00 PM - 4:00 PM',
+    location: 'Library Room 204',
+    building: 'C3C',
+    category: 'Academic',
+  },
+  {
+    id: 'event-4',
+    title: 'International Food Festival',
+    description: 'Celebrate diversity with food from around the world. Free samples available!',
+    date: getDate(3),
+    time: '11:00 AM - 3:00 PM',
+    location: 'Campus Hub Courtyard',
+    building: 'C7A',
+    category: 'Free Food',
+  },
+  {
+    id: 'event-5',
+    title: 'Tech Networking Night',
+    description: 'Connect with industry professionals and learn about tech careers.',
+    date: getDate(5),
+    time: '6:00 PM - 8:00 PM',
+    location: 'Engineering Building, Room E101',
+    building: 'E7A',
+    category: 'Career',
+  },
+  {
+    id: 'event-6',
+    title: 'Student Club Welcome Day',
+    description: 'Discover clubs and societies on campus. Free snacks provided!',
+    date: getDate(0),
+    time: '10:00 AM - 3:00 PM',
+    location: 'Campus Hub',
+    building: 'C7A',
+    category: 'Social',
+  },
+  {
+    id: 'event-7',
+    title: 'Research Seminar: AI in Healthcare',
+    description: 'Explore cutting-edge research on artificial intelligence applications in medicine.',
+    date: getDate(4),
+    time: '3:00 PM - 5:00 PM',
+    location: 'Wallumattagal Building, Lecture Hall',
+    building: 'W6A',
+    category: 'Academic',
+  },
+  {
+    id: 'event-8',
+    title: 'Movie Night: Sci-Fi Marathon',
+    description: 'Join us for a night of classic science fiction films with free popcorn!',
+    date: getDate(6),
+    time: '7:00 PM - 11:00 PM',
+    location: 'Campus Hub Theatre',
+    building: 'C7A',
+    category: 'Social',
+  },
+  {
+    id: 'event-9',
+    title: 'Resume Writing Workshop',
+    description: 'Get expert tips on crafting the perfect resume for your dream job.',
+    date: getDate(7),
+    time: '1:00 PM - 3:00 PM',
+    location: 'Careers Centre',
+    building: 'W3A',
+    category: 'Career',
+  },
+  {
+    id: 'event-10',
+    title: 'Free Coffee Morning',
+    description: 'Start your day right with free coffee and pastries!',
+    date: getDate(1),
+    time: '8:00 AM - 10:00 AM',
+    location: 'Library Café',
+    building: 'C3C',
+    category: 'Free Food',
+  },
+];
