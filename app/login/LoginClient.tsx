@@ -23,6 +23,9 @@ export default function LoginClient() {
 
   const supabase = createBrowserClient();
 
+  // Add debug logging
+  console.log('🔍 LoginClient rendered, supabase client:', !!supabase);
+
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {

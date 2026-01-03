@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase/server';
+import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
+import { z } from 'zod';
+
+const signupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  fullName: z.string().min(1).optional(),
+  studentId: z.string().optional(),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => null);
+    const parsed = signupSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return jsonError('Invalid signup data', 400);
+    }
+
+    const supabase = await createServerClient();
+    const { email, password, fullName, studentId } = parsed.data;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          student_id: studentId,
+        },
+        // Auto-confirm email for development
+        emailRedirectTo: undefined
+      }
+    });
+
+    // For development, auto-confirm the user
+    if (data.user && !data.session && !error) {
+      const { error: confirmError } = await supabase.auth.admin.updateUserById(data.user.id, {
+        email_confirm: true
+      });
+
+      if (confirmError) {
+        console.warn('Auto-confirmation failed:', confirmError);
+      } else {
+        // Try to create a session
+        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (!sessionError && sessionData.session) {
+          return jsonSuccess({
+            user: sessionData.user,
+            session: sessionData.session,
+            message: 'Signup successful (auto-confirmed for development)'
+          });
+        }
+      }
+    }
+
+    if (error) {
+      return jsonError(error.message, 400);
+    }
+
+    // Create profile record if user was created
+    if (data.user && !data.user.email_confirmed_at) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          email: data.user.email!,
+          full_name: fullName,
+          student_id: studentId,
+        });
+
+      if (profileError) {
+        console.warn('Profile creation failed:', profileError);
+      }
+    }
+
+    return jsonSuccess({
+      user: data.user,
+      session: data.session,
+      message: data.session ? 'Signup successful' : 'Please check your email to confirm your account'
+    });
+
+  } catch (error) {
+    console.error('Signup error:', error);
+    return jsonError('Internal server error', 500);
+  }
+}
