@@ -21,7 +21,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from('deadlines')
     .select('*')
-    .order('due_at', { ascending: true });
+    .order('due_date', { ascending: true });
 
   if (error) {
     return jsonError(error.message, 500);

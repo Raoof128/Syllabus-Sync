@@ -36,7 +36,7 @@ const dateSchema = z.preprocess((value) => value, z.coerce.date());
 
 const unitSchema = z.object({
   id: z.string().uuid().optional(),
-  code: z.string().min(1).max(20).regex(/^[A-Z]{3}\d{3}$/, 'Unit code must be in format AAA123'),
+  code: z.string().min(1).max(20).regex(/^[A-Z]{3,4}\d{3,4}$/, 'Unit code must be in format AAA123 or AAAA1234'),
   name: z.string().min(1).max(200),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
   location: z.object({

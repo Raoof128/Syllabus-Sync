@@ -17,11 +17,13 @@ export default function MQStyleGuidePage() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    const html = document.documentElement;
-    if (isDark) {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
+    if (typeof document !== 'undefined' && document.documentElement) {
+      const html = document.documentElement;
+      if (isDark) {
+        html.classList.add('dark');
+      } else {
+        html.classList.remove('dark');
+      }
     }
   }, [isDark]);
 

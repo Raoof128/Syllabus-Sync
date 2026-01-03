@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.4] - 2026-01-03
+
+### Fixed
+
+#### Critical Runtime Stability Fixes ✅
+- **Translation Syntax Error**: Fixed ECMAScript parsing error where Persian translations section was incorrectly placed outside the main translations object, causing build failures
+- **Database Schema Compatibility**: Resolved column name mismatches in deadlines API (was querying `due_at` instead of migrated `due_date` column)
+- **Unit Validation Regex**: Updated unit code validation to accept Macquarie University format (COMP2310, MATH1001) instead of restrictive AAA123 pattern
+- **DOM Access Safety**: Fixed "Cannot read properties of undefined (reading 'classList')" runtime errors by adding comprehensive DOM readiness checks in CampusMap, theme store, and demo components
+- **SSR Compatibility**: Enhanced client-side DOM manipulation with proper window/document existence verification to prevent server-side rendering issues
+
+### Technical Debt
+
+#### Build System Stability ✅
+- **Syntax Error Resolution**: Eliminated parsing errors that prevented successful compilation
+- **Database Integration**: Fixed API calls to use correct column names after schema migration
+- **Runtime Error Prevention**: Added defensive DOM access patterns to prevent undefined property errors
+- **Production Readiness**: Resolved all blocking issues for stable deployment
+
+---
+
 ## [0.5.3] - 2026-01-03
 
 ### Added

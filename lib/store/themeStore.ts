@@ -72,7 +72,7 @@ export const useThemeEffect = () => {
   const { theme, resolvedTheme } = useThemeStore();
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && document.documentElement) {
       const root = document.documentElement;
 
       // Apply theme class

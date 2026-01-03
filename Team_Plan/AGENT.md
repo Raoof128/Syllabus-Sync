@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.3 | Last Updated: January 03, 2026
+Version: 0.5.4 | Last Updated: January 03, 2026
 
 ---
 
@@ -70,6 +70,13 @@ Macquarie University Administration - February 2025
 - **RTL Language Support**: Right-to-left text direction support for Persian language with automatic detection
 - **Type-Safe Implementation**: Full TypeScript compliance with translation key validation and zero runtime errors
 - **Zero Hardcoded Strings**: Complete elimination of user-facing hardcoded text - every string is now translatable
+
+#### ✅ Critical Bug Fixes & Runtime Stability (v0.5.4)
+- **Translation Syntax Error**: Fixed ECMAScript parsing error in translations.ts where Persian section was incorrectly placed outside main translations object
+- **Database Schema Compatibility**: Resolved column name mismatches (due_at → due_date) and validation regex conflicts for unit codes
+- **DOM Access Safety**: Fixed runtime "Cannot read properties of undefined (reading 'classList')" errors by adding comprehensive DOM readiness checks
+- **SSR Compatibility**: Enhanced client-side DOM manipulation with proper window/document existence verification
+- **Build System Stability**: Eliminated parsing errors and runtime crashes for production deployment readiness
 
 #### ✅ Core Application Features (v0.4.0)
 - **Home Dashboard**: Units management, schedule overview, quick actions
@@ -1338,6 +1345,13 @@ Summary: Implemented comprehensive i18n system with English, Spanish, and Persia
 Files changed: lib/i18n/translations.ts (enhanced with 200+ keys), lib/hooks/useTranslation.ts (added RTL detection), app/settings/page.tsx (added language selector), components/home/NextDeadline.tsx, components/home/TodaySchedule.tsx, components/home/EventsFeed.tsx, components/deadlines/DeadlineForm.tsx, components/units/UnitForm.tsx, components/layout/Header.tsx, components/ProfileCard.tsx, components/ui/dialog.tsx, app/home/HomeClient.tsx, app/map/page.tsx, app/feed/page.tsx, app/login/LoginClient.tsx, app/signup/SignupClient.tsx, app/test-auth/page.tsx, Team_Plan/AGENT.md, Team_Plan/CHANGELOG.md.
 Verification: npm run lint (pass); npm test (41/41 pass); all user-facing strings translatable; language switching works instantly; RTL support functional for Persian.
 Follow-ups: Monitor for any new strings added in future development; consider automated translation key validation in CI pipeline.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Critical bug fixes and runtime stability improvements.
+Summary: Fixed ECMAScript parsing error in translations.ts by moving Persian section inside translations object, resolved database schema column name mismatches (due_at → due_date in API queries), updated unit code validation regex to accept Macquarie University formats, fixed runtime DOM access errors by adding comprehensive document/documentElement existence checks in CampusMap, themeStore, and mq-demo components.
+Files changed: lib/i18n/translations.ts (syntax fix), app/api/deadlines/route.ts (column reference fix), app/api/units/route.ts (validation regex update), app/map/CampusMap.tsx (DOM safety checks), lib/store/themeStore.ts (DOM safety checks), app/mq-demo/page.tsx (DOM safety checks), Team_Plan/AGENT.md, Team_Plan/CHANGELOG.md.
+Verification: Syntax errors eliminated; database API calls now use correct column names; DOM access errors resolved with proper existence checks; application stability improved.
+Follow-ups: Monitor for additional DOM access issues in other components; ensure database schema remains synchronized with API expectations.
 
 Raouf: 2026-01-03 AEDT — CI Artifact Upload Fix
 

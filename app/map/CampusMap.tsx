@@ -143,14 +143,18 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
 
   useEffect(() => {
     const updateThemeKey = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setThemeKey(isDark ? 'dark' : 'light');
+      if (typeof document !== 'undefined' && document.documentElement) {
+        const isDark = document.documentElement.classList.contains('dark');
+        setThemeKey(isDark ? 'dark' : 'light');
+      }
     };
 
     updateThemeKey();
-    const observer = new MutationObserver(updateThemeKey);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    if (typeof document !== 'undefined' && document.documentElement) {
+      const observer = new MutationObserver(updateThemeKey);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    }
   }, []);
 
   return (

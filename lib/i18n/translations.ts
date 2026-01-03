@@ -548,8 +548,6 @@ export const translations = {
     clearError: 'Error',
     clearErrorMsg: 'Error al borrar datos locales. Por favor, inténtalo de nuevo.',
   },
-} as const;
-
   fa: {
     // Navigation
     home: 'خانه',
