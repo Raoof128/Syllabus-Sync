@@ -1570,3 +1570,17 @@ Summary: Added translation support for DeadlineForm choices (priorities, types),
 Files: components/deadlines/DeadlineForm.tsx; components/home/EventsFeed.tsx; app/feed/page.tsx; lib/i18n/translations.ts; lib/types/index.ts; data/sampleEvents.ts.
 Verification: Verified code compilation and logic correctness.
 Follow-ups: Complete remaining translations for other languages if needed.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of Sidebar and Feed Static Content.
+Summary: Added missing Persian (fa) and Spanish (es) translation keys for the Feed page (descriptions, announcements, stats, categories) and Sidebar (navigation items, dashboard widgets). Updated NextDeadline component to use locale-aware date formatting.
+Files: lib/i18n/translations.ts; components/home/NextDeadline.tsx.
+Verification: Verified that all hardcoded strings identified in the Feed page now have corresponding translation keys in all supported languages.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of Map Page.
+Summary: Added missing translation keys for Map page UI elements (e.g., "Campus Buildings", "Turn-by-Turn Navigation") and building details (names, descriptions, tags) in Persian (fa) and Spanish (es). Updated `app/map/page.tsx` to translate building tags dynamically.
+Files: lib/i18n/translations.ts; app/map/page.tsx.
+Verification: Confirmed keys exist in translations file and are used in the Map page component.
+Follow-ups: None.

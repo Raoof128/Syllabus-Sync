@@ -291,8 +291,8 @@ export default function MapPage() {
                   aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
                   className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${index === selectedResultIndex
-                      ? 'bg-mq-info/10'
-                      : 'hover:bg-mq-hover-background'
+                    ? 'bg-mq-info/10'
+                    : 'hover:bg-mq-hover-background'
                     }`}
                 >
                   <div className="flex items-center justify-between">
@@ -306,7 +306,7 @@ export default function MapPage() {
                       </div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
-                      {building.tags?.[0] || 'building'}
+                      {t((building.tags?.[0] || 'building') as any)}
                     </Badge>
                   </div>
                 </button>
@@ -407,8 +407,8 @@ export default function MapPage() {
                   href={`/map?building=${building.code}`}
                   aria-current={isSelected ? 'page' : undefined}
                   className={`p-3 rounded-mq-lg transition-colors ${isSelected
-                      ? 'bg-mq-success/10 border-2 border-mq-success'
-                      : 'bg-mq-background-secondary hover:bg-mq-hover-background'
+                    ? 'bg-mq-success/10 border-2 border-mq-success'
+                    : 'bg-mq-background-secondary hover:bg-mq-hover-background'
                     }`}
                 >
                   <div className="flex items-center justify-between">
@@ -421,7 +421,7 @@ export default function MapPage() {
                   {buildingData?.tags && buildingData.tags.length > 0 && (
                     <div className="mt-1">
                       <Badge variant="neutral" className="text-xs">
-                        {buildingData.tags[0]}
+                        {t(buildingData.tags[0] as any)}
                       </Badge>
                     </div>
                   )}

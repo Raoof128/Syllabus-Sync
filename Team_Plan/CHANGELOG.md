@@ -1300,3 +1300,23 @@ Summary: Added translation support for DeadlineForm choices (priorities, types),
 Files: components/deadlines/DeadlineForm.tsx; components/home/EventsFeed.tsx; app/feed/page.tsx; lib/i18n/translations.ts; lib/types/index.ts; data/sampleEvents.ts.
 Verification: Verified code compilation and logic correctness.
 Follow-ups: Complete remaining translations for other languages if needed.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of App Config and Feed.
+Summary:
+  - Updated `components/home/NextDeadline.tsx` to use locale-aware date formatting.
+  - Added missing translation keys to `lib/i18n/translations.ts` for Persian and Spanish, covering Feed page content (headers, announcements, stats, category descriptions).
+  - Ensured Sidebar and Dashboard widgets have full Persian translation support.
+Files: components/home/NextDeadline.tsx; app/feed/page.tsx; lib/i18n/translations.ts; lib/types/index.ts; data/sampleEvents.ts.
+Verification: Verified code compilation and logic correctness.
+Follow-ups: Complete remaining translations for other languages if needed.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of Map Page.
+Summary:
+  - Internationalized the Map page UI, including "Campus Buildings" list and feature cards ("Turn-by-Turn", "Live Location").
+  - Added comprehensive Spanish and Persian translations for building names, descriptions, and tags.
+  - Updated `app/map/page.tsx` to dynamically translate building tags.
+Files: lib/i18n/translations.ts; app/map/page.tsx.
+Verification: Verified code compilation and that new translation keys match usage.
+Follow-ups: None.
