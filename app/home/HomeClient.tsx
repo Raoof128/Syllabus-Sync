@@ -6,6 +6,7 @@ import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
 import UnitCard from '@/components/units/UnitCard';
 import dynamic from 'next/dynamic';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 // Dynamically import forms for better code splitting
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
@@ -50,6 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function HomeClient() {
+  const { t } = useTranslation();
   // Global error boundary for home page
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -91,19 +93,19 @@ export default function HomeClient() {
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="text-center py-12">
           <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-mq-content mb-4">Something went wrong</h1>
+          <h1 className="text-2xl font-bold text-mq-content mb-4">{t('somethingWentWrong')}</h1>
           <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-            {errorMessage || 'We encountered an unexpected error. Please try refreshing the page.'}
+            {errorMessage || t('unexpectedError')}
           </p>
           <div className="space-y-3">
             <Button onClick={handleErrorRecovery} className="mr-3">
-              Try Again
+              {t('tryAgain')}
             </Button>
             <Button
               variant="secondary"
               onClick={() => window.location.href = '/'}
             >
-              Go Home
+              {t('goHome')}
             </Button>
           </div>
         </div>
@@ -340,17 +342,17 @@ export default function HomeClient() {
     if (deleteUnitConfirm) {
       try {
         removeUnit(deleteUnitConfirm.id);
-        const successMessage = `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} has been deleted.`;
-        toastUtils.success('Unit Deleted', successMessage);
+        const successMessage = `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} ${t('unitDeletedMsg')}`;
+        toastUtils.success(t('unitDeleted'), successMessage);
         announceToScreenReader(successMessage);
       } catch (error) {
-        const errorMessage = 'Unable to delete the unit. Please try again.';
+        const errorMessage = t('deleteFailedMsg');
         errorHandler.logError(
           error instanceof Error ? error : new Error('Failed to delete unit'),
           'Home Delete Unit',
           'medium'
         );
-        toastUtils.error('Delete Failed', errorMessage);
+        toastUtils.error(t('deleteFailed'), errorMessage);
         announceToScreenReader(errorMessage);
       }
       setDeleteUnitConfirm(null);
@@ -376,16 +378,16 @@ export default function HomeClient() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-md focus:shadow-lg"
       >
-        Skip to main content
+        {t('skipToMain')}
       </a>
 
       {/* Header */}
       <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
         <div className="flex-1 min-w-0">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-            Welcome, {DEMO_USER.name}!
+            {t('welcome')}, {DEMO_USER.name}!
           </h1>
-          <p className="text-mq-content-secondary">Here&apos;s your day at a glance.</p>
+          <p className="text-mq-content-secondary">{t('dayAtGlance')}</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Keyboard Shortcuts Hint */}
@@ -411,7 +413,7 @@ export default function HomeClient() {
               </div>
               <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
                 <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
-                <span className="text-mq-sm text-mq-content">Workload:</span>
+                <span className="text-mq-sm text-mq-content">{t('workload')}</span>
                 <Badge
                   className={stressColors[stressLevel]}
                   aria-label={`Current workload level: ${stressLevel}`}
@@ -426,18 +428,18 @@ export default function HomeClient() {
               <Button
                 className="gap-2 touch-manipulation"
                 size="default"
-                aria-label="Add new unit or deadline"
+                aria-label={`${t('addNew').toLowerCase()} ${t('addUnit').toLowerCase()} ${t('addDeadline').toLowerCase()}`}
                 aria-haspopup="menu"
               >
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add New</span>
-                <span className="sm:hidden">Add</span>
+                <span className="hidden sm:inline">{t('addNew')}</span>
+                <span className="sm:hidden">{t('add')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
               className="bg-mq-background border-mq-border"
-              aria-label="Add new items menu"
+              aria-label={t('addNewItemsMenu')}
             >
               <DropdownMenuItem
                 onClick={handleAddUnit}
@@ -450,7 +452,7 @@ export default function HomeClient() {
                 }}
               >
                 <BookOpen className="h-4 w-4" />
-                Add Unit
+                {t('addUnit')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleAddDeadline}
@@ -463,7 +465,7 @@ export default function HomeClient() {
                 }}
               >
                 <Clock className="h-4 w-4" />
-                Add Deadline
+                {t('addDeadline')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -477,14 +479,14 @@ export default function HomeClient() {
           <div className="flex-1">
             <h2 id="get-started-heading" className="sr-only">Getting Started Guide</h2>
             <p className="text-mq-sm text-mq-info">
-              <strong>Get started:</strong> Add your units to sync classes to your calendar.
+              <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
             </p>
           </div>
         </section>
       )}
 
       {/* Main Dashboard Grid */}
-      <section id="main-content" className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" role="main" aria-label="Dashboard overview">
+      <section id="main-content" className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" role="main" aria-label={t('dashboardOverview')}>
         <div className="animate-slide-up">
           <TodaySchedule />
         </div>
@@ -499,7 +501,7 @@ export default function HomeClient() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle id="units-section-heading" className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" aria-hidden="true" />
-              My Units
+              {t('myUnits')}
             </CardTitle>
           <Button onClick={handleAddUnit} size="sm" className="gap-1">
             <Plus className="h-4 w-4" />
@@ -518,14 +520,13 @@ export default function HomeClient() {
           ) : units.length === 0 ? (
              <div className="text-center py-12">
                <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-               <h3 className="text-mq-lg font-semibold text-mq-content mb-2">No units yet</h3>
-               <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                 Add your first unit to start tracking your schedule. It&apos;ll sync your calendar
-                 and today&apos;s schedule.
-               </p>
+              <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
+              <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                {t('addFirstUnitDesc')}
+              </p>
               <Button onClick={handleAddUnit} className="gap-2">
                 <Plus className="h-4 w-4" />
-                Add Your First Unit
+                {t('addYourFirstUnit')}
               </Button>
             </div>
           ) : (
@@ -534,15 +535,15 @@ export default function HomeClient() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
                 <div className="text-center animate-fade-in">
                   <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
-                  <p className="text-mq-xs text-mq-content-secondary">Units</p>
+                  <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
                 </div>
                 <div className="text-center animate-fade-in animation-delay-100">
                   <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
-                  <p className="text-mq-xs text-mq-content-secondary">Classes/Week</p>
+                  <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
                 </div>
                 <div className="text-center animate-fade-in animation-delay-200">
                   <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
-                  <p className="text-mq-xs text-mq-content-secondary">Study Hours</p>
+                  <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
                 </div>
               </div>
 
@@ -565,7 +566,7 @@ export default function HomeClient() {
 
       {/* Events Section */}
       <section aria-labelledby="events-section-heading" className="mb-8">
-        <h2 id="events-section-heading" className="sr-only">Today's Events</h2>
+        <h2 id="events-section-heading" className="sr-only">{t('todaysEvents')}</h2>
         <EventsFeed />
       </section>
 
@@ -583,13 +584,13 @@ export default function HomeClient() {
       <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Unit</DialogTitle>
+            <DialogTitle>{t('deleteUnit')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete{' '}
+              {t('deleteUnitConfirm')}{' '}
               <strong>
                 {deleteUnitConfirm?.code} - {deleteUnitConfirm?.name}
               </strong>
-              ? This action cannot be undone.
+              ? {t('deleteUnitConfirmEnd')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
@@ -597,7 +598,7 @@ export default function HomeClient() {
               Cancel
             </Button>
             <Button variant="primary" onClick={confirmDeleteUnit}>
-              Delete
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

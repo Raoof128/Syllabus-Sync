@@ -24,6 +24,7 @@ import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function CalendarClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
@@ -31,14 +32,15 @@ export default function CalendarClient() {
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
   const units = useUnitsStore((state) => state.units);
   const hasHydrated = useHydration();
+  const { t } = useTranslation();
 
   // For now, just show a simple calendar view
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Calendar</h1>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('calendar')}</h1>
         <p className="text-mq-content-secondary">
-          Track upcoming deadlines and manage assignment dates.
+          {t('trackDeadlinesDesc')}
         </p>
       </div>
 
@@ -46,16 +48,16 @@ export default function CalendarClient() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarDays className="h-5 w-5" />
-            Upcoming Deadlines
+            {t('upcomingDeadlines')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {hasHydrated && deadlines.length === 0 ? (
             <div className="text-center py-12">
               <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-              <h3 className="text-mq-lg font-semibold text-mq-content mb-2">No deadlines yet</h3>
+              <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noDeadlinesYet')}</h3>
               <p className="text-mq-content-secondary mb-4">
-                Add deadlines to see them organized in your calendar view.
+                {t('addDeadlinesDesc')}
               </p>
             </div>
           ) : (
@@ -78,7 +80,7 @@ export default function CalendarClient() {
                         {deadline.title}
                       </h4>
                       <p className="text-mq-sm text-mq-content-secondary">
-                        {deadline.unitCode} • Due {new Date(deadline.dueDate).toLocaleDateString()}
+                        {deadline.unitCode} • {t('due')} {new Date(deadline.dueDate).toLocaleDateString()}
                       </p>
                     </div>
                   </div>

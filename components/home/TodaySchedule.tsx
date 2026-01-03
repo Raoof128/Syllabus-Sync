@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 const TodaySchedule = memo(function TodaySchedule() {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
+  const { t } = useTranslation();
   const todayLabel = useMemo(() => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[new Date().getDay()];
@@ -31,7 +33,7 @@ const TodaySchedule = memo(function TodaySchedule() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Today&apos;s Classes</CardTitle>
+        <CardTitle>{t('todaysClasses')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {!isHydrated ? (
@@ -54,8 +56,8 @@ const TodaySchedule = memo(function TodaySchedule() {
         ) : todayClasses.length === 0 ? (
           <div className="text-center py-8">
             <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-mq-content mb-2">No classes today</h3>
-            <p className="text-mq-content-secondary mb-4">You&apos;re all caught up! Enjoy your free time.</p>
+            <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noClassesToday')}</h3>
+            <p className="text-mq-content-secondary mb-4">{t('noClassesDesc')}</p>
             <Button
               onClick={() => {
                 try {
@@ -67,7 +69,7 @@ const TodaySchedule = memo(function TodaySchedule() {
                 }
               }}
               className="gap-2 focus:ring-2 focus:ring-mq-primary/50"
-              aria-label="Add a new unit to start tracking classes"
+              aria-label={t('addUnitAria')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
@@ -79,6 +81,7 @@ const TodaySchedule = memo(function TodaySchedule() {
                   }
                 }
               }}
+              aria-label={t('addUnitAria')}
             >
               <BookOpen className="h-4 w-4" />
               Add Unit

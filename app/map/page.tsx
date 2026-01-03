@@ -12,6 +12,7 @@ import { UNIVERSITY_CONFIG, CAMPUS_BUILDINGS } from '@/lib/config';
 import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import Link from 'next/link';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 // Custom hook for debounced search
 // eslint-disable react-hooks/set-state-in-effect
@@ -73,6 +74,7 @@ function useDebouncedSearch(searchFunction: (query: string) => Building[], delay
 const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 
 export default function MapPage() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [coordPickerMode, setCoordPickerMode] = useState(false);
@@ -211,8 +213,8 @@ export default function MapPage() {
     <div className="container mx-auto p-4 max-w-7xl">
       {/* Header */}
       <header className="mb-6">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Campus Map</h1>
-        <p className="text-mq-content-secondary">Navigate {UNIVERSITY_CONFIG.name} campus with ease.</p>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('campusMap')}</h1>
+        <p className="text-mq-content-secondary">{t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}</p>
       </header>
 
       {/* Selected Building Banner */}
@@ -222,15 +224,15 @@ export default function MapPage() {
             <Navigation className="h-5 w-5 text-mq-success" />
             <div>
               <p className="text-mq-sm font-medium text-mq-success">
-                Navigating to: <strong>{selectedBuilding.name}</strong>
+                {t('navigatingTo')}: <strong>{selectedBuilding.name}</strong>
               </p>
-              <p className="text-mq-xs text-mq-success">Building {selectedBuilding.id}</p>
+              <p className="text-mq-xs text-mq-success">{t('building')} {selectedBuilding.id}</p>
             </div>
           </div>
           <Link href="/map">
             <Button variant="secondary" size="sm" className="gap-1">
               <X className="h-4 w-4" />
-              Clear
+              {t('clear')}
             </Button>
           </Link>
         </div>
@@ -251,7 +253,7 @@ export default function MapPage() {
           )}
           <Input
             type="text"
-            placeholder="Search buildings by name, code, or tags..."
+            placeholder={t('searchBuildings')}
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -269,7 +271,7 @@ export default function MapPage() {
             <button
               type="button"
               onClick={clearSearch}
-              aria-label="Clear search"
+              aria-label={t('clearSearch')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
             >
               <X className="h-4 w-4" />
@@ -279,7 +281,7 @@ export default function MapPage() {
             <div
               id="map-search-results"
               role="listbox"
-              aria-label="Building results"
+              aria-label={t('buildingResults')}
               className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
             >
               {filteredBuildings.map((building, index: number) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bell, Palette, Shield, Info, Mail, Calendar, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -9,6 +9,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +26,6 @@ import { APP_CONFIG } from '@/lib/config';
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [language, setLanguage] = useState('en');
 
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
@@ -34,32 +34,16 @@ export default function SettingsPage() {
 
   const { theme, resolvedTheme, setTheme } = useThemeStore();
   const notifications = useNotificationsStore((state) => state.notifications);
-
-  // Load preferences on mount
-  useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const savedLanguage = localStorage.getItem('language') || 'en';
-        setLanguage(savedLanguage);
-      }
-    } catch (error) {
-      // Silently handle localStorage errors (e.g., in private browsing mode)
-      console.warn('Unable to load language preference from localStorage');
-    }
-  }, []);
+  const { t, language, setLanguage } = useTranslation();
 
   // Handle language change with keyboard support
-  const handleLanguageChange = (newLanguage: string) => {
+  const handleLanguageChange = (newLanguage: 'en' | 'es') => {
     if (newLanguage === language) return; // No change needed
     setLanguage(newLanguage);
-    try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('language', newLanguage);
-        toastUtils.success('Language Updated', `Language changed to ${newLanguage === 'en' ? 'English' : 'Español'}`);
-      }
-    } catch (error) {
-      toastUtils.error('Settings Error', 'Unable to save language preference. Please try again.');
-    }
+    toastUtils.success(
+      t('languageUpdated'),
+      `${t('languageUpdatedMsg')} ${newLanguage === 'en' ? t('english') : t('spanish')}`
+    );
   };
 
   // Handle notification preferences (local storage based)
@@ -68,13 +52,18 @@ export default function SettingsPage() {
       if (typeof window !== 'undefined') {
         const key = `notification-${type}`;
         localStorage.setItem(key, enabled.toString());
+        const typeLabels: Record<string, string> = {
+          deadlines: t('deadlineReminders'),
+          classes: t('classReminders'),
+          events: t('eventUpdates'),
+        };
         toastUtils.success(
-          'Preference Updated',
-          `${type} notifications ${enabled ? 'enabled' : 'disabled'}`
+          t('preferenceUpdated'),
+          `${typeLabels[type] || type} ${enabled ? t('enabled').toLowerCase() : t('disabled').toLowerCase()}`
         );
       }
     } catch (error) {
-      toastUtils.error('Settings Error', 'Unable to save notification preference. Please try again.');
+      toastUtils.error(t('settingsError'), t('preferenceError'));
     }
   };
 
@@ -117,14 +106,14 @@ export default function SettingsPage() {
         'Settings Clear Data',
         'medium',
       );
-      toastUtils.error('Error', 'Failed to clear local data. Please try again.');
+      toastUtils.error(t('clearError'), t('clearErrorMsg'));
     } finally {
       setClearing(false);
       if (cleared) {
         setShowClearConfirm(false);
         toastUtils.success(
-          'Data Cleared',
-          'All units, deadlines, and data have been cleared successfully.',
+          t('dataCleared'),
+          t('dataClearedMsg'),
         );
       }
     }
@@ -133,8 +122,8 @@ export default function SettingsPage() {
   return (
       <div className="container mx-auto p-6 max-w-7xl">
         <header className="mb-8">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">Settings</h1>
-          <p className="text-mq-content-secondary">Manage your preferences and account settings.</p>
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('settingsTitle')}</h1>
+          <p className="text-mq-content-secondary">{t('settingsSubtitle')}</p>
         </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
@@ -142,7 +131,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notifications
+              {t('notifications')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -151,8 +140,8 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-mq-content-tertiary" />
                   <div>
-                    <p className="text-mq-sm font-medium text-mq-content">Deadline Reminders</p>
-                    <p className="text-mq-sm text-mq-content-secondary mt-1">Get notified about upcoming deadlines</p>
+                    <p className="text-mq-sm font-medium text-mq-content">{t('deadlineReminders')}</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">{t('deadlineRemindersDesc')}</p>
                   </div>
                 </div>
                 <Button
@@ -166,18 +155,18 @@ export default function SettingsPage() {
                     }
                   }}
                   className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('deadlines') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`Deadline reminders notifications are ${isNotificationEnabled('deadlines') ? 'enabled' : 'disabled'}. Click to ${isNotificationEnabled('deadlines') ? 'disable' : 'enable'}`}
+                  aria-label={`${t('deadlineReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('deadlines') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('deadlines') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
                   aria-pressed={isNotificationEnabled('deadlines')}
                 >
                   {isNotificationEnabled('deadlines') ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
-                      Enabled
+                      {t('enabled')}
                     </>
                   ) : (
                     <>
                       <XCircle className="h-3 w-3" />
-                      Disabled
+                      {t('disabled')}
                     </>
                   )}
                 </Button>
@@ -188,8 +177,8 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-mq-content-tertiary" />
                   <div>
-                    <p className="text-mq-sm font-medium text-mq-content">Class Reminders</p>
-                    <p className="text-mq-sm text-mq-content-secondary mt-1">Notifications for class schedules</p>
+                    <p className="text-mq-sm font-medium text-mq-content">{t('classReminders')}</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">{t('classRemindersDesc')}</p>
                   </div>
                 </div>
                 <Button
@@ -203,18 +192,18 @@ export default function SettingsPage() {
                     }
                   }}
                   className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('classes') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`Class schedule notifications are ${isNotificationEnabled('classes') ? 'enabled' : 'disabled'}. Click to ${isNotificationEnabled('classes') ? 'disable' : 'enable'}`}
+                  aria-label={`${t('classReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('classes') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('classes') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
                   aria-pressed={isNotificationEnabled('classes')}
                 >
                   {isNotificationEnabled('classes') ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
-                      Enabled
+                      {t('enabled')}
                     </>
                   ) : (
                     <>
                       <XCircle className="h-3 w-3" />
-                      Disabled
+                      {t('disabled')}
                     </>
                   )}
                 </Button>
@@ -225,8 +214,8 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Info className="h-4 w-4 text-mq-content-tertiary" />
                   <div>
-                    <p className="text-mq-sm font-medium text-mq-content">Event Updates</p>
-                    <p className="text-mq-sm text-mq-content-secondary mt-1">Updates about campus events</p>
+                    <p className="text-mq-sm font-medium text-mq-content">{t('eventUpdates')}</p>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">{t('eventUpdatesDesc')}</p>
                   </div>
                 </div>
                 <Button
@@ -240,7 +229,7 @@ export default function SettingsPage() {
                     }
                   }}
                   className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('events') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`Campus event notifications are ${isNotificationEnabled('events') ? 'enabled' : 'disabled'}. Click to ${isNotificationEnabled('events') ? 'disable' : 'enable'}`}
+                  aria-label={`${t('eventUpdates')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('events') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('events') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
                   aria-pressed={isNotificationEnabled('events')}
                 >
                   {isNotificationEnabled('events') ? (
@@ -264,16 +253,16 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5" />
-              Appearance
+              {t('appearance')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">Dark Mode</h4>
+                  <h4 className="font-semibold text-mq-content">{t('darkMode')}</h4>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    Current: {theme === 'system' ? `System (${resolvedTheme})` : resolvedTheme}
+                    {t('current')}: {theme === 'system' ? `${t('system')} (${resolvedTheme})` : resolvedTheme}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -283,7 +272,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme('light')}
                     className={`px-3 py-1 text-xs ${theme === 'light' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
                   >
-                    Light
+                    {t('light')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -291,7 +280,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme('system')}
                     className={`px-3 py-1 text-xs ${theme === 'system' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
                   >
-                    System
+                    {t('system')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -299,7 +288,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme('dark')}
                     className={`px-3 py-1 text-xs ${theme === 'dark' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
                   >
-                    Dark
+                    {t('dark')}
                   </Button>
                 </div>
               </div>
@@ -307,9 +296,9 @@ export default function SettingsPage() {
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">Language</h4>
+                  <h4 className="font-semibold text-mq-content">{t('language')}</h4>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    Current: {language === 'en' ? 'English' : 'Español'}
+                    {t('current')}: {language === 'en' ? t('english') : t('spanish')}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -325,9 +314,9 @@ export default function SettingsPage() {
                     }}
                     className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'en' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
                     aria-pressed={language === 'en'}
-                    aria-label={`Switch to English language${language === 'en' ? ' (currently selected)' : ''}`}
+                    aria-label={`${t('switchToEnglish')}${language === 'en' ? ` ${t('currentlySelected')}` : ''}`}
                   >
-                    English
+                    {t('english')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -341,9 +330,9 @@ export default function SettingsPage() {
                     }}
                     className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'es' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
                     aria-pressed={language === 'es'}
-                    aria-label={`Switch to Spanish language${language === 'es' ? ' (currently selected)' : ''}`}
+                    aria-label={`${t('switchToSpanish')}${language === 'es' ? ` ${t('currentlySelected')}` : ''}`}
                   >
-                    Español
+                    {t('spanish')}
                   </Button>
                 </div>
               </div>
@@ -355,15 +344,15 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Privacy & Security
+              {t('privacySecurity')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">Data Storage</h4>
-                  <p className="text-mq-sm text-mq-content-secondary">Currently using local storage</p>
+                  <h4 className="font-semibold text-mq-content">{t('dataStorage')}</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('dataStorageDesc')}</p>
                 </div>
                 <div className="w-10 h-5 bg-mq-success rounded-full opacity-50" />
               </div>
@@ -371,8 +360,8 @@ export default function SettingsPage() {
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">Export Data</h4>
-                  <p className="text-mq-sm text-mq-content-secondary">Download all your data as JSON</p>
+                  <h4 className="font-semibold text-mq-content">{t('exportData')}</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('exportDataDesc')}</p>
                 </div>
                 <Button
                   variant="secondary"
@@ -396,27 +385,27 @@ export default function SettingsPage() {
                       a.click();
                       document.body.removeChild(a);
                       URL.revokeObjectURL(url);
-                      toastUtils.success('Export Complete', 'Your data has been downloaded successfully.');
+                      toastUtils.success(t('exportComplete'), t('exportCompleteMsg'));
                     } catch (error) {
                       errorHandler.logError(
                         error instanceof Error ? error : new Error('Failed to export data'),
                         'Settings Export Data',
                         'medium'
                       );
-                      toastUtils.error('Export Failed', 'Unable to export your data. Please try again.');
+                      toastUtils.error(t('exportFailed'), t('exportFailedMsg'));
                     }
                   }}
-                  aria-label="Export all your units and deadlines data as a JSON file"
+                  aria-label={t('exportDataDesc')}
                 >
-                  Export
+                  {t('export')}
                 </Button>
               </div>
             </div>
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg hover:bg-mq-hover-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">Clear All Data</h4>
-                  <p className="text-mq-sm text-mq-content-secondary">Delete all stored data from app</p>
+                  <h4 className="font-semibold text-mq-content">{t('clearAllData')}</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('clearAllDataDesc')}</p>
                 </div>
                 <Button
                   variant="primary"
@@ -426,7 +415,7 @@ export default function SettingsPage() {
                   className="flex items-center gap-2"
                 >
                   {clearing && <Loader2 className="h-3 w-3 animate-spin" />}
-                  {clearing ? 'Clearing...' : 'Clear Data'}
+                  {clearing ? t('clearing') : t('clearData')}
                 </Button>
               </div>
             </div>
@@ -437,23 +426,23 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>{t('quickActions')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button variant="secondary" className="w-full justify-start" asChild>
-              <Link href="/home">🏠 Home Dashboard</Link>
+              <Link href="/home">{t('homeDashboard')}</Link>
             </Button>
             <Button variant="secondary" className="w-full justify-start" asChild>
-              <Link href="/calendar">📅 Calendar View</Link>
+              <Link href="/calendar">{t('calendarView')}</Link>
             </Button>
             <Button variant="secondary" className="w-full justify-start" asChild>
-              <Link href="/feed">📰 Events Feed</Link>
+              <Link href="/feed">{t('eventsFeed')}</Link>
             </Button>
             <Button variant="secondary" className="w-full justify-start" asChild>
-              <Link href="/map">🗺️ Campus Map</Link>
+              <Link href="/map">{t('campusMap')}</Link>
             </Button>
             <Button variant="secondary" className="w-full justify-start" asChild>
-              <Link href="/manage-profiles">👤 Manage Profiles</Link>
+              <Link href="/manage-profiles">{t('manageProfiles')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -462,53 +451,53 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5" />
-              Help & Support
+              {t('helpSupport')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-              <h4 className="font-semibold text-mq-content mb-1">About Syllabus Sync</h4>
+              <h4 className="font-semibold text-mq-content mb-1">{t('aboutTitle')}</h4>
               <p className="text-mq-sm text-mq-content-secondary">
-                Version {APP_CONFIG.version} - Macquarie University Campus Management
+                {t('version')} {APP_CONFIG.version} - {t('aboutDesc')}
               </p>
             </div>
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-              <h4 className="font-semibold text-mq-content mb-1">Need Help?</h4>
+              <h4 className="font-semibold text-mq-content mb-1">{t('needHelp')}</h4>
               <p className="text-mq-sm text-mq-content-secondary mb-2">
-                Visit our documentation or contact support.
+                {t('helpDesc')}
               </p>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => {
-                  toastUtils.info('Documentation', '📚 Opening Macquarie University Syllabus Sync documentation...');
+                  toastUtils.info(t('viewDocumentation'), t('documentationOpening'));
                   // In a real app, this would open documentation
                   setTimeout(() => {
-                    toastUtils.success('Documentation', '📖 Documentation will be available soon. Check back later!');
+                    toastUtils.success(t('viewDocumentation'), t('documentationMsg'));
                   }, 1500);
                 }}
-                aria-label="View application documentation and help guides"
+                aria-label={t('viewDocumentation').toLowerCase()}
               >
-                View Documentation
+                {t('viewDocumentation')}
               </Button>
             </div>
             <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-              <h4 className="font-semibold text-mq-content mb-1">Feedback</h4>
+              <h4 className="font-semibold text-mq-content mb-1">{t('feedback')}</h4>
               <p className="text-mq-sm text-mq-content-secondary mb-2">
-                Help us improve by sharing your feedback.
+                {t('feedbackDesc')}
               </p>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => {
-                  toastUtils.info('Feedback', '📝 Preparing feedback form...');
+                  toastUtils.info(t('feedback'), t('feedbackPreparing'));
                   setTimeout(() => {
-                    toastUtils.success('Thank you!', '💌 Feedback system will be available soon. We appreciate your input!');
+                    toastUtils.success(t('feedbackThankYou'), t('feedbackMsg'));
                   }, 1500);
                 }}
-                aria-label="Send feedback about the Syllabus Sync application"
+                aria-label={t('sendFeedback').toLowerCase()}
               >
-                Send Feedback
+                {t('sendFeedback')}
               </Button>
             </div>
           </CardContent>
@@ -519,18 +508,17 @@ export default function SettingsPage() {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Clear All Data</DialogTitle>
+            <DialogTitle>{t('clearAllDataTitle')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to clear all data? This action cannot be undone and will remove
-              all units, deadlines, and profiles.
+              {t('clearAllDataDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button variant="primary" onClick={confirmClearAllData} disabled={clearing}>
-              {clearing ? 'Clearing...' : 'Clear All Data'}
+              {clearing ? t('clearing') : t('clearAllDataTitle')}
             </Button>
           </DialogFooter>
         </DialogContent>

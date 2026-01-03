@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Bell,
   Settings,
@@ -38,6 +39,7 @@ const notificationIcons = {
 };
 
 const Header = memo(() => {
+  const { t } = useTranslation();
   const router = useRouter();
   const supabase = createBrowserClient();
 
@@ -125,7 +127,7 @@ const Header = memo(() => {
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/MQ_Logo_Final.png"
-            alt="Macquarie University Logo"
+            alt={t('mqLogoAlt')}
             width={128}
             height={128}
             style={{ objectFit: 'contain' }}
@@ -145,7 +147,7 @@ const Header = memo(() => {
         <div className="relative" ref={dropdownRef}>
           <button
             className="p-2 rounded-mq transition-all duration-mq-fast ease-mq-snap relative hover:bg-mq-background-secondary min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-            aria-label="Notifications"
+            aria-label={t('notifications')}
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell className="w-5 h-5 text-mq-content-secondary" />
@@ -265,7 +267,7 @@ const Header = memo(() => {
             <DropdownMenuTrigger asChild>
               <button
                 className="flex items-center gap-2 p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] hover:bg-mq-background-secondary"
-                aria-label="Open profile menu"
+                aria-label={t('openProfileMenu')}
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -280,7 +282,7 @@ const Header = memo(() => {
                   )}
                 </div>
                 <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
-                  {user?.email || 'User'}
+                  {user?.email || t('user')}
                 </div>
               </button>
             </DropdownMenuTrigger>

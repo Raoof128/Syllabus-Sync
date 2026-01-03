@@ -6,6 +6,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Deadline } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ interface DeadlineFormProps {
 }
 
 export default function DeadlineForm({ open, onOpenChange, editDeadline }: DeadlineFormProps) {
+  const { t } = useTranslation();
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
@@ -66,7 +68,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const { execute: saveWithRetry } = useRetry(performSave, {
     maxAttempts: 3,
     showToastOnError: false, // We'll handle toasts manually
-    errorMessage: 'Failed to save deadline. Please try again.',
+    errorMessage: t('failedToSaveDeadline'),
   });
 
   const resetForm = () => {
@@ -104,9 +106,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({
-      title: validationRules.required('Title'),
-      unitCode: validationRules.required('Unit'),
-      dueDate: validationRules.required('Due date'),
+      title: validationRules.required(t('title')),
+      unitCode: validationRules.required(t('unit')),
+      dueDate: validationRules.required(t('dueDate')),
     });
 
     const validationErrors = validator({ title, unitCode, dueDate });
@@ -149,12 +151,12 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       // Success - show toast and close form
       if (editDeadline) {
         toastUtils.success(
-          'Deadline Updated',
+          t('deadlineUpdated'),
           `"${deadlineData.title}" has been updated successfully.`,
         );
       } else {
         toastUtils.success(
-          'Deadline Added',
+          t('deadlineAdded'),
           `"${deadlineData.title}" has been added successfully.`,
         );
       }
@@ -172,7 +174,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const confirmDelete = () => {
     if (editDeadline) {
       removeDeadline(editDeadline.id);
-      toastUtils.success('Deadline Deleted', `"${editDeadline.title}" has been deleted.`);
+      toastUtils.success(t('deadlineDeleted'), `"${editDeadline.title}" ${t('deletedMsg')}`);
       onOpenChange(false);
       resetForm();
     }
@@ -208,11 +210,11 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editDeadline ? 'Edit Deadline' : 'Add New Deadline'}</DialogTitle>
+            <DialogTitle>{editDeadline ? t('editDeadline') : t('addNewDeadline')}</DialogTitle>
             <DialogDescription>
               {editDeadline
-                ? 'Update details of your deadline.'
-                : 'Fill in details to add a new deadline.'}
+                ? t('updateDeadlineDetails')
+                : t('fillDeadlineDetails')}
             </DialogDescription>
           </DialogHeader>
 
@@ -250,7 +252,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   aria-describedby={unitDescribedBy}
                   aria-invalid={Boolean(errors.unitCode)}
                 >
-                  <SelectValue placeholder="Select unit" />
+                  <SelectValue placeholder={t('selectUnit')} />
                 </SelectTrigger>
                 <SelectContent>
                   {units.map((unit) => (
@@ -312,7 +314,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 onValueChange={(v) => setPriority(v as Deadline['priority'])}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
+                  <SelectValue placeholder={t('selectPriority')} />
                 </SelectTrigger>
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
@@ -328,7 +330,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               <Label htmlFor="type">Type</Label>
               <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={t('selectType')} />
                 </SelectTrigger>
                 <SelectContent>
                   {DEADLINE_TYPES.map((t) => (
@@ -373,7 +375,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               Cancel
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0}>
-              {editDeadline ? 'Save Changes' : 'Add Deadline'}
+              {editDeadline ? t('saveChanges') : t('addDeadline')}
             </Button>
           </DialogFooter>
         </DialogContent>

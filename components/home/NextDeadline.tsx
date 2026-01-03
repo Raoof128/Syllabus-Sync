@@ -11,10 +11,12 @@ import { formatDistanceToNow, format, isValid } from 'date-fns';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 const NextDeadline = memo(function NextDeadline() {
   const isHydrated = useHydration();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const { t } = useTranslation();
   const nextDeadline = useMemo(() => {
     const now = new Date();
     const validUpcoming = deadlines
@@ -44,30 +46,30 @@ const NextDeadline = memo(function NextDeadline() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Next Deadline</CardTitle>
+        <CardTitle>{t('nextDeadline')}</CardTitle>
         <Link
           href="/calendar"
           className="text-sm text-mq-info hover:text-mq-info/80 hover:underline"
         >
-          View all →
+          {t('viewAll')}
         </Link>
       </CardHeader>
       <CardContent>
         {!isHydrated ? (
           <div className="h-32 flex items-center justify-center">
-            <p className="text-mq-content">Loading...</p>
+            <p className="text-mq-content">{t('loading')}</p>
           </div>
         ) : !nextDeadline ? (
           <div className="text-center py-8">
             <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-mq-content mb-2">No upcoming deadlines</h3>
+            <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noUpcomingDeadlines')}</h3>
             <p className="text-mq-content mb-4">
-              All caught up! Add your first deadline to stay on top of your work.
+              {t('noDeadlinesDesc')}
             </p>
              <Button asChild>
                <Link href="/calendar" className="gap-2">
                  <Clock className="h-4 w-4" />
-                 Add Deadline
+                 {t('addDeadline')}
                </Link>
              </Button>
           </div>

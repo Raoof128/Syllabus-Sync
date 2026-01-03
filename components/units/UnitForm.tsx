@@ -5,6 +5,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
 import { UNIT_COLORS } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,7 @@ const DAYS: DayOfWeek[] = [
 ];
 
 export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
+  const { t } = useTranslation();
   const { addUnit, updateUnit } = useUnitsStore();
 
   // Form state
@@ -73,7 +75,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const { execute: saveWithRetry, isLoading: isSaving } = useRetry(performSave, {
     maxAttempts: 3,
     showToastOnError: false, // We'll handle toasts manually
-    errorMessage: 'Failed to save unit. Please try again.',
+    errorMessage: t('failedToSaveUnit'),
   });
 
   const resetForm = () => {
@@ -122,13 +124,13 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({
-      code: validationRules.required('Unit code'),
-      name: validationRules.required('Unit name'),
-      building: validationRules.required('Building'),
-      room: validationRules.required('Room'),
+      code: validationRules.required(t('unitCode')),
+      name: validationRules.required(t('unitName')),
+      building: validationRules.required(t('building')),
+      room: validationRules.required(t('room')),
       schedule: (scheduleValue) =>
         !scheduleValue || !Array.isArray(scheduleValue) || scheduleValue.length === 0
-          ? 'At least one class time is required'
+          ? t('atLeastOneClass')
           : null,
     });
 
@@ -138,7 +140,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (ct.startTime >= ct.endTime) {
         classTimeErrors.push({
           field: `time_${index}`,
-          message: 'End time must be after start time',
+          message: t('endTimeAfterStart'),
         });
       }
     });
@@ -150,7 +152,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (timesSet.has(timeKey)) {
         classTimeErrors.push({
           field: `duplicate_${index}`,
-          message: 'Duplicate class time',
+          message: t('duplicateClassTime'),
         });
       }
       timesSet.add(timeKey);
@@ -187,12 +189,12 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       // Success - show toast and close form
       if (editUnit) {
         toastUtils.success(
-          'Unit Updated',
+          t('unitUpdated'),
           `${unitData.code} - ${unitData.name} has been updated successfully.`,
         );
       } else {
         toastUtils.success(
-          'Unit Added',
+          t('unitAdded'),
           `${unitData.code} - ${unitData.name} has been added successfully.`,
         );
       }
@@ -223,11 +225,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editUnit ? 'Edit Unit' : 'Add New Unit'}</DialogTitle>
+            <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
           <DialogDescription>
             {editUnit
-              ? 'Update the details of your unit.'
-              : 'Fill in the details to add a new unit to your schedule.'}
+              ? t('updateUnitDetails')
+              : t('fillUnitDetails')}
           </DialogDescription>
         </DialogHeader>
 
@@ -404,7 +406,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                     size="sm"
                     onClick={() => removeClassTime(ct.id)}
                     className="mt-6"
-                    aria-label="Remove class time"
+                    aria-label={t('removeClassTime')}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -427,7 +429,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               Cancel
             </Button>
             <Button type="button" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving...' : editUnit ? 'Update' : 'Add'} Unit
+              {isSaving ? t('saving') : editUnit ? t('update') : t('add')} {t('unit')}
             </Button>
           </div>
         </DialogFooter>

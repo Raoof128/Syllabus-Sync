@@ -5,6 +5,7 @@ import { useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Home,
   MapPin,
@@ -25,6 +26,7 @@ const navigation = [
 ];
 
 const Sidebar = memo(() => {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -34,7 +36,7 @@ const Sidebar = memo(() => {
       <button
         className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl active:scale-95 transition-all duration-mq-fast touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
       >
         {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
@@ -60,7 +62,7 @@ const Sidebar = memo(() => {
           <Link href="/home" className="flex items-center gap-2">
             <Image
               src="/MQ_Logo_Final.png"
-              alt="Macquarie University Logo"
+              alt={t('mqLogoAlt')}
               width={128}
               height={128}
               style={{ objectFit: 'contain', borderRadius: '8px' }}
@@ -68,7 +70,7 @@ const Sidebar = memo(() => {
           </Link>
         </div>
 
-        <nav className="space-y-2" role="navigation" aria-label="Main navigation">
+        <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
           {navigation.map((item) => {
             const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
             const Icon = item.icon;
