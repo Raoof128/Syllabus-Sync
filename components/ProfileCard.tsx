@@ -62,7 +62,7 @@ const ProfileCard = React.memo(
               </div>
               {isCurrent && (
                 <Badge className="absolute -top-1 -right-1 bg-green-500 text-white text-xs">
-                  Current
+                  {t('current')}
                 </Badge>
               )}
             </div>
@@ -71,7 +71,7 @@ const ProfileCard = React.memo(
               <h3 className="font-semibold text-mq-content">{profile.name}</h3>
               <p className="text-sm text-mq-content-secondary">{profile.email}</p>
               <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
-                <span>ID: {profile.studentId}</span>
+                <span>{t('idPrefix')}{profile.studentId}</span>
                 <span>•</span>
                 <span>
                   {profile.course} • {profile.year}
@@ -87,7 +87,7 @@ const ProfileCard = React.memo(
                 size="sm"
                 onClick={() => onEdit(profile)}
                 className="h-8 w-8 p-0"
-                aria-label={`Edit ${profile.name}`}
+                aria-label={t('editProfileAria', { name: profile.name })}
               >
                 <Edit className="w-4 h-4" />
               </Button>
@@ -97,7 +97,7 @@ const ProfileCard = React.memo(
               size="sm"
               onClick={() => onSetCurrent(profile.id)}
               className="h-8 w-8 p-0"
-              aria-label={`Use ${profile.name}`}
+              aria-label={t('useProfileAria', { name: profile.name })}
             >
               <Check className="w-4 h-4" />
             </Button>
@@ -107,7 +107,7 @@ const ProfileCard = React.memo(
                 size="sm"
                 onClick={() => setDeleteConfirm(true)}
                 className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                aria-label={`Delete ${profile.name}`}
+                aria-label={t('deleteProfileAria', { name: profile.name })}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -165,11 +165,11 @@ const ProfileCard = React.memo(
         {deleteConfirm && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-900 mb-3">
-              Are you sure you want to delete this profile? This action cannot be undone.
+              {t('deleteProfileConfirm')}
             </p>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setDeleteConfirm(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 variant="destructive"
@@ -178,7 +178,7 @@ const ProfileCard = React.memo(
                   setDeleteConfirm(false);
                 }}
               >
-                Delete Profile
+                {t('deleteProfile')}
               </Button>
             </div>
           </div>

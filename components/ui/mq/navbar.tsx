@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from './button';
 import { MQLink } from './link';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 interface NavbarProps {
   title?: string;
@@ -14,16 +15,26 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  title = 'Macquarie University',
-  navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'About', href: '/about' },
-    { label: 'Programs', href: '/programs' },
-    { label: 'Contact', href: '/contact' },
-  ],
+  title,
+  navItems,
   onAction,
-  actionLabel = 'Apply Now',
+  actionLabel,
 }) => {
+  const { t } = useTranslation();
+  
+  const defaultTitle = t('macquarieUniversity');
+  const defaultNavItems = [
+    { label: t('navHome'), href: '/' },
+    { label: t('navAbout'), href: '/about' },
+    { label: t('navPrograms'), href: '/programs' },
+    { label: t('navContact'), href: '/contact' },
+  ];
+  const defaultActionLabel = t('applyNow');
+
+  const finalTitle = title || defaultTitle;
+  const finalNavItems = navItems || defaultNavItems;
+  const finalActionLabel = actionLabel || defaultActionLabel;
+
   return (
     <nav className="bg-mq-background border-b border-mq-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -31,11 +42,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex">
             <div className="flex flex-shrink-0 items-center">
               <Link href="/" className="text-mq-xl font-bold text-mq-content hover:text-mq-primary transition-colors duration-mq-fast">
-                {title}
+                {finalTitle}
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navItems.map((item) => (
+              {finalNavItems.map((item) => (
                 <MQLink
                   key={item.href}
                   href={item.href}
@@ -49,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {onAction && (
               <Button variant="primary" size="sm" onClick={onAction}>
-                {actionLabel}
+                {finalActionLabel}
               </Button>
             )}
           </div>

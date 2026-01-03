@@ -526,7 +526,7 @@ export default function SettingsPage() {
           <DialogHeader>
             <DialogTitle>{t('clearAllDataTitle')}</DialogTitle>
             <DialogDescription>
-              {t('clearAllDataDesc')}
+              {t('clearAllDataDialogDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">

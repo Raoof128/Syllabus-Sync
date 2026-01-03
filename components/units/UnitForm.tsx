@@ -225,7 +225,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-            <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
+          <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
           <DialogDescription>
             {editUnit
               ? t('updateUnitDetails')
@@ -237,11 +237,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           {/* Unit Code */}
           <div className="space-y-2">
             <Label htmlFor="code">
-              Unit Code <span className="text-mq-error">*</span>
+              {t('unitCodeLabel')} <span className="text-mq-error">*</span>
             </Label>
             <Input
               id="code"
-              placeholder="e.g., COMP2310"
+              placeholder={t('unitCodePlaceholder')}
               value={code}
               onChange={(e) => setCode(e.target.value)}
               aria-describedby={codeDescribedBy}
@@ -249,7 +249,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               className={errors.code ? 'border-mq-error' : ''}
             />
             <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
-              Use the official unit code (letters + numbers).
+              {t('unitCodeHelp')}
             </p>
             {errors.code && (
               <p id="unit-code-error" className="text-sm text-mq-error">
@@ -261,11 +261,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           {/* Unit Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
-              Unit Name <span className="text-mq-error">*</span>
+              {t('unitNameLabel')} <span className="text-mq-error">*</span>
             </Label>
             <Input
               id="name"
-              placeholder="e.g., Computer Networks"
+              placeholder={t('unitNamePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={errors.name ? 'border-mq-error' : ''}
@@ -277,11 +277,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="building">
-                Building <span className="text-mq-error">*</span>
+                {t('buildingLabel')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="building"
-                placeholder="e.g., C5C"
+                placeholder={t('buildingPlaceholder')}
                 value={building}
                 onChange={(e) => setBuilding(e.target.value)}
                 aria-describedby={buildingDescribedBy}
@@ -289,7 +289,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 className={errors.building ? 'border-mq-error' : ''}
               />
               <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
-                Use the campus building code from the map list.
+                {t('buildingHelp')}
               </p>
               {errors.building && (
                 <p id="unit-building-error" className="text-sm text-mq-error">
@@ -300,11 +300,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
             <div className="space-y-2">
               <Label htmlFor="room">
-                Room <span className="text-mq-error">*</span>
+                {t('roomLabel')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="room"
-                placeholder="e.g., 204"
+                placeholder={t('roomPlaceholder')}
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
                 className={errors.room ? 'border-mq-error' : ''}
@@ -328,7 +328,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />
-                      {c.name}
+                      {t(c.translationKey as any)}
                     </div>
                   </SelectItem>
                 ))}
@@ -340,11 +340,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>
-                Class Times <span className="text-mq-error">*</span>
+                {t('classTimesLabel')} <span className="text-mq-error">*</span>
               </Label>
               <Button type="button" variant="outline" size="sm" onClick={addClassTime}>
                 <Plus className="w-4 h-4 mr-1" />
-                Add Class Time
+                {t('addClassTime')}
               </Button>
             </div>
 
@@ -369,7 +369,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         <SelectContent>
                           {DAYS.map((day) => (
                             <SelectItem key={day} value={day}>
-                              {day}
+                              {t(day.toLowerCase() as any)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -426,7 +426,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         <DialogFooter className="flex justify-end">
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={handleCancel}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="button" onClick={handleSave} disabled={isSaving}>
               {isSaving ? t('saving') : editUnit ? t('update') : t('add')} {t('unit')}

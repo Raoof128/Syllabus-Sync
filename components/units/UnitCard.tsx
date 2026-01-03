@@ -15,18 +15,18 @@ interface UnitCardProps {
   showActions?: boolean;
 }
 
-const DAY_SHORT: { [key: string]: string } = {
-  Monday: 'Mon',
-  Tuesday: 'Tue',
-  Wednesday: 'Wed',
-  Thursday: 'Thu',
-  Friday: 'Fri',
-  Saturday: 'Sat',
-  Sunday: 'Sun',
-};
-
 const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: UnitCardProps) => {
   const { t } = useTranslation();
+
+  const DAY_SHORT: { [key: string]: string } = {
+    Monday: t('mon'),
+    Tuesday: t('tue'),
+    Wednesday: t('wed'),
+    Thursday: t('thu'),
+    Friday: t('fri'),
+    Saturday: t('sat'),
+    Sunday: t('sun'),
+  };
 
   // Get unique days
   const getUniqueDays = () => {

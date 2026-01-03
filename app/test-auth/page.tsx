@@ -71,7 +71,7 @@ export default function TestAuthPage() {
           disabled={loading}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          Test Signup
+          {t('testSignup')}
         </button>
 
         <button
@@ -79,7 +79,7 @@ export default function TestAuthPage() {
           disabled={loading}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
         >
-          Test Signin
+          {t('testSignin')}
         </button>
 
         <button
@@ -87,13 +87,13 @@ export default function TestAuthPage() {
           disabled={loading}
           className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
         >
-          Test User
+          {t('testUser')}
         </button>
       </div>
 
       {result && (
         <div className="bg-gray-100 p-4 rounded">
-          <h2 className="font-bold mb-2">Result ({result.action}):</h2>
+          <h2 className="font-bold mb-2">{t('resultAction', { action: result.action })}</h2>
           <pre className="text-sm overflow-auto">{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}

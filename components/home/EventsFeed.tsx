@@ -42,8 +42,12 @@ const EventsFeed = memo(function EventsFeed() {
                 className="p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-mq-content">{event.title}</h3>
-                  <Badge className={categoryColors[event.category]}>{event.category}</Badge>
+                  <h3 className="font-semibold text-mq-content">
+                    {t((event.translationKey || event.title) as any)}
+                  </h3>
+                  <Badge className={categoryColors[event.category]}>
+                    {t(('category_' + event.category.replace(/ /g, '')) as any)}
+                  </Badge>
                 </div>
 
                 <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
@@ -65,7 +69,7 @@ const EventsFeed = memo(function EventsFeed() {
                       variant="secondary"
                       size="sm"
                       className="gap-1 text-xs h-7 focus:ring-2 focus:ring-mq-primary/50"
-                      aria-label={`Navigate to ${event.building} on campus map`}
+                      aria-label={t('navigateToBuildingAria', { building: event.building })}
                     >
                       <Link href={`/map?building=${event.building}`}>
                         <Navigation className="h-3 w-3" />

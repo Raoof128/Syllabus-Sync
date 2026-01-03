@@ -168,7 +168,7 @@ const Header = memo(() => {
                     onClick={() => markAllAsRead()}
                     className="text-xs text-mq-info hover:text-mq-info/80 rounded-mq focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background"
                   >
-                    Mark all read
+                    {t('markAllRead')}
                   </button>
                 )}
               </div>
@@ -247,8 +247,8 @@ const Header = memo(() => {
           <button
             onClick={toggleTheme}
             className="relative p-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background active:scale-95 hover:bg-mq-background-secondary min-h-[44px] min-w-[44px]"
-            aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-            title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
+            title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
           >
             <div className="relative w-5 h-5">
               <Sun
@@ -296,7 +296,7 @@ const Header = memo(() => {
                   className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <User className="w-4 h-4" />
-                  Manage Profiles
+                  {t('manageProfiles')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -305,7 +305,7 @@ const Header = memo(() => {
                   className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <Settings className="w-4 h-4" />
-                  Settings
+                  {t('settings')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -314,7 +314,7 @@ const Header = memo(() => {
                   className="flex items-center gap-2 text-mq-content-secondary"
                 >
                   <Calendar className="w-4 h-4" />
-                  Calendar
+                  {t('calendar')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -330,7 +330,7 @@ const Header = memo(() => {
                 className="flex items-center gap-2 text-mq-content-secondary hover:text-mq-content cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
-                Sign out
+                {t('signOut')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

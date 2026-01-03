@@ -67,14 +67,14 @@ export const BRAND_COLORS = {
  * Colors available for users to assign to their units/courses
  */
 export const UNIT_COLORS = [
-  { name: 'University Red', value: '#A6192E' },
-  { name: 'University Blue', value: '#002A45' },
-  { name: 'University Gold', value: '#FFB81C' },
-  { name: 'Green', value: '#10b981' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Pink', value: '#ec4899' },
-  { name: 'Cyan', value: '#06b6d4' },
+  { name: 'University Red', value: '#A6192E', translationKey: 'colorUniversityRed' },
+  { name: 'University Blue', value: '#002A45', translationKey: 'colorUniversityBlue' },
+  { name: 'University Gold', value: '#FFB81C', translationKey: 'colorUniversityGold' },
+  { name: 'Green', value: '#10b981', translationKey: 'colorGreen' },
+  { name: 'Purple', value: '#a855f7', translationKey: 'colorPurple' },
+  { name: 'Orange', value: '#f97316', translationKey: 'colorOrange' },
+  { name: 'Pink', value: '#ec4899', translationKey: 'colorPink' },
+  { name: 'Cyan', value: '#06b6d4', translationKey: 'colorCyan' },
 ] as const;
 
 /**
@@ -83,17 +83,17 @@ export const UNIT_COLORS = [
  * Add or modify buildings for your campus
  */
 export const CAMPUS_BUILDINGS = [
-  { code: 'C5C', name: 'Computer Science Building' },
-  { code: 'C3C', name: 'Library' },
-  { code: 'C7A', name: 'Campus Hub' },
-  { code: 'W6A', name: 'Wallumattagal Building' },
-  { code: 'E7A', name: 'Engineering Building' },
-  { code: 'E7B', name: 'Engineering Building B' },
-  { code: 'W3A', name: 'Careers & Employment' },
-  { code: '12WW', name: '12 Wally\'s Walk' },
-  { code: '4WW', name: '4 Wally\'s Walk' },
-  { code: 'LIB', name: 'Library' },
-  { code: 'Sports', name: 'Sports Precinct' },
+  { code: 'C5C', name: 'Computer Science Building', translationKey: 'building_C5C_name' },
+  { code: 'C3C', name: 'Library', translationKey: 'building_C3C_name' },
+  { code: 'C7A', name: 'Campus Hub', translationKey: 'building_C7A_name' },
+  { code: 'W6A', name: 'Wallumattagal Building', translationKey: 'building_W6A_name' },
+  { code: 'E7A', name: 'Engineering Building', translationKey: 'building_E7A_name' },
+  { code: 'E7B', name: 'Engineering Building B', translationKey: 'building_E7B_name' },
+  { code: 'W3A', name: 'Careers & Employment', translationKey: 'building_W3A_name' },
+  { code: '12WW', name: '12 Wally\'s Walk', translationKey: 'building_12WW_name' },
+  { code: '4WW', name: '4 Wally\'s Walk', translationKey: 'building_4WW_name' },
+  { code: 'LIB', name: 'Library', translationKey: 'building_LIB_name' },
+  { code: 'Sports', name: 'Sports Precinct', translationKey: 'building_Sports_name' },
 ] as const;
 
 /**

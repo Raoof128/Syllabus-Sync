@@ -224,7 +224,7 @@ export default function MapPage() {
             <Navigation className="h-5 w-5 text-mq-success" />
             <div>
               <p className="text-mq-sm font-medium text-mq-success">
-                {t('navigatingTo')}: <strong>{selectedBuilding.name}</strong>
+                {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey as any)}</strong>
               </p>
               <p className="text-mq-xs text-mq-success">{t('building')} {selectedBuilding.id}</p>
             </div>
@@ -244,9 +244,8 @@ export default function MapPage() {
         <div className="relative">
           {isSearching ? (
             <Loader2
-              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
-                prefersReducedMotion ? '' : 'animate-spin'
-              }`}
+              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${prefersReducedMotion ? '' : 'animate-spin'
+                }`}
             />
           ) : (
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
@@ -291,16 +290,16 @@ export default function MapPage() {
                   role="option"
                   aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
-                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
-                    index === selectedResultIndex
+                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${index === selectedResultIndex
                       ? 'bg-mq-info/10'
                       : 'hover:bg-mq-hover-background'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-mq-content truncate">
-                        {highlightMatch(building.name)}
+                        {/* Note: Highlight match logic runs on English names for now */}
+                        {highlightMatch(t(building.translationKey as any))}
                       </div>
                       <div className="text-mq-sm text-mq-content-secondary">
                         {highlightMatch(building.id)}
@@ -316,7 +315,7 @@ export default function MapPage() {
           )}
           {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
-              No buildings found matching &quot;{searchQuery}&quot;
+              {t('noBuildingsFound', { query: searchQuery })}
             </div>
           )}
         </div>
@@ -327,10 +326,10 @@ export default function MapPage() {
             <Info className="h-5 w-5 text-mq-info" />
             <div>
               <p className="text-mq-sm font-medium text-mq-info">
-                Coordinate Picker Mode
+                {t('coordPickerMode')}
               </p>
               <p className="text-mq-xs text-mq-info">
-                Click on the map to copy pixel coordinates for adding new markers
+                {t('coordPickerDesc')}
               </p>
             </div>
           </div>
@@ -338,7 +337,7 @@ export default function MapPage() {
             {copiedCoords && (
               <div className="flex items-center gap-2 text-mq-sm text-mq-success">
                 <Copy className="h-4 w-4" />
-                Copied: {copiedCoords}
+                {t('copied')} {copiedCoords}
               </div>
             )}
             <Button
@@ -350,12 +349,12 @@ export default function MapPage() {
               {coordPickerMode ? (
                 <>
                   <Eye className="h-4 w-4" />
-                  Enabled
+                  {t('enabled')}
                 </>
               ) : (
                 <>
                   <EyeOff className="h-4 w-4" />
-                  Disabled
+                  {t('disabled')}
                 </>
               )}
             </Button>
@@ -394,7 +393,7 @@ export default function MapPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5" />
-            Campus Buildings
+            {t('campusBuildings')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -407,11 +406,10 @@ export default function MapPage() {
                   key={building.code}
                   href={`/map?building=${building.code}`}
                   aria-current={isSelected ? 'page' : undefined}
-                  className={`p-3 rounded-mq-lg transition-colors ${
-                    isSelected
+                  className={`p-3 rounded-mq-lg transition-colors ${isSelected
                       ? 'bg-mq-success/10 border-2 border-mq-success'
                       : 'bg-mq-background-secondary hover:bg-mq-hover-background'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-mq-content">{building.code}</div>
@@ -419,7 +417,7 @@ export default function MapPage() {
                       <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
                     )}
                   </div>
-                  <div className="text-mq-sm text-mq-content-secondary">{building.name}</div>
+                  <div className="text-mq-sm text-mq-content-secondary">{t(building.translationKey as any)}</div>
                   {buildingData?.tags && buildingData.tags.length > 0 && (
                     <div className="mt-1">
                       <Badge variant="neutral" className="text-xs">
@@ -440,7 +438,7 @@ export default function MapPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Navigation className="h-5 w-5" />
-              Turn-by-Turn Navigation
+              {t('turnByTurn')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -448,13 +446,13 @@ export default function MapPage() {
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
                 <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                   Get directions between buildings with estimated walking time.
-                 </p>
-               </div>
-               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                 <Info className="h-4 w-4" />
-                 <span>{t('comingSoon')}</span>
-               </div>
+                  {t('walkingDirectionsDesc')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                <Info className="h-4 w-4" />
+                <span>{t('comingSoon')}</span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -463,21 +461,21 @@ export default function MapPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              Live Location
+              {t('liveLocation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">Real-time Tracking</h4>
+                <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                   Track your current location on campus in real-time.
-                 </p>
-               </div>
-               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                 <Info className="h-4 w-4" />
-                 <span>{t('comingSoon')}</span>
-               </div>
+                  {t('realTimeTrackingDesc')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                <Info className="h-4 w-4" />
+                <span>{t('comingSoon')}</span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -486,21 +484,21 @@ export default function MapPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              Advanced Search
+              {t('advancedSearch')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">Filter & Find</h4>
+                <h4 className="font-semibold text-mq-content">{t('filterAndFind')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mt-1">
-                   Search by facilities, accessibility features, and more.
-                 </p>
-               </div>
-               <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                 <Info className="h-4 w-4" />
-                 <span>{t('comingSoon')}</span>
-               </div>
+                  {t('filterAndFindDesc')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                <Info className="h-4 w-4" />
+                <span>{t('comingSoon')}</span>
+              </div>
             </div>
           </CardContent>
         </Card>

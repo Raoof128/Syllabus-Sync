@@ -1563,3 +1563,10 @@ Summary: Performed comprehensive i18n refactor covering all remaining hardcoded 
 Files changed: components/units/UnitForm.tsx (Day/End labels), app/feed/page.tsx (New badge), app/not-found.tsx (page content and navigation), app/manage-profiles/page.tsx (all form labels), app/client-layout.tsx (skip link), app/home/HomeClient.tsx (accessibility labels), lib/i18n/translations.ts (15 new keys across 3 languages), Team_Plan/AGENT.md, Team_Plan/CHANGELOG.md.
 Verification: 100% hardcoded string elimination in user-facing components; all translations functional across English/Spanish/Persian; accessibility compliance maintained; no linting errors or TypeScript issues.
 Follow-ups: Monitor for any future string additions during development; translations ready for additional languages if needed.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of App Config and Feed.
+Summary: Added translation support for DeadlineForm choices (priorities, types), EventsFeed content (categories, titles), and FeedPage filters. Internationalized sample event data and added missing translation keys to translations.ts for en, es, and fa. Implemented locale-aware date formatting in FeedPage.
+Files: components/deadlines/DeadlineForm.tsx; components/home/EventsFeed.tsx; app/feed/page.tsx; lib/i18n/translations.ts; lib/types/index.ts; data/sampleEvents.ts.
+Verification: Verified code compilation and logic correctness.
+Follow-ups: Complete remaining translations for other languages if needed.

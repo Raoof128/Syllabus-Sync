@@ -55,10 +55,10 @@ export default function LoginClient() {
         return;
       }
 
-      toastUtils.success('Welcome back!', 'You have been successfully logged in.');
+      toastUtils.success(t('welcomeBack'), t('loginSuccess'));
       router.push(redirectTo);
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('unexpectedError'));
     } finally {
       setIsLoading(false);
     }
@@ -77,10 +77,10 @@ export default function LoginClient() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            Welcome to {APP_CONFIG.name}
+            {t('welcomeTo', { appName: APP_CONFIG.name })}
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in to access your {UNIVERSITY_CONFIG.name} dashboard
+            {t('signInToAccess', { uniName: UNIVERSITY_CONFIG.name })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -96,7 +96,7 @@ export default function LoginClient() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@student.mq.edu.au"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -119,27 +119,26 @@ export default function LoginClient() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('signingIn') : t('signIn')}
             </Button>
           </form>
 
           <div className="text-center text-sm text-mq-content-secondary mt-6 p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
-            <div className="font-medium text-mq-info mb-1">🔧 OAuth Configuration Required</div>
+            <div className="font-medium text-mq-info mb-1">{t('oauthRequired')}</div>
             <div className="text-xs">
-              Google Sign-In requires OAuth provider setup in Supabase dashboard.<br/>
-              Configure Google OAuth under Authentication → Providers to enable this feature.
+              {t('googleOAuthDesc')}
             </div>
           </div>
 
           <div className="text-center text-sm text-mq-content-secondary">
             <p>
-              Don&apos;t have an account?{' '}
+              {t('noAccount')}{' '}
               <button
                 onClick={() => router.push('/signup')}
                 className="text-mq-primary hover:underline font-medium"
                 disabled={isLoading}
               >
-                Sign up
+                {t('signUp')}
               </button>
             </p>
           </div>

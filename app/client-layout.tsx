@@ -118,7 +118,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
       <ThemeProvider>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse text-mq-content">Loading...</div>
+          <div className="animate-pulse text-mq-content">{t('loading')}</div>
         </div>
       </ThemeProvider>
     );

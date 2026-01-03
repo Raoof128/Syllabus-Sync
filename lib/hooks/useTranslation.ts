@@ -35,8 +35,14 @@ export function useTranslation() {
     }
   }, [language]);
 
-  const t = useCallback((key: TranslationKey): string => {
-    return translations[language][key] || translations.en[key] || key;
+  const t = useCallback((key: TranslationKey, vars?: Record<string, string | number>): string => {
+    let text = (translations[language] as any)[key] || translations.en[key] || key;
+    if (vars) {
+      Object.entries(vars).forEach(([k, v]) => {
+        text = text.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+      });
+    }
+    return text;
   }, [language]);
 
   return {

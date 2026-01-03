@@ -10,18 +10,26 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 
 // Dynamically import forms for better code splitting
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
-  loading: () => (
-    <div className="flex items-center justify-center p-8">
-      <p className="text-mq-content">Loading...</p>
-    </div>
-  ),
+  loading: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { t } = useTranslation();
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-mq-content">{t('loading')}</p>
+      </div>
+    );
+  },
 });
 const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
-  loading: () => (
-    <div className="flex items-center justify-center p-8">
-      <p className="text-mq-content">Loading...</p>
-    </div>
-  ),
+  loading: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { t } = useTranslation();
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-mq-content">{t('loading')}</p>
+      </div>
+    );
+  },
 });
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';

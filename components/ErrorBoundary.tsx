@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 interface Props {
   children: ReactNode;
@@ -19,6 +20,118 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   retryCount: number;
+}
+
+function ErrorBoundaryUI({ 
+  error, 
+  errorInfo, 
+  retryCount, 
+  maxRetries, 
+  onRetry, 
+  onReset, 
+  showErrorDetails 
+}: {
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+  retryCount: number;
+  maxRetries: number;
+  onRetry: () => void;
+  onReset: () => void;
+  showErrorDetails?: boolean;
+}) {
+  const { t } = useTranslation();
+  const canRetry = retryCount < maxRetries;
+
+  return (
+    <div className="flex items-center justify-center min-h-[60vh] px-4 animate-fade-in">
+      <div className="text-center max-w-lg mx-auto">
+        {/* Error Icon */}
+        <div className="mx-auto w-20 h-20 bg-mq-error/10 rounded-full flex items-center justify-center mb-6">
+          <AlertTriangle className="w-10 h-10 text-mq-error" />
+        </div>
+
+        {/* Error Title */}
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-3">
+          {t('oops')}
+        </h1>
+
+        {/* Error Description */}
+        <p className="text-mq-content-secondary mb-6 text-mq-medium">
+          {t('boundaryErrorDesc')}
+        </p>
+
+        {/* Retry Counter */}
+        {retryCount > 0 && (
+          <div className="mb-4 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
+            <p className="text-mq-sm text-mq-warning">
+              {t('retryAttempt', { count: retryCount, max: maxRetries })}
+            </p>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+          {canRetry ? (
+            <Button onClick={onRetry} className="gap-2" size="lg">
+              <RefreshCcw className="w-4 h-4" />
+              {t('tryAgain')}
+            </Button>
+          ) : (
+            <Button asChild className="gap-2" size="lg">
+              <Link href="/home">
+                <Home className="w-4 h-4" />
+                {t('goHome')}
+              </Link>
+            </Button>
+          )}
+
+          <Button variant="outline" onClick={onReset} className="gap-2" size="lg">
+            <Bug className="w-4 h-4" />
+            {t('reset')}
+          </Button>
+        </div>
+
+        {/* Development Error Details */}
+        {(showErrorDetails || process.env.NODE_ENV === 'development') && error && (
+          <details className="mt-8 text-left bg-mq-background-secondary p-4 rounded-mq-lg border border-mq-border">
+            <summary className="cursor-pointer font-medium text-mq-content mb-2">
+              {t('errorDetailsDev')}
+            </summary>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-mq-content mb-1">
+                  {t('errorMessage')}
+                </h4>
+                <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
+                  {error.message}
+                </code>
+              </div>
+
+              {errorInfo && (
+                <div>
+                  <h4 className="font-medium text-mq-content mb-1">
+                    {t('componentStack')}
+                  </h4>
+                  <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
+                    {errorInfo.componentStack}
+                  </pre>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-medium text-mq-content mb-1">
+                  {t('stackTrace')}
+                </h4>
+                <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
+                  {error.stack}
+                </pre>
+              </div>
+            </div>
+          </details>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
@@ -129,100 +242,16 @@ export default class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
-      const { error, errorInfo, retryCount } = this.state;
-      const maxRetries = 3;
-      const canRetry = retryCount < maxRetries;
-
       return (
-        <div className="flex items-center justify-center min-h-[60vh] px-4 animate-fade-in">
-          <div className="text-center max-w-lg mx-auto">
-            {/* Error Icon */}
-            <div className="mx-auto w-20 h-20 bg-mq-error/10 rounded-full flex items-center justify-center mb-6">
-              <AlertTriangle className="w-10 h-10 text-mq-error" />
-            </div>
-
-            {/* Error Title */}
-            <h1 className="text-mq-3xl font-bold text-mq-content mb-3">
-              Oops! Something went wrong
-            </h1>
-
-            {/* Error Description */}
-            <p className="text-mq-content-secondary mb-6 text-mq-medium">
-              We encountered an unexpected error. This has been automatically reported and
-              we&apos;re working to fix it.
-            </p>
-
-            {/* Retry Counter */}
-            {retryCount > 0 && (
-              <div className="mb-4 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
-                <p className="text-mq-sm text-mq-warning">
-                  Retry attempt {retryCount} of {maxRetries}
-                </p>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-              {canRetry ? (
-                <Button onClick={this.handleRetry} className="gap-2" size="lg">
-                  <RefreshCcw className="w-4 h-4" />
-                  Try Again
-                </Button>
-              ) : (
-                <Button asChild className="gap-2" size="lg">
-                  <Link href="/home">
-                    <Home className="w-4 h-4" />
-                    Go Home
-                  </Link>
-                </Button>
-              )}
-
-              <Button variant="outline" onClick={this.handleReset} className="gap-2" size="lg">
-                <Bug className="w-4 h-4" />
-                Reset
-              </Button>
-            </div>
-
-            {/* Development Error Details */}
-            {(this.props.showErrorDetails || process.env.NODE_ENV === 'development') && error && (
-              <details className="mt-8 text-left bg-mq-background-secondary p-4 rounded-mq-lg border border-mq-border">
-                <summary className="cursor-pointer font-medium text-mq-content mb-2">
-                  🔧 Error Details (Development)
-                </summary>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-mq-content mb-1">
-                      Error Message:
-                    </h4>
-                    <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
-                      {error.message}
-                    </code>
-                  </div>
-
-                  {errorInfo && (
-                    <div>
-                      <h4 className="font-medium text-mq-content mb-1">
-                        Component Stack:
-                      </h4>
-                      <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
-                        {errorInfo.componentStack}
-                      </pre>
-                    </div>
-                  )}
-
-                  <div>
-                    <h4 className="font-medium text-mq-content mb-1">
-                      Stack Trace:
-                    </h4>
-                    <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
-                      {error.stack}
-                    </pre>
-                  </div>
-                </div>
-              </details>
-            )}
-          </div>
-        </div>
+        <ErrorBoundaryUI
+          error={this.state.error}
+          errorInfo={this.state.errorInfo}
+          retryCount={this.state.retryCount}
+          maxRetries={3}
+          onRetry={this.handleRetry}
+          onReset={this.handleReset}
+          showErrorDetails={this.props.showErrorDetails}
+        />
       );
     }
 

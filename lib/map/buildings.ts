@@ -4,6 +4,8 @@ export type Building = {
   position: [number, number]; // [y, x] in CRS.Simple pixel space
   description?: string;
   tags?: string[];
+  translationKey: string;
+  descriptionKey: string;
 };
 
 export const buildings: Building[] = [
@@ -13,6 +15,8 @@ export const buildings: Building[] = [
     position: [1600, 2300],
     description: 'Home to computer science and IT programs. Features modern labs, lecture theaters, and study spaces.',
     tags: ['academic', 'technology', 'labs'],
+    translationKey: 'building_C5C_name',
+    descriptionKey: 'building_C5C_desc',
   },
   {
     id: 'C3C',
@@ -20,6 +24,8 @@ export const buildings: Building[] = [
     position: [1400, 2100],
     description: 'Central library with extensive collections, study areas, and academic support services.',
     tags: ['academic', 'study', 'resources'],
+    translationKey: 'building_C3C_name',
+    descriptionKey: 'building_C3C_desc',
   },
   {
     id: 'C7A',
@@ -27,6 +33,8 @@ export const buildings: Building[] = [
     position: [1650, 2350],
     description: 'Student services center with administration, student support, and recreational facilities.',
     tags: ['services', 'administration', 'social'],
+    translationKey: 'building_C7A_name',
+    descriptionKey: 'building_C7A_desc',
   },
   {
     id: 'W6A',
@@ -34,6 +42,8 @@ export const buildings: Building[] = [
     position: [1200, 1800],
     description: 'Teaching and learning facility with classrooms, lecture theaters, and student spaces.',
     tags: ['academic', 'teaching', 'classrooms'],
+    translationKey: 'building_W6A_name',
+    descriptionKey: 'building_W6A_desc',
   },
   {
     id: 'E7A',
@@ -41,6 +51,8 @@ export const buildings: Building[] = [
     position: [2000, 2500],
     description: 'Engineering and design studios with specialized labs and workshops.',
     tags: ['academic', 'engineering', 'labs'],
+    translationKey: 'building_E7A_name',
+    descriptionKey: 'building_E7A_desc',
   },
   {
     id: 'E7B',
@@ -48,6 +60,8 @@ export const buildings: Building[] = [
     position: [2050, 2550],
     description: 'Additional engineering facilities with advanced research labs and equipment.',
     tags: ['academic', 'engineering', 'research'],
+    translationKey: 'building_E7B_name',
+    descriptionKey: 'building_E7B_desc',
   },
   {
     id: 'W3A',
@@ -55,6 +69,8 @@ export const buildings: Building[] = [
     position: [1800, 2200],
     description: 'Career services center offering job search assistance, resume workshops, and employer connections.',
     tags: ['services', 'careers', 'workshops'],
+    translationKey: 'building_W3A_name',
+    descriptionKey: 'building_W3A_desc',
   },
   {
     id: '12WW',
@@ -62,6 +78,8 @@ export const buildings: Building[] = [
     position: [1500, 2000],
     description: 'Academic building with classrooms and faculty offices.',
     tags: ['academic', 'teaching'],
+    translationKey: 'building_12WW_name',
+    descriptionKey: 'building_12WW_desc',
   },
   {
     id: '4WW',
@@ -69,6 +87,8 @@ export const buildings: Building[] = [
     position: [1550, 2050],
     description: 'Lecture and tutorial spaces for various disciplines.',
     tags: ['academic', 'teaching'],
+    translationKey: 'building_4WW_name',
+    descriptionKey: 'building_4WW_desc',
   },
   {
     id: 'LIB',
@@ -76,6 +96,8 @@ export const buildings: Building[] = [
     position: [1400, 2100],
     description: 'Central library with extensive collections, study areas, and academic support services.',
     tags: ['academic', 'study', 'resources'],
+    translationKey: 'building_LIB_name',
+    descriptionKey: 'building_LIB_desc',
   },
   {
     id: 'Sports',
@@ -83,6 +105,8 @@ export const buildings: Building[] = [
     position: [2500, 3000],
     description: 'Sports facilities including gym, courts, and recreational areas.',
     tags: ['sports', 'recreation', 'fitness'],
+    translationKey: 'building_Sports_name',
+    descriptionKey: 'building_Sports_desc',
   },
 ];
 

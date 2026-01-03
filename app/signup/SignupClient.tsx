@@ -30,13 +30,13 @@ export default function SignupClient() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDoNotMatch'));
       setIsLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('passwordTooShort'));
       setIsLoading(false);
       return;
     }
@@ -53,12 +53,12 @@ export default function SignupClient() {
       }
 
       toastUtils.success(
-        'Account created!',
-        'Please check your email to verify your account.'
+        t('accountCreated'),
+        t('verifyEmail')
       );
       router.push('/login');
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('unexpectedError'));
     } finally {
       setIsLoading(false);
     }
@@ -74,10 +74,10 @@ export default function SignupClient() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            Join {APP_CONFIG.name}
+            {t('joinApp', { appName: APP_CONFIG.name })}
           </CardTitle>
           <CardDescription className="text-center">
-            Create your account for {UNIVERSITY_CONFIG.name}
+            {t('createAccountFor', { uniName: UNIVERSITY_CONFIG.name })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -93,7 +93,7 @@ export default function SignupClient() {
               <Input
                 id="email"
                 type="email"
-                placeholder="your.email@student.mq.edu.au"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -129,19 +129,19 @@ export default function SignupClient() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('creatingAccount') : t('createAccount')}
             </Button>
           </form>
 
           <div className="text-center text-sm text-mq-content-secondary">
             <p>
-              Already have an account?{' '}
+              {t('alreadyHaveAccount')}{' '}
               <button
                 onClick={() => router.push('/login')}
                 className="text-mq-primary hover:underline font-medium"
                 disabled={isLoading}
               >
-                Sign in
+                {t('signIn')}
               </button>
             </p>
           </div>

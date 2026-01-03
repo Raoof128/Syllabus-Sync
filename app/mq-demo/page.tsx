@@ -12,8 +12,10 @@ import { Navbar } from '@/components/ui/mq/navbar';
 import { Hero } from '@/components/ui/mq/hero';
 import { SectionHeading } from '@/components/ui/mq/section-heading';
 import { hoverLift, fadeIn } from '@/components/ui/mq/animations';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function MQStyleGuidePage() {
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -37,27 +39,27 @@ export default function MQStyleGuidePage() {
           onClick={() => setIsDark(!isDark)}
           className="shadow-mq"
         >
-          {isDark ? '☀️ Light' : '🌙 Dark'}
+          {isDark ? `☀️ ${t('light')}` : `🌙 ${t('dark')}`}
         </Button>
       </div>
 
       {/* Navbar Demo */}
       <Navbar
-        title="Macquarie University"
+        title={t('welcomeToUni', { uniName: 'Macquarie University' })}
         onAction={() => {}}
-        actionLabel="Apply Now"
+        actionLabel={t('applyNow')}
       />
 
       {/* Hero Demo */}
       <Hero
-        title="Welcome to Macquarie University"
-        subtitle="Experience world-class education with cutting-edge facilities and innovative teaching methods."
+        title={t('welcomeToUni', { uniName: 'Macquarie University' })}
+        subtitle={t('uniDesc')}
         primaryAction={{
-          label: 'Explore Programs',
+          label: t('explorePrograms'),
           onClick: () => {},
         }}
         secondaryAction={{
-          label: 'Learn More',
+          label: t('learnMore'),
           href: '#learn-more',
         }}
       />
@@ -66,10 +68,10 @@ export default function MQStyleGuidePage() {
         {/* Section Heading */}
         <div className="mb-12 text-center">
           <SectionHeading level="h1" className="mb-4">
-            MQ Design System
+            {t('mqDesignSystem')}
           </SectionHeading>
           <p className="text-mq-xl text-mq-content-secondary max-w-2xl mx-auto">
-            A comprehensive design system built with Macquarie University brand tokens.
+            {t('mqDesignSystemDesc')}
           </p>
         </div>
 
@@ -77,36 +79,36 @@ export default function MQStyleGuidePage() {
           {/* Buttons */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Buttons
+              {t('buttons')}
             </SectionHeading>
             <div className="grid gap-6 md:grid-cols-3">
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Primary Button</CardTitle>
-                  <CardDescription>For main actions</CardDescription>
+                  <CardTitle>{t('primaryButton')}</CardTitle>
+                  <CardDescription>{t('primaryButtonDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="primary">Primary Action</Button>
+                  <Button variant="primary">{t('primaryAction')}</Button>
                 </CardContent>
               </Card>
 
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Secondary Button</CardTitle>
-                  <CardDescription>For secondary actions</CardDescription>
+                  <CardTitle>{t('secondaryButton')}</CardTitle>
+                  <CardDescription>{t('secondaryButtonDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="secondary">Secondary Action</Button>
+                  <Button variant="secondary">{t('secondaryAction')}</Button>
                 </CardContent>
               </Card>
 
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Ghost Button</CardTitle>
-                  <CardDescription>For subtle actions</CardDescription>
+                  <CardTitle>{t('ghostButton')}</CardTitle>
+                  <CardDescription>{t('ghostButtonDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="ghost">Ghost Action</Button>
+                  <Button variant="ghost">{t('ghostAction')}</Button>
                 </CardContent>
               </Card>
             </div>
@@ -115,23 +117,23 @@ export default function MQStyleGuidePage() {
           {/* Links */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Links
+              {t('links')}
             </SectionHeading>
             <Card className={fadeIn}>
               <CardHeader>
-                <CardTitle>Link Variants</CardTitle>
-                <CardDescription>Different link styles for various contexts</CardDescription>
+                <CardTitle>{t('linkVariants')}</CardTitle>
+                <CardDescription>{t('linkVariantsDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <MQLink href="#default">Default Link</MQLink>
+                  <MQLink href="#default">{t('defaultLink')}</MQLink>
                 </div>
                 <div>
-                  <MQLink href="#subtle" variant="subtle">Subtle Link</MQLink>
+                  <MQLink href="#subtle" variant="subtle">{t('subtleLink')}</MQLink>
                 </div>
                 <div>
                   <MQLink href="https://mq.edu.au" external>
-                    External Link (opens in new tab)
+                    {t('externalLink')}
                   </MQLink>
                 </div>
               </CardContent>
@@ -141,18 +143,18 @@ export default function MQStyleGuidePage() {
           {/* Badges */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Badges
+              {t('badges')}
             </SectionHeading>
             <Card className={fadeIn}>
               <CardHeader>
-                <CardTitle>Badge Variants</CardTitle>
-                <CardDescription>For labels, tags, and status indicators</CardDescription>
+                <CardTitle>{t('badgeVariants')}</CardTitle>
+                <CardDescription>{t('badgeVariantsDesc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="neutral">Neutral</Badge>
-                  <Badge variant="brand">Brand</Badge>
-                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="neutral">{t('neutral')}</Badge>
+                  <Badge variant="brand">{t('brand')}</Badge>
+                  <Badge variant="secondary">{t('secondary')}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -161,32 +163,31 @@ export default function MQStyleGuidePage() {
           {/* Cards */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Cards
+              {t('cards')}
             </SectionHeading>
             <div className="grid gap-6 md:grid-cols-2">
               <Card className={cn(fadeIn, hoverLift)}>
                 <CardHeader>
-                  <CardTitle>Card Title</CardTitle>
-                  <CardDescription>Card description goes here</CardDescription>
+                  <CardTitle>{t('cardTitle')}</CardTitle>
+                  <CardDescription>{t('cardDescPlaceholder')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    This is the card content. Cards can contain various types of content
-                    and are great for grouping related information.
+                    {t('cardContentPlaceholder')}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className={cn(fadeIn, hoverLift)}>
                 <CardHeader>
-                  <CardTitle>Another Card</CardTitle>
-                  <CardDescription>With different content</CardDescription>
+                  <CardTitle>{t('anotherCard')}</CardTitle>
+                  <CardDescription>{t('anotherCardDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Badge variant="brand">Featured</Badge>
+                    <Badge variant="brand">{t('featured')}</Badge>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      This card demonstrates combining components within cards.
+                      {t('cardDemoDesc')}
                     </p>
                   </div>
                 </CardContent>
@@ -197,30 +198,30 @@ export default function MQStyleGuidePage() {
           {/* Input */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Input
+              {t('input')}
             </SectionHeading>
             <div className="grid gap-6 md:grid-cols-2">
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Text Input</CardTitle>
-                  <CardDescription>Standard input with label</CardDescription>
+                  <CardTitle>{t('textInput')}</CardTitle>
+                  <CardDescription>{t('textInputDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Input label="Full Name" placeholder="Enter your full name" />
+                  <Input label={t('fullName')} placeholder={t('enterFullName')} />
                 </CardContent>
               </Card>
 
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Input with Error</CardTitle>
-                  <CardDescription>Input showing validation error</CardDescription>
+                  <CardTitle>{t('inputError')}</CardTitle>
+                  <CardDescription>{t('inputErrorDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Input
-                    label="Email Address"
+                    label={t('emailAddress')}
                     type="email"
-                    placeholder="Enter your email"
-                    error="Please enter a valid email address"
+                    placeholder={t('enterEmail')}
+                    error={t('validEmailError')}
                   />
                 </CardContent>
               </Card>
@@ -230,34 +231,34 @@ export default function MQStyleGuidePage() {
           {/* Alerts */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Alerts
+              {t('alerts')}
             </SectionHeading>
             <div className="space-y-4">
               <Alert variant="info" className={fadeIn}>
-                <AlertTitle>Information</AlertTitle>
+                <AlertTitle>{t('information')}</AlertTitle>
                 <AlertDescription>
-                  This is an informational alert. It provides helpful information to users.
+                  {t('infoAlertDesc')}
                 </AlertDescription>
               </Alert>
 
               <Alert variant="warning" className={fadeIn}>
-                <AlertTitle>Warning</AlertTitle>
+                <AlertTitle>{t('warning')}</AlertTitle>
                 <AlertDescription>
-                  This is a warning alert. It indicates something that requires attention.
+                  {t('warningAlertDesc')}
                 </AlertDescription>
               </Alert>
 
               <Alert variant="success" className={fadeIn}>
-                <AlertTitle>Success</AlertTitle>
+                <AlertTitle>{t('success')}</AlertTitle>
                 <AlertDescription>
-                  This is a success alert. It confirms that an action was completed successfully.
+                  {t('successAlertDesc')}
                 </AlertDescription>
               </Alert>
 
               <Alert variant="error" className={fadeIn}>
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('error')}</AlertTitle>
                 <AlertDescription>
-                  This is an error alert. It indicates that something went wrong.
+                  {t('errorAlertDesc')}
                 </AlertDescription>
               </Alert>
             </div>
@@ -266,29 +267,29 @@ export default function MQStyleGuidePage() {
           {/* Animations */}
           <section>
             <SectionHeading level="h2" className="mb-8">
-              Animations
+              {t('animations')}
             </SectionHeading>
             <div className="grid gap-6 md:grid-cols-2">
               <Card className={hoverLift}>
                 <CardHeader>
-                  <CardTitle>Hover Lift</CardTitle>
-                  <CardDescription>Hover over this card to see the lift effect</CardDescription>
+                  <CardTitle>{t('hoverLift')}</CardTitle>
+                  <CardDescription>{t('hoverLiftDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    This card has the hover lift animation applied. Try hovering over it!
+                    {t('hoverLiftContent')}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className={fadeIn}>
                 <CardHeader>
-                  <CardTitle>Fade In</CardTitle>
-                  <CardDescription>This card fades in on load</CardDescription>
+                  <CardTitle>{t('fadeIn')}</CardTitle>
+                  <CardDescription>{t('fadeInDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    This card uses the fade-in animation utility.
+                    {t('fadeInContent')}
                   </p>
                 </CardContent>
               </Card>

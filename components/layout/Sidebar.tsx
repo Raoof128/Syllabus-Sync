@@ -17,12 +17,14 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navigation = [
-  { name: 'Home', href: '/home', icon: Home },
-  { name: 'Calendar', href: '/calendar', icon: Calendar },
-  { name: 'Map', href: '/map', icon: MapPin },
-  { name: 'Feed', href: '/feed', icon: MessageSquare },
-  { name: 'Settings', href: '/settings', icon: Settings },
+import { TranslationKey } from '@/lib/i18n/translations';
+
+const navigation: { name: TranslationKey; href: string; icon: any }[] = [
+  { name: 'home', href: '/home', icon: Home },
+  { name: 'calendar', href: '/calendar', icon: Calendar },
+  { name: 'map', href: '/map', icon: MapPin },
+  { name: 'feed', href: '/feed', icon: MessageSquare },
+  { name: 'settings', href: '/settings', icon: Settings },
 ];
 
 const Sidebar = memo(() => {
@@ -87,10 +89,10 @@ const Sidebar = memo(() => {
                     : 'text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary',
                 )}
                 aria-current={isActive ? 'page' : undefined}
-                aria-label={`Navigate to ${item.name}`}
+                aria-label={t('navigateToItem', { name: t(item.name) })}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
-                {item.name}
+                {t(item.name)}
               </Link>
             );
           })}

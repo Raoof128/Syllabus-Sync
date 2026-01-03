@@ -50,6 +50,8 @@ export type Event = {
   building?: string; // "C5C" - for map navigation
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   imageUrl?: string;
+  translationKey?: string;
+  descriptionKey?: string;
 };
 
 export type Notification = {

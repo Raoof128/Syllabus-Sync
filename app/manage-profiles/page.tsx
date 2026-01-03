@@ -9,7 +9,11 @@ import dynamic from 'next/dynamic';
 
 // Dynamically import ProfileCard for better code splitting
 const ProfileCard = dynamic(() => import('@/components/ProfileCard'), {
-  loading: () => <div className="flex items-center justify-center p-4">Loading profile...</div>,
+  loading: () => {
+    // We can't use the hook here because it's not a component body, but this is a fallback.
+    // We can just return a simple div or assume 'Loading profile...' is fine for fallback.
+    return <div className="flex items-center justify-center p-4">Loading profile...</div>;
+  },
 });
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/mq/input';
@@ -60,7 +64,7 @@ export default function ManageProfilesPage() {
         year: '',
       });
       setShowAddDialog(false);
-      toastUtils.success('Profile Created', 'Your new profile has been created successfully.');
+      toastUtils.success(t('profileCreated'), t('profileCreatedMsg'));
     }
   };
 
@@ -92,27 +96,27 @@ export default function ManageProfilesPage() {
         year: '',
       });
       setShowAddDialog(false);
-      toastUtils.success('Profile Updated', 'Your profile has been updated successfully.');
+      toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
     }
   };
 
   const handleDeleteProfile = (id: string) => {
     deleteProfile(id);
-    toastUtils.success('Profile Deleted', 'The profile has been deleted successfully.');
+    toastUtils.success(t('profileDeleted'), t('profileDeletedMsg'));
   };
 
   const handleSetCurrentProfile = (id: string) => {
     setCurrentProfile(id);
-    toastUtils.success('Profile Switched', 'Your current profile has been changed.');
+    toastUtils.success(t('profileSwitched'), t('profileSwitchedMsg'));
   };
 
   return (
       <div className="container mx-auto p-6 max-w-7xl">
         <header className="mb-8">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-            Manage Profiles
+            {t('manageProfiles')}
           </h1>
-          <p className="text-mq-content">Edit and manage your user profiles.</p>
+          <p className="text-mq-content">{t('manageProfilesDesc')}</p>
         </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -122,7 +126,7 @@ export default function ManageProfilesPage() {
               <h2 className="flex items-center justify-between text-lg font-semibold">
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5" aria-hidden="true" />
-                  All Profiles ({profiles.length})
+                  {t('allProfiles', { count: profiles.length })}
                 </div>
               </h2>
             </CardHeader>
@@ -131,14 +135,14 @@ export default function ManageProfilesPage() {
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
                   <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                    No Profiles Yet
+                    {t('noProfilesYet')}
                   </h3>
                   <p className="text-mq-content-secondary mb-4">
-                    Create your first profile to get started.
+                    {t('createFirstProfile')}
                   </p>
                   <Button onClick={() => setShowAddDialog(true)}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Profile
+                    {t('createProfile')}
                   </Button>
                 </div>
               ) : (
@@ -163,7 +167,7 @@ export default function ManageProfilesPage() {
           <CardHeader>
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <Check className="h-5 w-5" aria-hidden="true" />
-              Current Profile
+              {t('currentProfile')}
             </h2>
           </CardHeader>
           <CardContent>
@@ -177,18 +181,18 @@ export default function ManageProfilesPage() {
                     <h2 className="text-mq-xl font-bold text-mq-content">{currentProfile.name}</h2>
                     <p className="text-mq-content-secondary">{currentProfile.email}</p>
                     <p className="text-mq-sm text-mq-content-tertiary">
-                      Student ID: {currentProfile.studentId}
+                      {t('studentId')}: {currentProfile.studentId}
                     </p>
                   </div>
                 </div>
 
                  <div className="grid grid-cols-1 gap-3 text-mq-sm">
                    <div>
-                     <span className="text-mq-content-tertiary">Student ID:</span>
+                     <span className="text-mq-content-tertiary">{t('studentId')}:</span>
                      <p className="font-medium text-mq-content">{currentProfile.studentId}</p>
                    </div>
                    <div>
-                     <span className="text-mq-content-tertiary">Member Since:</span>
+                     <span className="text-mq-content-tertiary">{t('memberSince')}</span>
                      <p className="font-medium text-mq-content">
                        {new Date(currentProfile.createdAt).toLocaleDateString()}
                      </p>
@@ -199,14 +203,14 @@ export default function ManageProfilesPage() {
               <div className="text-center py-8">
                 <User className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
                 <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                  No Profile Selected
+                  {t('noProfileSelected')}
                 </h3>
                 <p className="text-mq-content-secondary mb-4">
-                  Select or create a profile to get started.
+                  {t('selectProfileDesc')}
                 </p>
                 <Button onClick={() => setShowAddDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Profile
+                  {t('createProfile')}
                 </Button>
               </div>
             )}
@@ -223,11 +227,11 @@ export default function ManageProfilesPage() {
       >
         <DialogContent className="sm:max-w-md" aria-describedby="profile-form-description">
           <DialogHeader>
-            <DialogTitle>{editingProfile ? 'Edit Profile' : 'Create New Profile'}</DialogTitle>
+            <DialogTitle>{editingProfile ? t('editProfile') : t('createNewProfile')}</DialogTitle>
             <p id="profile-form-description" className="text-mq-sm text-mq-content-secondary">
               {editingProfile
-                ? 'Update your profile information.'
-                : 'Fill in your details to create a new profile.'}
+                ? t('updateProfileDesc')
+                : t('fillProfileDetails')}
             </p>
           </DialogHeader>
           <form
@@ -248,12 +252,12 @@ export default function ManageProfilesPage() {
                 name="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter your full name"
+                placeholder={t('enterFullName')}
                 required
                 aria-describedby="name-help"
               />
               <p id="name-help" className="sr-only">
-                Enter your full legal name
+                {t('enterLegalName')}
               </p>
             </div>
 
@@ -265,12 +269,12 @@ export default function ManageProfilesPage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="your.email@mq.edu.au"
+                placeholder={t('emailPlaceholderExample')}
                 required
                 aria-describedby="email-help"
               />
               <p id="email-help" className="sr-only">
-                Enter your university email address
+                {t('enterEmailDesc')}
               </p>
             </div>
 
@@ -286,7 +290,7 @@ export default function ManageProfilesPage() {
                 aria-describedby="student-id-help"
               />
               <p id="student-id-help" className="sr-only">
-                Enter your 8-digit student ID number
+                {t('enterStudentIdDesc')}
               </p>
             </div>
 
@@ -298,11 +302,11 @@ export default function ManageProfilesPage() {
                   name="course"
                   value={formData.course}
                   onChange={(e) => setFormData({ ...formData, course: e.target.value })}
-                  placeholder="e.g., Bachelor of IT"
+                  placeholder={t('coursePlaceholder')}
                   aria-describedby="course-help"
                 />
                 <p id="course-help" className="sr-only">
-                  Enter your degree program name
+                  {t('enterCourseDesc')}
                 </p>
               </div>
 
@@ -313,11 +317,11 @@ export default function ManageProfilesPage() {
                   name="year"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  placeholder="e.g., 2nd Year"
+                  placeholder={t('yearPlaceholder')}
                   aria-describedby="year-help"
                 />
                 <p id="year-help" className="sr-only">
-                  Enter your current year of study
+                  {t('enterYearDesc')}
                 </p>
               </div>
             </div>
@@ -331,9 +335,9 @@ export default function ManageProfilesPage() {
                   setEditingProfile(null);
                 }}
               >
-                Cancel
+                {t('cancel')}
               </Button>
-              <Button type="submit">{editingProfile ? 'Update Profile' : 'Create Profile'}</Button>
+              <Button type="submit">{editingProfile ? t('updateProfile') : t('createProfile')}</Button>
             </div>
           </form>
         </DialogContent>

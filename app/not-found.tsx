@@ -1,4 +1,6 @@
 // app/not-found.tsx
+'use client';
+
 import Link from 'next/link';
 import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';

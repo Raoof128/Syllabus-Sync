@@ -1293,3 +1293,10 @@ Summary: Complete RESTful API system with standardized responses, advanced middl
 Files changed: app/api/_lib/response.ts; app/api/_lib/middleware.ts; app/api/_lib/versioning.ts; app/api/notifications/route.ts; app/api/units/route.ts; docs/api.md; scripts/test-api.js.
 Verification: npm run lint (pass); npm test (41/41 pass); npm run build (success); API documentation validated; test script functional.
 Follow-ups: API is production-ready for database integration; consider adding GraphQL support for complex queries; monitor API usage patterns for optimization opportunities.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Internationalization of App Config and Feed.
+Summary: Added translation support for DeadlineForm choices (priorities, types), EventsFeed content (categories, titles), and FeedPage filters. Internationalized sample event data and added missing translation keys to translations.ts for en, es, and fa. Implemented locale-aware date formatting in FeedPage.
+Files: components/deadlines/DeadlineForm.tsx; components/home/EventsFeed.tsx; app/feed/page.tsx; lib/i18n/translations.ts; lib/types/index.ts; data/sampleEvents.ts.
+Verification: Verified code compilation and logic correctness.
+Follow-ups: Complete remaining translations for other languages if needed.

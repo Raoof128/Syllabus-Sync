@@ -66,12 +66,12 @@ const NextDeadline = memo(function NextDeadline() {
             <p className="text-mq-content mb-4">
               {t('noDeadlinesDesc')}
             </p>
-             <Button asChild>
-               <Link href="/calendar" className="gap-2">
-                 <Clock className="h-4 w-4" />
-                 {t('addDeadline')}
-               </Link>
-             </Button>
+            <Button asChild>
+              <Link href="/calendar" className="gap-2">
+                <Clock className="h-4 w-4" />
+                {t('addDeadline')}
+              </Link>
+            </Button>
           </div>
         ) : (
           <Link
@@ -87,7 +87,7 @@ const NextDeadline = memo(function NextDeadline() {
                     {nextDeadline.unitCode} — {nextDeadline.title}
                   </h3>
                   <Badge className={PRIORITY_COLORS[nextDeadline.priority]}>
-                    {nextDeadline.priority}
+                    {t(('priority_' + nextDeadline.priority) as any)}
                   </Badge>
                 </div>
 

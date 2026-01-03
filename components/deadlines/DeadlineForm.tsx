@@ -221,11 +221,11 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="title">
-                Title <span className="text-mq-error">*</span>
+                {t('title')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="title"
-                placeholder="e.g., Assignment 1"
+                placeholder={t('titlePlaceholder')}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-describedby={titleDescribedBy}
@@ -233,7 +233,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 className={errors.title ? 'border-mq-error' : ''}
               />
               <p id="deadline-title-help" className="text-xs text-mq-content-tertiary">
-                Keep titles short for calendar readability.
+                {t('titleHelp')}
               </p>
               {errors.title && (
                 <p id="deadline-title-error" className="text-sm text-mq-error">
@@ -244,7 +244,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
             <div className="space-y-2">
               <Label htmlFor="unitCode">
-                Unit Code <span className="text-mq-error">*</span>
+                {t('unitCode')} <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
                 <SelectTrigger
@@ -263,7 +263,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 </SelectContent>
               </Select>
               <p id="deadline-unit-help" className="text-xs text-mq-content-tertiary">
-                Pick the unit that owns this deadline.
+                {t('unitHelp')}
               </p>
               {errors.unitCode && (
                 <p id="deadline-unit-error" className="text-sm text-mq-error">
@@ -274,7 +274,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
             <div className="space-y-2">
               <Label htmlFor="dueDate">
-                Due Date <span className="text-mq-error">*</span>
+                {t('dueDate')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="dueDate"
@@ -286,7 +286,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 className={errors.dueDate ? 'border-mq-error' : ''}
               />
               <p id="deadline-date-help" className="text-xs text-mq-content-tertiary">
-                Use the date in your local campus timezone.
+                {t('dateHelp')}
               </p>
               {errors.dueDate && (
                 <p id="deadline-date-error" className="text-sm text-mq-error">
@@ -297,7 +297,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
             <div className="space-y-2">
               <Label htmlFor="dueTime">
-                Due Time <span className="text-mq-error">*</span>
+                {t('dueTime')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="dueTime"
@@ -319,7 +319,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
                     <SelectItem key={p} value={p}>
-                      {p}
+                      {t(('priority_' + p) as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -333,9 +333,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   <SelectValue placeholder={t('selectType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {DEADLINE_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
+                  {DEADLINE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {t(('type_' + type) as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -351,7 +351,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
               />
               <Label htmlFor="completed" className="text-sm font-medium">
-                Mark as completed
+                {t('markAsCompleted')}
               </Label>
             </div>
 
@@ -367,12 +367,12 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <DialogFooter className="flex gap-2">
             {editDeadline && (
               <Button variant="destructive" onClick={handleDelete}>
-                Delete
+                {t('delete')}
               </Button>
             )}
             <div className="flex-1" />
             <Button variant="outline" onClick={handleCancel}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0}>
               {editDeadline ? t('saveChanges') : t('addDeadline')}
@@ -387,15 +387,15 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <DialogHeader>
             <DialogTitle>{t('deleteDeadline')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this deadline? This action cannot be undone.
+              {t('deleteDeadlineConfirm')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
