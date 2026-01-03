@@ -2,72 +2,174 @@
 'use client';
 
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 import { Notification } from '@/lib/types';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import { apiRequest } from '@/lib/utils/api';
 
 interface NotificationsState {
   notifications: Notification[];
-  addNotification: (notification: Notification) => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  removeNotification: (id: string) => void;
-  clearAll: () => void;
+  isLoading: boolean;
+  hasLoaded: boolean;
+  loadNotifications: () => Promise<void>;
+  addNotification: (notification: Notification) => Promise<Notification | null>;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  removeNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
   getUnreadCount: () => number;
 }
 
-type NotificationsPersistedState = Pick<NotificationsState, 'notifications'>;
+const normalizeNotification = (notification: Notification): Notification => ({
+  ...notification,
+  createdAt: notification.createdAt instanceof Date ? notification.createdAt : new Date(notification.createdAt),
+});
 
-export const useNotificationsStore = create<NotificationsState>()(
-  persist(
-    (set, get) => ({
-      notifications: [],
+export const useNotificationsStore = create<NotificationsState>((set, get) => ({
+  notifications: [],
+  isLoading: false,
+  hasLoaded: false,
 
-      addNotification: (notification) =>
-        set((state) => {
-          if (state.notifications.some((existing) => existing.id === notification.id)) {
-            return state;
-          }
-          return { notifications: [notification, ...state.notifications] };
-        }),
+  loadNotifications: async () => {
+    if (get().hasLoaded) return;
+    set({ isLoading: true });
+    try {
+      const data = await apiRequest<Notification[]>('/api/notifications');
+      set({ notifications: data.map(normalizeNotification), hasLoaded: true });
+    } catch (error) {
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to load notifications'),
+        'NotificationsStore.loadNotifications',
+        'high',
+      );
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-      markAsRead: (id) =>
-        set((state) => ({
-          notifications: state.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
-          ),
-        })),
+  addNotification: async (notificationData) => {
+    const notification: Notification = {
+      ...notificationData,
+      id: notificationData.id || `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: notificationData.createdAt || new Date(),
+    };
 
-      markAllAsRead: () =>
-        set((state) => ({
-          notifications: state.notifications.map((n) => ({ ...n, read: true })),
-        })),
+    const normalized = normalizeNotification(notification);
+    set((state) => ({ notifications: [normalized, ...state.notifications] }));
 
-      removeNotification: (id) =>
-        set((state) => ({
-          notifications: state.notifications.filter((n) => n.id !== id),
-        })),
+    try {
+      const created = await apiRequest<Notification>('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(normalized),
+      });
+      const serverNormalized = normalizeNotification(created);
+      set((state) => ({
+        notifications: state.notifications.map((n) => (n.id === normalized.id ? serverNormalized : n)),
+      }));
+      return serverNormalized;
+    } catch (error) {
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to add notification'),
+        'NotificationsStore.addNotification',
+        'high',
+      );
+      return normalized; // Return local version on error
+    }
+  },
 
-      clearAll: () => set({ notifications: [] }),
+  markAsRead: async (id) => {
+    // Update local state immediately
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === id ? { ...n, read: true } : n
+      ),
+    }));
 
-      getUnreadCount: () => {
-        return get().notifications.filter((n) => !n.read).length;
-      },
-    }),
-    {
-      name: 'notifications-storage',
-      storage: createJSONStorage(() => localStorage),
-      version: 1,
-      migrate: (persistedState) => {
-        const state = persistedState as NotificationsPersistedState;
-        if (!state?.notifications?.length) return { notifications: [] };
-        const seen = new Set<string>();
-        const deduped = state.notifications.filter((notification) => {
-          if (seen.has(notification.id)) return false;
-          seen.add(notification.id);
-          return true;
-        });
-        return { ...state, notifications: deduped };
-      },
-    },
-  ),
-);
+    try {
+      await apiRequest<Notification>(`/api/notifications/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      });
+    } catch (error) {
+      // Revert on error
+      set((state) => ({
+        notifications: state.notifications.map((n) =>
+          n.id === id ? { ...n, read: false } : n
+        ),
+      }));
+      errorHandler.logError(
+        error instanceof Error ? error : new Error(`Failed to mark notification ${id} as read`),
+        'NotificationsStore.markAsRead',
+        'high',
+      );
+    }
+  },
+
+  markAllAsRead: async () => {
+    // Update local state immediately
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, read: true })),
+    }));
+
+    try {
+      await apiRequest<{ updated: number }>('/api/notifications/mark-all-read', {
+        method: 'PUT',
+      });
+    } catch (error) {
+      // Revert on error
+      set((state) => ({
+        notifications: state.notifications.map((n) => ({ ...n, read: false })),
+      }));
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to mark all notifications as read'),
+        'NotificationsStore.markAllAsRead',
+        'high',
+      );
+    }
+  },
+
+  removeNotification: async (id) => {
+    // Remove from local state immediately
+    const notificationToRemove = get().notifications.find(n => n.id === id);
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id),
+    }));
+
+    try {
+      await apiRequest<{ id: string }>(`/api/notifications/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      // Restore on error
+      if (notificationToRemove) {
+        set((state) => ({ notifications: [...state.notifications, notificationToRemove] }));
+      }
+      errorHandler.logError(
+        error instanceof Error ? error : new Error(`Failed to remove notification ${id}`),
+        'NotificationsStore.removeNotification',
+        'high',
+      );
+    }
+  },
+
+  clearAll: async () => {
+    // Clear local state immediately
+    const notificationsToRestore = [...get().notifications];
+    set({ notifications: [] });
+
+    try {
+      await apiRequest<{ deleted: number }>('/api/notifications', { method: 'DELETE' });
+    } catch (error) {
+      // Restore on error
+      set({ notifications: notificationsToRestore });
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to clear all notifications'),
+        'NotificationsStore.clearAll',
+        'high',
+      );
+    }
+  },
+
+  getUnreadCount: () => {
+    return get().notifications.filter((n) => !n.read).length;
+  },
+}));

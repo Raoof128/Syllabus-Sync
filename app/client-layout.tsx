@@ -9,8 +9,15 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const loadUnits = useUnitsStore((state) => state.loadUnits);
+  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
+  const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
+
   // Set up global error handlers
   React.useEffect(() => {
     // Handle unhandled promise rejections
@@ -40,6 +47,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       window.removeEventListener('error', handleError);
     };
   }, []);
+
+  React.useEffect(() => {
+    void loadUnits();
+    void loadDeadlines();
+    void loadNotifications();
+  }, [loadUnits, loadDeadlines, loadNotifications]);
 
   return (
     <ThemeProvider>
