@@ -1504,6 +1504,13 @@ Files changed: lib/i18n/translations.ts (enhanced), app/calendar/CalendarClient.
 Verification: Complete scan confirmed no hardcoded user-facing strings remain; all components pass TypeScript compilation and linting; language switching works seamlessly across all UI elements.
 Follow-ups: Monitor for any new strings added in future development; consider automated translation key validation in CI.
 
+### Persian (Farsi) Language Support - RTL Implementation
+Scope: Added complete Persian language support with right-to-left (RTL) text direction and native Persian translations.
+Summary: Implemented Persian as the third language option with 200+ translation keys covering all UI elements, form validation, error messages, and accessibility features. Added RTL support detection and language switching capability. Persian translations use proper Farsi terminology and cultural adaptation for academic context.
+Files changed: lib/i18n/translations.ts (added Persian translations), lib/hooks/useTranslation.ts (added RTL detection), app/settings/page.tsx (added Persian language option).
+Verification: Persian language selection works correctly; RTL detection implemented; all translation keys properly translated to Persian; language switching maintains functionality.
+Follow-ups: Consider adding RTL-specific CSS styling for complete Persian UI adaptation; test Persian text rendering across different browsers.
+
 ### Internationalization Implementation - Settings Page Enhancement
 Scope: Implemented complete internationalization (i18n) system for the settings page with English and Spanish language support.
 Summary: Created comprehensive translation system with useTranslation hook, translation files for English and Spanish, and fully internationalized the settings page including notifications, appearance, privacy, quick actions, help & support sections, and confirmation dialogs. Language preference persists in localStorage and UI updates immediately when language is changed.

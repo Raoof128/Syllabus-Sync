@@ -12,7 +12,7 @@ export function useTranslation() {
     try {
       if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('language') as Language;
-        if (saved && (saved === 'en' || saved === 'es')) {
+        if (saved && (saved === 'en' || saved === 'es' || saved === 'fa')) {
           setLanguageState(saved);
         }
       }
@@ -43,6 +43,6 @@ export function useTranslation() {
     t,
     language,
     setLanguage,
-    isRTL: false, // For future RTL language support
+    isRTL: language === 'fa', // Persian is a right-to-left language
   };
 }

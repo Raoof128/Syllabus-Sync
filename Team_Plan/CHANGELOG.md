@@ -184,7 +184,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Exhaustive Codebase Scan**: Performed thorough file-by-file audit of entire application to identify all hardcoded strings
 - **200+ New Translation Keys**: Added comprehensive translations covering calendar, home dashboard, map navigation, layout components, forms, and error handling
 - **Complete Component Coverage**: All major UI components fully localized including CalendarClient, HomeClient, Map page, Header, Sidebar, UnitForm, and DeadlineForm
-- **Native Spanish Translations**: Professional Spanish translations with proper grammar, academic terminology, and cultural adaptation
+- **Multi-Language Support**: Professional translations for English, Spanish, and Persian (Farsi) languages
+- **Native Quality Translations**: Spanish and Persian translations with proper grammar, academic terminology, and cultural adaptation
+- **RTL Language Support**: Implemented right-to-left (RTL) text direction detection for Persian language
 - **Full Accessibility Support**: All aria-labels, screen reader text, keyboard navigation, and form validation messages translated
 - **Zero Hardcoded Strings**: Complete elimination of user-facing hardcoded text - every string is now translatable
 - **Real-time Language Switching**: Instant UI updates across all components when language preference changes

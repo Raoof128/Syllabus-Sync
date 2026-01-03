@@ -37,12 +37,12 @@ export default function SettingsPage() {
   const { t, language, setLanguage } = useTranslation();
 
   // Handle language change with keyboard support
-  const handleLanguageChange = (newLanguage: 'en' | 'es') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa') => {
     if (newLanguage === language) return; // No change needed
     setLanguage(newLanguage);
     toastUtils.success(
       t('languageUpdated'),
-      `${t('languageUpdatedMsg')} ${newLanguage === 'en' ? t('english') : t('spanish')}`
+      `${t('languageUpdatedMsg')} ${newLanguage === 'en' ? t('english') : newLanguage === 'es' ? t('spanish') : t('persian')}`
     );
   };
 
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 <div>
                   <h4 className="font-semibold text-mq-content">{t('language')}</h4>
                   <p className="text-mq-sm text-mq-content-secondary">
-                    {t('current')}: {language === 'en' ? t('english') : t('spanish')}
+                    {t('current')}: {language === 'en' ? t('english') : language === 'es' ? t('spanish') : t('persian')}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -333,6 +333,22 @@ export default function SettingsPage() {
                     aria-label={`${t('switchToSpanish')}${language === 'es' ? ` ${t('currentlySelected')}` : ''}`}
                   >
                     {t('spanish')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('fa')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('fa');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'fa' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'fa'}
+                    aria-label={`${t('switchToPersian')}${language === 'fa' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('persian')}
                   </Button>
                 </div>
               </div>
