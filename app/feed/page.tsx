@@ -97,7 +97,8 @@ export default function FeedPage() {
                       onClick={() => setActiveFilter(filter)}
                       aria-pressed={isActive}
                     >
-                      {t(('filter_' + filter.replace(/ /g, '')) as any)}
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {t((`filter_${filter.replace(/ /g, '')}`) as any)}
                     </Button>
                   );
                 })}
@@ -114,7 +115,8 @@ export default function FeedPage() {
                   {activeFilter === 'All'
                     ? t('allEvents')
                     : t('categoryEvents', {
-                      category: t(('category_' + activeFilter.replace(/ /g, '')) as any),
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      category: t((`category_${activeFilter.replace(/ /g, '')}`) as any),
                     })}
                 </span>
                 <Badge variant="neutral">{t('eventsCount', { count: filteredEvents.length })}</Badge>
@@ -131,17 +133,20 @@ export default function FeedPage() {
                       {/* Event Header */}
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <h3 className="font-semibold text-mq-content text-mq-lg">
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                           {t((event.translationKey || event.title) as any)}
                         </h3>
                         <Badge
                           className={categoryColors[event.category as keyof typeof categoryColors]}
                         >
-                          {t(('category_' + event.category.replace(/ /g, '')) as any)}
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {t((`category_${event.category.replace(/ /g, '')}`) as any)}
                         </Badge>
                       </div>
 
                       {/* Event Description */}
                       <p className="text-mq-sm text-mq-content-secondary mb-3">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t((event.descriptionKey || event.description) as any)}
                       </p>
 

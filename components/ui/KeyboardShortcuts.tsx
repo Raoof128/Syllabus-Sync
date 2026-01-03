@@ -1,14 +1,12 @@
-import { Keyboard, Command, Plus } from 'lucide-react';
+import { Keyboard, Command } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/mq/button';
-import { useEffect, useState } from 'react';
 
 import { useTranslation } from '@/lib/hooks/useTranslation';
 

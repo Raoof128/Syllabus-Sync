@@ -328,6 +328,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {t(c.translationKey as any)}
                     </div>
                   </SelectItem>
@@ -369,6 +370,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         <SelectContent>
                           {DAYS.map((day) => (
                             <SelectItem key={day} value={day}>
+                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                               {t(day.toLowerCase() as any)}
                             </SelectItem>
                           ))}

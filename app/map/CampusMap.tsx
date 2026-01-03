@@ -92,12 +92,14 @@ function MapController({
   selectedBuilding,
   coordPickerMode,
   onMapClick,
-  setMapInstance
+  setMapInstance,
+  setPickedLocation
 }: {
   selectedBuilding?: Building;
   coordPickerMode: boolean;
   onMapClick: (e: L.LeafletMouseEvent) => void;
   setMapInstance: (map: L.Map) => void;
+  setPickedLocation: (latlng: L.LatLng | null) => void;
 }) {
   const map = useMap();
 
@@ -107,8 +109,24 @@ function MapController({
 
   // Handle map clicks
   useMapEvents({
-    click: onMapClick,
+    click: (e) => {
+      // If in coordinate picker mode, set the picked location for visual feedback
+      if (coordPickerMode) {
+        setPickedLocation(e.latlng);
+      }
+      // Clean previous picked location if exiting mode or clicking elsewhere? 
+      // Actually, standard behavior is usually to move the marker.
+
+      onMapClick(e);
+    },
   });
+
+  useEffect(() => {
+    // Clear picked location when picker mode is disabled
+    if (!coordPickerMode) {
+      setPickedLocation(null);
+    }
+  }, [coordPickerMode, setPickedLocation]);
 
   useEffect(() => {
     // Center on Macquarie University
@@ -160,6 +178,7 @@ interface CampusMapProps {
 export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
   const [themeKey, setThemeKey] = useState<'light' | 'dark'>('light');
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [pickedLocation, setPickedLocation] = useState<L.LatLng | null>(null);
 
   // -- Hybrid Navigation State --
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
@@ -177,6 +196,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   useEffect(() => {
     // Only run if map is ready and geolocation exists
     if (!mapInstance || !navigator.geolocation) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (!navigator.geolocation) setLocationStatus('error');
       return;
     }
@@ -240,7 +260,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [mapInstance]); // Depend on mapInstance being ready
+  }, [mapInstance, origin]); // Depend on mapInstance and origin
 
   // "Center on Me" Button Action
   const centerOnUser = () => {
@@ -341,11 +361,29 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
           coordPickerMode={coordPickerMode}
           onMapClick={onMapClick}
           setMapInstance={setMapInstance}
+          setPickedLocation={setPickedLocation}
         />
 
         {/* Route Polyline */}
         {routeCoords.length > 0 && (
           <Polyline positions={routeCoords} color="blue" weight={5} opacity={0.7} />
+        )}
+
+        {/* Picked Location Marker */}
+        {pickedLocation && (
+          <Marker
+            position={pickedLocation}
+            icon={createMarkerIcon(true)} // Reuse the red selection icon
+          >
+            <Popup>
+              <div className="p-2">
+                <p className="font-semibold text-mq-content">Picked Location</p>
+                <p className="text-xs font-mono text-mq-content-secondary mt-1">
+                  {Math.round(pickedLocation.lat * 100000) / 100000}, {Math.round(pickedLocation.lng * 100000) / 100000}
+                </p>
+              </div>
+            </Popup>
+          </Marker>
         )}
 
         {/* Building markers */}
@@ -394,21 +432,21 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         >
           {locationStatus === 'denied' ? (
             <>
-              <line x1="1" y1="1" x2="23" y2="23"></line>
-              <path d="M21 21l-9-9m0 0L3 3"></path>
+              <line x1="1" y1="1" x2="23" y2="23" />
+              <path d="M21 21l-9-9m0 0L3 3" />
             </>
           ) : (
             <>
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="3"></circle>
-              <line x1="12" y1="2" x2="12" y2="4"></line>
-              <line x1="12" y1="20" x2="12" y2="22"></line>
-              <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
-              <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
-              <line x1="2" y1="12" x2="4" y2="12"></line>
-              <line x1="20" y1="12" x2="22" y2="12"></line>
-              <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
-              <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="12" r="3" />
+              <line x1="12" y1="2" x2="12" y2="4" />
+              <line x1="12" y1="20" x2="12" y2="22" />
+              <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" />
+              <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" />
+              <line x1="2" y1="12" x2="4" y2="12" />
+              <line x1="20" y1="12" x2="22" y2="12" />
+              <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" />
+              <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" />
             </>
           )}
         </svg>
@@ -491,7 +529,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                   }}
                 >
                   <span>Start Navigation</span>
-                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 </button>
 
                 {/* Custom Timeline */}
@@ -500,7 +538,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                     <h4 className="text-xs font-bold uppercase tracking-wider mb-3 opacity-50" style={{ color: 'var(--c-content-tertiary)' }}>Turn-by-Turn</h4>
                     <div className="relative space-y-6 ml-1">
                       {/* Vertical Line */}
-                      <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style={{ backgroundColor: 'var(--c-border)' }}></div>
+                      <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style={{ backgroundColor: 'var(--c-border)' }} />
 
                       {preview.steps.slice(0, 8).map((s, i) => (
                         <div key={i} className="relative pl-6 group">
@@ -509,7 +547,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                             style={{
                               backgroundColor: 'var(--c-card-background)',
                               borderColor: i === 0 ? 'var(--c-success)' : 'var(--c-content-faded)'
-                            }}></div>
+                            }} />
 
                           <p className="text-sm font-medium leading-snug" style={{ color: 'var(--c-content)' }}>{s.text}</p>
                           <p className="text-xs font-mono mt-0.5 opacity-60" style={{ color: 'var(--c-content-secondary)' }}>{formatDistance(s.distance)}</p>

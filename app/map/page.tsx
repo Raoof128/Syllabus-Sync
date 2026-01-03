@@ -224,6 +224,7 @@ export default function MapPage() {
             <Navigation className="h-5 w-5 text-mq-success" />
             <div>
               <p className="text-mq-sm font-medium text-mq-success">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey as any)}</strong>
               </p>
               <p className="text-mq-xs text-mq-success">{t('building')} {selectedBuilding.id}</p>
@@ -299,6 +300,7 @@ export default function MapPage() {
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-mq-content truncate">
                         {/* Note: Highlight match logic runs on English names for now */}
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {highlightMatch(t(building.translationKey as any))}
                       </div>
                       <div className="text-mq-sm text-mq-content-secondary">
@@ -306,6 +308,7 @@ export default function MapPage() {
                       </div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {t((building.tags?.[0] || 'building') as any)}
                     </Badge>
                   </div>
@@ -417,10 +420,12 @@ export default function MapPage() {
                       <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
                     )}
                   </div>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   <div className="text-mq-sm text-mq-content-secondary">{t(building.translationKey as any)}</div>
                   {buildingData?.tags && buildingData.tags.length > 0 && (
                     <div className="mt-1">
                       <Badge variant="neutral" className="text-xs">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t(buildingData.tags[0] as any)}
                       </Badge>
                     </div>

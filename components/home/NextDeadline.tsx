@@ -14,7 +14,7 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 
-const NextDeadline = memo(function NextDeadline() {
+const NextDeadline = memo(() => {
   const isHydrated = useHydration();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const { t, language } = useTranslation();
@@ -100,7 +100,8 @@ const NextDeadline = memo(function NextDeadline() {
                     {nextDeadline.unitCode} — {nextDeadline.title}
                   </h3>
                   <Badge className={PRIORITY_COLORS[nextDeadline.priority]}>
-                    {t(('priority_' + nextDeadline.priority) as any)}
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {t(typeof nextDeadline.priority === 'string' ? `priority_${nextDeadline.priority}` as any : nextDeadline.priority)}
                   </Badge>
                 </div>
 

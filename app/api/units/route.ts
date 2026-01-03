@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+// import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import {
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
           endTime: String(ct.end_time),
         });
         return acc;
-      }, {} as Record<string, Array<{id: string; day: string; startTime: string; endTime: string}>>);
+      }, {} as Record<string, Array<{ id: string; day: string; startTime: string; endTime: string }>>);
 
       // Map units with their class times
       const units = (unitsData ?? []).map(unit => ({
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
         };
 
         // Start transaction-like approach for unit and class times
-        const { data: unitDataResult, error: unitError } = await supabase
+        const { error: unitError } = await supabase
           .from('units')
           .insert(serializeUnit(payload))
           .select('*')

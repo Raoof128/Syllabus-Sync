@@ -25,8 +25,7 @@ export default function LoginClient() {
 
   const supabase = createBrowserClient();
 
-  // Add debug logging
-  console.debug('🔍 LoginClient rendered, supabase client:', !!supabase);
+
 
   useEffect(() => {
     // Check if user is already logged in
@@ -57,7 +56,7 @@ export default function LoginClient() {
 
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
       router.push(redirectTo);
-    } catch (err) {
+    } catch {
       setError(t('unexpectedError'));
     } finally {
       setIsLoading(false);

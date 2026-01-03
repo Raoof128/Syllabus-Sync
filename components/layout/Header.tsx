@@ -45,10 +45,11 @@ const Header = memo(() => {
   const supabase = createBrowserClient();
 
   const [user, setUser] = useState<{ email?: string } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true);
 
   const notifications = useNotificationsStore((state) => state.notifications);
-  const addNotification = useNotificationsStore((state) => state.addNotification);
+  // const addNotification = useNotificationsStore((state) => state.addNotification);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, Palette, Shield, Info, Mail, Calendar, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/mq/button';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
-import { useNotificationsStore } from '@/lib/store/notificationsStore';
+// import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Dialog,
@@ -34,8 +34,35 @@ export default function SettingsPage() {
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
 
   const { theme, resolvedTheme, setTheme } = useThemeStore();
-  const notifications = useNotificationsStore((state) => state.notifications);
+  // const notifications = useNotificationsStore((state) => state.notifications);
   const { t, language, setLanguage } = useTranslation();
+
+  // Notification States (Optimistic UI)
+  const [notifications, setNotifications] = useState({
+    deadlines: true,
+    classes: true,
+    events: true
+  });
+
+  // Initialize from LocalStorage
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const getVal = (key: string) => {
+          const val = localStorage.getItem(`notification-${key}`);
+          return val === null ? true : val === 'true';
+        }
+        setNotifications({
+          deadlines: getVal('deadlines'),
+          classes: getVal('classes'),
+          events: getVal('events')
+        });
+      }
+    } catch {
+      // Defaults are true
+    }
+  }, []); // Run once on mount
 
   // Handle language change with keyboard support
   const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa') => {
@@ -47,39 +74,38 @@ export default function SettingsPage() {
     );
   };
 
-  // Handle notification preferences (local storage based)
-  const handleNotificationPreference = (type: string, enabled: boolean) => {
+  // Handle notification preferences
+  const handleNotificationPreference = (type: keyof typeof notifications, enabled: boolean) => {
     try {
+      // 1. Update State Immediately (Optimistic)
+      setNotifications(prev => ({
+        ...prev,
+        [type]: enabled
+      }));
+
+      // 2. Persist to Storage
       if (typeof window !== 'undefined') {
         const key = `notification-${type}`;
         localStorage.setItem(key, enabled.toString());
+
         const typeLabels: Record<string, string> = {
           deadlines: t('deadlineReminders'),
           classes: t('classReminders'),
           events: t('eventUpdates'),
         };
+
         toastUtils.success(
           t('preferenceUpdated'),
           `${typeLabels[type] || type} ${enabled ? t('enabled').toLowerCase() : t('disabled').toLowerCase()}`
         );
       }
     } catch (error) {
+      // Revert on error? For simple local storage, unlikely to fail, but could add revert logic.
+      errorHandler.logError(error as Error, 'Notification Prefs', 'low');
       toastUtils.error(t('settingsError'), t('preferenceError'));
     }
   };
 
-  // Check if notification type is enabled
-  const isNotificationEnabled = (type: string) => {
-    try {
-      if (typeof window === 'undefined') return true;
-      const key = `notification-${type}`;
-      const saved = localStorage.getItem(key);
-      return saved !== null ? saved === 'true' : true; // Default to enabled
-    } catch (error) {
-      // If localStorage fails, default to enabled
-      return true;
-    }
-  };
 
   const handleClearAllData = () => {
     setShowClearConfirm(true);
@@ -148,18 +174,18 @@ export default function SettingsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleNotificationPreference('deadlines', !isNotificationEnabled('deadlines'))}
+                  onClick={() => handleNotificationPreference('deadlines', !notifications.deadlines)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleNotificationPreference('deadlines', !isNotificationEnabled('deadlines'));
+                      handleNotificationPreference('deadlines', !notifications.deadlines);
                     }
                   }}
-                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('deadlines') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`${t('deadlineReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('deadlines') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('deadlines') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                  aria-pressed={isNotificationEnabled('deadlines')}
+                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.deadlines ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
+                  aria-label={`${t('deadlineReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.deadlines ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.deadlines ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
+                  aria-pressed={notifications.deadlines}
                 >
-                  {isNotificationEnabled('deadlines') ? (
+                  {notifications.deadlines ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
                       {t('enabled')}
@@ -185,18 +211,18 @@ export default function SettingsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleNotificationPreference('classes', !isNotificationEnabled('classes'))}
+                  onClick={() => handleNotificationPreference('classes', !notifications.classes)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleNotificationPreference('classes', !isNotificationEnabled('classes'));
+                      handleNotificationPreference('classes', !notifications.classes);
                     }
                   }}
-                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('classes') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`${t('classReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('classes') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('classes') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                  aria-pressed={isNotificationEnabled('classes')}
+                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.classes ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
+                  aria-label={`${t('classReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.classes ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.classes ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
+                  aria-pressed={notifications.classes}
                 >
-                  {isNotificationEnabled('classes') ? (
+                  {notifications.classes ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
                       {t('enabled')}
@@ -222,18 +248,18 @@ export default function SettingsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleNotificationPreference('events', !isNotificationEnabled('events'))}
+                  onClick={() => handleNotificationPreference('events', !notifications.events)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      handleNotificationPreference('events', !isNotificationEnabled('events'));
+                      handleNotificationPreference('events', !notifications.events);
                     }
                   }}
-                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${isNotificationEnabled('events') ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                  aria-label={`${t('eventUpdates')} ${t('notifications').toLowerCase()} ${t('are')} ${isNotificationEnabled('events') ? t('enabled') : t('disabled')}. ${t('clickTo')} ${isNotificationEnabled('events') ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                  aria-pressed={isNotificationEnabled('events')}
+                  className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.events ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
+                  aria-label={`${t('eventUpdates')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.events ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.events ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
+                  aria-pressed={notifications.events}
                 >
-                  {isNotificationEnabled('events') ? (
+                  {notifications.events ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
                       Enabled
@@ -248,6 +274,7 @@ export default function SettingsPage() {
               </div>
             </div>
           </CardContent>
+
         </Card>
 
         <Card>

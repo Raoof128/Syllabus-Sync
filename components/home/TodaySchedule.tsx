@@ -9,7 +9,7 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 
-const TodaySchedule = memo(function TodaySchedule() {
+const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const { t } = useTranslation();
@@ -38,20 +38,20 @@ const TodaySchedule = memo(function TodaySchedule() {
       <CardContent className="space-y-3">
         {!isHydrated ? (
           <div className="space-y-4 p-2">
-             <div className="animate-pulse">
-               <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
-               <div className="space-y-2">
-                 <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                 <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
-               </div>
-             </div>
-             <div className="animate-pulse animation-delay-100">
-               <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
-               <div className="space-y-2">
-                 <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                 <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
-               </div>
-             </div>
+            <div className="animate-pulse">
+              <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
+              <div className="space-y-2">
+                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
+              </div>
+            </div>
+            <div className="animate-pulse animation-delay-100">
+              <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
+              <div className="space-y-2">
+                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
+              </div>
+            </div>
           </div>
         ) : todayClasses.length === 0 ? (
           <div className="text-center py-8">

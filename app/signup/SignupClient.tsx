@@ -57,7 +57,7 @@ export default function SignupClient() {
         t('verifyEmail')
       );
       router.push('/login');
-    } catch (err) {
+    } catch {
       setError(t('unexpectedError'));
     } finally {
       setIsLoading(false);

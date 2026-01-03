@@ -1,27 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+// import { useEffect, useMemo, useState } from 'react';
 import {
-  Filter,
-  Clock,
-  Bell,
-  Grid3x3,
-  List,
-  Plus,
   CheckCircle2,
   Circle,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight,
   CalendarDays,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Button } from '@/components/ui/mq/button';
+// import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import DeadlineForm from '@/components/deadlines/DeadlineForm';
-import { Deadline } from '@/lib/types';
+// import { useUnitsStore } from '@/lib/store/unitsStore';
+// import DeadlineForm from '@/components/deadlines/DeadlineForm';
+// import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -29,8 +20,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 export default function CalendarClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
-  const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
-  const units = useUnitsStore((state) => state.units);
+
   const hasHydrated = useHydration();
   const { t } = useTranslation();
 

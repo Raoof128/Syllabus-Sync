@@ -18,7 +18,7 @@ export function ScrollReveal({
     delay = 0,
     duration = 0.6,
     yOffset = 30,
-    threshold = 0.1,
+
     className = '',
     staggerChildren = 0
 }: ScrollRevealProps) {
@@ -67,7 +67,7 @@ export const revealChildVariants = {
         y: 0,
         transition: {
             duration: 0.5,
-            ease: [0.5, 0.5, 0, 1]
+            ease: [0.5, 0.5, 0, 1] as const
         }
     }
 };

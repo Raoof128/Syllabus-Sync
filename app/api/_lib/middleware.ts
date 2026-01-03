@@ -75,9 +75,9 @@ export const rateLimit = (
     handler: () => Promise<NextResponse>
   ): Promise<NextResponse> => {
     const ip = request.headers.get('x-forwarded-for') ||
-                request.headers.get('x-real-ip') ||
-                request.headers.get('x-client-ip') ||
-                'unknown';
+      request.headers.get('x-real-ip') ||
+      request.headers.get('x-client-ip') ||
+      'unknown';
     const key = `${ip}:${request.nextUrl.pathname}`;
 
     const now = Date.now();
@@ -248,6 +248,7 @@ export const validateRequest = <T>(
           'Request validation failed',
           400,
           ERROR_CODES.VALIDATION_ERROR,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           { errors: (result.error as any).errors }
         );
       }
@@ -279,16 +280,18 @@ export const logRequest = (
     const url = request.nextUrl.pathname;
     const userAgent = request.headers.get('user-agent') || 'Unknown';
     const ip = request.headers.get('x-forwarded-for') ||
-                request.headers.get('x-real-ip') ||
-                request.headers.get('x-client-ip') ||
-                'Unknown';
+      request.headers.get('x-real-ip') ||
+      request.headers.get('x-client-ip') ||
+      'Unknown';
 
+    // eslint-disable-next-line no-console
     console[level](`[${method}] ${url} - IP: ${ip} - User-Agent: ${userAgent}`);
 
     try {
       const response = await handler();
       const duration = Date.now() - startTime;
 
+      // eslint-disable-next-line no-console
       console[level](`[${method}] ${url} - ${response.status} - ${duration}ms`);
       return response;
     } catch (error) {

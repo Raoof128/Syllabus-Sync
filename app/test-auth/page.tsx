@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function TestAuthPage() {
   const { t } = useTranslation();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 

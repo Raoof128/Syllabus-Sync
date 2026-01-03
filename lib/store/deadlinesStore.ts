@@ -201,7 +201,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
               const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
               const timeWeight = daysUntil <= 0 ? 2.0 : daysUntil <= 1 ? 1.5 : daysUntil <= 3 ? 1.25 : daysUntil <= 7 ? 1 : daysUntil <= 14 ? 0.75 : 0.5;
               return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
-            } catch (error) {
+            } catch {
               return sum;
             }
           }, 0);
@@ -209,7 +209,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           if (totalPoints >= 12) return 'High';
           if (totalPoints >= 6) return 'Busy';
           return 'Low';
-        } catch (error) {
+        } catch {
           return 'Low';
         }
       },
@@ -218,11 +218,14 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       name: 'deadlines-storage',
       storage: createJSONStorage(() => localStorage),
       version: 4,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const state = persistedState as { state: { deadlines: any[] } };
         if (version < 4) {
-          if (persistedState?.state?.deadlines && Array.isArray(persistedState.state.deadlines)) {
+          if (state?.state?.deadlines && Array.isArray(state.state.deadlines)) {
             // Migration: Version 4 forces ALL IDs to be valid UUIDs
-            persistedState.state.deadlines = persistedState.state.deadlines.map((deadline: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            state.state.deadlines = state.state.deadlines.map((deadline: any) => {
               // Legacy hardcoded map
               const idMap: Record<string, string> = {
                 'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',

@@ -1,0 +1,58 @@
+
+> syllabus-sync@0.5.7 lint
+> eslint "app/**/*.{ts,tsx}" "components/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}" "data/**/*.{ts,tsx}" "eslint.config.mjs" "next.config.ts" && echo "Lint OK"
+
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/api/_lib/middleware.ts
+  287:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  293:7  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/api/health/route.ts
+  1:10  warning  'NextRequest' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/calendar/CalendarClient.tsx
+  7:0  error  Parsing error: Expression expected
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/home/HomeClient.tsx
+   99:7   warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  106:7   warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  147:24  error    React Hook "useRef" is called conditionally. React Hooks must be called in the exact same order in every component render     react-hooks/rules-of-hooks
+  148:43  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  149:51  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  150:41  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  151:49  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  152:53  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  155:45  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render   react-hooks/rules-of-hooks
+  167:3   error    React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+  201:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error                                             no-console
+  207:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error                                             no-console
+  222:9   warning  Unexpected console statement. Only these console methods are allowed: warn, error                                             no-console
+  231:3   error    React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+  274:23  error    React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render    react-hooks/rules-of-hooks
+  285:21  error    React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render    react-hooks/rules-of-hooks
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/login/LoginClient.tsx
+  28:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/map/CampusMap.tsx
+  180:35  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/map/CampusMap.tsx:180:35
+  178 |     // Only run if map is ready and geolocation exists
+  179 |     if (!mapInstance || !navigator.geolocation) {
+> 180 |       if (!navigator.geolocation) setLocationStatus('error');
+      |                                   ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  181 |       return;
+  182 |     }
+  183 |  react-hooks/set-state-in-effect
+  243:6   warning  React Hook useEffect has a missing dependency: 'origin'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-hooks/exhaustive-deps
+
+✖ 23 problems (13 errors, 10 warnings)
+  0 errors and 3 warnings potentially fixable with the `--fix` option.
+

@@ -8,7 +8,8 @@ export function useTranslation() {
   const { language, setLanguage, isRTL } = useLanguageStore();
 
   const t = useCallback((key: TranslationKey, vars?: Record<string, string | number>): string => {
-    // Fallback logic: check current language -> check English -> return key
+    // Fallback logic: check current language -> check English
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let text = (translations[language] as any)[key] || translations.en[key] || key;
 
     if (vars) {

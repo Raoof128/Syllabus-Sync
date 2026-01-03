@@ -37,7 +37,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, Clock, TrendingUp } from 'lucide-react';
+import { Info, Plus, BookOpen, TrendingUp } from 'lucide-react'; // Clock removed
 import { Button } from '@/components/ui/mq/button';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
@@ -54,75 +54,18 @@ import {
 } from '@/components/ui/dialog';
 import { Unit, Deadline } from '@/lib/types';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'; // Removed unused imports
+
 
 
 export default function HomeClient() {
   const { t } = useTranslation();
+
+  // -- HOOKS MUST BE DECLARED BEFORE ANY RETURNS --
   // Global error boundary for home page
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Error recovery function
-  const handleErrorRecovery = () => {
-    setHasError(false);
-    setErrorMessage(null);
-    // Force a re-render by updating a state
-    window.location.reload();
-  };
-
-  // Catch any unhandled errors in child components
-  useEffect(() => {
-    const handleUnhandledError = (event: ErrorEvent) => {
-      console.error('Unhandled error in home page:', event.error);
-      setHasError(true);
-      setErrorMessage(event.error?.message || 'An unexpected error occurred');
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection in home page:', event.reason);
-      setHasError(true);
-      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
-    };
-
-    window.addEventListener('error', handleUnhandledError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('error', handleUnhandledError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, []);
-
-  // If there's an error, show error UI
-  if (hasError) {
-    return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-mq-content mb-4">{t('somethingWentWrong')}</h1>
-          <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-            {errorMessage || t('unexpectedError')}
-          </p>
-          <div className="space-y-3">
-            <Button onClick={handleErrorRecovery} className="mr-3">
-              {t('tryAgain')}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => window.location.href = '/'}
-            >
-              {t('goHome')}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
   const units = useUnitsStore((state) => state.units);
   const addUnit = useUnitsStore((state) => state.addUnit);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
@@ -130,15 +73,16 @@ export default function HomeClient() {
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
   const hasHydrated = useHydration();
+
   const [seedDisabled] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {
       return localStorage.getItem('seed-disabled') === 'true';
-    } catch (error) {
-      console.warn('Unable to access localStorage for seed settings:', error);
+    } catch {
       return false;
     }
   });
+
   const hasSeededRef = useRef(false);
   const [unitFormOpen, setUnitFormOpen] = useState(false);
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
@@ -149,14 +93,6 @@ export default function HomeClient() {
   // Live region for screen reader announcements
   const [announcements, setAnnouncements] = useState<string[]>([]);
 
-  // Function to announce actions to screen readers
-  const announceToScreenReader = (message: string) => {
-    setAnnouncements(prev => [...prev, `${Date.now()}: ${message}`]);
-    // Clear old announcements after 5 seconds
-    setTimeout(() => {
-      setAnnouncements(prev => prev.filter(ann => !ann.startsWith(`${Date.now() - 5000}:`)));
-    }, 5000);
-  };
 
   // Load sample data on first visit with comprehensive validation
   useEffect(() => {
@@ -193,12 +129,14 @@ export default function HomeClient() {
       if (!unitsSeeded && validUnits.length > 0) {
         validUnits.forEach(addUnit);
         localStorage.setItem(unitsSeededKey, 'true');
+        // eslint-disable-next-line no-console
         console.log(`Loaded ${validUnits.length} sample units`);
       }
 
       if (!deadlinesSeeded && validDeadlines.length > 0) {
         validDeadlines.forEach(addDeadline);
         localStorage.setItem(deadlinesSeededKey, 'true');
+        // eslint-disable-next-line no-console
         console.log(`Loaded ${validDeadlines.length} sample deadlines`);
       }
     } catch (error) {
@@ -214,6 +152,7 @@ export default function HomeClient() {
 
         validUnits.forEach(addUnit);
         validDeadlines.forEach(addDeadline);
+        // eslint-disable-next-line no-console
         console.log('Fallback: loaded sample data without localStorage persistence');
       } catch (fallbackError) {
         console.error('Critical error: Could not load sample data:', fallbackError);
@@ -323,6 +262,80 @@ export default function HomeClient() {
     }
   }, [units]);
 
+
+
+
+
+
+  // Error recovery function
+  const handleErrorRecovery = () => {
+    setHasError(false);
+    setErrorMessage(null);
+    window.location.reload();
+  };
+
+  // Catch any unhandled errors in child components
+  useEffect(() => {
+    const handleUnhandledError = (event: ErrorEvent) => {
+      console.error('Unhandled error in home page:', event.error);
+      setHasError(true);
+      setErrorMessage(event.error?.message || 'An unexpected error occurred');
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection in home page:', event.reason);
+      setHasError(true);
+      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
+    };
+
+    window.addEventListener('error', handleUnhandledError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleUnhandledError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  // If there's an error, show error UI
+  if (hasError) {
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h1 className="text-2xl font-bold text-mq-content mb-4">{t('somethingWentWrong')}</h1>
+          <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
+            {errorMessage || t('unexpectedError')}
+          </p>
+          <div className="space-y-3">
+            <Button onClick={handleErrorRecovery} className="mr-3">
+              {t('tryAgain')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => window.location.href = '/'}
+            >
+              {t('goHome')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+
+  // Function to announce actions to screen readers
+  const announceToScreenReader = (message: string) => {
+    setAnnouncements(prev => [...prev, `${Date.now()}: ${message}`]);
+    // Clear old announcements after 5 seconds
+    setTimeout(() => {
+      setAnnouncements(prev => prev.filter(ann => !ann.startsWith(`${Date.now() - 5000}:`)));
+    }, 5000);
+  };
+
+
+
   const stressColors = {
     Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
     Busy: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
@@ -370,10 +383,7 @@ export default function HomeClient() {
     }
   };
 
-  const handleAddDeadline = () => {
-    setEditingDeadline(null);
-    setDeadlineFormOpen(true);
-  };
+
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">

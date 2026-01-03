@@ -319,7 +319,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
                     <SelectItem key={p} value={p}>
-                      {t(('priority_' + p) as any)}
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {t(`priority_${p}` as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -335,7 +336,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 <SelectContent>
                   {DEADLINE_TYPES.map((type) => (
                     <SelectItem key={type} value={type}>
-                      {t(('type_' + type) as any)}
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {t(`type_${type}` as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>

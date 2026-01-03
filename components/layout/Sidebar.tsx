@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
-const navigation: { name: TranslationKey; href: string; icon: any }[] = [
+const navigation: { name: TranslationKey; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { name: 'home', href: '/home', icon: Home },
   { name: 'calendar', href: '/calendar', icon: Calendar },
   { name: 'map', href: '/map', icon: MapPin },

@@ -1,8 +1,9 @@
-import { NextRequest } from 'next/server';
+// import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(request: Request) {
   try {
     // Test database connection
     const supabase = await createServerClient();

@@ -1,6 +1,6 @@
 // app/signup/page.tsx
 import { Metadata } from 'next';
-import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@/lib/config';
 import SignupClient from './SignupClient';
 
 export const metadata: Metadata = {

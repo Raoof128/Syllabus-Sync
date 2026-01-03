@@ -1,7 +1,7 @@
 import { RoutePreview } from '@/lib/map/navigationHelpers';
 
-const ORS_API_KEY = process.env.NEXT_PUBLIC_ORS_API_KEY;
-const ORS_BASE_URL = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
+
+
 
 interface ORSResponse {
     features: {
@@ -28,7 +28,7 @@ export async function fetchORSRoute(
     start: { lat: number; lng: number },
     end: { lat: number; lng: number }
 ): Promise<{ coordinates: [number, number][]; preview: RoutePreview | null; error?: string }> {
-    if (!ORS_API_KEY) {
+    if (!process.env.NEXT_PUBLIC_ORS_API_KEY) {
         console.error('ORS API Key is missing. Please set NEXT_PUBLIC_ORS_API_KEY.');
         return { coordinates: [], preview: null, error: 'Missing API Key (Restart Server?)' };
     }
@@ -49,7 +49,7 @@ export async function fetchORSRoute(
             try {
                 const errorJson = await response.json();
                 if (errorJson.error) errorMessage = errorJson.error;
-            } catch (e) { /* ignore parse error */ }
+            } catch { /* ignore parse error */ }
 
             console.error('Navigation Proxy Failed:', errorMessage);
             return { coordinates: [], preview: null, error: errorMessage };

@@ -1819,3 +1819,47 @@ Files: components/layout/Header.tsx.
 Verification: Verified build success and UI functionality.
 Logs: Updated CHANGELOG.md and TEAM_ROADMAP.md with latest milestones.
 Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Next.js Middleware Deprecation.
+Summary: 
+  - Renamed `middleware.ts` to `proxy.ts` to resolve Next.js 16 deprecation warning ("The 'middleware' file convention is deprecated. Please use 'proxy' instead").
+  - Renamed exported function from `middleware` to `proxy` to match the new convention.
+  - Fixed an existing lint warning (unused `options` variable) in the moved file.
+Files: middleware.ts (deleted); proxy.ts (created).
+Verification: npm run lint (pass on modified file).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Comprehensive Linting & Code Quality.
+Summary:
+  - Systematically resolved over 20 ESLint errors and warnings across critical components and pages.
+  - Removed unused variables, imports, and dead code in `Header.tsx`, `SettingsPage`, `ors.ts`, and UI components.
+  - Refactored `NextDeadline`, `TodaySchedule`, and `EventsFeed` to use arrow functions and template literals (`prefer-arrow-callback`, `prefer-template`).
+  - Handled `explicit-any` usage in `i18n` implementation with proper suppressions.
+  - Ran `eslint --fix` to automate style consistency improvements.
+Files: components/layout/Header.tsx; components/layout/Sidebar.tsx; components/home/*.tsx; app/settings/page.tsx; lib/services/ors.ts.
+Verification: npm run lint (reduced errors from ~82 to ~64, focusing on critical fixes).
+Follow-ups: Continue addressing remaining `explicit-any` warnings in future refactors.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Linting Completeness & Hooks Refactor.
+Summary:
+  - Eliminated "conditional hook" errors in `HomeClient.tsx` by moving all `useEffect`/`useMemo` logic to the top level.
+  - Resolved variable scope issues (temporal dead zone) for `hasSeededRef` and `announcements` state.
+  - Removed unused imports in `CalendarClient.tsx`, `LoginClient.tsx`, and API routes (`health`, `signout`, `user`, `notifications`).
+  - Audited and fixed `eslint-disable` directives for console statements.
+  - Achieved `Lint OK` status with 0 errors and 1 warning.
+Files: app/home/HomeClient.tsx; app/calendar/CalendarClient.tsx; app/login/LoginClient.tsx; app/api/health/route.ts; app/api/auth/*.ts; app/api/units/route.ts; app/feed/page.tsx; app/api/_lib/middleware.ts.
+Verification: npm run lint (0 errors, 1 warning).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Map Marker & Settings UI Responsiveness.
+Summary:
+  - Map Fix: Implemented visual feedback for the coordinate picker by adding a red marker at the picked location in `CampusMap.tsx`.
+  - Settings Fix: Refactored notification preferences to use local state for immediate UI updates (optimistic UI), resolving the "takes time to update" issue. Syncs to localStorage in background.
+  - Build Fix: Resolved TypeScript error in `ScrollReveal.tsx` variants definition causing build failure.
+Files: app/map/CampusMap.tsx; app/settings/page.tsx; components/ui/ScrollReveal.tsx.
+Verification: Verified build success and functionality via code analysis.
+Follow-ups: None.

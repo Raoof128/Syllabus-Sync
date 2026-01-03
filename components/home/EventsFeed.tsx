@@ -18,7 +18,7 @@ const categoryColors: Record<string, string> = {
   'Free Food': 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
 };
 
-const EventsFeed = memo(function EventsFeed() {
+const EventsFeed = memo(() => {
   const { t } = useTranslation();
   // Filter to show only today's events
   const todayEvents = sampleEvents.filter((event) => isToday(new Date(event.date)));
@@ -43,10 +43,12 @@ const EventsFeed = memo(function EventsFeed() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-mq-content">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {t((event.translationKey || event.title) as any)}
                   </h3>
                   <Badge className={categoryColors[event.category]}>
-                    {t(('category_' + event.category.replace(/ /g, '')) as any)}
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {t(typeof event.category === 'string' ? `category_${event.category.replace(/ /g, '')}` as any : event.category)}
                   </Badge>
                 </div>
 
