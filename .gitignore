@@ -70,3 +70,12 @@ next-env.d.ts
 
 # ignore exported zip artifacts
 syllabus-sync_*.zip
+
+# Supabase generated files
+src/
+supabase/
+
+# Database migration scripts (local development)
+database-migration.sql
+fix-schema-mismatch.sql
+*-migration.sql

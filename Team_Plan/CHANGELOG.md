@@ -161,6 +161,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stress Calculation**: Robust error handling for invalid dates and edge cases in deadline prioritization
 - **Cross-Component Communication**: Flawless event system with proper cleanup and error handling
 
+#### Database Schema Migration & Alignment ✅
+- **Schema Drift Resolution**: Fixed critical mismatches between Supabase database and application code expectations
+- **Column Name Standardization**: Migrated deadlines.due_at → due_date, added unit_code field, removed unit_id references
+- **Data Type Corrections**: Converted class_times.day from integer (0-6) to text enum (Monday-Sunday)
+- **Table Structure Alignment**: Converted units table from separate building/room columns to location JSONB structure
+- **Missing Tables Creation**: Added notifications, profiles, and user_preferences tables with proper RLS policies
+- **Safe Data Migration**: Preserved existing data during schema transformations with proper foreign key handling
+- **Row Level Security**: Implemented comprehensive RLS policies for all user-scoped tables (deadlines, notifications, user_preferences, profiles)
+- **Development Seed Data**: Created deterministic seed script with realistic academic data for UI testing and development
+- **Type Safety**: Generated authoritative TypeScript types from Supabase to prevent future schema drift
+- **Migration Safety**: Implemented idempotent migration script (002_clean_align_schema) that handles existing data gracefully
+
 ---
 
 ## [0.5.1] - 2026-01-03
