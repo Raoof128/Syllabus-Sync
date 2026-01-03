@@ -927,6 +927,17 @@ export const translations = {
     settings: 'تنظیمات',
     manageProfiles: 'مدیریت پروفایل‌ها',
 
+    // Layout Components
+    mqLogoAlt: 'لوگوی دانشگاه Macquarie',
+    openProfileMenu: 'باز کردن منوی پروفایل',
+    user: 'کاربر',
+    closeMenu: 'بستن منو',
+    openMenu: 'باز کردن منو',
+    mainNavigation: 'ناوبری اصلی',
+    navigateToItem: 'رفتن به {{name}}',
+    markAllRead: 'علامت‌گذاری همه به عنوان خوانده شده',
+    signOut: 'خروج',
+
     // Common
     loading: 'در حال بارگذاری...',
     save: 'ذخیره',
@@ -1023,6 +1034,22 @@ export const translations = {
     currentlySelected: '(در حال حاضر انتخاب شده)',
     are: 'هستند',
     clickTo: 'برای',
+
+    // Home Components
+    nextDeadline: 'مهلت بعدی',
+    viewAll: 'مشاهده همه ←',
+    viewAllEvents: 'مشاهده همه رویدادها ←',
+    eventsToday: 'رویدادهای امروز',
+    todaysClasses: 'کلاس‌های امروز',
+    noClassesToday: 'امروز کلاسی ندارید',
+    noClassesDesc: 'شما به روز هستید! از وقت آزاد خود لذت ببرید.',
+    addUnit: 'افزودن واحد',
+    addUnitAria: 'یک واحد جدید اضافه کنید تا کلاس‌ها را پیگیری کنید',
+    noUpcomingDeadlines: 'هیچ مهلتی در پیش نیست',
+    noDeadlinesDesc: 'همه چیز انجام شده! اولین مهلت خود را اضافه کنید تا کارهایتان را مدیریت کنید.',
+    addDeadline: 'افزودن مهلت',
+    noEventsToday: 'هیچ رویدادی برای امروز برنامه‌ریزی نشده است',
+    navigateTo: 'حرکت به سوی',
 
     // Home Page
     skipToMain: 'رفتن به محتوای اصلی',

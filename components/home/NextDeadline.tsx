@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 import { Clock, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow, format, isValid } from 'date-fns';
+import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
@@ -16,7 +17,19 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 const NextDeadline = memo(function NextDeadline() {
   const isHydrated = useHydration();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+
+  const currentLocale = useMemo(() => {
+    switch (language) {
+      case 'es':
+        return es;
+      case 'fa':
+        return faIR;
+      default:
+        return enAU;
+    }
+  }, [language]);
+
   const nextDeadline = useMemo(() => {
     const now = new Date();
     const validUpcoming = deadlines
@@ -92,7 +105,7 @@ const NextDeadline = memo(function NextDeadline() {
                 </div>
 
                 <p className="text-sm text-mq-content-secondary mt-1">
-                  {t('due')} {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a') : t('invalidDate')}
+                  {t('due')} {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a', { locale: currentLocale }) : t('invalidDate')}
                 </p>
               </div>
 
@@ -110,7 +123,7 @@ const NextDeadline = memo(function NextDeadline() {
                       : 'text-mq-content-secondary'
                   }
                 >
-                  {hasValidDate ? formatDistanceToNow(dueDate as Date, { addSuffix: true }) : ''}
+                  {hasValidDate ? formatDistanceToNow(dueDate as Date, { addSuffix: true, locale: currentLocale }) : ''}
                 </span>
               </div>
             </div>
