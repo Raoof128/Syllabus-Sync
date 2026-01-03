@@ -76,11 +76,16 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       }));
       return serverNormalized;
     } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to add deadline'),
-        'DeadlinesStore.addDeadline',
-        'high',
-      );
+      // Silently handle API errors - stores work with local data
+      // Only log unexpected errors, not auth failures
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to add deadline'),
+          'DeadlinesStore.addDeadline',
+          'medium',
+        );
+      }
       return normalized; // Return local version on error
     }
   },

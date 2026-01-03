@@ -94,6 +94,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Component Variants**: Aligned UI component variants with design system specifications
 - **Error Type Safety**: Implemented proper error handling for unknown types throughout the application
 
+#### OAuth Provider Configuration ⚠️
+- **Google Sign-In**: Temporarily disabled due to missing OAuth provider configuration in Supabase
+- **Provider Setup Required**: Google OAuth must be enabled in Supabase dashboard under Authentication → Providers
+- **User Guidance**: Added informational message in login interface explaining OAuth setup requirements
+- **Alternative Authentication**: Email/password authentication fully functional and available
+
+#### Store Error Handling Optimization ✅
+- **API Error Filtering**: Modified stores to silently handle authentication errors and only log unexpected failures
+- **Improved Error Messages**: Updated apiRequest function to properly parse API error responses
+- **Reduced Console Noise**: Authentication failures no longer trigger high-priority error logs
+- **Enhanced User Experience**: Stores continue working with local data during API unavailability
+
 ---
 
 ## [0.5.1] - 2026-01-03

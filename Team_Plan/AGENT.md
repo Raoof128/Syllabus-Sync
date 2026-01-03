@@ -1439,7 +1439,7 @@ Scope: Comprehensive database debug and polish - connectivity, schema validation
 Summary: Conducted thorough database analysis revealing Supabase connection established with core tables (deadlines, units, class_times, events) functional; identified schema column mismatches (due_at vs due_date); implemented graceful API error handling in stores; verified API endpoints work correctly with authentication requirements; created comprehensive testing scripts for ongoing database monitoring.
 Files changed: lib/store/deadlinesStore.ts; lib/store/notificationsStore.ts; lib/store/unitsStore.ts; app/api/deadlines/route.ts; scripts/setup-database.js; scripts/test-database.js; scripts/inspect-schema.js.
 Verification: Database connected successfully; core API endpoints functional; stores handle API failures gracefully with persisted data fallback; application runs without console errors; comprehensive testing infrastructure established.
-Follow-ups: Monitor production deployment performance; consider adding comprehensive end-to-end testing for user workflows; track application usage metrics and error rates.
+Follow-ups: Monitor production deployment performance; consider adding comprehensive end-to-end testing for user workflows; track application usage metrics and error rates; configure OAuth providers in Supabase for enhanced authentication options; verify store error handling in authenticated user sessions.
 
 ### Raouf: 2026-01-03 (Australia/Sydney)
 Scope: Comprehensive system debugging and polishing - code quality, testing, architecture review, and production readiness assessment.

@@ -62,27 +62,8 @@ export default function LoginClient() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}${redirectTo}`,
-        },
-      });
-
-      if (error) {
-        setError(error.message);
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Google OAuth disabled - requires Supabase configuration
+  // const handleGoogleLogin = async () => { ... }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
@@ -140,26 +121,13 @@ export default function LoginClient() {
             </Button>
           </form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-mq-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-mq-background px-2 text-mq-content-secondary">
-                Or continue with
-              </span>
+          <div className="text-center text-sm text-mq-content-secondary mt-6 p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
+            <div className="font-medium text-mq-info mb-1">🔧 OAuth Configuration Required</div>
+            <div className="text-xs">
+              Google Sign-In requires OAuth provider setup in Supabase dashboard.<br/>
+              Configure Google OAuth under Authentication → Providers to enable this feature.
             </div>
           </div>
-
-            <Button
-              variant="secondary"
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-            className="w-full"
-          >
-            <Icons.Google className="mr-2 h-4 w-4" />
-            Sign in with Google
-          </Button>
 
           <div className="text-center text-sm text-mq-content-secondary">
             <p>

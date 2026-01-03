@@ -76,11 +76,16 @@ export const useUnitsStore = create<UnitsState>()(
       }));
       return serverNormalized;
     } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to add unit'),
-        'UnitsStore.addUnit',
-        'high',
-      );
+      // Silently handle API errors - stores work with local data
+      // Only log unexpected errors, not auth failures
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to add unit'),
+          'UnitsStore.addUnit',
+          'medium',
+        );
+      }
       return normalized; // Return the local version on error
     }
   },
