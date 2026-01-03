@@ -29,6 +29,7 @@ import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, Clock, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { toastUtils } from '@/lib/utils/toast';
+import { errorHandler } from '@/lib/utils/errorHandling';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
@@ -49,6 +50,66 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function HomeClient() {
+  // Global error boundary for home page
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Error recovery function
+  const handleErrorRecovery = () => {
+    setHasError(false);
+    setErrorMessage(null);
+    // Force a re-render by updating a state
+    window.location.reload();
+  };
+
+  // Catch any unhandled errors in child components
+  useEffect(() => {
+    const handleUnhandledError = (event: ErrorEvent) => {
+      console.error('Unhandled error in home page:', event.error);
+      setHasError(true);
+      setErrorMessage(event.error?.message || 'An unexpected error occurred');
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('Unhandled promise rejection in home page:', event.reason);
+      setHasError(true);
+      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
+    };
+
+    window.addEventListener('error', handleUnhandledError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleUnhandledError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  // If there's an error, show error UI
+  if (hasError) {
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h1 className="text-2xl font-bold text-mq-content mb-4">Something went wrong</h1>
+          <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
+            {errorMessage || 'We encountered an unexpected error. Please try refreshing the page.'}
+          </p>
+          <div className="space-y-3">
+            <Button onClick={handleErrorRecovery} className="mr-3">
+              Try Again
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => window.location.href = '/'}
+            >
+              Go Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const units = useUnitsStore((state) => state.units);
   const addUnit = useUnitsStore((state) => state.addUnit);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
@@ -60,7 +121,8 @@ export default function HomeClient() {
     if (typeof window === 'undefined') return false;
     try {
       return localStorage.getItem('seed-disabled') === 'true';
-    } catch {
+    } catch (error) {
+      console.warn('Unable to access localStorage for seed settings:', error);
       return false;
     }
   });
@@ -71,7 +133,19 @@ export default function HomeClient() {
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
 
-  // Load sample data on first visit
+  // Live region for screen reader announcements
+  const [announcements, setAnnouncements] = useState<string[]>([]);
+
+  // Function to announce actions to screen readers
+  const announceToScreenReader = (message: string) => {
+    setAnnouncements(prev => [...prev, `${Date.now()}: ${message}`]);
+    // Clear old announcements after 5 seconds
+    setTimeout(() => {
+      setAnnouncements(prev => prev.filter(ann => !ann.startsWith(`${Date.now() - 5000}:`)));
+    }, 5000);
+  };
+
+  // Load sample data on first visit with comprehensive validation
   useEffect(() => {
     if (!hasHydrated || hasSeededRef.current || seedDisabled) {
       return;
@@ -84,43 +158,156 @@ export default function HomeClient() {
       const unitsSeeded = localStorage.getItem(unitsSeededKey) === 'true';
       const deadlinesSeeded = localStorage.getItem(deadlinesSeededKey) === 'true';
 
-      if (!unitsSeeded) {
-        sampleUnits.forEach(addUnit);
+      // Validate sample data before adding
+      const validUnits = sampleUnits.filter(unit => {
+        return unit &&
+               typeof unit.code === 'string' &&
+               typeof unit.name === 'string' &&
+               typeof unit.color === 'string' &&
+               Array.isArray(unit.schedule) &&
+               unit.schedule.length > 0;
+      });
+
+      const validDeadlines = sampleDeadlines.filter(deadline => {
+        return deadline &&
+               typeof deadline.title === 'string' &&
+               typeof deadline.unitCode === 'string' &&
+               typeof deadline.priority === 'string' &&
+               deadline.dueDate &&
+               !isNaN(new Date(deadline.dueDate).getTime());
+      });
+
+      if (!unitsSeeded && validUnits.length > 0) {
+        validUnits.forEach(addUnit);
         localStorage.setItem(unitsSeededKey, 'true');
+        console.log(`Loaded ${validUnits.length} sample units`);
       }
-      if (!deadlinesSeeded) {
-        sampleDeadlines.forEach(addDeadline);
+
+      if (!deadlinesSeeded && validDeadlines.length > 0) {
+        validDeadlines.forEach(addDeadline);
         localStorage.setItem(deadlinesSeededKey, 'true');
+        console.log(`Loaded ${validDeadlines.length} sample deadlines`);
       }
-    } catch {
-      sampleUnits.forEach(addUnit);
-      sampleDeadlines.forEach(addDeadline);
+    } catch (error) {
+      console.warn('Failed to load sample data, falling back to direct addition:', error);
+      try {
+        // Fallback: add data without localStorage
+        const validUnits = sampleUnits.filter(unit =>
+          unit && unit.code && unit.name && unit.color && Array.isArray(unit.schedule)
+        );
+        const validDeadlines = sampleDeadlines.filter(deadline =>
+          deadline && deadline.title && deadline.unitCode && deadline.dueDate
+        );
+
+        validUnits.forEach(addUnit);
+        validDeadlines.forEach(addDeadline);
+        console.log('Fallback: loaded sample data without localStorage persistence');
+      } catch (fallbackError) {
+        console.error('Critical error: Could not load sample data:', fallbackError);
+      }
     }
     hasSeededRef.current = true;
   }, [addDeadline, addUnit, hasHydrated, seedDisabled]);
 
+  // Listen for custom events from child components and keyboard shortcuts
+  useEffect(() => {
+    const handleAddUnitEvent = () => {
+      setEditingUnit(null);
+      setUnitFormOpen(true);
+    };
+
+    const handleAddDeadlineEvent = () => {
+      setEditingDeadline(null);
+      setDeadlineFormOpen(true);
+    };
+
+    // Keyboard shortcuts for power users
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only trigger shortcuts when not typing in an input/textarea
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Ctrl/Cmd + U for Add Unit
+      if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+        e.preventDefault();
+        handleAddUnitEvent();
+      }
+
+      // Ctrl/Cmd + D for Add Deadline
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        handleAddDeadlineEvent();
+      }
+    };
+
+    window.addEventListener('add-unit', handleAddUnitEvent);
+    window.addEventListener('add-deadline', handleAddDeadlineEvent);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('add-unit', handleAddUnitEvent);
+      window.removeEventListener('add-deadline', handleAddDeadlineEvent);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const hasUnits = units.length > 0;
-  const stressLevel = hasHydrated ? getStressLevel() : 'Low';
+  const stressLevel = useMemo(() => {
+    if (!hasHydrated) return 'Low';
+    try {
+      return getStressLevel();
+    } catch (error) {
+      console.warn('Error calculating stress level:', error);
+      return 'Low';
+    }
+  }, [hasHydrated, getStressLevel]);
 
   // Memoized unit stats calculation for better performance
   const unitStats = useMemo(() => {
-    const totalClasses = units.reduce((acc, u) => acc + u.schedule.length, 0);
-    const totalStudyHours = units.reduce((acc, u) => {
-      return (
-        acc +
-        u.schedule.reduce((hours, s) => {
-          const [startH, startM] = s.startTime.split(':').map(Number);
-          const [endH, endM] = s.endTime.split(':').map(Number);
-          return hours + (endH - startH) + (endM - startM) / 60;
-        }, 0)
-      );
-    }, 0);
+    try {
+      const totalClasses = units.reduce((acc, u) => acc + (u.schedule?.length || 0), 0);
+      const totalStudyHours = units.reduce((acc, u) => {
+        if (!u.schedule) return acc;
+        return (
+          acc +
+          u.schedule.reduce((hours, s) => {
+            try {
+              const [startH, startM] = s.startTime.split(':').map(Number);
+              const [endH, endM] = s.endTime.split(':').map(Number);
 
-    return {
-      unitCount: units.length,
-      totalClasses,
-      studyHours: Math.round(totalStudyHours),
-    };
+              // Validate time values
+              if (isNaN(startH) || isNaN(startM) || isNaN(endH) || isNaN(endM)) {
+                return hours;
+              }
+
+              // Ensure valid time ranges
+              if (startH < 0 || startH > 23 || endH < 0 || endH > 23) {
+                return hours;
+              }
+
+              return hours + Math.max(0, (endH - startH) + (endM - startM) / 60);
+            } catch (error) {
+              console.warn('Error calculating hours for schedule:', s, error);
+              return hours;
+            }
+          }, 0)
+        );
+      }, 0);
+
+      return {
+        unitCount: units.length,
+        totalClasses,
+        studyHours: Math.max(0, Math.round(totalStudyHours)),
+      };
+    } catch (error) {
+      console.error('Error calculating unit stats:', error);
+      return {
+        unitCount: units.length,
+        totalClasses: 0,
+        studyHours: 0,
+      };
+    }
   }, [units]);
 
   const stressColors = {
@@ -151,11 +338,21 @@ export default function HomeClient() {
 
   const confirmDeleteUnit = () => {
     if (deleteUnitConfirm) {
-      removeUnit(deleteUnitConfirm.id);
-      toastUtils.success(
-        'Unit Deleted',
-        `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} has been deleted.`,
-      );
+      try {
+        removeUnit(deleteUnitConfirm.id);
+        const successMessage = `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} has been deleted.`;
+        toastUtils.success('Unit Deleted', successMessage);
+        announceToScreenReader(successMessage);
+      } catch (error) {
+        const errorMessage = 'Unable to delete the unit. Please try again.';
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to delete unit'),
+          'Home Delete Unit',
+          'medium'
+        );
+        toastUtils.error('Delete Failed', errorMessage);
+        announceToScreenReader(errorMessage);
+      }
       setDeleteUnitConfirm(null);
     }
   };
@@ -167,8 +364,23 @@ export default function HomeClient() {
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
+      {/* Screen reader announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {announcements.map((announcement, index) => (
+          <div key={index}>{announcement.split(': ').slice(1).join(': ')}</div>
+        ))}
+      </div>
+
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-md focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
-      <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
+      <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
         <div className="flex-1 min-w-0">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
             Welcome, {DEMO_USER.name}!
@@ -176,27 +388,47 @@ export default function HomeClient() {
           <p className="text-mq-content-secondary">Here&apos;s your day at a glance.</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Stress Level Indicator - Show compact version on mobile */}
+          {/* Keyboard Shortcuts Hint */}
+          <div className="hidden lg:flex items-center gap-1 px-2 py-1 bg-mq-background-secondary rounded text-mq-xs text-mq-content-tertiary border border-mq-border/50">
+            <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono">Ctrl+U</kbd>
+            <span>Add Unit</span>
+            <kbd className="px-1 py-0.5 bg-mq-background rounded text-mq-xs font-mono ml-2">Ctrl+D</kbd>
+            <span>Add Deadline</span>
+          </div>
+
+          {/* Stress Level Indicator */}
           {hasHydrated && deadlines.length > 0 && (
-            <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
-              <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
-              <Badge className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}>
-                {stressEmoji[stressLevel]}
-              </Badge>
-            </div>
-          )}
-          {hasHydrated && deadlines.length > 0 && (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
-              <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
-              <span className="text-mq-sm text-mq-content">Workload:</span>
-              <Badge className={stressColors[stressLevel]}>
-                {stressEmoji[stressLevel]} {stressLevel}
-              </Badge>
-            </div>
+            <>
+              <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
+                <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
+                <Badge
+                  className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
+                  aria-label={`Current workload level: ${stressLevel}`}
+                  title={`Workload: ${stressLevel}`}
+                >
+                  {stressEmoji[stressLevel]}
+                </Badge>
+              </div>
+              <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
+                <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
+                <span className="text-mq-sm text-mq-content">Workload:</span>
+                <Badge
+                  className={stressColors[stressLevel]}
+                  aria-label={`Current workload level: ${stressLevel}`}
+                >
+                  {stressEmoji[stressLevel]} {stressLevel}
+                </Badge>
+              </div>
+            </>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="gap-2 touch-manipulation" size="default">
+              <Button
+                className="gap-2 touch-manipulation"
+                size="default"
+                aria-label="Add new unit or deadline"
+                aria-haspopup="menu"
+              >
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Add New</span>
                 <span className="sm:hidden">Add</span>
@@ -205,12 +437,31 @@ export default function HomeClient() {
             <DropdownMenuContent
               align="end"
               className="bg-mq-background border-mq-border"
+              aria-label="Add new items menu"
             >
-              <DropdownMenuItem onClick={handleAddUnit} className="gap-2 cursor-pointer">
+              <DropdownMenuItem
+                onClick={handleAddUnit}
+                className="gap-2 cursor-pointer focus:bg-mq-primary/10"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleAddUnit();
+                  }
+                }}
+              >
                 <BookOpen className="h-4 w-4" />
                 Add Unit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleAddDeadline} className="gap-2 cursor-pointer">
+              <DropdownMenuItem
+                onClick={handleAddDeadline}
+                className="gap-2 cursor-pointer focus:bg-mq-primary/10"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleAddDeadline();
+                  }
+                }}
+              >
                 <Clock className="h-4 w-4" />
                 Add Deadline
               </DropdownMenuItem>
@@ -221,33 +472,35 @@ export default function HomeClient() {
 
       {/* Get Started Banner */}
       {!hasUnits && (
-        <div className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3">
-          <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" />
+        <section className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3" aria-labelledby="get-started-heading">
+          <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1">
+            <h2 id="get-started-heading" className="sr-only">Getting Started Guide</h2>
             <p className="text-mq-sm text-mq-info">
               <strong>Get started:</strong> Add your units to sync classes to your calendar.
             </p>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Main Grid - Today's Schedule & Next Deadline */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6">
+      {/* Main Dashboard Grid */}
+      <section id="main-content" className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" role="main" aria-label="Dashboard overview">
         <div className="animate-slide-up">
           <TodaySchedule />
         </div>
         <div className="animate-slide-up animation-delay-100">
           <NextDeadline />
         </div>
-      </div>
+      </section>
 
       {/* My Units Section */}
-      <Card className="mb-6">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            My Units
-          </CardTitle>
+      <section aria-labelledby="units-section-heading">
+        <Card className="mb-6">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle id="units-section-heading" className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" aria-hidden="true" />
+              My Units
+            </CardTitle>
           <Button onClick={handleAddUnit} size="sm" className="gap-1">
             <Plus className="h-4 w-4" />
             Add Unit
@@ -308,11 +561,13 @@ export default function HomeClient() {
           )}
         </CardContent>
       </Card>
+      </section>
 
-      {/* Events */}
-      <div className="mb-8">
+      {/* Events Section */}
+      <section aria-labelledby="events-section-heading" className="mb-8">
+        <h2 id="events-section-heading" className="sr-only">Today's Events</h2>
         <EventsFeed />
-      </div>
+      </section>
 
       {/* Unit Form Dialog */}
       <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />

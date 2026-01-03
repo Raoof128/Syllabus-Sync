@@ -1,15 +1,14 @@
 // components/home/TodaySchedule.tsx
 'use client';
 
-import React, { useMemo } from 'react';
-import Link from 'next/link';
+import React, { useMemo, memo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 
-export default function TodaySchedule() {
+const TodaySchedule = memo(function TodaySchedule() {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const todayLabel = useMemo(() => {
@@ -57,11 +56,32 @@ export default function TodaySchedule() {
             <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-mq-content mb-2">No classes today</h3>
             <p className="text-mq-content-secondary mb-4">You&apos;re all caught up! Enjoy your free time.</p>
-            <Button asChild className="gap-2">
-              <Link href="/home">
-                <BookOpen className="h-4 w-4" />
-                Add Unit
-              </Link>
+            <Button
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('add-unit'));
+                } catch (error) {
+                  console.warn('Failed to trigger add unit event:', error);
+                  // Fallback to direct navigation
+                  window.location.href = '/home';
+                }
+              }}
+              className="gap-2 focus:ring-2 focus:ring-mq-primary/50"
+              aria-label="Add a new unit to start tracking classes"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  try {
+                    window.dispatchEvent(new CustomEvent('add-unit'));
+                  } catch (error) {
+                    console.warn('Failed to trigger add unit event:', error);
+                    window.location.href = '/home';
+                  }
+                }
+              }}
+            >
+              <BookOpen className="h-4 w-4" />
+              Add Unit
             </Button>
           </div>
         ) : (
@@ -99,4 +119,8 @@ export default function TodaySchedule() {
       </CardContent>
     </Card>
   );
-}
+});
+
+TodaySchedule.displayName = 'TodaySchedule';
+
+export default TodaySchedule;

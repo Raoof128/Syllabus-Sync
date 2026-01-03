@@ -1,7 +1,7 @@
 // components/home/EventsFeed.tsx
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, Navigation } from 'lucide-react';
@@ -17,7 +17,7 @@ const categoryColors: Record<string, string> = {
   'Free Food': 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
 };
 
-export default function EventsFeed() {
+const EventsFeed = memo(function EventsFeed() {
   // Filter to show only today's events
   const todayEvents = sampleEvents.filter((event) => isToday(new Date(event.date)));
 
@@ -58,7 +58,13 @@ export default function EventsFeed() {
                 {/* Navigation to Map */}
                 {event.building && (
                   <div className="mt-2">
-                    <Button asChild variant="secondary" size="sm" className="gap-1 text-xs h-7">
+                    <Button
+                      asChild
+                      variant="secondary"
+                      size="sm"
+                      className="gap-1 text-xs h-7 focus:ring-2 focus:ring-mq-primary/50"
+                      aria-label={`Navigate to ${event.building} on campus map`}
+                    >
                       <Link href={`/map?building=${event.building}`}>
                         <Navigation className="h-3 w-3" />
                         Navigate to {event.building}
@@ -73,4 +79,8 @@ export default function EventsFeed() {
       </CardContent>
     </Card>
   );
-}
+});
+
+EventsFeed.displayName = 'EventsFeed';
+
+export default EventsFeed;

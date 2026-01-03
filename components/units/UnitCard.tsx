@@ -55,8 +55,15 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                   variant="ghost"
                   size="sm"
                   onClick={() => onEdit(unit)}
-                  className="h-8 w-8 p-0"
-                  aria-label={`Edit ${unit.code}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onEdit(unit);
+                    }
+                  }}
+                  className="h-8 w-8 p-0 focus:ring-2 focus:ring-mq-primary/50"
+                  aria-label={`Edit ${unit.code} - ${unit.name}`}
+                  title={`Edit ${unit.code}`}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>
@@ -66,8 +73,15 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
                   variant="ghost"
                   size="sm"
                   onClick={() => onDelete(unit)}
-                  className="h-8 w-8 p-0 text-mq-error hover:text-mq-error hover:bg-mq-error/10"
-                  aria-label={`Delete ${unit.code}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onDelete(unit);
+                    }
+                  }}
+                  className="h-8 w-8 p-0 text-mq-error hover:text-mq-error hover:bg-mq-error/10 focus:ring-2 focus:ring-mq-error/50"
+                  aria-label={`Delete ${unit.code} - ${unit.name}`}
+                  title={`Delete ${unit.code}`}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>

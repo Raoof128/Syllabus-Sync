@@ -1,7 +1,7 @@
 // components/home/NextDeadline.tsx
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 
-export default function NextDeadline() {
+const NextDeadline = memo(function NextDeadline() {
   const isHydrated = useHydration();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const nextDeadline = useMemo(() => {
@@ -74,7 +74,8 @@ export default function NextDeadline() {
         ) : (
           <Link
             href={calendarDate ? `/calendar?date=${calendarDate}` : '/calendar'}
-            className="block"
+            className="block focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:rounded-lg"
+            aria-label={`View ${nextDeadline.title} deadline details in calendar`}
           >
             <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-mq-hover-background transition-colors">
               {/* Deadline info */}
@@ -116,4 +117,8 @@ export default function NextDeadline() {
       </CardContent>
     </Card>
   );
-}
+});
+
+NextDeadline.displayName = 'NextDeadline';
+
+export default NextDeadline;

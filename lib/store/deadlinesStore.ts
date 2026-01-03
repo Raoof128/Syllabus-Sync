@@ -161,35 +161,62 @@ export const useDeadlinesStore = create<DeadlinesState>()(
   },
 
   getStressLevel: (): StressLevel => {
-    const upcoming = get().getUpcoming(20);
-    const now = new Date();
-    const priorityPoints: Record<Deadline['priority'], number> = {
-      Urgent: 4,
-      High: 3,
-      Medium: 2,
-      Low: 1,
-    };
+    try {
+      const upcoming = get().getUpcoming(20);
+      const now = new Date();
 
-    const totalPoints = upcoming.reduce((sum, deadline) => {
-      const dueDate = new Date(deadline.dueDate);
-      const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const timeWeight =
-        daysUntil <= 1
-          ? 1.5
-          : daysUntil <= 3
-            ? 1.25
-            : daysUntil <= 7
-              ? 1
-              : daysUntil <= 14
-                ? 0.75
-                : 0.5;
+      // Validate current date
+      if (isNaN(now.getTime())) {
+        console.warn('Invalid current date, returning Low stress level');
+        return 'Low';
+      }
 
-      return sum + priorityPoints[deadline.priority] * timeWeight;
-    }, 0);
+      const priorityPoints: Record<Deadline['priority'], number> = {
+        Urgent: 4,
+        High: 3,
+        Medium: 2,
+        Low: 1,
+      };
 
-    if (totalPoints >= 12) return 'High';
-    if (totalPoints >= 6) return 'Busy';
-    return 'Low';
+      const totalPoints = upcoming.reduce((sum, deadline) => {
+        try {
+          const dueDate = new Date(deadline.dueDate);
+
+          // Validate deadline date
+          if (isNaN(dueDate.getTime())) {
+            console.warn('Invalid deadline date:', deadline.dueDate);
+            return sum; // Skip invalid dates
+          }
+
+          const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+          // Handle past due dates (give them maximum weight)
+          const timeWeight = daysUntil <= 0
+            ? 2.0
+            : daysUntil <= 1
+              ? 1.5
+              : daysUntil <= 3
+                ? 1.25
+                : daysUntil <= 7
+                  ? 1
+                  : daysUntil <= 14
+                    ? 0.75
+                    : 0.5;
+
+          return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
+        } catch (error) {
+          console.warn('Error calculating stress for deadline:', deadline, error);
+          return sum;
+        }
+      }, 0);
+
+      if (totalPoints >= 12) return 'High';
+      if (totalPoints >= 6) return 'Busy';
+      return 'Low';
+    } catch (error) {
+      console.error('Error calculating stress level:', error);
+      return 'Low'; // Safe fallback
+    }
   },
 }),
 {
