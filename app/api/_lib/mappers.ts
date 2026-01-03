@@ -12,17 +12,30 @@ const parseDate = (value: unknown): Date => {
 };
 
 export const mapUnitRow = (row: Row): Unit => {
-  const location = (row.location as Unit['location']) ?? {
-    building: (row.building as string) ?? '',
-    room: (row.room as string) ?? '',
-  };
+  // Handle both old flat structure and new JSONB location
+  let location: Unit['location'];
+  if (row.location && typeof row.location === 'object') {
+    // New JSONB structure: {"building": "C5C", "room": "204"}
+    const loc = row.location as { building?: string; room?: string };
+    location = {
+      building: loc.building ?? '',
+      room: loc.room ?? '',
+    };
+  } else {
+    // Fallback for old flat structure
+    location = {
+      building: String(row.building ?? ''),
+      room: String(row.room ?? ''),
+    };
+  }
+
   return {
     id: String(row.id ?? ''),
-    code: String(row.code ?? row.unit_code ?? ''),
+    code: String(row.code ?? ''),
     name: String(row.name ?? ''),
     color: String(row.color ?? ''),
     location,
-    schedule: (row.schedule as Unit['schedule']) ?? [],
+    schedule: [], // Will be populated separately from class_times table
     createdAt: parseDate(row.created_at ?? row.createdAt),
   };
 };
@@ -31,7 +44,7 @@ export const mapDeadlineRow = (row: Row): Deadline => ({
   id: String(row.id ?? ''),
   title: String(row.title ?? ''),
   unitCode: String(row.unit_code ?? row.unitCode ?? ''),
-  dueDate: parseDate(row.due_date ?? row.dueDate),
+  dueDate: parseDate(row.due_date ?? row.dueDate ?? row.due_at), // Handle both due_date and legacy due_at
   priority: row.priority as Deadline['priority'],
   type: row.type as Deadline['type'],
   completed: Boolean(row.completed),
@@ -42,8 +55,8 @@ export const mapEventRow = (row: Row): Event => ({
   id: String(row.id ?? ''),
   title: String(row.title ?? ''),
   description: String(row.description ?? ''),
-  date: parseDate(row.date),
-  time: String(row.time ?? ''),
+  date: parseDate(row.event_date ?? row.date), // Handle both event_date and legacy date
+  time: String(row.event_time ?? row.time ?? ''),
   location: String(row.location ?? ''),
   building: row.building ? String(row.building) : undefined,
   category: row.category as Event['category'],
@@ -66,8 +79,7 @@ export const serializeUnit = (unit: Unit) => ({
   code: unit.code,
   name: unit.name,
   color: unit.color,
-  location: unit.location,
-  schedule: unit.schedule,
+  location: unit.location, // JSONB field stores the nested location object
   created_at: unit.createdAt.toISOString(),
 });
 

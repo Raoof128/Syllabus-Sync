@@ -244,7 +244,7 @@ export const validationRules = {
       : null,
 
   numeric: (fieldName: string) => (value: unknown) =>
-    value && isNaN(Number(value)) ? `${fieldName} must be a number` : null,
+    value && Number.isNaN(Number(value)) ? `${fieldName} must be a number` : null,
 
   positive: (fieldName: string) => (value: unknown) =>
     value && Number(value) <= 0 ? `${fieldName} must be a positive number` : null,
