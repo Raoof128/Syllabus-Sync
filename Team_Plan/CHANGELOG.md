@@ -1358,3 +1358,59 @@ Summary: Fine-tuned page transition physics for a "premium" feel. Adjusted sprin
 Files: app/template.tsx.
 Verification: Verified updated motion values.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Visual Styling.
+Summary: Updated the global light mode background color to `#EDEADE` per user request, giving the application a custom-tinted foundation.
+Files: app/mq-tokens.css.
+Verification: Token update confirmed.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Color Theme.
+Summary: Conducted a global find-and-replace of pure white (`#ffffff`) to `#EDEADE` in design tokens and theme logic. This includes card backgrounds, input fields, and dark mode text, ensuring a consistent custom tint throughout the application.
+Files: app/mq-tokens.css; lib/store/themeStore.ts.
+Verification: Verified replacements in token definitions and theme store fallbacks.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Visual Contrast.
+Summary: Restored white background for cards, inputs, and inverted elements while maintaining the `#EDEADE` page background. This fixes the "invisible UI" bug where content surfaces were blending into the page background.
+Files: app/mq-tokens.css.
+Verification: Verified token definitions.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Visual Contrast Bug.
+Summary: Restored full `#EDEADE` theme while fixing the "invisible button/border" issue. Darkened global border color to `charcoal-700` and adjusted secondary button backgrounds to darker sand shades (`sand-300`) to ensure they pop against the page background.
+Files: app/mq-tokens.css.
+Verification: Verified token contrast.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Lost Button Colors.
+Summary: Restored Light Mode definitions for semantic state colors (Success/Green, Warning/Amber, Error/Red, Info/Blue) in `app/mq-tokens.css`. This fixes the regression where status buttons (like "Enabled") lost their green background color.
+Files: app/mq-tokens.css.
+Verification: Verified CSS variable definitions.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Critical Data Bug.
+Summary: Fixed "Invalid input syntax for type uuid" error in Deadline Store. Implemented a data migration to convert all legacy string IDs to proper UUIDs, preventing API crashes when syncing deadlines.
+Files: lib/store/deadlinesStore.ts.
+Verification: Verified valid UUID generation.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Missing Imports.
+Summary: Restored missing `zustand` and utility imports in `deadlinesStore.ts` that caused a "create is not defined" runtime error.
+Files: lib/store/deadlinesStore.ts.
+Verification: Verified imports.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Critical Data Bug (Retry).
+Summary: Enhanced deadline store robustness by adding strict validation guards. The app now filters out or blocks API calls for invalid legacy IDs (`deadline-xyz`) to prevent backend crashes, while forcing a version 4 migration to clean up local data.
+Files: lib/store/deadlinesStore.ts.
+Verification: Verified guards and version bump.
+Follow-ups: None.

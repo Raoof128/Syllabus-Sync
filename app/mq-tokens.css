@@ -37,33 +37,33 @@
   --c-slate-500: #8d98a1;
 
   /* Semantic Mappings */
-  --c-background: #ffffff;
-  --c-background-invert: #ffffff;
+  --c-background: #EDEADE;
+  --c-background-invert: #EDEADE;
   --c-content: var(--c-charcoal-900);
   --c-content-secondary: var(--c-charcoal-800);
   --c-content-tertiary: var(--c-charcoal-700);
   --c-content-faded: var(--c-charcoal-600);
 
-   /* Tailwind CSS Variable Mappings - Light Mode */
-   --background: 0 0% 100%;
-   --foreground: 222.2 84% 4.9%;
-   --card: 0 0% 100%;
-   --card-foreground: 222.2 84% 4.9%;
-   --popover: 0 0% 100%;
-   --popover-foreground: 222.2 84% 4.9%;
-   --primary: 222.2 84% 4.9%;
-   --primary-foreground: 210 40% 98%;
-   --secondary: 210 40% 96%;
-   --secondary-foreground: 222.2 84% 4.9%;
-   --muted: 210 40% 96%;
-   --muted-foreground: 215.4 16.3% 46.9%;
-   --accent: 210 40% 96%;
-   --accent-foreground: 222.2 84% 4.9%;
-   --destructive: 0 84.2% 60.2%;
-   --destructive-foreground: 210 40% 98%;
-   --border: 214.3 31.8% 91.4%;
-   --input: 214.3 31.8% 91.4%;
-   --ring: 222.2 84% 4.9%;
+  /* Tailwind CSS Variable Mappings - Light Mode */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 84% 4.9%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
 
   /* Typography - --f-[family] format */
   --f-primary: "Work Sans", sans-serif;
@@ -86,19 +86,32 @@
   --t-snap-slow: 0.3s cubic-bezier(0, 0, 0, 1);
   --t-snap-fast: 0.15s cubic-bezier(0, 0, 0, 1);
 
-   /* Additional tokens for complete UI */
-   --c-border: var(--c-charcoal-200);
-   --c-focus: var(--c-red);
-   --c-card-background: #ffffff;
-   --c-input-background: #ffffff;
-   --c-button-secondary: var(--c-sand-100);
-   --c-hover-background: var(--c-sand-100);
+  /* Additional tokens for complete UI */
+  --c-border: var(--c-charcoal-700);
+  /* Darker border for visibility on Alabaster */
+  --c-focus: var(--c-red);
+  --c-card-background: #EDEADE;
+  --c-input-background: #EDEADE;
+  /* Make buttons slightly darker/different than background to pop */
+  --c-button-secondary: var(--c-sand-300);
+  --c-hover-background: var(--c-sand-200);
 
-   /* MQ Token aliases for globals.css compatibility */
-   --mq-background: var(--c-background);
-   --mq-content: var(--c-content);
-   --mq-border: var(--c-border);
-   --mq-focus: var(--c-focus);
+  /* MQ Token aliases for globals.css compatibility */
+  --mq-background: var(--c-background);
+  --mq-content: var(--c-content);
+  --mq-border: var(--c-border);
+  --mq-focus: var(--c-focus);
+
+  /* UI state colors - Light Mode Defaults */
+  --c-success: #10b981;
+  --c-warning: #f59e0b;
+  --c-error: #ef4444;
+  --c-info: #3b82f6;
+
+  --mq-success: var(--c-success);
+  --mq-warning: var(--c-warning);
+  --mq-error: var(--c-error);
+  --mq-info: var(--c-info);
 
   /* Spacing (approximated) */
   --c-space-1: 0.25rem;
@@ -122,73 +135,101 @@
   --c-background: var(--c-charcoal-800);
   --c-background-secondary: var(--c-charcoal-700);
   --c-background-tertiary: var(--c-charcoal-600);
-   --c-background-invert: #ffffff;
+  --c-background-invert: #EDEADE;
 
-   --c-content: #ffffff;
-   --c-content-secondary: var(--c-charcoal-200);
-   --c-content-tertiary: var(--c-charcoal-300);
-   --c-content-faded: var(--c-charcoal-400);
+  --c-content: #EDEADE;
+  --c-content-secondary: var(--c-charcoal-200);
+  --c-content-tertiary: var(--c-charcoal-300);
+  --c-content-faded: var(--c-charcoal-400);
 
-   --c-border: var(--c-charcoal-600);
-   --c-border-secondary: var(--c-charcoal-500);
+  --c-border: var(--c-charcoal-600);
+  --c-border-secondary: var(--c-charcoal-500);
 
-   /* MQ Token aliases for globals.css compatibility */
-   --mq-background: var(--c-background);
-   --mq-content: var(--c-content);
-   --mq-border: var(--c-border);
-   --mq-focus: var(--c-focus);
-   --mq-card-background: var(--c-card-background);
-   --mq-input-background: var(--c-input-background);
-   --mq-primary: var(--c-red);
-   --mq-content-secondary: var(--c-content-secondary);
-   --mq-content-tertiary: var(--c-content-tertiary);
-   --mq-success: var(--c-success);
-   --mq-error: var(--c-error);
-   --mq-warning: var(--c-warning);
-   --mq-info: var(--c-info);
-   --mq-shadow: var(--c-shadow);
-   --mq-shadow-sm: var(--c-shadow-sm);
+  /* MQ Token aliases for globals.css compatibility */
+  --mq-background: var(--c-background);
+  --mq-content: var(--c-content);
+  --mq-border: var(--c-border);
+  --mq-focus: var(--c-focus);
+  --mq-card-background: var(--c-card-background);
+  --mq-input-background: var(--c-input-background);
+  --mq-primary: var(--c-red);
+  --mq-content-secondary: var(--c-content-secondary);
+  --mq-content-tertiary: var(--c-content-tertiary);
+  --mq-success: var(--c-success);
+  --mq-error: var(--c-error);
+  --mq-warning: var(--c-warning);
+  --mq-info: var(--c-info);
+  --mq-shadow: var(--c-shadow);
+  --mq-shadow-sm: var(--c-shadow-sm);
 
   /* Tailwind CSS Variable Mappings - Dark Mode (MQ Charcoal Theme) */
-  --background: 215 14% 24%; /* charcoal-800 */
-  --foreground: 0 0% 98%; /* white */
-  --card: 215 14% 24%; /* charcoal-800 */
-  --card-foreground: 0 0% 98%; /* white */
-  --popover: 215 14% 24%; /* charcoal-800 */
-  --popover-foreground: 0 0% 98%; /* white */
-   --primary: 0 0% 98%; /* white */
-   --primary-foreground: 215 14% 24%; /* charcoal-800 */
-   --secondary: 215 14% 24%; /* charcoal-800 */
-   --secondary-foreground: 0 0% 98%; /* white */
-   --muted: 215 14% 24%; /* charcoal-800 */
-   --muted-foreground: 215 14% 34%; /* charcoal-600 */
-   --accent: 215 14% 24%; /* charcoal-800 */
-   --accent-foreground: 0 0% 98%; /* white */
-   --destructive: 0 84.2% 60.2%; /* red-500 */
-   --destructive-foreground: 0 0% 98%; /* white */
-   --border: 215 14% 34%; /* charcoal-600 */
-   --input: 215 14% 24%; /* charcoal-800 */
-   --ring: 0 0% 98%; /* white */
+  --background: 215 14% 24%;
+  /* charcoal-800 */
+  --foreground: 0 0% 98%;
+  /* white */
+  --card: 215 14% 24%;
+  /* charcoal-800 */
+  --card-foreground: 0 0% 98%;
+  /* white */
+  --popover: 215 14% 24%;
+  /* charcoal-800 */
+  --popover-foreground: 0 0% 98%;
+  /* white */
+  --primary: 0 0% 98%;
+  /* white */
+  --primary-foreground: 215 14% 24%;
+  /* charcoal-800 */
+  --secondary: 215 14% 24%;
+  /* charcoal-800 */
+  --secondary-foreground: 0 0% 98%;
+  /* white */
+  --muted: 215 14% 24%;
+  /* charcoal-800 */
+  --muted-foreground: 215 14% 34%;
+  /* charcoal-600 */
+  --accent: 215 14% 24%;
+  /* charcoal-800 */
+  --accent-foreground: 0 0% 98%;
+  /* white */
+  --destructive: 0 84.2% 60.2%;
+  /* red-500 */
+  --destructive-foreground: 0 0% 98%;
+  /* white */
+  --border: 215 14% 34%;
+  /* charcoal-600 */
+  --input: 215 14% 24%;
+  /* charcoal-800 */
+  --ring: 0 0% 98%;
+  /* white */
 
   --c-focus: var(--c-red);
 
   /* mq-dark brand colors for enhanced contrast */
-  --c-red: #d6001c; /* mq-dark-red - brighter for dark backgrounds */
-  --c-bright-red: #ff1a1a; /* enhanced bright red */
-  --c-purple: #c6007e; /* mq-dark-purple - brighter for dark backgrounds */
-  --c-magenta: #e600b3; /* enhanced magenta */
+  --c-red: #d6001c;
+  /* mq-dark-red - brighter for dark backgrounds */
+  --c-bright-red: #ff1a1a;
+  /* enhanced bright red */
+  --c-purple: #c6007e;
+  /* mq-dark-purple - brighter for dark backgrounds */
+  --c-magenta: #e600b3;
+  /* enhanced magenta */
 
   /* Neutral adjustments for dark mode */
-  --c-charcoal-100: var(--c-charcoal-800); /* lighter charcoal becomes darker */
+  --c-charcoal-100: var(--c-charcoal-800);
+  /* lighter charcoal becomes darker */
   --c-sand-100: var(--c-charcoal-700);
   --c-sand-200: var(--c-charcoal-600);
   --c-slate-100: var(--c-navy-800);
 
   /* UI state colors for dark mode - consistent with MQ brand */
-  --c-success: #10b981; /* green-500 - keeping for accessibility */
-  --c-warning: #f59e0b; /* amber-500 - keeping for accessibility */
-  --c-error: #ef4444; /* red-500 - keeping for accessibility */
-  --c-info: #3b82f6; /* blue-500 - keeping for accessibility */
+  --c-success: #10b981;
+  /* green-500 - keeping for accessibility */
+  --c-warning: #f59e0b;
+  /* amber-500 - keeping for accessibility */
+  --c-error: #ef4444;
+  /* red-500 - keeping for accessibility */
+  --c-info: #3b82f6;
+  /* blue-500 - keeping for accessibility */
 
   /* MQ Token aliases for globals.css compatibility */
   --mq-success: var(--c-success);

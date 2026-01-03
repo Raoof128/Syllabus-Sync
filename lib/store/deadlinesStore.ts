@@ -1,6 +1,4 @@
-// lib/store/deadlinesStore.ts
-'use client';
-
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Deadline, StressLevel } from '@/lib/types';
@@ -26,223 +24,228 @@ const normalizeDeadline = (deadline: Deadline): Deadline => ({
   createdAt: deadline.createdAt instanceof Date ? deadline.createdAt : new Date(deadline.createdAt),
 });
 
+// Helper to validate UUIDs
+const isValidUUID = (id: string) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+};
+
 export const useDeadlinesStore = create<DeadlinesState>()(
   persist(
     (set, get) => ({
-  deadlines: [],
-  isLoading: false,
-  hasLoaded: false,
+      deadlines: [],
+      isLoading: false,
+      hasLoaded: false,
 
-  loadDeadlines: async () => {
-    if (get().hasLoaded) return;
-    set({ isLoading: true });
-    try {
-      const data = await apiRequest<Deadline[]>('/api/deadlines');
-      set({ deadlines: data.map(normalizeDeadline), hasLoaded: true });
-    } catch (error) {
-      // Silently fail - keep persisted data if API is unavailable
-      // This allows the app to work with local data until database is set up
-      console.warn('Failed to load deadlines from API, using persisted data:', error);
-      set({ hasLoaded: true }); // Mark as loaded to prevent retry
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  addDeadline: async (deadline) => {
-    const deadlineWithId: Deadline = {
-      ...deadline,
-      id: deadline.id || `deadline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: deadline.createdAt || new Date(),
-    };
-
-    const normalized = normalizeDeadline(deadlineWithId);
-    set((state) => {
-      if (state.deadlines.some((existing) => existing.id === normalized.id)) {
-        return state;
-      }
-      return { deadlines: [...state.deadlines, normalized] };
-    });
-
-    try {
-      const created = await apiRequest<Deadline>('/api/deadlines', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(normalized),
-      });
-      const serverNormalized = normalizeDeadline(created);
-      set((state) => ({
-        deadlines: state.deadlines.map((d) => (d.id === normalized.id ? serverNormalized : d)),
-      }));
-      return serverNormalized;
-    } catch (error) {
-      // Silently handle API errors - stores work with local data
-      // Only log unexpected errors, not auth failures
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
-        errorHandler.logError(
-          error instanceof Error ? error : new Error('Failed to add deadline'),
-          'DeadlinesStore.addDeadline',
-          'medium',
-        );
-      }
-      return normalized; // Return local version on error
-    }
-  },
-
-  removeDeadline: async (id) => {
-    // Remove from local state immediately
-    const deadlineToRemove = get().deadlines.find(d => d.id === id);
-    set((state) => ({
-      deadlines: state.deadlines.filter((d) => d.id !== id),
-    }));
-
-    try {
-      await apiRequest<{ id: string }>(`/api/deadlines/${id}`, { method: 'DELETE' });
-    } catch (error) {
-      // Restore the deadline to local state on error
-      if (deadlineToRemove) {
-        set((state) => ({ deadlines: [...state.deadlines, deadlineToRemove] }));
-      }
-      errorHandler.logError(
-        error instanceof Error ? error : new Error(`Failed to remove deadline ${id}`),
-        'DeadlinesStore.removeDeadline',
-        'high',
-      );
-    }
-  },
-
-  updateDeadline: async (id, updatedDeadline) => {
-    const currentDeadline = get().deadlines.find(d => d.id === id);
-    if (!currentDeadline) return null;
-
-    const optimisticUpdate = { ...currentDeadline, ...updatedDeadline };
-    set((state) => ({
-      deadlines: state.deadlines.map((d) => (d.id === id ? optimisticUpdate : d)),
-    }));
-
-    try {
-      const updated = await apiRequest<Deadline>(`/api/deadlines/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedDeadline),
-      });
-      const normalized = normalizeDeadline(updated);
-      set((state) => ({
-        deadlines: state.deadlines.map((d) => (d.id === id ? normalized : d)),
-      }));
-      return normalized;
-    } catch (error) {
-      // Revert to original state on error
-      set((state) => ({
-        deadlines: state.deadlines.map((d) => (d.id === id ? currentDeadline : d)),
-      }));
-      errorHandler.logError(
-        error instanceof Error ? error : new Error(`Failed to update deadline ${id}`),
-        'DeadlinesStore.updateDeadline',
-        'high',
-      );
-      return null;
-    }
-  },
-
-  toggleComplete: async (id) => {
-    const existing = get().deadlines.find((deadline) => deadline.id === id);
-    if (!existing) return;
-    await get().updateDeadline(id, { completed: !existing.completed });
-  },
-
-  getUpcoming: (limit = 5) => {
-    const now = new Date();
-    return get()
-      .deadlines.filter((d) => !d.completed && new Date(d.dueDate) > now)
-      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-      .slice(0, limit);
-  },
-
-  getStressLevel: (): StressLevel => {
-    try {
-      const upcoming = get().getUpcoming(20);
-      const now = new Date();
-
-      // Validate current date
-      if (isNaN(now.getTime())) {
-        console.warn('Invalid current date, returning Low stress level');
-        return 'Low';
-      }
-
-      const priorityPoints: Record<Deadline['priority'], number> = {
-        Urgent: 4,
-        High: 3,
-        Medium: 2,
-        Low: 1,
-      };
-
-      const totalPoints = upcoming.reduce((sum, deadline) => {
+      loadDeadlines: async () => {
+        if (get().hasLoaded) return;
+        set({ isLoading: true });
         try {
-          const dueDate = new Date(deadline.dueDate);
-
-          // Validate deadline date
-          if (isNaN(dueDate.getTime())) {
-            console.warn('Invalid deadline date:', deadline.dueDate);
-            return sum; // Skip invalid dates
-          }
-
-          const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-          // Handle past due dates (give them maximum weight)
-          const timeWeight = daysUntil <= 0
-            ? 2.0
-            : daysUntil <= 1
-              ? 1.5
-              : daysUntil <= 3
-                ? 1.25
-                : daysUntil <= 7
-                  ? 1
-                  : daysUntil <= 14
-                    ? 0.75
-                    : 0.5;
-
-          return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
+          const data = await apiRequest<Deadline[]>('/api/deadlines');
+          // Ensure loaded data has valid UUIDs (filter out bad ones from API if any)
+          const validData = data.map(normalizeDeadline).filter(d => {
+            if (!isValidUUID(d.id)) {
+              console.warn(`Filtered out invalid deadline ID from API: ${d.id}`);
+              return false;
+            }
+            return true;
+          });
+          set({ deadlines: validData, hasLoaded: true });
         } catch (error) {
-          console.warn('Error calculating stress for deadline:', deadline, error);
-          return sum;
+          // Silently fail - keep persisted data if API is unavailable
+          console.warn('Failed to load deadlines from API, using persisted data:', error);
+          set({ hasLoaded: true });
+        } finally {
+          set({ isLoading: false });
         }
-      }, 0);
+      },
 
-      if (totalPoints >= 12) return 'High';
-      if (totalPoints >= 6) return 'Busy';
-      return 'Low';
-    } catch (error) {
-      console.error('Error calculating stress level:', error);
-      return 'Low'; // Safe fallback
-    }
-  },
-}),
-{
-  name: 'deadlines-storage',
-  storage: createJSONStorage(() => localStorage),
-  version: 2,
-  migrate: (persistedState: any, version: number) => {
-    if (version < 2) {
-      // Migration from version 1 to 2: Convert old string IDs to UUIDs
-      if (persistedState?.state?.deadlines && Array.isArray(persistedState.state.deadlines)) {
-        const idMap: Record<string, string> = {
-          'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',
-          'deadline-math1001-quiz-1': '550e8400-e29b-41d4-a716-446655440002',
-          'deadline-hist2002-essay-1': '550e8400-e29b-41d4-a716-446655440003',
+      addDeadline: async (deadline) => {
+        // Ensure new ID is a UUID
+        const id = (deadline.id && isValidUUID(deadline.id)) ? deadline.id : uuidv4();
+
+        const deadlineWithId: Deadline = {
+          ...deadline,
+          id,
+          createdAt: deadline.createdAt || new Date(),
         };
 
-        persistedState.state.deadlines = persistedState.state.deadlines.map((deadline: any) => {
-          if (deadline.id && idMap[deadline.id]) {
-            return { ...deadline, id: idMap[deadline.id] };
+        const normalized = normalizeDeadline(deadlineWithId);
+        set((state) => {
+          if (state.deadlines.some((existing) => existing.id === normalized.id)) {
+            return state;
           }
-          return deadline;
+          return { deadlines: [...state.deadlines, normalized] };
         });
-      }
-    }
-    return persistedState;
-  },
-},
-),
+
+        try {
+          const created = await apiRequest<Deadline>('/api/deadlines', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(normalized),
+          });
+          const serverNormalized = normalizeDeadline(created);
+          set((state) => ({
+            deadlines: state.deadlines.map((d) => (d.id === normalized.id ? serverNormalized : d)),
+          }));
+          return serverNormalized;
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
+            errorHandler.logError(
+              error instanceof Error ? error : new Error('Failed to add deadline'),
+              'DeadlinesStore.addDeadline',
+              'medium',
+            );
+          }
+          return normalized;
+        }
+      },
+
+      removeDeadline: async (id) => {
+        // Guard: If ID is invalid, just remove locally and stop
+        if (!isValidUUID(id)) {
+          console.warn(`Removing invalid ID locally only: ${id}`);
+          set((state) => ({
+            deadlines: state.deadlines.filter((d) => d.id !== id),
+          }));
+          return;
+        }
+
+        const deadlineToRemove = get().deadlines.find(d => d.id === id);
+        set((state) => ({
+          deadlines: state.deadlines.filter((d) => d.id !== id),
+        }));
+
+        try {
+          await apiRequest<{ id: string }>(`/api/deadlines/${id}`, { method: 'DELETE' });
+        } catch (error) {
+          if (deadlineToRemove) {
+            set((state) => ({ deadlines: [...state.deadlines, deadlineToRemove] }));
+          }
+          errorHandler.logError(
+            error instanceof Error ? error : new Error(`Failed to remove deadline ${id}`),
+            'DeadlinesStore.removeDeadline',
+            'high',
+          );
+        }
+      },
+
+      updateDeadline: async (id, updatedDeadline) => {
+        // Guard: If ID is invalid, abort API call to prevent crash
+        if (!isValidUUID(id)) {
+          console.error(`Cannot update invalid UUID: ${id}`);
+          return null;
+        }
+
+        const currentDeadline = get().deadlines.find(d => d.id === id);
+        if (!currentDeadline) return null;
+
+        const optimisticUpdate = { ...currentDeadline, ...updatedDeadline };
+        set((state) => ({
+          deadlines: state.deadlines.map((d) => (d.id === id ? optimisticUpdate : d)),
+        }));
+
+        try {
+          const updated = await apiRequest<Deadline>(`/api/deadlines/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedDeadline),
+          });
+          const normalized = normalizeDeadline(updated);
+          set((state) => ({
+            deadlines: state.deadlines.map((d) => (d.id === id ? normalized : d)),
+          }));
+          return normalized;
+        } catch (error) {
+          set((state) => ({
+            deadlines: state.deadlines.map((d) => (d.id === id ? currentDeadline : d)),
+          }));
+          errorHandler.logError(
+            error instanceof Error ? error : new Error(`Failed to update deadline ${id}`),
+            'DeadlinesStore.updateDeadline',
+            'high',
+          );
+          return null;
+        }
+      },
+
+      toggleComplete: async (id) => {
+        const existing = get().deadlines.find((deadline) => deadline.id === id);
+        if (!existing) return;
+        await get().updateDeadline(id, { completed: !existing.completed });
+      },
+
+      getUpcoming: (limit = 5) => {
+        const now = new Date();
+        return get()
+          .deadlines.filter((d) => !d.completed && new Date(d.dueDate) > now)
+          .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+          .slice(0, limit);
+      },
+
+      getStressLevel: (): StressLevel => {
+        try {
+          const upcoming = get().getUpcoming(20);
+          const now = new Date();
+          if (isNaN(now.getTime())) return 'Low';
+
+          const priorityPoints: Record<Deadline['priority'], number> = {
+            Urgent: 4, High: 3, Medium: 2, Low: 1,
+          };
+
+          const totalPoints = upcoming.reduce((sum, deadline) => {
+            try {
+              const dueDate = new Date(deadline.dueDate);
+              if (isNaN(dueDate.getTime())) return sum;
+              const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              const timeWeight = daysUntil <= 0 ? 2.0 : daysUntil <= 1 ? 1.5 : daysUntil <= 3 ? 1.25 : daysUntil <= 7 ? 1 : daysUntil <= 14 ? 0.75 : 0.5;
+              return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
+            } catch (error) {
+              return sum;
+            }
+          }, 0);
+
+          if (totalPoints >= 12) return 'High';
+          if (totalPoints >= 6) return 'Busy';
+          return 'Low';
+        } catch (error) {
+          return 'Low';
+        }
+      },
+    }),
+    {
+      name: 'deadlines-storage',
+      storage: createJSONStorage(() => localStorage),
+      version: 4,
+      migrate: (persistedState: any, version: number) => {
+        if (version < 4) {
+          if (persistedState?.state?.deadlines && Array.isArray(persistedState.state.deadlines)) {
+            // Migration: Version 4 forces ALL IDs to be valid UUIDs
+            persistedState.state.deadlines = persistedState.state.deadlines.map((deadline: any) => {
+              // Legacy hardcoded map
+              const idMap: Record<string, string> = {
+                'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',
+                'deadline-math1001-quiz-1': '550e8400-e29b-41d4-a716-446655440002',
+                'deadline-hist2002-essay-1': '550e8400-e29b-41d4-a716-446655440003',
+              };
+
+              let newId = deadline.id;
+
+              if (newId && idMap[newId]) {
+                // Known legacy ID -> Map to specific UUID
+                newId = idMap[newId];
+              } else if (!isValidUUID(newId)) {
+                // Unknown legacy/invalid ID -> Generate random UUID
+                newId = uuidv4();
+              }
+
+              return { ...deadline, id: newId };
+            });
+          }
+        }
+        return persistedState;
+      },
+    },
+  ),
 );

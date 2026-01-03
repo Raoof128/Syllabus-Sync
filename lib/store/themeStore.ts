@@ -92,7 +92,7 @@ export const useThemeEffect = () => {
         const computedBackground = getComputedStyle(root)
           .getPropertyValue('--mq-background')
           .trim();
-        const fallback = resolvedTheme === 'dark' ? '#0f172a' : '#ffffff';
+        const fallback = resolvedTheme === 'dark' ? '#0f172a' : '#EDEADE';
         metaThemeColor.setAttribute('content', computedBackground || fallback);
       }
     }
