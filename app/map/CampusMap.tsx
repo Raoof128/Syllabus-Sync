@@ -1,10 +1,10 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
-import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents, Polyline } from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
 import { buildings, Building } from '@/lib/map/buildings';
+import { RoutePreview, formatDistance, formatDuration, openBestNavApp } from '@/lib/map/navigationHelpers';
+import { fetchORSRoute } from '@/lib/services/ors';
 
 // Convert pixel coordinates to lat/lng for markers
 const pixelToLatLng = (x: number, y: number) => {
@@ -23,6 +23,7 @@ const pixelToLatLng = (x: number, y: number) => {
 
 // Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'; // Hybrid Nav Req
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
@@ -45,6 +46,9 @@ const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
   [-33.770, 151.125], // top-right
 ];
 
+// Fallback origin (Campus Hub/Centre approx)
+const CAMPUS_CENTRE = { lat: -33.775, lng: 151.115 };
+
 const resolveCssColor = (variableName: string, fallback: string) => {
   if (typeof window === 'undefined') {
     return fallback;
@@ -66,11 +70,11 @@ const createMarkerIcon = (isSelected: boolean) => {
           <circle cx="12.5" cy="12.5" r="5" fill="${centerFill}"/>
         </svg>
       `)}`,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  shadowSize: [41, 41],
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    shadowSize: [41, 41],
   });
 };
 
@@ -141,6 +145,59 @@ interface CampusMapProps {
 export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
   const [themeKey, setThemeKey] = useState<'light' | 'dark'>('light');
 
+  // -- Hybrid Navigation State --
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
+  const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
+  const [preview, setPreview] = useState<RoutePreview | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+
+  // 1. Get User Location on Mount
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        },
+        (err) => {
+          console.warn('Geolocation denied or failed, using campus centre fallback.', err);
+          setOrigin(CAMPUS_CENTRE);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      setOrigin(CAMPUS_CENTRE);
+    }
+  }, []);
+
+  // 2. Routing Logic when selectedBuilding changes
+  useEffect(() => {
+    async function updateRoute() {
+      if (!selectedBuilding || !origin) {
+        setPreview(null);
+        setRouteCoords([]);
+        return;
+      }
+
+      // ORS requires lat/lng
+      const destLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
+      const dest = { lat: destLatLng.lat, lng: destLatLng.lng };
+
+      setRouteError(null);
+      const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, dest);
+
+      if (routeData) {
+        setRouteCoords(coordinates);
+        setPreview(routeData);
+      } else {
+        setRouteError(error || "Couldn't load route preview");
+        setRouteCoords([]);
+        setPreview(null);
+      }
+    }
+
+    updateRoute();
+  }, [selectedBuilding, origin]);
+
   useEffect(() => {
     const updateThemeKey = () => {
       if (typeof document !== 'undefined' && document.documentElement) {
@@ -158,57 +215,173 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   }, []);
 
   return (
-            <MapContainer
-              center={[-33.77, 151.115]}
-              zoom={16}
-              zoomControl
-              style={{
-                height: '100%',
-                width: '100%',
-              }}
+    <div className="relative w-full h-full">
+      <MapContainer
+        center={[-33.77, 151.115]}
+        zoom={16}
+        zoomControl
+        style={{
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        {/* Campus image overlay */}
+        <ImageOverlay
+          url={CAMPUS_IMAGE_URL}
+          bounds={CAMPUS_BOUNDS}
+        />
+
+        <MapController
+          selectedBuilding={selectedBuilding}
+          coordPickerMode={coordPickerMode}
+          onMapClick={onMapClick}
+        />
+
+        {/* Route Polyline */}
+        {routeCoords.length > 0 && (
+          <Polyline positions={routeCoords} color="blue" weight={5} opacity={0.7} />
+        )}
+
+        {/* Building markers */}
+        {buildings.map((building) => {
+          const buildingLatLng = pixelToLatLng(building.position[0], building.position[1]);
+          return (
+            <Marker
+              key={`${building.id}-${themeKey}-${selectedBuilding?.id === building.id ? 'selected' : 'base'}`}
+              position={buildingLatLng}
+              icon={createMarkerIcon(selectedBuilding?.id === building.id)}
             >
-              {/* Campus image overlay */}
-              <ImageOverlay
-                url={CAMPUS_IMAGE_URL}
-                bounds={CAMPUS_BOUNDS}
-              />
+              <Popup>
+                <div className="p-2 min-w-[200px]">
+                  <h3 className="font-semibold text-mq-content">{building.name}</h3>
+                  <p className="text-mq-sm text-mq-content-secondary mb-2">Building {building.id}</p>
+                  {building.description && (
+                    <p className="text-mq-sm text-mq-content-tertiary mb-3">{building.description}</p>
+                  )}
+                  {building.tags && building.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {building.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
 
-              <MapController
-                selectedBuilding={selectedBuilding}
-                coordPickerMode={coordPickerMode}
-                onMapClick={onMapClick}
-              />
+      {/* Hybrid Navigation Panel */}
+      {selectedBuilding && (preview || routeError) && (
+        <div
+          className="route-panel absolute bottom-4 left-4 z-[1000] p-5 rounded-2xl shadow-xl w-80 max-h-[60vh] overflow-y-auto border backdrop-blur-md transition-all duration-300"
+          style={{
+            backgroundColor: 'var(--c-card-background)',
+            borderColor: 'var(--c-border)',
+            color: 'var(--c-content)',
+            boxShadow: 'var(--c-shadow-sm)'
+          }}
+        >
+          {/* Header */}
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="font-bold text-xl leading-tight" style={{ fontFamily: 'var(--f-primary)', color: 'var(--c-content)' }}>
+                {selectedBuilding.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className="text-xs font-mono" style={{ borderColor: 'var(--c-border)', color: 'var(--c-content-secondary)' }}>
+                  {selectedBuilding.id}
+                </Badge>
+                {preview && (
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--c-slate-100)', color: 'var(--c-navy-900)' }}>
+                    Walking
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setPreview(null);
+                setRouteError(null);
+                setRouteCoords([]);
+              }}
+              className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              aria-label="Close navigation"
+            >
+              <svg className="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-              {/* Building markers */}
-              {buildings.map((building) => {
-                const buildingLatLng = pixelToLatLng(building.position[0], building.position[1]);
-                return (
-                  <Marker
-                    key={`${building.id}-${themeKey}-${selectedBuilding?.id === building.id ? 'selected' : 'base'}`}
-                    position={buildingLatLng}
-                    icon={createMarkerIcon(selectedBuilding?.id === building.id)}
-                  >
-                    <Popup>
-                      <div className="p-2 min-w-[200px]">
-                        <h3 className="font-semibold text-mq-content">{building.name}</h3>
-                        <p className="text-mq-sm text-mq-content-secondary mb-2">Building {building.id}</p>
-                        {building.description && (
-                          <p className="text-mq-sm text-mq-content-tertiary mb-3">{building.description}</p>
-                        )}
-                        {building.tags && building.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {building.tags.map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </Popup>
-                  </Marker>
-                );
-              })}
-            </MapContainer>
+          {routeError ? (
+            <div className="p-3 rounded-lg flex items-start gap-3" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--c-error)' }}>
+              <svg className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--c-error)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <p className="text-sm font-medium" style={{ color: 'var(--c-error)' }}>
+                {routeError}
+              </p>
+            </div>
+          ) : (
+            preview && (
+              <>
+                {/* Summary Stats */}
+                <div className="flex items-baseline gap-1 mb-5">
+                  <span className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--c-success)' }}>
+                    {formatDuration(preview.durationSeconds)}
+                  </span>
+                  <span className="text-sm font-medium opacity-60 ml-1" style={{ color: 'var(--c-content-secondary)' }}>
+                    ({formatDistance(preview.distanceMeters)})
+                  </span>
+                </div>
+
+                {/* Call to Action */}
+                <button
+                  onClick={() => {
+                    const destLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
+                    openBestNavApp(origin, { lat: destLatLng.lat, lng: destLatLng.lng });
+                  }}
+                  className="w-full font-bold py-3 px-4 rounded-xl mb-6 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-md hover:shadow-lg group"
+                  style={{
+                    backgroundColor: 'var(--c-red)',
+                    color: '#ffffff', // Always white
+                  }}
+                >
+                  <span>Start Navigation</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </button>
+
+                {/* Custom Timeline */}
+                {preview.steps.length > 0 && (
+                  <div className="pt-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider mb-3 opacity-50" style={{ color: 'var(--c-content-tertiary)' }}>Turn-by-Turn</h4>
+                    <div className="relative space-y-6 ml-1">
+                      {/* Vertical Line */}
+                      <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style={{ backgroundColor: 'var(--c-border)' }}></div>
+
+                      {preview.steps.slice(0, 8).map((s, i) => (
+                        <div key={i} className="relative pl-6 group">
+                          {/* Dot */}
+                          <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 z-10 box-border transition-colors group-hover:scale-110"
+                            style={{
+                              backgroundColor: 'var(--c-card-background)',
+                              borderColor: i === 0 ? 'var(--c-success)' : 'var(--c-content-faded)'
+                            }}></div>
+
+                          <p className="text-sm font-medium leading-snug" style={{ color: 'var(--c-content)' }}>{s.text}</p>
+                          <p className="text-xs font-mono mt-0.5 opacity-60" style={{ color: 'var(--c-content-secondary)' }}>{formatDistance(s.distance)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )
+          )}
+        </div>
+      )}
+    </div>
   );
 }

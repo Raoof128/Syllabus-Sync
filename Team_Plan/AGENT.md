@@ -1708,3 +1708,59 @@ Summary:
 Files: lib/store/deadlinesStore.ts.
 Verification: Verified guards and new migration version.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Hybrid Navigation.
+Summary: 
+  - Implemented "Route Preview" (Hybrid Navigation) using Leaflet and OpenRouteService (ORS).
+  - Configured `NEXT_PUBLIC_ORS_API_KEY` in `.env.local` (decoded from user-provided base64 token).
+  - Component `app/map/CampusMap.tsx` now fetches walking routes on building selection and renders a blue polyline.
+  - Added "Start Navigation" deep-linking to Google/Apple Maps for turn-by-turn handoff.
+  - Created `lib/services/ors.ts` adapter for strictly type-safe route fetching.
+Files: app/map/CampusMap.tsx; lib/services/ors.ts; lib/map/navigationHelpers.ts; .env.local.
+Verification: Integrated verified API key; route preview and deep links logic implemented without breaking SSR.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Route Preview Error.
+Summary: 
+  - User reported "Couldn't load route preview" generic error.
+  - Enhanced `fetchORSRoute` in `ors.ts` to return specific error messages (e.g., "Invalid API Key", "No route found", "Route Failed: 403").
+  - Updated `CampusMap.tsx` to display these specific errors in the UI instead of the generic "Couldn't load..." message.
+  - This helps diagnose if the issue is a missing env var (needs restart), bad key, or network issue.
+Files: lib/services/ors.ts; app/map/CampusMap.tsx.
+Verification: Verified error propagation logic.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Hybrid Nav Network Error.
+Summary: 
+  - User reported "Network Error" when fetching route preview. This confirms standard `fetch` from the client (browser) was blocked by CORS or security policies.
+  - Implemented an API Proxy Route (`app/api/navigate/route.ts`) to handle the ORS request server-side.
+  - Updated `lib/services/ors.ts` to call this internal proxy (`/api/navigate`) instead of the external ORS URL directly.
+  - This solves CORS issues and keeps the API key hidden from the client browser.
+Files: app/api/navigate/route.ts; lib/services/ors.ts.
+Verification: Created proxy endpoint and wired up client.
+Follow-ups: Restart dev server to load environment variables.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - ORS 403 Forbidden.
+Summary: 
+  - Diagnosed `ORS Gateway Error: 403` by manually testing the API keys with `curl`.
+  - Discovered that the correct API Key was the `id` field (`7bf5c...`) from the user's base64 token, not the `org` field (`5b3ce...`) which seemed more standard but was rejected.
+  - Updated `.env.local` with the validated, working key.
+Files: .env.local.
+Verification: Validated key via curl against ORS API; received successful GeoJSON response.
+Follow-ups: Restart dev server to apply new key.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Hybrid Nav UI.
+Summary: 
+  - Redesigned the Hybrid Navigation Panel to fully align with the Macquarie University "Premium" design tokens.
+  - Replaced hardcoded styles with CSS variables from `mq-tokens.css` (e.g., `var(--c-card-background)`, `var(--c-red)`).
+  - Added a "Close" (X) button to dismiss the navigation without deselecting the building.
+  - Improved the "Turn-by-Turn" timeline visualization with custom CSS connectors and semantic colors (success green for start, faded for steps).
+  - Ensured Dark Mode compatibility by strictly using semantic tokens.
+Files: app/map/CampusMap.tsx.
+Verification: Verified correct class usage and inline style variable mapping.
+Follow-ups: None.

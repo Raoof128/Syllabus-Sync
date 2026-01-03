@@ -1414,3 +1414,44 @@ Summary: Enhanced deadline store robustness by adding strict validation guards. 
 Files: lib/store/deadlinesStore.ts.
 Verification: Verified guards and version bump.
 Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Feature - Hybrid Navigation.
+Summary: Added Hybrid Navigation system to the Campus Map.
+  - Preview: Shows walking path, distance, and ETA within the app using OpenRouteService.
+  - Handoff: "Start Navigation" button seamlessly opens the route in the user's native Google Maps or Apple Maps app.
+  - Setup: Configured ORS API key integration.
+Files: app/map/CampusMap.tsx; lib/services/ors.ts.
+Verification: Verified map overlay and API integration.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Route Preview Error.
+Summary: Improved error handling for the Hybrid Navigation feature. The map now displays specific error messages (e.g., "Invalid API Key", "No route found") instead of a generic failure message, making it easier to troubleshoot routing issues.
+Files: lib/services/ors.ts; app/map/CampusMap.tsx.
+Verification: Verified error display logic.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - Hybrid Nav Network Error.
+Summary: Migrated ORS navigation requests to a server-side proxy (`/api/navigate`) to resolve CORS "Network Error" issues in the browser and improve API security.
+Files: app/api/navigate/route.ts; lib/services/ors.ts.
+Verification: Verified proxy implementation.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Fix - ORS 403 Forbidden.
+Summary: Corrected the OpenRouteService API Key configuration in `.env.local`. Replaced the incorrect token with the validated key derived from the user's credentials, resolving the "403 Forbidden" error.
+Files: .env.local.
+Verification: Verified API access.
+Follow-ups: None.
+
+Raouf: 2026-01-03 (Australia/Sydney)
+Scope: Polish - Hybrid Nav UI.
+Summary: Redesigned the Hybrid Navigation Panel to match the Macquarie University "Premium" theme.
+  - Unified Colors: Now uses official `mq-tokens.css` variables for backgrounds, borders, and text.
+  - Better UX: Added a "Close" button and improved the visual layout of turn-by-turn steps.
+  - Dark Mode: Full compatibility with automatic theme switching.
+Files: app/map/CampusMap.tsx.
+Verification: Verified style integration.
+Follow-ups: None.
