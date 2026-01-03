@@ -16,7 +16,7 @@ const deadlineUpdateSchema = z.object({
 });
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const { id } = await params;
   const body = await request.json().catch(() => null);
   const parsed = deadlineUpdateSchema.safeParse(body);
@@ -56,7 +56,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const { id } = await params;
   const { error } = await supabase.from('deadlines').delete().eq('id', id);
 

@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import {
@@ -65,9 +66,10 @@ const unitQuerySchema = z.object({
  * - sortOrder: Sort order (asc, desc; default: desc)
  */
 export async function GET(request: Request) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return requireAuth(request, async (_userId) => {
     try {
-      const supabase = createServerClient();
+      const supabase = await createServerClient();
       const url = new URL(request.url);
       const query = unitQuerySchema.parse({
         search: url.searchParams.get('search') || undefined,
@@ -178,18 +180,20 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return requireAuth(request, async (_userId) => {
     return validateRequest(unitSchema)(request, async (validatedData) => {
       try {
-        const supabase = createServerClient();
+        const supabase = await createServerClient();
+        const { schedule, ...unitData } = validatedData;
         const payload = {
-          ...validatedData,
-          id: validatedData.id ?? crypto.randomUUID(),
-          createdAt: validatedData.createdAt ?? new Date(),
+          ...unitData,
+          id: unitData.id ?? crypto.randomUUID(),
+          createdAt: unitData.createdAt ?? new Date(),
         };
 
         // Start transaction-like approach for unit and class times
-        const { data: unitData, error: unitError } = await supabase
+        const { data: unitDataResult, error: unitError } = await supabase
           .from('units')
           .insert(serializeUnit(payload))
           .select('*')
@@ -202,11 +206,11 @@ export async function POST(request: Request) {
           return handleDatabaseError(unitError);
         }
 
-        let createdClassTimes = [];
+        let createdClassTimes: Array<{ id: string; day: string; startTime: string; endTime: string; unit_id?: string }> = [];
 
         // Insert class times if any
-        if (payload.schedule && payload.schedule.length > 0) {
-          const classTimesToInsert = payload.schedule.map(ct => ({
+        if (schedule && schedule.length > 0) {
+          const classTimesToInsert = schedule.map(ct => ({
             unit_id: unitData.id,
             day: ct.day,
             start_time: ct.startTime,

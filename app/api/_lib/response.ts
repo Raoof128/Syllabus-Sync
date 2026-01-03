@@ -55,7 +55,7 @@ export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
 export const jsonSuccess = <T = unknown>(
   data: T,
   status: number = 200,
-  meta?: ApiResponse['meta']
+  meta?: Partial<ApiResponse['meta']>
 ): NextResponse<ApiResponse<T>> => {
   return NextResponse.json(
     {
@@ -101,7 +101,7 @@ export const jsonError = (
  * Handle Zod validation errors
  */
 export const handleValidationError = (error: ZodError): NextResponse<ApiResponse<never>> => {
-  const details = error.errors.reduce((acc, err) => {
+  const details = error.issues.reduce((acc, err) => {
     const field = err.path.join('.');
     if (!acc[field]) acc[field] = [];
     acc[field].push(err.message);
@@ -127,7 +127,7 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
     'A database error occurred',
     500,
     ERROR_CODES.DATABASE_ERROR,
-    process.env.NODE_ENV === 'development' ? { originalError: error.message } : undefined
+    process.env.NODE_ENV === 'development' ? { originalError: error instanceof Error ? error.message : String(error) } : undefined
   );
 };
 

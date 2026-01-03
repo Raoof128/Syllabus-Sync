@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerClient();
 
     // Simple query to test database connectivity
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('units')
       .select('count', { count: 'exact', head: true });
 

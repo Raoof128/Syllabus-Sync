@@ -74,7 +74,7 @@ export const mapNotificationRow = (row: Row): Notification => ({
   relatedId: row.related_id ? String(row.related_id) : undefined,
 });
 
-export const serializeUnit = (unit: Unit) => ({
+export const serializeUnit = (unit: Omit<Unit, 'schedule'>) => ({
   id: unit.id,
   code: unit.code,
   name: unit.name,

@@ -10,11 +10,11 @@ import { jsonUnauthorized, jsonError, ERROR_CODES } from './response';
  * Require authentication for API routes
  */
 export const requireAuth = async (
-  request: NextRequest,
+  request: Request,
   handler: (userId: string) => Promise<NextResponse>
 ): Promise<NextResponse> => {
   try {
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
@@ -32,11 +32,11 @@ export const requireAuth = async (
  * Optional authentication - provides user ID if authenticated
  */
 export const optionalAuth = async (
-  request: NextRequest,
+  request: Request,
   handler: (userId?: string) => Promise<NextResponse>
 ): Promise<NextResponse> => {
   try {
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     return await handler(user?.id);
@@ -74,7 +74,10 @@ export const rateLimit = (
     request: NextRequest,
     handler: () => Promise<NextResponse>
   ): Promise<NextResponse> => {
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') ||
+                request.headers.get('x-real-ip') ||
+                request.headers.get('x-client-ip') ||
+                'unknown';
     const key = `${ip}:${request.nextUrl.pathname}`;
 
     const now = Date.now();
@@ -192,7 +195,7 @@ export const cors = (
     const isAllowedOrigin = !origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin);
 
     if (isAllowedOrigin) {
-      const corsHeaders = {
+      const corsHeaders: Record<string, string> = {
         'Access-Control-Allow-Origin': allowedOrigins.includes('*') ? '*' : (origin || allowedOrigins[0]),
         'Access-Control-Allow-Methods': allowedMethods.join(', '),
         'Access-Control-Allow-Headers': allowedHeaders.join(', '),
@@ -227,7 +230,7 @@ export const validateRequest = <T>(
   schema: { safeParse: (data: unknown) => { success: boolean; data?: T; error?: unknown } }
 ) => {
   return async (
-    request: NextRequest,
+    request: Request,
     handler: (validatedData: T) => Promise<NextResponse>
   ): Promise<NextResponse> => {
     try {
@@ -245,11 +248,11 @@ export const validateRequest = <T>(
           'Request validation failed',
           400,
           ERROR_CODES.VALIDATION_ERROR,
-          { errors: result.error.errors }
+          { errors: (result.error as any).errors }
         );
       }
 
-      return await handler(result.data);
+      return await handler(result.data!);
     } catch (error) {
       console.error('Validation middleware error:', error);
       return jsonError('Request processing failed', 400, ERROR_CODES.BAD_REQUEST);
@@ -275,7 +278,10 @@ export const logRequest = (
     const method = request.method;
     const url = request.nextUrl.pathname;
     const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'Unknown';
+    const ip = request.headers.get('x-forwarded-for') ||
+                request.headers.get('x-real-ip') ||
+                request.headers.get('x-client-ip') ||
+                'Unknown';
 
     console[level](`[${method}] ${url} - IP: ${ip} - User-Agent: ${userAgent}`);
 

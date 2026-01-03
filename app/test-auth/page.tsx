@@ -23,7 +23,7 @@ export default function TestAuthPage() {
       const data = await response.json();
       setResult({ action: 'signup', ...data });
     } catch (error) {
-      setResult({ action: 'signup', error: error.message });
+      setResult({ action: 'signup', error: error instanceof Error ? error.message : String(error) });
     }
     setLoading(false);
   };
@@ -42,7 +42,7 @@ export default function TestAuthPage() {
       const data = await response.json();
       setResult({ action: 'signin', ...data });
     } catch (error) {
-      setResult({ action: 'signin', error: error.message });
+      setResult({ action: 'signin', error: error instanceof Error ? error.message : String(error) });
     }
     setLoading(false);
   };
@@ -54,7 +54,7 @@ export default function TestAuthPage() {
       const data = await response.json();
       setResult({ action: 'user', ...data });
     } catch (error) {
-      setResult({ action: 'user', error: error.message });
+      setResult({ action: 'user', error: error instanceof Error ? error.message : String(error) });
     }
     setLoading(false);
   };

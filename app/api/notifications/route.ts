@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import {
@@ -48,7 +49,7 @@ const notificationQuerySchema = z.object({
 export async function GET(request: Request) {
   return requireAuth(request, async (userId) => {
     try {
-      const supabase = createServerClient();
+      const supabase = await createServerClient();
       const url = new URL(request.url);
       const query = notificationQuerySchema.parse({
         type: url.searchParams.get('type') || undefined,
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
   return requireAuth(request, async (userId) => {
     return validateRequest(notificationSchema)(request, async (validatedData) => {
       try {
-        const supabase = createServerClient();
+        const supabase = await createServerClient();
         const payload = {
           ...validatedData,
           id: validatedData.id ?? crypto.randomUUID(),

@@ -31,7 +31,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const body = await request.json().catch(() => null);
   const parsed = deadlineSchema.safeParse(body);
 

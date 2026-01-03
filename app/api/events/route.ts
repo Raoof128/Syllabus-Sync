@@ -18,7 +18,7 @@ const eventSchema = z.object({
 });
 
 export async function GET() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const { data, error } = await supabase
     .from('events')
     .select('*')
@@ -32,7 +32,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
   const body = await request.json().catch(() => null);
   const parsed = eventSchema.safeParse(body);
 

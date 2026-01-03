@@ -3,7 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError } from '@/app/api/_lib/response';
 
 export async function PUT() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { data, error } = await supabase
     .from('notifications')

@@ -24,7 +24,7 @@ export default function LoginClient() {
   const supabase = createBrowserClient();
 
   // Add debug logging
-  console.log('🔍 LoginClient rendered, supabase client:', !!supabase);
+  console.debug('🔍 LoginClient rendered, supabase client:', !!supabase);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -102,7 +102,7 @@ export default function LoginClient() {
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="error">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -151,8 +151,8 @@ export default function LoginClient() {
             </div>
           </div>
 
-          <Button
-            variant="outline"
+            <Button
+              variant="secondary"
             onClick={handleGoogleLogin}
             disabled={isLoading}
             className="w-full"
