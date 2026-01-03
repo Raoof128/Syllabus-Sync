@@ -178,7 +178,47 @@ export const useUnitsStore = create<UnitsState>()(
 {
   name: 'units-storage',
   storage: createJSONStorage(() => localStorage),
-  version: 1,
+  version: 2,
+  migrate: (persistedState: any, version: number) => {
+    if (version < 2) {
+      // Migration from version 1 to 2: Convert old string IDs to UUIDs
+      if (persistedState?.state?.units && Array.isArray(persistedState.state.units)) {
+        const idMap: Record<string, string> = {
+          'unit-comp2310': '550e8400-e29b-41d4-a716-446655440100',
+          'unit-math1001': '550e8400-e29b-41d4-a716-446655440200',
+          'unit-hist2002': '550e8400-e29b-41d4-a716-446655440300',
+        };
+
+        persistedState.state.units = persistedState.state.units.map((unit: any) => {
+          if (unit.id && idMap[unit.id]) {
+            // Also update schedule IDs
+            const updatedUnit = { ...unit, id: idMap[unit.id] };
+            if (updatedUnit.schedule && Array.isArray(updatedUnit.schedule)) {
+              updatedUnit.schedule = updatedUnit.schedule.map((schedule: any) => {
+                if (schedule.id) {
+                  // Convert schedule IDs to UUIDs
+                  const scheduleIdMap: Record<string, string> = {
+                    'comp2310-lecture': '550e8400-e29b-41d4-a716-446655440101',
+                    'comp2310-tutorial': '550e8400-e29b-41d4-a716-446655440102',
+                    'math1001-lecture': '550e8400-e29b-41d4-a716-446655440201',
+                    'math1001-workshop': '550e8400-e29b-41d4-a716-446655440202',
+                    'hist2002-lecture': '550e8400-e29b-41d4-a716-446655440301',
+                  };
+                  if (scheduleIdMap[schedule.id]) {
+                    return { ...schedule, id: scheduleIdMap[schedule.id] };
+                  }
+                }
+                return schedule;
+              });
+            }
+            return updatedUnit;
+          }
+          return unit;
+        });
+      }
+    }
+    return persistedState;
+  },
 },
 ),
 );

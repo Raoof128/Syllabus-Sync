@@ -10,7 +10,7 @@ const getDate = (hoursAgo: number): Date => {
 
 export const sampleNotifications: Notification[] = [
   {
-    id: 'notif-1',
+    id: '550e8400-e29b-41d4-a716-446655440010',
     title: 'Welcome to Syllabus Sync!',
     message: 'Get started by adding your units and deadlines to stay organized this semester.',
     type: 'system',
@@ -19,7 +19,7 @@ export const sampleNotifications: Notification[] = [
     link: '/home',
   },
   {
-    id: 'notif-2',
+    id: '550e8400-e29b-41d4-a716-446655440011',
     title: 'Career Fair Tomorrow',
     message: 'Don\'t miss the Career Fair 2026 at Campus Hub. Meet top employers!',
     type: 'event',
@@ -28,7 +28,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-3',
+    id: '550e8400-e29b-41d4-a716-446655440012',
     title: 'Free Pizza Today!',
     message: 'Free Pizza Friday is happening now at the Library Courtyard.',
     type: 'event',
@@ -37,7 +37,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-4',
+    id: '550e8400-e29b-41d4-a716-446655440013',
     title: 'Upcoming Class Reminder',
     message: 'Your next class starts in 30 minutes at C5C Room 204.',
     type: 'class',
@@ -46,7 +46,7 @@ export const sampleNotifications: Notification[] = [
     link: '/home',
   },
   {
-    id: 'notif-5',
+    id: '550e8400-e29b-41d4-a716-446655440014',
     title: 'Assignment Due Soon',
     message: 'Reminder: Your assignment is due in 2 days. Don\'t forget to submit!',
     type: 'deadline',

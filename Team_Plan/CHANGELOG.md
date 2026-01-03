@@ -173,6 +173,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Type Safety**: Generated authoritative TypeScript types from Supabase to prevent future schema drift
 - **Migration Safety**: Implemented idempotent migration script (002_clean_align_schema) that handles existing data gracefully
 
+#### Critical UUID Migration Fix ✅
+- **PostgreSQL UUID Validation**: Resolved "invalid input syntax for type uuid" errors in deadline updates by implementing automatic data migration in Zustand stores
+- **Store Migration Functions**: Added version-based migrations in deadlinesStore.ts and unitsStore.ts to convert legacy string IDs to proper UUIDs
+- **Sample Data Updates**: Updated all sample data files (sampleUnits.ts, sampleNotifications.ts) to use proper UUID format instead of descriptive string IDs
+- **Backward Compatibility**: Existing users with old localStorage data automatically get their IDs migrated to UUIDs on next app load
+- **Database Operations**: All API calls now send valid UUIDs that PostgreSQL accepts, eliminating validation errors
+
 ---
 
 ## [0.5.1] - 2026-01-03

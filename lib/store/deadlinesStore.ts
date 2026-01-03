@@ -222,7 +222,27 @@ export const useDeadlinesStore = create<DeadlinesState>()(
 {
   name: 'deadlines-storage',
   storage: createJSONStorage(() => localStorage),
-  version: 1,
+  version: 2,
+  migrate: (persistedState: any, version: number) => {
+    if (version < 2) {
+      // Migration from version 1 to 2: Convert old string IDs to UUIDs
+      if (persistedState?.state?.deadlines && Array.isArray(persistedState.state.deadlines)) {
+        const idMap: Record<string, string> = {
+          'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',
+          'deadline-math1001-quiz-1': '550e8400-e29b-41d4-a716-446655440002',
+          'deadline-hist2002-essay-1': '550e8400-e29b-41d4-a716-446655440003',
+        };
+
+        persistedState.state.deadlines = persistedState.state.deadlines.map((deadline: any) => {
+          if (deadline.id && idMap[deadline.id]) {
+            return { ...deadline, id: idMap[deadline.id] };
+          }
+          return deadline;
+        });
+      }
+    }
+    return persistedState;
+  },
 },
 ),
 );

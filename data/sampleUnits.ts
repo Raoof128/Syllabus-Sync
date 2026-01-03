@@ -11,7 +11,7 @@ const getDate = (daysFromNow: number, hours = 9, minutes = 0): Date => {
 // Use stable IDs to prevent hydration issues
 export const sampleUnits: Unit[] = [
   {
-    id: 'unit-comp2310',
+    id: '550e8400-e29b-41d4-a716-446655440100',
     code: 'COMP2310',
     name: 'Networking',
     color: '#A6192E',
@@ -20,13 +20,13 @@ export const sampleUnits: Unit[] = [
       room: '204',
     },
     schedule: [
-      { id: 'comp2310-lecture', day: 'Monday', startTime: '09:00', endTime: '11:00' },
-      { id: 'comp2310-tutorial', day: 'Wednesday', startTime: '14:00', endTime: '15:00' },
+      { id: '550e8400-e29b-41d4-a716-446655440101', day: 'Monday', startTime: '09:00', endTime: '11:00' },
+      { id: '550e8400-e29b-41d4-a716-446655440102', day: 'Wednesday', startTime: '14:00', endTime: '15:00' },
     ],
     createdAt: getDate(-14),
   },
   {
-    id: 'unit-math1001',
+    id: '550e8400-e29b-41d4-a716-446655440200',
     code: 'MATH1001',
     name: 'Foundations of Mathematics',
     color: '#002A45',
@@ -35,13 +35,13 @@ export const sampleUnits: Unit[] = [
       room: '112',
     },
     schedule: [
-      { id: 'math1001-lecture', day: 'Tuesday', startTime: '10:00', endTime: '12:00' },
-      { id: 'math1001-workshop', day: 'Thursday', startTime: '13:00', endTime: '14:30' },
+      { id: '550e8400-e29b-41d4-a716-446655440201', day: 'Tuesday', startTime: '10:00', endTime: '12:00' },
+      { id: '550e8400-e29b-41d4-a716-446655440202', day: 'Thursday', startTime: '13:00', endTime: '14:30' },
     ],
     createdAt: getDate(-21),
   },
   {
-    id: 'unit-hist2002',
+    id: '550e8400-e29b-41d4-a716-446655440300',
     code: 'HIST2002',
     name: 'Modern Europe: 1789-1914 (Honours Stream A)',
     color: '#FFB81C',
@@ -50,7 +50,7 @@ export const sampleUnits: Unit[] = [
       room: '301',
     },
     schedule: [
-      { id: 'hist2002-lecture', day: 'Friday', startTime: '16:00', endTime: '18:00' },
+      { id: '550e8400-e29b-41d4-a716-446655440301', day: 'Friday', startTime: '16:00', endTime: '18:00' },
     ],
     createdAt: getDate(-30),
   },
@@ -58,7 +58,7 @@ export const sampleUnits: Unit[] = [
 
 export const sampleDeadlines: Deadline[] = [
   {
-    id: 'deadline-comp2310-assignment-1',
+    id: '550e8400-e29b-41d4-a716-446655440001',
     title: 'Assignment 1: Network Fundamentals',
     unitCode: 'COMP2310',
     dueDate: getDate(3, 23, 59),
@@ -68,7 +68,7 @@ export const sampleDeadlines: Deadline[] = [
     createdAt: getDate(-7, 10, 0),
   },
   {
-    id: 'deadline-math1001-quiz-1',
+    id: '550e8400-e29b-41d4-a716-446655440002',
     title: 'Quiz 1: Linear Algebra Basics',
     unitCode: 'MATH1001',
     dueDate: getDate(7, 18, 0),
@@ -78,7 +78,7 @@ export const sampleDeadlines: Deadline[] = [
     createdAt: getDate(-5, 9, 30),
   },
   {
-    id: 'deadline-hist2002-essay-1',
+    id: '550e8400-e29b-41d4-a716-446655440003',
     title: 'Essay 1: Revolution, Reform & Resilience (1200 words)',
     unitCode: 'HIST2002',
     dueDate: getDate(-2, 17, 0),
