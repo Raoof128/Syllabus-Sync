@@ -65,7 +65,7 @@ export default function SettingsPage() {
   }, []); // Run once on mount
 
   // Handle language change with keyboard support
-  const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur' | 'th' | 'vi' | 'ru') => {
     if (newLanguage === language) return; // No change needed
     setLanguage(newLanguage);
 
@@ -80,6 +80,9 @@ export default function SettingsPage() {
       ko: t('korean'),
       ja: t('japanese'),
       ur: t('urdu'),
+      th: t('thai'),
+      vi: t('vietnamese'),
+      ru: t('russian'),
     };
 
     toastUtils.success(
@@ -487,6 +490,54 @@ export default function SettingsPage() {
                     aria-label={`${t('switchToUrdu')}${language === 'ur' ? ` ${t('currentlySelected')}` : ''}`}
                   >
                     {t('urdu')}
+                  </Button>
+                  <Button
+                    variant={language === 'th' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => handleLanguageChange('th')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('th');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'th' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'th'}
+                    aria-label={`${t('switchToThai')}${language === 'th' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('thai')}
+                  </Button>
+                  <Button
+                    variant={language === 'vi' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => handleLanguageChange('vi')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('vi');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'vi' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'vi'}
+                    aria-label={`${t('switchToVietnamese')}${language === 'vi' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('vietnamese')}
+                  </Button>
+                  <Button
+                    variant={language === 'ru' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => handleLanguageChange('ru')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('ru');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ru' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'ru'}
+                    aria-label={`${t('switchToRussian')}${language === 'ru' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('russian')}
                   </Button>
                 </div>
               </div>
