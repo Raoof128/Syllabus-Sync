@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, memo } from 'react';
+import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -42,7 +42,9 @@ const notificationIcons = {
 const Header = memo(() => {
   const { t } = useTranslation();
   const router = useRouter();
-  const supabase = createBrowserClient();
+
+  // Memoize Supabase client to prevent recreation on every render
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   const [user, setUser] = useState<{ email?: string } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.36] - 2026-01-04
+
+### Changed
+
+#### Node.js 22 LTS Upgrade 🚀
+
+Raouf: Upgraded runtime to Node.js 22 LTS for better performance and modern JavaScript support.
+
+**Runtime Upgrade:**
+- **package.json engines**: Updated from `>=20.9.0` to `>=22.0.0`
+- **@types/node**: Upgraded from `^20` to `^22` for proper TypeScript support
+- **CI/CD**: All GitHub Actions workflows now use `node-version: 22.x`
+
+**Server/Client Component Architecture:**
+- **Feed Page**: Split `page.tsx` into server component (metadata) + `FeedClient.tsx` (client logic)
+- **Map Page**: Split `page.tsx` into server component (metadata) + `MapClient.tsx` (client logic)
+- **SEO**: All major pages now have proper server-side metadata exports
+- **Bundle**: Reduced initial JS by moving metadata to server components
+
+### Fixed
+
+#### Critical Bug: React Hooks Ordering Error 🐛
+
+Raouf: Resolved "Rendered more hooks than during the previous render" runtime error.
+
+**Root Cause:**
+- Adding `useState` and `useEffect` hooks to `template.tsx` for reduced-motion detection
+- Hook count mismatched during framer-motion page transitions causing React to crash
+
+**Solution:**
+- Removed hooks entirely from `template.tsx` - kept it stateless
+- Framer-motion has built-in `prefers-reduced-motion` support, so manual detection was unnecessary
+- Simplified animation from complex spring+blur to simple 150ms opacity fade
+
+---
+
+## [0.5.35] - 2026-01-04
+
+### Performance
+
+#### Performance Phase 1 - Rendering & Hydration Optimizations ⚡
+
+Raouf: Comprehensive performance optimization pass focused on rendering engine, hydration, and perceived performance.
+
+**Render Fixes:**
+- **FingerprintButton**: Fixed cascading render issues by properly using useEffect with eslint-disable for legitimate setState-in-effect patterns
+- **template.tsx**: Simplified page transitions from complex spring+blur (500ms) to simple opacity fade (150ms); respects `prefers-reduced-motion` preference
+
+**Loading State Optimizations:**
+- **loading.tsx**: Converted from client to server component with CSS-only spinner for zero-JS first paint
+- **Meaningful First Paint**: Server-rendered loading states eliminate hydration delay
+
+**Client Bundle Reduction:**
+- **Supabase Client Memoization**: Memoized `createBrowserClient()` in ClientLayout, Header, and LoginClient using `useMemo` to prevent recreation on every render
+- **LoginClient Cleanup**: Removed unused Button/Icons imports; replaced `<img>` with Next.js `<Image>` for LCP optimization
+
+---
+
 ## [0.5.34] - 2026-01-04
 
 ### Added

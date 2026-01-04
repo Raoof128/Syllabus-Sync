@@ -1,7 +1,7 @@
 // app/client-layout.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -22,7 +22,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
 
-  const supabase = createBrowserClient();
+  // Memoize Supabase client to prevent recreation on every render
+  const supabase = useMemo(() => createBrowserClient(), []);
+
+  // Use stable selectors to reduce subscription overhead
   const loadUnits = useUnitsStore((state) => state.loadUnits);
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);

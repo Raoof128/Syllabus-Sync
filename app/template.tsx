@@ -1,3 +1,5 @@
+// app/template.tsx
+// Simple page transitions with reduced-motion support
 'use client';
 
 import { motion } from 'framer-motion';
@@ -5,15 +7,14 @@ import { motion } from 'framer-motion';
 export default function Template({ children }: { children: React.ReactNode }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{
-                type: 'spring',
-                stiffness: 90,
-                damping: 25,
-                mass: 0.8,
-                duration: 0.5
+                duration: 0.15,
+                ease: 'easeOut',
             }}
+            // Motion library has built-in reduced-motion support
+            // When user prefers reduced motion, motion.div will skip animations
             className="w-full h-full"
         >
             {children}

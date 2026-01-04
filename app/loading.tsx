@@ -1,16 +1,13 @@
 // app/loading.tsx
-'use client';
-
-import { Loader2 } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+// Server Component - CSS-only skeleton for zero-JS first paint
 
 export default function Loading() {
-  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
       <div className="text-center" role="status" aria-live="polite">
-        <Loader2 className="h-8 w-8 animate-spin text-mq-primary mx-auto mb-4" />
-        <p className="text-mq-content-secondary">{t('loading')}</p>
+        {/* CSS-only spinner - no client JS needed */}
+        <div className="h-8 w-8 mx-auto mb-4 rounded-full border-4 border-mq-border border-t-mq-primary animate-spin" />
+        <p className="text-mq-content-secondary sr-only">Loading...</p>
       </div>
     </div>
   );

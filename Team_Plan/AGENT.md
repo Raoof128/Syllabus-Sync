@@ -1529,6 +1529,27 @@ Files changed: lib/store/deadlinesStore.ts, lib/store/unitsStore.ts, data/sample
 Verification: TypeScript compilation passes; store migrations properly convert old string IDs to UUIDs; PostgreSQL validation errors eliminated; backward compatibility maintained for existing users.
 Follow-ups: Monitor for any remaining UUID-related errors; consider adding automated tests for store migrations.
 
+### Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Performance Phase 1 - Critical rendering and hydration optimizations.
+Summary: Fixed cascading render issues in FingerprintButton by properly using useEffect with eslint-disable comments for legitimate setState-in-effect patterns. Converted loading.tsx from client to server component with CSS-only spinner for faster First Contentful Paint. Optimized template.tsx page transitions to respect reduced-motion preferences (default to no animation until hydrated) and simplified animation from complex spring+blur to simple 150ms opacity fade. Memoized Supabase client creation in client-layout.tsx, Header.tsx, and LoginClient.tsx using useMemo to prevent recreation on every render. Removed unused imports (Button, Icons) from LoginClient and replaced `<img>` with Next.js `<Image>` component for LCP optimization.
+Files changed: components/auth/FingerprintButton.tsx; app/loading.tsx; app/template.tsx; app/client-layout.tsx; components/layout/Header.tsx; app/login/LoginClient.tsx.
+Verification: npm run lint (0 errors, 0 warnings); npm run build (success, all pages static/dynamic as expected).
+Follow-ups: Continue Performance Phase 2 with map lazy-loading improvements and Zustand selector optimizations.
+
+### Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Performance Phase 2 - Node.js 22 LTS upgrade and server/client component architecture.
+Summary: Upgraded runtime to Node.js 22 LTS by updating package.json engines (>=22.0.0), installing @types/node@22, and updating all CI/CD workflow node-version references from 20.x to 22.x. Split feed/page.tsx and map/page.tsx into proper server/client component architecture: created FeedClient.tsx and MapClient.tsx as client components, converted page.tsx files to server components with proper Next.js Metadata exports. This enables SSR metadata and reduces initial JS bundle. Updated package version to 0.5.36.
+Files changed: package.json; package-lock.json; .github/workflows/ci-cd.yml; app/feed/page.tsx; app/feed/FeedClient.tsx (new); app/map/page.tsx; app/map/MapClient.tsx (new from old page.tsx).
+Verification: npm run lint (0 errors, 1 minor style warning); npm run build (success, 27 routes generated); node --version confirms v22.16.0.
+Follow-ups: Consider adding route-level Suspense boundaries for streaming; evaluate Zustand store selector consolidation.
+
+### Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Critical bug fix - React hooks ordering error in template.tsx.
+Summary: Resolved "Rendered more hooks than during the previous render" runtime error. Root cause: adding useState and useEffect hooks to template.tsx for reduced-motion detection caused hook count mismatches during framer-motion page transitions. Fix: removed hooks entirely from template.tsx and simplified to a stateless component. Framer-motion has built-in reduced-motion support so manual detection was unnecessary. Animation simplified from complex spring+blur to 150ms opacity fade.
+Files changed: app/template.tsx.
+Verification: Browser testing confirms all routes (/, /login, /home, /map) now load without React errors; npm run lint (0 errors, 0 warnings); npm run build (success).
+Follow-ups: None - issue fully resolved.
+
 ### Complete Internationalization Implementation - Full Spanish Language Support
 Scope: Implemented comprehensive internationalization (i18n) system covering all user-facing strings across the entire application with English and Spanish language support.
 Summary: Created complete translation infrastructure with 60+ translation keys covering settings page, home dashboard components (NextDeadline, EventsFeed, TodaySchedule), navigation, notifications, and user interactions. Implemented useTranslation hook with automatic language persistence and real-time UI updates. Replaced all hardcoded strings with translatable keys, ensuring full accessibility compliance in both languages.

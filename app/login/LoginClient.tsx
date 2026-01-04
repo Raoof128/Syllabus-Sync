@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/mq/button';
 import { FingerprintButton } from '@/components/auth/FingerprintButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
-import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -24,7 +23,8 @@ export default function LoginClient() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') || '/home';
 
-  const supabase = createBrowserClient();
+  // Memoize Supabase client to prevent recreation on every render
+  const supabase = useMemo(() => createBrowserClient(), []);
 
 
 
@@ -86,10 +86,13 @@ export default function LoginClient() {
           <div className="flex items-center justify-center mb-6">
             <div className="relative w-65 h-65 flex items-center justify-center">
               {/* Use consistent MQ branding logo */}
-              <img
+              <Image
                 src="/MQ_Logo_Final.png"
                 alt="Macquarie University Logo"
+                width={260}
+                height={260}
                 className="object-contain w-full h-full drop-shadow-xl"
+                priority
               />
             </div>
           </div>

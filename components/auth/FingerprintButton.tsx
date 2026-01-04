@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 
@@ -22,15 +22,19 @@ export function FingerprintButton({
 }: FingerprintButtonProps) {
     const [isActive, setIsActive] = useState(false);
     const containerRef = useRef<HTMLButtonElement>(null);
+    const prevLoadingRef = useRef(isLoading);
     const { t } = useTranslation();
 
-    // Reset/Handle loading state
+    // Sync isActive when isLoading transitions from false to true
+    // This is a legitimate use case for setState in effect: syncing with external prop
     useEffect(() => {
-        if (isLoading && !isActive) {
+        /* eslint-disable react-hooks/set-state-in-effect */
+        if (isLoading && !prevLoadingRef.current && !isActive) {
             setIsActive(true);
         }
-        // Note: We don't auto-stop animation on !isLoading to allow 'ok' success animation to finish
-    }, [isLoading]);
+        prevLoadingRef.current = isLoading;
+        /* eslint-enable react-hooks/set-state-in-effect */
+    }, [isLoading, isActive]);
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (disabled || isLoading || isActive) return;
