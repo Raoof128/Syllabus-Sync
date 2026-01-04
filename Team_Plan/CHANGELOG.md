@@ -7,33 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.5.25] - 2026-01-04
+## [0.5.26] - 2026-01-04
 
 ### Fixed
 
-#### Comprehensive Button System Audit & Polish 🔍✨
+#### ESLint Warnings Resolved ✅
 
-Raouf: Conducted full audit of all button implementations across the application
+Raouf: Fixed remaining ESLint warnings to achieve clean lint output
 
-- **Import Inconsistencies Fixed**: Updated 5 components to use MQ Button instead of regular Shadcn Button
-- **MQ Button Variants Enhanced**: Added `destructive` and `outline` variants to MQ Button component
-- **Accessibility Improvements**: Added missing `aria-label` to notification "mark all as read" button
-- **Design System Consistency**: All buttons now follow MQ design system with red highlighting
-- **Component Coverage**: Verified button consistency across Header, Sidebar, Forms, and Error boundaries
+- **Unused ESLint Directive**: Removed unnecessary `eslint-disable` comment from WelcomeHeader.tsx
+- **Image Optimization**: Replaced `<img>` element with Next.js `<Image />` component in Header.tsx
+- **Performance Improvement**: Image component provides automatic optimization and lazy loading
+- **Code Quality**: Achieved 0 errors and 0 warnings in ESLint
 
 ### Technical Details
 
 - **Files Updated**: 
-  - `components/ui/mq/button.tsx` - Added destructive/outline variants
-  - `components/ProfileCard.tsx` - Fixed import
-  - `components/deadlines/DeadlineForm.tsx` - Fixed import
-  - `components/units/UnitForm.tsx` - Fixed import  
-  - `components/ErrorBoundary.tsx` - Fixed import
-  - `app/error.tsx` - Fixed import
-  - `components/layout/Header.tsx` - Added aria-label
-- **Button Variants**: primary, secondary, destructive, outline, ghost
-- **Accessibility**: All buttons have proper labels and focus states
-- **Styling**: Consistent MQ red highlighting across all interactive elements
+  - `components/home/WelcomeHeader.tsx` - Removed unused eslint-disable directive
+  - `components/layout/Header.tsx` - Replaced img with Next.js Image component
+- **Lint Status**: 0 errors, 0 warnings achieved
+- **Performance**: Better LCP (Largest Contentful Paint) with optimized images
 
 ---
 

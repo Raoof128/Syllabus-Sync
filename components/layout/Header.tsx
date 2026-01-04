@@ -285,9 +285,11 @@ const Header = memo(() => {
                   style={{ backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary }}
                 >
                   {currentProfile?.avatar ? (
-                    <img
+                    <Image
                       src={currentProfile.avatar}
                       alt={currentProfile.name}
+                      width={32}
+                      height={32}
                       className="w-full h-full object-cover"
                     />
                   ) : currentProfile ? (

@@ -139,7 +139,6 @@ export function WelcomeHeader({ name, fallbackName, className = '' }: WelcomeHea
         } else {
             // Select a random general message
             const randomIndex = Math.floor(Math.random() * generalKeys.length);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setMessageKey(generalKeys[randomIndex]);
         }
     }, []); // Empty deps = run once on mount

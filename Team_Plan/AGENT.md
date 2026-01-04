@@ -1821,11 +1821,11 @@ Logs: Updated CHANGELOG.md and TEAM_ROADMAP.md with latest milestones.
 Follow-ups: None.
 
 Raouf: 2026-01-04 (Australia/Sydney)
-Scope: Comprehensive Button System Audit & Polish.
-Summary: Conducted full audit of all button implementations, fixed import inconsistencies (5 components updated to use MQ Button), enhanced MQ Button with destructive/outline variants, improved accessibility with missing aria-label, ensured design system consistency with MQ red highlighting across all buttons.
-Files changed: components/ui/mq/button.tsx, components/ProfileCard.tsx, components/deadlines/DeadlineForm.tsx, components/units/UnitForm.tsx, components/ErrorBoundary.tsx, app/error.tsx, components/layout/Header.tsx.
-Verification: npm run dev (successful server start); all buttons now have consistent MQ styling, red highlighting, and proper accessibility.
-Follow-ups: Monitor button behavior across different screen sizes and ensure no regressions in form submissions.
+Scope: ESLint Warnings Resolved.
+Summary: Fixed remaining ESLint warnings by removing unused eslint-disable directive and replacing img element with Next.js Image component, achieving clean 0 errors, 0 warnings lint status.
+Files changed: components/home/WelcomeHeader.tsx, components/layout/Header.tsx.
+Verification: npm run lint (Lint OK, 0 errors, 0 warnings); improved performance with optimized image loading.
+Follow-ups: Maintain clean lint status and monitor for any new warnings during development.
 
 Raouf: 2026-01-04 (Australia/Sydney)
 Scope: Premium Polish & Smooth Transitions for All Interactive Elements.
