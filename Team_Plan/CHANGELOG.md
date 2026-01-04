@@ -54,6 +54,22 @@ Raouf: Added real-time clock and date display in the header using client/server 
 - **Typography**: Uses `tabular-nums` for stable digit width during updates
 - **Performance**: Zero hydration errors, minimal JS cost, smooth updates
 
+#### Suspense Boundaries with Skeleton Loaders ⚡
+
+Raouf: Added progressive streaming with Suspense boundaries and CSS skeleton loaders.
+
+**Pages Enhanced:**
+- **Home** (`/home`): Full dashboard skeleton with header, widgets, content grid
+- **Calendar** (`/calendar`): Header + deadline list skeleton
+- **Feed** (`/feed`): Filter tabs + event cards skeleton
+- **Map** (`/map`): Fixed-dimension map placeholder (~500px) + building grid
+
+**Benefits:**
+- Meaningful first paint before JavaScript hydrates
+- Fixed dimensions prevent CLS during map load
+- CSS-only animations (zero additional JS)
+- Streaming-ready server component pattern
+
 ---
 
 ## [0.5.35] - 2026-01-04
