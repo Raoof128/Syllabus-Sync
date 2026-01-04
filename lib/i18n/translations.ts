@@ -210,7 +210,7 @@ export const translations = {
     navigateTo: 'Navigate to',
 
     // Unit Components
-    editUnit: 'Edit',
+    editUnit: 'Edit Unit',
     deleteUnit: 'Delete',
     classTimes: 'Class Times',
     colorCodingForCalendar: 'Color coding for calendar',
@@ -3646,7 +3646,7 @@ export const translations = {
     navContact: 'संपर्क',
     applyNow: 'अभी आवेदन करें',
 
-    // Form Components  
+    // Form Components
     failedToSaveUnit: 'विषय सेव करने में विफल। कृपया पुनः प्रयास करें।',
     campusFeedDesc: '{{uniName}} में कैंपस इवेंट, घोषणाओं और अवसरों के साथ अपडेट रहें।',
     stayConnected: 'जुड़े रहें:',

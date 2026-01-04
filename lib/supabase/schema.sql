@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.units (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 
   -- Constraints
-  CONSTRAINT units_code_format CHECK (code ~ '^[A-Z]{3}\d{3}$'),
+  CONSTRAINT units_code_format CHECK (code ~ '^[A-Z]{3,4}\d{3,4}$'),
   CONSTRAINT units_color_format CHECK (color ~ '^#[0-9A-Fa-f]{6}$')
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS public.deadlines (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  unit_code TEXT NOT NULL REFERENCES public.units(code) ON DELETE CASCADE,
+  unit_code TEXT NOT NULL,
   due_date TIMESTAMPTZ NOT NULL,
   priority TEXT NOT NULL DEFAULT 'Medium',
   type TEXT NOT NULL DEFAULT 'Assignment',
@@ -80,8 +80,9 @@ CREATE TABLE IF NOT EXISTS public.deadlines (
 
   -- Constraints
   CONSTRAINT deadlines_priority_enum CHECK (priority IN ('Low', 'Medium', 'High', 'Urgent')),
-  CONSTRAINT deadlines_type_enum CHECK (type IN ('Assignment', 'Exam', 'Quiz', 'Presentation')),
-  CONSTRAINT deadlines_future_date CHECK (due_date > NOW())
+  CONSTRAINT deadlines_type_enum CHECK (type IN ('Assignment', 'Exam', 'Quiz', 'Presentation'))
+  -- Note: Foreign key to units(code) is intentionally omitted for flexibility
+  -- Note: Future date constraint removed to allow updating past deadlines
 );
 
 -- ============================================================================
@@ -111,8 +112,8 @@ CREATE TABLE IF NOT EXISTS public.events (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  date DATE NOT NULL,
-  time TEXT NOT NULL,
+  event_date DATE NOT NULL,
+  event_time TEXT NOT NULL,
   location TEXT NOT NULL,
   building TEXT, -- Optional building reference
   category TEXT NOT NULL DEFAULT 'Academic',
@@ -122,7 +123,8 @@ CREATE TABLE IF NOT EXISTS public.events (
 
   -- Constraints
   CONSTRAINT events_category_enum CHECK (category IN ('Career', 'Social', 'Academic', 'Free Food')),
-  CONSTRAINT events_time_format CHECK (time ~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]$')
+  -- Accept both 24h format (HH:MM) and 12h format (H:MM AM/PM)
+  CONSTRAINT events_time_format CHECK (event_time ~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]$|^(1[0-2]|0?[1-9]):[0-5][0-9] [AP]M$')
 );
 
 -- ============================================================================
@@ -166,7 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_read ON public.notifications(read);
 CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON public.notifications(created_at);
 
 -- Events indexes
-CREATE INDEX IF NOT EXISTS idx_events_date ON public.events(date);
+CREATE INDEX IF NOT EXISTS idx_events_date ON public.events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_category ON public.events(category);
 CREATE INDEX IF NOT EXISTS idx_events_building ON public.events(building);
 

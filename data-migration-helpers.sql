@@ -85,9 +85,9 @@ WHERE due_date IS NULL
 -- =============================================================================
 
 -- Step 1: Check current events structure
--- SELECT id, date, time, event_date, event_time FROM public.events LIMIT 3;
+-- SELECT id, event_date, event_time FROM public.events LIMIT 3;
 
--- Step 2: Rename columns (if they haven't been renamed yet)
+-- Step 2: If migrating from old column names (date, time), rename them
 -- ALTER TABLE public.events RENAME COLUMN date TO event_date;
 -- ALTER TABLE public.events RENAME COLUMN time TO event_time;
 -- ALTER TABLE public.events RENAME COLUMN imageUrl TO image_url;

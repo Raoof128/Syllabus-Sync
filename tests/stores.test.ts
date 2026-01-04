@@ -110,7 +110,7 @@ describe('unitsStore', () => {
 
 describe('deadlinesStore', () => {
   const mockDeadline: Deadline = {
-    id: 'test-deadline-1',
+    id: '11111111-1111-1111-1111-111111111111',
     title: 'Assignment 1',
     unitCode: 'COMP2310',
     dueDate: new Date(Date.now() + 86400000 * 2), // 2 days from now
@@ -167,7 +167,7 @@ describe('deadlinesStore', () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { removeDeadline } = useDeadlinesStore.getState();
-    await removeDeadline('test-deadline-1');
+    await removeDeadline('11111111-1111-1111-1111-111111111111');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines).toHaveLength(0);
@@ -177,7 +177,7 @@ describe('deadlinesStore', () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { updateDeadline } = useDeadlinesStore.getState();
-    await updateDeadline('test-deadline-1', { title: 'Updated Title' });
+    await updateDeadline('11111111-1111-1111-1111-111111111111', { title: 'Updated Title' });
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines[0].title).toBe('Updated Title');
@@ -187,16 +187,16 @@ describe('deadlinesStore', () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { toggleComplete } = useDeadlinesStore.getState();
-    await toggleComplete('test-deadline-1');
+    await toggleComplete('11111111-1111-1111-1111-111111111111');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines[0].completed).toBe(true);
   });
 
   it('should get upcoming deadlines sorted by due date', () => {
-    const deadline1 = { ...mockDeadline, id: 'd1', dueDate: new Date(Date.now() + 86400000 * 5) };
-    const deadline2 = { ...mockDeadline, id: 'd2', dueDate: new Date(Date.now() + 86400000) };
-    const deadline3 = { ...mockDeadline, id: 'd3', dueDate: new Date(Date.now() + 86400000 * 3), completed: true };
+    const deadline1 = { ...mockDeadline, id: '22222222-2222-2222-2222-222222222222', dueDate: new Date(Date.now() + 86400000 * 5) };
+    const deadline2 = { ...mockDeadline, id: '33333333-3333-3333-3333-333333333333', dueDate: new Date(Date.now() + 86400000) };
+    const deadline3 = { ...mockDeadline, id: '44444444-4444-4444-4444-444444444444', dueDate: new Date(Date.now() + 86400000 * 3), completed: true };
 
     useDeadlinesStore.setState({ deadlines: [deadline1, deadline2, deadline3] });
 
@@ -204,8 +204,8 @@ describe('deadlinesStore', () => {
     const upcoming = getUpcoming(3);
 
     expect(upcoming).toHaveLength(2); // Excludes completed
-    expect(upcoming[0].id).toBe('d2'); // Closest due date first
-    expect(upcoming[1].id).toBe('d1');
+    expect(upcoming[0].id).toBe('33333333-3333-3333-3333-333333333333'); // Closest due date first
+    expect(upcoming[1].id).toBe('22222222-2222-2222-2222-222222222222');
   });
 
   it('should calculate stress level correctly', () => {
@@ -216,10 +216,10 @@ describe('deadlinesStore', () => {
 
     // High stress - multiple urgent deadlines soon
     const urgentDeadlines = [
-      { ...mockDeadline, id: 'd1', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
-      { ...mockDeadline, id: 'd2', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
-      { ...mockDeadline, id: 'd3', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
-      { ...mockDeadline, id: 'd4', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
+      { ...mockDeadline, id: '55555555-5555-5555-5555-555555555555', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
+      { ...mockDeadline, id: '66666666-6666-6666-6666-666666666666', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
+      { ...mockDeadline, id: '77777777-7777-7777-7777-777777777777', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
+      { ...mockDeadline, id: '88888888-8888-8888-8888-888888888888', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
     ];
     useDeadlinesStore.setState({ deadlines: urgentDeadlines });
     ({ getStressLevel } = useDeadlinesStore.getState());
