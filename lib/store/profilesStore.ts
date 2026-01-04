@@ -40,20 +40,22 @@ export const useProfilesStore = create<ProfilesState>()(
     (set, get) => ({
       profiles: [],
       currentProfileId: null,
-      
+
       addProfile: (profileData) => {
         const newProfile: UserProfile = {
           ...profileData,
           id: crypto.randomUUID(),
           createdAt: new Date(),
         };
-        
+
         set((state) => ({
           ...state,
           profiles: [...state.profiles, newProfile],
+          // Automatically set as current profile (always set new profile as current)
+          currentProfileId: newProfile.id,
         }));
       },
-      
+
       updateProfile: (id, updates) => {
         set((state) => ({
           ...state,
@@ -62,13 +64,13 @@ export const useProfilesStore = create<ProfilesState>()(
           ),
         }));
       },
-      
+
       deleteProfile: (id) => {
         set((state) => {
           const newProfiles = state.profiles.filter((profile) => profile.id !== id);
-          const newCurrentProfileId = 
+          const newCurrentProfileId =
             state.currentProfileId === id ? null : state.currentProfileId;
-          
+
           return {
             ...state,
             profiles: newProfiles,
@@ -76,29 +78,29 @@ export const useProfilesStore = create<ProfilesState>()(
           };
         });
       },
-      
+
       setCurrentProfile: (id) => {
         set((state) => ({
           ...state,
           currentProfileId: id,
         }));
       },
-      
+
       getCurrentProfile: () => {
         const { profiles, currentProfileId } = get();
-        return currentProfileId 
+        return currentProfileId
           ? profiles.find((profile) => profile.id === currentProfileId) || null
           : null;
       },
-      
+
       updateCurrentProfile: (updates) => {
         const { currentProfileId } = get();
         if (!currentProfileId) return;
-        
+
         set((state) => ({
           ...state,
           profiles: state.profiles.map((profile) =>
-            profile.id === currentProfileId 
+            profile.id === currentProfileId
               ? { ...profile, ...updates, lastLogin: new Date() }
               : profile
           ),

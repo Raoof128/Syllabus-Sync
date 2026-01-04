@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
+import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
 import dynamic from 'next/dynamic';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -35,6 +36,7 @@ const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm')
 });
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, TrendingUp } from 'lucide-react'; // Clock removed
@@ -72,7 +74,19 @@ export default function HomeClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
+  const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
+  const profiles = useProfilesStore((state) => state.profiles);
+  const currentProfileId = useProfilesStore((state) => state.currentProfileId);
+  const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
+  const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
+
+  // Auto-select first profile if profiles exist but none is selected (migration for existing users)
+  useEffect(() => {
+    if (hasHydrated && profiles.length > 0 && !currentProfileId) {
+      setCurrentProfile(profiles[0].id);
+    }
+  }, [hasHydrated, profiles, currentProfileId, setCurrentProfile]);
 
   const [seedDisabled] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -405,12 +419,7 @@ export default function HomeClient() {
       {/* Header */}
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-              {t('welcome')}, {DEMO_USER.name}!
-            </h1>
-            <p className="text-mq-content-secondary">{t('dayAtGlance')}</p>
-          </div>
+          <WelcomeHeader name={currentProfile?.name} fallbackName={DEMO_USER.name} />
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Stress Level Indicator */}
             {hasHydrated && deadlines.length > 0 && (

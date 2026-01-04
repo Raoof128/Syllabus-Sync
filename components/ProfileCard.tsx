@@ -42,14 +42,14 @@ const ProfileCard = React.memo(
         className={cn(
           'relative transition-all duration-300',
           isCurrent
-            ? 'ring-2 ring-blue-500 bg-blue-50 shadow-lg'
-            : 'hover:shadow-lg hover:-translate-y-1',
+            ? 'ring-2 ring-mq-primary bg-mq-primary/5 shadow-mq-lg'
+            : 'hover:shadow-mq-lg hover:-translate-y-1 hover:bg-mq-background-secondary',
         )}
       >
         <CardHeader className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-mq-charcoal-900 flex items-center justify-center text-white font-bold text-mq-large">
+              <div className="w-16 h-16 rounded-full bg-mq-primary flex items-center justify-center text-white font-bold text-mq-large">
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
@@ -61,7 +61,7 @@ const ProfileCard = React.memo(
                 )}
               </div>
               {isCurrent && (
-                <Badge className="absolute -top-1 -right-1 bg-green-500 text-white text-xs">
+                <Badge className="absolute -top-1 -right-1 bg-mq-success text-white text-xs">
                   {t('current')}
                 </Badge>
               )}
@@ -86,7 +86,7 @@ const ProfileCard = React.memo(
                 variant="ghost"
                 size="sm"
                 onClick={() => onEdit(profile)}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-primary"
                 aria-label={t('editProfileAria', { name: profile.name })}
               >
                 <Edit className="w-4 h-4" />
@@ -96,7 +96,7 @@ const ProfileCard = React.memo(
               variant="ghost"
               size="sm"
               onClick={() => onSetCurrent(profile.id)}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-success"
               aria-label={t('useProfileAria', { name: profile.name })}
             >
               <Check className="w-4 h-4" />
@@ -106,7 +106,7 @@ const ProfileCard = React.memo(
                 variant="ghost"
                 size="sm"
                 onClick={() => setDeleteConfirm(true)}
-                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                className="h-8 w-8 p-0 text-mq-error hover:text-mq-error/80"
                 aria-label={t('deleteProfileAria', { name: profile.name })}
               >
                 <Trash2 className="w-4 h-4" />
@@ -125,7 +125,7 @@ const ProfileCard = React.memo(
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.notifications ? 'bg-green-500' : 'bg-mq-background-tertiary',
+                  profile.preferences.notifications ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
@@ -137,7 +137,7 @@ const ProfileCard = React.memo(
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.emailReminders ? 'bg-green-500' : 'bg-mq-background-tertiary',
+                  profile.preferences.emailReminders ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
@@ -149,30 +149,31 @@ const ProfileCard = React.memo(
               <div
                 className={cn(
                   'w-10 h-5 rounded-full transition-colors',
-                  profile.preferences.pushNotifications ? 'bg-green-500' : 'bg-mq-background-tertiary',
+                  profile.preferences.pushNotifications ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
               />
             </div>
           </div>
         </CardContent>
 
-        <label className="flex items-center gap-2 px-3 py-2 border border-mq-border rounded-lg hover:bg-mq-hover-background cursor-pointer text-sm">
+        <label className="flex items-center gap-2 px-3 py-2 border border-mq-border rounded-mq hover:bg-mq-hover-background cursor-pointer text-sm text-mq-content-secondary transition-colors m-4 mt-0">
           <Camera className="h-4 w-4" />
           <span>{t('changeAvatar')}</span>
           <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
         </label>
 
         {deleteConfirm && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-900 mb-3">
+          <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
+            <p className="text-sm text-mq-error mb-3 font-medium">
               {t('deleteProfileConfirm')}
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setDeleteConfirm(false)}>
+              <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(false)}>
                 {t('cancel')}
               </Button>
               <Button
                 variant="destructive"
+                size="sm"
                 onClick={() => {
                   onDelete(profile.id);
                   setDeleteConfirm(false);

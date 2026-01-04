@@ -15,7 +15,7 @@ export const useLanguageStore = create<LanguageState>()(
             isRTL: false,
             setLanguage: (language) => set({
                 language,
-                isRTL: language === 'fa'
+                isRTL: language === 'fa' || language === 'ar' || language === 'ur'
             }),
         }),
         {

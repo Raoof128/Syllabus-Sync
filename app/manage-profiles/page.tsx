@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Plus, Users, Check } from 'lucide-react';
+import { User, Plus, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import { Button } from '@/components/ui/mq/button';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -43,7 +43,7 @@ export default function ManageProfilesPage() {
     setCurrentProfile,
   } = useProfilesStore();
 
-  const currentProfile = profiles.find((profile) => profile.id === currentProfileId);
+
 
   const handleAddProfile = () => {
     if (formData.name && formData.email && formData.studentId) {
@@ -111,112 +111,58 @@ export default function ManageProfilesPage() {
   };
 
   return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <header className="mb-8">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-            {t('manageProfiles')}
-          </h1>
-          <p className="text-mq-content">{t('manageProfilesDesc')}</p>
-        </header>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <header className="mb-8">
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
+          {t('manageProfiles')}
+        </h1>
+        <p className="text-mq-content">{t('manageProfilesDesc')}</p>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <h2 className="flex items-center justify-between text-lg font-semibold">
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" aria-hidden="true" />
-                  {t('allProfiles', { count: profiles.length })}
-                </div>
-              </h2>
-            </CardHeader>
-            <CardContent>
-              {profiles.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                    {t('noProfilesYet')}
-                  </h3>
-                  <p className="text-mq-content-secondary mb-4">
-                    {t('createFirstProfile')}
-                  </p>
-                  <Button onClick={() => setShowAddDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('createProfile')}
-                  </Button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {profiles.map((profile) => (
-                    <ProfileCard
-                      key={profile.id}
-                      profile={profile}
-                      isCurrent={profile.id === currentProfileId}
-                      onEdit={handleEditProfile}
-                      onDelete={handleDeleteProfile}
-                      onSetCurrent={handleSetCurrentProfile}
-                    />
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <Check className="h-5 w-5" aria-hidden="true" />
-              {t('currentProfile')}
-            </h2>
-          </CardHeader>
-          <CardContent>
-            {currentProfile ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-mq-card-background flex items-center justify-center text-mq-content font-bold text-mq-xl">
-                    {currentProfile.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h2 className="text-mq-xl font-bold text-mq-content">{currentProfile.name}</h2>
-                    <p className="text-mq-content-secondary">{currentProfile.email}</p>
-                    <p className="text-mq-sm text-mq-content-tertiary">
-                      {t('studentId')}: {currentProfile.studentId}
-                    </p>
-                  </div>
-                </div>
-
-                 <div className="grid grid-cols-1 gap-3 text-mq-sm">
-                   <div>
-                     <span className="text-mq-content-tertiary">{t('studentId')}:</span>
-                     <p className="font-medium text-mq-content">{currentProfile.studentId}</p>
-                   </div>
-                   <div>
-                     <span className="text-mq-content-tertiary">{t('memberSince')}</span>
-                     <p className="font-medium text-mq-content">
-                       {new Date(currentProfile.createdAt).toLocaleDateString()}
-                     </p>
-                   </div>
-                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <User className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                  {t('noProfileSelected')}
-                </h3>
-                <p className="text-mq-content-secondary mb-4">
-                  {t('selectProfileDesc')}
-                </p>
-                <Button onClick={() => setShowAddDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('createProfile')}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <Users className="h-5 w-5" aria-hidden="true" />
+            {t('allProfiles', { count: profiles.length })}
+          </h2>
+          {profiles.length > 0 && (
+            <Button size="sm" onClick={() => setShowAddDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              {t('createProfile')}
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {profiles.length === 0 ? (
+            <div className="text-center py-12">
+              <User className="h-16 w-16 text-mq-content-tertiary mx-auto mb-4" />
+              <h3 className="text-mq-xl font-semibold text-mq-content mb-2">
+                {t('noProfilesYet')}
+              </h3>
+              <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
+                {t('createFirstProfile')}
+              </p>
+              <Button onClick={() => setShowAddDialog(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('createProfile')}
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {profiles.map((profile) => (
+                <ProfileCard
+                  key={profile.id}
+                  profile={profile}
+                  isCurrent={profile.id === currentProfileId}
+                  onEdit={handleEditProfile}
+                  onDelete={handleDeleteProfile}
+                  onSetCurrent={handleSetCurrentProfile}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog
         open={showAddDialog}

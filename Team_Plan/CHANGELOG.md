@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.8] - 2026-01-04
+
+### Added
+
+#### Complete Internationalization Translations 🌍
+
+Raouf: Comprehensive translation audit and implementation for all 9 languages
+
+- **Full Chinese (zh) translations**: Added 476+ missing translation keys, covering all sections including settings, forms, navigation, profiles, error messages, events, priorities, and categories
+- **Full Arabic (ar) translations**: Added 476+ missing translation keys with proper RTL support for all UI components
+- **Full Hindi (hi) translations**: Added 476+ missing translation keys for complete Indian language support
+- **Full Korean (ko) translations**: Added 476+ missing translation keys for Korean-speaking students
+- **Full Japanese (ja) translations**: Added 476+ missing translation keys for Japanese-speaking students
+- **Full Spanish (es) translations**: Added 204 missing translation keys to complete Spanish support
+- **Full Persian (fa) translations**: Added 199 missing translation keys to complete Persian/Farsi support with RTL
+- **Full Urdu (ur) translations**: Added 520+ complete translation keys with RTL support for Pakistani and Indian students
+
+### Technical Details
+
+- **Files changed**: `lib/i18n/translations.ts`, `lib/store/languageStore.ts`, `app/settings/page.tsx`
+- **Total keys per language**: ~520-537 keys (matching or exceeding English reference)
+- **Categories covered**: Navigation, Common, Colors, Buildings, Settings, Notifications, Appearance, Privacy, Quick Actions, Help, Languages, Home, Units, Forms, Pages, Profiles, Auth, Map, Feed, Calendar, Layout, Events, Priorities, Types, Categories, Filters, Sample Events, Toast Messages, Days of Week
+- **Verification**: TypeScript compilation passes with no errors
+- **Audit result**: 0 missing keys across all 9 languages
+- **RTL Support**: Arabic (ar), Persian (fa), and Urdu (ur) all have proper RTL detection
+
+### Impact
+
+- All 9 languages now have complete translations: English, Spanish, Persian, Chinese, Arabic, Hindi, Korean, Japanese, Urdu
+- The app is fully internationalized with zero fallback strings needed
+- Users in any language will see complete UI translations in their native language
+
+---
+
+
 ## [0.5.7] - 2026-01-04
 
 ### Fixed
@@ -1542,4 +1577,57 @@ Summary:
   - Build Fix: Resolved TypeScript error in `ScrollReveal.tsx` variants definition causing build failure.
 Files: app/map/CampusMap.tsx; app/settings/page.tsx; components/ui/ScrollReveal.tsx.
 Verification: Verified build success and functionality via code analysis.
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Feature - Dynamic Welcome Header System.
+Summary:
+  - Created `WelcomeHeader` component with:
+    - Dynamic name handling (first name extraction with fallback).
+    - 5 themed message pools (~50 messages): Core, Student Life, Campus, Academic, Time-of-Day.
+    - Professional Australian English tone, no emojis, judge-safe.
+    - Message selected ONCE on mount (no re-rolling on state changes).
+    - Time-aware messages (morning/afternoon/evening/night) with 30% probability.
+    - Comprehensive documentation with optional extension patterns (exam week, faculty-specific, daily rotation, fun mode).
+  - Integrated into `HomeClient.tsx` replacing static welcome text.
+  - All messages are Macquarie-specific: campus walking jokes, building references, library humour.
+Files: components/home/WelcomeHeader.tsx (new); app/home/HomeClient.tsx.
+Verification: npm run build (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Feature - New Languages & WelcomeHeader Fix.
+Summary:
+  - Added 5 new languages: Chinese (zh), Arabic (ar), Hindi (hi), Korean (ko), Japanese (ja).
+  - Total language support: 8 languages (en, es, fa, zh, ar, hi, ko, ja).
+  - Each new language includes ~35 core translations (Navigation, Common, Home Page, Settings, Toast Messages).
+  - Settings page updated with 5 new language selector buttons.
+  - RTL support extended to Arabic (in addition to Persian).
+  - Fixed WelcomeHeader name fallback: now correctly uses `fallbackName` prop when `currentProfile?.name` is null.
+  - Updated `handleLanguageChange` to use a clean language map instead of nested ternaries.
+Files: lib/i18n/translations.ts; app/settings/page.tsx; lib/store/languageStore.ts; components/home/WelcomeHeader.tsx; app/home/HomeClient.tsx.
+Verification: npm run build (pass).
+Follow-ups: Could add more translations for each language progressively.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: UI - Merge Profile Sections.
+Summary:
+  - Merged "All Profiles" and "Current Profile" sections into a single unified card.
+  - Removed redundant "Current Profile" sidebar (ProfileCard already indicates the current profile via styling).
+  - Added "Create Profile" button to card header when profiles exist.
+  - Improved empty state with larger icon and better spacing.
+  - Changed grid from 2-columns to 3-columns (lg) for better profile card layout.
+  - Removed unused imports (Check icon) and variables (currentProfile).
+Files: app/manage-profiles/page.tsx.
+Verification: npm run build (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Auto-select Current Profile.
+Summary:
+  - Fixed: New profiles are now automatically set as the current profile when created.
+  - Fixed: Added migration logic for existing users - if profiles exist but none is selected, the first profile is auto-selected on Home page load.
+  - Root cause: `addProfile` in profilesStore wasn't setting `currentProfileId`, so created profiles weren't active.
+Files: lib/store/profilesStore.ts; app/home/HomeClient.tsx.
+Verification: npm run build (pass).
 Follow-ups: None.

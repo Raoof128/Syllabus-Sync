@@ -24,7 +24,7 @@ export function ScrollReveal({
 }: ScrollRevealProps) {
     // Using the easing curve from mq-tokens.css (--t-ease-slow)
     // cubic-bezier(0.5, 0.5, 0, 1)
-    const ease = [0.5, 0.5, 0, 1];
+    const ease = [0.5, 0.5, 0, 1] as const;
 
     const variants = {
         hidden: {

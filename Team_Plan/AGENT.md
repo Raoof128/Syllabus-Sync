@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.5 | Last Updated: January 03, 2026
+Version: 0.5.8 | Last Updated: January 04, 2026
 
 ---
 
@@ -34,7 +34,7 @@ Version: 0.5.5 | Last Updated: January 03, 2026
 ### Demo Target
 Macquarie University Administration - February 2025
 
-### Current Features (v0.5.2)
+### Current Features (v0.5.8)
 
 #### ✅ Phase 1 Complete: Code Quality & Error Handling
 - **Enterprise Code Quality**: 0 ESLint errors/warnings, full TypeScript strictness
@@ -63,13 +63,13 @@ Macquarie University Administration - February 2025
 - **Database Integration Ready**: Transactional operations, data mapping, and Supabase compatibility with error recovery mechanisms
 - **Testing & Quality Assurance**: Automated API testing suite with comprehensive endpoint coverage and response validation
 
-#### ✅ Complete Internationalization (i18n) System (v0.5.3)
-- **Multi-Language Support**: Comprehensive internationalization with English, Spanish, and Persian/Farsi language support
-- **200+ Translation Keys**: Complete coverage of all user-facing strings across calendar, home dashboard, forms, navigation, and error messages
+#### ✅ Complete Internationalization System (v0.5.8) 🌍
+- **9 Languages Fully Supported**: English (en), Spanish (es), Persian/Farsi (fa), Chinese Simplified (zh), Arabic (ar), Hindi (hi), Korean (ko), Japanese (ja), Urdu (ur)
+- **520+ Translation Keys Per Language**: Complete coverage of all user-facing strings across the entire application
+- **RTL Language Support**: Full right-to-left support for Arabic, Persian, and Urdu with automatic text direction detection
 - **Professional Translations**: Native speaker-quality translations with proper academic terminology and cultural adaptation
-- **RTL Language Support**: Right-to-left text direction support for Persian language with automatic detection
-- **Type-Safe Implementation**: Full TypeScript compliance with translation key validation and zero runtime errors
-- **Zero Hardcoded Strings**: Complete elimination of user-facing hardcoded text - every string is now translatable
+- **Categories Covered**: Navigation, Common, Colors, Buildings, Settings, Notifications, Appearance, Privacy, Quick Actions, Help, Languages, Home, Units, Forms, Pages, Profiles, Auth, Map, Feed, Calendar, Layout, Events, Priorities, Types, Categories, Filters, Sample Events, Toast Messages
+- **Zero Fallback Strings**: All languages have complete translations matching the English reference
 
 #### ✅ Critical Bug Fixes & Runtime Stability (v0.5.4)
 - **Translation Syntax Error**: Fixed ECMAScript parsing error in translations.ts where Persian section was incorrectly placed outside main translations object
@@ -1862,4 +1862,57 @@ Summary:
   - Build Fix: Resolved TypeScript error in `ScrollReveal.tsx` variants definition causing build failure.
 Files: app/map/CampusMap.tsx; app/settings/page.tsx; components/ui/ScrollReveal.tsx.
 Verification: Verified build success and functionality via code analysis.
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Feature - Dynamic Welcome Header System.
+Summary:
+  - Created `WelcomeHeader` component with:
+    - Dynamic name handling (first name extraction with fallback).
+    - 5 themed message pools (~50 messages): Core, Student Life, Campus, Academic, Time-of-Day.
+    - Professional Australian English tone, no emojis, judge-safe.
+    - Message selected ONCE on mount (no re-rolling on state changes).
+    - Time-aware messages (morning/afternoon/evening/night) with 30% probability.
+    - Comprehensive documentation with optional extension patterns (exam week, faculty-specific, daily rotation, fun mode).
+  - Integrated into `HomeClient.tsx` replacing static welcome text.
+  - All messages are Macquarie-specific: campus walking jokes, building references, library humour.
+Files: components/home/WelcomeHeader.tsx (new); app/home/HomeClient.tsx.
+Verification: npm run build (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Feature - New Languages & WelcomeHeader Fix.
+Summary:
+  - Added 5 new languages: Chinese (zh), Arabic (ar), Hindi (hi), Korean (ko), Japanese (ja).
+  - Total language support: 8 languages (en, es, fa, zh, ar, hi, ko, ja).
+  - Each new language includes ~35 core translations (Navigation, Common, Home Page, Settings, Toast Messages).
+  - Settings page updated with 5 new language selector buttons.
+  - RTL support extended to Arabic (in addition to Persian).
+  - Fixed WelcomeHeader name fallback: now correctly uses `fallbackName` prop when `currentProfile?.name` is null.
+  - Updated `handleLanguageChange` to use a clean language map instead of nested ternaries.
+Files: lib/i18n/translations.ts; app/settings/page.tsx; lib/store/languageStore.ts; components/home/WelcomeHeader.tsx; app/home/HomeClient.tsx.
+Verification: npm run build (pass).
+Follow-ups: Could add more translations for each language progressively.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: UI - Merge Profile Sections.
+Summary:
+  - Merged "All Profiles" and "Current Profile" sections into a single unified card.
+  - Removed redundant "Current Profile" sidebar (ProfileCard already indicates the current profile via styling).
+  - Added "Create Profile" button to card header when profiles exist.
+  - Improved empty state with larger icon and better spacing.
+  - Changed grid from 2-columns to 3-columns (lg) for better profile card layout.
+  - Removed unused imports (Check icon) and variables (currentProfile).
+Files: app/manage-profiles/page.tsx.
+Verification: npm run build (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Auto-select Current Profile.
+Summary:
+  - Fixed: New profiles are now automatically set as the current profile when created.
+  - Fixed: Added migration logic for existing users - if profiles exist but none is selected, the first profile is auto-selected on Home page load.
+  - Root cause: `addProfile` in profilesStore wasn't setting `currentProfileId`, so created profiles weren't active.
+Files: lib/store/profilesStore.ts; app/home/HomeClient.tsx.
+Verification: npm run build (pass).
 Follow-ups: None.

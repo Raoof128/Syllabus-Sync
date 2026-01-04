@@ -45,7 +45,7 @@ export default function SettingsPage() {
   });
 
   // Initialize from LocalStorage
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -65,12 +65,26 @@ export default function SettingsPage() {
   }, []); // Run once on mount
 
   // Handle language change with keyboard support
-  const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa') => {
+  const handleLanguageChange = (newLanguage: 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur') => {
     if (newLanguage === language) return; // No change needed
     setLanguage(newLanguage);
+
+    // Map language codes to translation keys
+    const languageNames: Record<string, string> = {
+      en: t('english'),
+      es: t('spanish'),
+      fa: t('persian'),
+      zh: t('chinese'),
+      ar: t('arabic'),
+      hi: t('hindi'),
+      ko: t('korean'),
+      ja: t('japanese'),
+      ur: t('urdu'),
+    };
+
     toastUtils.success(
       t('languageUpdated'),
-      `${t('languageUpdatedMsg')} ${newLanguage === 'en' ? t('english') : newLanguage === 'es' ? t('spanish') : t('persian')}`
+      `${t('languageUpdatedMsg')} ${languageNames[newLanguage] || newLanguage}`
     );
   };
 
@@ -377,6 +391,102 @@ export default function SettingsPage() {
                     aria-label={`${t('switchToPersian')}${language === 'fa' ? ` ${t('currentlySelected')}` : ''}`}
                   >
                     {t('persian')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('zh')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('zh');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'zh' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'zh'}
+                    aria-label={`${t('switchToChinese')}${language === 'zh' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('chinese')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('ar')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('ar');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ar' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'ar'}
+                    aria-label={`${t('switchToArabic')}${language === 'ar' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('arabic')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('hi')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('hi');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'hi' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'hi'}
+                    aria-label={`${t('switchToHindi')}${language === 'hi' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('hindi')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('ko')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('ko');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ko' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'ko'}
+                    aria-label={`${t('switchToKorean')}${language === 'ko' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('korean')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLanguageChange('ja')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('ja');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ja' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'ja'}
+                    aria-label={`${t('switchToJapanese')}${language === 'ja' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('japanese')}
+                  </Button>
+                  <Button
+                    variant={language === 'ur' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => handleLanguageChange('ur')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleLanguageChange('ur');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ur' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                    aria-pressed={language === 'ur'}
+                    aria-label={`${t('switchToUrdu')}${language === 'ur' ? ` ${t('currentlySelected')}` : ''}`}
+                  >
+                    {t('urdu')}
                   </Button>
                 </div>
               </div>

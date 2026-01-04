@@ -16,6 +16,7 @@ const buttonVariants = cva(
         sm: 'h-8 px-3 text-[length:var(--fs-small)]',
         default: 'h-10 px-4 py-2 text-[length:var(--fs-regular)]',
         lg: 'h-12 px-6 text-[length:var(--fs-large)]',
+        icon: 'h-10 w-10',
       },
     },
     defaultVariants: {
@@ -27,7 +28,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
