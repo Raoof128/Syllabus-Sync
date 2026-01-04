@@ -58,6 +58,23 @@ export const translations = {
     building_Sports_name: 'Sports Precinct',
     building_Sports_desc: 'Sports facilities including gym, courts, and recreational areas.',
 
+    // Tags
+    technology: 'Technology',
+    labs: 'Labs',
+    study: 'Study',
+    resources: 'Resources',
+    services: 'Services',
+    administration: 'Administration',
+    teaching: 'Teaching',
+    classrooms: 'Classrooms',
+    engineering: 'Engineering',
+    research: 'Research',
+    careers: 'Careers',
+    workshops: 'Workshops',
+    sports: 'Sports',
+    recreation: 'Recreation',
+    fitness: 'Fitness',
+
     // Settings Page
     settingsTitle: 'Settings',
     settingsSubtitle: 'Manage your preferences and account settings.',
@@ -161,6 +178,20 @@ export const translations = {
     currentlySelected: '(currently selected)',
     are: 'are',
     clickTo: 'Click to',
+
+    // Welcome Messages (dynamic header)
+    welcomeMsg1: "Here's your day at a glance.",
+    welcomeMsg2: 'Your academic dashboard is ready.',
+    welcomeMsg3: "Let's make today productive.",
+    welcomeMsg4: 'Your schedule awaits.',
+    welcomeMsg5: 'Everything you need, in one place.',
+    welcomeMsg6: 'Ready when you are.',
+    welcomeMsg7: 'Your university companion.',
+    welcomeMsg8: 'Organised and on track.',
+    welcomeMsgMorning: 'Early start, strong finish.',
+    welcomeMsgAfternoon: 'Keep the momentum going.',
+    welcomeMsgEvening: 'Evening study session in progress.',
+    welcomeMsgNight: 'The quiet hours belong to the dedicated.',
 
     // Home Components
     nextDeadline: 'Next Deadline',
@@ -1042,6 +1073,20 @@ export const translations = {
     enable: 'Activar',
     disable: 'Desactivar',
 
+    // Welcome Messages
+    welcomeMsg1: 'Aquí tienes un resumen de tu día.',
+    welcomeMsg2: 'Tu panel académico está listo.',
+    welcomeMsg3: 'Hagamos que hoy sea productivo.',
+    welcomeMsg4: 'Tu horario te espera.',
+    welcomeMsg5: 'Todo lo que necesitas, en un solo lugar.',
+    welcomeMsg6: 'Listo cuando tú lo estés.',
+    welcomeMsg7: 'Tu compañero universitario.',
+    welcomeMsg8: 'Organizado y en camino.',
+    welcomeMsgMorning: 'Comienzo temprano, final fuerte.',
+    welcomeMsgAfternoon: 'Mantén el impulso.',
+    welcomeMsgEvening: 'Sesión de estudio nocturna en progreso.',
+    welcomeMsgNight: 'Las horas tranquilas pertenecen a los dedicados.',
+
     // Auth Pages
     welcomeBack: '¡Bienvenido de nuevo!',
     loginSuccess: 'Has iniciado sesión correctamente.',
@@ -1094,7 +1139,7 @@ export const translations = {
     emailPlaceholderExample: 'tu.email@mq.edu.au',
     enterEmailDesc: 'Ingresa tu correo electrónico universitario',
     enterStudentIdDesc: 'Ingresa tu número de ID de estudiante de 8 dígitos',
-    coursePlaceholder: 'Ej., Licenciatura en TI',
+    coursePlaceholder: 'Ej., Licenciatura en IT',
     enterCourseDesc: 'Ingresa el nombre de tu programa de grado',
     yearPlaceholder: 'Ej., Segundo año',
     enterYearDesc: 'Ingresa tu año de estudio actual',
@@ -1702,6 +1747,20 @@ export const translations = {
     enable: 'فعال کردن',
     disable: 'غیرفعال کردن',
 
+    // Welcome Messages
+    welcomeMsg1: 'نگاهی کلی به روز شما.',
+    welcomeMsg2: 'داشبورد تحصیلی شما آماده است.',
+    welcomeMsg3: 'بیایید امروز را پربار کنیم.',
+    welcomeMsg4: 'برنامه شما در انتظار است.',
+    welcomeMsg5: 'همه چیزهایی که نیاز دارید، در یک مکان.',
+    welcomeMsg6: 'هر وقت شما آماده باشید.',
+    welcomeMsg7: 'همراه دانشگاهی شما.',
+    welcomeMsg8: 'منظم و در مسیر.',
+    welcomeMsgMorning: 'شروع زود، پایان قوی.',
+    welcomeMsgAfternoon: 'شتاب را حفظ کنید.',
+    welcomeMsgEvening: 'جلسه مطالعه عصرگاهی در جریان است.',
+    welcomeMsgNight: 'ساعات آرام متعلق به افراد متعهد است.',
+
     // Auth Pages
     welcomeBack: 'خوش آمدید!',
     loginSuccess: 'با موفقیت وارد شدید.',
@@ -1885,7 +1944,7 @@ export const translations = {
     mon: 'دوش',
     tue: 'سه‌ش',
     wed: 'چهار',
-    thu: 'پنج',
+    thu: 'پنج‌ش',
     fri: 'جمعه',
     sat: 'شنبه',
     sun: 'یکش',
@@ -1964,6 +2023,23 @@ export const translations = {
     building_LIB_desc: '中央图书馆，拥有丰富的馆藏、学习区域和学术支持服务。',
     building_Sports_name: '体育中心',
     building_Sports_desc: '体育设施，包括健身房、球场和休闲区。',
+
+    // Tags
+    technology: '技术',
+    labs: '实验室',
+    study: '学习',
+    resources: '资源',
+    services: '服务',
+    administration: '行政',
+    teaching: '教学',
+    classrooms: '教室',
+    engineering: '工程',
+    research: '研究',
+    careers: '职业',
+    workshops: '研讨会',
+    sports: '运动',
+    recreation: '娱乐',
+    fitness: '健身',
 
     // Settings Page
     settingsTitle: '设置',
@@ -2068,6 +2144,20 @@ export const translations = {
     currentlySelected: '（当前选中）',
     are: '是',
     clickTo: '点击',
+
+    // Welcome Messages
+    welcomeMsg1: '这是您的一天概览。',
+    welcomeMsg2: '您的学术仪表盘已就绪。',
+    welcomeMsg3: '让我们度过高效的一天。',
+    welcomeMsg4: '您的日程安排在等待。',
+    welcomeMsg5: '您所需的一切，尽在一处。',
+    welcomeMsg6: '随时为您准备。',
+    welcomeMsg7: '您的大学伴侣。',
+    welcomeMsg8: '井井有条，步入正轨。',
+    welcomeMsgMorning: '早起的鸟儿有虫吃。',
+    welcomeMsgAfternoon: '保持势头。',
+    welcomeMsgEvening: '晚间学习进行中。',
+    welcomeMsgNight: '宁静的时光属于专注者。',
 
     // Home Components
     nextDeadline: '下一个截止日期',
@@ -2566,6 +2656,23 @@ export const translations = {
     building_Sports_name: 'المجمع الرياضي',
     building_Sports_desc: 'مرافق رياضية تشمل صالة رياضية وملاعب ومناطق ترفيهية.',
 
+    // Tags
+    technology: 'تكنولوجيا',
+    labs: 'مختبرات',
+    study: 'دراسة',
+    resources: 'موارد',
+    services: 'خدمات',
+    administration: 'إدارة',
+    teaching: 'تدريس',
+    classrooms: 'قاعات دراسية',
+    engineering: 'هندسة',
+    research: 'بحث',
+    careers: 'وظائف',
+    workshops: 'ورش عمل',
+    sports: 'رياضة',
+    recreation: 'ترفيه',
+    fitness: 'لياقة بدنية',
+
     // Settings Page
     settingsTitle: 'الإعدادات',
     settingsSubtitle: 'إدارة تفضيلاتك وإعدادات حسابك.',
@@ -2669,6 +2776,20 @@ export const translations = {
     currentlySelected: '(محدد حالياً)',
     are: 'هي',
     clickTo: 'انقر لـ',
+
+    // Welcome Messages
+    welcomeMsg1: 'إليك لمحة سريعة عن يومك.',
+    welcomeMsg2: 'لوحة التحكم الأكاديمية جاهزة.',
+    welcomeMsg3: 'لنجعل اليوم مثمرًا.',
+    welcomeMsg4: 'جدولك في انتظارك.',
+    welcomeMsg5: 'كل ما تحتاجه في مكان واحد.',
+    welcomeMsg6: 'جاهز عندما تكون أنت.',
+    welcomeMsg7: 'رفيقك الجامعي.',
+    welcomeMsg8: 'منظم وعلى المسار الصحيح.',
+    welcomeMsgMorning: 'بداية مبكرة، نهاية قوية.',
+    welcomeMsgAfternoon: 'حافظ على الزخم.',
+    welcomeMsgEvening: 'جلسة دراسة مسائية قيد التقدم.',
+    welcomeMsgNight: 'الساعات الهادئة للمجتهدين.',
 
     // Home Components
     nextDeadline: 'الموعد النهائي القادم',
@@ -3167,6 +3288,23 @@ export const translations = {
     building_Sports_name: 'स्पोर्ट्स प्रीसिंक्ट',
     building_Sports_desc: 'खेल सुविधाएं जिम, कोर्ट और मनोरंजन क्षेत्रों सहित।',
 
+    // Tags
+    technology: 'प्रौद्योगिकी',
+    labs: 'प्रयोगशालाएं',
+    study: 'अध्ययन',
+    resources: 'संसाधन',
+    services: 'सेवाएं',
+    administration: 'प्रशासन',
+    teaching: 'शिक्षण',
+    classrooms: 'कक्षाएं',
+    engineering: 'अभियंत्रिकी',
+    research: 'अनुसंधान',
+    careers: 'करियर',
+    workshops: 'कार्यशालाएं',
+    sports: 'खेल',
+    recreation: 'मनोरंजन',
+    fitness: 'फिटनेस',
+
     // Settings Page
     settingsTitle: 'सेटिंग्स',
     settingsSubtitle: 'अपनी प्राथमिकताएं और खाता सेटिंग्स प्रबंधित करें।',
@@ -3270,6 +3408,20 @@ export const translations = {
     currentlySelected: '(वर्तमान में चयनित)',
     are: 'हैं',
     clickTo: 'क्लिक करें',
+
+    // Welcome Messages
+    welcomeMsg1: 'यहाँ आपके दिन का संक्षिप्त विवरण है।',
+    welcomeMsg2: 'आपका अकादमिक डैशबोर्ड तैयार है।',
+    welcomeMsg3: 'आइए आज को उत्पादक बनाते हैं।',
+    welcomeMsg4: 'आपकी समय-सारणी प्रतीक्षा कर रही है।',
+    welcomeMsg5: 'आपको जो कुछ भी चाहिए, एक ही जगह पर।',
+    welcomeMsg6: 'जब आप तैयार हों।',
+    welcomeMsg7: 'आपका विश्वविद्यालय साथी।',
+    welcomeMsg8: 'व्यवस्थित और सही रास्ते पर।',
+    welcomeMsgMorning: 'जल्दी शुरुआत, मजबूत अंत।',
+    welcomeMsgAfternoon: 'गति बनाए रखें।',
+    welcomeMsgEvening: 'शाम का अध्ययन सत्र जारी है।',
+    welcomeMsgNight: 'शांत घंटे समर्पित लोगों के लिए हैं।',
 
     // Home Components
     nextDeadline: 'अगली समय सीमा',
@@ -3768,6 +3920,23 @@ export const translations = {
     building_Sports_name: '스포츠 프리싱크트',
     building_Sports_desc: '체육관, 코트 및 레크리에이션 구역을 포함한 스포츠 시설.',
 
+    // Tags
+    technology: '기술',
+    labs: '실험실',
+    study: '공부',
+    resources: '자원',
+    services: '서비스',
+    administration: '행정',
+    teaching: '교육',
+    classrooms: '강의실',
+    engineering: '공학',
+    research: '연구',
+    careers: '진로',
+    workshops: '워크숍',
+    sports: '스포츠',
+    recreation: '레크리에이션',
+    fitness: '피트니스',
+
     // Settings Page
     settingsTitle: '설정',
     settingsSubtitle: '환경설정 및 계정 설정을 관리하세요.',
@@ -3871,6 +4040,20 @@ export const translations = {
     currentlySelected: '(현재 선택됨)',
     are: '입니다',
     clickTo: '클릭하여',
+
+    // Welcome Messages
+    welcomeMsg1: '오늘의 개요는 다음과 같습니다.',
+    welcomeMsg2: '학업 대시보드가 준비되었습니다.',
+    welcomeMsg3: '오늘 하루도 생산적으로 보내봅시다.',
+    welcomeMsg4: '일정이 기다리고 있습니다.',
+    welcomeMsg5: '필요한 모든 것이 한 곳에.',
+    welcomeMsg6: '준비되셨나요?',
+    welcomeMsg7: '당신의 대학 생활 파트너.',
+    welcomeMsg8: '체계적이고 순조롭게.',
+    welcomeMsgMorning: '일찍 시작하여 힘차게 마무리를.',
+    welcomeMsgAfternoon: '추진력을 유지하세요.',
+    welcomeMsgEvening: '저녁 공부 시간이 진행 중입니다.',
+    welcomeMsgNight: '고요한 시간은 헌신하는 자들의 것입니다.',
 
     // Home Components
     nextDeadline: '다음 마감일',
@@ -4369,6 +4552,23 @@ export const translations = {
     building_Sports_name: 'スポーツプリシンクト',
     building_Sports_desc: 'ジム、コート、レクリエーションエリアを含むスポーツ施設。',
 
+    // Tags
+    technology: '技術',
+    labs: '研究室',
+    study: '勉強',
+    resources: 'リソース',
+    services: 'サービス',
+    administration: '管理',
+    teaching: '教育',
+    classrooms: '教室',
+    engineering: '工学',
+    research: '研究',
+    careers: 'キャリア',
+    workshops: 'ワークショップ',
+    sports: 'スポーツ',
+    recreation: 'レクリエーション',
+    fitness: 'フィットネス',
+
     // Settings Page
     settingsTitle: '設定',
     settingsSubtitle: '環境設定とアカウント設定を管理します。',
@@ -4472,6 +4672,20 @@ export const translations = {
     currentlySelected: '（現在選択中）',
     are: 'です',
     clickTo: 'クリックして',
+
+    // Welcome Messages
+    welcomeMsg1: '今日の概要はこちらです。',
+    welcomeMsg2: '学習ダッシュボードの準備ができました。',
+    welcomeMsg3: '今日を生産的な一日にしましょう。',
+    welcomeMsg4: 'スケジュールが待っています。',
+    welcomeMsg5: '必要なものはすべてここに。',
+    welcomeMsg6: '準備万端です。',
+    welcomeMsg7: 'あなたの大学生活のパートナー。',
+    welcomeMsg8: '整理整頓、順調に。',
+    welcomeMsgMorning: '早起きは合格の徳。',
+    welcomeMsgAfternoon: '勢いを維持しましょう。',
+    welcomeMsgEvening: '夜の勉強セッションが進行中です。',
+    welcomeMsgNight: '静かな時間は努力する人のためにあります。',
 
     // Home Components
     nextDeadline: '次の締め切り',
@@ -5073,6 +5287,20 @@ export const translations = {
     currentlySelected: '(فی الحال منتخب)',
     are: 'ہیں',
     clickTo: 'تبدیل کرنے کے لیے کلک کریں',
+
+    // Welcome Messages
+    welcomeMsg1: 'یہاں آپ کے دن کا ایک مختصر جائزہ ہے۔',
+    welcomeMsg2: 'آپ کا تعلیمی ڈیش بورڈ تیار ہے۔',
+    welcomeMsg3: 'آئیے آج کو نتیجہ خیز بنائیں۔',
+    welcomeMsg4: 'آپ کا شیڈول منتظر ہے۔',
+    welcomeMsg5: 'آپ کی ضرورت کی ہر چیز، ایک ہی جگہ پر۔',
+    welcomeMsg6: 'جب آپ تیار ہوں، ہم تیار ہیں۔',
+    welcomeMsg7: 'آپ کا یونیورسٹی ساتھی۔',
+    welcomeMsg8: 'منظم اور درست راستے پر۔',
+    welcomeMsgMorning: 'جلد آغاز، مضبوط اختتام۔',
+    welcomeMsgAfternoon: 'رفتار برقرار رکھیں۔',
+    welcomeMsgEvening: 'شام کا مطالعہ سیشن جاری ہے۔',
+    welcomeMsgNight: 'خاموش گھڑیاں لگن والوں کی ہیں۔',
 
     // Home Components
     nextDeadline: 'اگلی ڈیڈ لائن',
@@ -5692,6 +5920,20 @@ export const translations = {
     are: 'คือ',
     clickTo: 'คลิกเพื่อ',
 
+    // Welcome Messages
+    welcomeMsg1: 'นี่คือภาพรวมวันของคุณ',
+    welcomeMsg2: 'แดชบอร์ดการเรียนของคุณพร้อมแล้ว',
+    welcomeMsg3: 'มาทำให้วันนี้เป็นวันที่ดีกันเถอะ',
+    welcomeMsg4: 'ตารางเรียนของคุณรออยู่',
+    welcomeMsg5: 'ทุกสิ่งที่คุณต้องการ อยู่ในที่เดียว',
+    welcomeMsg6: 'พร้อมเสมอเมื่อคุณพร้อม',
+    welcomeMsg7: 'เพื่อนคู่คิดในรั้วมหาวิทยาลัยของคุณ',
+    welcomeMsg8: 'เป็นระเบียบและตรงตามแผน',
+    welcomeMsgMorning: 'เริ่มต้นเช้าวันใหม่ด้วยความสดใส',
+    welcomeMsgAfternoon: 'รักษาความกระตือรือร้นเข้าไว้',
+    welcomeMsgEvening: 'ช่วงเวลาอ่านหนังสือตอนเย็นเริ่มขึ้นแล้ว',
+    welcomeMsgNight: 'ช่วงเวลาเงียบสงบเหมาะแก่ผู้มีความมุ่งมั่น',
+
     // Home Components
     nextDeadline: 'กำหนดส่งถัดไป',
     viewAll: 'ดูทั้งหมด →',
@@ -6310,6 +6552,20 @@ export const translations = {
     are: 'là',
     clickTo: 'Nhấn để',
 
+    // Welcome Messages
+    welcomeMsg1: 'Đây là cái nhìn tổng quan về ngày của bạn.',
+    welcomeMsg2: 'Bảng điều khiển học tập của bạn đã sẵn sàng.',
+    welcomeMsg3: 'Hãy làm cho hôm nay thật hiệu quả.',
+    welcomeMsg4: 'Lịch trình của bạn đang chờ.',
+    welcomeMsg5: 'Mọi thứ bạn cần, ở một nơi.',
+    welcomeMsg6: 'Sẵn sàng bất cứ khi nào bạn muốn.',
+    welcomeMsg7: 'Người bạn đồng hành đại học của bạn.',
+    welcomeMsg8: 'Có tổ chức và đi đúng hướng.',
+    welcomeMsgMorning: 'Khởi đầu sớm, kết thúc mạnh mẽ.',
+    welcomeMsgAfternoon: 'Giữ vững động lực.',
+    welcomeMsgEvening: 'Phiên học tối đang diễn ra.',
+    welcomeMsgNight: 'Những giờ yên tĩnh thuộc về những người tận tụy.',
+
     // Home Components
     nextDeadline: 'Hạn nộp tiếp theo',
     viewAll: 'Xem tất cả →',
@@ -6927,6 +7183,20 @@ export const translations = {
     currentlySelected: '(выбран)',
     are: 'есть',
     clickTo: 'Нажмите чтобы',
+
+    // Welcome Messages
+    welcomeMsg1: 'Вот краткий обзор вашего дня.',
+    welcomeMsg2: 'Ваша учебная панель готова.',
+    welcomeMsg3: 'Давайте сделаем этот день продуктивным.',
+    welcomeMsg4: 'Ваше расписание ждет вас.',
+    welcomeMsg5: 'Всё, что вам нужно, в одном месте.',
+    welcomeMsg6: 'Готовы, когда вы готовы.',
+    welcomeMsg7: 'Ваш университетский компаньон.',
+    welcomeMsg8: 'Организованно и по плану.',
+    welcomeMsgMorning: 'Раннее начало, сильный финиш.',
+    welcomeMsgAfternoon: 'Сохраняйте темп.',
+    welcomeMsgEvening: 'Вечерняя учебная сессия в разгаре.',
+    welcomeMsgNight: 'Тихие часы принадлежат самым усердным.',
 
     // Home Components
     nextDeadline: 'Следующий дедлайн',

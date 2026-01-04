@@ -26,6 +26,8 @@ Raouf: Comprehensive translation audit and implementation for all 12 languages
 - **Full Thai (th) translations**: Added 520+ complete translation keys for Thai-speaking students
 - **Full Vietnamese (vi) translations**: Added 520+ complete translation keys for Vietnamese-speaking students  
 - **Full Russian (ru) translations**: Added 520+ complete translation keys for Russian-speaking students
+- **Dynamic Welcome Header**: Fully translated rotating welcome messages (morning/afternoon/evening) for all 12 languages
+- **Consolidated Tags**: Standardized tag keys (technology, labs, etc.) across all languages to ensure 100% parity
 
 ### Technical Details
 

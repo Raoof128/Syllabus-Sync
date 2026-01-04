@@ -37,98 +37,10 @@ interface WelcomeHeaderProps {
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 
 // ============================================
-// MESSAGE POOLS
+// MESSAGE POOLS (MOVED TO TRANSLATIONS)
 // ============================================
-// Each pool is thematically grouped for maintainability.
-// All messages use Australian English and avoid emojis, slang, or memes.
-
-/** Core Macquarie welcome messages - always safe, always professional */
-const CORE_MESSAGES: readonly string[] = [
-    "Here's your day at a glance.",
-    "Your academic dashboard is ready.",
-    "Let's make today productive.",
-    "Your schedule awaits.",
-    "Everything you need, in one place.",
-    "Ready when you are.",
-    "Your university companion.",
-    "Organised and on track.",
-    "Your academic command centre.",
-    "All systems go.",
-] as const;
-
-/** Student life messages - light, relatable, professional */
-const STUDENT_LIFE_MESSAGES: readonly string[] = [
-    "Coffee first, then we conquer.",
-    "One lecture at a time.",
-    "You've got this.",
-    "Another day, another tutorial.",
-    "Keep calm and study on.",
-    "The library awaits.",
-    "Your future self will thank you.",
-    "Progress over perfection.",
-    "Small steps, big results.",
-    "Stay focused, stay brilliant.",
-] as const;
-
-/** Macquarie campus-specific messages - walking, scale, atmosphere */
-const CAMPUS_MESSAGES: readonly string[] = [
-    "Hope you've got comfortable shoes today.",
-    "The walk to C5C builds character.",
-    "At least the weather's nice for the trek to E7A.",
-    "Pro tip: the library has the best air conditioning.",
-    "Another lap around campus never hurt anyone.",
-    "Somewhere between W6A and your next class.",
-    "The campus is big, but your ambition is bigger.",
-    "Navigating Macquarie, one building at a time.",
-    "From the train station to your tutorial: a journey.",
-    "The outdoor escalators are judging your cardio.",
-] as const;
-
-/** Academic grind messages - motivational, deadline-aware tone */
-const ACADEMIC_MESSAGES: readonly string[] = [
-    "Deadlines wait for no one.",
-    "Your assignments are calling.",
-    "Time to turn caffeine into grades.",
-    "The semester waits for no one.",
-    "Another day closer to graduation.",
-    "Your transcript is watching.",
-    "Excellence requires attendance.",
-    "Procrastination is not a study technique.",
-    "The grind never stops.",
-    "Knowledge doesn't download itself.",
-] as const;
-
-/** Time-of-day aware messages */
-const TIME_OF_DAY_MESSAGES: Readonly<Record<TimeOfDay, readonly string[]>> = {
-    morning: [
-        "Early start, strong finish.",
-        "The early bird catches the HD.",
-        "Morning classes build discipline.",
-        "Rise and grind.",
-        "Fresh coffee, fresh start.",
-    ],
-    afternoon: [
-        "Halfway through the day.",
-        "Keep the momentum going.",
-        "The afternoon productivity window is open.",
-        "Post-lunch focus mode: activated.",
-        "The day is yours to command.",
-    ],
-    evening: [
-        "Evening sessions can be productive too.",
-        "The library's quiet hours are golden.",
-        "Sunset study sessions hit different.",
-        "Wind down with some light revision.",
-        "The day's not over until you say so.",
-    ],
-    night: [
-        "Burning the midnight oil?",
-        "The quiet hours belong to the dedicated.",
-        "Night owl mode engaged.",
-        "Sometimes the best ideas come late.",
-        "The campus is peaceful at this hour.",
-    ],
-} as const;
+// Messages are now handled via i18n keys (welcomeMsg1..8, etc.)
+// to support full internationalisation.
 
 // ============================================
 // HELPER FUNCTIONS
@@ -145,42 +57,6 @@ function getTimeOfDay(): TimeOfDay {
     if (hour >= 12 && hour < 17) return 'afternoon';
     if (hour >= 17 && hour < 21) return 'evening';
     return 'night';
-}
-
-/**
- * Selects a random element from an array.
- * Uses Math.random() for simplicity; could be replaced with a seeded
- * random for deterministic testing.
- */
-function selectRandom<T>(array: readonly T[]): T {
-    return array[Math.floor(Math.random() * array.length)];
-}
-
-/**
- * Combines all message pools and selects ONE message.
- * Weighted slightly toward core messages for professionalism.
- * 
- * @param includeTimeAware - Whether to include time-of-day messages (default: true)
- * @returns A single welcome message string
- */
-function selectWelcomeMessage(includeTimeAware: boolean = true): string {
-    // Weight distribution: Core messages appear twice to increase probability
-    const allMessages: string[] = [
-        ...CORE_MESSAGES,
-        ...CORE_MESSAGES, // Double weight for professional messages
-        ...STUDENT_LIFE_MESSAGES,
-        ...CAMPUS_MESSAGES,
-        ...ACADEMIC_MESSAGES,
-    ];
-
-    // 30% chance to use a time-of-day message when enabled
-    if (includeTimeAware && Math.random() < 0.3) {
-        const timeOfDay = getTimeOfDay();
-        const timeMessages = TIME_OF_DAY_MESSAGES[timeOfDay];
-        return selectRandom(timeMessages);
-    }
-
-    return selectRandom(allMessages);
 }
 
 /**
@@ -233,15 +109,39 @@ export function WelcomeHeader({ name, fallbackName, className = '' }: WelcomeHea
         return fallbackName ? formatDisplayName(fallbackName) : null;
     }, [name, fallbackName]);
 
-    // State for the rotating message - initialised to null to prevent hydration mismatch
-    const [message, setMessage] = useState<string | null>(null);
+    // State for the message key - initialised to null to prevent hydration mismatch
+    const [messageKey, setMessageKey] = useState<string | null>(null);
 
-    // Select message ONCE on client-side mount
+    // Select message ONCE on client-side mount using translation keys
     // This prevents:
     // 1. SSR/CSR hydration mismatches
     // 2. Message re-rolling on every state change
     useEffect(() => {
-        setMessage(selectWelcomeMessage());
+        const timeOfDay = getTimeOfDay();
+
+        // Define message keys based on time of day
+        const generalKeys = [
+            'welcomeMsg1', 'welcomeMsg2', 'welcomeMsg3', 'welcomeMsg4',
+            'welcomeMsg5', 'welcomeMsg6', 'welcomeMsg7', 'welcomeMsg8',
+        ];
+
+        const timeKeys: Record<TimeOfDay, string> = {
+            morning: 'welcomeMsgMorning',
+            afternoon: 'welcomeMsgAfternoon',
+            evening: 'welcomeMsgEvening',
+            night: 'welcomeMsgNight',
+        };
+
+        // 30% chance to use a time-of-day message
+        if (Math.random() < 0.3) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setMessageKey(timeKeys[timeOfDay]);
+        } else {
+            // Select a random general message
+            const randomIndex = Math.floor(Math.random() * generalKeys.length);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setMessageKey(generalKeys[randomIndex]);
+        }
     }, []); // Empty deps = run once on mount
 
     // Build the greeting text
@@ -249,14 +149,16 @@ export function WelcomeHeader({ name, fallbackName, className = '' }: WelcomeHea
         ? `${t('welcome')}, ${displayName}!`
         : `${t('welcome')}!`;
 
+    // Get the translated message using the selected key
+    const message = messageKey ? t(messageKey as 'welcomeMsg1') : t('dayAtGlance');
+
     return (
         <div className={`flex-1 min-w-0 ${className}`}>
             <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
                 {greeting}
             </h1>
             <p className="text-mq-content-secondary">
-                {/* Use translation fallback while message is loading (SSR) */}
-                {message ?? t('dayAtGlance')}
+                {message}
             </p>
         </div>
     );

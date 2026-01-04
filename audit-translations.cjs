@@ -2,7 +2,7 @@ const fs = require('fs');
 const content = fs.readFileSync('lib/i18n/translations.ts', 'utf8');
 
 // Extract keys for each language using simple regex
-const languages = ['en', 'es', 'fa', 'zh', 'ar', 'hi', 'ko', 'ja'];
+const languages = ['en', 'es', 'fa', 'zh', 'ar', 'hi', 'ko', 'ja', 'ur', 'th', 'vi', 'ru'];
 const keysByLang = {};
 
 languages.forEach(lang => {

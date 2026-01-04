@@ -68,7 +68,7 @@ Macquarie University Administration - February 2025
 - **520+ Translation Keys Per Language**: Complete coverage of all user-facing strings across the entire application
 - **RTL Language Support**: Full right-to-left support for Arabic, Persian, and Urdu with automatic text direction detection
 - **Professional Translations**: Native speaker-quality translations with proper academic terminology and cultural adaptation
-- **Categories Covered**: Navigation, Common, Colors, Buildings, Settings, Notifications, Appearance, Privacy, Quick Actions, Help, Languages, Home, Units, Forms, Pages, Profiles, Auth, Map, Feed, Calendar, Layout, Events, Priorities, Types, Categories, Filters, Sample Events, Toast Messages
+- **Categories Covered**: Navigation, Common, Colors, Buildings, Settings, Notifications, Appearance, Privacy, Quick Actions, Help, Languages, Home, Units, Forms, Pages, Profiles, Auth, Map, Feed, Calendar, Layout, Events, Priorities, Types, Categories, Filters, Sample Events, Toast Messages, Welcome Messages, Tags
 - **Zero Fallback Strings**: All languages have complete translations matching the English reference
 
 #### ✅ Critical Bug Fixes & Runtime Stability (v0.5.4)
