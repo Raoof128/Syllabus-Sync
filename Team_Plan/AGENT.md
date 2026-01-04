@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.34 | Last Updated: January 04, 2026
+Version: 0.5.37 | Last Updated: January 04, 2026
 
 ---
 
