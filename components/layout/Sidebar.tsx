@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import SocialButtons from './SocialButtons';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
@@ -55,7 +56,7 @@ const Sidebar = memo(() => {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed md:relative z-40 w-48 bg-mq-card-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast',
+          'fixed md:relative z-40 w-48 bg-mq-card-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast flex flex-col',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
         )}
       >
@@ -97,6 +98,11 @@ const Sidebar = memo(() => {
             );
           })}
         </nav>
+
+        {/* Social buttons at bottom */}
+        <div className="mt-auto pt-6 border-t border-mq-border">
+          <SocialButtons />
+        </div>
       </div>
     </>
   );

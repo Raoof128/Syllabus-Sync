@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.37] - 2026-01-04
+
+### Added
+
+#### Animated Social Buttons in Sidebar 🔗
+
+Raouf: Added premium animated social buttons at the bottom of the sidebar with expandable hover effects.
+
+**Implementation:**
+- **SocialButtons Component** (`components/layout/SocialButtons.tsx`): New reusable component with social media links (GitHub, Twitter, LinkedIn, Email)
+- **Hover Animation**: Buttons expand from 48px icon-only to 140px with text label on hover
+- **Glow Effect**: Dual-layer pseudo-element animation with gradient background and blurred shadow layer
+- **MQ Brand Colors**: Uses Macquarie Red gradient (`#a6192e` to `#d6001c`) instead of social platform colors
+- **Icon Transitions**: Icon scales down as text label scales up with 0.25s transition delay
+- **Dark Mode Support**: Proper styling adjustments for dark theme backgrounds
+- **Sidebar Integration**: Added to sidebar footer with `mt-auto` flex layout to push to bottom
+
+**Files Changed:**
+- `app/globals.css` - Added `.social-buttons` CSS animation styles
+- `components/layout/SocialButtons.tsx` - New component with Lucide icons
+- `components/layout/Sidebar.tsx` - Integrated social buttons at sidebar bottom
+
+---
+
 ## [0.5.36] - 2026-01-04
 
 ### Changed
