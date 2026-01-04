@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/mq/button';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
 import { useRetry } from '@/lib/hooks/use-retry';

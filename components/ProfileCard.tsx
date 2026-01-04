@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'lucide-react';
 import { UserProfile } from '@/lib/store/profilesStore';

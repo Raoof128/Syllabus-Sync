@@ -39,7 +39,7 @@ const EventsFeed = memo(() => {
             {todayEvents.map((event) => (
               <div
                 key={event.id}
-                className="p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
+                className="group p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
               >
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-mq-content">

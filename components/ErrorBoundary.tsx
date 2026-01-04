@@ -4,7 +4,7 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 

@@ -7,6 +7,109 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.25] - 2026-01-04
+
+### Fixed
+
+#### Comprehensive Button System Audit & Polish 🔍✨
+
+Raouf: Conducted full audit of all button implementations across the application
+
+- **Import Inconsistencies Fixed**: Updated 5 components to use MQ Button instead of regular Shadcn Button
+- **MQ Button Variants Enhanced**: Added `destructive` and `outline` variants to MQ Button component
+- **Accessibility Improvements**: Added missing `aria-label` to notification "mark all as read" button
+- **Design System Consistency**: All buttons now follow MQ design system with red highlighting
+- **Component Coverage**: Verified button consistency across Header, Sidebar, Forms, and Error boundaries
+
+### Technical Details
+
+- **Files Updated**: 
+  - `components/ui/mq/button.tsx` - Added destructive/outline variants
+  - `components/ProfileCard.tsx` - Fixed import
+  - `components/deadlines/DeadlineForm.tsx` - Fixed import
+  - `components/units/UnitForm.tsx` - Fixed import  
+  - `components/ErrorBoundary.tsx` - Fixed import
+  - `app/error.tsx` - Fixed import
+  - `components/layout/Header.tsx` - Added aria-label
+- **Button Variants**: primary, secondary, destructive, outline, ghost
+- **Accessibility**: All buttons have proper labels and focus states
+- **Styling**: Consistent MQ red highlighting across all interactive elements
+
+---
+
+## [0.5.12] - 2026-01-04
+
+### Added
+
+#### Enhanced Button Glow Animation ✨
+
+Raouf: Refined premium button glow effects using advanced CSS pseudo-element positioning
+
+- **Optimized Glow Positioning**: Adjusted `::after` pseudo-element top positioning from `5px` to `10px` for enhanced visual depth.
+- **Refined Opacity Levels**: Fine-tuned glow opacity to `0.5` for the blurred layer, creating a more sophisticated floating light effect.
+- **Preserved Brand Colors**: Maintained Macquarie University red color scheme (`#a6192e` to `#d6001c`) as required.
+- **Universal Application**: Animation automatically applies to all buttons through the existing `btn-premium` class system.
+
+### Technical Details
+
+- **Files changed**: `app/globals.css`
+- **Animation Style**: Dual-layer glow effect with hardware-accelerated opacity transitions.
+- **Color Preservation**: Red gradient colors maintained exactly as specified.
+
+---
+
+## [0.5.11] - 2026-01-04
+
+### Added
+
+#### Premium Glow Button Animations 💖
+
+Raouf: Implemented high-end glow transitions for all application buttons
+
+- **Dynamic Glow Effect**: Added a dual-layer pseudo-element animation (`::before` and `::after`) to all buttons.
+- **Glassmorphic Blur**: Implemented a secondary blurred glow layer that creates a "floating light" effect on hover.
+- **Gradient Transitions**: Integrated Macquarie University red-to-bright-red gradients for the hover state.
+- **Universal Application**: Wired the `btn-premium` class directly into the base MQ `Button` component, ensuring all buttons across the app benefit from the new animation.
+- **Micro-Interactions**: Improved icon scaling and text contrast during the hover transition.
+
+### Fixed
+
+- **Animation Visibility**: Resolved issue where solid button backgrounds were obscuring the glow animation.
+- **Stacking Context**: Implemented `isolation: isolate` to ensure glow layers render correctly behind text but above parent containers.
+- **Variables**: Explicitly defined color variables used in raw CSS linear-gradients to ensure browser compatibility.
+
+### Technical Details
+
+- **Files changed**: `app/globals.css`, `components/ui/mq/button.tsx`
+- **Performance**: Optimized animations using hardware-accelerated transforms and opacity.
+- **Accessibility**: Maintained high contrast ratios and focus states during animations.
+
+---
+
+## [0.5.10] - 2026-01-04
+
+### Added
+
+#### Interactive Hover Effects ✨
+
+Raouf: Implemented comprehensive hover effects for key UI elements to enhance tactile feedback
+
+- **Sidebar Navigation**: Added smooth translation and icon scaling animation on hover
+- **Cards (Base & MQ)**: Implemented lift-on-hover (translate-y) and shadow deepening for consistent elevation
+- **Buttons (Primary & Secondary)**: Added tactile lift effect (translate-y) and shadow transitions
+- **Micro-animations**:
+  - **Header Actions**: Added icon scaling for Bell, rotation for Sun/Moon theme toggles, and scaling/shadow for Profile avatar
+  - **Home Widgets**: Added horizontal translation and shadow deepening for Today's Schedule and Event Feed items
+  - **Badges**: Added subtle scaling animation to MQ Badges for interactive feel
+- **Polished Feedback**: Standardized transition durations (200-300ms) across the application
+
+### Technical Details
+
+- **Files changed**: `components/layout/Sidebar.tsx`, `components/ui/card.tsx`, `components/ui/mq/card.tsx`, `components/ui/mq/button.tsx`, `components/ui/mq/badge.tsx`, `components/home/TodaySchedule.tsx`, `components/home/EventsFeed.tsx`, `components/layout/Header.tsx`
+- **Animation Strategy**: Leveraged Tailwind `group` utilities and spring-like transitions (`ease-mq-snap`) for a premium feel
+
+---
+
 ## [0.5.9] - 2026-01-04
 
 ### Fixed

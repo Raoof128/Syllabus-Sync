@@ -90,7 +90,7 @@ const TodaySchedule = memo(() => {
           todayClasses.map((cls) => (
             <div
               key={`${cls.id}-${cls.code}`}
-              className="flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-colors"
+              className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
             >
               {/* Color indicator */}
               <div

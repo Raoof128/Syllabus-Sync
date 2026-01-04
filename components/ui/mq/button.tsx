@@ -8,9 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-mq-primary text-white shadow-mq-sm hover:bg-mq-red-bright hover:shadow-mq active:scale-[0.98]',
-        secondary: 'bg-mq-button-secondary text-mq-content border border-mq-border hover:bg-mq-hover-background hover:border-mq-border-secondary active:scale-[0.98]',
-        ghost: 'text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content active:scale-[0.98]',
+        primary: 'bg-mq-primary text-white shadow-mq-sm hover:bg-mq-red-bright hover:shadow-mq hover:-translate-y-0.5 active:scale-[0.98]',
+        secondary: 'bg-mq-button-secondary text-mq-content border border-mq-border hover:bg-mq-red hover:border-mq-red hover:text-white hover:shadow-mq-sm hover:-translate-y-0.5 active:scale-[0.98]',
+        destructive: 'bg-mq-error text-white shadow-mq-sm hover:bg-mq-error/90 hover:shadow-mq hover:-translate-y-0.5 active:scale-[0.98]',
+        outline: 'border border-mq-border bg-transparent text-mq-content hover:bg-mq-red hover:border-mq-red hover:text-white hover:shadow-mq-sm hover:-translate-y-0.5 active:scale-[0.98]',
+        ghost: 'text-mq-content-secondary hover:bg-mq-red hover:text-white hover:shadow-mq-sm active:scale-[0.98]',
       },
       size: {
         sm: 'h-8 px-3 text-[length:var(--fs-small)]',
@@ -37,7 +39,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), 'btn-premium')}
         ref={ref}
         {...props}
       />

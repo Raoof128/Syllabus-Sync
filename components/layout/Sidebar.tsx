@@ -36,7 +36,7 @@ const Sidebar = memo(() => {
     <>
       {/* Mobile menu button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl active:scale-95 transition-all duration-mq-fast touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center btn-premium"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
       >
@@ -83,15 +83,15 @@ const Sidebar = memo(() => {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium transition-all duration-mq-fast ease-mq-snap touch-manipulation min-h-[44px]',
+                  'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] btn-premium',
                   isActive
                     ? 'bg-mq-primary text-white shadow-mq-sm'
-                    : 'text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary',
+                    : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq hover:translate-x-1 active:scale-[0.98]',
                 )}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={t('navigateToItem', { name: t(item.name) })}
               >
-                <Icon className="h-4 w-4" aria-hidden="true" />
+                <Icon className={cn("h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap", isActive && "animate-pulse-subtle")} aria-hidden="true" />
                 {t(item.name)}
               </Link>
             );
