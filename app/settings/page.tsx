@@ -279,12 +279,12 @@ export default function SettingsPage() {
                   {notifications.events ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
-                      Enabled
+                      {t('enabled')}
                     </>
                   ) : (
                     <>
                       <XCircle className="h-3 w-3" />
-                      Disabled
+                      {t('disabled')}
                     </>
                   )}
                 </Button>

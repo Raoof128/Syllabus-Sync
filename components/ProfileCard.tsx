@@ -18,23 +18,32 @@ interface ProfileCardProps {
   onEdit: (profile: UserProfile) => void;
   onDelete: (id: string) => void;
   onSetCurrent: (id: string) => void;
+  onUpdate: (id: string, updates: Partial<UserProfile>) => void;
 }
 
 const ProfileCard = React.memo(
-  ({ profile, isCurrent, onEdit, onDelete, onSetCurrent }: ProfileCardProps) => {
+  ({ profile, isCurrent, onEdit, onDelete, onSetCurrent, onUpdate }: ProfileCardProps) => {
     const { t } = useTranslation();
     const [deleteConfirm, setDeleteConfirm] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
     const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          setAvatarUrl(e.target?.result as string);
+          const result = e.target?.result as string;
+          onUpdate(profile.id, { avatar: result });
         };
         reader.readAsDataURL(file);
       }
+    };
+
+    const togglePreference = (key: keyof typeof profile.preferences) => {
+      onUpdate(profile.id, {
+        preferences: {
+          ...profile.preferences,
+          [key]: !profile.preferences[key],
+        },
+      });
     };
 
     return (
@@ -48,18 +57,25 @@ const ProfileCard = React.memo(
       >
         <CardHeader className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-mq-primary flex items-center justify-center text-white font-bold text-mq-large">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={profile.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="w-8 h-8" />
-                )}
-              </div>
+            <div className="relative group cursor-pointer">
+              <label className="cursor-pointer">
+                <div className="w-16 h-16 rounded-full bg-mq-primary flex items-center justify-center text-white font-bold text-mq-large overflow-hidden">
+                  {profile.avatar ? (
+                    <img
+                      src={profile.avatar}
+                      alt={profile.name}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-8 h-8" />
+                  )}
+                </div>
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+                <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+              </label>
+
               {isCurrent && (
                 <Badge className="absolute -top-1 -right-1 bg-mq-success text-white text-xs">
                   {t('current')}
@@ -116,51 +132,83 @@ const ProfileCard = React.memo(
         </CardHeader>
 
         <CardContent className="pt-0">
-          <div className="space-y-2">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('emailNotifications')}</span>
               </div>
-              <div
+              <button
+                role="switch"
+                aria-checked={profile.preferences.notifications}
+                onClick={() => togglePreference('notifications')}
                 className={cn(
-                  'w-10 h-5 rounded-full transition-colors',
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                   profile.preferences.notifications ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
-              />
+              >
+                <span
+                  className={cn(
+                    'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                    profile.preferences.notifications ? 'translate-x-6' : 'translate-x-1'
+                  )}
+                />
+              </button>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
               </div>
-              <div
+              <button
+                role="switch"
+                aria-checked={profile.preferences.emailReminders}
+                onClick={() => togglePreference('emailReminders')}
                 className={cn(
-                  'w-10 h-5 rounded-full transition-colors',
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                   profile.preferences.emailReminders ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
-              />
+              >
+                <span
+                  className={cn(
+                    'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                    profile.preferences.emailReminders ? 'translate-x-6' : 'translate-x-1'
+                  )}
+                />
+              </button>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('pushNotifications')}</span>
               </div>
-              <div
+              <button
+                role="switch"
+                aria-checked={profile.preferences.pushNotifications}
+                onClick={() => togglePreference('pushNotifications')}
                 className={cn(
-                  'w-10 h-5 rounded-full transition-colors',
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                   profile.preferences.pushNotifications ? 'bg-mq-success' : 'bg-mq-background-tertiary',
                 )}
-              />
+              >
+                <span
+                  className={cn(
+                    'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                    profile.preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1'
+                  )}
+                />
+              </button>
             </div>
           </div>
         </CardContent>
 
-        <label className="flex items-center gap-2 px-3 py-2 border border-mq-border rounded-mq hover:bg-mq-hover-background cursor-pointer text-sm text-mq-content-secondary transition-colors m-4 mt-0">
-          <Camera className="h-4 w-4" />
-          <span>{t('changeAvatar')}</span>
-          <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
-        </label>
+        <div className="px-4 pb-4">
+          <label className="flex items-center justify-center gap-2 w-full p-2 text-sm font-medium text-mq-content-secondary bg-mq-background-secondary hover:bg-mq-hover-background rounded-mq border border-mq-border cursor-pointer transition-colors">
+            <Camera className="h-4 w-4" />
+            <span>{t('changeAvatar')}</span>
+            <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+          </label>
+        </div>
 
         {deleteConfirm && (
           <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">

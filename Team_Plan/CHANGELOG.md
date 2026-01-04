@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.9] - 2026-01-04
+
+### Fixed
+
+#### Profile & Settings Wired Up ✅
+
+Raouf: Functional wiring of profile section and settings i18n fixes
+
+- **Profile Card Wiring**: Converted decorative ProfileCard elements into fully functional controls connected to `profilesStore`
+- **Avatar Upload**: Implemented functional avatar image upload with base64 storage
+- **Preference Toggles**: Wired up notification, email, and push preference toggles in user profiles
+- **Settings Localization**: Fixed hardcoded "Enabled"/"Disabled" text in Settings page events section to use `t('enabled')`/`t('disabled')` keys
+- **Interactive UI**: Connected `manage-profiles` page to store updates for real-time data persistence
+- **Header Avatar**: Header now correctly displays the user's uploaded avatar instead of falling back to initials
+
+### Technical Details
+
+- **Files changed**: `components/ProfileCard.tsx`, `app/manage-profiles/page.tsx`, `app/settings/page.tsx`, `components/layout/Header.tsx`
+- **Store Actions**: Utilized `updateProfile` from `profilesStore`
+- **Props Interface**: extended `ProfileCardProps` with `onUpdate` callback
+
+---
+
 ## [0.5.8] - 2026-01-04
 
 ### Added

@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.8 | Last Updated: January 04, 2026
+Version: 0.5.9 | Last Updated: January 04, 2026
 
 ---
 
@@ -1914,5 +1914,16 @@ Summary:
   - Fixed: Added migration logic for existing users - if profiles exist but none is selected, the first profile is auto-selected on Home page load.
   - Root cause: `addProfile` in profilesStore wasn't setting `currentProfileId`, so created profiles weren't active.
 Files: lib/store/profilesStore.ts; app/home/HomeClient.tsx.
+Verification: npm run build (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-04 (Australia/Sydney)
+Scope: Fix - Wire up Profile & Settings.
+Summary:
+  - Wired up ProfileCard functionality (avatar, preferences) using onUpdate prop.
+  - Connected manage-profiles page to store updateProfile action.
+  - Fixed hardcoded "Enabled"/"Disabled" text in Settings page to use translations.
+  - Fixed Header to display user avatar profile image instead of fallback initials.
+Files: components/ProfileCard.tsx; app/manage-profiles/page.tsx; app/settings/page.tsx; components/layout/Header.tsx.
 Verification: npm run build (pass).
 Follow-ups: None.

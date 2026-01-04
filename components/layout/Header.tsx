@@ -279,10 +279,16 @@ const Header = memo(() => {
                 aria-label={t('openProfileMenu')}
               >
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: BRAND_COLORS.primary }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden"
+                  style={{ backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary }}
                 >
-                  {currentProfile ? (
+                  {currentProfile?.avatar ? (
+                    <img
+                      src={currentProfile.avatar}
+                      alt={currentProfile.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : currentProfile ? (
                     <span className="text-white font-bold text-sm">
                       {currentProfile.name.charAt(0).toUpperCase()}
                     </span>

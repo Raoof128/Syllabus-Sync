@@ -157,6 +157,7 @@ export default function ManageProfilesPage() {
                   onEdit={handleEditProfile}
                   onDelete={handleDeleteProfile}
                   onSetCurrent={handleSetCurrentProfile}
+                  onUpdate={updateProfile}
                 />
               ))}
             </div>
