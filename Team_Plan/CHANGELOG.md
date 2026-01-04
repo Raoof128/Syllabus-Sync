@@ -41,6 +41,19 @@ Raouf: Resolved "Rendered more hooks than during the previous render" runtime er
 - Framer-motion has built-in `prefers-reduced-motion` support, so manual detection was unnecessary
 - Simplified animation from complex spring+blur to simple 150ms opacity fade
 
+### Added
+
+#### Live Clock Display in Header 🕒
+
+Raouf: Added real-time clock and date display in the header using client/server split pattern.
+
+**Implementation:**
+- **Clock Component** (`components/layout/Clock.tsx`): Client-side component that updates every second
+- **Date Display**: Rendered client-side with `isClient` guard to prevent SSR mismatch
+- **Locale Support**: Both date and clock support all 12 app languages
+- **Typography**: Uses `tabular-nums` for stable digit width during updates
+- **Performance**: Zero hydration errors, minimal JS cost, smooth updates
+
 ---
 
 ## [0.5.35] - 2026-01-04

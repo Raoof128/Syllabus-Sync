@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
+import { Clock as LiveClock } from '@/components/layout/Clock';
 
 const notificationIcons = {
   deadline: Clock,
@@ -40,7 +41,7 @@ const notificationIcons = {
 };
 
 const Header = memo(() => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const router = useRouter();
 
   // Memoize Supabase client to prevent recreation on every render
@@ -152,6 +153,34 @@ const Header = memo(() => {
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-4">
+        {/* Date & Time display - hidden on small screens, only after hydration */}
+        {isClient && (
+          <div className="hidden md:flex flex-col items-end text-right">
+            <span className="text-mq-sm font-semibold text-mq-content">
+              {new Date().toLocaleDateString(
+                language === 'fa' ? 'fa-IR'
+                  : language === 'es' ? 'es-ES'
+                    : language === 'zh' ? 'zh-CN'
+                      : language === 'ar' ? 'ar-SA'
+                        : language === 'hi' ? 'hi-IN'
+                          : language === 'ru' ? 'ru-RU'
+                            : language === 'ja' ? 'ja-JP'
+                              : language === 'ko' ? 'ko-KR'
+                                : language === 'ur' ? 'ur-PK'
+                                  : language === 'th' ? 'th-TH'
+                                    : language === 'vi' ? 'vi-VN'
+                                      : 'en-AU',
+                {
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'short',
+                }
+              )}
+            </span>
+            <LiveClock />
+          </div>
+        )}
+
         {/* Keyboard Shortcuts */}
         <div className="hidden lg:block">
           <KeyboardShortcuts />
