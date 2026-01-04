@@ -64,9 +64,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       const authenticated = !!session;
       setIsAuthenticated(authenticated);
 
-      if (authenticated && isAuthRoute) {
-        router.push('/home');
-      } else if (!authenticated && isProtectedRoute) {
+      /* 
+         Raouf: Disabled auto-redirect for auth routes in the listener to prevent
+         interrupting the fingerprint login animation. 
+         LoginClient handles its own redirect after the animation completes.
+      */
+      if (!authenticated && isProtectedRoute) {
         router.push(`/login?redirectTo=${pathname}`);
       }
     });

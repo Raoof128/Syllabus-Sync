@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/mq/button';
+import { FingerprintButton } from '@/components/auth/FingerprintButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,13 +31,17 @@ export default function LoginClient() {
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
+      // If we are currently handling a login (isLoading), don't auto-redirect via this check
+      // This prevents the "fast redirect" race condition the user reported
+      if (isLoading) return;
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         router.push(redirectTo);
       }
     };
     checkUser();
-  }, [supabase.auth, router, redirectTo]);
+  }, [supabase.auth, router, redirectTo, isLoading]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +49,18 @@ export default function LoginClient() {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // Enforce minimum 60s wait (1 minute) per user request
+      const minWait = new Promise(resolve => setTimeout(resolve, 6300));
+
+      const [authResult] = await Promise.all([
+        supabase.auth.signInWithPassword({
+          email,
+          password,
+        }).catch(err => ({ error: err })), // Catch auth errors to prevent fail-fast
+        minWait
+      ]);
+
+      const { error } = authResult || {};
 
       if (error) {
         setError(error.message);
@@ -70,9 +83,14 @@ export default function LoginClient() {
     <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-mq-primary rounded-mq-lg flex items-center justify-center">
-              <Icons.Graduation className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-center mb-6">
+            <div className="relative w-65 h-65 flex items-center justify-center">
+              {/* Use consistent MQ branding logo */}
+              <img
+                src="/MQ_Logo_Final.png"
+                alt="Macquarie University Logo"
+                className="object-contain w-full h-full drop-shadow-xl"
+              />
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
@@ -113,13 +131,24 @@ export default function LoginClient() {
                 disabled={isLoading}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? t('signingIn') : t('signIn')}
-            </Button>
+            <div className="flex justify-center mt-6 mb-6">
+              <FingerprintButton
+                type="submit"
+                isLoading={isLoading}
+                className="mx-auto" /* Center the fixed-width button */
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-mq-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-mq-card-background px-2 text-mq-content-secondary">
+                  {t('orSignWith')}
+                </span>
+              </div>
+            </div>
           </form>
 
           <div className="text-center text-sm text-mq-content-secondary mt-6 p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">

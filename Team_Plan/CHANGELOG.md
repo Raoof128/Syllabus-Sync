@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.34] - 2026-01-04
+
+### Added
+
+#### Stable Fingerprint Login Animation 👆
+
+Raouf: Re-implemented the fingerprint login animation using optimized CSS/SVG paths for maximum stability and performance.
+
+- **Fidelity**: Ported original reference animation with exact stroke physics.
+- **Performance**: Used hardware-accelerated CSS keyframes instead of JS-driven motion.
+- **Safety**: Scoped all CSS classes (`fp-*`) to avoid global style leaks.
+- **Integration**: Wrapped in a TypeScript React component with proper event handling (`onAnimationEnd`).
+- **Layout**: Positioned as the primary sign-in action with centered alignment.
+- **Visuals**: Increased login screen logo size by ~10% for better brand visibility.
+- **Timing**: Animation runs at 6s, but login process holds for 60s (1 minute) to ensure success state visibility.
+- **Fix**: Disabled global auto-redirect in `ClientLayout` to prevent interrupting the login animation.
+
+---
+
+## [0.5.27] - 2026-01-04
+
+### Fixed
+
+#### Stability Restoration ✅
+
+Raouf: Reverted unstable login animation and starfield changes to restore site stability.
+
+- **Revert**: Rolled back uncommitted changes to `app/globals.css` and login components.
+- **Stability**: Ensured application builds and renders correctly without broken styles.
+
+---
+
 ## [0.5.26] - 2026-01-04
 
 ### Fixed
