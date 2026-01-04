@@ -12,10 +12,10 @@ export function isSupabaseConfigured(): boolean {
     !supabaseUrl.includes('your-project-id')
   );
 
-  // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ"
+  // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ" or publishable keys starting with "sb_"
   const hasValidKey = !!(
     supabaseAnonKey &&
-    supabaseAnonKey.startsWith('eyJ') &&
+    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
     supabaseAnonKey !== 'your-anon-key-here' &&
     !supabaseAnonKey.includes('PASTE')
   );
