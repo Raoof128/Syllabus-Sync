@@ -475,7 +475,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                   {selectedBuilding.id}
                 </Badge>
                 {preview && (
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--c-slate-100)', color: 'var(--c-navy-900)' }}>
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--c-slate-100)', color: 'var(--c-content-secondary)' }}>
                     Walking
                   </span>
                 )}

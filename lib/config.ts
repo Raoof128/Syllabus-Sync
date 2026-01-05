@@ -118,7 +118,7 @@ export const FEATURES = {
  * Links to university social media (optional)
  */
 export const SOCIAL_LINKS = {
-  twitter: 'https://twitter.com/macquarieuni',
+  twitter: 'https://x.com/macquarieuni',
   facebook: 'https://facebook.com/macquarieuniversity',
   instagram: 'https://instagram.com/macquarieuni',
   linkedin: 'https://linkedin.com/school/macquarie-university',

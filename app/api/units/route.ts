@@ -102,7 +102,7 @@ export async function GET(request: Request) {
       }
 
       // Get unit IDs for class times query
-      const unitIds = unitsData?.map(unit => unit.id) ?? [];
+      const unitIds = unitsData?.map((unit: any) => unit.id) ?? [];
 
       // Get class times for these units
       const { data: classTimesData, error: classTimesError } = await supabase
@@ -130,7 +130,7 @@ export async function GET(request: Request) {
       }, {} as Record<string, Array<{ id: string; day: string; startTime: string; endTime: string }>>);
 
       // Map units with their class times
-      const units = (unitsData ?? []).map(unit => ({
+      const units = (unitsData ?? []).map((unit: any) => ({
         ...mapUnitRow(unit),
         schedule: classTimesByUnit[String(unit.id)] ?? [],
       }));

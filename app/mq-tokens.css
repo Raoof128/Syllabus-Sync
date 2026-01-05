@@ -25,11 +25,6 @@
   --c-sand-400: #cac2b4;
   --c-sand-500: #919288;
 
-  --c-navy-600: #73808c;
-  --c-navy-700: #5c6873;
-  --c-navy-800: #45505a;
-  --c-navy-900: #2d3945;
-
   --c-slate-100: #ecf2f6;
   --c-slate-200: #d9e5ed;
   --c-slate-300: #c6d8e4;
@@ -39,6 +34,8 @@
   /* Semantic Mappings */
   --c-background: #EDEADE;
   --c-background-invert: #EDEADE;
+  --c-background-secondary: var(--c-sand-200);
+  --c-background-tertiary: var(--c-sand-100);
   --c-content: var(--c-charcoal-900);
   --c-content-secondary: var(--c-charcoal-800);
   --c-content-tertiary: var(--c-charcoal-700);
@@ -53,16 +50,24 @@
   --popover-foreground: 222.2 84% 4.9%;
   --primary: 222.2 84% 4.9%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222.2 84% 4.9%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222.2 84% 4.9%;
+  --secondary: 60 5% 95%;
+  /* Sand-100 for proper contrast */
+  --secondary-foreground: 60 10% 20%;
+  /* Charcoal for text */
+  --muted: 60 5% 95%;
+  /* Sand-100 */
+  --muted-foreground: 60 10% 40%;
+  /* Sand-400 */
+  --accent: 60 5% 95%;
+  /* Sand-100 */
+  --accent-foreground: 60 10% 20%;
+  /* Charcoal */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
+  --border: 60 10% 85%;
+  /* Sand-200 */
+  --input: 60 10% 85%;
+  /* Sand-200 */
   --ring: 222.2 84% 4.9%;
 
   /* Typography - --f-[family] format */
@@ -93,8 +98,8 @@
   --c-card-background: #EDEADE;
   --c-input-background: #EDEADE;
   /* Make buttons slightly darker/different than background to pop */
-  --c-button-secondary: var(--c-sand-300);
-  --c-hover-background: var(--c-sand-200);
+  --c-button-secondary: var(--c-sand-200);
+  --c-hover-background: var(--c-sand-100);
 
   /* MQ Token aliases for globals.css compatibility */
   --mq-background: var(--c-background);
@@ -170,42 +175,42 @@
   --mq-shadow-sm: var(--c-shadow-sm);
 
   /* Tailwind CSS Variable Mappings - Dark Mode (MQ Charcoal Theme) */
-  --background: 215 14% 24%;
-  /* charcoal-800 */
+  --background: 215 0% 15%;
+  /* charcoal-800 neutralized */
   --foreground: 0 0% 98%;
   /* white */
-  --card: 215 14% 24%;
-  /* charcoal-800 */
+  --card: 215 0% 15%;
+  /* charcoal-800 neutralized */
   --card-foreground: 0 0% 98%;
   /* white */
-  --popover: 215 14% 24%;
-  /* charcoal-800 */
+  --popover: 215 0% 15%;
+  /* charcoal-800 neutralized */
   --popover-foreground: 0 0% 98%;
   /* white */
   --primary: 0 0% 98%;
   /* white */
-  --primary-foreground: 215 14% 24%;
-  /* charcoal-800 */
-  --secondary: 215 14% 24%;
-  /* charcoal-800 */
+  --primary-foreground: 215 0% 15%;
+  /* charcoal-800 neutralized */
+  --secondary: 215 0% 20%;
+  /* charcoal-700 neutralized */
   --secondary-foreground: 0 0% 98%;
   /* white */
-  --muted: 215 14% 24%;
-  /* charcoal-800 */
-  --muted-foreground: 215 14% 34%;
-  /* charcoal-600 */
-  --accent: 215 14% 24%;
-  /* charcoal-800 */
+  --muted: 215 0% 20%;
+  /* charcoal-700 neutralized */
+  --muted-foreground: 215 0% 60%;
+  /* charcoal-400 neutralized */
+  --accent: 215 0% 20%;
+  /* charcoal-700 neutralized */
   --accent-foreground: 0 0% 98%;
   /* white */
   --destructive: 0 84.2% 60.2%;
   /* red-500 */
   --destructive-foreground: 0 0% 98%;
   /* white */
-  --border: 215 14% 34%;
-  /* charcoal-600 */
-  --input: 215 14% 24%;
-  /* charcoal-800 */
+  --border: 215 0% 25%;
+  /* charcoal-600 neutralized */
+  --input: 215 0% 20%;
+  /* charcoal-700 neutralized */
   --ring: 0 0% 98%;
   /* white */
 
@@ -226,7 +231,7 @@
   /* lighter charcoal becomes darker */
   --c-sand-100: var(--c-charcoal-700);
   --c-sand-200: var(--c-charcoal-600);
-  --c-slate-100: var(--c-navy-800);
+  --c-slate-100: var(--c-charcoal-800);
 
   /* UI state colors for dark mode - consistent with MQ brand */
   --c-success: #10b981;

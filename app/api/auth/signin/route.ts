@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       const { data: users, error: userError } = await supabase.auth.admin.listUsers();
 
       if (!userError && users) {
-        const user = users.users.find(u => u.email === email);
+        const user = users.users.find((u: any) => u.email === email);
         if (user) {
           // Confirm the email
           await supabase.auth.admin.updateUserById(user.id, {
