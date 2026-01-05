@@ -19,10 +19,23 @@ Raouf: Implemented a premium gradient border interaction for all home dashboard 
 - **Gradient Border Shell**: Cards use a transparent border that transitions to a Macquarie Red linear gradient (`#a6192e` → `#d6001c`) on hover.
 - **Inner Content Scale**: The inner content container scales down to 98% on hover, creating a 3D "pushed back" effect that reveals more of the gradient border.
 - **Soft Glow**: Added a subtle red box-shadow (`rgba(166, 25, 46, 0.3)`) that appears alongside the gradient.
-- **Theme Compatibility**: Fixed initial color leak bugs by strictly using `hsl(var(--card))` for the inner content background, ensuring perfect integration with both light and dark modes.
 - **Unified Class**: Applied via the shared `.mq-magic-card` utility class, instantly updating all 5 dashboard widget types.
 
+**Files Changed:**
+- `app/globals.css` - Added `.mq-magic-card` and `.mq-magic-card-content` animation classes
+- `app/mq-tokens.css` - Added missing `--mq-card-background` aliases to `:root` for light mode
+- `components/home/*` - All home widgets now inherit the gradient hover effect
+
 ### Fixed
+
+#### Theme Color Leak in Light Mode 🐛
+
+Raouf: Resolved critical CSS variable issue causing cards to turn completely red during hover animation in light mode.
+
+- **Root Cause**: `--mq-card-background` was missing from `:root` (light mode) in `mq-tokens.css`, causing `var(--mq-card-background)` to fall back to `transparent`, which exposed the red gradient fill.
+- **Solution**: Added complete MQ token aliases (`--mq-card-background`, `--mq-input-background`, `--mq-primary`, etc.) to `:root` block in `mq-tokens.css`.
+- **Migration**: Changed `.mq-magic-card-content` background from `hsl(var(--card))` to `var(--mq-card-background)` for consistent MQ palette usage across light/dark themes.
+- **Result**: Cards now maintain proper Alabaster (`#EDEADE`) surface color in light mode and Charcoal (`#43453f`) in dark mode, with gradient visible only as a border on hover.
 
 #### Next.js 16 Turbopack Config ⚙️
 

@@ -101,6 +101,13 @@
   --mq-content: var(--c-content);
   --mq-border: var(--c-border);
   --mq-focus: var(--c-focus);
+  --mq-card-background: var(--c-card-background);
+  --mq-input-background: var(--c-input-background);
+  --mq-primary: var(--c-red);
+  --mq-content-secondary: var(--c-content-secondary);
+  --mq-content-tertiary: var(--c-content-tertiary);
+  --mq-shadow: var(--c-shadow);
+  --mq-shadow-sm: var(--c-shadow-sm);
 
   /* UI state colors - Light Mode Defaults */
   --c-success: #10b981;

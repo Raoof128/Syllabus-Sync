@@ -37,7 +37,7 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 #### ✅ UI Polish & Config (v0.5.39)
-- **Gradient Card Hover Effects**: Raouf: Implemented a sophisticated "Uiverse-style" card hover effect with Macquarie University red branding. Cards now feature a transparent border that illuminates with a gradient (`#a6192e` → `#d6001c`) on hover, accompanied by a subtle inner-content scale reduction (98%) and soft glow. Fixed light/dark mode color leaks by using correct `hsl(var(--card))` variables.
+- **Gradient Card Hover Effects**: Raouf: Implemented a sophisticated "Uiverse-style" card hover effect with Macquarie University red branding. Cards now feature a transparent border that illuminates with a gradient (`#a6192e` → `#d6001c`) on hover, accompanied by a subtle inner-content scale reduction (98%) and soft glow. Fixed critical light/dark mode color leaks by properly aliasing `--mq-card-background` in both `:root` (light) and `.dark` (dark) contexts within `mq-tokens.css`, and migrated `mq-magic-card-content` to use MQ design tokens instead of Shadcn's `hsl(var(--card))` for proper theme consistency.
 - **Next.js 16 Config**: Raouf: Added explicit `turbopack: {}` configuration to `next.config.ts` to silence startup warnings while maintaining a webpack fallback for safe mode.
 
 #### ✅ Stability Fixes (v0.5.38)
