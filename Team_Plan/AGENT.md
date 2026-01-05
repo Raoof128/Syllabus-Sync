@@ -2006,3 +2006,6 @@ Summary:
 Files: app/globals.css; components/ui/mq/button.tsx.
 Verification: npm run build (pass).
 Follow-ups: None.
+
+
+Raouf: Grand Finale (Task 2.6) — Added missing Russian (ru) geolocation Map Page translation keys to complete the 12-language rollout. Verified with ESLint (Lint OK) and grep count reaching 12 occurrences of locationAccessDenied. Date: 2026-01-05.

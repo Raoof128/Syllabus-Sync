@@ -614,8 +614,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: 0.5s;
+  transition: all 0.5s ease;
   border: 1px solid var(--mq-border);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .social-buttons li::before {
@@ -623,20 +625,19 @@
   position: absolute;
   inset: 0;
   border-radius: 48px;
-  background: linear-gradient(45deg, var(--i, #a6192e), var(--j, #d6001c));
+  background: linear-gradient(45deg, #a6192e, #d6001c);
   opacity: 0;
-  transition: 0.5s;
+  transition: opacity 0.5s ease;
+  z-index: 0;
 }
 
 .social-buttons li::after {
   content: "";
   position: absolute;
-  top: 10px;
-  width: 100%;
-  height: 100%;
+  inset: -10px;
   border-radius: 48px;
-  background: linear-gradient(45deg, var(--i, #a6192e), var(--j, #d6001c));
-  transition: 0.5s;
+  background: linear-gradient(45deg, #a6192e, #d6001c);
+  transition: opacity 0.5s ease;
   filter: blur(15px);
   z-index: -1;
   opacity: 0;
@@ -644,7 +645,8 @@
 
 .social-buttons li:hover {
   width: 140px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0);
+  box-shadow: 0 10px 25px rgba(166, 25, 46, 0.3);
+  background: transparent;
 }
 
 .social-buttons li:hover::before {
@@ -655,13 +657,24 @@
   opacity: 0.5;
 }
 
+.social-buttons li a {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .social-buttons li .social-icon {
   color: var(--mq-content-secondary);
   font-size: 1.4em;
-  transition: 0.5s;
+  transition: all 0.5s ease;
   transition-delay: 0.25s;
-  z-index: 2;
+  z-index: 10;
   position: relative;
+  flex-shrink: 0;
 }
 
 .social-buttons li:hover .social-icon {
@@ -670,21 +683,18 @@
   transition-delay: 0s;
 }
 
-.social-buttons li span {
-  position: absolute;
-}
-
 .social-buttons li .social-title {
+  position: absolute;
   color: #fff;
   font-size: 0.85em;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   transform: scale(0);
-  transition: 0.5s;
+  transition: all 0.5s ease;
   transition-delay: 0s;
-  z-index: 2;
-  position: relative;
+  z-index: 10;
+  white-space: nowrap;
 }
 
 .social-buttons li:hover .social-title {
@@ -701,4 +711,8 @@
 
 .dark .social-buttons li .social-icon {
   color: var(--mq-content);
+}
+
+.dark .social-buttons li:hover {
+  box-shadow: 0 10px 25px rgba(166, 25, 46, 0.4);
 }
