@@ -1534,9 +1534,9 @@ Follow-ups: Test client-side authentication forms in browser; verify complete us
 
 ### Raouf: 2026-01-03 (Australia/Sydney)
 Scope: Complete settings page functionality wiring and UI element connections.
-Summary: Wired up all settings page elements including language selection toggle (English/Español), notification preferences for deadlines/classes/events, enhanced Quick Actions navigation with all app sections, added Help & Support section with app info and feedback buttons, improved data export functionality with toast notifications, connected theme toggle with proper state management.
-Files changed: app/settings/page.tsx.
-Verification: All settings page elements are now fully functional; language preference persists in localStorage; notification preferences work with visual feedback; Quick Actions provide complete app navigation; Help & Support section provides user guidance; build passes successfully.
+Summary: Wired up all settings page elements including language selection toggle (English/Español), notification preferences for deadlines/classes/events, enhanced Quick Actions navigation with all app sections, added Help & Support section with app info and feedback buttons, improved data export functionality with toast notifications, connected theme toggle with proper state management, and added visual polish to match MQ design tokens.
+Files changed: app/settings/page.tsx; app/globals.css.
+Verification: All settings page elements are now fully functional; language preference persists in localStorage; notification preferences work with visual feedback; Quick Actions provide complete app navigation; Help & Support section provides user guidance; visual design updated (black borders applied to buttons and subcards, settings buttons use #EDEADE in light mode); build passes successfully.
 Follow-ups: Consider implementing actual language localization; add email notification system when available; enhance feedback system with actual submission capability.
 
 ### Raouf: 2026-01-03 (Australia/Sydney)

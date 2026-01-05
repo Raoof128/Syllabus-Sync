@@ -85,6 +85,18 @@ Raouf: Resolved critical hover effect leak between Announcements and Event Categ
 - Identified duplicate section and nesting issue
 - Verified fix with EditFile tool
 
+### Changed
+
+#### Settings Page Visual Update — Button Borders & Tint 🎨
+
+Raouf: Added black borders to all buttons and subcards on the Settings page and set settings-page button background to #EDEADE in light mode to match the Alabaster tint for improved contrast and brand consistency.
+
+- Implementation:
+  - Scoped CSS rules added to `app/globals.css` targeting `.settings-page [data-slot="button"]` and `.settings-page .mq-magic-card-content .p-3.bg-mq-card-background.rounded-mq-lg` to apply 1px solid black borders.
+  - Light mode button background set to `#EDEADE` for settings page buttons; `.dark` overrides keep dark mode visuals unchanged.
+- Files changed: `app/globals.css`
+- Verification: Visual inspection on Settings page; CSS-only change; existing lint/typecheck status unchanged (unrelated JS/TS issues remain).
+
 ---
 
 ## [0.5.41] - 2026-01-05
