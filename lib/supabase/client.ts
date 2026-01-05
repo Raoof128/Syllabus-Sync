@@ -5,12 +5,22 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 // Check if Supabase is properly configured (not placeholder values)
 export function isSupabaseConfigured(): boolean {
-  return !!(
+  // Check URL is valid
+  const hasValidUrl = !!(
     supabaseUrl &&
-    supabaseAnonKey &&
-    !supabaseUrl.includes('your-project-id') &&
-    supabaseAnonKey !== 'your-anon-key-here'
+    supabaseUrl.includes('supabase.co') &&
+    !supabaseUrl.includes('your-project-id')
   );
+
+  // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ" or publishable keys starting with "sb_"
+  const hasValidKey = !!(
+    supabaseAnonKey &&
+    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
+    supabaseAnonKey !== 'your-anon-key-here' &&
+    !supabaseAnonKey.includes('PASTE')
+  );
+
+  return hasValidUrl && hasValidKey;
 }
 
 export function createBrowserClient() {

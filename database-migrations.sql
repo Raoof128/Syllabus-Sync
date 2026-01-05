@@ -106,7 +106,7 @@ ALTER TABLE public.events ADD COLUMN IF NOT EXISTS building text;
 -- Add user_id to deadlines if it doesn't exist
 -- ALTER TABLE public.deadlines ADD COLUMN IF NOT EXISTS user_id uuid;
 -- ALTER TABLE public.deadlines ADD CONSTRAINT deadlines_user_id_fkey
---   FOREIGN KEY (user_id) REFERENCES public.users(id);
+--   FOREIGN KEY (user_id) REFERENCES auth.users(id);
 
 -- Add user_id to units if it doesn't exist
 -- ALTER TABLE public.units ADD COLUMN IF NOT EXISTS user_id uuid;
