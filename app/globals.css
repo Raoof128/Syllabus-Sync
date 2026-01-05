@@ -892,8 +892,38 @@
 .dark .social-buttons li:hover a {
   box-shadow: 0 10px 25px rgba(166, 25, 46, 0.4);
 }
-.settings-page [data-slot='button'] {
+.settings-page [data-slot='button'],
+.settings-page button {
   border: 1px solid #000 !important;
+  background-color: #edeade !important;
+  color: var(--c-content) !important;
+  transition: background-color 0.15s ease;
+}
+
+.settings-page [data-slot='button']:hover,
+.settings-page button:hover {
+  background-color: #e6e4d8 !important;
+}
+
+.settings-page .mq-magic-card-content .p-3.bg-mq-card-background.rounded-mq-lg {
+  border: 1px solid #000 !important;
+}
+
+.settings-page .mq-magic-card-content .p-3.bg-mq-card-background.rounded-mq-lg:hover {
+  border-color: #000 !important;
+}
+
+.settings-page [data-slot='button'][data-variant='primary'],
+.settings-page [data-slot='button'][data-variant='destructive'] {
+  border-color: #000 !important;
+  background-color: #edeade !important;
+  color: var(--c-content) !important;
+}
+
+.dark .settings-page [data-slot='button'],
+.dark .settings-page button {
+  background-color: var(--c-card-background) !important;
+  color: var(--c-content) !important;
 }
 
 .settings-page [data-slot='button'][data-variant='primary'],
