@@ -37,6 +37,14 @@ Updated team roles and responsibilities with clear tab/feature ownership:
 - `Team_Plan/AGENT.md` - Added team roles section with ownership table
 - `Team_Plan/CHANGELOG.md` - Added this changelog entry
 =======
+## [0.5.43] - 2026-01-06
+
+### Fixed
+
+- **Removed GitHub social button**: Removed the GitHub entry from the sidebar social buttons; `components/layout/SocialButtons.tsx` no longer includes a GitHub link and unused imports were cleaned up.
+- **TypeScript & ESLint fixes**: Fixed several implicit `any` and typing issues and aligned button variant usage with component typings. Key files changed: `app/api/units/route.ts`, `app/api/auth/signin/route.ts`, `app/login/LoginClient.tsx`, `app/client-layout.tsx`, `components/layout/SocialButtons.tsx`, `components/ui/*`.
+- **Verification**: Ran `npm run lint` and `npm run typecheck` — Lint OK; TypeScript passes.
+
 ## [0.5.42] - 2026-01-06
 
 ### Fixed

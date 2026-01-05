@@ -2,7 +2,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Github, Globe, Linkedin, Mail } from 'lucide-react';
+import { Globe, Linkedin, Mail } from 'lucide-react';
 
 const XIcon = ({ className }: { className?: string }) => (
     <svg
@@ -26,12 +26,6 @@ interface SocialLink {
 }
 
 const socialLinks: SocialLink[] = [
-    {
-        name: 'github',
-        icon: Github,
-        href: 'https://github.com/Macquarie-University',
-        label: 'GitHub',
-    },
     {
         name: 'x',
         icon: XIcon,

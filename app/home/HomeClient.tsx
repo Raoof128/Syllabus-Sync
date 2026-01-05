@@ -587,7 +587,7 @@ export default function HomeClient() {
             </Button>
             <Button variant="primary" onClick={confirmDeleteUnit}>
               {t('delete')}
-            </Button>
+            </Button> 
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.41 | Last Updated: January 05, 2026
+Version: 0.5.43 | Last Updated: January 06, 2026
 
 ---
 
@@ -56,6 +56,11 @@ Version: 0.5.41 | Last Updated: January 05, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Removed GitHub social button & fixed TypeScript/ESLint issues (v0.5.43)
+- **Removed GitHub button**: Raouf removed the GitHub social button from the sidebar by editing `components/layout/SocialButtons.tsx` and cleaning up unused imports; the sidebar no longer shows a GitHub button.
+- **TypeScript & ESLint fixes**: Fixed implicit `any` types and typing issues across server and client code; key files updated include `app/api/units/route.ts`, `app/api/auth/signin/route.ts`, `app/login/LoginClient.tsx`, `app/client-layout.tsx`, `components/layout/SocialButtons.tsx`, and several `components/ui/*` files.
+- **Verification**: Ran `npm run lint` and `npm run typecheck` — Lint OK; TypeScript passes.
 
 #### ✅ Events Feed Page - MQ Magic Card Hover + Critical JSX Fix (v0.5.41)
 - **Hover Effects**: Raouf: Extended the premium gradient border hover animation to all Events Feed page cards (Filter Tabs, Events List Container, Individual Event Cards, Quick Stats Sidebar, Announcements Sidebar). All cards now feature the Macquarie red gradient (`#a6192e` → `#d6001c`) with 3D content scale (98%) and soft glow effect matching the consistent interaction pattern established on Home and Map pages.

@@ -42,7 +42,7 @@ export const Hero: React.FC<HeroProps> = ({
               >
                 {primaryAction.label}
               </Button>
-            )}
+            )} 
             {secondaryAction && (
               <Button
                 variant="secondary"

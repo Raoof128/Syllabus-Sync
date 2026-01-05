@@ -502,7 +502,7 @@ export default function SettingsPage() {
                       {t('japanese')}
                     </Button>
                     <Button
-                      variant={language === 'ur' ? 'primary' : 'ghost'}
+                      variant={language === 'ur' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => handleLanguageChange('ur')}
                       onKeyDown={(e) => {
@@ -518,7 +518,7 @@ export default function SettingsPage() {
                       {t('urdu')}
                     </Button>
                     <Button
-                      variant={language === 'th' ? 'primary' : 'ghost'}
+                      variant={language === 'th' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => handleLanguageChange('th')}
                       onKeyDown={(e) => {
@@ -534,7 +534,7 @@ export default function SettingsPage() {
                       {t('thai')}
                     </Button>
                     <Button
-                      variant={language === 'vi' ? 'primary' : 'ghost'}
+                      variant={language === 'vi' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => handleLanguageChange('vi')}
                       onKeyDown={(e) => {
@@ -550,7 +550,7 @@ export default function SettingsPage() {
                       {t('vietnamese')}
                     </Button>
                     <Button
-                      variant={language === 'ru' ? 'primary' : 'ghost'}
+                      variant={language === 'ru' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => handleLanguageChange('ru')}
                       onKeyDown={(e) => {
@@ -672,7 +672,7 @@ export default function SettingsPage() {
                     <p className="text-mq-sm text-mq-content-secondary">{t('clearAllDataDesc')}</p>
                   </div>
                   <Button
-                    variant="primary"
+                    variant="default"
                     size="sm"
                     onClick={handleClearAllData}
                     disabled={clearing}
@@ -783,7 +783,7 @@ export default function SettingsPage() {
             <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
               {t('cancel')}
             </Button>
-            <Button variant="primary" onClick={confirmClearAllData} disabled={clearing}>
+            <Button variant="default" onClick={confirmClearAllData} disabled={clearing}>
               {clearing ? t('clearing') : t('clearAllDataTitle')}
             </Button>
           </DialogFooter>

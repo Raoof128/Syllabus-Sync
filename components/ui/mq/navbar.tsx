@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Button variant="primary" size="sm" onClick={onAction}>
                 {finalActionLabel}
               </Button>
-            )}
+            )}  
           </div>
         </div>
       </div>

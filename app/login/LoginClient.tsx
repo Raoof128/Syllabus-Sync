@@ -56,7 +56,7 @@ export default function LoginClient() {
         supabase.auth.signInWithPassword({
           email,
           password,
-        }).catch(err => ({ error: err })), // Catch auth errors to prevent fail-fast
+        }).catch((err: unknown) => ({ error: err as Error })), // Catch auth errors to prevent fail-fast
         minWait
       ]);
 
