@@ -274,8 +274,24 @@ Version: 0.5.8 | Last Updated: January 04, 2026
 
 ## 👥 Team Responsibilities
 
-### 👨‍💻 Raouf - Backend Lead & Full-Stack Developer
-**Primary Focus:** Database, API, Authentication, Infrastructure
+### 📋 Tab Ownership Summary
+
+| Tab/Feature | Owner | Status |
+|-------------|-------|--------|
+| **Home Tab** | Pouya | 🚧 In Progress |
+| **Calendar Tab** | Pouya | 🚧 In Progress |
+| **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
+| **Map Tab** | Raouf | 🚧 In Progress |
+| **Settings Tab** | Raouf | 🚧 In Progress |
+| **AI Integration** | Kit | 🔜 Demo Feature |
+
+### 👨‍💻 Raouf - Backend Lead & Map/Settings Owner
+**Primary Focus:** Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Authentication, Infrastructure
+
+**Tab Responsibilities:**
+- 🗺️ **Map Tab**: Interactive campus map, building navigation, search functionality
+- ⚙️ **Settings Tab**: User preferences, theme settings, data management, profile settings
+- 📰 **Feed Tab (Backend)**: Events API, data architecture, filtering logic
 
 **Completed Work:**
 - ✅ Complete database schema design and implementation
@@ -287,20 +303,45 @@ Version: 0.5.8 | Last Updated: January 04, 2026
 - ✅ Production deployment preparation
 
 **Current Responsibilities:**
-- 🔧 Backend system maintenance and optimization
+- 🔧 Map tab development and campus navigation features
+- ⚙️ Settings tab functionality and user preferences
+- 📰 Feed tab backend logic and API integration
 - 🚀 Performance monitoring and scaling
 - 🔒 Security updates and compliance
 - 📊 Analytics and monitoring implementation
 
-### 👨‍💻 Pouya - Frontend Lead & UI/UX Developer
-**Primary Focus:** User Interface, Components, User Experience
+### 👨‍💻 Pouya - Frontend Lead & Home/Calendar Owner
+**Primary Focus:** Home Tab, Calendar Tab, Feed Tab (Frontend), User Interface, Components, User Experience
+
+**Tab Responsibilities:**
+- 🏠 **Home Tab**: Home dashboard, widgets, quick actions, today's schedule
+- 📅 **Calendar Tab**: Calendar page, deadline management, unit integration
+- 📰 **Feed Tab (Frontend)**: Events UI, filtering components, display widgets
 
 **Planned Work:**
+- 🏠 Home tab enhancements and dashboard optimization
+- 📅 Calendar tab development with deadline integration
+- 📰 Feed tab frontend UI components and filtering
 - 🎨 Advanced UI components and animations
 - 📱 Mobile responsiveness and touch interactions
 - ♿ Accessibility enhancements and compliance
 - 🎯 User experience optimization and testing
 - 🎪 Demo preparation and presentation materials
+
+### 🤖 Kit - AI Integration Specialist
+**Primary Focus:** AI Features, Demo AI Integration, Smart Recommendations
+
+**AI Responsibilities:**
+- 🤖 **AI Integration**: Implement AI features for demo presentation
+- 🧠 **Smart Recommendations**: AI-powered suggestions and predictions
+- 💬 **Natural Language Processing**: Potential chatbot or assistant features
+- 🎪 **Demo AI Features**: Showcase AI capabilities to university administration
+
+**Planned Work:**
+- 🤖 AI feature implementation for demo
+- 🧠 Smart deadline predictions and reminders
+- 💬 AI assistant or chatbot integration
+- 🎯 AI-powered user experience enhancements
 
 ---
 
@@ -418,12 +459,13 @@ Version: 0.5.8 | Last Updated: January 04, 2026
 
 ---
 
-**Last Updated:** January 04, 2026
-**Version:** 0.5.8
+**Last Updated:** January 05, 2026
+**Version:** 0.5.41
 **Status:** Production Ready - 12-Language Support & Dynamic i18n
 
 ---
 
 **Questions?** Contact team leads:
-- **Raouf**: Backend, Database, API, Infrastructure
-- **Pouya**: Frontend, UI/UX, Components, User Experience
+- **Raouf**: Map Tab, Settings Tab, Backend, Database, API, Infrastructure
+- **Pouya**: Home Tab, Calendar Tab, Frontend, UI/UX, Components, User Experience
+- **Kit**: AI Integration, Demo AI Features

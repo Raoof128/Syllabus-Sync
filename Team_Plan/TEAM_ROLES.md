@@ -1,19 +1,34 @@
 # 👥 Team Roles & Responsibilities
 
-**Syllabus Sync - Frontend/Backend Division**
+**Syllabus Sync - Feature-Based Team Division**
 
-Last Updated: January 01, 2026
-Version: 0.5.0
+Last Updated: January 05, 2026
+Version: 0.5.41
+
+---
+
+## 📋 Tab/Feature Ownership Summary
+
+| Tab/Feature | Owner | Status |
+|-------------|-------|--------|
+| **Home Tab** | Pouya | 🚧 In Progress |
+| **Calendar Tab** | Pouya | 🚧 In Progress |
+| **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
+| **Map Tab** | Raouf | 🚧 In Progress |
+| **Settings Tab** | Raouf | 🚧 In Progress |
+| **AI Integration** | Kit | 🔜 Demo Feature |
 
 ---
 
 ## 🚀 RAOUF - Full-Stack Developer & Project Lead
 
 ### Role Overview
-Responsible for complete end-to-end development of the Syllabus Sync application, including frontend UI/UX, backend architecture, system design, performance optimization, testing, and deployment.
+Responsible for Map tab, Settings tab, half of Feed tab, backend architecture, system design, performance optimization, testing, and deployment.
 
 ### Primary Responsibilities
-- ✅ **Frontend Development**: UI/UX design, React components, responsive design, accessibility
+- ✅ **Map Tab Development**: Interactive campus map, building navigation, search functionality
+- ✅ **Settings Tab Development**: User preferences, theme settings, data management
+- ✅ **Feed Tab (Backend)**: Events API, data architecture, filtering logic
 - ✅ **Backend Architecture**: TypeScript types, state management, error handling systems
 - ✅ **System Integration**: API design, performance optimization, build configuration
 - ✅ **Quality Assurance**: Testing, linting, code quality, documentation
@@ -378,9 +393,12 @@ app/api/
 ## 🎨 POUYA - Frontend Lead
 
 ### Role Overview
-Responsible for all user-facing features, UI/UX implementation, component development, state management, and ensuring a responsive, intuitive interface.
+Responsible for Home tab, Calendar tab, half of Feed tab (frontend), all user-facing features, UI/UX implementation, component development, state management, and ensuring a responsive, intuitive interface.
 
 ### Primary Responsibilities
+- ✅ **Home Tab Development**: Home dashboard, widgets, quick actions, today's schedule
+- ✅ **Calendar Tab Development**: Calendar page, deadline management, unit integration
+- ✅ **Feed Tab (Frontend)**: Events UI, filtering components, display widgets
 - ✅ UI/UX implementation & design
 - ✅ React component development
 - ✅ State management with Zustand
@@ -579,16 +597,17 @@ Hey Pouya! Don't forget to run `npm run prepush` after every single task you com
 
 ## 📊 Work Distribution Summary
 
-| Category | Pouya (Frontend) | Raouf (Backend) |
-|----------|------------------|-----------------|
-| **Pages** | Home, Layout, Error pages, Calendar | Map, Settings, Feed |
-| **Components** | All UI components, forms, widgets | Error boundaries, system components |
-| **State** | Zustand stores, CRUD operations | Types, API integration, configuration |
-| **Styling** | CSS, Tailwind, responsive design | Theme system, build configuration |
-| **Data** | Store logic, user interactions | Sample data, API architecture |
-| **Testing** | Component tests, UI interactions | System tests, build verification |
-| **Config** | Tailwind, PostCSS, component setup | App config, ESLint, TypeScript, build |
-| **Quality** | Accessibility, UX, performance | Error handling, retry systems, monitoring |
+| Category | Pouya (Frontend) | Raouf (Backend) | Kit (AI) |
+|----------|------------------|-----------------|----------|
+| **Tabs** | Home, Calendar, Feed (50%) | Map, Settings, Feed (50%) | AI Integration |
+| **Pages** | Home, Layout, Error pages, Calendar | Map, Settings | AI Demo features |
+| **Components** | All UI components, forms, widgets | Error boundaries, system components | AI components |
+| **State** | Zustand stores, CRUD operations | Types, API integration, configuration | AI state |
+| **Styling** | CSS, Tailwind, responsive design | Theme system, build configuration | - |
+| **Data** | Store logic, user interactions | Sample data, API architecture | AI models |
+| **Testing** | Component tests, UI interactions | System tests, build verification | AI testing |
+| **Config** | Tailwind, PostCSS, component setup | App config, ESLint, TypeScript, build | - |
+| **Quality** | Accessibility, UX, performance | Error handling, retry systems, monitoring | - |
 
 ---
 
@@ -669,8 +688,9 @@ Hey Pouya! Don't forget to run `npm run prepush` after every single task you com
 
 ## 📞 Contact & Coordination
 
-**Frontend Lead:** Pouya
-**Backend Lead:** Raouf
+**Frontend Lead (Home & Calendar):** Pouya
+**Backend Lead (Map & Settings):** Raouf
+**AI Integration Lead:** Kit
 
 **Meeting Schedule:**
 - Weekly sync: Every Monday
@@ -684,6 +704,25 @@ Hey Pouya! Don't forget to run `npm run prepush` after every single task you com
 - AGENT.md: Technical reference
 - CHANGELOG.md: Version history
 - TEAM_ROLES.md: Team responsibilities (this file)
+
+---
+
+## 🤖 KIT - AI Integration Specialist
+
+### Role Overview
+Responsible for adding AI capabilities to the web application for the demo presentation.
+
+### Primary Responsibilities
+- 🔜 **AI Integration**: Implement AI features for demo
+- 🔜 **Smart Recommendations**: AI-powered suggestions and predictions
+- 🔜 **Natural Language Processing**: Potential chatbot or assistant features
+- 🔜 **Demo AI Features**: Showcase AI capabilities to university administration
+
+### 📂 Files Kit Works On (AI)
+- AI integration components and services
+- AI-related API endpoints
+- AI model configuration and setup
+- Demo-specific AI features
 
 ---
 
@@ -710,14 +749,18 @@ Hey Pouya! Don't forget to run `npm run prepush` after every single task you com
 - [x] **Both**: Quality assurance and final integration testing
 
 ### Phase 3 🚧 (Next - API Integration & Cloud)
-- [ ] **Pouya**: Supabase authentication UI and real-time components
+- [ ] **Pouya**: Home tab enhancements and Calendar tab integration with real-time data
+- [ ] **Pouya**: Feed tab frontend (UI components, filtering, display)
+- [ ] **Raouf**: Map tab development and Settings tab functionality
+- [ ] **Raouf**: Feed tab backend (API, data architecture, filtering logic)
 - [ ] **Raouf**: Database schema design and API implementation
-- [ ] **Both**: Migration from localStorage to cloud storage
-- [ ] **Both**: User collaboration and sharing features
+- [ ] **Kit**: AI integration planning and implementation for demo
+- [ ] **All**: Migration from localStorage to cloud storage
+- [ ] **All**: User collaboration and sharing features
 
 ---
 
-**Last Updated:** January 01, 2026
-**Version:** 0.5.0
+**Last Updated:** January 05, 2026
+**Version:** 0.5.41
 **Status:** Phase 1 & Phase 2 Complete ✅ - Ready for Phase 3 (API Integration)
 

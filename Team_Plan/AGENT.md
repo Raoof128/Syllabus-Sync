@@ -2,22 +2,43 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.40 | Last Updated: January 05, 2026
+Version: 0.5.41 | Last Updated: January 05, 2026
 
 ---
 
 ## 📋 Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Architecture](#architecture)
-3. [Tech Stack](#tech-stack)
-4. [Team Roles](#team-roles)
+2. [Team Roles](#team-roles)
+3. [Architecture](#architecture)
+4. [Tech Stack](#tech-stack)
 5. [File Structure](#file-structure)
 6. [Development Guidelines](#development-guidelines)
 7. [State Management](#state-management)
 8. [API Reference](#api-reference)
 9. [Component Library](#component-library)
 10. [Testing Strategy](#testing-strategy)
+
+---
+
+## Team Roles
+
+### 📋 Tab/Feature Ownership
+
+| Tab/Feature | Owner | Status |
+|-------------|-------|--------|
+| **Home Tab** | Pouya | 🚧 In Progress |
+| **Calendar Tab** | Pouya | 🚧 In Progress |
+| **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
+| **Map Tab** | Raouf | 🚧 In Progress |
+| **Settings Tab** | Raouf | 🚧 In Progress |
+| **AI Integration** | Kit | 🔜 Demo Feature |
+
+### Team Members
+
+- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Infrastructure
+- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend), UI/UX, Components
+- **Kit**: AI Integration for Demo
 
 ---
 

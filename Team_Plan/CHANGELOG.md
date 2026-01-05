@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.41] - 2026-01-05
+
+### Changed
+
+#### Team Structure Update 👥
+
+Updated team roles and responsibilities with clear tab/feature ownership:
+
+**Tab Ownership:**
+| Tab/Feature | Owner |
+|-------------|-------|
+| **Home Tab** | Pouya |
+| **Calendar Tab** | Pouya |
+| **Feed Tab** | Pouya (50%) + Raouf (50%) |
+| **Map Tab** | Raouf |
+| **Settings Tab** | Raouf |
+| **AI Integration** | Kit |
+
+**Team Member Focus:**
+- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend - UI components, filtering, display)
+- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend - API, data architecture, filtering logic)
+- **Kit**: AI Integration for Demo (smart recommendations, NLP features, demo AI capabilities)
+
+**Files Changed:**
+- `Team_Plan/TEAM_ROLES.md` - Comprehensive update with new tab ownership structure
+- `Team_Plan/TEAM_ROADMAP.md` - Updated team responsibilities and contact info
+- `Team_Plan/AGENT.md` - Added team roles section with ownership table
+- `Team_Plan/CHANGELOG.md` - Added this changelog entry
+
+---
+
 ## [0.5.40] - 2026-01-05
 
 ### Changed
