@@ -79,3 +79,10 @@ supabase/
 database-migration.sql
 fix-schema-mismatch.sql
 *-migration.sql
+BATCH_TEST.md
+MAGIC_CARD_NESTED_FIX.md
+MAGIC_CARD_FIX_SUMMARY.md
+UPGRADE_TEST_REPORT.md
+TEMP_FIX.txt
+SUBAGENT_MCP_COMPLETE_REFERENCE.md
+FeedClient_SIDEBAR_FIX.txt

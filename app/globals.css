@@ -596,18 +596,23 @@
 
 .mq-magic-card {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 100%;
-  height: 100%;
   padding: 3px;
   border-radius: var(--c-radius-lg);
-  /* No background by default - gradient only shows on hover */
   background: transparent;
-  transition: background 0.3s ease-out, box-shadow 0.3s ease-out;
   isolation: isolate;
   z-index: 1;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Magic Card Animation ENABLED - Complete Red Hover Effect for Event Cards */
+
+.mq-magic-card:hover {
+  background: linear-gradient(135deg, #a6192e, #d6001c);
+  box-shadow: 0 8px 20px rgba(166, 25, 46, 0.25), 0 4px 8px rgba(166, 25, 46, 0.15);
+  transform: translateY(-2px);
 }
 
 .mq-magic-card-content {
@@ -615,26 +620,32 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   border-radius: calc(var(--c-radius-lg) - 3px);
-  overflow: hidden;
-  /* Match MQ design tokens in BOTH themes */
+  overflow: visible;
   background-color: var(--mq-card-background);
   border: 1px solid var(--mq-border);
-  transition: all 0.2s ease-out;
-  z-index: 1;
-}
-
-/* Hover State: red gradient border appears + glow + inner card shrink */
-.mq-magic-card:hover {
-  z-index: 50;
-  background: linear-gradient(163deg, #a6192e 0%, #d6001c 100%);
-  box-shadow: 0 0 30px 1px rgba(166, 25, 46, 0.3);
+  z-index: 2;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mq-magic-card:hover .mq-magic-card-content {
-  transform: scale(0.98);
-  border-radius: calc(var(--c-radius-lg) + 2px);
+  transform: scale(0.995);
+  border-radius: calc(var(--c-radius-lg) - 3px);
+  border-color: transparent;
+  box-shadow: inset 0 0 20px rgba(166, 25, 46, 0.08);
+}
+
+/* Active state - subtle press effect */
+.mq-magic-card:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(166, 25, 46, 0.2), 0 2px 4px rgba(166, 25, 46, 0.1);
+}
+
+/* Ensure all content inside cards is visible */
+.mq-magic-card-content > * {
+  position: relative;
+  z-index: 3;
 }
 
 

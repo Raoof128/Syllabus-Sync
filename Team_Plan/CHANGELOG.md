@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+<<<<<<< HEAD
 ## [0.5.41] - 2026-01-05
 
 ### Changed
@@ -35,6 +36,105 @@ Updated team roles and responsibilities with clear tab/feature ownership:
 - `Team_Plan/TEAM_ROADMAP.md` - Updated team responsibilities and contact info
 - `Team_Plan/AGENT.md` - Added team roles section with ownership table
 - `Team_Plan/CHANGELOG.md` - Added this changelog entry
+=======
+## [0.5.42] - 2026-01-06
+
+### Fixed
+
+#### Duplicate Event Categories Section - Hover Leak Bug 🐛
+
+Raouf: Resolved critical hover effect leak between Announcements and Event Categories cards on the Events Feed page caused by duplicate "Categories Legend" section nested inside Announcements wrapper.
+
+**Root Cause:**
+- **Duplicate Section**: Two "Event Categories" sections existed (lines 288-321 "Categories Legend" + lines 324-349 "Event Categories")
+- **Nesting Issue**: The old "Categories Legend" section (288-321) was nested inside the Announcements `mq-magic-card` wrapper, causing both cards to share the same parent hover context
+- **Hover Leak**: Hovering over either Announcements or Event Categories triggered the red gradient effect on BOTH cards simultaneously
+
+**Solution:**
+- **Removed** duplicate "Categories Legend" section (lines 287-322)
+- **Kept** the new "Event Categories" section with its own independent `mq-magic-card` wrapper (lines 289-314)
+- **Result**: Each card now has its own wrapper, enabling independent hover effects
+
+**Structure After Fix:**
+```tsx
+// Announcements (line 249-287)
+<div className="mq-magic-card">           // ✅ Independent wrapper
+  <Card className="mq-magic-card-content">
+    {/* Announcements content */}
+  </Card>
+</div>                                     // ✅ Closes properly
+
+// Event Categories (line 289-314)
+<div className="mq-magic-card">           // ✅ Independent wrapper
+  <Card className="mq-magic-card-content">
+    {/* Event Categories badges */}
+  </Card>
+</div>                                     // ✅ Closes properly
+```
+
+**Files Changed:**
+- `app/feed/FeedClient.tsx` - Removed duplicate "Categories Legend" section
+
+**Testing:**
+- ✅ Hover over Announcements → Only Announcements gets red gradient
+- ✅ Hover over Event Categories → Only Event Categories gets red gradient
+- ✅ No more hover effect "leak" between cards
+
+**Debugging Method:**
+- Used SubAgent MCP v2.5.0 ContextAgent with `lineRange: { start: 240, end: 360 }` to inspect exact structure
+- Identified duplicate section and nesting issue
+- Verified fix with EditFile tool
+
+---
+
+## [0.5.41] - 2026-01-05
+
+### Added
+
+#### MQ Magic Card Hover Effects - Events Feed Page 🎨
+
+Raouf: Extended the premium gradient border hover animation to all Events Feed page cards, matching the consistent interaction pattern established on Home and Map pages.
+
+**Implementation:**
+- **Universal Coverage**: Applied `.mq-magic-card` / `.mq-magic-card-content` wrapper to all 5 card types on Events Feed:
+  - Filter Tabs Card (category selector)
+  - Events List Container Card
+  - Individual Event Cards (within the map)
+  - Quick Stats Sidebar Card
+  - Announcements Sidebar Card
+- **Gradient Effect**: Red linear gradient border (`#a6192e` → `#d6001c`) appears on hover
+- **3D Interaction**: Inner content scales to 98% creating depth perception
+- **Soft Glow**: Subtle red box-shadow (`rgba(166, 25, 46, 0.3)`) enhances premium feel
+
+**Files Changed:**
+- `app/feed/FeedClient.tsx` - Wrapped all cards with MQ magic hover shell
+
+### Fixed
+
+#### Critical JSX Parsing Error 🐛
+
+Raouf: Resolved build-blocking parsing error at line 196 in FeedClient.tsx caused by unbalanced JSX tags in the events rendering block.
+
+- **Root Cause**: Missing closing `</div>` tag for the outer `mq-magic-card` wrapper in the `filteredEvents.map()` block, causing the ternary operator `) : (` to be misinterpreted by the parser
+- **Error Message**: "Unexpected token. Did you mean `{'}'}` or `&rbrace;`?"
+- **Solution**: Added the missing closing `</div>` tag between the `mq-magic-card-content` closing tag and the `))` map terminator
+- **Debugging Method**: Used SubAgent MCP ContextAgent with complete file content (no truncation) to identify exact JSX structure imbalance
+- **JSX Balance Restored**: 
+  ```tsx
+  <div className="mq-magic-card">              // Opens
+    <div className="mq-magic-card-content p-4"> // Opens
+      {/* Event content */}
+    </div>                                       // ✅ Closes mq-magic-card-content
+  </div>                                         // ✅ Closes mq-magic-card (was missing!)
+  ))                                             // ✅ Closes map
+  ```
+
+**Verification:**
+- Build error completely resolved
+- All event cards render with proper hover animation
+- No CLS (Cumulative Layout Shift) issues
+- SubAgent MCP EditFile tool successfully applied targeted fix
+>>>>>>> 68a9766 (Raouf-feat(feed): implement magic card hover effects and fix JSX structure)
 
 ---
 

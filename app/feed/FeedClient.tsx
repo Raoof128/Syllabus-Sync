@@ -126,64 +126,63 @@ const FeedClient = memo(() => {
                             <div className="space-y-4">
                                 {filteredEvents.length > 0 ? (
                                     filteredEvents.map((event) => (
-                                        <div
-                                            key={event.id}
-                                            className="p-4 bg-mq-card-background rounded-mq-lg hover:bg-mq-hover-background transition-all duration-mq-fast ease-mq-snap hover:shadow-mq border border-mq-border hover:border-mq-border-secondary"
-                                        >
-                                            {/* Event Header */}
-                                            <div className="flex items-start justify-between gap-3 mb-3">
-                                                <h3 className="font-semibold text-mq-content text-mq-lg">
+                                        <div key={event.id} className="mq-magic-card">
+                                            <div className="mq-magic-card-content p-4">
+                                                {/* Event Header */}
+                                                <div className="flex items-start justify-between gap-3 mb-3">
+                                                    <h3 className="font-semibold text-mq-content text-mq-lg">
+                                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                                        {t((event.translationKey || event.title) as any)}
+                                                    </h3>
+                                                    <Badge
+                                                        className={categoryColors[event.category as keyof typeof categoryColors]}
+                                                    >
+                                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                                        {t((`category_${event.category.replace(/ /g, '')}`) as any)}
+                                                    </Badge>
+                                                </div>
+
+                                                {/* Event Description */}
+                                                <p className="text-mq-sm text-mq-content-secondary mb-3">
                                                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                                    {t((event.translationKey || event.title) as any)}
-                                                </h3>
-                                                <Badge
-                                                    className={categoryColors[event.category as keyof typeof categoryColors]}
-                                                >
-                                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                                    {t((`category_${event.category.replace(/ /g, '')}`) as any)}
-                                                </Badge>
-                                            </div>
+                                                    {t((event.descriptionKey || event.description) as any)}
+                                                </p>
 
-                                            {/* Event Description */}
-                                            <p className="text-mq-sm text-mq-content-secondary mb-3">
-                                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                                {t((event.descriptionKey || event.description) as any)}
-                                            </p>
+                                                {/* Event Details */}
+                                                <div className="flex flex-wrap items-center gap-4 text-mq-sm text-mq-content-secondary">
+                                                    <div className="flex items-center gap-1">
+                                                        <Calendar className="h-4 w-4" />
+                                                        {new Date(event.date).toLocaleDateString(
+                                                            language === 'fa' ? 'fa-IR' : language === 'es' ? 'es-ES' : 'en-AU',
+                                                            {
+                                                                weekday: 'short',
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                            },
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Clock className="h-4 w-4" />
+                                                        {event.time}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <MapPin className="h-4 w-4" />
+                                                        {event.location}
+                                                    </div>
+                                                </div>
 
-                                            {/* Event Details */}
-                                            <div className="flex flex-wrap items-center gap-4 text-mq-sm text-mq-content-secondary">
-                                                <div className="flex items-center gap-1">
-                                                    <Calendar className="h-4 w-4" />
-                                                    {new Date(event.date).toLocaleDateString(
-                                                        language === 'fa' ? 'fa-IR' : language === 'es' ? 'es-ES' : 'en-AU',
-                                                        {
-                                                            weekday: 'short',
-                                                            month: 'short',
-                                                            day: 'numeric',
-                                                        },
-                                                    )}
+                                                {/* Action Button */}
+                                                <div className="mt-3 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
+                                                    <Button variant="secondary" size="sm">
+                                                        {t('remindMe')}
+                                                    </Button>
+                                                    <Button asChild variant="secondary" size="sm">
+                                                        <Link href={`/map?building=${event.building}`}>
+                                                            <Navigation className="h-4 w-4 mr-2" />
+                                                            {t('navigate')}
+                                                        </Link>
+                                                    </Button>
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="h-4 w-4" />
-                                                    {event.time}
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <MapPin className="h-4 w-4" />
-                                                    {event.location}
-                                                </div>
-                                            </div>
-
-                                            {/* Action Button */}
-                                            <div className="mt-3 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
-                                                <Button variant="secondary" size="sm">
-                                                    {t('remindMe')}
-                                                </Button>
-                                                <Button asChild variant="secondary" size="sm">
-                                                    <Link href={`/map?building=${event.building}`}>
-                                                        <Navigation className="h-4 w-4 mr-2" />
-                                                        {t('navigate')}
-                                                    </Link>
-                                                </Button>
                                             </div>
                                         </div>
                                     ))
@@ -201,7 +200,8 @@ const FeedClient = memo(() => {
                 {/* Sidebar - 1 column */}
                 <div className="space-y-6">
                     {/* Quick Stats */}
-                    <Card>
+                    <div className="mq-magic-card">
+                        <Card className="mq-magic-card-content">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <TrendingUp className="h-5 w-5" />
@@ -243,10 +243,12 @@ const FeedClient = memo(() => {
                                 </span>
                             </div>
                         </CardContent>
-                    </Card>
+                        </Card>
+                    </div>
 
                     {/* Announcements */}
-                    <Card>
+                    <div className="mq-magic-card">
+                        <Card className="mq-magic-card-content">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Megaphone className="h-5 w-5" />
@@ -282,46 +284,39 @@ const FeedClient = memo(() => {
                             </div>
                         </CardContent>
                     </Card>
-
-                    {/* Categories Legend */}
-                    <Card>
+                    </div>
+                
+            {/* Event Categories */}
+        <div className="mq-magic-card">
+    <Card className="mq-magic-card-content">
                         <CardHeader>
-                            <CardTitle>{t('eventCategories')}</CardTitle>
+                        <CardTitle>{t('eventCategories')}</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <Badge className={categoryColors.Academic}>
-                                    {t('academic')}
-                                </Badge>
-                                <span className="text-mq-sm text-mq-content-secondary">{t('workshopsStudy')}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Badge className={categoryColors.Career}>
-                                    {t('career')}
-                                </Badge>
-                                <span className="text-mq-sm text-mq-content-secondary">{t('jobInternship')}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Badge className={categoryColors.Social}>
-                                    {t('social')}
-                                </Badge>
-                                <span className="text-mq-sm text-mq-content-secondary">
-                                    {t('meetupsNetworking')}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Badge className={categoryColors['Free Food']}>
-                                    {t('freeFood')}
-                                </Badge>
-                                <span className="text-mq-sm text-mq-content-secondary">{t('mealsSnacks')}</span>
-                            </div>
+                        <CardContent className="space-y-3">
+                        <div className="flex items-center justify-between">
+                        <Badge className="bg-mq-success/10 text-mq-success">{t('category_Academic')}</Badge>
+                        <span className="text-mq-sm text-mq-content-secondary">Workshops & Study</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                        <Badge className="bg-mq-info/10 text-mq-info">{t('category_Career')}</Badge>
+                        <span className="text-mq-sm text-mq-content-secondary">Job & Internship</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                        <Badge className="bg-mq-purple/10 text-mq-purple">{t('category_Social')}</Badge>
+                        <span className="text-mq-sm text-mq-content-secondary">Meetups & Networking</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                        <Badge className="bg-mq-warning/10 text-mq-warning">{t('category_FreeFood')}</Badge>
+                        <span className="text-mq-sm text-mq-content-secondary">Meals & Snacks</span>
+                        </div>
                         </CardContent>
-                    </Card>
-                </div>
-            </div>
-        </div>
-    );
-});
+                        </Card>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        );
+                        });
 
 FeedClient.displayName = 'FeedClient';
 
