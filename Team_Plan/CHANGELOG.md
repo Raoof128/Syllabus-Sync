@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.40] - 2026-01-05
+
+### Changed
+
+#### Map Page Card Hover Consistency 🗺️
+
+Raouf: Extended the shared `.mq-magic-card` / `.mq-magic-card-content` hover treatment to all Map page cards so the Map page matches the Home dashboard's MQ red gradient + glow interaction.
+
+**Files Changed:**
+- `app/map/MapClient.tsx` - Wrapped the Map, Campus Buildings, and all 3 "Features Coming Soon" cards with the hover shell.
+
+---
+
 ## [0.5.39] - 2026-01-05
 
 ### Added

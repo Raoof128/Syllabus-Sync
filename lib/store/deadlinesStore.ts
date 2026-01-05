@@ -132,14 +132,19 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       },
 
       updateDeadline: async (id, updatedDeadline) => {
-        // Guard: If ID is invalid, abort API call to prevent crash
-        if (!isValidUUID(id)) {
-          console.error(`Cannot update invalid UUID: ${id}`);
-          return null;
-        }
-
-        const currentDeadline = get().deadlines.find(d => d.id === id);
+        const currentDeadline = get().deadlines.find((d) => d.id === id);
         if (!currentDeadline) return null;
+
+        // If ID is not a UUID, treat as local-only (sample/legacy) and skip API calls.
+        // This prevents console errors and keeps the UI functional (e.g. toggleComplete).
+        if (!isValidUUID(id)) {
+          console.warn(`Updating non-UUID deadline locally only: ${id}`);
+          const localUpdate = { ...currentDeadline, ...updatedDeadline };
+          set((state) => ({
+            deadlines: state.deadlines.map((d) => (d.id === id ? localUpdate : d)),
+          }));
+          return localUpdate;
+        }
 
         const optimisticUpdate = { ...currentDeadline, ...updatedDeadline };
         set((state) => ({

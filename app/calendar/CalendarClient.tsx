@@ -34,55 +34,59 @@ export default function CalendarClient() {
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5" />
-            {t('upcomingDeadlines')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {hasHydrated && deadlines.length === 0 ? (
-            <div className="text-center py-12">
-              <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-              <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noDeadlinesYet')}</h3>
-              <p className="text-mq-content-secondary mb-4">
-                {t('addDeadlinesDesc')}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {deadlines.slice(0, 5).map((deadline) => (
-                <div key={deadline.id} className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => toggleComplete(deadline.id)}
-                      className="text-mq-content-secondary hover:text-mq-content transition-colors"
-                    >
-                      {deadline.completed ? (
-                        <CheckCircle2 className="h-5 w-5 text-mq-success" />
-                      ) : (
-                        <Circle className="h-5 w-5" />
-                      )}
-                    </button>
-                    <div>
-                      <h4 className={`font-medium ${deadline.completed ? 'line-through text-mq-content-secondary' : 'text-mq-content'}`}>
-                        {deadline.title}
-                      </h4>
-                      <p className="text-mq-sm text-mq-content-secondary">
-                        {deadline.unitCode} • {t('due')} {new Date(deadline.dueDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className={PRIORITY_COLORS[deadline.priority]}>
-                    {deadline.priority}
-                  </Badge>
+      <div className="mq-magic-card">
+        <div className="mq-magic-card-content p-0">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" />
+                {t('upcomingDeadlines')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {hasHydrated && deadlines.length === 0 ? (
+                <div className="text-center py-12">
+                  <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noDeadlinesYet')}</h3>
+                  <p className="text-mq-content-secondary mb-4">
+                    {t('addDeadlinesDesc')}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              ) : (
+                <div className="space-y-4">
+                  {deadlines.slice(0, 5).map((deadline) => (
+                    <div key={deadline.id} className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => toggleComplete(deadline.id)}
+                          className="text-mq-content-secondary hover:text-mq-content transition-colors"
+                        >
+                          {deadline.completed ? (
+                            <CheckCircle2 className="h-5 w-5 text-mq-success" />
+                          ) : (
+                            <Circle className="h-5 w-5" />
+                          )}
+                        </button>
+                        <div>
+                          <h4 className={`font-medium ${deadline.completed ? 'line-through text-mq-content-secondary' : 'text-mq-content'}`}>
+                            {deadline.title}
+                          </h4>
+                          <p className="text-mq-sm text-mq-content-secondary">
+                            {deadline.unitCode} • {t('due')} {new Date(deadline.dueDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge className={PRIORITY_COLORS[deadline.priority]}>
+                        {deadline.priority}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

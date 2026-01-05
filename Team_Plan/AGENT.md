@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.39 | Last Updated: January 05, 2026
+Version: 0.5.40 | Last Updated: January 05, 2026
 
 ---
 
@@ -35,6 +35,9 @@ Version: 0.5.39 | Last Updated: January 05, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Map Page Hover Polish (v0.5.40)
+- **Map Page Magic Cards**: Raouf: Applied the shared `mq-magic-card` hover wrapper to the Map page cards (Interactive Map, Campus Buildings Quick Reference, and all 3 "Features Coming Soon" cards) so Map matches the same MQ red gradient + glow hover behaviour used on Home/Calendar.
 
 #### ✅ UI Polish & Config (v0.5.39)
 - **Gradient Card Hover Effects**: Raouf: Implemented a sophisticated "Uiverse-style" card hover effect with Macquarie University red branding. Cards now feature a transparent border that illuminates with a gradient (`#a6192e` → `#d6001c`) on hover, accompanied by a subtle inner-content scale reduction (98%) and soft glow. Fixed critical light/dark mode color leaks by properly aliasing `--mq-card-background` in both `:root` (light) and `.dark` (dark) contexts within `mq-tokens.css`, and migrated `mq-magic-card-content` to use MQ design tokens instead of Shadcn's `hsl(var(--card))` for proper theme consistency.

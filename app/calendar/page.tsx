@@ -35,12 +35,14 @@ function CalendarSkeleton() {
       </div>
 
       {/* Calendar card skeleton */}
-      <div className="bg-mq-card-background rounded-mq-lg border border-mq-border p-6">
-        <div className="h-8 bg-mq-background-secondary rounded-mq w-56 mb-6" />
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 bg-mq-background-secondary rounded-mq border border-mq-border" />
-          ))}
+      <div className="mq-magic-card">
+        <div className="mq-magic-card-content p-6">
+          <div className="h-8 bg-mq-background-secondary rounded-mq w-56 mb-6" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 bg-mq-background-secondary rounded-mq border border-mq-border" />
+            ))}
+          </div>
         </div>
       </div>
     </div>

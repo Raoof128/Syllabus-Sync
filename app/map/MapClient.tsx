@@ -366,147 +366,167 @@ export default function MapClient() {
       </div>
 
       {/* Map */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>{t('interactiveCampusMap')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div
-            ref={mapContainerRef}
-            className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
-          >
-            {shouldRenderMap ? (
-              <CampusMap
-                selectedBuilding={selectedBuilding}
-                coordPickerMode={coordPickerMode}
-                onMapClick={handleMapClick}
-              />
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
-                <MapPin className="h-6 w-6" />
-                <p className="text-mq-sm">{t('mapLoadsWhenVisible')}</p>
+      <div className="mq-magic-card mb-6">
+        <div className="mq-magic-card-content p-0">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardHeader>
+              <CardTitle>{t('interactiveCampusMap')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div
+                ref={mapContainerRef}
+                className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
+              >
+                {shouldRenderMap ? (
+                  <CampusMap
+                    selectedBuilding={selectedBuilding}
+                    coordPickerMode={coordPickerMode}
+                    onMapClick={handleMapClick}
+                  />
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
+                    <MapPin className="h-6 w-6" />
+                    <p className="text-mq-sm">{t('mapLoadsWhenVisible')}</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Campus Buildings Quick Reference */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            {t('campusBuildings')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {CAMPUS_BUILDINGS.map((building) => {
-              const buildingData = getBuildingById(building.code);
-              const isSelected = selectedBuildingId === building.code;
-              return (
-                <Link
-                  key={building.code}
-                  href={`/map?building=${building.code}`}
-                  aria-current={isSelected ? 'page' : undefined}
-                  className={`p-3 rounded-mq-lg transition-colors ${isSelected
-                    ? 'bg-mq-success/10 border-2 border-mq-success'
-                    : 'bg-mq-background-secondary hover:bg-mq-hover-background'
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold text-mq-content">{building.code}</div>
-                    {isSelected && (
-                      <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
-                    )}
-                  </div>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  <div className="text-mq-sm text-mq-content-secondary">{t(building.translationKey as any)}</div>
-                  {buildingData?.tags && buildingData.tags.length > 0 && (
-                    <div className="mt-1">
-                      <Badge variant="neutral" className="text-xs">
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {t(buildingData.tags[0] as any)}
-                      </Badge>
-                    </div>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mq-magic-card mb-6">
+        <div className="mq-magic-card-content p-0">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5" />
+                {t('campusBuildings')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {CAMPUS_BUILDINGS.map((building) => {
+                  const buildingData = getBuildingById(building.code);
+                  const isSelected = selectedBuildingId === building.code;
+                  return (
+                    <Link
+                      key={building.code}
+                      href={`/map?building=${building.code}`}
+                      aria-current={isSelected ? 'page' : undefined}
+                      className={`p-3 rounded-mq-lg transition-colors ${isSelected
+                        ? 'bg-mq-success/10 border-2 border-mq-success'
+                        : 'bg-mq-background-secondary hover:bg-mq-hover-background'
+                        }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="font-semibold text-mq-content">{building.code}</div>
+                        {isSelected && (
+                          <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
+                        )}
+                      </div>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <div className="text-mq-sm text-mq-content-secondary">{t(building.translationKey as any)}</div>
+                      {buildingData?.tags && buildingData.tags.length > 0 && (
+                        <div className="mt-1">
+                          <Badge variant="neutral" className="text-xs">
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {t(buildingData.tags[0] as any)}
+                          </Badge>
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Features Coming Soon */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Navigation className="h-5 w-5" />
-              {t('turnByTurn')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
-                <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  {t('walkingDirectionsDesc')}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                <Info className="h-4 w-4" />
-                <span>{t('comingSoon')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mq-magic-card">
+          <div className="mq-magic-card-content p-0 h-full">
+            <Card className="border-0 shadow-none bg-transparent h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Navigation className="h-5 w-5" />
+                  {t('turnByTurn')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
+                      {t('walkingDirectionsDesc')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                    <Info className="h-4 w-4" />
+                    <span>{t('comingSoon')}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              {t('liveLocation')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
-                <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  {t('realTimeTrackingDesc')}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                <Info className="h-4 w-4" />
-                <span>{t('comingSoon')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mq-magic-card">
+          <div className="mq-magic-card-content p-0 h-full">
+            <Card className="border-0 shadow-none bg-transparent h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  {t('liveLocation')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
+                      {t('realTimeTrackingDesc')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                    <Info className="h-4 w-4" />
+                    <span>{t('comingSoon')}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              {t('advancedSearch')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
-                <h4 className="font-semibold text-mq-content">{t('filterAndFind')}</h4>
-                <p className="text-mq-sm text-mq-content-secondary mt-1">
-                  {t('filterAndFindDesc')}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
-                <Info className="h-4 w-4" />
-                <span>{t('comingSoon')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mq-magic-card">
+          <div className="mq-magic-card-content p-0 h-full">
+            <Card className="border-0 shadow-none bg-transparent h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  {t('advancedSearch')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <h4 className="font-semibold text-mq-content">{t('filterAndFind')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
+                      {t('filterAndFindDesc')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
+                    <Info className="h-4 w-4" />
+                    <span>{t('comingSoon')}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
