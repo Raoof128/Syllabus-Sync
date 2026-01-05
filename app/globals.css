@@ -601,13 +601,13 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  padding: 2px;
+  padding: 3px;
   border-radius: var(--c-radius-lg);
-  overflow: hidden; /* Keep everything nicely clipped */
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  /* No background by default - gradient only shows on hover */
+  background: transparent;
+  transition: all 0.3s ease-out;
   isolation: isolate;
   z-index: 1;
-  will-change: transform;
 }
 
 .mq-magic-card-content {
@@ -616,23 +616,25 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  border-radius: calc(var(--c-radius-lg) - 2px);
+  border-radius: calc(var(--c-radius-lg) - 3px);
   overflow: hidden;
-  background: var(--mq-card-background);
-  border: 1px solid var(--mq-border);
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  /* Explicit white in light mode, dark in dark mode */
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  transition: all 0.2s ease-out;
   z-index: 1;
 }
 
-/* Hover State: Scale card */
+/* Hover State: red gradient border appears + glow + inner card shrink */
 .mq-magic-card:hover {
   z-index: 50;
-  box-shadow: 0rem 6px 13px rgba(166, 25, 46, 0.1),
-    0rem 24px 24px rgba(166, 25, 46, 0.09),
-    0rem 55px 33px rgba(166, 25, 46, 0.05),
-    0rem 97px 39px rgba(166, 25, 46, 0.01),
-    0rem 152px 43px rgba(166, 25, 46, 0);
-  transform: scale(1.02); /* slightly less aggressive than 1.05 for UI stability */
+  background: linear-gradient(163deg, #a6192e 0%, #d6001c 100%);
+  box-shadow: 0 0 30px 1px rgba(166, 25, 46, 0.3);
+}
+
+.mq-magic-card:hover .mq-magic-card-content {
+  transform: scale(0.98);
+  border-radius: calc(var(--c-radius-lg) + 2px);
 }
 
 

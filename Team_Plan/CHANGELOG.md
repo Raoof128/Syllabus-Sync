@@ -7,7 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.5.38] - 2026-01-05
+## [0.5.39] - 2026-01-05
+
+### Added
+
+#### Uiverse-Style Card Hover Effects 🎨
+
+Raouf: Implemented a premium gradient border interaction for all home dashboard cards (Today, Deadlines, Events, Units).
+
+**Implementation:**
+- **Gradient Border Shell**: Cards use a transparent border that transitions to a Macquarie Red linear gradient (`#a6192e` → `#d6001c`) on hover.
+- **Inner Content Scale**: The inner content container scales down to 98% on hover, creating a 3D "pushed back" effect that reveals more of the gradient border.
+- **Soft Glow**: Added a subtle red box-shadow (`rgba(166, 25, 46, 0.3)`) that appears alongside the gradient.
+- **Theme Compatibility**: Fixed initial color leak bugs by strictly using `hsl(var(--card))` for the inner content background, ensuring perfect integration with both light and dark modes.
+- **Unified Class**: Applied via the shared `.mq-magic-card` utility class, instantly updating all 5 dashboard widget types.
+
+### Fixed
+
+#### Next.js 16 Turbopack Config ⚙️
+
+Raouf: Resolved build warnings related to Next.js 16's default Turbopack usage.
+
+- **Explicit Config**: Added `turbopack: {}` to `next.config.ts` to acknowledge Turbopack usage and silence the "webpack config present without turbopack config" warning.
+- **Webpack Fallback**: Retained the custom webpack chunk-splitting configuration as a fallback for the `dev:safe` script (non-Turbopack mode).
+- **Cleanup**: Cleared stale development caches to resolve conflicting build artifacts.
+
+---\n\n## [0.5.38] - 2026-01-05
 
 ### Fixed
 
