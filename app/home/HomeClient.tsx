@@ -530,7 +530,11 @@ export default function HomeClient() {
                     variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
                   >
                     {units.map((unit) => (
-                      <motion.div key={unit.id} variants={revealChildVariants}>
+                      <motion.div
+                        key={unit.id}
+                        variants={revealChildVariants}
+                        className="relative z-0 hover:z-50 focus-within:z-50"
+                      >
                         <UnitCard
                           unit={unit}
                           onEdit={handleEditUnit}

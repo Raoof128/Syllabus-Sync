@@ -24,68 +24,72 @@ const EventsFeed = memo(() => {
   const todayEvents = sampleEvents.filter((event) => isToday(new Date(event.date)));
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{t('eventsToday')}</CardTitle>
-        <Link href="/feed" className="text-sm text-mq-info hover:text-mq-info/80 hover:underline">
-          {t('viewAllEvents')}
-        </Link>
-      </CardHeader>
-      <CardContent>
-        {todayEvents.length === 0 ? (
-          <p className="text-mq-content-tertiary text-center py-8">{t('noEventsToday')}</p>
-        ) : (
-          <div className="space-y-3">
-            {todayEvents.map((event) => (
-              <div
-                key={event.id}
-                className="group p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-mq-content">
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {t((event.translationKey || event.title) as any)}
-                  </h3>
-                  <Badge className={categoryColors[event.category]}>
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {t(typeof event.category === 'string' ? `category_${event.category.replace(/ /g, '')}` as any : event.category)}
-                  </Badge>
-                </div>
+    <div className="mq-magic-card">
+      <div className="mq-magic-card-content">
+        <Card className="h-full border-0 shadow-none bg-transparent">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>{t('eventsToday')}</CardTitle>
+            <Link href="/feed" className="text-sm text-mq-info hover:text-mq-info/80 hover:underline">
+              {t('viewAllEvents')}
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {todayEvents.length === 0 ? (
+              <p className="text-mq-content-tertiary text-center py-8">{t('noEventsToday')}</p>
+            ) : (
+              <div className="space-y-3">
+                {todayEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="group p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-semibold text-mq-content">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {t((event.translationKey || event.title) as any)}
+                      </h3>
+                      <Badge className={categoryColors[event.category]}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {t(typeof event.category === 'string' ? `category_${event.category.replace(/ /g, '')}` as any : event.category)}
+                      </Badge>
+                    </div>
 
-                <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {event.time}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {event.location}
-                  </div>
-                </div>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {event.time}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {event.location}
+                      </div>
+                    </div>
 
-                {/* Navigation to Map */}
-                {event.building && (
-                  <div className="mt-2">
-                    <Button
-                      asChild
-                      variant="secondary"
-                      size="sm"
-                      className="gap-1 text-xs h-7 focus:ring-2 focus:ring-mq-primary/50"
-                      aria-label={t('navigateToBuildingAria', { building: event.building })}
-                    >
-                      <Link href={`/map?building=${event.building}`}>
-                        <Navigation className="h-3 w-3" />
-                        {t('navigateTo')} {event.building}
-                      </Link>
-                    </Button>
+                    {/* Navigation to Map */}
+                    {event.building && (
+                      <div className="mt-2">
+                        <Button
+                          asChild
+                          variant="secondary"
+                          size="sm"
+                          className="gap-1 text-xs h-7 focus:ring-2 focus:ring-mq-primary/50"
+                          aria-label={t('navigateToBuildingAria', { building: event.building })}
+                        >
+                          <Link href={`/map?building=${event.building}`}>
+                            <Navigation className="h-3 w-3" />
+                            {t('navigateTo')} {event.building}
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 });
 

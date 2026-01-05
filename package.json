@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev:safe": "next dev --no-turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint \"app/**/*.{ts,tsx}\" \"components/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\" \"data/**/*.{ts,tsx}\" \"eslint.config.mjs\" \"next.config.ts\" && echo \"Lint OK\"",

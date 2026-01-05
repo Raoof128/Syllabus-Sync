@@ -31,95 +31,99 @@ const TodaySchedule = memo(() => {
   }, [todayLabel, units]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('todaysClasses')}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {!isHydrated ? (
-          <div className="space-y-4 p-2">
-            <div className="animate-pulse">
-              <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
-              <div className="space-y-2">
-                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
-              </div>
-            </div>
-            <div className="animate-pulse animation-delay-100">
-              <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
-              <div className="space-y-2">
-                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
-              </div>
-            </div>
-          </div>
-        ) : todayClasses.length === 0 ? (
-          <div className="text-center py-8">
-            <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noClassesToday')}</h3>
-            <p className="text-mq-content-secondary mb-4">{t('noClassesDesc')}</p>
-            <Button
-              onClick={() => {
-                try {
-                  window.dispatchEvent(new CustomEvent('add-unit'));
-                } catch (error) {
-                  console.warn('Failed to trigger add unit event:', error);
-                  // Fallback to direct navigation
-                  window.location.href = '/home';
-                }
-              }}
-              className="gap-2 focus:ring-2 focus:ring-mq-primary/50"
-              aria-label={t('addUnitAria')}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  try {
-                    window.dispatchEvent(new CustomEvent('add-unit'));
-                  } catch (error) {
-                    console.warn('Failed to trigger add unit event:', error);
-                    window.location.href = '/home';
-                  }
-                }
-              }}
-            >
-              <BookOpen className="h-4 w-4" />
-              {t('addUnit')}
-            </Button>
-          </div>
-        ) : (
-          todayClasses.map((cls) => (
-            <div
-              key={`${cls.id}-${cls.code}`}
-              className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
-            >
-              {/* Color indicator */}
-              <div
-                className="w-1 h-full rounded-full flex-shrink-0"
-                style={{ backgroundColor: cls.color }}
-              />
-
-              {/* Class info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-mq-content">
-                  {cls.code} — {cls.name}
-                </h3>
-
-                <div className="flex items-center gap-4 mt-1 text-sm text-mq-content-secondary">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {cls.startTime} - {cls.endTime}
+    <div className="mq-magic-card">
+      <div className="mq-magic-card-content">
+        <Card className="h-full border-0 shadow-none bg-transparent">
+          <CardHeader>
+            <CardTitle>{t('todaysClasses')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!isHydrated ? (
+              <div className="space-y-4 p-2">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
+                  <div className="space-y-2">
+                    <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                    <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {cls.location.building} {cls.location.room}
+                </div>
+                <div className="animate-pulse animation-delay-100">
+                  <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
+                  <div className="space-y-2">
+                    <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                    <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
+            ) : todayClasses.length === 0 ? (
+              <div className="text-center py-8">
+                <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noClassesToday')}</h3>
+                <p className="text-mq-content-secondary mb-4">{t('noClassesDesc')}</p>
+                <Button
+                  onClick={() => {
+                    try {
+                      window.dispatchEvent(new CustomEvent('add-unit'));
+                    } catch (error) {
+                      console.warn('Failed to trigger add unit event:', error);
+                      // Fallback to direct navigation
+                      window.location.href = '/home';
+                    }
+                  }}
+                  className="gap-2 focus:ring-2 focus:ring-mq-primary/50"
+                  aria-label={t('addUnitAria')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      try {
+                        window.dispatchEvent(new CustomEvent('add-unit'));
+                      } catch (error) {
+                        console.warn('Failed to trigger add unit event:', error);
+                        window.location.href = '/home';
+                      }
+                    }
+                  }}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  {t('addUnit')}
+                </Button>
+              </div>
+            ) : (
+              todayClasses.map((cls) => (
+                <div
+                  key={`${cls.id}-${cls.code}`}
+                  className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
+                >
+                  {/* Color indicator */}
+                  <div
+                    className="w-1 h-full rounded-full flex-shrink-0"
+                    style={{ backgroundColor: cls.color }}
+                  />
+
+                  {/* Class info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-mq-content">
+                      {cls.code} — {cls.name}
+                    </h3>
+
+                    <div className="flex items-center gap-4 mt-1 text-sm text-mq-content-secondary">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {cls.startTime} - {cls.endTime}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-4 w-4" />
+                        {cls.location.building} {cls.location.room}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 });
 

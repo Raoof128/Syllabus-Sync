@@ -12,6 +12,35 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-toast'],
   },
 
+  // Empty turbopack config to acknowledge Turbopack usage
+  // Turbopack handles chunk splitting automatically in Next.js 16+
+  turbopack: {},
+
+  // Webpack fallback for chunk loading issues (used when running with --no-turbopack)
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization?.splitChunks,
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Prevent chunk loading errors by creating stable chunks
+            framework: {
+              chunks: 'all',
+              name: 'framework',
+              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+              priority: 40,
+              enforce: true,
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
+
   // Optimize images
   images: {
     formats: ['image/webp', 'image/avif'],
