@@ -600,6 +600,8 @@
   gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
+  /* Add padding to account for expansion overlap */
+  padding: 0 10px;
 }
 
 .social-buttons li {
@@ -607,71 +609,84 @@
   list-style: none;
   width: 48px;
   height: 48px;
+  /* Placeholder only - no visual styles here */
+  z-index: 1;
+}
+
+/* Bring hovered item to front so expansion overlays neighbors */
+.social-buttons li:hover {
+  z-index: 50;
+}
+
+/* The actual visual button - absolutely positioned to center of placeholder */
+.social-buttons li a {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
   background: var(--mq-card-background);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border-radius: 48px;
-  cursor: pointer;
+  border: 1px solid var(--mq-border);
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.5s ease;
-  border: 1px solid var(--mq-border);
+  text-decoration: none;
   overflow: hidden;
   isolation: isolate;
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              background 0.3s ease, 
+              box-shadow 0.3s ease;
 }
 
-.social-buttons li::before {
+/* Expansion state - grows outwards from center */
+.social-buttons li:hover a {
+  width: 140px;
+  box-shadow: 0 10px 25px rgba(166, 25, 46, 0.3);
+  background: transparent;
+}
+
+/* Gradient background (moved to anchor tag) */
+.social-buttons li a::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 48px;
   background: linear-gradient(45deg, #a6192e, #d6001c);
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
   z-index: 0;
 }
 
-.social-buttons li::after {
+/* Glow effect (moved to anchor tag) */
+.social-buttons li a::after {
   content: "";
   position: absolute;
   inset: -10px;
   border-radius: 48px;
   background: linear-gradient(45deg, #a6192e, #d6001c);
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
   filter: blur(15px);
   z-index: -1;
   opacity: 0;
 }
 
-.social-buttons li:hover {
-  width: 140px;
-  box-shadow: 0 10px 25px rgba(166, 25, 46, 0.3);
-  background: transparent;
-}
-
-.social-buttons li:hover::before {
+.social-buttons li:hover a::before {
   opacity: 1;
 }
 
-.social-buttons li:hover::after {
+.social-buttons li:hover a::after {
   opacity: 0.5;
 }
 
-.social-buttons li a {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Icon Animation */
 .social-buttons li .social-icon {
   color: var(--mq-content-secondary);
   font-size: 1.4em;
-  transition: all 0.5s ease;
-  transition-delay: 0.25s;
+  transition: transform 0.25s ease, opacity 0.2s ease;
+  transition-delay: 0.1s;
   z-index: 10;
   position: relative;
   flex-shrink: 0;
@@ -679,10 +694,12 @@
 
 .social-buttons li:hover .social-icon {
   transform: scale(0);
-  color: #fff;
+  opacity: 0;
   transition-delay: 0s;
+  color: #fff;
 }
 
+/* Text Animation */
 .social-buttons li .social-title {
   position: absolute;
   color: #fff;
@@ -690,20 +707,23 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  transform: scale(0);
-  transition: all 0.5s ease;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
   transition-delay: 0s;
   z-index: 10;
   white-space: nowrap;
+  pointer-events: none;
 }
 
 .social-buttons li:hover .social-title {
+  opacity: 1;
   transform: scale(1);
-  transition-delay: 0.25s;
+  transition-delay: 0.1s;
 }
 
 /* Dark mode adjustments */
-.dark .social-buttons li {
+.dark .social-buttons li a {
   background: var(--mq-card-background);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   border-color: var(--mq-border);
@@ -713,6 +733,6 @@
   color: var(--mq-content);
 }
 
-.dark .social-buttons li:hover {
+.dark .social-buttons li:hover a {
   box-shadow: 0 10px 25px rgba(166, 25, 46, 0.4);
 }

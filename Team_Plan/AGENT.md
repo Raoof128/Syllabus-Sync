@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.37 | Last Updated: January 04, 2026
+Version: 0.5.38 | Last Updated: January 05, 2026
 
 ---
 
@@ -33,6 +33,12 @@ Version: 0.5.37 | Last Updated: January 04, 2026
 
 ### Demo Target
 Macquarie University Administration - February 2025
+
+### Recent Work Log
+
+#### ✅ Stability Fixes (v0.5.38)
+- **Social Buttons UI Stability**: Raouf: Fixed the bottom sidebar social buttons "UI shake" by keeping the layout footprint stable (48x48) while preserving the expansion animation via an overlay approach (absolute-positioned expanding anchor + z-index layering).
+- **Animation Polish**: Raouf: Kept the premium MQ gradient + glow effect and improved the icon→label transition timing to feel smooth without triggering layout reflow.
 
 ### Current Features (v0.5.8)
 
