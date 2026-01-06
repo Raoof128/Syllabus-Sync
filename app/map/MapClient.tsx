@@ -25,6 +25,7 @@ import { Building, getBuildingById, searchBuildings } from '@/lib/map/buildings'
 import Link from 'next/link';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 // Custom hook for debounced search
 // eslint-disable react-hooks/set-state-in-effect
@@ -465,15 +466,13 @@ export default function MapClient() {
                           </Badge>
                         )}
                       </div>
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       <div className="text-mq-sm text-mq-content-secondary">
-                        {t(building.translationKey as any)}
+                        {t(building.translationKey)}
                       </div>
                       {buildingData?.tags && buildingData.tags.length > 0 && (
                         <div className="mt-1">
                           <Badge variant="neutral" className="text-xs">
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                            {t(buildingData.tags[0] as any)}
+                            {t(buildingData.tags[0] as TranslationKey)}
                           </Badge>
                         </div>
                       )}

@@ -10,6 +10,7 @@ import { isToday } from 'date-fns';
 import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info border border-mq-info/20',
@@ -65,14 +66,12 @@ const EventsFeed = memo(() => {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-semibold text-mq-content">
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {t((event.translationKey || event.title) as any)}
+                        {t((event.translationKey || event.title) as TranslationKey)}
                       </h3>
                       <Badge className={`${categoryColors[event.category]} alabaster-readable`}>
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t(
                           typeof event.category === 'string'
-                            ? (`category_${event.category.replace(/ /g, '')}` as any)
+                            ? (`category_${event.category.replace(/ /g, '')}` as TranslationKey)
                             : event.category,
                         )}
                       </Badge>

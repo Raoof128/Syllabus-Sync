@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 const NextDeadline = memo(() => {
   const isHydrated = useHydration();
@@ -143,10 +144,9 @@ const NextDeadline = memo(() => {
                       <Badge
                         className={`${PRIORITY_COLORS[nextDeadline.priority]} alabaster-readable`}
                       >
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t(
                           typeof nextDeadline.priority === 'string'
-                            ? (`priority_${nextDeadline.priority}` as any)
+                            ? (`priority_${nextDeadline.priority}` as TranslationKey)
                             : nextDeadline.priority,
                         )}
                       </Badge>
