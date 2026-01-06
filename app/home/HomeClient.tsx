@@ -55,8 +55,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Unit, Deadline } from '@/lib/types';
-import {
-} from '@/components/ui/dropdown-menu'; // Removed unused imports
 
 
 
@@ -124,18 +122,18 @@ export default function HomeClient() {
       // Validate sample data before adding
       const validUnits = sampleUnits.filter(unit => {
         return unit &&
-          typeof unit.code === 'string' &&
-          typeof unit.name === 'string' &&
-          typeof unit.color === 'string' &&
+          unit.code &&
+          unit.name &&
+          unit.color &&
           Array.isArray(unit.schedule) &&
           unit.schedule.length > 0;
       });
 
       const validDeadlines = sampleDeadlines.filter(deadline => {
         return deadline &&
-          typeof deadline.title === 'string' &&
-          typeof deadline.unitCode === 'string' &&
-          typeof deadline.priority === 'string' &&
+          deadline.title &&
+          deadline.unitCode &&
+          deadline.priority &&
           deadline.dueDate &&
           !isNaN(new Date(deadline.dueDate).getTime());
       });
@@ -400,7 +398,7 @@ export default function HomeClient() {
 
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl home-page">
+    <div className="home-page">
       {/* Screen reader announcements */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {announcements.map((announcement, index) => (
@@ -408,16 +406,7 @@ export default function HomeClient() {
         ))}
       </div>
 
-      {/* Skip to main content link for accessibility */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-md focus:shadow-lg"
-      >
-        {t('skipToMain')}
-      </a>
-
       {/* Header */}
-      <h1 className="text-mq-sm text-mq-content mb-2">Home</h1>
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
           <WelcomeHeader name={currentProfile?.name} fallbackName={DEMO_USER.name} />
@@ -588,7 +577,7 @@ export default function HomeClient() {
             </Button>
             <Button variant="primary" onClick={confirmDeleteUnit}>
               {t('delete')}
-            </Button> 
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

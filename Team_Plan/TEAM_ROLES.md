@@ -2,8 +2,8 @@
 
 **Syllabus Sync - Feature-Based Team Division**
 
-Last Updated: January 05, 2026
-Version: 0.5.41
+Last Updated: January 06, 2026
+Version: 0.5.42
 
 ---
 
@@ -17,6 +17,21 @@ Version: 0.5.41
 | **Map Tab** | Raouf | 🚧 In Progress |
 | **Settings Tab** | Raouf | 🚧 In Progress |
 | **AI Integration** | Kit | 🔜 Demo Feature |
+
+---
+
+## 👤 POUYA - Frontend Developer
+
+### Role Overview
+Responsible for Home tab, Calendar tab, and half of Feed tab. Focus on user-facing features, UI/UX, and client-side functionality.
+
+### Primary Responsibilities
+- ✅ **Home Tab Development**: Dashboard, units management, today's schedule, deadlines widget
+- ✅ **Calendar Tab Development**: Calendar view, deadline management, scheduling
+- ✅ **Feed Tab (Frontend)**: Events display, UI components, user interactions
+- ✅ **Unit Management**: UnitCard, UnitForm, CRUD operations
+- ✅ **Deadline Management**: DeadlineForm, deadline tracking, stress level indicator
+- ✅ **UI/UX Polish**: User experience improvements, accessibility
 
 ---
 

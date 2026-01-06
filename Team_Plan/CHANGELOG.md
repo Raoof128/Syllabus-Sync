@@ -7,36 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-<<<<<<< HEAD
-## [0.5.41] - 2026-01-05
+## [0.5.44] - 2026-01-06
 
-### Changed
+### Fixed
 
-#### Team Structure Update 👥
+#### Home Page Bug Fixes & Cleanup 🏠
 
-Updated team roles and responsibilities with clear tab/feature ownership:
+Pouya: Fixed several issues on the Home page for a cleaner, more professional experience.
 
-**Tab Ownership:**
-| Tab/Feature | Owner |
-|-------------|-------|
-| **Home Tab** | Pouya |
-| **Calendar Tab** | Pouya |
-| **Feed Tab** | Pouya (50%) + Raouf (50%) |
-| **Map Tab** | Raouf |
-| **Settings Tab** | Raouf |
-| **AI Integration** | Kit |
-
-**Team Member Focus:**
-- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend - UI components, filtering, display)
-- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend - API, data architecture, filtering logic)
-- **Kit**: AI Integration for Demo (smart recommendations, NLP features, demo AI capabilities)
+**Issues Fixed:**
+- **Removed unused import**: Removed empty import from `@/components/ui/dropdown-menu` that was generating a warning
+- **Simplified validation**: Removed redundant `typeof` checks for typed properties (code, name, color, title, unitCode, priority)
+- **Fixed duplicate heading**: Removed duplicate "Home" heading that was appearing twice (once in page.tsx, once in HomeClient.tsx)
+- **Fixed skip link**: Moved skip-to-main-content link to page.tsx where the `#main-content` anchor exists
+- **Improved layout structure**: Removed redundant container wrapper from HomeClient.tsx since page.tsx already provides the container
 
 **Files Changed:**
-- `Team_Plan/TEAM_ROLES.md` - Comprehensive update with new tab ownership structure
-- `Team_Plan/TEAM_ROADMAP.md` - Updated team responsibilities and contact info
-- `Team_Plan/AGENT.md` - Added team roles section with ownership table
-- `Team_Plan/CHANGELOG.md` - Added this changelog entry
-=======
+- `app/home/HomeClient.tsx` - Removed unused imports, fixed validation, removed duplicate heading
+- `app/home/page.tsx` - Added skip link, improved layout structure
+
+**Build Status:**
+- ✅ Build compiles successfully with no errors
+- ✅ All 27 routes generated successfully
+
+---
+
 ## [0.5.43] - 2026-01-06
 
 ### Fixed
@@ -99,6 +94,37 @@ Raouf: Resolved critical hover effect leak between Announcements and Event Categ
 
 Raouf: Added black borders to all buttons and subcards on the Settings page and set settings-page button background to #EDEADE in light mode to match the Alabaster tint for improved contrast and brand consistency.
 
+---
+
+## [0.5.41] - 2026-01-05
+
+### Changed
+
+#### Team Structure Update 👥
+
+Updated team roles and responsibilities with clear tab/feature ownership:
+
+**Tab Ownership:**
+| Tab/Feature | Owner |
+|-------------|-------|
+| **Home Tab** | Pouya |
+| **Calendar Tab** | Pouya |
+| **Feed Tab** | Pouya (50%) + Raouf (50%) |
+| **Map Tab** | Raouf |
+| **Settings Tab** | Raouf |
+| **AI Integration** | Kit |
+
+**Team Member Focus:**
+- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend - UI components, filtering, display)
+- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend - API, data architecture, filtering logic)
+- **Kit**: AI Integration for Demo (smart recommendations, NLP features, demo AI capabilities)
+
+**Files Changed:**
+- `Team_Plan/TEAM_ROLES.md` - Comprehensive update with new tab ownership structure
+- `Team_Plan/TEAM_ROADMAP.md` - Updated team responsibilities and contact info
+- `Team_Plan/AGENT.md` - Added team roles section with ownership table
+- `Team_Plan/CHANGELOG.md` - Added this changelog entry
+
 - Implementation:
   - Scoped CSS rules added to `app/globals.css` targeting `.settings-page [data-slot="button"]` and `.settings-page .mq-magic-card-content .p-3.bg-mq-card-background.rounded-mq-lg` to apply 1px solid black borders.
   - Light mode button background set to `#EDEADE` for settings page buttons; `.dark` overrides keep dark mode visuals unchanged.
@@ -154,7 +180,6 @@ Raouf: Resolved build-blocking parsing error at line 196 in FeedClient.tsx cause
 - All event cards render with proper hover animation
 - No CLS (Cumulative Layout Shift) issues
 - SubAgent MCP EditFile tool successfully applied targeted fix
->>>>>>> 68a9766 (Raouf-feat(feed): implement magic card hover effects and fix JSX structure)
 
 ---
 

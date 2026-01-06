@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.43 | Last Updated: January 06, 2026
+Version: 0.5.44 | Last Updated: January 06, 2026
 
 ---
 
@@ -56,6 +56,14 @@ Version: 0.5.43 | Last Updated: January 06, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Home Page Bug Fixes & Cleanup (v0.5.44)
+- **Removed unused import**: Pouya: Removed empty import from `@/components/ui/dropdown-menu` that was generating a warning.
+- **Simplified validation**: Pouya: Removed redundant `typeof` checks for typed properties (code, name, color, title, unitCode, priority).
+- **Fixed duplicate heading**: Pouya: Removed duplicate "Home" heading that appeared twice (once in page.tsx, once in HomeClient.tsx).
+- **Fixed skip link**: Pouya: Moved skip-to-main-content link to page.tsx where the `#main-content` anchor exists.
+- **Improved layout structure**: Pouya: Removed redundant container wrapper from HomeClient.tsx since page.tsx already provides the container.
+- **Build Status**: ✅ Build compiles successfully with no errors. All 27 routes generated successfully.
 
 #### ✅ Removed GitHub social button & fixed TypeScript/ESLint issues (v0.5.43)
 - **Removed GitHub button**: Raouf removed the GitHub social button from the sidebar by editing `components/layout/SocialButtons.tsx` and cleaning up unused imports; the sidebar no longer shows a GitHub button.
