@@ -409,6 +409,7 @@ export const translations = {
     mqLogoAlt: 'Macquarie University Logo',
     openProfileMenu: 'Open profile menu',
     user: 'User',
+    guest: 'Guest',
     closeMenu: 'Close menu',
     openMenu: 'Open menu',
     mainNavigation: 'Main navigation',
@@ -982,6 +983,7 @@ export const translations = {
 
     openProfileMenu: 'Abrir menú de perfil',
     user: 'Usuario',
+    guest: 'Invitado',
     closeMenu: 'Cerrar menú',
     openMenu: 'Abrir menú',
     mainNavigation: 'Navegación principal',
@@ -1340,6 +1342,7 @@ export const translations = {
     mqLogoAlt: 'لوگوی دانشگاه Macquarie',
     openProfileMenu: 'باز کردن منوی پروفایل',
     user: 'کاربر',
+    guest: 'مهمان',
     closeMenu: 'بستن منو',
     openMenu: 'باز کردن منو',
     mainNavigation: 'ناوبری اصلی',

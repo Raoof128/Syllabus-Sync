@@ -30,8 +30,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
-import { Clock as LiveClock } from '@/components/layout/Clock';
 
 const notificationIcons = {
   deadline: Clock,
@@ -47,7 +45,7 @@ const Header = memo(() => {
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
 
-  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string; name?: string } } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true);
 
@@ -78,7 +76,7 @@ const Header = memo(() => {
     getUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string; email?: string } } | null) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string; email?: string; user_metadata?: { full_name?: string; name?: string } } } | null) => {
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
@@ -130,11 +128,20 @@ const Header = memo(() => {
   // Only calculate unread count on client to avoid hydration mismatch
   const unreadCount = isClient ? getUnreadCount() : 0;
 
+  // Get display name: prioritize profile name, then Supabase user metadata, then email prefix
+  const displayName = useMemo(() => {
+    if (currentProfile?.name) return currentProfile.name;
+    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+    if (user?.user_metadata?.name) return user.user_metadata.name;
+    if (user?.email) return user.email.split('@')[0];
+    return null;
+  }, [currentProfile?.name, user?.user_metadata?.full_name, user?.user_metadata?.name, user?.email]);
+
   return (
-    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-6 relative z-10">
-      {/* Left side - Logo and title */}
-      <div className="flex items-center gap-3">
-        <Link href="/" className="flex items-center gap-3">
+    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between pl-2 pr-4 sm:pl-3 sm:pr-6 relative z-10">
+      {/* Left side - Logo and title (far left) */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3">
           <Image
             src="/MQ_Logo_Final.png"
             alt={t('mqLogoAlt')}
@@ -149,14 +156,11 @@ const Header = memo(() => {
             <p className="text-mq-xs text-mq-content-secondary">{UNIVERSITY_CONFIG.shortName}</p>
           </div>
         </Link>
-      </div>
 
-      {/* Right side - Actions */}
-      <div className="flex items-center gap-4">
-        {/* Date & Time display - hidden on small screens, only after hydration */}
+        {/* Date display - next to logo/title */}
         {isClient && (
-          <div className="hidden md:flex flex-col items-end text-right">
-            <span className="text-mq-sm font-semibold text-mq-content">
+          <div className="hidden md:flex items-center ml-4 pl-4 border-l border-mq-border">
+            <span className="text-mq-sm font-medium text-mq-content-secondary">
               {new Date().toLocaleDateString(
                 language === 'fa' ? 'fa-IR'
                   : language === 'es' ? 'es-ES'
@@ -171,20 +175,19 @@ const Header = memo(() => {
                                     : language === 'vi' ? 'vi-VN'
                                       : 'en-AU',
                 {
-                  weekday: 'short',
+                  weekday: 'long',
                   day: 'numeric',
-                  month: 'short',
+                  month: 'long',
+                  year: 'numeric',
                 }
               )}
             </span>
-            <LiveClock />
           </div>
         )}
+      </div>
 
-        {/* Keyboard Shortcuts */}
-        <div className="hidden lg:block">
-          <KeyboardShortcuts />
-        </div>
+      {/* Right side - Actions (far right) */}
+      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
 
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
@@ -323,16 +326,16 @@ const Header = memo(() => {
                       height={32}
                       className="w-full h-full object-cover"
                     />
-                  ) : currentProfile ? (
+                  ) : displayName ? (
                     <span className="text-white font-bold text-sm">
-                      {currentProfile.name.charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </span>
                   ) : (
                     <User className="w-5 h-5 text-white" />
                   )}
                 </div>
                 <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
-                  {user?.email || t('user')}
+                  {displayName || t('guest')}
                 </div>
               </button>
             </DropdownMenuTrigger>
