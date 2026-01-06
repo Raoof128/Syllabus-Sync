@@ -489,6 +489,24 @@ git push origin feature/your-feature-name
 - `test:` Test updates
 - `chore:` Build/config changes
 
+### Commit & Changelog Template (Raouf:)
+
+In addition to the Conventional Commits format above, the project requires that any entry added to the changelog or key agent docs describing code changes use the **`Raouf:`** template. This ensures consistent, auditable release notes and agent logs.
+
+Required fields for a `Raouf:` entry:
+- **Date** (Australia/Sydney)
+- **Scope** (area or component)
+- **Short summary** (1 sentence)
+- **Files changed** (list)
+- **Verification** (commands and results)
+
+Example:
+```
+Raouf: [2026-01-06] (Feed) Applied Playwright+axe instrumentation and contrast fixes — Files: tests/accessibility.spec.ts, app/globals.css — Verified: npm run test:e2e -- --grep "Home|Feed|Calendar|Map"
+```
+
+See `.agent/rules/raouf-change-protocol.md` for the full protocol and mandatory postflight logging steps.
+
 ---
 
 ## State Management

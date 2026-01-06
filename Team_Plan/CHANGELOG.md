@@ -5,6 +5,18 @@ All notable changes to **The Syllabus Sync** project will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+**Entry Template (Raouf:)**
+
+All changelog entries documenting code or release-related changes MUST include a **`Raouf:`** template line with: date (Australia/Sydney), scope, a short summary, files changed, and verification steps.
+
+Example:
+
+```
+Raouf: [2026-01-06] (Feed) Applied Playwright+axe instrumentation and contrast fixes — Files: tests/accessibility.spec.ts, app/globals.css — Verified: npm run test:e2e -- --grep "Home|Feed|Calendar|Map"
+```
+
+See `.agent/rules/raouf-change-protocol.md` for the full protocol and mandatory postflight logging.
+
 ---
 
 <<<<<<< HEAD

@@ -193,7 +193,7 @@ export default function MapClient() {
   useEffect(() => {
     try {
       document.title = `${APP_CONFIG.name} - Campus Map`;
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);
