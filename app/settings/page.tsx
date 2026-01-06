@@ -54,6 +54,13 @@ const languageNames: Record<string, string> = {
   th: 'ไทย',
   vi: 'Tiếng Việt',
   ru: 'Русский',
+  ta: 'தமிழ்',
+  bn: 'বাংলা',
+  id: 'Bahasa Indonesia',
+  ms: 'Bahasa Melayu',
+  it: 'Italiano',
+  fr: 'Français',
+  he: 'עברית',
 };
 
 export default function SettingsPage() {
@@ -92,7 +99,23 @@ export default function SettingsPage() {
   }, []);
 
   const handleLanguageChange = (
-    newLanguage: 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur' | 'th' | 'vi' | 'ru',
+    newLanguage:
+      | 'en'
+      | 'es'
+      | 'fa'
+      | 'zh'
+      | 'ar'
+      | 'hi'
+      | 'ko'
+      | 'ja'
+      | 'ur'
+      | 'th'
+      | 'vi'
+      | 'ru'
+      | 'ta'
+      | 'bn'
+      | 'id'
+      | 'ms',
   ) => {
     if (newLanguage === language) return;
     setLanguage(newLanguage);
@@ -359,6 +382,10 @@ export default function SettingsPage() {
                         'th',
                         'vi',
                         'ru',
+                        'ta',
+                        'bn',
+                        'id',
+                        'ms',
                       ] as const
                     ).map((lang) => (
                       <Button

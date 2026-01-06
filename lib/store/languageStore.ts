@@ -3,25 +3,26 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Language } from '@/lib/i18n/translations';
 
 interface LanguageState {
-    language: Language;
-    setLanguage: (language: Language) => void;
-    isRTL: boolean;
+  language: Language;
+  setLanguage: (language: Language) => void;
+  isRTL: boolean;
 }
 
 export const useLanguageStore = create<LanguageState>()(
-    persist(
-        (set) => ({
-            language: 'en',
-            isRTL: false,
-            setLanguage: (language) => set({
-                language,
-                isRTL: language === 'fa' || language === 'ar' || language === 'ur'
-            }),
+  persist(
+    (set) => ({
+      language: 'en',
+      isRTL: false,
+      setLanguage: (language) =>
+        set({
+          language,
+          isRTL: language === 'fa' || language === 'ar' || language === 'ur' || language === 'he',
         }),
-        {
-            name: 'language-storage',
-            storage: createJSONStorage(() => localStorage),
-            version: 1,
-        }
-    )
+    }),
+    {
+      name: 'language-storage',
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+    },
+  ),
 );
