@@ -3,7 +3,8 @@ const path = require('path');
 const base = path.join(__dirname, '..', 'locales');
 const en = JSON.parse(fs.readFileSync(path.join(base, 'en', 'translations.json'), 'utf8'));
 const locales = fs.readdirSync(base);
-const suspiciousRx = /TODO|TRANSLATE|TRANSLATE_ME|TBD/i;
+// Only match explicit uppercase markers (e.g. TODO, TBD) to avoid false positives in translations
+const suspiciousRx = /\b(?:TODO|TRANSLATE|TRANSLATE_ME|TBD)\b/;
 console.log('Locale\tTotal\tMissing\tExtra\tEmpty\tSuspicious');
 locales.forEach((l) => {
   const file = path.join(base, l, 'translations.json');
