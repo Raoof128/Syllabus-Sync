@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.59 | Last Updated: January 07, 2026
+Version: 0.5.61 | Last Updated: January 07, 2026
 
 ---
 
@@ -56,6 +56,10 @@ Version: 0.5.59 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ CI/CD Deploy Fix + i18n Translation Keys (v0.5.61)
+- **CI/CD workflow fix (Raouf)**: Fixed GitHub Actions "Deploy Preview" job that was always being skipped on push events. The job had `if: github.event_name == 'pull_request'` which only runs on PRs. Updated to deploy: Production (`--prod` flag) on push to `main`, Staging on push to `develop`, Preview on pull requests. File changed: `.github/workflows/ci-cd.yml`.
+- **i18n translation keys (Raouf)**: Added `skipToContent`, `youAreOffline`, `backOnline`, and `networkStatusChanged` translation keys to all 18 non-English locale files (ar, bn, es, fa, fr, he, hi, id, it, ja, ko, ms, ru, ta, th, ur, vi, zh). Files changed: `locales/*/translations.json` (18 files).
 
 #### ✅ Map Geolocation Permission Fix (v0.5.54)
 - **Permissions-Policy header fix (Raouf)**: Fixed browser blocking location permission by changing `Permissions-Policy` header from `geolocation=()` (blocks all) to `geolocation=(self)` (allows same-origin requests). This was preventing `navigator.geolocation.watchPosition()` from working in CampusMap.tsx. File changed: `next.config.ts`.

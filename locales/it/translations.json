@@ -629,5 +629,9 @@
   "confirmExport": "Conferma Esportazione",
   "confirmExportDesc": "Stai per esportare tutti i tuoi dati incluse unità, scadenze e preferenze. Questo file conterrà le tue impostazioni personali.",
   "proceedExport": "Procedi con l'Esportazione",
-  "loadingSettings": "Caricamento impostazioni..."
+  "loadingSettings": "Caricamento impostazioni...",
+  "skipToContent": "Vai al contenuto",
+  "youAreOffline": "Sei offline",
+  "backOnline": "Di nuovo online",
+  "networkStatusChanged": "Stato della rete cambiato"
 }

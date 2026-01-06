@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.61] - 2026-01-07
+
+### Fixed
+
+#### CI/CD Deploy Fix + i18n Translation Keys (Raouf)
+
+**CI/CD Workflow Fix:**
+
+- **Deploy Preview job fix (Raouf)**: The GitHub Actions "Deploy Preview" job was always being skipped on push events because the condition `if: github.event_name == 'pull_request'` only runs on PRs, not pushes. Updated `.github/workflows/ci-cd.yml` to:
+  - Deploy to **Production** (with `--prod` flag) on push to `main` branch
+  - Deploy to **Staging** on push to `develop` branch  
+  - Deploy **Preview** on pull requests
+
+**i18n Translation Keys:**
+
+- **Added offline/skip-to-content translations (Raouf)**: Added the following accessibility-related translation keys to all 18 non-English locale files:
+  - `skipToContent` - Skip navigation link text
+  - `youAreOffline` - Offline indicator message
+  - `backOnline` - Back online notification
+  - `networkStatusChanged` - Network status toast title
+
+**Files Changed:**
+- `.github/workflows/ci-cd.yml` - CI/CD deploy conditions
+- `locales/ar/translations.json` - Arabic
+- `locales/bn/translations.json` - Bengali
+- `locales/es/translations.json` - Spanish
+- `locales/fa/translations.json` - Persian
+- `locales/fr/translations.json` - French
+- `locales/he/translations.json` - Hebrew
+- `locales/hi/translations.json` - Hindi
+- `locales/id/translations.json` - Indonesian
+- `locales/it/translations.json` - Italian
+- `locales/ja/translations.json` - Japanese
+- `locales/ko/translations.json` - Korean
+- `locales/ms/translations.json` - Malay
+- `locales/ru/translations.json` - Russian
+- `locales/ta/translations.json` - Tamil
+- `locales/th/translations.json` - Thai
+- `locales/ur/translations.json` - Urdu
+- `locales/vi/translations.json` - Vietnamese
+- `locales/zh/translations.json` - Chinese
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run test` (46/46 tests passing)
+
+---
+
 ## [0.5.60] - 2026-01-07
 
 ### Fixed

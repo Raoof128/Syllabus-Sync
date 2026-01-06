@@ -629,5 +629,9 @@
   "confirmExport": "Sahkan Eksport",
   "confirmExportDesc": "Anda akan mengeksport semua data anda termasuk unit, tarikh akhir dan keutamaan. Fail ini akan mengandungi tetapan peribadi anda.",
   "proceedExport": "Teruskan dengan Eksport",
-  "loadingSettings": "Memuatkan tetapan..."
+  "loadingSettings": "Memuatkan tetapan...",
+  "skipToContent": "Langkau ke kandungan",
+  "youAreOffline": "Anda sedang luar talian",
+  "backOnline": "Kembali dalam talian",
+  "networkStatusChanged": "Status rangkaian berubah"
 }

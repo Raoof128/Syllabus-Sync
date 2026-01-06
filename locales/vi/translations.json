@@ -629,5 +629,9 @@
   "confirmExport": "Xác nhận Xuất",
   "confirmExportDesc": "Bạn sắp xuất tất cả dữ liệu bao gồm các đơn vị, thời hạn và tùy chọn. Tệp này sẽ chứa cài đặt cá nhân của bạn.",
   "proceedExport": "Tiến hành Xuất",
-  "loadingSettings": "Đang tải cài đặt..."
+  "loadingSettings": "Đang tải cài đặt...",
+  "skipToContent": "Chuyển đến nội dung",
+  "youAreOffline": "Bạn đang ngoại tuyến",
+  "backOnline": "Đã trực tuyến trở lại",
+  "networkStatusChanged": "Trạng thái mạng đã thay đổi"
 }

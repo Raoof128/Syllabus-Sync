@@ -629,5 +629,9 @@
   "confirmExport": "Konfirmasi Ekspor",
   "confirmExportDesc": "Anda akan mengekspor semua data Anda termasuk unit, tenggat waktu, dan preferensi. File ini akan berisi pengaturan pribadi Anda.",
   "proceedExport": "Lanjutkan dengan Ekspor",
-  "loadingSettings": "Memuat pengaturan..."
+  "loadingSettings": "Memuat pengaturan...",
+  "skipToContent": "Lewati ke konten",
+  "youAreOffline": "Anda sedang offline",
+  "backOnline": "Kembali online",
+  "networkStatusChanged": "Status jaringan berubah"
 }

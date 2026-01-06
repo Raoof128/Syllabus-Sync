@@ -629,5 +629,9 @@
   "confirmExport": "내보내기 확인",
   "confirmExportDesc": "유닛, 마감일 및 환경설정을 포함한 모든 데이터를 내보내려고 합니다. 이 파일에는 개인 설정이 포함됩니다.",
   "proceedExport": "내보내기 진행",
-  "loadingSettings": "설정 로딩 중..."
+  "loadingSettings": "설정 로딩 중...",
+  "skipToContent": "콘텐츠로 건너뛰기",
+  "youAreOffline": "오프라인 상태입니다",
+  "backOnline": "다시 온라인 상태",
+  "networkStatusChanged": "네트워크 상태 변경됨"
 }

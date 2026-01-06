@@ -629,5 +629,9 @@
   "confirmExport": "确认导出",
   "confirmExportDesc": "您即将导出所有数据，包括单元、截止日期和首选项。此文件将包含您的个人设置。",
   "proceedExport": "继续导出",
-  "loadingSettings": "正在加载设置..."
+  "loadingSettings": "正在加载设置...",
+  "skipToContent": "跳转到内容",
+  "youAreOffline": "您已离线",
+  "backOnline": "已恢复在线",
+  "networkStatusChanged": "网络状态已更改"
 }

@@ -629,5 +629,9 @@
   "confirmExport": "אשר ייצוא",
   "confirmExportDesc": "אתה עומד לייצא את כל הנתונים שלך כולל יחידות, מועדים והעדפות. קובץ זה יכיל את ההגדרות האישיות שלך.",
   "proceedExport": "המשך עם הייצוא",
-  "loadingSettings": "טוען הגדרות..."
+  "loadingSettings": "טוען הגדרות...",
+  "skipToContent": "דלג לתוכן",
+  "youAreOffline": "אתה במצב לא מקוון",
+  "backOnline": "חזרת לקו",
+  "networkStatusChanged": "מצב הרשת השתנה"
 }

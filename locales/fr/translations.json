@@ -629,5 +629,9 @@
   "confirmExport": "Confirmer l'exportation",
   "confirmExportDesc": "Vous êtes sur le point d'exporter toutes vos données, y compris les unités, les échéances et les préférences. Ce fichier contiendra vos paramètres personnels.",
   "proceedExport": "Procéder à l'exportation",
-  "loadingSettings": "Chargement des paramètres..."
+  "loadingSettings": "Chargement des paramètres...",
+  "skipToContent": "Aller au contenu",
+  "youAreOffline": "Vous êtes hors ligne",
+  "backOnline": "De retour en ligne",
+  "networkStatusChanged": "État du réseau modifié"
 }
