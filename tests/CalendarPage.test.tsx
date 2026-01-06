@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import CalendarPage from '@/app/calendar/page';
 
 const deadlinesState = {
@@ -66,25 +67,55 @@ describe('CalendarPage', () => {
     deadlinesState.getStressLevel.mockClear();
   });
 
-  it.skip('opens edit dialog with keyboard interaction', async () => {
-    // Skipped: The keyboard interaction test requires more complex setup
-    // due to the restructured calendar layout
+  // Replaced skipped dialog-opening tests with interaction tests matching the current CalendarClient behavior.
+  it('completion control is keyboard-focusable and activates', async () => {
     render(<CalendarPage />);
 
-    // Find all elements with role="button" and look for the deadline card div
-    const buttons = screen.getAllByRole('button');
-    const listCard = buttons.find((node) =>
-      node.tagName === 'DIV' && node.textContent?.includes('Assignment 1')
-    );
-    expect(listCard).toBeDefined();
-    fireEvent.keyDown(listCard as HTMLElement, { key: 'Enter', code: 'Enter' });
+    const title = screen.getByText('Assignment 1');
+    const contentWrapper = title.parentElement?.parentElement as HTMLElement | null;
+    expect(contentWrapper).toBeDefined();
+    const toggleButton = contentWrapper!.querySelector('button') as HTMLButtonElement;
+    expect(toggleButton).toBeTruthy();
+
+    // Ensure the control is focusable and has a clear accessible name
+    toggleButton.focus();
+    expect(document.activeElement).toBe(toggleButton);
+    expect(toggleButton).toHaveAttribute('aria-label');
+
+    // Simulate activation (keyboard activation should trigger a click in browsers; use click here to assert behavior)
+    fireEvent.click(toggleButton);
+
+    expect(deadlinesState.toggleComplete).toHaveBeenCalledWith('deadline-1');
+  });
+
+  it('toggles complete when completion button clicked', async () => {
+    render(<CalendarPage />);
+
+    const title = screen.getByText('Assignment 1');
+    const contentWrapper = title.parentElement?.parentElement as HTMLElement | null;
+    expect(contentWrapper).toBeDefined();
+    const toggleButton = contentWrapper!.querySelector('button') as HTMLButtonElement;
+    expect(toggleButton).toBeTruthy();
+
+    fireEvent.click(toggleButton);
+
+    expect(deadlinesState.toggleComplete).toHaveBeenCalledWith('deadline-1');
+  });
+
+  it('opens edit dialog with keyboard interaction', async () => {
+    render(<CalendarPage />);
+
+    const cardButton = screen.getByRole('button', { name: /Assignment 1 deadline/i });
+    const user = userEvent.setup();
+    cardButton.focus();
+    await user.keyboard('{Enter}');
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
-  it.skip('opens edit dialog from calendar grid button click', async () => {
+  it('opens edit dialog from calendar grid button click', async () => {
     render(<CalendarPage />);
 
     const gridButton = screen.getByTitle(/Assignment 1 \(2:30 PM\)/i);

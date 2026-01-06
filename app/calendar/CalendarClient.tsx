@@ -1,18 +1,19 @@
 'use client';
 
-// import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   CheckCircle2,
   Circle,
   CalendarDays,
+  Edit2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 // import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-// import { useUnitsStore } from '@/lib/store/unitsStore';
-// import DeadlineForm from '@/components/deadlines/DeadlineForm';
-// import { Deadline } from '@/lib/types';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import DeadlineForm from '@/components/deadlines/DeadlineForm';
+import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -21,8 +22,24 @@ export default function CalendarClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
 
+  const units = useUnitsStore((s) => s.units);
+
   const hasHydrated = useHydration();
   const { t } = useTranslation();
+
+  // Dialog state for editing deadlines
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDeadline, setEditDeadline] = useState<Deadline | null>(null);
+
+  const openEdit = (d: Deadline) => {
+    setEditDeadline(d);
+    setDialogOpen(true);
+  };
+
+  const closeEdit = () => {
+    setDialogOpen(false);
+    setEditDeadline(null);
+  };
 
   // For now, just show a simple calendar view
   return (
@@ -54,39 +71,83 @@ export default function CalendarClient() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {deadlines.slice(0, 5).map((deadline) => (
-                    <div key={deadline.id} className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border" style={{ color: 'var(--mq-content)' }}>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => toggleComplete(deadline.id)}
-                          className="text-mq-content-secondary hover:text-mq-content transition-colors"
-                        >
-                          {deadline.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-mq-success" />
-                          ) : (
-                            <Circle className="h-5 w-5" />
-                          )}
-                        </button>
-                        <div>
-                          <h4 className={`font-medium ${deadline.completed ? 'line-through text-mq-content-secondary' : 'text-mq-content'}`}>
-                            {deadline.title}
-                          </h4>
-                          <p className="text-mq-sm text-mq-content-secondary">
-                            {deadline.unitCode} • {t('due')} {new Date(deadline.dueDate).toLocaleDateString()}
-                          </p>
+                  {deadlines.slice(0, 5).map((deadline) => {
+                    const due = new Date(deadline.dueDate);
+                    const time = due.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+                    return (
+                      <div
+                        key={deadline.id}
+                        className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border"
+                        style={{ color: 'var(--mq-content)' }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${deadline.title} deadline`}
+                        aria-haspopup="dialog"
+                        aria-expanded={dialogOpen && editDeadline?.id === deadline.id}
+                        onKeyDown={(e) => {
+                          // Only open edit on Enter to avoid intercepting Space (used by buttons)
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            openEdit(deadline);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => toggleComplete(deadline.id)}
+                            aria-label={deadline.completed ? t('markIncomplete') : t('markComplete')}
+                            className="text-mq-content-secondary hover:text-mq-content transition-colors"
+                          >
+                            {deadline.completed ? (
+                              <CheckCircle2 className="h-5 w-5 text-mq-success" />
+                            ) : (
+                              <Circle className="h-5 w-5" />
+                            )}
+                          </button>
+                          <div>
+                            <h4 className={`font-medium ${deadline.completed ? 'line-through text-mq-content-secondary' : 'text-mq-content'}`}>
+                              {deadline.title}
+                            </h4>
+                            <p className="text-mq-sm text-mq-content-secondary">
+                              {deadline.unitCode} • {t('due')} {due.toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          {/* Grid button with title so tests can target it */}
+                          <button
+                            title={`${deadline.title} (${time})`}
+                            aria-label={t('openEditDialog')}
+                            onClick={() => openEdit(deadline)}
+                            className="text-mq-content-secondary hover:text-mq-content transition-colors"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+
+                          <Badge className={`${PRIORITY_COLORS[deadline.priority]} alabaster-readable`}>
+                            {deadline.priority}
+                          </Badge>
                         </div>
                       </div>
-                      <Badge className={`${PRIORITY_COLORS[deadline.priority]} alabaster-readable`}>
-                        {deadline.priority}
-                      </Badge>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <DeadlineForm
+        open={dialogOpen}
+        onOpenChange={(v) => {
+          setDialogOpen(v);
+          if (!v) setEditDeadline(null);
+        }}
+        editDeadline={editDeadline}
+      />
     </div>
   );
 }
