@@ -37,6 +37,22 @@ Updated team roles and responsibilities with clear tab/feature ownership:
 - `Team_Plan/AGENT.md` - Added team roles section with ownership table
 - `Team_Plan/CHANGELOG.md` - Added this changelog entry
 =======
+## [0.5.44] - 2026-01-06
+
+### Added
+
+- **Playwright + axe instrumentation**: Enhanced accessibility tests in `tests/accessibility.spec.ts` to capture computed styles, pseudo-element and ancestor diagnostics, and per-violation screenshots/JSON artifacts (`test-results/axe-violation-*.json`, `*.png`) to assist precise fixes.
+
+### Changed
+
+- **Theme & token unification**: Replaced inline black color literals with design tokens (`var(--mq-content)`, `var(--mq-content-secondary)`), added a unified dark-mode rule (`html.dark ... color: var(--mq-content)`), and applied Alabaster-specific fallbacks scoped to `Feed`, `Map`, `Home`, and `Calendar` pages in `app/globals.css` to meet WCAG contrast expectations.
+
+### Fixed
+
+- **Map head / hydration**: Removed an invalid nested `<head>` from `app/map/page.tsx` and ensured a server-rendered `<title>` via `app/map/head.tsx` to resolve hydration errors.
+- **E2E resilience & main landmark stability**: Made `ClientLayout` render a visible `<main id="main-content">` during auth checks and updated `tests/e2e.spec.ts` to accept either dashboard main or login page during unauthenticated flows; Playwright E2E tests for `Home|Feed|Calendar|Map` passed after these fixes.
+- **Reverted black borders**: On request, removed the aggressive black border rules added for Alabaster light pages and committed `chore: revert black border rules added for Alabaster light mode` to restore prior visuals.
+
 ## [0.5.43] - 2026-01-06
 
 ### Fixed
