@@ -11,28 +11,19 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
 import { motion } from 'framer-motion';
 
+// Loading skeleton component for dynamic imports (static, no hooks)
+const FormLoadingSkeleton = () => (
+  <div className="flex items-center justify-center p-8">
+    <p className="text-mq-content animate-pulse">Loading...</p>
+  </div>
+);
+
 // Dynamically import forms for better code splitting
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
-  loading: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { t } = useTranslation();
-    return (
-      <div className="flex items-center justify-center p-8">
-        <p className="text-mq-content">{t('loading')}</p>
-      </div>
-    );
-  },
+  loading: FormLoadingSkeleton,
 });
 const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
-  loading: () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { t } = useTranslation();
-    return (
-      <div className="flex items-center justify-center p-8">
-        <p className="text-mq-content">{t('loading')}</p>
-      </div>
-    );
-  },
+  loading: FormLoadingSkeleton,
 });
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
@@ -158,6 +149,7 @@ export default function HomeClient() {
   });
 
   const hasSeededRef = useRef(false);
+  const announcementTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const [unitFormOpen, setUnitFormOpen] = useState(false);
   const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
@@ -166,6 +158,15 @@ export default function HomeClient() {
 
   // Live region for screen reader announcements
   const [announcements, setAnnouncements] = useState<string[]>([]);
+
+  // Cleanup announcement timers on unmount
+  useEffect(() => {
+    const timers = announcementTimersRef.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
 
   // Load sample data on first visit with comprehensive validation
   useEffect(() => {
@@ -394,11 +395,14 @@ export default function HomeClient() {
 
   // Function to announce actions to screen readers
   const announceToScreenReader = (message: string) => {
-    setAnnouncements((prev) => [...prev, `${Date.now()}: ${message}`]);
+    const timestamp = Date.now();
+    setAnnouncements((prev) => [...prev, `${timestamp}: ${message}`]);
     // Clear old announcements after 5 seconds
-    setTimeout(() => {
-      setAnnouncements((prev) => prev.filter((ann) => !ann.startsWith(`${Date.now() - 5000}:`)));
+    const timer = setTimeout(() => {
+      setAnnouncements((prev) => prev.filter((ann) => !ann.startsWith(`${timestamp}:`)));
+      announcementTimersRef.current.delete(timer);
     }, 5000);
+    announcementTimersRef.current.add(timer);
   };
 
   const stressColors = {

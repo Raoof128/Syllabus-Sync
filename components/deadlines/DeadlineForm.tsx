@@ -82,7 +82,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     setErrors({});
   };
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editDeadline) {
       setTitle(editDeadline.title);
@@ -101,8 +100,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     } else {
       resetForm();
     }
-  }, [editDeadline, open]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+    // Use editDeadline?.id to avoid re-running when object reference changes but content is same
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editDeadline?.id, open]);
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({

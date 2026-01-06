@@ -89,7 +89,6 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   };
 
   // Initialize form with edit data
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editUnit) {
       setCode(editUnit.code);
@@ -101,8 +100,9 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     } else {
       resetForm();
     }
-  }, [editUnit, open]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+    // Use editUnit?.id to avoid re-running when object reference changes but content is same
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editUnit?.id, open]);
 
   const addClassTime = () => {
     const newClassTime: ClassTime = {

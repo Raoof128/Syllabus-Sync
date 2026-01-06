@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
-import { jsonError } from '@/app/api/_lib/response';
+import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow } from '@/app/api/_lib/mappers';
+import { requireAuth } from '@/app/api/_lib/middleware';
 
 const eventSchema = z.object({
   id: z.string().min(1).optional(),
@@ -18,54 +18,67 @@ const eventSchema = z.object({
 });
 
 export async function GET() {
-  const supabase = await createServerClient();
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .order('event_date', { ascending: true });
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('event_date', { ascending: true });
 
-  if (error) {
-    return jsonError(error.message, 500);
+    if (error) {
+      return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+    }
+
+    return jsonSuccess(data?.map(mapEventRow) ?? []);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return jsonError('Failed to fetch events', 500, ERROR_CODES.INTERNAL_ERROR);
   }
-
-  return NextResponse.json(data?.map(mapEventRow) ?? []);
 }
 
 export async function POST(request: Request) {
-  const supabase = await createServerClient();
-  const body = await request.json().catch(() => null);
-  const parsed = eventSchema.safeParse(body);
+  return requireAuth(request, async () => {
+    try {
+      const body = await request.json().catch(() => null);
+      const parsed = eventSchema.safeParse(body);
 
-  if (!parsed.success) {
-    return jsonError('Invalid event payload.', 400);
-  }
+      if (!parsed.success) {
+        return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR);
+      }
 
-  const payload = {
-    ...parsed.data,
-    id: parsed.data.id ?? crypto.randomUUID(),
-    createdAt: parsed.data.createdAt ?? new Date(),
-  };
+      const supabase = await createServerClient();
 
-  const { data, error } = await supabase
-    .from('events')
-    .insert({
-      id: payload.id,
-      title: payload.title,
-      description: payload.description,
-      event_date: payload.date.toISOString().split('T')[0], // Date only
-      event_time: payload.time,
-      location: payload.location,
-      building: payload.building,
-      category: payload.category,
-      image_url: payload.imageUrl,
-      created_at: payload.createdAt.toISOString(),
-    })
-    .select('*')
-    .single();
+      const payload = {
+        ...parsed.data,
+        id: parsed.data.id ?? crypto.randomUUID(),
+        createdAt: parsed.data.createdAt ?? new Date(),
+      };
 
-  if (error) {
-    return jsonError(error.message, 500);
-  }
+      const { data, error } = await supabase
+        .from('events')
+        .insert({
+          id: payload.id,
+          title: payload.title,
+          description: payload.description,
+          event_date: payload.date.toISOString().split('T')[0], // Date only
+          event_time: payload.time,
+          location: payload.location,
+          building: payload.building,
+          category: payload.category,
+          image_url: payload.imageUrl,
+          created_at: payload.createdAt.toISOString(),
+        })
+        .select('*')
+        .single();
 
-  return NextResponse.json(mapEventRow(data));
+      if (error) {
+        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+      }
+
+      return jsonSuccess(mapEventRow(data), 201);
+    } catch (error) {
+      console.error('Error creating event:', error);
+      return jsonError('Failed to create event', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+  });
 }

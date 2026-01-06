@@ -7,6 +7,93 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.59] - 2026-01-07
+
+### Fixed
+
+#### Comprehensive API Security & Store Stability Audit (Raouf)
+
+Fixed critical security vulnerabilities and stability issues across API routes, Zustand stores, and React hooks.
+
+**API Security Fixes (CRITICAL)**:
+
+1. **`/api/notifications/mark-all-read`** - Fixed missing authentication and user filter:
+   - Added `requireAuth` middleware
+   - Added `user_id` filter to only update current user's notifications
+   - Added try-catch error handling with proper error codes
+   - Changed to use `jsonSuccess` response helper
+
+2. **`/api/units/[id]`** - Fixed missing authentication and validation:
+   - Added `requireAuth` middleware for PUT/DELETE
+   - Added UUID format validation with regex
+   - Added `user_id` filter to prevent unauthorized access
+   - Added try-catch error handling
+   - Changed to use `jsonSuccess`/`jsonError` response helpers
+
+3. **`/api/deadlines/[id]`** - Fixed missing authentication and validation:
+   - Added `requireAuth` middleware for PUT/DELETE
+   - Added UUID format validation with regex
+   - Added `user_id` filter to prevent unauthorized access
+   - Added try-catch error handling
+   - Changed to use `jsonSuccess`/`jsonError` response helpers
+
+4. **`/api/events`** - Fixed error handling:
+   - GET remains public (events are shared campus-wide)
+   - POST requires authentication via `requireAuth`
+   - Added try-catch error handling
+   - Changed to use `jsonSuccess`/`jsonError` response helpers
+
+5. **`/api/navigate`** - Fixed coordinate validation:
+   - Added comprehensive `isValidCoordinate` helper function
+   - Validates lat range [-90, 90] and lng range [-180, 180]
+   - Checks for NaN and Infinity values
+   - Added proper JSON body validation
+   - Changed to use `jsonSuccess`/`jsonError` response helpers
+
+**Zustand Store Fixes**:
+
+1. **`notificationsStore`** - Fixed persist and rollback issues:
+   - Added `persist` middleware to persist notifications to localStorage
+   - Added `MAX_NOTIFICATIONS = 100` limit to prevent unbounded array growth
+   - Fixed `markAllAsRead` rollback logic - now preserves original read states using a Map instead of incorrectly setting all to `read: false`
+   - Added version number for migration support
+
+2. **`unitsStore`** - Fixed restore logic in `removeUnit`:
+   - Store unit reference **before** removing from state (was trying to find already-deleted item)
+   - Unit can now be properly restored on API error
+
+**React Hooks Fixes**:
+
+1. **`HomeClient.tsx`** - Fixed Rules of Hooks violation:
+   - Removed `useTranslation()` calls from dynamic import `loading` functions
+   - Created proper `FormLoadingSkeleton` component with static text
+   - Added `announcementTimersRef` to track setTimeout IDs
+   - Added cleanup effect to clear timers on unmount (prevents memory leak)
+
+2. **`DeadlineForm.tsx`** - Fixed unnecessary re-renders:
+   - Changed `editDeadline` to `editDeadline?.id` in useEffect dependency array
+   - Prevents re-running effect when object reference changes but content is same
+
+3. **`UnitForm.tsx`** - Fixed unnecessary re-renders:
+   - Changed `editUnit` to `editUnit?.id` in useEffect dependency array
+   - Prevents re-running effect when object reference changes but content is same
+
+**Files changed**:
+- `app/api/notifications/mark-all-read/route.ts`
+- `app/api/units/[id]/route.ts`
+- `app/api/deadlines/[id]/route.ts`
+- `app/api/events/route.ts`
+- `app/api/navigate/route.ts`
+- `lib/store/notificationsStore.ts`
+- `lib/store/unitsStore.ts`
+- `app/home/HomeClient.tsx`
+- `components/deadlines/DeadlineForm.tsx`
+- `components/units/UnitForm.tsx`
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes); `npm test` (46/46 pass).
+
+---
+
 ## [0.5.58] - 2026-01-07
 
 ### Fixed

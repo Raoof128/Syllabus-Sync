@@ -92,6 +92,9 @@ export const useUnitsStore = create<UnitsState>()(
       },
 
       removeUnit: async (id) => {
+        // Store the unit before removing for potential rollback
+        const unitToRestore = get().units.find((u) => u.id === id);
+
         // Remove from local state immediately
         set((state) => ({
           units: state.units.filter((u) => u.id !== id),
@@ -101,7 +104,6 @@ export const useUnitsStore = create<UnitsState>()(
           await apiRequest<{ id: string }>(`/api/units/${id}`, { method: 'DELETE' });
         } catch (error) {
           // On error, restore the unit to local state
-          const unitToRestore = get().units.find((u) => u.id === id);
           if (unitToRestore) {
             set((state) => ({ units: [...state.units, unitToRestore] }));
           }
