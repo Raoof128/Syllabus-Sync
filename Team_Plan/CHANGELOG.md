@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Settings language layout (Raouf)**: Switched the language selector to a 4-column grid so the 19 language codes render in the intended 4/4/4/4/3 ordering for consistent spacing on desktop. File changed: `app/settings/page.tsx`.
 - **Settings cleanup (Raouf)**: Removed the Account section and the data retention / encryption note / clear-all-data subcards from Settings to match the latest UI spec. File changed: `app/settings/page.tsx`.
+- **Skip link removal (Raouf)**: Removed the skip-to-main-content banner to stop the red overlay from appearing on focus. Files changed: `app/client-layout.tsx`, `app/home/page.tsx`.
+- **Manage Sessions wiring (Raouf)**: Wired the Manage Sessions button to a functional dialog that lists local sessions and allows signing out sessions instead of showing a decorative control. File changed: `app/settings/page.tsx`.
+- **Lint fix (Raouf)**: Addressed lint errors by moving localStorage hydration to state initializers and removing unused imports in `app/settings/page.tsx`.
 
 ## [0.5.47] - 2026-01-06
 

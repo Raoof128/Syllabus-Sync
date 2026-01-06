@@ -1,10 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
@@ -24,6 +32,8 @@ import {
   Mail,
   Download,
 } from 'lucide-react';
+
+type SessionInfo = { id: string; device: string; lastActive: string; current: boolean };
 
 const languageNames: Record<string, string> = {
   en: 'English',
@@ -54,27 +64,59 @@ export default function SettingsPage() {
   const { theme, resolvedTheme, setTheme } = useThemeStore();
   const { t, language, setLanguage } = useTranslation();
 
-  const [notifications, setNotifications] = useState({
-    deadlines: true,
-    classes: true,
-    events: true,
-  });
+  const [sessions, setSessions] = useState<SessionInfo[]>(() => {
+    if (typeof window === 'undefined') return [];
 
-  useEffect(() => {
+    const getDeviceLabel = () => {
+      const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } })
+        ?.userAgentData;
+      const platform = uaData?.platform || navigator.platform || 'This device';
+      const ua = navigator.userAgent;
+      const browserMatch = ua.match(/(Firefox|Edg|Chrome|Safari)/);
+      const browser = browserMatch ? browserMatch[0] : 'Browser';
+      return `${platform} · ${browser}`;
+    };
+
     try {
-      if (typeof window !== 'undefined') {
-        const getVal = (key: string) => {
-          const val = localStorage.getItem(`notification-${key}`);
-          return val === null ? true : val === 'true';
-        };
-        setNotifications({
-          deadlines: getVal('deadlines'),
-          classes: getVal('classes'),
-          events: getVal('events'),
-        });
-      }
-    } catch {}
-  }, []);
+      const stored = window.localStorage.getItem('mq-sessions');
+      const parsed = stored ? (JSON.parse(stored) as SessionInfo[]) : [];
+      const currentId = 'current-device';
+      const now = new Date().toISOString();
+      const currentSession: SessionInfo = {
+        id: currentId,
+        device: getDeviceLabel(),
+        lastActive: now,
+        current: true,
+      };
+
+      const existingIndex = parsed.findIndex((s) => s.id === currentId);
+      const nextSessions =
+        existingIndex >= 0
+          ? parsed.map((s, idx) => (idx === existingIndex ? currentSession : s))
+          : [...parsed, currentSession];
+
+      window.localStorage.setItem('mq-sessions', JSON.stringify(nextSessions));
+      return nextSessions;
+    } catch (error) {
+      errorHandler.logError(error as Error, 'Sessions bootstrap', 'low');
+      return [];
+    }
+  });
+  const [showSessionsDialog, setShowSessionsDialog] = useState(false);
+  const [notifications, setNotifications] = useState(() => {
+    if (typeof window === 'undefined') {
+      return { deadlines: true, classes: true, events: true };
+    }
+    const getVal = (key: string) => {
+      const val = localStorage.getItem(`notification-${key}`);
+      return val === null ? true : val === 'true';
+    };
+    return {
+      deadlines: getVal('deadlines'),
+      classes: getVal('classes'),
+      events: getVal('events'),
+    };
+  });
 
   const handleLanguageChange = (
     newLanguage:
@@ -125,6 +167,42 @@ export default function SettingsPage() {
       }
     } catch (error) {
       errorHandler.logError(error as Error, 'Notification Prefs', 'low');
+      toastUtils.error(t('settingsError'), t('preferenceError'));
+    }
+  };
+
+  const openSessions = () => {
+    if (typeof window !== 'undefined') {
+      setShowSessionsDialog(true);
+    }
+  };
+
+  const endSession = (id: string) => {
+    try {
+      setSessions((prev) => {
+        const remaining = prev.filter((session) => session.id !== id || session.current);
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem('mq-sessions', JSON.stringify(remaining));
+        }
+        return remaining;
+      });
+      toastUtils.success(t('manageSessions'), t('preferenceUpdated'));
+    } catch (error) {
+      errorHandler.logError(error as Error, 'End session', 'medium');
+      toastUtils.error(t('settingsError'), t('preferenceError'));
+    }
+  };
+
+  const endAllSessions = () => {
+    try {
+      const currentOnly = sessions.filter((s) => s.current);
+      setSessions(currentOnly);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('mq-sessions', JSON.stringify(currentOnly));
+      }
+      toastUtils.success(t('manageSessions'), t('preferenceUpdated'));
+    } catch (error) {
+      errorHandler.logError(error as Error, 'End all sessions', 'medium');
       toastUtils.error(t('settingsError'), t('preferenceError'));
     }
   };
@@ -383,7 +461,7 @@ export default function SettingsPage() {
                     variant="ghost"
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                    onClick={() => toastUtils.info(t('manageSessions'), t('comingSoon'))}
+                    onClick={openSessions}
                   >
                     {t('manageSessions')}
                   </Button>
@@ -515,6 +593,60 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <Dialog open={showSessionsDialog} onOpenChange={setShowSessionsDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('manageSessions')}</DialogTitle>
+            <DialogDescription>{t('manageSessionsDesc')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            {sessions.length === 0 ? (
+              <p className="text-mq-sm text-mq-content-secondary">No sessions to show.</p>
+            ) : (
+              sessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2"
+                >
+                  <div>
+                    <p className="font-semibold text-mq-content">
+                      {session.current ? t('current') : t('manageSessions')}
+                    </p>
+                    <p className="text-mq-sm text-mq-content-secondary">{session.device}</p>
+                    <p className="text-mq-xs text-mq-content-tertiary">
+                      Last active: {new Date(session.lastActive).toLocaleString()}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+                    disabled={session.current}
+                    onClick={() => endSession(session.id)}
+                  >
+                    {t('signOut')}
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <DialogFooter className="flex justify-between">
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={sessions.length === 0}
+              onClick={endAllSessions}
+            >
+              Sign out all sessions
+            </Button>
+            <Button variant="secondary" onClick={() => setShowSessionsDialog(false)}>
+              {t('close')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

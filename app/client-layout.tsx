@@ -167,14 +167,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Render full layout for authenticated routes
   return (
     <ThemeProvider>
-      {/* Skip to main content link */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-mq-primary text-white px-4 py-2 rounded-mq z-50 focus:outline-none focus:ring-2 focus:ring-mq-focus focus:ring-offset-2"
-      >
-        {t('skipToMainContent')}
-      </a>
-
       <div className="flex min-h-screen bg-mq-background">
         {/* Sidebar */}
         <Sidebar />

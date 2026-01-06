@@ -2145,3 +2145,21 @@ Summary:
 Files: app/settings/page.tsx.
 Verification: Not run (UI-only layout change).
 Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Skip Link & Sessions.
+Summary:
+  - Removed the skip-to-main-content banner so the red overlay no longer appears on focus.
+  - Wired the Manage Sessions control to a real dialog showing local sessions with sign-out actions.
+Files: app/client-layout.tsx; app/home/page.tsx; app/settings/page.tsx.
+Verification: Not run (UI-only change).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Lint Hydration.
+Summary:
+  - Moved notification/session hydration to state initializers to satisfy lint rules about setState in effects.
+  - Removed unused imports after refactor.
+Files: app/settings/page.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
