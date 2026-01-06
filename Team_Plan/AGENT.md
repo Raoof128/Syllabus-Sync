@@ -2163,3 +2163,53 @@ Summary:
 Files: app/settings/page.tsx.
 Verification: npm run lint -- --max-warnings=0 (pass).
 Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Profile Card Hover.
+Summary:
+  - Wrapped ProfileCard in the shared mq-magic-card hover shell so it matches other cards and removes the red outline.
+Files: components/ProfileCard.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Profile Menu & Card Borders.
+Summary:
+  - Removed the Calendar item from the profile dropdown.
+  - Added priority-colored borders around ProfileCard sub-sections to align with the provided design.
+Files: components/layout/Header.tsx; components/ProfileCard.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Quick Actions & Profile Borders.
+Summary:
+  - Rounded Quick Actions buttons to match other card styles.
+  - Standardized ProfileCard subcard borders to the shared token color for consistent styling.
+Files: components/home/QuickActions.tsx; components/ProfileCard.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Quick Actions Rounded.
+Summary:
+  - Swapped Quick Actions buttons to fully rounded styling with adjusted padding so they no longer look square.
+Files: components/home/QuickActions.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Quick Actions Pill Corners.
+Summary:
+  - Updated Quick Actions buttons to use `rounded-full` for a clear pill shape.
+Files: components/home/QuickActions.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Settings Quick Actions.
+Summary:
+  - Rounded the Settings quick actions buttons to align with other card styles.
+Files: app/settings/page.tsx.
+Verification: Not run (UI-only change).
+Follow-ups: None.

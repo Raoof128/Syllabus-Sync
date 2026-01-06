@@ -47,14 +47,13 @@ const ProfileCard = React.memo(
     };
 
     return (
-      <Card
-        className={cn(
-          'relative transition-all duration-300',
-          isCurrent
-            ? 'ring-2 ring-mq-primary bg-mq-primary/5 shadow-mq-lg'
-            : 'hover:shadow-mq-lg hover:-translate-y-1 hover:bg-mq-background-secondary',
-        )}
-      >
+      <div className="mq-magic-card">
+        <Card
+          className={cn(
+            'mq-magic-card-content relative transition-all duration-300',
+            isCurrent ? 'ring-2 ring-mq-primary bg-mq-primary/5 shadow-mq-lg' : '',
+          )}
+        >
         <CardHeader className="flex flex-row items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="relative group cursor-pointer">
@@ -141,7 +140,7 @@ const ProfileCard = React.memo(
 
         <CardContent className="pt-0">
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('emailNotifications')}</span>
@@ -163,7 +162,7 @@ const ProfileCard = React.memo(
                 />
               </button>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
@@ -187,7 +186,7 @@ const ProfileCard = React.memo(
                 />
               </button>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4 text-mq-content-tertiary" />
                 <span className="text-sm text-mq-content-secondary">{t('pushNotifications')}</span>
@@ -215,34 +214,35 @@ const ProfileCard = React.memo(
         </CardContent>
 
         <div className="px-4 pb-4">
-          <label className="flex items-center justify-center gap-2 w-full p-2 text-sm font-medium text-mq-content-secondary bg-mq-background-secondary hover:bg-mq-hover-background rounded-mq border border-mq-border cursor-pointer transition-colors">
+          <label className="flex items-center justify-center gap-2 w-full p-2 text-sm font-medium text-mq-content-secondary bg-mq-card-background hover:bg-mq-hover-background rounded-mq border border-mq-border cursor-pointer transition-colors">
             <Camera className="h-4 w-4" />
             <span>{t('changeAvatar')}</span>
             <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           </label>
         </div>
 
-        {deleteConfirm && (
-          <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
-            <p className="text-sm text-mq-error mb-3 font-medium">{t('deleteProfileConfirm')}</p>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(false)}>
-                {t('cancel')}
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  onDelete(profile.id);
-                  setDeleteConfirm(false);
-                }}
-              >
-                {t('deleteProfile')}
-              </Button>
+          {deleteConfirm && (
+            <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
+              <p className="text-sm text-mq-error mb-3 font-medium">{t('deleteProfileConfirm')}</p>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(false)}>
+                  {t('cancel')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    onDelete(profile.id);
+                    setDeleteConfirm(false);
+                  }}
+                >
+                  {t('deleteProfile')}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-      </Card>
+          )}
+        </Card>
+      </div>
     );
   },
 );

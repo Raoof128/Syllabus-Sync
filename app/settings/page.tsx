@@ -526,7 +526,7 @@ export default function SettingsPage() {
                   <Button
                     key={href}
                     variant="ghost"
-                    className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border"
+                    className="w-full justify-start rounded-mq-lg bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border"
                     asChild
                   >
                     <Link href={href}>{label}</Link>

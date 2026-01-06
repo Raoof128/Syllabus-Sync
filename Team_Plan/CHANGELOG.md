@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skip link removal (Raouf)**: Removed the skip-to-main-content banner to stop the red overlay from appearing on focus. Files changed: `app/client-layout.tsx`, `app/home/page.tsx`.
 - **Manage Sessions wiring (Raouf)**: Wired the Manage Sessions button to a functional dialog that lists local sessions and allows signing out sessions instead of showing a decorative control. File changed: `app/settings/page.tsx`.
 - **Lint fix (Raouf)**: Addressed lint errors by moving localStorage hydration to state initializers and removing unused imports in `app/settings/page.tsx`.
+- **Profile card hover (Raouf)**: Applied the standard `mq-magic-card` hover wrapper to ProfileCard so it matches other cards and drops the red outline. File changed: `components/ProfileCard.tsx`.
+- **Profile menu + card polish (Raouf)**: Removed Calendar from the profile dropdown and gave ProfileCard sub-sections a priority-colored border to match the design. Files changed: `components/layout/Header.tsx`, `components/ProfileCard.tsx`.
+- **Quick actions + profile borders (Raouf)**: Rounded the Quick Actions buttons to match other cards and unified ProfileCard subcard borders to the standard token color. Files changed: `components/home/QuickActions.tsx`, `components/ProfileCard.tsx`.
+- **Quick actions fully rounded (Raouf)**: Updated Quick Actions buttons to use full rounding and padding so they no longer appear squared. File changed: `components/home/QuickActions.tsx`.
+- **Quick actions pill round (Raouf)**: Switched Quick Actions buttons to `rounded-full` to ensure visibly pill-shaped corners. File changed: `components/home/QuickActions.tsx`.
+- **Settings quick actions rounding (Raouf)**: Rounded the Settings quick actions buttons so they match the rest of the card styling. File changed: `app/settings/page.tsx`.
 
 ## [0.5.47] - 2026-01-06
 

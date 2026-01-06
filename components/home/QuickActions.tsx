@@ -9,12 +9,12 @@ export default function QuickActions() {
   return (
     <div className="mq-magic-card h-auto">
       <div className="mq-magic-card-content p-4 items-center justify-center bg-mq-card-background">
-        <div className="flex gap-4 w-full justify-center">
+        <div className="flex flex-col gap-3 w-full">
           <Button
             asChild
             variant="ghost"
             size="lg"
-            className="border border-mq-border bg-transparent hover:bg-mq-hover-background text-mq-content"
+            className="border border-mq-border rounded-full bg-mq-card-background hover:bg-mq-hover-background text-mq-content justify-start px-5 py-3"
           >
             <Link href="/map" className="gap-2">
               <Map className="h-5 w-5" />
@@ -26,7 +26,7 @@ export default function QuickActions() {
             asChild
             variant="ghost"
             size="lg"
-            className="border border-mq-border bg-transparent hover:bg-mq-hover-background text-mq-content"
+            className="border border-mq-border rounded-full bg-mq-card-background hover:bg-mq-hover-background text-mq-content justify-start px-5 py-3"
           >
             <Link href="/calendar" className="gap-2">
               <Calendar className="h-5 w-5" />

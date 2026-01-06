@@ -410,15 +410,6 @@ const Header = memo(() => {
                   {t('settings')}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  href="/calendar"
-                  className="flex items-center gap-2 text-mq-content-secondary"
-                >
-                  <Calendar className="w-4 h-4" />
-                  {t('calendar')}
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={async () => {
