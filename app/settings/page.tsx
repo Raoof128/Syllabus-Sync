@@ -13,12 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
-import { APP_CONFIG } from '@/lib/config';
+import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
 
@@ -32,13 +33,33 @@ import {
   Shield,
   XCircle,
   Mail,
+  Download,
+  Trash2,
+  Lock,
+  Key,
+  LogOut,
+  User,
 } from 'lucide-react';
+
+const languageNames: Record<string, string> = {
+  en: 'English',
+  es: 'Español',
+  fa: 'فارسی',
+  zh: '中文',
+  ar: 'العربية',
+  hi: 'हिन्दी',
+  ko: '한국어',
+  ja: '日本語',
+  ur: 'اردو',
+  th: 'ไทย',
+  vi: 'Tiếng Việt',
+  ru: 'Русский',
+};
 
 export default function SettingsPage() {
   const [clearing, setClearing] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [storageEnabled, setStorageEnabled] = useState(true);
-
+  const [clearConfirmText, setClearConfirmText] = useState('');
 
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
@@ -48,14 +69,12 @@ export default function SettingsPage() {
   const { theme, resolvedTheme, setTheme } = useThemeStore();
   const { t, language, setLanguage } = useTranslation();
 
-  // Notification States (Optimistic UI)
   const [notifications, setNotifications] = useState({
     deadlines: true,
     classes: true,
     events: true,
   });
 
-  // Initialize from LocalStorage
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -69,63 +88,25 @@ export default function SettingsPage() {
           events: getVal('events'),
         });
       }
-    } catch {
-      // Defaults are true
-    }
+    } catch {}
   }, []);
 
   const handleLanguageChange = (
-    newLanguage:
-      | 'en'
-      | 'es'
-      | 'fa'
-      | 'zh'
-      | 'ar'
-      | 'hi'
-      | 'ko'
-      | 'ja'
-      | 'ur'
-      | 'th'
-      | 'vi'
-      | 'ru',
+    newLanguage: 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur' | 'th' | 'vi' | 'ru',
   ) => {
     if (newLanguage === language) return;
     setLanguage(newLanguage);
 
-    const languageNames: Record<string, string> = {
-      en: t('english'),
-      es: t('spanish'),
-      fa: t('persian'),
-      zh: t('chinese'),
-      ar: t('arabic'),
-      hi: t('hindi'),
-      ko: t('korean'),
-      ja: t('japanese'),
-      ur: t('urdu'),
-      th: t('thai'),
-      vi: t('vietnamese'),
-      ru: t('russian'),
-    };
-
-    toastUtils.success(
-      t('languageUpdated'),
-      `${t('languageUpdatedMsg')} ${languageNames[newLanguage] || newLanguage}`,
-    );
+    const displayName = languageNames[newLanguage] || newLanguage;
+    toastUtils.success(t('languageUpdated'), `${t('languageUpdatedMsg')} ${displayName}`);
   };
 
-  const handleNotificationPreference = (
-    type: keyof typeof notifications,
-    enabled: boolean,
-  ) => {
+  const handleNotificationPreference = (type: keyof typeof notifications, enabled: boolean) => {
     try {
-      setNotifications((prev) => ({
-        ...prev,
-        [type]: enabled,
-      }));
+      setNotifications((prev) => ({ ...prev, [type]: enabled }));
 
       if (typeof window !== 'undefined') {
-        const key = `notification-${type}`;
-        localStorage.setItem(key, enabled.toString());
+        localStorage.setItem(`notification-${type}`, enabled.toString());
 
         const typeLabels: Record<string, string> = {
           deadlines: t('deadlineReminders'),
@@ -145,10 +126,16 @@ export default function SettingsPage() {
   };
 
   const handleClearAllData = () => {
+    setClearConfirmText('');
     setShowClearConfirm(true);
   };
 
   const confirmClearAllData = () => {
+    if (clearConfirmText !== 'CLEAR') {
+      toastUtils.error(t('clearDataConfirmRequired'), '');
+      return;
+    }
+
     setClearing(true);
     let cleared = false;
 
@@ -164,6 +151,9 @@ export default function SettingsPage() {
         localStorage.removeItem('units-seeded');
         localStorage.removeItem('deadlines-seeded');
         localStorage.removeItem('notifications-seeded');
+        ['deadlines', 'classes', 'events'].forEach((k) =>
+          localStorage.removeItem(`notification-${k}`),
+        );
       }
 
       cleared = true;
@@ -183,6 +173,54 @@ export default function SettingsPage() {
     }
   };
 
+  const handleExportData = () => {
+    try {
+      const data = {
+        units,
+        deadlines,
+        preferences: {
+          theme,
+          language,
+          notifications: {
+            deadlines:
+              typeof window !== 'undefined'
+                ? localStorage.getItem('notification-deadlines') === 'true'
+                : true,
+            classes:
+              typeof window !== 'undefined'
+                ? localStorage.getItem('notification-classes') === 'true'
+                : true,
+            events:
+              typeof window !== 'undefined'
+                ? localStorage.getItem('notification-events') === 'true'
+                : true,
+          },
+        },
+        exportedAt: new Date().toISOString(),
+        version: '1.0',
+        appVersion: APP_CONFIG.version,
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `syllabus-sync-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toastUtils.success(t('exportComplete'), t('exportCompleteMsg'));
+    } catch (error) {
+      errorHandler.logError(
+        error instanceof Error ? error : new Error('Failed to export data'),
+        'Settings Export Data',
+        'medium',
+      );
+      toastUtils.error(t('exportFailed'), t('exportFailedMsg'));
+    }
+  };
+
   return (
     <div className="settings-page container mx-auto p-6 max-w-7xl">
       <header className="mb-8">
@@ -191,7 +229,6 @@ export default function SettingsPage() {
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-        {/* Notifications */}
         <div className="mq-magic-card">
           <Card className="mq-magic-card-content">
             <CardHeader>
@@ -201,124 +238,70 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-mq-content-tertiary" />
-                    <div>
-                      <p className="text-mq-sm font-medium text-mq-content">{t('deadlineReminders')}</p>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">{t('deadlineRemindersDesc')}</p>
+              {[
+                {
+                  key: 'deadlines',
+                  icon: Mail,
+                  label: t('deadlineReminders'),
+                  desc: t('deadlineRemindersDesc'),
+                },
+                {
+                  key: 'classes',
+                  icon: Calendar,
+                  label: t('classReminders'),
+                  desc: t('classRemindersDesc'),
+                },
+                {
+                  key: 'events',
+                  icon: Info,
+                  label: t('eventUpdates'),
+                  desc: t('eventUpdatesDesc'),
+                },
+              ].map(({ key, icon: Icon, label, desc }) => (
+                <div
+                  key={key}
+                  className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Icon className="h-4 w-4 text-mq-content-tertiary" />
+                      <div>
+                        <p className="text-mq-sm font-medium text-mq-content">{label}</p>
+                        <p className="text-mq-sm text-mq-content-secondary mt-1">{desc}</p>
+                      </div>
                     </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleNotificationPreference('deadlines', !notifications.deadlines)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleNotificationPreference('deadlines', !notifications.deadlines);
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        handleNotificationPreference(
+                          key as keyof typeof notifications,
+                          !notifications[key as keyof typeof notifications],
+                        )
                       }
-                    }}
-                    className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.deadlines ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                    aria-label={`${t('deadlineReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.deadlines ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.deadlines ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                    aria-pressed={notifications.deadlines}
-                  >
-                    {notifications.deadlines ? (
-                      <>
-                        <CheckCircle className="h-3 w-3" />
-                        {t('enabled')}
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3 w-3" />
-                        {t('disabled')}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-4 w-4 text-mq-content-tertiary" />
-                    <div>
-                      <p className="text-mq-sm font-medium text-mq-content">{t('classReminders')}</p>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">{t('classRemindersDesc')}</p>
-                    </div>
+                      className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications[key as keyof typeof notifications] ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
+                      aria-label={`${label} ${t('notifications').toLowerCase()} ${t('are')} ${notifications[key as keyof typeof notifications] ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications[key as keyof typeof notifications] ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
+                      aria-pressed={notifications[key as keyof typeof notifications]}
+                    >
+                      {notifications[key as keyof typeof notifications] ? (
+                        <>
+                          <CheckCircle className="h-3 w-3" />
+                          {t('enabled')}
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="h-3 w-3" />
+                          {t('disabled')}
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleNotificationPreference('classes', !notifications.classes)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleNotificationPreference('classes', !notifications.classes);
-                      }
-                    }}
-                    className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.classes ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                    aria-label={`${t('classReminders')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.classes ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.classes ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                    aria-pressed={notifications.classes}
-                  >
-                    {notifications.classes ? (
-                      <>
-                        <CheckCircle className="h-3 w-3" />
-                        {t('enabled')}
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3 w-3" />
-                        {t('disabled')}
-                      </>
-                    )}
-                  </Button>
                 </div>
-              </div>
-
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Info className="h-4 w-4 text-mq-content-tertiary" />
-                    <div>
-                      <p className="text-mq-sm font-medium text-mq-content">{t('eventUpdates')}</p>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">{t('eventUpdatesDesc')}</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleNotificationPreference('events', !notifications.events)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleNotificationPreference('events', !notifications.events);
-                      }
-                    }}
-                    className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 ${notifications.events ? 'bg-mq-success text-white hover:bg-mq-success/80' : 'bg-mq-error text-white hover:bg-mq-error/80'}`}
-                    aria-label={`${t('eventUpdates')} ${t('notifications').toLowerCase()} ${t('are')} ${notifications.events ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications.events ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                    aria-pressed={notifications.events}
-                  >
-                    {notifications.events ? (
-                      <>
-                        <CheckCircle className="h-3 w-3" />
-                        {t('enabled')}
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3 w-3" />
-                        {t('disabled')}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+              ))}
             </CardContent>
           </Card>
         </div>
 
-        {/* Appearance */}
         <div className="mq-magic-card">
           <Card className="mq-magic-card-content">
             <CardHeader>
@@ -333,34 +316,22 @@ export default function SettingsPage() {
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('darkMode')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {t('current')}: {theme === 'system' ? `${t('system')} (${resolvedTheme})` : resolvedTheme}
+                      {t('current')}:{' '}
+                      {theme === 'system' ? `${t('system')} (${resolvedTheme})` : resolvedTheme}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setTheme('light')}
-                      className={`px-3 py-1 text-xs ${theme === 'light' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
-                    >
-                      {t('light')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setTheme('system')}
-                      className={`px-3 py-1 text-xs ${theme === 'system' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
-                    >
-                      {t('system')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setTheme('dark')}
-                      className={`px-3 py-1 text-xs ${theme === 'dark' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
-                    >
-                      {t('dark')}
-                    </Button>
+                    {(['light', 'system', 'dark'] as const).map((mode) => (
+                      <Button
+                        key={mode}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setTheme(mode)}
+                        className={`px-3 py-1 text-xs ${theme === mode ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
+                      >
+                        {t(mode)}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -370,211 +341,45 @@ export default function SettingsPage() {
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('language')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {t('current')}: {language === 'en' ? t('english') : language === 'es' ? t('spanish') : t('persian')}
+                      {t('current')}: {languageNames[language] || language}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('en')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('en');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'en' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'en'}
-                      aria-label={`${t('switchToEnglish')}${language === 'en' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('english')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('es')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('es');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'es' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'es'}
-                      aria-label={`${t('switchToSpanish')}${language === 'es' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('spanish')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('fa')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('fa');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'fa' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'fa'}
-                      aria-label={`${t('switchToPersian')}${language === 'fa' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('persian')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('zh')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('zh');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'zh' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'zh'}
-                      aria-label={`${t('switchToChinese')}${language === 'zh' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('chinese')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('ar')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('ar');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ar' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'ar'}
-                      aria-label={`${t('switchToArabic')}${language === 'ar' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('arabic')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('hi')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('hi');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'hi' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'hi'}
-                      aria-label={`${t('switchToHindi')}${language === 'hi' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('hindi')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('ko')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('ko');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ko' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'ko'}
-                      aria-label={`${t('switchToKorean')}${language === 'ko' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('korean')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange('ja')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('ja');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ja' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'ja'}
-                      aria-label={`${t('switchToJapanese')}${language === 'ja' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('japanese')}
-                    </Button>
-                    <Button
-                      variant={language === 'ur' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleLanguageChange('ur')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('ur');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ur' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'ur'}
-                      aria-label={`${t('switchToUrdu')}${language === 'ur' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('urdu')}
-                    </Button>
-                    <Button
-                      variant={language === 'th' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleLanguageChange('th')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('th');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'th' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'th'}
-                      aria-label={`${t('switchToThai')}${language === 'th' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('thai')}
-                    </Button>
-                    <Button
-                      variant={language === 'vi' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleLanguageChange('vi')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('vi');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'vi' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'vi'}
-                      aria-label={`${t('switchToVietnamese')}${language === 'vi' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('vietnamese')}
-                    </Button>
-                    <Button
-                      variant={language === 'ru' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleLanguageChange('ru')}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleLanguageChange('ru');
-                        }
-                      }}
-                      className={`px-3 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === 'ru' ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
-                      aria-pressed={language === 'ru'}
-                      aria-label={`${t('switchToRussian')}${language === 'ru' ? ` ${t('currentlySelected')}` : ''}`}
-                    >
-                      {t('russian')}
-                    </Button>
+                  <div className="flex flex-wrap items-center gap-1 sm:gap-2 max-w-[200px]">
+                    {(
+                      [
+                        'en',
+                        'es',
+                        'fa',
+                        'zh',
+                        'ar',
+                        'hi',
+                        'ko',
+                        'ja',
+                        'ur',
+                        'th',
+                        'vi',
+                        'ru',
+                      ] as const
+                    ).map((lang) => (
+                      <Button
+                        key={lang}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLanguageChange(lang)}
+                        className={`px-2 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${language === lang ? 'bg-mq-primary text-white' : 'text-mq-content-secondary hover:bg-mq-primary/10'}`}
+                        aria-pressed={language === lang}
+                        aria-label={`Switch to ${languageNames[lang]}`}
+                      >
+                        {lang.toUpperCase()}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </div>
-
             </CardContent>
           </Card>
         </div>
 
-        {/* Privacy & Security */}
         <div className="mq-magic-card">
           <Card className="mq-magic-card-content">
             <CardHeader>
@@ -587,33 +392,76 @@ export default function SettingsPage() {
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-mq-content">{t('dataStorage')}</h4>
+                    <h4 className="font-semibold text-mq-content">{t('dataRetention')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary">{t('dataRetentionDesc')}</p>
+                  </div>
+                  <Lock className="h-4 w-4 text-mq-success" />
+                </div>
+              </div>
+
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-mq-content">{t('encryptionNote')}</h4>
+                  </div>
+                  <Key className="h-4 w-4 text-mq-success" />
+                </div>
+              </div>
+
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-mq-content">{t('changePassword')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {storageEnabled ? t('dataStorageDesc') : 'Storage disabled (Session only)'}
+                      {t('changePasswordDesc')}
                     </p>
                   </div>
-                  <button
-                    role="switch"
-                    aria-checked={storageEnabled}
-                    onClick={() => {
-                      if (storageEnabled) {
-                        toastUtils.info(
-                          'Local Storage',
-                          'Disabling local storage is not recommended as your data will not be saved.',
-                        );
-                        // Optional: setStorageEnabled(false);
-                      } else {
-                        setStorageEnabled(true);
-                        toastUtils.success('Storage Enabled', 'Your data will be saved locally.');
-                      }
-                    }}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 ${storageEnabled ? 'bg-mq-success' : 'bg-mq-background-tertiary'}`}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+                    onClick={() => toastUtils.info(t('changePassword'), t('comingSoon'))}
                   >
-                    <span className="sr-only">{t('toggleStorage')}</span>
-                    <span
-                      className={`${storageEnabled ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
-                    />
-                  </button>
+                    {t('changePassword')}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-mq-content">{t('manageSessions')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary">
+                      {t('manageSessionsDesc')}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+                    onClick={() => toastUtils.info(t('manageSessions'), t('comingSoon'))}
+                  >
+                    {t('manageSessions')}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-mq-content">{t('privacyPolicy')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary">{t('privacyPolicy')}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+                    onClick={() =>
+                      window.open(EXTERNAL_LINKS.privacy, '_blank', 'noopener,noreferrer')
+                    }
+                  >
+                    {t('view')}
+                  </Button>
                 </div>
               </div>
 
@@ -627,41 +475,9 @@ export default function SettingsPage() {
                     variant="ghost"
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => {
-                      try {
-                        const data = {
-                          units,
-                          deadlines,
-                          exportedAt: new Date().toISOString(),
-                          version: '1.0',
-                          appVersion: APP_CONFIG.version,
-                        };
-                        const blob = new Blob([JSON.stringify(data, null, 2)], {
-                          type: 'application/json',
-                        });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `syllabus-sync-data-${new Date().toISOString().split('T')[0]}.json`;
-                        a.style.display = 'none';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        toastUtils.success(t('exportComplete'), t('exportCompleteMsg'));
-                      } catch (error) {
-                        errorHandler.logError(
-                          error instanceof Error
-                            ? error
-                            : new Error('Failed to export data'),
-                          'Settings Export Data',
-                          'medium',
-                        );
-                        toastUtils.error(t('exportFailed'), t('exportFailedMsg'));
-                      }
-                    }}
-                    aria-label={t('exportDataDesc')}
+                    onClick={handleExportData}
                   >
+                    <Download className="h-4 w-4 mr-2" />
                     {t('export')}
                   </Button>
                 </div>
@@ -681,6 +497,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-2"
                   >
                     {clearing && <Loader2 className="h-3 w-3 animate-spin" />}
+                    <Trash2 className="h-3 w-3" />
                     {clearing ? t('clearing') : t('clearData')}
                   </Button>
                 </div>
@@ -688,36 +505,92 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          <div className="mq-magic-card">
+            <Card className="mq-magic-card-content">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  {t('account')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
+                  <h4 className="font-semibold text-mq-content mb-1">{t('signedInAs')}</h4>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('guest')}</p>
+                </div>
+
+                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-mq-content">{t('signOut')}</h4>
+                      <p className="text-mq-sm text-mq-content-secondary">{t('signOut')}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+                      onClick={() => toastUtils.info(t('signOut'), t('comingSoon'))}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      {t('signOut')}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-mq-content">{t('deleteAccount')}</h4>
+                      <p className="text-mq-sm text-mq-content-secondary">
+                        {t('deleteAccountWarning')}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="bg-mq-error/10 text-mq-error hover:bg-mq-error/20"
+                      onClick={() => toastUtils.info(t('deleteAccount'), t('comingSoon'))}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {t('delete')}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mq-magic-card">
+            <Card className="mq-magic-card-content">
+              <CardHeader>
+                <CardTitle>{t('quickActions')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {[
+                  { href: '/home', label: t('homeDashboard') },
+                  { href: '/calendar', label: t('calendarView') },
+                  { href: '/feed', label: t('eventsFeed') },
+                  { href: '/map', label: t('campusMap') },
+                  { href: '/manage-profiles', label: t('manageProfiles') },
+                ].map(({ href, label }) => (
+                  <Button
+                    key={href}
+                    variant="ghost"
+                    className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border"
+                    asChild
+                  >
+                    <Link href={href}>{label}</Link>
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Quick Actions */}
-        <div className="mq-magic-card">
-          <Card className="mq-magic-card-content">
-            <CardHeader>
-              <CardTitle>{t('quickActions')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border" asChild>
-                <Link href="/home">{t('homeDashboard')}</Link>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border" asChild>
-                <Link href="/calendar">{t('calendarView')}</Link>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border" asChild>
-                <Link href="/feed">{t('eventsFeed')}</Link>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border" asChild>
-                <Link href="/map">{t('campusMap')}</Link>
-              </Button>
-              <Button variant="ghost" className="w-full justify-start bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border" asChild>
-                <Link href="/manage-profiles">{t('manageProfiles')}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Help & Support */}
         <div className="mq-magic-card">
           <Card className="mq-magic-card-content">
             <CardHeader>
@@ -743,10 +616,9 @@ export default function SettingsPage() {
                   onClick={() => {
                     toastUtils.info(t('viewDocumentation'), t('documentationOpening'));
                     setTimeout(() => {
-                      toastUtils.success(t('viewDocumentation'), t('documentationMsg'));
-                    }, 1500);
+                      window.open(EXTERNAL_LINKS.documentation, '_blank', 'noopener,noreferrer');
+                    }, 500);
                   }}
-                  aria-label={t('viewDocumentation').toLowerCase()}
                 >
                   {t('viewDocumentation')}
                 </Button>
@@ -761,10 +633,9 @@ export default function SettingsPage() {
                   onClick={() => {
                     toastUtils.info(t('feedback'), t('feedbackPreparing'));
                     setTimeout(() => {
-                      toastUtils.success(t('feedbackThankYou'), t('feedbackMsg'));
-                    }, 1500);
+                      window.location.href = EXTERNAL_LINKS.feedback;
+                    }, 500);
                   }}
-                  aria-label={t('sendFeedback').toLowerCase()}
                 >
                   {t('sendFeedback')}
                 </Button>
@@ -774,18 +645,38 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Clear Data Confirmation Dialog */}
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t('clearAllDataTitle')}</DialogTitle>
-            <DialogDescription>{t('clearAllDataDialogDesc')}</DialogDescription>
+            <DialogDescription className="space-y-2">
+              <p>{t('clearAllDataDialogDesc')}</p>
+              <p className="text-mq-error font-medium">{t('exportReminder')}</p>
+              <p className="text-mq-sm text-mq-content-secondary">
+                {t('clearDataSummary')
+                  .replace('{{units}}', units.length.toString())
+                  .replace('{{deadlines}}', deadlines.length.toString())}
+              </p>
+            </DialogDescription>
           </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder={t('clearDataConfirmPlaceholder')}
+              value={clearConfirmText}
+              onChange={(e) => setClearConfirmText(e.target.value)}
+              className="text-center"
+            />
+          </div>
           <DialogFooter className="flex gap-2">
             <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
               {t('cancel')}
             </Button>
-            <Button variant="default" onClick={confirmClearAllData} disabled={clearing}>
+            <Button
+              variant="default"
+              onClick={confirmClearAllData}
+              disabled={clearing || clearConfirmText !== 'CLEAR'}
+            >
+              {clearing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {clearing ? t('clearing') : t('clearAllDataTitle')}
             </Button>
           </DialogFooter>

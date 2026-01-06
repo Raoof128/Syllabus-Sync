@@ -21,8 +21,8 @@ export const translations = {
     next: 'Next',
     previous: 'Previous',
     search: 'Search',
-
     filter: 'Filter',
+    view: 'View',
 
     // Colors
     colorUniversityRed: 'University Red',
@@ -36,25 +36,32 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'Computer Science Building',
-    building_C5C_desc: 'Home to computer science and IT programs. Features modern labs, lecture theaters, and study spaces.',
+    building_C5C_desc:
+      'Home to computer science and IT programs. Features modern labs, lecture theaters, and study spaces.',
     building_C3C_name: 'Library',
-    building_C3C_desc: 'Central library with extensive collections, study areas, and academic support services.',
+    building_C3C_desc:
+      'Central library with extensive collections, study areas, and academic support services.',
     building_C7A_name: 'Campus Hub',
-    building_C7A_desc: 'Student services center with administration, student support, and recreational facilities.',
+    building_C7A_desc:
+      'Student services center with administration, student support, and recreational facilities.',
     building_W6A_name: 'Wallumattagal Building',
-    building_W6A_desc: 'Teaching and learning facility with classrooms, lecture theaters, and student spaces.',
+    building_W6A_desc:
+      'Teaching and learning facility with classrooms, lecture theaters, and student spaces.',
     building_E7A_name: 'Engineering Building',
     building_E7A_desc: 'Engineering and design studios with specialized labs and workshops.',
     building_E7B_name: 'Engineering Building B',
-    building_E7B_desc: 'Additional engineering facilities with advanced research labs and equipment.',
+    building_E7B_desc:
+      'Additional engineering facilities with advanced research labs and equipment.',
     building_W3A_name: 'Careers & Employment',
-    building_W3A_desc: 'Career services center offering job search assistance, resume workshops, and employer connections.',
-    building_12WW_name: '12 Wally\'s Walk',
+    building_W3A_desc:
+      'Career services center offering job search assistance, resume workshops, and employer connections.',
+    building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'Academic building with classrooms and faculty offices.',
-    building_4WW_name: '4 Wally\'s Walk',
+    building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'Lecture and tutorial spaces for various disciplines.',
     building_LIB_name: 'Library',
-    building_LIB_desc: 'Central library with extensive collections, study areas, and academic support services.',
+    building_LIB_desc:
+      'Central library with extensive collections, study areas, and academic support services.',
     building_Sports_name: 'Sports Precinct',
     building_Sports_desc: 'Sports facilities including gym, courts, and recreational areas.',
 
@@ -126,7 +133,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'Clear All Data',
-    clearAllDataDialogDesc: 'Are you sure you want to clear all data? This action cannot be undone and will remove all units, deadlines, and profiles.',
+    clearAllDataDialogDesc:
+      'Are you sure you want to clear all data? This action cannot be undone and will remove all units, deadlines, and profiles.',
 
     // Quick Actions
     homeDashboard: '🏠 Home Dashboard',
@@ -138,7 +146,6 @@ export const translations = {
     aboutTitle: 'About Syllabus Sync',
     aboutDesc: 'Macquarie University Campus Management',
     version: 'Version',
-
 
     needHelp: 'Need Help?',
     helpDesc: 'Visit our documentation or contact support.',
@@ -200,9 +207,9 @@ export const translations = {
     viewAll: 'View all →',
     viewAllEvents: 'View all events →',
     eventsToday: 'Events Today',
-    todaysClasses: 'Today\'s Classes',
+    todaysClasses: "Today's Classes",
     noClassesToday: 'No classes today',
-    noClassesDesc: 'You\'re all caught up! Enjoy your free time.',
+    noClassesDesc: "You're all caught up! Enjoy your free time.",
     addUnit: 'Add Unit',
     addUnitAria: 'Add a new unit to start tracking classes',
     noUpcomingDeadlines: 'No upcoming deadlines',
@@ -235,7 +242,8 @@ export const translations = {
     gettingStartedGuide: 'Getting Started Guide',
     noNotificationsYet: 'No notifications yet',
     pageNotFound: 'Page Not Found',
-    pageNotFoundDescription: 'Sorry, we couldn\'t find the page you\'re looking for. It might have been moved or doesn\'t exist.',
+    pageNotFoundDescription:
+      "Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.",
     goHome: 'Go Home',
     new: 'New',
 
@@ -259,15 +267,19 @@ export const translations = {
     comingSoon: 'Coming Soon',
     // Geolocation Messages
     locationAccessDenied: 'Location Access Denied',
-    locationDeniedDesc: 'Permission is still denied. Check your System Preferences (OS level) to ensure your browser has access to Location Services.',
-    locationDeniedHelp: 'Please check: 1) Browser address bar (lock icon), 2) macOS System Settings → Privacy → Location Services.',
+    locationDeniedDesc:
+      'Permission is still denied. Check your System Preferences (OS level) to ensure your browser has access to Location Services.',
+    locationDeniedHelp:
+      'Please check: 1) Browser address bar (lock icon), 2) macOS System Settings → Privacy → Location Services.',
     locationError: 'Location Error',
     positionUnavailable: 'Position Unavailable',
-    positionUnavailableDesc: 'Your device could not determine its location. Check if Location Services are enabled.',
+    positionUnavailableDesc:
+      'Your device could not determine its location. Check if Location Services are enabled.',
     locationTimeout: 'Location Timeout',
     locationTimeoutDesc: 'Location request timed out. Try moving to a better signal area.',
     insecureConnection: 'Insecure Connection',
-    insecureConnectionDesc: 'Geolocation requires a secure connection (HTTPS) or localhost. Your browser is blocking it for security.',
+    insecureConnectionDesc:
+      'Geolocation requires a secure connection (HTTPS) or localhost. Your browser is blocking it for security.',
     locating: 'Locating...',
     requestingPosition: 'Requesting your current position...',
     locationFound: 'Location Found',
@@ -293,8 +305,9 @@ export const translations = {
     signIn: 'Sign In',
     orSignWith: 'Or sign in with',
     oauthRequired: '🔧 OAuth Configuration Required',
-    googleOAuthDesc: 'Google Sign-In requires OAuth provider setup in Supabase dashboard. Configure Google OAuth under Authentication → Providers to enable this feature.',
-    noAccount: 'Don\'t have an account?',
+    googleOAuthDesc:
+      'Google Sign-In requires OAuth provider setup in Supabase dashboard. Configure Google OAuth under Authentication → Providers to enable this feature.',
+    noAccount: "Don't have an account?",
     signUp: 'Sign up',
     passwordsDoNotMatch: 'Passwords do not match',
     passwordTooShort: 'Password must be at least 6 characters long',
@@ -319,7 +332,8 @@ export const translations = {
     editProfileAria: 'Edit {{name}}',
     useProfileAria: 'Use {{name}}',
     deleteProfileAria: 'Delete {{name}}',
-    deleteProfileConfirm: 'Are you sure you want to delete this profile? This action cannot be undone.',
+    deleteProfileConfirm:
+      'Are you sure you want to delete this profile? This action cannot be undone.',
     deleteProfile: 'Delete Profile',
     loadingProfile: 'Loading profile...',
     manageProfilesDesc: 'Edit and manage your user profiles.',
@@ -357,7 +371,7 @@ export const translations = {
     // Home Page
     skipToMain: 'Skip to main content',
     welcome: 'Welcome',
-    dayAtGlance: 'Here\'s your day at a glance.',
+    dayAtGlance: "Here's your day at a glance.",
     addNew: 'Add New',
     addNewItemsMenu: 'Add new items menu',
     getStarted: 'Get started:',
@@ -365,12 +379,13 @@ export const translations = {
     dashboardOverview: 'Dashboard overview',
     myUnits: 'My Units',
     noUnitsYet: 'No units yet',
-    addFirstUnitDesc: 'Add your first unit to start tracking your schedule. It\'ll sync your calendar and today\'s schedule.',
+    addFirstUnitDesc:
+      "Add your first unit to start tracking your schedule. It'll sync your calendar and today's schedule.",
     addYourFirstUnit: 'Add Your First Unit',
     units: 'Units',
     classesPerWeek: 'Classes/Week',
     studyHours: 'Study Hours',
-    todaysEvents: 'Today\'s Events',
+    todaysEvents: "Today's Events",
     deleteUnitConfirm: 'Are you sure you want to delete',
     deleteUnitConfirmEnd: 'This action cannot be undone.',
     unitDeleted: 'Unit Deleted',
@@ -382,7 +397,8 @@ export const translations = {
     somethingWentWrong: 'Something went wrong',
     unexpectedError: 'We encountered an unexpected error. Please try refreshing the page.',
     appErrorDesc: 'An unexpected error occurred. Please try again or return to the home page.',
-    boundaryErrorDesc: 'We encountered an unexpected error. This has been automatically reported and we\'re working to fix it.',
+    boundaryErrorDesc:
+      "We encountered an unexpected error. This has been automatically reported and we're working to fix it.",
     oops: 'Oops! Something went wrong',
     retryAttempt: 'Retry attempt {{count}} of {{max}}',
     reset: 'Reset',
@@ -433,9 +449,11 @@ export const translations = {
 
     // Form Components
     failedToSaveUnit: 'Failed to save unit. Please try again.',
-    campusFeedDesc: 'Stay updated with campus events, announcements, and opportunities at {{uniName}}.',
+    campusFeedDesc:
+      'Stay updated with campus events, announcements, and opportunities at {{uniName}}.',
     stayConnected: 'Stay connected:',
-    stayConnectedDesc: 'Discover workshops, career fairs, social events, and free food opportunities happening on campus.',
+    stayConnectedDesc:
+      'Discover workshops, career fairs, social events, and free food opportunities happening on campus.',
     filterEvents: 'Filter Events',
     allEvents: 'All Events',
     categoryEvents: '{{category}} Events',
@@ -472,11 +490,13 @@ export const translations = {
     filterAndFindDesc: 'Search by facilities, accessibility features, and more.',
     noBuildingsFound: 'No buildings found matching "{{query}}"',
     welcomeToUni: 'Welcome to {{uniName}}',
-    uniDesc: 'Experience world-class education with cutting-edge facilities and innovative teaching methods.',
+    uniDesc:
+      'Experience world-class education with cutting-edge facilities and innovative teaching methods.',
     explorePrograms: 'Explore Programs',
     learnMore: 'Learn More',
     mqDesignSystem: 'MQ Design System',
-    mqDesignSystemDesc: 'A comprehensive design system built with Macquarie University brand tokens.',
+    mqDesignSystemDesc:
+      'A comprehensive design system built with Macquarie University brand tokens.',
     buttons: 'Buttons',
     primaryButton: 'Primary Button',
     secondaryButton: 'Secondary Button',
@@ -503,7 +523,8 @@ export const translations = {
     cards: 'Cards',
     cardTitle: 'Card Title',
     cardDescPlaceholder: 'Card description goes here',
-    cardContentPlaceholder: 'This is the card content. Cards can contain various types of content and are great for grouping related information.',
+    cardContentPlaceholder:
+      'This is the card content. Cards can contain various types of content and are great for grouping related information.',
     anotherCard: 'Another Card',
     anotherCardDesc: 'With different content',
     featured: 'Featured',
@@ -521,7 +542,8 @@ export const translations = {
     warning: 'Warning',
     warningAlertDesc: 'This is a warning alert. It indicates something that requires attention.',
     success: 'Success',
-    successAlertDesc: 'This is a success alert. It confirms that an action was completed successfully.',
+    successAlertDesc:
+      'This is a success alert. It confirms that an action was completed successfully.',
     error: 'Error',
     errorAlertDesc: 'This is an error alert. It indicates that something went wrong.',
     animations: 'Animations',
@@ -549,7 +571,8 @@ export const translations = {
     addClassTime: 'Add Class Time',
     dueTime: 'Due Time',
     markAsCompleted: 'Mark as completed',
-    deleteDeadlineConfirm: 'Are you sure you want to delete this deadline? This action cannot be undone.',
+    deleteDeadlineConfirm:
+      'Are you sure you want to delete this deadline? This action cannot be undone.',
     mon: 'Mon',
     tue: 'Tue',
     wed: 'Wed',
@@ -622,27 +645,36 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'Career Fair 2026',
-    event_careerFair2026_desc: 'Meet top employers and explore career opportunities across various industries.',
+    event_careerFair2026_desc:
+      'Meet top employers and explore career opportunities across various industries.',
     event_freePizzaFriday_title: 'Free Pizza Friday',
     event_freePizzaFriday_desc: 'Join us for free pizza and networking with fellow students!',
     event_studySkillsWorkshop_title: 'Study Skills Workshop',
-    event_studySkillsWorkshop_desc: 'Learn effective study techniques and time management strategies.',
+    event_studySkillsWorkshop_desc:
+      'Learn effective study techniques and time management strategies.',
     event_internationalFoodFestival_title: 'International Food Festival',
-    event_internationalFoodFestival_desc: 'Celebrate diversity with food from around the world. Free samples available!',
+    event_internationalFoodFestival_desc:
+      'Celebrate diversity with food from around the world. Free samples available!',
     event_techNetworkingNight_title: 'Tech Networking Night',
-    event_techNetworkingNight_desc: 'Connect with industry professionals and learn about tech careers.',
+    event_techNetworkingNight_desc:
+      'Connect with industry professionals and learn about tech careers.',
     event_studentClubWelcomeDay_title: 'Student Club Welcome Day',
-    event_studentClubWelcomeDay_desc: 'Discover clubs and societies on campus. Free snacks provided!',
+    event_studentClubWelcomeDay_desc:
+      'Discover clubs and societies on campus. Free snacks provided!',
     event_researchSeminarAI_title: 'Research Seminar: AI in Healthcare',
-    event_researchSeminarAI_desc: 'Explore cutting-edge research on artificial intelligence applications in medicine.',
+    event_researchSeminarAI_desc:
+      'Explore cutting-edge research on artificial intelligence applications in medicine.',
     event_movieNightSciFi_title: 'Movie Night: Sci-Fi Marathon',
-    event_movieNightSciFi_desc: 'Join us for a night of classic science fiction films with free popcorn!',
+    event_movieNightSciFi_desc:
+      'Join us for a night of classic science fiction films with free popcorn!',
     event_resumeWritingWorkshop_title: 'Resume Writing Workshop',
-    event_resumeWritingWorkshop_desc: 'Get expert tips on crafting the perfect resume for your dream job.',
+    event_resumeWritingWorkshop_desc:
+      'Get expert tips on crafting the perfect resume for your dream job.',
     event_freeCoffeeMorning_title: 'Free Coffee Morning',
     event_freeCoffeeMorning_desc: 'Start your day right with free coffee and pastries!',
     event_alumniPanel_title: 'Alumni Panel: Careers in Data & Policy',
-    event_alumniPanel_desc: 'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
+    event_alumniPanel_desc:
+      'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
 
     // Toast Messages
     languageUpdated: 'Language Updated',
@@ -650,6 +682,52 @@ export const translations = {
     settingsError: 'Settings Error',
     preferenceError: 'Unable to save preference. Please try again.',
     preferenceUpdated: 'Preference Updated',
+
+    // Storage Disabled
+    storageDisabled: 'Storage disabled',
+    storageDisabledDesc: 'Using session-only mode. Data will not be saved.',
+    storageEnabled: 'Storage Enabled',
+    storageEnabledMsg: 'Your data will be saved locally.',
+    storageToggleWarning:
+      'Disabling local storage is not recommended as your data will not be saved.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'This will remove {{units}} units and {{deadlines}} deadlines.',
+    clearDataConfirmPlaceholder: 'Type CLEAR to confirm',
+    clearDataConfirmRequired: 'Please type CLEAR to confirm',
+    exportReminder: 'Consider exporting your data first.',
+
+    // Account Section
+    account: 'Account',
+    accountDesc: 'Manage your account and authentication.',
+    signedInAs: 'Signed in as',
+    signOutSuccess: 'Successfully signed out',
+    signOutError: 'Failed to sign out. Please try again.',
+    deleteAccount: 'Delete Account',
+    deleteAccountDesc: 'Permanently delete your account and all data',
+    deleteAccountWarning: 'This action cannot be undone.',
+
+    // Security Section
+    security: 'Security',
+    securityDesc: 'Manage your security settings',
+    changePassword: 'Change Password',
+    changePasswordDesc: 'Update your password',
+    manageSessions: 'Manage Sessions',
+    manageSessionsDesc: 'View and manage active sessions',
+    twoFactorAuth: 'Two-Factor Authentication',
+    twoFactorAuthDesc: 'Add an extra layer of security',
+    privacyPolicy: 'Privacy Policy',
+    termsOfService: 'Terms of Service',
+    dataRetention: 'Data Retention',
+    dataRetentionDesc: 'Your data is stored locally and never leaves your device.',
+    encryptionNote: 'All data is encrypted locally on your device.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'Export includes preferences and settings',
+
+    // Clear Data Types
+    unitsCount: '{{count}} units',
+    deadlinesCount: '{{count}} deadlines',
   },
   es: {
     // Navigation
@@ -673,6 +751,7 @@ export const translations = {
     previous: 'Anterior',
     search: 'Buscar',
     filter: 'Filtrar',
+    view: 'Ver',
 
     // Settings Page
     settingsTitle: 'Configuración',
@@ -723,7 +802,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'Borrar Todos los Datos',
-    clearAllDataDialogDesc: '¿Estás seguro de que quieres borrar todos los datos? Esta acción no se puede deshacer y eliminará todas las unidades, fechas límite y perfiles.',
+    clearAllDataDialogDesc:
+      '¿Estás seguro de que quieres borrar todos los datos? Esta acción no se puede deshacer y eliminará todas las unidades, fechas límite y perfiles.',
 
     // Quick Actions
     homeDashboard: '🏠 Panel de Inicio',
@@ -738,7 +818,8 @@ export const translations = {
     needHelp: '¿Necesitas Ayuda?',
     helpDesc: 'Visita nuestra documentación o contacta al soporte.',
     viewDocumentation: 'Ver Documentación',
-    documentationOpening: '📚 Abriendo documentación de Syllabus Sync de la Universidad Macquarie...',
+    documentationOpening:
+      '📚 Abriendo documentación de Syllabus Sync de la Universidad Macquarie...',
     documentationMsg: '📖 La documentación estará disponible pronto. ¡Vuelve más tarde!',
     feedback: 'Comentarios',
     feedbackDesc: 'Ayúdanos a mejorar compartiendo tus comentarios.',
@@ -767,7 +848,8 @@ export const translations = {
     addUnit: 'Agregar Unidad',
     addUnitAria: 'Agregar una nueva unidad para comenzar a rastrear clases',
     noUpcomingDeadlines: 'No hay fechas límite próximas',
-    noDeadlinesDesc: '¡Todo al día! Agrega tu primera fecha límite para mantenerte al tanto de tu trabajo.',
+    noDeadlinesDesc:
+      '¡Todo al día! Agrega tu primera fecha límite para mantenerte al tanto de tu trabajo.',
     addDeadline: 'Agregar Fecha Límite',
     noEventsToday: 'No hay eventos programados para hoy',
     navigateTo: 'Navegar a',
@@ -795,7 +877,8 @@ export const translations = {
     gettingStartedGuide: 'Guía de Introducción',
     noNotificationsYet: 'Aún no hay notificaciones',
     pageNotFound: 'Página No Encontrada',
-    pageNotFoundDescription: 'Lo sentimos, no pudimos encontrar la página que buscas. Puede que haya sido movida o no exista.',
+    pageNotFoundDescription:
+      'Lo sentimos, no pudimos encontrar la página que buscas. Puede que haya sido movida o no exista.',
     goHome: 'Ir al Inicio',
     new: 'Nuevo',
 
@@ -819,15 +902,20 @@ export const translations = {
     comingSoon: 'Próximamente',
     // Geolocation Messages
     locationAccessDenied: 'Acceso a Ubicación Denegado',
-    locationDeniedDesc: 'El permiso sigue denegado. Verifica las Preferencias del Sistema (nivel del SO) para asegurar que tu navegador tiene acceso a los Servicios de Ubicación.',
-    locationDeniedHelp: 'Por favor verifica: 1) Barra de direcciones del navegador (ícono de candado), 2) Configuración del Sistema macOS → Privacidad → Servicios de Ubicación.',
+    locationDeniedDesc:
+      'El permiso sigue denegado. Verifica las Preferencias del Sistema (nivel del SO) para asegurar que tu navegador tiene acceso a los Servicios de Ubicación.',
+    locationDeniedHelp:
+      'Por favor verifica: 1) Barra de direcciones del navegador (ícono de candado), 2) Configuración del Sistema macOS → Privacidad → Servicios de Ubicación.',
     locationError: 'Error de Ubicación',
     positionUnavailable: 'Posición No Disponible',
-    positionUnavailableDesc: 'Tu dispositivo no pudo determinar su ubicación. Verifica si los Servicios de Ubicación están habilitados.',
+    positionUnavailableDesc:
+      'Tu dispositivo no pudo determinar su ubicación. Verifica si los Servicios de Ubicación están habilitados.',
     locationTimeout: 'Tiempo de Espera de Ubicación Agotado',
-    locationTimeoutDesc: 'La solicitud de ubicación agotó el tiempo de espera. Intenta moverte a un área con mejor señal.',
+    locationTimeoutDesc:
+      'La solicitud de ubicación agotó el tiempo de espera. Intenta moverte a un área con mejor señal.',
     insecureConnection: 'Conexión Insegura',
-    insecureConnectionDesc: 'La geolocalización requiere una conexión segura (HTTPS) o localhost. Tu navegador la está bloqueando por seguridad.',
+    insecureConnectionDesc:
+      'La geolocalización requiere una conexión segura (HTTPS) o localhost. Tu navegador la está bloqueando por seguridad.',
     locating: 'Localizando...',
     requestingPosition: 'Solicitando tu posición actual...',
     locationFound: 'Ubicación Encontrada',
@@ -836,9 +924,11 @@ export const translations = {
 
     // Feed Page
     campusFeed: 'Feed del Campus',
-    campusFeedDesc: 'Manténgase actualizado con eventos del campus, anuncios y oportunidades en {{uniName}}.',
+    campusFeedDesc:
+      'Manténgase actualizado con eventos del campus, anuncios y oportunidades en {{uniName}}.',
     stayConnected: 'Manténgase conectado:',
-    stayConnectedDesc: 'Descubra talleres, ferias de carreras, eventos sociales y comida gratis en el campus.',
+    stayConnectedDesc:
+      'Descubra talleres, ferias de carreras, eventos sociales y comida gratis en el campus.',
     info: 'Info',
     eventCategories: 'Categorías de Eventos',
     filterEvents: 'Filtrar Eventos',
@@ -890,27 +980,36 @@ export const translations = {
 
     // Building Names
     building_C5C_name: 'Edificio de Ciencias de la Computación',
-    building_C5C_desc: 'Hogar de programas de ciencias de la computación y TI. Cuenta con laboratorios modernos, salas de conferencias y espacios de estudio.',
+    building_C5C_desc:
+      'Hogar de programas de ciencias de la computación y TI. Cuenta con laboratorios modernos, salas de conferencias y espacios de estudio.',
     building_C3C_name: 'Biblioteca',
-    building_C3C_desc: 'Biblioteca central con amplias colecciones, áreas de estudio y servicios de apoyo académico.',
+    building_C3C_desc:
+      'Biblioteca central con amplias colecciones, áreas de estudio y servicios de apoyo académico.',
     building_C7A_name: 'Centro del Campus',
-    building_C7A_desc: 'Centro de servicios estudiantiles con administración, apoyo estudiantil e instalaciones recreativas.',
+    building_C7A_desc:
+      'Centro de servicios estudiantiles con administración, apoyo estudiantil e instalaciones recreativas.',
     building_W6A_name: 'Edificio Wallumattagal',
-    building_W6A_desc: 'Instalación de enseñanza y aprendizaje con aulas, salas de conferencias y espacios para estudiantes.',
+    building_W6A_desc:
+      'Instalación de enseñanza y aprendizaje con aulas, salas de conferencias y espacios para estudiantes.',
     building_E7A_name: 'Edificio de Ingeniería',
-    building_E7A_desc: 'Estudios de ingeniería y diseño con laboratorios especializados y talleres.',
+    building_E7A_desc:
+      'Estudios de ingeniería y diseño con laboratorios especializados y talleres.',
     building_E7B_name: 'Edificio de Ingeniería B',
-    building_E7B_desc: 'Instalaciones de ingeniería adicionales con laboratorios de investigación avanzados y equipos.',
+    building_E7B_desc:
+      'Instalaciones de ingeniería adicionales con laboratorios de investigación avanzados y equipos.',
     building_W3A_name: 'Carreras y Empleo',
-    building_W3A_desc: 'Centro de servicios profesionales que ofrece asistencia en la búsqueda de empleo, talleres de currículum y conexiones con empleadores.',
-    building_12WW_name: '12 Wally\'s Walk',
+    building_W3A_desc:
+      'Centro de servicios profesionales que ofrece asistencia en la búsqueda de empleo, talleres de currículum y conexiones con empleadores.',
+    building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'Edificio académico con aulas y oficinas de la facultad.',
-    building_4WW_name: '4 Wally\'s Walk',
+    building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'Espacios de conferencias y tutorías para diversas disciplinas.',
     building_LIB_name: 'Biblioteca',
-    building_LIB_desc: 'Biblioteca central con amplias colecciones, áreas de estudio y servicios de apoyo académico.',
+    building_LIB_desc:
+      'Biblioteca central con amplias colecciones, áreas de estudio y servicios de apoyo académico.',
     building_Sports_name: 'Recinto Deportivo',
-    building_Sports_desc: 'Instalaciones deportivas que incluyen gimnasio, canchas y áreas recreativas.',
+    building_Sports_desc:
+      'Instalaciones deportivas que incluyen gimnasio, canchas y áreas recreativas.',
 
     // Tags
 
@@ -943,7 +1042,8 @@ export const translations = {
     dashboardOverview: 'Resumen del panel',
     myUnits: 'Mis Unidades',
     noUnitsYet: 'Aún no hay unidades',
-    addFirstUnitDesc: 'Agrega tu primera unidad para comenzar a rastrear tu horario. Se sincronizará con tu calendario y el horario de hoy.',
+    addFirstUnitDesc:
+      'Agrega tu primera unidad para comenzar a rastrear tu horario. Se sincronizará con tu calendario y el horario de hoy.',
     addYourFirstUnit: 'Agrega Tu Primera Unidad',
     units: 'Unidades',
     classesPerWeek: 'Clases/Semana',
@@ -960,7 +1060,6 @@ export const translations = {
     somethingWentWrong: 'Algo salió mal',
     unexpectedError: 'Encontramos un error inesperado. Por favor, intenta actualizar la página.',
     tryAgain: 'Intentar de Nuevo',
-
 
     // Calendar Page
 
@@ -996,7 +1095,6 @@ export const translations = {
     unitCode: 'Código de unidad',
     unitName: 'Nombre de unidad',
 
-
     atLeastOneClass: 'Se requiere al menos un horario de clase',
     endTimeAfterStart: 'La hora de finalización debe ser posterior a la hora de inicio',
     duplicateClassTime: 'Horario de clase duplicado',
@@ -1027,7 +1125,6 @@ export const translations = {
     selectType: 'Seleccionar tipo',
     saveChanges: 'Guardar Cambios',
 
-
     // Priorities
     priority_Low: 'Baja',
     priority_Medium: 'Media',
@@ -1055,27 +1152,36 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'Feria de Carreras 2026',
-    event_careerFair2026_desc: 'Meet top employers and explore career opportunities across various industries.',
+    event_careerFair2026_desc:
+      'Meet top employers and explore career opportunities across various industries.',
     event_freePizzaFriday_title: 'Viernes de Pizza Gratis',
     event_freePizzaFriday_desc: 'Join us for free pizza and networking with fellow students!',
     event_studySkillsWorkshop_title: 'Taller de Habilidades de Estudio',
-    event_studySkillsWorkshop_desc: 'Learn effective study techniques and time management strategies.',
+    event_studySkillsWorkshop_desc:
+      'Learn effective study techniques and time management strategies.',
     event_internationalFoodFestival_title: 'Festival Internacional de Comida',
-    event_internationalFoodFestival_desc: 'Celebrate diversity with food from around the world. Free samples available!',
+    event_internationalFoodFestival_desc:
+      'Celebrate diversity with food from around the world. Free samples available!',
     event_techNetworkingNight_title: 'Noche de Networking Tecnológico',
-    event_techNetworkingNight_desc: 'Connect with industry professionals and learn about tech careers.',
+    event_techNetworkingNight_desc:
+      'Connect with industry professionals and learn about tech careers.',
     event_studentClubWelcomeDay_title: 'Día de Bienvenida de Clubes Estudiantes',
-    event_studentClubWelcomeDay_desc: 'Discover clubs and societies on campus. Free snacks provided!',
+    event_studentClubWelcomeDay_desc:
+      'Discover clubs and societies on campus. Free snacks provided!',
     event_researchSeminarAI_title: 'Seminario de Investigación: IA en Salud',
-    event_researchSeminarAI_desc: 'Explore cutting-edge research on artificial intelligence applications in medicine.',
+    event_researchSeminarAI_desc:
+      'Explore cutting-edge research on artificial intelligence applications in medicine.',
     event_movieNightSciFi_title: 'Noche de Cine: Maratón de Ciencia Ficción',
-    event_movieNightSciFi_desc: 'Join us for a night of classic science fiction films with free popcorn!',
+    event_movieNightSciFi_desc:
+      'Join us for a night of classic science fiction films with free popcorn!',
     event_resumeWritingWorkshop_title: 'Taller de Escritura de Currículum',
-    event_resumeWritingWorkshop_desc: 'Get expert tips on crafting the perfect resume for your dream job.',
+    event_resumeWritingWorkshop_desc:
+      'Get expert tips on crafting the perfect resume for your dream job.',
     event_freeCoffeeMorning_title: 'Mañana de Café Gratis',
     event_freeCoffeeMorning_desc: 'Start your day right with free coffee and pastries!',
     event_alumniPanel_title: 'Panel de Exalumnos: Carreras en Datos y Políticas',
-    event_alumniPanel_desc: 'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
+    event_alumniPanel_desc:
+      'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
 
     // Colors
     colorUniversityRed: 'Rojo Universitario',
@@ -1135,7 +1241,8 @@ export const translations = {
     signIn: 'Iniciar sesión',
     orSignWith: 'O iniciar sesión con',
     oauthRequired: '🔧 Configuración OAuth requerida',
-    googleOAuthDesc: 'El inicio de sesión con Google requiere configuración del proveedor OAuth en el panel de Supabase. Configura Google OAuth en Autenticación → Proveedores para habilitar esta función.',
+    googleOAuthDesc:
+      'El inicio de sesión con Google requiere configuración del proveedor OAuth en el panel de Supabase. Configura Google OAuth en Autenticación → Proveedores para habilitar esta función.',
     noAccount: '¿No tienes cuenta?',
     signUp: 'Registrarse',
     passwordsDoNotMatch: 'Las contraseñas no coinciden',
@@ -1157,7 +1264,8 @@ export const translations = {
     editProfileAria: 'Editar {{name}}',
     useProfileAria: 'Usar {{name}}',
     deleteProfileAria: 'Eliminar {{name}}',
-    deleteProfileConfirm: '¿Estás seguro de que quieres eliminar este perfil? Esta acción no se puede deshacer.',
+    deleteProfileConfirm:
+      '¿Estás seguro de que quieres eliminar este perfil? Esta acción no se puede deshacer.',
     deleteProfile: 'Eliminar perfil',
     loadingProfile: 'Cargando perfil...',
     manageProfilesDesc: 'Edita y administra tus perfiles de usuario.',
@@ -1193,8 +1301,10 @@ export const translations = {
     profileSwitchedMsg: 'Tu perfil actual ha sido cambiado.',
 
     // Error Handling Extended
-    appErrorDesc: 'Ocurrió un error inesperado. Por favor, inténtalo de nuevo o vuelve a la página de inicio.',
-    boundaryErrorDesc: 'Encontramos un error inesperado. Esto ha sido reportado automáticamente y estamos trabajando en solucionarlo.',
+    appErrorDesc:
+      'Ocurrió un error inesperado. Por favor, inténtalo de nuevo o vuelve a la página de inicio.',
+    boundaryErrorDesc:
+      'Encontramos un error inesperado. Esto ha sido reportado automáticamente y estamos trabajando en solucionarlo.',
     oops: '¡Ups! Algo salió mal',
     retryAttempt: 'Reintento {{count}} de {{max}}',
     reset: 'Reiniciar',
@@ -1221,17 +1331,20 @@ export const translations = {
 
     // Map Extended
     coordPickerMode: 'Modo selector de coordenadas',
-    coordPickerDesc: 'Haz clic en el mapa para copiar coordenadas de píxeles para agregar nuevos marcadores',
+    coordPickerDesc:
+      'Haz clic en el mapa para copiar coordenadas de píxeles para agregar nuevos marcadores',
     copied: 'Copiado:',
     noBuildingsFound: 'No se encontraron edificios que coincidan con "{{query}}"',
     welcomeToUni: 'Bienvenido a {{uniName}}',
-    uniDesc: 'Experimenta educación de clase mundial con instalaciones de vanguardia y métodos de enseñanza innovadores.',
+    uniDesc:
+      'Experimenta educación de clase mundial con instalaciones de vanguardia y métodos de enseñanza innovadores.',
     explorePrograms: 'Explorar programas',
     learnMore: 'Saber más',
 
     // Design System
     mqDesignSystem: 'Sistema de Diseño MQ',
-    mqDesignSystemDesc: 'Un sistema de diseño integral construido con tokens de marca de la Universidad Macquarie.',
+    mqDesignSystemDesc:
+      'Un sistema de diseño integral construido con tokens de marca de la Universidad Macquarie.',
     buttons: 'Botones',
     primaryButton: 'Botón Primario',
     secondaryButton: 'Botón Secundario',
@@ -1258,7 +1371,8 @@ export const translations = {
     cards: 'Tarjetas',
     cardTitle: 'Título de Tarjeta',
     cardDescPlaceholder: 'La descripción de la tarjeta va aquí',
-    cardContentPlaceholder: 'Este es el contenido de la tarjeta. Las tarjetas pueden contener varios tipos de contenido y son excelentes para agrupar información relacionada.',
+    cardContentPlaceholder:
+      'Este es el contenido de la tarjeta. Las tarjetas pueden contener varios tipos de contenido y son excelentes para agrupar información relacionada.',
     anotherCard: 'Otra Tarjeta',
     anotherCardDesc: 'Con contenido diferente',
     featured: 'Destacado',
@@ -1276,13 +1390,15 @@ export const translations = {
     warning: 'Advertencia',
     warningAlertDesc: 'Esta es una alerta de advertencia. Indica algo que necesita atención.',
     success: 'Éxito',
-    successAlertDesc: 'Esta es una alerta de éxito. Confirma que una acción se completó exitosamente.',
+    successAlertDesc:
+      'Esta es una alerta de éxito. Confirma que una acción se completó exitosamente.',
     error: 'Error',
     errorAlertDesc: 'Esta es una alerta de error. Indica que algo salió mal.',
     animations: 'Animaciones',
     hoverLift: 'Levantamiento al Pasar',
     hoverLiftDesc: 'Pasa el mouse sobre esta tarjeta para ver el efecto de levantamiento',
-    hoverLiftContent: 'Esta tarjeta tiene aplicada una animación de levantamiento al pasar. ¡Intenta pasar el mouse sobre ella!',
+    hoverLiftContent:
+      'Esta tarjeta tiene aplicada una animación de levantamiento al pasar. ¡Intenta pasar el mouse sobre ella!',
     fadeIn: 'Aparecer Gradualmente',
     fadeInDesc: 'Esta tarjeta aparece gradualmente al cargar',
     fadeInContent: 'Esta tarjeta usa la utilidad de animación de aparición gradual.',
@@ -1306,7 +1422,8 @@ export const translations = {
     addClassTime: 'Agregar horario de clase',
     dueTime: 'Hora de vencimiento',
     markAsCompleted: 'Marcar como completado',
-    deleteDeadlineConfirm: '¿Estás seguro de que quieres eliminar esta fecha límite? Esta acción no se puede deshacer.',
+    deleteDeadlineConfirm:
+      '¿Estás seguro de que quieres eliminar esta fecha límite? Esta acción no se puede deshacer.',
 
     // Days of Week
     mon: 'Lun',
@@ -1331,6 +1448,51 @@ export const translations = {
     preferenceError: 'No se pudo guardar la preferencia. Por favor, inténtalo de nuevo.',
     preferenceUpdated: 'Preferencia Actualizada',
 
+    // Storage Disabled
+    storageDisabled: 'Almacenamiento desactivado',
+    storageDisabledDesc: 'Usando modo de solo sesión. Los datos no se guardarán.',
+    storageEnabled: 'Almacenamiento Activado',
+    storageEnabledMsg: 'Tus datos se guardarán localmente.',
+    storageToggleWarning:
+      'No se recomienda desactivar el almacenamiento local ya que tus datos no se guardarán.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'Esto eliminará {{units}} unidades y {{deadlines}} fechas límite.',
+    clearDataConfirmPlaceholder: 'Escribe CLEAR para confirmar',
+    clearDataConfirmRequired: 'Por favor escribe CLEAR para confirmar',
+    exportReminder: 'Considera exportar tus datos primero.',
+
+    // Account Section
+    account: 'Cuenta',
+    accountDesc: 'Administra tu cuenta y autenticación.',
+    signedInAs: 'Sesión iniciada como',
+    signOutSuccess: 'Sesión cerrada exitosamente',
+    signOutError: 'Error al cerrar sesión. Por favor, inténtalo de nuevo.',
+    deleteAccount: 'Eliminar Cuenta',
+    deleteAccountDesc: 'Eliminar permanentemente tu cuenta y todos los datos',
+    deleteAccountWarning: 'Esta acción no se puede deshacer.',
+
+    // Security Section
+    security: 'Seguridad',
+    securityDesc: 'Administra tu configuración de seguridad',
+    changePassword: 'Cambiar Contraseña',
+    changePasswordDesc: 'Actualiza tu contraseña',
+    manageSessions: 'Administrar Sesiones',
+    manageSessionsDesc: 'Ver y administrar sesiones activas',
+    twoFactorAuth: 'Autenticación de Dos Factores',
+    twoFactorAuthDesc: 'Añade una capa extra de seguridad',
+    privacyPolicy: 'Política de Privacidad',
+    termsOfService: 'Términos de Servicio',
+    dataRetention: 'Retención de Datos',
+    dataRetentionDesc: 'Tus datos se almacenan localmente y nunca abandonan tu dispositivo.',
+    encryptionNote: 'Todos los datos están encriptados localmente en tu dispositivo.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'La exportación incluye preferencias y configuración',
+
+    // Clear Data Types
+    unitsCount: '{{count}} unidades',
+    deadlinesCount: '{{count}} fechas límite',
   },
   fa: {
     // Navigation
@@ -1366,6 +1528,7 @@ export const translations = {
     previous: 'قبلی',
     search: 'جستجو',
     filter: 'فیلتر',
+    view: 'مشاهده',
 
     // Settings Page
     settingsTitle: 'تنظیمات',
@@ -1416,7 +1579,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'پاک کردن همه داده‌ها',
-    clearAllDataDialogDesc: 'آیا مطمئن هستید که می‌خواهید همه داده‌ها را پاک کنید؟ این عمل قابل برگرداندن نیست و همه واحدها، مهلت‌ها و پروفایل‌ها را حذف خواهد کرد.',
+    clearAllDataDialogDesc:
+      'آیا مطمئن هستید که می‌خواهید همه داده‌ها را پاک کنید؟ این عمل قابل برگرداندن نیست و همه واحدها، مهلت‌ها و پروفایل‌ها را حذف خواهد کرد.',
 
     // Quick Actions
     homeDashboard: '🏠 داشبورد خانه',
@@ -1473,14 +1637,14 @@ export const translations = {
     dayAtGlance: 'نمای کلی روز شما.',
     addNew: 'افزودن جدید',
 
-
     addNewItemsMenu: 'منوی افزودن موارد جدید',
     getStarted: 'شروع کنید:',
     addUnitsToSync: 'واحدهای خود را اضافه کنید تا کلاس‌ها با تقویم همگام شوند.',
     dashboardOverview: 'نمای کلی داشبورد',
     myUnits: 'واحدهای من',
     noUnitsYet: 'هنوز واحدی وجود ندارد',
-    addFirstUnitDesc: 'اولین واحد خود را اضافه کنید تا برنامه خود را پیگیری کنید. تقویم و برنامه امروز شما را همگام خواهد کرد.',
+    addFirstUnitDesc:
+      'اولین واحد خود را اضافه کنید تا برنامه خود را پیگیری کنید. تقویم و برنامه امروز شما را همگام خواهد کرد.',
     addYourFirstUnit: 'اولین واحد خود را اضافه کنید',
     units: 'واحدها',
     classesPerWeek: 'کلاس در هفته',
@@ -1517,7 +1681,8 @@ export const translations = {
     gettingStartedGuide: 'راهنمای شروع',
     noNotificationsYet: 'هنوز اعلانی وجود ندارد',
     pageNotFound: 'صفحه یافت نشد',
-    pageNotFoundDescription: 'متأسفانه، صفحه‌ای که به دنبال آن بودید را پیدا نکردیم. ممکن است منتقل شده یا وجود نداشته باشد.',
+    pageNotFoundDescription:
+      'متأسفانه، صفحه‌ای که به دنبال آن بودید را پیدا نکردیم. ممکن است منتقل شده یا وجود نداشته باشد.',
     goHome: 'برو به خانه',
     new: 'جدید',
 
@@ -1541,15 +1706,20 @@ export const translations = {
     comingSoon: 'به زودی',
     // Geolocation Messages
     locationAccessDenied: 'دسترسی به موقعیت مکانی رد شد',
-    locationDeniedDesc: 'مجوز هنوز رد شده است. تنظیمات سیستم (سطح سیستم عامل) را بررسی کنید تا اطمینان حاصل کنید مرورگر شما به سرویس‌های مکان‌یابی دسترسی دارد.',
-    locationDeniedHelp: 'لطفاً بررسی کنید: ۱) نوار آدرس مرورگر (آیکون قفل)، ۲) تنظیمات سیستم macOS ← حریم خصوصی ← سرویس‌های مکان‌یابی.',
+    locationDeniedDesc:
+      'مجوز هنوز رد شده است. تنظیمات سیستم (سطح سیستم عامل) را بررسی کنید تا اطمینان حاصل کنید مرورگر شما به سرویس‌های مکان‌یابی دسترسی دارد.',
+    locationDeniedHelp:
+      'لطفاً بررسی کنید: ۱) نوار آدرس مرورگر (آیکون قفل)، ۲) تنظیمات سیستم macOS ← حریم خصوصی ← سرویس‌های مکان‌یابی.',
     locationError: 'خطای موقعیت مکانی',
     positionUnavailable: 'موقعیت در دسترس نیست',
-    positionUnavailableDesc: 'دستگاه شما نتوانست موقعیت خود را تشخیص دهد. بررسی کنید که آیا سرویس‌های مکان‌یابی فعال هستند.',
+    positionUnavailableDesc:
+      'دستگاه شما نتوانست موقعیت خود را تشخیص دهد. بررسی کنید که آیا سرویس‌های مکان‌یابی فعال هستند.',
     locationTimeout: 'زمان درخواست موقعیت به پایان رسید',
-    locationTimeoutDesc: 'زمان درخواست موقعیت مکانی به پایان رسید. سعی کنید به منطقه‌ای با سیگنال بهتر بروید.',
+    locationTimeoutDesc:
+      'زمان درخواست موقعیت مکانی به پایان رسید. سعی کنید به منطقه‌ای با سیگنال بهتر بروید.',
     insecureConnection: 'اتصال ناامن',
-    insecureConnectionDesc: 'مکان‌یابی جغرافیایی به اتصال امن (HTTPS) یا localhost نیاز دارد. مرورگر شما آن را به دلایل امنیتی مسدود می‌کند.',
+    insecureConnectionDesc:
+      'مکان‌یابی جغرافیایی به اتصال امن (HTTPS) یا localhost نیاز دارد. مرورگر شما آن را به دلایل امنیتی مسدود می‌کند.',
     locating: 'در حال مکان‌یابی...',
     requestingPosition: 'درخواست موقعیت فعلی شما...',
     locationFound: 'موقعیت یافت شد',
@@ -1560,7 +1730,8 @@ export const translations = {
     campusFeed: 'فید دانشگاه',
     campusFeedDesc: 'با رویدادهای دانشگاه، اطلاعیه‌ها و فرصت‌ها در {{uniName}} به‌روز باشید.',
     stayConnected: 'متصل بمانید:',
-    stayConnectedDesc: 'کارگاه‌ها، نمایشگاه‌های شغلی، رویدادهای اجتماعی و فرصت‌های غذای رایگان در دانشگاه را کشف کنید.',
+    stayConnectedDesc:
+      'کارگاه‌ها، نمایشگاه‌های شغلی، رویدادهای اجتماعی و فرصت‌های غذای رایگان در دانشگاه را کشف کنید.',
     info: 'اطلاعات',
     eventCategories: 'دسته‌بندی‌های رویداد',
     filterEvents: 'فیلتر رویدادها',
@@ -1612,9 +1783,11 @@ export const translations = {
 
     // Building Names
     building_C5C_name: 'ساختمان علوم کامپیوتر',
-    building_C5C_desc: 'محل برگزاری برنامه‌های علوم کامپیوتر و فناوری اطلاعات. دارای آزمایشگاه‌های مدرن، تالارهای سخنرانی و فضاهای مطالعه.',
+    building_C5C_desc:
+      'محل برگزاری برنامه‌های علوم کامپیوتر و فناوری اطلاعات. دارای آزمایشگاه‌های مدرن، تالارهای سخنرانی و فضاهای مطالعه.',
     building_C3C_name: 'کتابخانه',
-    building_C3C_desc: 'کتابخانه مرکزی با مجموعه‌های گسترده، فضاهای مطالعه و خدمات پشتیبانی تحصیلی.',
+    building_C3C_desc:
+      'کتابخانه مرکزی با مجموعه‌های گسترده، فضاهای مطالعه و خدمات پشتیبانی تحصیلی.',
     building_C7A_name: 'مرکز پردیس',
     building_C7A_desc: 'مرکز خدمات دانشجویی با بخش‌های اداری، پشتیبانی دانشجویی و امکانات تفریحی.',
     building_W6A_name: 'ساختمان Wallumattagal',
@@ -1624,13 +1797,15 @@ export const translations = {
     building_E7B_name: 'ساختمان مهندسی B',
     building_E7B_desc: 'امکانات مهندسی اضافی با آزمایشگاه‌های تحقیقاتی پیشرفته و تجهیزات.',
     building_W3A_name: 'مشاغل و استخدام',
-    building_W3A_desc: 'مرکز خدمات شغلی ارائه دهنده کمک در جستجوی شغل، کارگاه‌های رزومه‌نویسی و ارتباط با کارفرمایان.',
-    building_12WW_name: 'ساختمان 12 Wally\'s Walk',
+    building_W3A_desc:
+      'مرکز خدمات شغلی ارائه دهنده کمک در جستجوی شغل، کارگاه‌های رزومه‌نویسی و ارتباط با کارفرمایان.',
+    building_12WW_name: "ساختمان 12 Wally's Walk",
     building_12WW_desc: 'ساختمان آموزشی با کلاس‌های درس و دفاتر دانشکده.',
-    building_4WW_name: 'ساختمان 4 Wally\'s Walk',
+    building_4WW_name: "ساختمان 4 Wally's Walk",
     building_4WW_desc: 'فضاهای سخنرانی و تدریس برای رشته‌های مختلف.',
     building_LIB_name: 'کتابخانه',
-    building_LIB_desc: 'کتابخانه مرکزی با مجموعه‌های گسترده، فضاهای مطالعه و خدمات پشتیبانی تحصیلی.',
+    building_LIB_desc:
+      'کتابخانه مرکزی با مجموعه‌های گسترده، فضاهای مطالعه و خدمات پشتیبانی تحصیلی.',
     building_Sports_name: 'مجموعه ورزشی',
     building_Sports_desc: 'امکانات ورزشی شامل سالن بدنسازی، زمین‌ها و مناطق تفریحی.',
 
@@ -1658,7 +1833,6 @@ export const translations = {
     unexpectedError: 'با یک خطای غیرمنتظره مواجه شدیم. لطفاً صفحه را بازخوانی کنید.',
     tryAgain: 'دوباره امتحان کنید',
 
-
     // Calendar Page
 
     trackDeadlinesDesc: 'مهلت‌های نزدیک را پیگیری کرده و تاریخ‌های تکالیف را مدیریت کنید.',
@@ -1680,16 +1854,10 @@ export const translations = {
 
     // Layout Components
 
-
-
-
-
-
     // Form Components
     failedToSaveUnit: 'ذخیره واحد ناموفق بود. لطفاً دوباره امتحان کنید.',
     unitCode: 'کد واحد',
     unitName: 'نام واحد',
-
 
     atLeastOneClass: 'حداقل یک زمان کلاس مورد نیاز است',
     endTimeAfterStart: 'زمان پایان باید بعد از زمان شروع باشد',
@@ -1721,7 +1889,6 @@ export const translations = {
     selectType: 'انتخاب نوع',
     saveChanges: 'ذخیره تغییرات',
 
-
     // Priorities
     priority_Low: 'کم',
     priority_Medium: 'متوسط',
@@ -1749,27 +1916,36 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'نمایشگاه کار ۲۰۲۶',
-    event_careerFair2026_desc: 'Meet top employers and explore career opportunities across various industries.',
+    event_careerFair2026_desc:
+      'Meet top employers and explore career opportunities across various industries.',
     event_freePizzaFriday_title: 'جمعه پیتزای رایگان',
     event_freePizzaFriday_desc: 'Join us for free pizza and networking with fellow students!',
     event_studySkillsWorkshop_title: 'کارگاه مهارت‌های مطالعه',
-    event_studySkillsWorkshop_desc: 'Learn effective study techniques and time management strategies.',
+    event_studySkillsWorkshop_desc:
+      'Learn effective study techniques and time management strategies.',
     event_internationalFoodFestival_title: 'جشنواره بین‌المللی غذا',
-    event_internationalFoodFestival_desc: 'Celebrate diversity with food from around the world. Free samples available!',
+    event_internationalFoodFestival_desc:
+      'Celebrate diversity with food from around the world. Free samples available!',
     event_techNetworkingNight_title: 'شب شبکه‌سازی تکنولوژی',
-    event_techNetworkingNight_desc: 'Connect with industry professionals and learn about tech careers.',
+    event_techNetworkingNight_desc:
+      'Connect with industry professionals and learn about tech careers.',
     event_studentClubWelcomeDay_title: 'روز خوش‌آمدگویی باشگاه دانشجویان',
-    event_studentClubWelcomeDay_desc: 'Discover clubs and societies on campus. Free snacks provided!',
+    event_studentClubWelcomeDay_desc:
+      'Discover clubs and societies on campus. Free snacks provided!',
     event_researchSeminarAI_title: 'سمینار پژوهشی: هوش مصنوعی در سلامت',
-    event_researchSeminarAI_desc: 'Explore cutting-edge research on artificial intelligence applications in medicine.',
+    event_researchSeminarAI_desc:
+      'Explore cutting-edge research on artificial intelligence applications in medicine.',
     event_movieNightSciFi_title: 'شب فیلم: ماراتن علمی تخیلی',
-    event_movieNightSciFi_desc: 'Join us for a night of classic science fiction films with free popcorn!',
+    event_movieNightSciFi_desc:
+      'Join us for a night of classic science fiction films with free popcorn!',
     event_resumeWritingWorkshop_title: 'کارگاه رزومه‌نویسی',
-    event_resumeWritingWorkshop_desc: 'Get expert tips on crafting the perfect resume for your dream job.',
+    event_resumeWritingWorkshop_desc:
+      'Get expert tips on crafting the perfect resume for your dream job.',
     event_freeCoffeeMorning_title: 'صبح قهوه رایگان',
     event_freeCoffeeMorning_desc: 'Start your day right with free coffee and pastries!',
     event_alumniPanel_title: 'پنل فارغ‌التحصیلان: مشاغل در داده و سیاست',
-    event_alumniPanel_desc: 'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
+    event_alumniPanel_desc:
+      'Hear short talks from alumni working in analytics, public policy, and consulting. Q&A plus networking with light refreshments.',
 
     // Colors
     colorUniversityRed: 'قرمز دانشگاه',
@@ -1827,7 +2003,8 @@ export const translations = {
     signIn: 'ورود',
     orSignWith: 'یا ورود با',
     oauthRequired: '🔧 پیکربندی OAuth مورد نیاز است',
-    googleOAuthDesc: 'ورود با گوگل نیاز به پیکربندی ارائه‌دهنده OAuth در داشبورد Supabase دارد. Google OAuth را در تأیید هویت → ارائه‌دهندگان پیکربندی کنید.',
+    googleOAuthDesc:
+      'ورود با گوگل نیاز به پیکربندی ارائه‌دهنده OAuth در داشبورد Supabase دارد. Google OAuth را در تأیید هویت → ارائه‌دهندگان پیکربندی کنید.',
     noAccount: 'حساب کاربری ندارید؟',
     signUp: 'ثبت‌نام',
     passwordsDoNotMatch: 'رمزهای عبور مطابقت ندارند',
@@ -1849,7 +2026,8 @@ export const translations = {
     editProfileAria: 'ویرایش {{name}}',
     useProfileAria: 'استفاده از {{name}}',
     deleteProfileAria: 'حذف {{name}}',
-    deleteProfileConfirm: 'آیا مطمئن هستید که می‌خواهید این پروفایل را حذف کنید؟ این عمل قابل بازگشت نیست.',
+    deleteProfileConfirm:
+      'آیا مطمئن هستید که می‌خواهید این پروفایل را حذف کنید؟ این عمل قابل بازگشت نیست.',
     deleteProfile: 'حذف پروفایل',
     loadingProfile: 'در حال بارگذاری پروفایل...',
     manageProfilesDesc: 'پروفایل‌های کاربری خود را ویرایش و مدیریت کنید.',
@@ -1886,7 +2064,8 @@ export const translations = {
 
     // Error Handling Extended
     appErrorDesc: 'یک خطای غیرمنتظره رخ داد. لطفاً دوباره امتحان کنید یا به صفحه اصلی برگردید.',
-    boundaryErrorDesc: 'با یک خطای غیرمنتظره مواجه شدیم. این خطا به صورت خودکار گزارش شده و ما در حال رفع آن هستیم.',
+    boundaryErrorDesc:
+      'با یک خطای غیرمنتظره مواجه شدیم. این خطا به صورت خودکار گزارش شده و ما در حال رفع آن هستیم.',
     oops: 'اوه! مشکلی پیش آمد',
     retryAttempt: 'تلاش مجدد {{count}} از {{max}}',
     reset: 'بازنشانی',
@@ -1947,7 +2126,8 @@ export const translations = {
     cards: 'کارت‌ها',
     cardTitle: 'عنوان کارت',
     cardDescPlaceholder: 'توضیحات کارت اینجا می‌آید',
-    cardContentPlaceholder: 'این محتوای کارت است. کارت‌ها می‌توانند انواع مختلف محتوا را در خود جای دهند و برای گروه‌بندی اطلاعات مرتبط عالی هستند.',
+    cardContentPlaceholder:
+      'این محتوای کارت است. کارت‌ها می‌توانند انواع مختلف محتوا را در خود جای دهند و برای گروه‌بندی اطلاعات مرتبط عالی هستند.',
     anotherCard: 'کارت دیگر',
     anotherCardDesc: 'با محتوای متفاوت',
     featured: 'ویژه',
@@ -1995,7 +2175,8 @@ export const translations = {
     addClassTime: 'افزودن زمان کلاس',
     dueTime: 'زمان سررسید',
     markAsCompleted: 'علامت‌گذاری به عنوان تکمیل شده',
-    deleteDeadlineConfirm: 'آیا مطمئن هستید که می‌خواهید این مهلت را حذف کنید؟ این عمل قابل بازگشت نیست.',
+    deleteDeadlineConfirm:
+      'آیا مطمئن هستید که می‌خواهید این مهلت را حذف کنید؟ این عمل قابل بازگشت نیست.',
 
     // Days of Week
     mon: 'دوش',
@@ -2020,6 +2201,51 @@ export const translations = {
     preferenceError: 'ترجیح ذخیره نشد. لطفاً دوباره امتحان کنید.',
     preferenceUpdated: 'ترجیح به‌روزرسانی شد',
 
+    // Storage Disabled
+    storageDisabled: 'ذخیره‌سازی غیرفعال شد',
+    storageDisabledDesc: 'در حال استفاده از حالت فقط جلسه. داده‌ها ذخیره نخواهند شد.',
+    storageEnabled: 'ذخیره‌سازی فعال شد',
+    storageEnabledMsg: 'داده‌های شما به صورت محلی ذخیره می‌شوند.',
+    storageToggleWarning:
+      'غیرفعال کردن ذخیره‌سازی محلی توصیه نمی‌شود زیرا داده‌های شما ذخیره نخواهند شد.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'این کار {{units}} درس و {{deadlines}} مهلت را حذف می‌کند.',
+    clearDataConfirmPlaceholder: 'برای تأیید CLEAR را بنویسید',
+    clearDataConfirmRequired: 'لطفاً CLEAR را بنویسید تا تأیید کنید',
+    exportReminder: 'بهتر است ابتدا داده‌های خود را صادر کنید.',
+
+    // Account Section
+    account: 'حساب',
+    accountDesc: 'حساب و احراز هویت خود را مدیریت کنید.',
+    signedInAs: 'وارد شده به عنوان',
+    signOutSuccess: 'با موفقیت خارج شدید',
+    signOutError: 'خطا در خروج. لطفاً دوباره امتحان کنید.',
+    deleteAccount: 'حذف حساب',
+    deleteAccountDesc: 'حساب و تمام داده‌های خود را به طور دائمی حذف کنید',
+    deleteAccountWarning: 'این عمل قابل بازگشت نیست.',
+
+    // Security Section
+    security: 'امنیت',
+    securityDesc: 'تنظیمات امنیتی خود را مدیریت کنید',
+    changePassword: 'تغییر رمز عبور',
+    changePasswordDesc: 'رمز عبور خود را به‌روزرسانی کنید',
+    manageSessions: 'مدیریت جلسات',
+    manageSessionsDesc: 'مشاهده و مدیریت جلسات فعال',
+    twoFactorAuth: 'احراز هویت دو عاملی',
+    twoFactorAuthDesc: 'یک لایه امنیتی اضافه اضافه کنید',
+    privacyPolicy: 'سیاست حریم خصوصی',
+    termsOfService: 'شرایط خدمات',
+    dataRetention: 'نگهداری داده‌ها',
+    dataRetentionDesc: 'داده‌های شما به صورت محلی ذخیره می‌شوند و هرگز دستگاه شما را ترک نمی‌کنند.',
+    encryptionNote: 'همه داده‌ها به صورت محلی در دستگاه شما رمزنگاری می‌شوند.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'صادرات شامل ترجیحات و تنظیمات می‌شود',
+
+    // Clear Data Types
+    unitsCount: '{{count}} درس',
+    deadlinesCount: '{{count}} مهلت',
   },
   // ============================================
   // CHINESE (SIMPLIFIED) - zh
@@ -2046,6 +2272,7 @@ export const translations = {
     previous: '上一步',
     search: '搜索',
     filter: '筛选',
+    view: '查看',
 
     // Colors
     colorUniversityRed: '校园红',
@@ -2149,7 +2376,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: '清除所有数据',
-    clearAllDataDialogDesc: '您确定要清除所有数据吗？此操作无法撤销，将删除所有课程、截止日期和账户。',
+    clearAllDataDialogDesc:
+      '您确定要清除所有数据吗？此操作无法撤销，将删除所有课程、截止日期和账户。',
 
     // Quick Actions
     homeDashboard: '🏠 首页仪表盘',
@@ -2279,7 +2507,8 @@ export const translations = {
     comingSoon: '即将推出',
     // Geolocation Messages
     locationAccessDenied: '位置访问被拒绝',
-    locationDeniedDesc: '权限仍被拒绝。请检查系统偏好设置（操作系统级别），确保浏览器可以访问位置服务。',
+    locationDeniedDesc:
+      '权限仍被拒绝。请检查系统偏好设置（操作系统级别），确保浏览器可以访问位置服务。',
     locationDeniedHelp: '请检查：1) 浏览器地址栏（锁图标），2) macOS 系统设置 → 隐私 → 位置服务。',
     locationError: '位置错误',
     positionUnavailable: '位置不可用',
@@ -2287,7 +2516,8 @@ export const translations = {
     locationTimeout: '位置请求超时',
     locationTimeoutDesc: '位置请求已超时。请尝试移动到信号更好的区域。',
     insecureConnection: '不安全的连接',
-    insecureConnectionDesc: '地理定位需要安全连接（HTTPS）或 localhost。您的浏览器出于安全原因将其阻止。',
+    insecureConnectionDesc:
+      '地理定位需要安全连接（HTTPS）或 localhost。您的浏览器出于安全原因将其阻止。',
     locating: '定位中...',
     requestingPosition: '正在请求您的当前位置...',
     locationFound: '位置已找到',
@@ -2313,7 +2543,8 @@ export const translations = {
     signIn: '登录',
     orSignWith: '或使用登录',
     oauthRequired: '🔧 需要OAuth配置',
-    googleOAuthDesc: 'Google登录需要在Supabase仪表盘中设置OAuth提供商。请在认证→提供商中配置Google OAuth以启用此功能。',
+    googleOAuthDesc:
+      'Google登录需要在Supabase仪表盘中设置OAuth提供商。请在认证→提供商中配置Google OAuth以启用此功能。',
     noAccount: '没有账户？',
     signUp: '注册',
     passwordsDoNotMatch: '密码不匹配',
@@ -2669,6 +2900,51 @@ export const translations = {
     settingsError: '设置错误',
     preferenceError: '无法保存偏好，请重试。',
     preferenceUpdated: '偏好已更新',
+
+    // Storage Disabled
+    storageDisabled: '存储已禁用',
+    storageDisabledDesc: '使用仅会话模式。数据将不会被保存。',
+    storageEnabled: '存储已启用',
+    storageEnabledMsg: '您的数据将保存在本地。',
+    storageToggleWarning: '不建议禁用本地存储，因为您的数据将不会被保存。',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: '这将删除 {{units}} 个课程和 {{deadlines}} 个截止日期。',
+    clearDataConfirmPlaceholder: '输入 CLEAR 确认',
+    clearDataConfirmRequired: '请输入 CLEAR 确认',
+    exportReminder: '建议先导出您的数据。',
+
+    // Account Section
+    account: '账户',
+    accountDesc: '管理您的账户和身份验证。',
+    signedInAs: '登录为',
+    signOutSuccess: '成功退出',
+    signOutError: '退出失败，请重试。',
+    deleteAccount: '删除账户',
+    deleteAccountDesc: '永久删除您的账户和所有数据',
+    deleteAccountWarning: '此操作无法撤销。',
+
+    // Security Section
+    security: '安全',
+    securityDesc: '管理您的安全设置',
+    changePassword: '更改密码',
+    changePasswordDesc: '更新您的密码',
+    manageSessions: '管理会话',
+    manageSessionsDesc: '查看和管理活动会话',
+    twoFactorAuth: '双因素身份验证',
+    twoFactorAuthDesc: '添加额外的安全层',
+    privacyPolicy: '隐私政策',
+    termsOfService: '服务条款',
+    dataRetention: '数据保留',
+    dataRetentionDesc: '您的数据存储在本地，永远不会离开您的设备。',
+    encryptionNote: '所有数据在您的设备上进行本地加密。',
+
+    // Export Enhanced
+    exportIncludesPrefs: '导出包括偏好设置',
+
+    // Clear Data Types
+    unitsCount: '{{count}} 个课程',
+    deadlinesCount: '{{count}} 个截止日期',
   },
   // ============================================
   // ARABIC - ar
@@ -2695,6 +2971,7 @@ export const translations = {
     previous: 'السابق',
     search: 'بحث',
     filter: 'تصفية',
+    view: 'عرض',
 
     // Colors
     colorUniversityRed: 'أحمر الجامعة',
@@ -2708,7 +2985,8 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'مبنى علوم الحاسوب',
-    building_C5C_desc: 'موطن برامج علوم الحاسوب وتكنولوجيا المعلومات. يضم مختبرات حديثة وقاعات محاضرات ومساحات دراسية.',
+    building_C5C_desc:
+      'موطن برامج علوم الحاسوب وتكنولوجيا المعلومات. يضم مختبرات حديثة وقاعات محاضرات ومساحات دراسية.',
     building_C3C_name: 'المكتبة',
     building_C3C_desc: 'المكتبة المركزية مع مجموعات واسعة ومناطق دراسية وخدمات دعم أكاديمي.',
     building_C7A_name: 'مركز الحرم الجامعي',
@@ -2720,7 +2998,8 @@ export const translations = {
     building_E7B_name: 'مبنى الهندسة ب',
     building_E7B_desc: 'مرافق هندسية إضافية مع مختبرات بحث متقدمة ومعدات.',
     building_W3A_name: 'مركز التوظيف',
-    building_W3A_desc: 'مركز خدمات التوظيف يقدم المساعدة في البحث عن عمل وورش عمل السيرة الذاتية وربط أصحاب العمل.',
+    building_W3A_desc:
+      'مركز خدمات التوظيف يقدم المساعدة في البحث عن عمل وورش عمل السيرة الذاتية وربط أصحاب العمل.',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'مبنى أكاديمي مع فصول دراسية ومكاتب أعضاء هيئة التدريس.',
     building_4WW_name: "4 Wally's Walk",
@@ -2798,7 +3077,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'مسح جميع البيانات',
-    clearAllDataDialogDesc: 'هل أنت متأكد أنك تريد مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف جميع المواد والمواعيد النهائية والملفات الشخصية.',
+    clearAllDataDialogDesc:
+      'هل أنت متأكد أنك تريد مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف جميع المواد والمواعيد النهائية والملفات الشخصية.',
 
     // Quick Actions
     homeDashboard: '🏠 لوحة القيادة الرئيسية',
@@ -2904,7 +3184,8 @@ export const translations = {
     gettingStartedGuide: 'دليل البدء',
     noNotificationsYet: 'لا توجد إشعارات بعد',
     pageNotFound: 'الصفحة غير موجودة',
-    pageNotFoundDescription: 'عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها. ربما تم نقلها أو أنها غير موجودة.',
+    pageNotFoundDescription:
+      'عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها. ربما تم نقلها أو أنها غير موجودة.',
     goHome: 'العودة للرئيسية',
     new: 'جديد',
 
@@ -2929,15 +3210,19 @@ export const translations = {
 
     // Geolocation Messages
     locationAccessDenied: 'تم رفض الوصول إلى الموقع',
-    locationDeniedDesc: 'لا يزال الإذن مرفوضًا. تحقق من تفضيلات النظام (مستوى نظام التشغيل) للتأكد من أن متصفحك لديه وصول إلى خدمات الموقع.',
-    locationDeniedHelp: 'يرجى التحقق من: 1) شريط عنوان المتصفح (أيقونة القفل)، 2) إعدادات نظام macOS ← الخصوصية ← خدمات الموقع.',
+    locationDeniedDesc:
+      'لا يزال الإذن مرفوضًا. تحقق من تفضيلات النظام (مستوى نظام التشغيل) للتأكد من أن متصفحك لديه وصول إلى خدمات الموقع.',
+    locationDeniedHelp:
+      'يرجى التحقق من: 1) شريط عنوان المتصفح (أيقونة القفل)، 2) إعدادات نظام macOS ← الخصوصية ← خدمات الموقع.',
     locationError: 'خطأ في الموقع',
     positionUnavailable: 'الموقع غير متاح',
-    positionUnavailableDesc: 'لم يتمكن جهازك من تحديد موقعه. تحقق مما إذا كانت خدمات الموقع ممكّنة.',
+    positionUnavailableDesc:
+      'لم يتمكن جهازك من تحديد موقعه. تحقق مما إذا كانت خدمات الموقع ممكّنة.',
     locationTimeout: 'انتهت مهلة طلب الموقع',
     locationTimeoutDesc: 'انتهت مهلة طلب الموقع. حاول الانتقال إلى منطقة ذات إشارة أفضل.',
     insecureConnection: 'اتصال غير آمن',
-    insecureConnectionDesc: 'يتطلب تحديد الموقع الجغرافي اتصالاً آمنًا (HTTPS) أو localhost. يحظره متصفحك لأسباب أمنية.',
+    insecureConnectionDesc:
+      'يتطلب تحديد الموقع الجغرافي اتصالاً آمنًا (HTTPS) أو localhost. يحظره متصفحك لأسباب أمنية.',
     locating: 'جارٍ تحديد الموقع...',
     requestingPosition: 'جارٍ طلب موقعك الحالي...',
     locationFound: 'تم العثور على الموقع',
@@ -2963,7 +3248,8 @@ export const translations = {
     signIn: 'تسجيل الدخول',
     orSignWith: 'أو تسجيل الدخول باستخدام',
     oauthRequired: '🔧 مطلوب إعداد OAuth',
-    googleOAuthDesc: 'يتطلب تسجيل الدخول بـ Google إعداد موفر OAuth في لوحة Supabase. قم بإعداد Google OAuth ضمن المصادقة ← الموفرين لتفعيل هذه الميزة.',
+    googleOAuthDesc:
+      'يتطلب تسجيل الدخول بـ Google إعداد موفر OAuth في لوحة Supabase. قم بإعداد Google OAuth ضمن المصادقة ← الموفرين لتفعيل هذه الميزة.',
     noAccount: 'ليس لديك حساب؟',
     signUp: 'إنشاء حساب',
     passwordsDoNotMatch: 'كلمات المرور غير متطابقة',
@@ -2989,7 +3275,8 @@ export const translations = {
     editProfileAria: 'تعديل {{name}}',
     useProfileAria: 'استخدام {{name}}',
     deleteProfileAria: 'حذف {{name}}',
-    deleteProfileConfirm: 'هل أنت متأكد أنك تريد حذف هذا الملف الشخصي؟ لا يمكن التراجع عن هذا الإجراء.',
+    deleteProfileConfirm:
+      'هل أنت متأكد أنك تريد حذف هذا الملف الشخصي؟ لا يمكن التراجع عن هذا الإجراء.',
     deleteProfile: 'حذف الملف الشخصي',
     loadingProfile: 'جاري تحميل الملف الشخصي...',
     manageProfilesDesc: 'تعديل وإدارة ملفاتك الشخصية.',
@@ -3104,7 +3391,8 @@ export const translations = {
     failedToSaveUnit: 'فشل حفظ المادة. يرجى المحاولة مرة أخرى.',
     campusFeedDesc: 'ابق على اطلاع بأحداث الحرم والإعلانات والفرص في {{uniName}}.',
     stayConnected: 'ابق على اتصال:',
-    stayConnectedDesc: 'اكتشف ورش العمل ومعارض التوظيف والأحداث الاجتماعية وفرص الطعام المجاني في الحرم.',
+    stayConnectedDesc:
+      'اكتشف ورش العمل ومعارض التوظيف والأحداث الاجتماعية وفرص الطعام المجاني في الحرم.',
     filterEvents: 'تصفية الأحداث',
     allEvents: 'جميع الأحداث',
     categoryEvents: 'أحداث {{category}}',
@@ -3172,7 +3460,8 @@ export const translations = {
     cards: 'البطاقات',
     cardTitle: 'عنوان البطاقة',
     cardDescPlaceholder: 'وصف البطاقة يذهب هنا',
-    cardContentPlaceholder: 'هذا هو محتوى البطاقة. يمكن أن تحتوي البطاقات على أنواع مختلفة من المحتوى وهي رائعة لتجميع المعلومات ذات الصلة.',
+    cardContentPlaceholder:
+      'هذا هو محتوى البطاقة. يمكن أن تحتوي البطاقات على أنواع مختلفة من المحتوى وهي رائعة لتجميع المعلومات ذات الصلة.',
     anotherCard: 'بطاقة أخرى',
     anotherCardDesc: 'بمحتوى مختلف',
     featured: 'مميز',
@@ -3218,7 +3507,8 @@ export const translations = {
     addClassTime: 'إضافة وقت محاضرة',
     dueTime: 'وقت التسليم',
     markAsCompleted: 'تحديد كمكتمل',
-    deleteDeadlineConfirm: 'هل أنت متأكد أنك تريد حذف هذا الموعد النهائي؟ لا يمكن التراجع عن هذا الإجراء.',
+    deleteDeadlineConfirm:
+      'هل أنت متأكد أنك تريد حذف هذا الموعد النهائي؟ لا يمكن التراجع عن هذا الإجراء.',
     mon: 'الإثنين',
     tue: 'الثلاثاء',
     wed: 'الأربعاء',
@@ -3297,21 +3587,25 @@ export const translations = {
     event_studySkillsWorkshop_title: 'ورشة مهارات الدراسة',
     event_studySkillsWorkshop_desc: 'تعلم تقنيات الدراسة الفعالة واستراتيجيات إدارة الوقت.',
     event_internationalFoodFestival_title: 'مهرجان الطعام الدولي',
-    event_internationalFoodFestival_desc: 'احتفل بالتنوع مع طعام من جميع أنحاء العالم. عينات مجانية متاحة!',
+    event_internationalFoodFestival_desc:
+      'احتفل بالتنوع مع طعام من جميع أنحاء العالم. عينات مجانية متاحة!',
     event_techNetworkingNight_title: 'ليلة التواصل التقني',
     event_techNetworkingNight_desc: 'تواصل مع محترفي الصناعة وتعرف على المهن التقنية.',
     event_studentClubWelcomeDay_title: 'يوم الترحيب بنوادي الطلاب',
-    event_studentClubWelcomeDay_desc: 'اكتشف النوادي والجمعيات في الحرم الجامعي. وجبات خفيفة مجانية مقدمة!',
+    event_studentClubWelcomeDay_desc:
+      'اكتشف النوادي والجمعيات في الحرم الجامعي. وجبات خفيفة مجانية مقدمة!',
     event_researchSeminarAI_title: 'ندوة بحثية: الذكاء الاصطناعي في الرعاية الصحية',
     event_researchSeminarAI_desc: 'استكشف أحدث الأبحاث حول تطبيقات الذكاء الاصطناعي في الطب.',
     event_movieNightSciFi_title: 'ليلة الأفلام: ماراثون الخيال العلمي',
     event_movieNightSciFi_desc: 'انضم إلينا لليلة من أفلام الخيال العلمي الكلاسيكية مع فشار مجاني!',
     event_resumeWritingWorkshop_title: 'ورشة كتابة السيرة الذاتية',
-    event_resumeWritingWorkshop_desc: 'احصل على نصائح خبراء حول إنشاء السيرة الذاتية المثالية لوظيفة أحلامك.',
+    event_resumeWritingWorkshop_desc:
+      'احصل على نصائح خبراء حول إنشاء السيرة الذاتية المثالية لوظيفة أحلامك.',
     event_freeCoffeeMorning_title: 'صباح القهوة المجانية',
     event_freeCoffeeMorning_desc: 'ابدأ يومك بشكل صحيح مع قهوة ومعجنات مجانية!',
     event_alumniPanel_title: 'لجنة الخريجين: المهن في البيانات والسياسة',
-    event_alumniPanel_desc: 'استمع إلى محادثات قصيرة من خريجين يعملون في التحليلات والسياسة العامة والاستشارات. أسئلة وأجوبة بالإضافة إلى تواصل مع مرطبات خفيفة.',
+    event_alumniPanel_desc:
+      'استمع إلى محادثات قصيرة من خريجين يعملون في التحليلات والسياسة العامة والاستشارات. أسئلة وأجوبة بالإضافة إلى تواصل مع مرطبات خفيفة.',
 
     // Toast Messages
     languageUpdated: 'تم تحديث اللغة',
@@ -3319,6 +3613,51 @@ export const translations = {
     settingsError: 'خطأ في الإعدادات',
     preferenceError: 'تعذر حفظ التفضيل. يرجى المحاولة مرة أخرى.',
     preferenceUpdated: 'تم تحديث التفضيل',
+
+    // Storage Disabled
+    storageDisabled: 'تم تعطيل التخزين',
+    storageDisabledDesc: 'استخدام وضع الجلسة فقط. لن يتم حفظ البيانات.',
+    storageEnabled: 'تم تمكين التخزين',
+    storageEnabledMsg: 'سيتم حفظ بياناتك محلياً.',
+    storageToggleWarning: 'لا يوصى بتعطيل التخزين المحلي حيث لن يتم حفظ بياناتك.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'سيؤدي هذا إلى إزالة {{units}} وحدات و {{deadlines}} مواعيد نهائية.',
+    clearDataConfirmPlaceholder: 'اكتب CLEAR للتأكيد',
+    clearDataConfirmRequired: 'يرجى كتابة CLEAR للتأكيد',
+    exportReminder: 'فكر في تصدير بياناتك أولاً.',
+
+    // Account Section
+    account: 'الحساب',
+    accountDesc: 'إدارة حسابك والمصادقة.',
+    signedInAs: 'تسجيل الدخول ك',
+    signOutSuccess: 'تم تسجيل الخروج بنجاح',
+    signOutError: 'فشل تسجيل الخروج. يرجى المحاولة مرة أخرى.',
+    deleteAccount: 'حذف الحساب',
+    deleteAccountDesc: 'حذف حسابك وجميع البيانات بشكل دائم',
+    deleteAccountWarning: 'لا يمكن التراجع عن هذا الإجراء.',
+
+    // Security Section
+    security: 'الأمان',
+    securityDesc: 'إدارة إعدادات الأمان الخاصة بك',
+    changePassword: 'تغيير كلمة المرور',
+    changePasswordDesc: 'تحديث كلمة المرور الخاصة بك',
+    manageSessions: 'إدارة الجلسات',
+    manageSessionsDesc: 'عرض وإدارة الجلسات النشطة',
+    twoFactorAuth: 'المصادقة ذات العاملين',
+    twoFactorAuthDesc: 'إضافة طبقة أمان إضافية',
+    privacyPolicy: 'سياسة الخصوصية',
+    termsOfService: 'شروط الخدمة',
+    dataRetention: 'احتفاظ البيانات',
+    dataRetentionDesc: 'يتم تخزين بياناتك محلياً ولا تغادر جهازك أبداً.',
+    encryptionNote: 'جميع البيانات مشفرة محلياً على جهازك.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'يتضمن التصدير التفضيلات والإعدادات',
+
+    // Clear Data Types
+    unitsCount: '{{count}} وحدات',
+    deadlinesCount: '{{count}} مواعيد نهائية',
   },
   // ============================================
   // HINDI - hi
@@ -3345,6 +3684,7 @@ export const translations = {
     previous: 'पिछला',
     search: 'खोजें',
     filter: 'फ़िल्टर',
+    view: 'देखें',
 
     // Colors
     colorUniversityRed: 'विश्वविद्यालय लाल',
@@ -3358,9 +3698,11 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'कंप्यूटर साइंस बिल्डिंग',
-    building_C5C_desc: 'कंप्यूटर साइंस और आईटी प्रोग्राम का घर। आधुनिक लैब, लेक्चर थिएटर और स्टडी स्पेस।',
+    building_C5C_desc:
+      'कंप्यूटर साइंस और आईटी प्रोग्राम का घर। आधुनिक लैब, लेक्चर थिएटर और स्टडी स्पेस।',
     building_C3C_name: 'लाइब्रेरी',
-    building_C3C_desc: 'केंद्रीय लाइब्रेरी विस्तृत संग्रह, अध्ययन क्षेत्र और शैक्षणिक सहायता सेवाओं के साथ।',
+    building_C3C_desc:
+      'केंद्रीय लाइब्रेरी विस्तृत संग्रह, अध्ययन क्षेत्र और शैक्षणिक सहायता सेवाओं के साथ।',
     building_C7A_name: 'कैंपस हब',
     building_C7A_desc: 'छात्र सेवा केंद्र प्रशासन, छात्र सहायता और मनोरंजन सुविधाओं के साथ।',
     building_W6A_name: 'वालुमाटागल बिल्डिंग',
@@ -3370,13 +3712,15 @@ export const translations = {
     building_E7B_name: 'इंजीनियरिंग बिल्डिंग B',
     building_E7B_desc: 'अतिरिक्त इंजीनियरिंग सुविधाएं उन्नत अनुसंधान लैब और उपकरणों के साथ।',
     building_W3A_name: 'करियर एवं रोज़गार',
-    building_W3A_desc: 'करियर सेवा केंद्र नौकरी खोज सहायता, रिज्यूमे वर्कशॉप और नियोक्ता कनेक्शन प्रदान करता है।',
+    building_W3A_desc:
+      'करियर सेवा केंद्र नौकरी खोज सहायता, रिज्यूमे वर्कशॉप और नियोक्ता कनेक्शन प्रदान करता है।',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'शैक्षणिक भवन कक्षाओं और फैकल्टी कार्यालयों के साथ।',
     building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'विभिन्न विषयों के लिए लेक्चर और ट्यूटोरियल स्पेस।',
     building_LIB_name: 'लाइब्रेरी',
-    building_LIB_desc: 'केंद्रीय लाइब्रेरी विस्तृत संग्रह, अध्ययन क्षेत्र और शैक्षणिक सहायता सेवाओं के साथ।',
+    building_LIB_desc:
+      'केंद्रीय लाइब्रेरी विस्तृत संग्रह, अध्ययन क्षेत्र और शैक्षणिक सहायता सेवाओं के साथ।',
     building_Sports_name: 'स्पोर्ट्स प्रीसिंक्ट',
     building_Sports_desc: 'खेल सुविधाएं जिम, कोर्ट और मनोरंजन क्षेत्रों सहित।',
 
@@ -3448,7 +3792,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'सभी डेटा साफ़ करें',
-    clearAllDataDialogDesc: 'क्या आप वाकई सभी डेटा साफ़ करना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती और सभी विषय, समय सीमाएं और प्रोफाइल हटा देगी।',
+    clearAllDataDialogDesc:
+      'क्या आप वाकई सभी डेटा साफ़ करना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती और सभी विषय, समय सीमाएं और प्रोफाइल हटा देगी।',
 
     // Quick Actions
     homeDashboard: '🏠 होम डैशबोर्ड',
@@ -3554,7 +3899,8 @@ export const translations = {
     gettingStartedGuide: 'शुरुआत गाइड',
     noNotificationsYet: 'अभी तक कोई सूचना नहीं',
     pageNotFound: 'पेज नहीं मिला',
-    pageNotFoundDescription: 'क्षमा करें, आप जो पेज खोज रहे हैं वह नहीं मिला। यह स्थानांतरित हो गया होगा या मौजूद नहीं है।',
+    pageNotFoundDescription:
+      'क्षमा करें, आप जो पेज खोज रहे हैं वह नहीं मिला। यह स्थानांतरित हो गया होगा या मौजूद नहीं है।',
     goHome: 'होम जाएं',
     new: 'नया',
 
@@ -3578,15 +3924,20 @@ export const translations = {
     comingSoon: 'जल्द आ रहा है',
     // Geolocation Messages
     locationAccessDenied: 'स्थान पहुंच अस्वीकृत',
-    locationDeniedDesc: 'अनुमति अभी भी अस्वीकृत है। कृपया यह सुनिश्चित करने के लिए सिस्टम प्राथमिकताएं (OS स्तर) जांचें कि आपके ब्राउज़र के पास स्थान सेवाओं तक पहुंच है।',
-    locationDeniedHelp: 'कृपया जांचें: 1) ब्राउज़र एड्रेस बार (लॉक आइकन), 2) macOS सिस्टम सेटिंग्स → गोपनीयता → स्थान सेवाएं।',
+    locationDeniedDesc:
+      'अनुमति अभी भी अस्वीकृत है। कृपया यह सुनिश्चित करने के लिए सिस्टम प्राथमिकताएं (OS स्तर) जांचें कि आपके ब्राउज़र के पास स्थान सेवाओं तक पहुंच है।',
+    locationDeniedHelp:
+      'कृपया जांचें: 1) ब्राउज़र एड्रेस बार (लॉक आइकन), 2) macOS सिस्टम सेटिंग्स → गोपनीयता → स्थान सेवाएं।',
     locationError: 'स्थान त्रुटि',
     positionUnavailable: 'स्थान अनुपलब्ध',
-    positionUnavailableDesc: 'आपका डिवाइस अपना स्थान निर्धारित नहीं कर सका। जांचें कि क्या स्थान सेवाएं सक्षम हैं।',
+    positionUnavailableDesc:
+      'आपका डिवाइस अपना स्थान निर्धारित नहीं कर सका। जांचें कि क्या स्थान सेवाएं सक्षम हैं।',
     locationTimeout: 'स्थान अनुरोध टाइमआउट',
-    locationTimeoutDesc: 'स्थान अनुरोध का समय समाप्त हो गया। बेहतर सिग्नल वाले क्षेत्र में जाने का प्रयास करें।',
+    locationTimeoutDesc:
+      'स्थान अनुरोध का समय समाप्त हो गया। बेहतर सिग्नल वाले क्षेत्र में जाने का प्रयास करें।',
     insecureConnection: 'असुरक्षित कनेक्शन',
-    insecureConnectionDesc: 'जियोलोकेशन के लिए सुरक्षित कनेक्शन (HTTPS) या लोकलहोस्ट की आवश्यकता होती है। सुरक्षा कारणों से आपका ब्राउज़र इसे अवरुद्ध कर रहा है।',
+    insecureConnectionDesc:
+      'जियोलोकेशन के लिए सुरक्षित कनेक्शन (HTTPS) या लोकलहोस्ट की आवश्यकता होती है। सुरक्षा कारणों से आपका ब्राउज़र इसे अवरुद्ध कर रहा है।',
     locating: 'खोज रहा है...',
     requestingPosition: 'आपके वर्तमान स्थान का अनुरोध कर रहा है...',
     locationFound: 'स्थान मिल गया',
@@ -3612,7 +3963,8 @@ export const translations = {
     signIn: 'साइन इन',
     orSignWith: 'या साइन इन करें',
     oauthRequired: '🔧 OAuth कॉन्फ़िगरेशन आवश्यक',
-    googleOAuthDesc: 'Google साइन-इन के लिए Supabase डैशबोर्ड में OAuth प्रदाता सेटअप आवश्यक है। इस सुविधा को सक्षम करने के लिए प्रमाणीकरण → प्रदाताओं के तहत Google OAuth कॉन्फ़िगर करें।',
+    googleOAuthDesc:
+      'Google साइन-इन के लिए Supabase डैशबोर्ड में OAuth प्रदाता सेटअप आवश्यक है। इस सुविधा को सक्षम करने के लिए प्रमाणीकरण → प्रदाताओं के तहत Google OAuth कॉन्फ़िगर करें।',
     noAccount: 'खाता नहीं है?',
     signUp: 'साइन अप',
     passwordsDoNotMatch: 'पासवर्ड मेल नहीं खाते',
@@ -3638,7 +3990,8 @@ export const translations = {
     editProfileAria: '{{name}} संपादित करें',
     useProfileAria: '{{name}} उपयोग करें',
     deleteProfileAria: '{{name}} हटाएं',
-    deleteProfileConfirm: 'क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।',
+    deleteProfileConfirm:
+      'क्या आप वाकई इस प्रोफ़ाइल को हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।',
     deleteProfile: 'प्रोफ़ाइल हटाएं',
     loadingProfile: 'प्रोफ़ाइल लोड हो रही है...',
     manageProfilesDesc: 'अपनी यूजर प्रोफ़ाइल संपादित और प्रबंधित करें।',
@@ -3684,7 +4037,8 @@ export const translations = {
     dashboardOverview: 'डैशबोर्ड अवलोकन',
     myUnits: 'मेरे विषय',
     noUnitsYet: 'अभी तक कोई विषय नहीं',
-    addFirstUnitDesc: 'अपने शेड्यूल को ट्रैक करना शुरू करने के लिए अपना पहला विषय जोड़ें। यह आपके कैलेंडर और आज के शेड्यूल से सिंक होगा।',
+    addFirstUnitDesc:
+      'अपने शेड्यूल को ट्रैक करना शुरू करने के लिए अपना पहला विषय जोड़ें। यह आपके कैलेंडर और आज के शेड्यूल से सिंक होगा।',
     addYourFirstUnit: 'अपना पहला विषय जोड़ें',
     units: 'विषय',
     classesPerWeek: 'कक्षाएं/सप्ताह',
@@ -3701,7 +4055,8 @@ export const translations = {
     somethingWentWrong: 'कुछ गलत हो गया',
     unexpectedError: 'हमें एक अप्रत्याशित त्रुटि मिली। कृपया पेज रिफ्रेश करने का प्रयास करें।',
     appErrorDesc: 'एक अप्रत्याशित त्रुटि हुई। कृपया पुनः प्रयास करें या होम पेज पर वापस जाएं।',
-    boundaryErrorDesc: 'हमें एक अप्रत्याशित त्रुटि मिली। यह स्वचालित रूप से रिपोर्ट किया गया है और हम इसे ठीक करने पर काम कर रहे हैं।',
+    boundaryErrorDesc:
+      'हमें एक अप्रत्याशित त्रुटि मिली। यह स्वचालित रूप से रिपोर्ट किया गया है और हम इसे ठीक करने पर काम कर रहे हैं।',
     oops: 'उफ़! कुछ गलत हो गया',
     retryAttempt: 'पुनः प्रयास {{count}} का {{max}}',
     reset: 'रीसेट',
@@ -3777,7 +4132,8 @@ export const translations = {
     meetupsNetworking: 'मीटअप और नेटवर्किंग',
     mealsSnacks: 'भोजन और स्नैक्स',
     coordPickerMode: 'कोऑर्डिनेट पिकर मोड',
-    coordPickerDesc: 'नए मार्कर जोड़ने के लिए पिक्सेल कोऑर्डिनेट कॉपी करने के लिए मैप पर क्लिक करें',
+    coordPickerDesc:
+      'नए मार्कर जोड़ने के लिए पिक्सेल कोऑर्डिनेट कॉपी करने के लिए मैप पर क्लिक करें',
     copied: 'कॉपी किया गया:',
     campusBuildings: 'कैंपस बिल्डिंग',
     turnByTurn: 'टर्न-बाय-टर्न नेविगेशन',
@@ -3790,11 +4146,13 @@ export const translations = {
     filterAndFindDesc: 'सुविधाओं, एक्सेसिबिलिटी फ़ीचर्स आदि द्वारा खोजें।',
     noBuildingsFound: '"{{query}}" से मेल खाने वाली कोई बिल्डिंग नहीं मिली',
     welcomeToUni: '{{uniName}} में आपका स्वागत है',
-    uniDesc: 'अत्याधुनिक सुविधाओं और नवाचारी शिक्षण विधियों के साथ विश्व स्तरीय शिक्षा का अनुभव करें।',
+    uniDesc:
+      'अत्याधुनिक सुविधाओं और नवाचारी शिक्षण विधियों के साथ विश्व स्तरीय शिक्षा का अनुभव करें।',
     explorePrograms: 'प्रोग्राम एक्सप्लोर करें',
     learnMore: 'और जानें',
     mqDesignSystem: 'MQ डिज़ाइन सिस्टम',
-    mqDesignSystemDesc: 'मैक्वेरी विश्वविद्यालय ब्रांड टोकन के साथ निर्मित एक व्यापक डिज़ाइन सिस्टम।',
+    mqDesignSystemDesc:
+      'मैक्वेरी विश्वविद्यालय ब्रांड टोकन के साथ निर्मित एक व्यापक डिज़ाइन सिस्टम।',
     buttons: 'बटन',
     primaryButton: 'प्राइमरी बटन',
     secondaryButton: 'सेकेंडरी बटन',
@@ -3821,7 +4179,8 @@ export const translations = {
     cards: 'कार्ड',
     cardTitle: 'कार्ड टाइटल',
     cardDescPlaceholder: 'कार्ड विवरण यहां जाता है',
-    cardContentPlaceholder: 'यह कार्ड कंटेंट है। कार्ड विभिन्न प्रकार की सामग्री रख सकते हैं और संबंधित जानकारी को समूहित करने के लिए बढ़िया हैं।',
+    cardContentPlaceholder:
+      'यह कार्ड कंटेंट है। कार्ड विभिन्न प्रकार की सामग्री रख सकते हैं और संबंधित जानकारी को समूहित करने के लिए बढ़िया हैं।',
     anotherCard: 'एक और कार्ड',
     anotherCardDesc: 'अलग कंटेंट के साथ',
     featured: 'फीचर्ड',
@@ -3837,7 +4196,8 @@ export const translations = {
     information: 'जानकारी',
     infoAlertDesc: 'यह एक सूचनात्मक अलर्ट है। यह उपयोगकर्ताओं को उपयोगी जानकारी प्रदान करता है।',
     warning: 'चेतावनी',
-    warningAlertDesc: 'यह एक चेतावनी अलर्ट है। यह कुछ ऐसा इंगित करता है जिस पर ध्यान देने की आवश्यकता है।',
+    warningAlertDesc:
+      'यह एक चेतावनी अलर्ट है। यह कुछ ऐसा इंगित करता है जिस पर ध्यान देने की आवश्यकता है।',
     success: 'सफलता',
     successAlertDesc: 'यह एक सफलता अलर्ट है। यह पुष्टि करता है कि एक क्रिया सफलतापूर्वक पूर्ण हुई।',
     error: 'त्रुटि',
@@ -3867,7 +4227,8 @@ export const translations = {
     addClassTime: 'कक्षा समय जोड़ें',
     dueTime: 'देय समय',
     markAsCompleted: 'पूर्ण के रूप में चिह्नित करें',
-    deleteDeadlineConfirm: 'क्या आप वाकई इस समय सीमा को हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।',
+    deleteDeadlineConfirm:
+      'क्या आप वाकई इस समय सीमा को हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।',
     mon: 'सोम',
     tue: 'मंगल',
     wed: 'बुध',
@@ -3940,27 +4301,35 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'करियर फेयर 2026',
-    event_careerFair2026_desc: 'शीर्ष नियोक्ताओं से मिलें और विभिन्न उद्योगों में करियर के अवसर खोजें।',
+    event_careerFair2026_desc:
+      'शीर्ष नियोक्ताओं से मिलें और विभिन्न उद्योगों में करियर के अवसर खोजें।',
     event_freePizzaFriday_title: 'फ्री पिज़्ज़ा फ्राइडे',
-    event_freePizzaFriday_desc: 'मुफ्त पिज़्ज़ा और साथी छात्रों के साथ नेटवर्किंग के लिए हमसे जुड़ें!',
+    event_freePizzaFriday_desc:
+      'मुफ्त पिज़्ज़ा और साथी छात्रों के साथ नेटवर्किंग के लिए हमसे जुड़ें!',
     event_studySkillsWorkshop_title: 'स्टडी स्किल्स वर्कशॉप',
     event_studySkillsWorkshop_desc: 'प्रभावी अध्ययन तकनीकें और समय प्रबंधन रणनीतियाँ सीखें।',
     event_internationalFoodFestival_title: 'इंटरनेशनल फूड फेस्टिवल',
-    event_internationalFoodFestival_desc: 'दुनिया भर के भोजन के साथ विविधता का जश्न मनाएं। मुफ्त नमूने उपलब्ध!',
+    event_internationalFoodFestival_desc:
+      'दुनिया भर के भोजन के साथ विविधता का जश्न मनाएं। मुफ्त नमूने उपलब्ध!',
     event_techNetworkingNight_title: 'टेक नेटवर्किंग नाइट',
-    event_techNetworkingNight_desc: 'इंडस्ट्री प्रोफेशनल्स से जुड़ें और टेक करियर के बारे में जानें।',
+    event_techNetworkingNight_desc:
+      'इंडस्ट्री प्रोफेशनल्स से जुड़ें और टेक करियर के बारे में जानें।',
     event_studentClubWelcomeDay_title: 'स्टूडेंट क्लब वेलकम डे',
     event_studentClubWelcomeDay_desc: 'कैंपस में क्लब और सोसाइटी खोजें। मुफ्त स्नैक्स उपलब्ध!',
     event_researchSeminarAI_title: 'रिसर्च सेमिनार: हेल्थकेयर में AI',
-    event_researchSeminarAI_desc: 'मेडिसिन में आर्टिफिशियल इंटेलिजेंस एप्लिकेशन पर अत्याधुनिक शोध खोजें।',
+    event_researchSeminarAI_desc:
+      'मेडिसिन में आर्टिफिशियल इंटेलिजेंस एप्लिकेशन पर अत्याधुनिक शोध खोजें।',
     event_movieNightSciFi_title: 'मूवी नाइट: साइ-फाई मैराथन',
-    event_movieNightSciFi_desc: 'मुफ्त पॉपकॉर्न के साथ क्लासिक साइंस फिक्शन फिल्मों की रात के लिए हमसे जुड़ें!',
+    event_movieNightSciFi_desc:
+      'मुफ्त पॉपकॉर्न के साथ क्लासिक साइंस फिक्शन फिल्मों की रात के लिए हमसे जुड़ें!',
     event_resumeWritingWorkshop_title: 'रिज्यूमे राइटिंग वर्कशॉप',
-    event_resumeWritingWorkshop_desc: 'अपनी ड्रीम जॉब के लिए परफेक्ट रिज्यूमे बनाने पर एक्सपर्ट टिप्स प्राप्त करें।',
+    event_resumeWritingWorkshop_desc:
+      'अपनी ड्रीम जॉब के लिए परफेक्ट रिज्यूमे बनाने पर एक्सपर्ट टिप्स प्राप्त करें।',
     event_freeCoffeeMorning_title: 'फ्री कॉफी मॉर्निंग',
     event_freeCoffeeMorning_desc: 'मुफ्त कॉफी और पेस्ट्री के साथ अपने दिन की सही शुरुआत करें!',
     event_alumniPanel_title: 'एलुमनी पैनल: डेटा और पॉलिसी में करियर',
-    event_alumniPanel_desc: 'एनालिटिक्स, पब्लिक पॉलिसी और कंसल्टिंग में काम करने वाले एलुमनी से छोटी बातचीत सुनें। क्यू एंड ए प्लस लाइट रिफ्रेशमेंट के साथ नेटवर्किंग।',
+    event_alumniPanel_desc:
+      'एनालिटिक्स, पब्लिक पॉलिसी और कंसल्टिंग में काम करने वाले एलुमनी से छोटी बातचीत सुनें। क्यू एंड ए प्लस लाइट रिफ्रेशमेंट के साथ नेटवर्किंग।',
 
     // Toast Messages
     languageUpdated: 'भाषा अपडेट हो गई',
@@ -3968,6 +4337,52 @@ export const translations = {
     settingsError: 'सेटिंग्स त्रुटि',
     preferenceError: 'प्राथमिकता सेव करने में असमर्थ। कृपया पुनः प्रयास करें।',
     preferenceUpdated: 'प्राथमिकता अपडेट हो गई',
+
+    // Storage Disabled
+    storageDisabled: 'स्टोरेज अक्षम',
+    storageDisabledDesc: 'सत्र-केवल मोड का उपयोग। डेटा सहेजा नहीं जाएगा।',
+    storageEnabled: 'स्टोरेज सक्षम',
+    storageEnabledMsg: 'आपका डेटा स्थानीय रूप से सहेजा जाएगा।',
+    storageToggleWarning:
+      'स्थानीय स्टोरेज अक्षम करने की अनुशंसा नहीं की जाती क्योंकि आपका डेटा सहेजा नहीं जाएगा।',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'इससे {{units}} यूनिट और {{deadlines}} डेडलाइन हट जाएंगी।',
+    clearDataConfirmPlaceholder: 'पुष्टि करने के लिए CLEAR लिखें',
+    clearDataConfirmRequired: 'कृपया पुष्टि करने के लिए CLEAR लिखें',
+    exportReminder: 'पहले अपना डेटा निर्यात करने पर विचार करें।',
+
+    // Account Section
+    account: 'खाता',
+    accountDesc: 'अपने खाते और प्रमाणीकरण का प्रबंधन करें।',
+    signedInAs: 'के रूप में लॉग इन',
+    signOutSuccess: 'सफलतापूर्वक साइन आउट किया',
+    signOutError: 'साइन आउट करने में विफल। कृपया पुनः प्रयास करें।',
+    deleteAccount: 'खाता हटाएं',
+    deleteAccountDesc: 'अपना खाता और सभी डेटा स्थायी रूप से हटाएं',
+    deleteAccountWarning: 'यह क्रिया पूर्ववत नहीं की जा सकती।',
+
+    // Security Section
+    security: 'सुरक्षा',
+    securityDesc: 'अपनी सुरक्षा सेटिंग्स प्रबंधित करें',
+    changePassword: 'पासवर्ड बदलें',
+    changePasswordDesc: 'अपना पासवर्ड अपडेट करें',
+    manageSessions: 'सत्र प्रबंधित करें',
+    manageSessionsDesc: 'सक्रिय सत्र देखें और प्रबंधित करें',
+    twoFactorAuth: 'दो-कारक प्रमाणीकरण',
+    twoFactorAuthDesc: 'अतिरिक्त सुरक्षा परत जोड़ें',
+    privacyPolicy: 'गोपनीयता नीति',
+    termsOfService: 'सेवा की शर्तें',
+    dataRetention: 'डेटा प्रतिधारण',
+    dataRetentionDesc: 'आपका डेटा स्थानीय रूप से संग्रहीत है और कभी भी आपके डिवाइस को नहीं छोड़ता।',
+    encryptionNote: 'सभी डेटा आपके डिवाइस पर स्थानीय रूप से एन्क्रिप्टेड है।',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'निर्यात में प्राथमिकताएं और सेटिंग्स शामिल हैं',
+
+    // Clear Data Types
+    unitsCount: '{{count}} यूनिट',
+    deadlinesCount: '{{count}} डेडलाइन',
   },
   // ============================================
   // KOREAN - ko
@@ -3994,6 +4409,7 @@ export const translations = {
     previous: '이전',
     search: '검색',
     filter: '필터',
+    view: '보기',
 
     // Colors
     colorUniversityRed: '대학 레드',
@@ -4007,7 +4423,8 @@ export const translations = {
 
     // Buildings
     building_C5C_name: '컴퓨터 사이언스 빌딩',
-    building_C5C_desc: '컴퓨터 과학 및 IT 프로그램의 본거지. 현대적인 연구실, 강의실 및 학습 공간이 있습니다.',
+    building_C5C_desc:
+      '컴퓨터 과학 및 IT 프로그램의 본거지. 현대적인 연구실, 강의실 및 학습 공간이 있습니다.',
     building_C3C_name: '도서관',
     building_C3C_desc: '광범위한 컬렉션, 학습 공간 및 학업 지원 서비스를 갖춘 중앙 도서관.',
     building_C7A_name: '캠퍼스 허브',
@@ -4097,7 +4514,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: '모든 데이터 삭제',
-    clearAllDataDialogDesc: '모든 데이터를 삭제하시겠습니까? 이 작업은 취소할 수 없으며 모든 과목, 마감일 및 프로필이 삭제됩니다.',
+    clearAllDataDialogDesc:
+      '모든 데이터를 삭제하시겠습니까? 이 작업은 취소할 수 없으며 모든 과목, 마감일 및 프로필이 삭제됩니다.',
 
     // Quick Actions
     homeDashboard: '🏠 홈 대시보드',
@@ -4203,7 +4621,8 @@ export const translations = {
     gettingStartedGuide: '시작 가이드',
     noNotificationsYet: '아직 알림 없음',
     pageNotFound: '페이지를 찾을 수 없음',
-    pageNotFoundDescription: '죄송합니다. 찾고 계신 페이지를 찾을 수 없습니다. 이동되었거나 존재하지 않을 수 있습니다.',
+    pageNotFoundDescription:
+      '죄송합니다. 찾고 계신 페이지를 찾을 수 없습니다. 이동되었거나 존재하지 않을 수 있습니다.',
     goHome: '홈으로 가기',
     new: '새로운',
 
@@ -4227,15 +4646,19 @@ export const translations = {
     comingSoon: '곧 출시',
     // Geolocation Messages
     locationAccessDenied: '위치 액세스 거부됨',
-    locationDeniedDesc: '권한이 여전히 거부되었습니다. 브라우저가 위치 서비스에 액세스할 수 있는지 시스템 환경설정(OS 수준)을 확인하세요.',
-    locationDeniedHelp: '확인해 주세요: 1) 브라우저 주소 표시줄(자물쇠 아이콘), 2) macOS 시스템 설정 → 개인정보 보호 → 위치 서비스.',
+    locationDeniedDesc:
+      '권한이 여전히 거부되었습니다. 브라우저가 위치 서비스에 액세스할 수 있는지 시스템 환경설정(OS 수준)을 확인하세요.',
+    locationDeniedHelp:
+      '확인해 주세요: 1) 브라우저 주소 표시줄(자물쇠 아이콘), 2) macOS 시스템 설정 → 개인정보 보호 → 위치 서비스.',
     locationError: '위치 오류',
     positionUnavailable: '위치 사용 불가',
-    positionUnavailableDesc: '기기의 위치를 확인할 수 없습니다. 위치 서비스가 활성화되어 있는지 확인하세요.',
+    positionUnavailableDesc:
+      '기기의 위치를 확인할 수 없습니다. 위치 서비스가 활성화되어 있는지 확인하세요.',
     locationTimeout: '위치 요청 시간 초과',
     locationTimeoutDesc: '위치 요청 시간이 초과되었습니다. 신호가 더 좋은 지역으로 이동해 보세요.',
     insecureConnection: '보안되지 않은 연결',
-    insecureConnectionDesc: '지리적 위치는 보안 연결(HTTPS) 또는 localhost가 필요합니다. 보안상의 이유로 브라우저가 이를 차단하고 있습니다.',
+    insecureConnectionDesc:
+      '지리적 위치는 보안 연결(HTTPS) 또는 localhost가 필요합니다. 보안상의 이유로 브라우저가 이를 차단하고 있습니다.',
     locating: '위치 확인 중...',
     requestingPosition: '현재 위치 요청 중...',
     locationFound: '위치 찾음',
@@ -4261,7 +4684,8 @@ export const translations = {
     signIn: '로그인',
     orSignWith: '또는',
     oauthRequired: '🔧 OAuth 구성 필요',
-    googleOAuthDesc: 'Google 로그인은 Supabase 대시보드에서 OAuth 제공자 설정이 필요합니다. 이 기능을 활성화하려면 인증 → 제공자에서 Google OAuth를 구성하세요.',
+    googleOAuthDesc:
+      'Google 로그인은 Supabase 대시보드에서 OAuth 제공자 설정이 필요합니다. 이 기능을 활성화하려면 인증 → 제공자에서 Google OAuth를 구성하세요.',
     noAccount: '계정이 없으신가요?',
     signUp: '가입하기',
     passwordsDoNotMatch: '비밀번호가 일치하지 않습니다',
@@ -4333,7 +4757,8 @@ export const translations = {
     dashboardOverview: '대시보드 개요',
     myUnits: '내 과목',
     noUnitsYet: '아직 과목 없음',
-    addFirstUnitDesc: '일정 추적을 시작하려면 첫 번째 과목을 추가하세요. 캘린더와 오늘의 일정에 동기화됩니다.',
+    addFirstUnitDesc:
+      '일정 추적을 시작하려면 첫 번째 과목을 추가하세요. 캘린더와 오늘의 일정에 동기화됩니다.',
     addYourFirstUnit: '첫 번째 과목 추가',
     units: '과목',
     classesPerWeek: '주당 수업',
@@ -4402,7 +4827,8 @@ export const translations = {
     failedToSaveUnit: '과목 저장 실패. 다시 시도해 주세요.',
     campusFeedDesc: '{{uniName}}의 캠퍼스 이벤트, 공지사항 및 기회에 대해 업데이트를 받으세요.',
     stayConnected: '연결 유지:',
-    stayConnectedDesc: '캠퍼스에서 워크샵, 취업 박람회, 소셜 이벤트 및 무료 음식 기회를 발견하세요.',
+    stayConnectedDesc:
+      '캠퍼스에서 워크샵, 취업 박람회, 소셜 이벤트 및 무료 음식 기회를 발견하세요.',
     filterEvents: '이벤트 필터',
     allEvents: '모든 이벤트',
     categoryEvents: '{{category}} 이벤트',
@@ -4470,7 +4896,8 @@ export const translations = {
     cards: '카드',
     cardTitle: '카드 제목',
     cardDescPlaceholder: '카드 설명이 여기에 들어갑니다',
-    cardContentPlaceholder: '이것은 카드 콘텐츠입니다. 카드는 다양한 유형의 콘텐츠를 담을 수 있으며 관련 정보를 그룹화하는 데 적합합니다.',
+    cardContentPlaceholder:
+      '이것은 카드 콘텐츠입니다. 카드는 다양한 유형의 콘텐츠를 담을 수 있으며 관련 정보를 그룹화하는 데 적합합니다.',
     anotherCard: '다른 카드',
     anotherCardDesc: '다른 콘텐츠 포함',
     featured: '추천',
@@ -4494,7 +4921,8 @@ export const translations = {
     animations: '애니메이션',
     hoverLift: '호버 리프트',
     hoverLiftDesc: '리프트 효과를 보려면 이 카드 위에 마우스를 올리세요',
-    hoverLiftContent: '이 카드에는 호버 리프트 애니메이션이 적용되어 있습니다. 마우스를 올려보세요!',
+    hoverLiftContent:
+      '이 카드에는 호버 리프트 애니메이션이 적용되어 있습니다. 마우스를 올려보세요!',
     fadeIn: '페이드 인',
     fadeInDesc: '이 카드는 로드 시 페이드 인됩니다',
     fadeInContent: '이 카드는 페이드 인 애니메이션 유틸리티를 사용합니다.',
@@ -4605,11 +5033,13 @@ export const translations = {
     event_movieNightSciFi_title: '영화의 밤: SF 마라톤',
     event_movieNightSciFi_desc: '무료 팝콘과 함께 클래식 공상과학 영화의 밤에 참여하세요!',
     event_resumeWritingWorkshop_title: '이력서 작성 워크샵',
-    event_resumeWritingWorkshop_desc: '꿈의 직장을 위한 완벽한 이력서 작성에 대한 전문가 팁을 받으세요.',
+    event_resumeWritingWorkshop_desc:
+      '꿈의 직장을 위한 완벽한 이력서 작성에 대한 전문가 팁을 받으세요.',
     event_freeCoffeeMorning_title: '무료 커피 모닝',
     event_freeCoffeeMorning_desc: '무료 커피와 페이스트리로 하루를 제대로 시작하세요!',
     event_alumniPanel_title: '동문 패널: 데이터 및 정책 분야 커리어',
-    event_alumniPanel_desc: '분석, 공공 정책 및 컨설팅 분야에서 일하는 동문들의 짧은 강연을 들으세요. Q&A 및 가벼운 다과와 함께하는 네트워킹.',
+    event_alumniPanel_desc:
+      '분석, 공공 정책 및 컨설팅 분야에서 일하는 동문들의 짧은 강연을 들으세요. Q&A 및 가벼운 다과와 함께하는 네트워킹.',
 
     // Toast Messages
     languageUpdated: '언어 업데이트됨',
@@ -4617,6 +5047,52 @@ export const translations = {
     settingsError: '설정 오류',
     preferenceError: '환경설정 저장 실패. 다시 시도해 주세요.',
     preferenceUpdated: '환경설정 업데이트됨',
+
+    // Storage Disabled
+    storageDisabled: '저장소 비활성화됨',
+    storageDisabledDesc: '세션 전용 모드 사용 중. 데이터가 저장되지 않습니다.',
+    storageEnabled: '저장소 활성화됨',
+    storageEnabledMsg: '데이터가 로컬에 저장됩니다.',
+    storageToggleWarning:
+      '로컬 저장소를 비활성화하면 데이터가 저장되지 않으므로 권장하지 않습니다.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: '이 작업은 {{units}}개 과목과 {{deadlines}}개 마감일을 제거합니다.',
+    clearDataConfirmPlaceholder: '확인하려면 CLEAR 입력',
+    clearDataConfirmRequired: '확인하려면 CLEAR를 입력하세요',
+    exportReminder: '먼저 데이터를 내보내는 것을 고려하세요.',
+
+    // Account Section
+    account: '계정',
+    accountDesc: '계정 및 인증 관리.',
+    signedInAs: '로그인한 사용자',
+    signOutSuccess: '성공적으로 로그아웃됨',
+    signOutError: '로그아웃 실패. 다시 시도해 주세요.',
+    deleteAccount: '계정 삭제',
+    deleteAccountDesc: '계정 및 모든 데이터 영구 삭제',
+    deleteAccountWarning: '이 작업은 실행 취소할 수 없습니다.',
+
+    // Security Section
+    security: '보안',
+    securityDesc: '보안 설정 관리',
+    changePassword: '비밀번호 변경',
+    changePasswordDesc: '비밀번호 업데이트',
+    manageSessions: '세션 관리',
+    manageSessionsDesc: '활성 세션 보기 및 관리',
+    twoFactorAuth: '이중 인증',
+    twoFactorAuthDesc: '추가 보안 계층 추가',
+    privacyPolicy: '개인정보 처리방침',
+    termsOfService: '서비스 약관',
+    dataRetention: '데이터 보존',
+    dataRetentionDesc: '데이터는 로컬에 저장되며 기기를 절대 떠나지 않습니다.',
+    encryptionNote: '모든 데이터가 기기에서 로컬로 암호화됩니다.',
+
+    // Export Enhanced
+    exportIncludesPrefs: '내보내기에 환경설정 및 설정 포함',
+
+    // Clear Data Types
+    unitsCount: '{{count}}개 과목',
+    deadlinesCount: '{{count}}개 마감일',
   },
   // ============================================
   // JAPANESE - ja
@@ -4643,6 +5119,7 @@ export const translations = {
     previous: '前へ',
     search: '検索',
     filter: 'フィルター',
+    view: '表示',
 
     // Colors
     colorUniversityRed: '大学レッド',
@@ -4656,7 +5133,8 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'コンピュータサイエンスビルディング',
-    building_C5C_desc: 'コンピュータサイエンスとITプログラムの本拠地。最新のラボ、講義室、学習スペースがあります。',
+    building_C5C_desc:
+      'コンピュータサイエンスとITプログラムの本拠地。最新のラボ、講義室、学習スペースがあります。',
     building_C3C_name: '図書館',
     building_C3C_desc: '豊富なコレクション、学習スペース、学術サポートサービスを備えた中央図書館。',
     building_C7A_name: 'キャンパスハブ',
@@ -4664,11 +5142,13 @@ export const translations = {
     building_W6A_name: 'ワルマタガルビルディング',
     building_W6A_desc: '教室、講義室、学生スペースを備えた教育施設。',
     building_E7A_name: '工学部ビルディング',
-    building_E7A_desc: '専門の研究室とワークショップを備えたエンジニアリングおよびデザインスタジオ。',
+    building_E7A_desc:
+      '専門の研究室とワークショップを備えたエンジニアリングおよびデザインスタジオ。',
     building_E7B_name: '工学部ビルディングB',
     building_E7B_desc: '高度な研究ラボと機器を備えた追加のエンジニアリング施設。',
     building_W3A_name: 'キャリア＆就職',
-    building_W3A_desc: '就職支援、履歴書ワークショップ、雇用主とのコネクションを提供するキャリアサービスセンター。',
+    building_W3A_desc:
+      '就職支援、履歴書ワークショップ、雇用主とのコネクションを提供するキャリアサービスセンター。',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: '教室と教職員オフィスを備えた学術ビル。',
     building_4WW_name: "4 Wally's Walk",
@@ -4746,7 +5226,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'すべてのデータを削除',
-    clearAllDataDialogDesc: 'すべてのデータを削除してもよろしいですか？この操作は取り消せず、すべてのコース、締め切り、プロフィールが削除されます。',
+    clearAllDataDialogDesc:
+      'すべてのデータを削除してもよろしいですか？この操作は取り消せず、すべてのコース、締め切り、プロフィールが削除されます。',
 
     // Quick Actions
     homeDashboard: '🏠 ホームダッシュボード',
@@ -4852,7 +5333,8 @@ export const translations = {
     gettingStartedGuide: '入門ガイド',
     noNotificationsYet: 'まだ通知はありません',
     pageNotFound: 'ページが見つかりません',
-    pageNotFoundDescription: '申し訳ありませんが、お探しのページが見つかりませんでした。移動されたか、存在しない可能性があります。',
+    pageNotFoundDescription:
+      '申し訳ありませんが、お探しのページが見つかりませんでした。移動されたか、存在しない可能性があります。',
     goHome: 'ホームへ戻る',
     new: '新規',
 
@@ -4876,15 +5358,20 @@ export const translations = {
     comingSoon: '近日公開',
     // Geolocation Messages
     locationAccessDenied: '位置情報へのアクセスが拒否されました',
-    locationDeniedDesc: '権限が引き続き拒否されています。システム設定（OSレベル）でブラウザが位置情報サービスにアクセスできることを確認してください。',
-    locationDeniedHelp: '次を確認してください：1) ブラウザのアドレスバー（鍵アイコン）、2) macOS システム設定 → プライバシー → 位置情報サービス。',
+    locationDeniedDesc:
+      '権限が引き続き拒否されています。システム設定（OSレベル）でブラウザが位置情報サービスにアクセスできることを確認してください。',
+    locationDeniedHelp:
+      '次を確認してください：1) ブラウザのアドレスバー（鍵アイコン）、2) macOS システム設定 → プライバシー → 位置情報サービス。',
     locationError: '位置情報エラー',
     positionUnavailable: '位置情報を取得できません',
-    positionUnavailableDesc: 'デバイスで位置情報を特定できませんでした。位置情報サービスが有効になっているか確認してください。',
+    positionUnavailableDesc:
+      'デバイスで位置情報を特定できませんでした。位置情報サービスが有効になっているか確認してください。',
     locationTimeout: '位置情報のタイムアウト',
-    locationTimeoutDesc: '位置情報の取得がタイムアウトしました。電波の良い場所へ移動して再試行してください。',
+    locationTimeoutDesc:
+      '位置情報の取得がタイムアウトしました。電波の良い場所へ移動して再試行してください。',
     insecureConnection: '安全でない接続',
-    insecureConnectionDesc: '位置情報の取得には安全な接続（HTTPS）または localhost が必要です。ブラウザがセキュリティ上の理由でブロックしています。',
+    insecureConnectionDesc:
+      '位置情報の取得には安全な接続（HTTPS）または localhost が必要です。ブラウザがセキュリティ上の理由でブロックしています。',
     locating: '位置情報を取得中...',
     requestingPosition: '現在地を要求しています...',
     locationFound: '位置情報を取得しました',
@@ -4910,7 +5397,8 @@ export const translations = {
     signIn: 'サインイン',
     orSignWith: 'または',
     oauthRequired: '🔧 OAuth設定が必要',
-    googleOAuthDesc: 'Googleサインインには、SupabaseダッシュボードでOAuthプロバイダーのセットアップが必要です。この機能を有効にするには、認証→プロバイダーでGoogle OAuthを設定してください。',
+    googleOAuthDesc:
+      'Googleサインインには、SupabaseダッシュボードでOAuthプロバイダーのセットアップが必要です。この機能を有効にするには、認証→プロバイダーでGoogle OAuthを設定してください。',
     noAccount: 'アカウントをお持ちでないですか？',
     signUp: 'サインアップ',
     passwordsDoNotMatch: 'パスワードが一致しません',
@@ -4982,7 +5470,8 @@ export const translations = {
     dashboardOverview: 'ダッシュボード概要',
     myUnits: 'マイコース',
     noUnitsYet: 'まだコースがありません',
-    addFirstUnitDesc: 'スケジュールの追跡を開始するには、最初のコースを追加してください。カレンダーと今日のスケジュールに同期されます。',
+    addFirstUnitDesc:
+      'スケジュールの追跡を開始するには、最初のコースを追加してください。カレンダーと今日のスケジュールに同期されます。',
     addYourFirstUnit: '最初のコースを追加',
     units: 'コース',
     classesPerWeek: '週あたりの授業',
@@ -4998,7 +5487,8 @@ export const translations = {
     // Error Handling
     somethingWentWrong: '問題が発生しました',
     unexpectedError: '予期しないエラーが発生しました。ページを更新してみてください。',
-    appErrorDesc: '予期しないエラーが発生しました。もう一度お試しいただくか、ホームページに戻ってください。',
+    appErrorDesc:
+      '予期しないエラーが発生しました。もう一度お試しいただくか、ホームページに戻ってください。',
     boundaryErrorDesc: '予期しないエラーが発生しました。自動的に報告され、修正に取り組んでいます。',
     oops: 'おっと！問題が発生しました',
     retryAttempt: '再試行 {{count}}/{{max}}',
@@ -5013,7 +5503,8 @@ export const translations = {
     trackDeadlinesDesc: '今後の締め切りを追跡し、課題の日付を管理します。',
     upcomingDeadlines: '今後の締め切り',
     noDeadlinesYet: 'まだ締め切りがありません',
-    addDeadlinesDesc: 'カレンダービューで整理された締め切りを表示するには、締め切りを追加してください。',
+    addDeadlinesDesc:
+      'カレンダービューで整理された締め切りを表示するには、締め切りを追加してください。',
     completed: '完了',
 
     // Map Page
@@ -5049,9 +5540,11 @@ export const translations = {
 
     // Form Components
     failedToSaveUnit: 'コースの保存に失敗しました。もう一度お試しください。',
-    campusFeedDesc: '{{uniName}}のキャンパスイベント、お知らせ、機会について最新情報を入手してください。',
+    campusFeedDesc:
+      '{{uniName}}のキャンパスイベント、お知らせ、機会について最新情報を入手してください。',
     stayConnected: 'つながりを保つ：',
-    stayConnectedDesc: 'キャンパスでワークショップ、就職フェア、ソーシャルイベント、無料フードの機会を発見してください。',
+    stayConnectedDesc:
+      'キャンパスでワークショップ、就職フェア、ソーシャルイベント、無料フードの機会を発見してください。',
     filterEvents: 'イベントをフィルター',
     allEvents: 'すべてのイベント',
     categoryEvents: '{{category}}イベント',
@@ -5119,7 +5612,8 @@ export const translations = {
     cards: 'カード',
     cardTitle: 'カードタイトル',
     cardDescPlaceholder: 'カードの説明がここに入ります',
-    cardContentPlaceholder: 'これはカードのコンテンツです。カードには様々なタイプのコンテンツを含めることができ、関連情報をグループ化するのに最適です。',
+    cardContentPlaceholder:
+      'これはカードのコンテンツです。カードには様々なタイプのコンテンツを含めることができ、関連情報をグループ化するのに最適です。',
     anotherCard: '別のカード',
     anotherCardDesc: '異なるコンテンツ付き',
     featured: '注目',
@@ -5143,7 +5637,8 @@ export const translations = {
     animations: 'アニメーション',
     hoverLift: 'ホバーリフト',
     hoverLiftDesc: 'リフトエフェクトを見るにはこのカードにホバーしてください',
-    hoverLiftContent: 'このカードにはホバーリフトアニメーションが適用されています。ホバーしてみてください！',
+    hoverLiftContent:
+      'このカードにはホバーリフトアニメーションが適用されています。ホバーしてみてください！',
     fadeIn: 'フェードイン',
     fadeInDesc: 'このカードは読み込み時にフェードインします',
     fadeInContent: 'このカードはフェードインアニメーションユーティリティを使用しています。',
@@ -5244,21 +5739,26 @@ export const translations = {
     event_studySkillsWorkshop_title: '学習スキルワークショップ',
     event_studySkillsWorkshop_desc: '効果的な学習テクニックと時間管理戦略を学びましょう。',
     event_internationalFoodFestival_title: '国際フードフェスティバル',
-    event_internationalFoodFestival_desc: '世界中の食べ物で多様性を祝いましょう。無料サンプルあり！',
+    event_internationalFoodFestival_desc:
+      '世界中の食べ物で多様性を祝いましょう。無料サンプルあり！',
     event_techNetworkingNight_title: 'テックネットワーキングナイト',
-    event_techNetworkingNight_desc: '業界のプロフェッショナルとつながり、テックキャリアについて学びましょう。',
+    event_techNetworkingNight_desc:
+      '業界のプロフェッショナルとつながり、テックキャリアについて学びましょう。',
     event_studentClubWelcomeDay_title: '学生クラブウェルカムデー',
-    event_studentClubWelcomeDay_desc: 'キャンパスのクラブやサークルを発見しましょう。無料スナック提供！',
+    event_studentClubWelcomeDay_desc:
+      'キャンパスのクラブやサークルを発見しましょう。無料スナック提供！',
     event_researchSeminarAI_title: '研究セミナー：ヘルスケアにおけるAI',
     event_researchSeminarAI_desc: '医療における人工知能応用に関する最先端の研究を探りましょう。',
     event_movieNightSciFi_title: '映画の夜：SFマラソン',
     event_movieNightSciFi_desc: '無料ポップコーンと一緒にクラシックSF映画の夜に参加しましょう！',
     event_resumeWritingWorkshop_title: '履歴書作成ワークショップ',
-    event_resumeWritingWorkshop_desc: '夢の仕事のための完璧な履歴書作成について専門家のアドバイスを受けましょう。',
+    event_resumeWritingWorkshop_desc:
+      '夢の仕事のための完璧な履歴書作成について専門家のアドバイスを受けましょう。',
     event_freeCoffeeMorning_title: '無料コーヒーモーニング',
     event_freeCoffeeMorning_desc: '無料のコーヒーとペストリーで一日を正しくスタートしましょう！',
     event_alumniPanel_title: '卒業生パネル：データとポリシーのキャリア',
-    event_alumniPanel_desc: 'アナリティクス、公共政策、コンサルティングで働く卒業生からの短い講演を聞きましょう。Q&Aと軽食を交えたネットワーキング。',
+    event_alumniPanel_desc:
+      'アナリティクス、公共政策、コンサルティングで働く卒業生からの短い講演を聞きましょう。Q&Aと軽食を交えたネットワーキング。',
 
     // Toast Messages
     languageUpdated: '言語が更新されました',
@@ -5266,6 +5766,52 @@ export const translations = {
     settingsError: '設定エラー',
     preferenceError: '設定を保存できませんでした。もう一度お試しください。',
     preferenceUpdated: '設定が更新されました',
+
+    // Storage Disabled
+    storageDisabled: 'ストレージが無効になりました',
+    storageDisabledDesc: 'セッションモードのみを使用しています。データは保存されません。',
+    storageEnabled: 'ストレージが有効になりました',
+    storageEnabledMsg: 'データはローカルに保存されます。',
+    storageToggleWarning:
+      'ローカルストレージを無効にするとデータが保存されないため、お勧めしません。',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'これにより、{{units}}件の科目と{{deadlines}}件の締め切りが削除されます。',
+    clearDataConfirmPlaceholder: '確認するにはCLEARと入力',
+    clearDataConfirmRequired: '確認するにはCLEARと入力してください',
+    exportReminder: 'まずデータのエクスポートを検討してください。',
+
+    // Account Section
+    account: 'アカウント',
+    accountDesc: 'アカウントと認証の管理。',
+    signedInAs: 'ログイン中',
+    signOutSuccess: '正常にログアウトしました',
+    signOutError: 'ログアウトに失敗しました。もう一度お試しください。',
+    deleteAccount: 'アカウント削除',
+    deleteAccountDesc: 'アカウントとすべてのデータを完全に削除',
+    deleteAccountWarning: 'この操作は取り消せません。',
+
+    // Security Section
+    security: 'セキュリティ',
+    securityDesc: 'セキュリティ設定の管理',
+    changePassword: 'パスワード変更',
+    changePasswordDesc: 'パスワードの更新',
+    manageSessions: 'セッション管理',
+    manageSessionsDesc: 'アクティブなセッションの表示与管理',
+    twoFactorAuth: '二要素認証',
+    twoFactorAuthDesc: 'セキュリティレイヤーを追加',
+    privacyPolicy: 'プライバシーポリシー',
+    termsOfService: '利用規約',
+    dataRetention: 'データ保持',
+    dataRetentionDesc: 'データはローカルに保存され、デバイスから離れることはありません。',
+    encryptionNote: 'すべてのデータはデバイス上でローカルに暗号化されています。',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'エクスポートには設定が含まれています',
+
+    // Clear Data Types
+    unitsCount: '{{count}}件の科目',
+    deadlinesCount: '{{count}}件の締め切り',
   },
   // ============================================
   // URDU - ur (RTL)
@@ -5292,6 +5838,7 @@ export const translations = {
     previous: 'پچھلا',
     search: 'تلاش کریں',
     filter: 'فلٹر',
+    view: 'دیکھیں',
 
     // Colors
     colorUniversityRed: 'یونیورسٹی سرخ',
@@ -5305,11 +5852,14 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'کمپیوٹر سائنس بلڈنگ',
-    building_C5C_desc: 'کمپیوٹر سائنس اور آئی ٹی پروگراموں کا مرکز۔ جدید لیبز، لیکچر ہالز، اور مطالعہ کی جگہیں۔',
+    building_C5C_desc:
+      'کمپیوٹر سائنس اور آئی ٹی پروگراموں کا مرکز۔ جدید لیبز، لیکچر ہالز، اور مطالعہ کی جگہیں۔',
     building_C3C_name: 'لائبریری',
-    building_C3C_desc: 'وسیع ذخیرہ، مطالعہ کے علاقے، اور تعلیمی معاونت کی خدمات کے ساتھ مرکزی لائبریری۔',
+    building_C3C_desc:
+      'وسیع ذخیرہ، مطالعہ کے علاقے، اور تعلیمی معاونت کی خدمات کے ساتھ مرکزی لائبریری۔',
     building_C7A_name: 'کیمپس ہب',
-    building_C7A_desc: 'انتظامیہ، طالب علم معاونت، اور تفریحی سہولیات کے ساتھ طالب علم خدمات کا مرکز۔',
+    building_C7A_desc:
+      'انتظامیہ، طالب علم معاونت، اور تفریحی سہولیات کے ساتھ طالب علم خدمات کا مرکز۔',
     building_W6A_name: 'ولوماٹاگل بلڈنگ',
     building_W6A_desc: 'کلاس رومز، لیکچر ہالز، اور طالب علموں کی جگہوں کے ساتھ تدریسی سہولت۔',
     building_E7A_name: 'انجینئرنگ بلڈنگ',
@@ -5317,13 +5867,15 @@ export const translations = {
     building_E7B_name: 'انجینئرنگ بلڈنگ B',
     building_E7B_desc: 'جدید ریسرچ لیبز اور آلات کے ساتھ اضافی انجینئرنگ سہولیات۔',
     building_W3A_name: 'کیریئرز اور روزگار',
-    building_W3A_desc: 'ملازمت کی تلاش میں مدد، ریزیومے ورکشاپس، اور آجروں سے رابطے فراہم کرنے والا کیریئر سروسز سینٹر۔',
+    building_W3A_desc:
+      'ملازمت کی تلاش میں مدد، ریزیومے ورکشاپس، اور آجروں سے رابطے فراہم کرنے والا کیریئر سروسز سینٹر۔',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'کلاس رومز اور فیکلٹی دفاتر کے ساتھ تعلیمی عمارت۔',
     building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'مختلف مضامین کے لیے لیکچر اور ٹیوٹوریل کی جگہیں۔',
     building_LIB_name: 'لائبریری',
-    building_LIB_desc: 'وسیع ذخیرہ، مطالعہ کے علاقے، اور تعلیمی معاونت کی خدمات کے ساتھ مرکزی لائبریری۔',
+    building_LIB_desc:
+      'وسیع ذخیرہ، مطالعہ کے علاقے، اور تعلیمی معاونت کی خدمات کے ساتھ مرکزی لائبریری۔',
     building_Sports_name: 'اسپورٹس پریسنکٹ',
     building_Sports_desc: 'جم، کورٹس، اور تفریحی علاقوں سمیت کھیلوں کی سہولیات۔',
 
@@ -5378,7 +5930,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'تمام ڈیٹا صاف کریں',
-    clearAllDataDialogDesc: 'کیا آپ واقعی تمام ڈیٹا صاف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا اور تمام یونٹس، ڈیڈ لائنز، اور پروفائلز حذف ہو جائیں گے۔',
+    clearAllDataDialogDesc:
+      'کیا آپ واقعی تمام ڈیٹا صاف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا اور تمام یونٹس، ڈیڈ لائنز، اور پروفائلز حذف ہو جائیں گے۔',
 
     // Quick Actions
     homeDashboard: '🏠 ہوم ڈیش بورڈ',
@@ -5484,7 +6037,8 @@ export const translations = {
     gettingStartedGuide: 'شروع کرنے کے لیے گائیڈ',
     noNotificationsYet: 'ابھی تک کوئی اطلاعات نہیں',
     pageNotFound: 'صفحہ نہیں ملا',
-    pageNotFoundDescription: 'معذرت، ہم وہ صفحہ نہیں ڈھونڈ سکے جو آپ تلاش کر رہے تھے۔ یہ منتقل ہو گیا ہے یا موجود نہیں ہے۔',
+    pageNotFoundDescription:
+      'معذرت، ہم وہ صفحہ نہیں ڈھونڈ سکے جو آپ تلاش کر رہے تھے۔ یہ منتقل ہو گیا ہے یا موجود نہیں ہے۔',
     goHome: 'ہوم پر جائیں',
     new: 'نیا',
 
@@ -5508,15 +6062,20 @@ export const translations = {
     comingSoon: 'جلد آ رہا ہے',
     // Geolocation Messages
     locationAccessDenied: 'مقام کی اجازت مسترد کر دی گئی',
-    locationDeniedDesc: 'اجازت اب بھی مسترد ہے۔ سسٹم کی ترجیحات (OS سطح) چیک کریں تاکہ یقینی ہو سکے کہ آپ کے براؤزر کو لوکیشن سروسز تک رسائی ہے۔',
-    locationDeniedHelp: 'براہ کرم چیک کریں: 1) براؤزر ایڈریس بار (لاک آئیکن)، 2) macOS سسٹم سیٹنگز → پرائیویسی → لوکیشن سروسز۔',
+    locationDeniedDesc:
+      'اجازت اب بھی مسترد ہے۔ سسٹم کی ترجیحات (OS سطح) چیک کریں تاکہ یقینی ہو سکے کہ آپ کے براؤزر کو لوکیشن سروسز تک رسائی ہے۔',
+    locationDeniedHelp:
+      'براہ کرم چیک کریں: 1) براؤزر ایڈریس بار (لاک آئیکن)، 2) macOS سسٹم سیٹنگز → پرائیویسی → لوکیشن سروسز۔',
     locationError: 'مقام کی خرابی',
     positionUnavailable: 'مقام دستیاب نہیں',
-    positionUnavailableDesc: 'آپ کا ڈیوائس اپنا مقام معلوم نہیں کر سکا۔ چیک کریں کہ لوکیشن سروسز فعال ہیں۔',
+    positionUnavailableDesc:
+      'آپ کا ڈیوائس اپنا مقام معلوم نہیں کر سکا۔ چیک کریں کہ لوکیشن سروسز فعال ہیں۔',
     locationTimeout: 'مقام کی درخواست کا وقت ختم',
-    locationTimeoutDesc: 'مقام کی درخواست کا وقت ختم ہو گیا۔ بہتر سگنل والے علاقے میں جانے کی کوشش کریں۔',
+    locationTimeoutDesc:
+      'مقام کی درخواست کا وقت ختم ہو گیا۔ بہتر سگنل والے علاقے میں جانے کی کوشش کریں۔',
     insecureConnection: 'غیر محفوظ کنکشن',
-    insecureConnectionDesc: 'جغرافیائی مقام کے لیے محفوظ کنکشن (HTTPS) یا localhost درکار ہے۔ آپ کا براؤزر اسے سیکیورٹی کی وجہ سے بلاک کر رہا ہے۔',
+    insecureConnectionDesc:
+      'جغرافیائی مقام کے لیے محفوظ کنکشن (HTTPS) یا localhost درکار ہے۔ آپ کا براؤزر اسے سیکیورٹی کی وجہ سے بلاک کر رہا ہے۔',
     locating: 'مقام تلاش کیا جا رہا ہے...',
     requestingPosition: 'آپ کے موجودہ مقام کی درخواست کی جا رہی ہے...',
     locationFound: 'مقام مل گیا',
@@ -5542,7 +6101,8 @@ export const translations = {
     signIn: 'سائن ان',
     orSignWith: 'یا اس کے ساتھ',
     oauthRequired: '🔧 OAuth کنفیگریشن درکار ہے',
-    googleOAuthDesc: 'گوگل سائن ان کے لیے Supabase ڈیش بورڈ میں OAuth فراہم کنندہ کی ترتیب درکار ہے۔ یہ خصوصیت فعال کرنے کے لیے تصدیق → فراہم کنندگان میں گوگل OAuth ترتیب دیں۔',
+    googleOAuthDesc:
+      'گوگل سائن ان کے لیے Supabase ڈیش بورڈ میں OAuth فراہم کنندہ کی ترتیب درکار ہے۔ یہ خصوصیت فعال کرنے کے لیے تصدیق → فراہم کنندگان میں گوگل OAuth ترتیب دیں۔',
     noAccount: 'اکاؤنٹ نہیں ہے؟',
     signUp: 'سائن اپ',
     passwordsDoNotMatch: 'پاس ورڈز میل نہیں کھاتے',
@@ -5614,7 +6174,8 @@ export const translations = {
     dashboardOverview: 'ڈیش بورڈ کا جائزہ',
     myUnits: 'میرے یونٹس',
     noUnitsYet: 'ابھی تک کوئی یونٹ نہیں',
-    addFirstUnitDesc: 'اپنے شیڈول کو ٹریک کرنا شروع کرنے کے لیے اپنا پہلا یونٹ شامل کریں۔ یہ آپ کے کیلنڈر اور آج کے شیڈول کے ساتھ سنک ہو جائے گا۔',
+    addFirstUnitDesc:
+      'اپنے شیڈول کو ٹریک کرنا شروع کرنے کے لیے اپنا پہلا یونٹ شامل کریں۔ یہ آپ کے کیلنڈر اور آج کے شیڈول کے ساتھ سنک ہو جائے گا۔',
     addYourFirstUnit: 'اپنا پہلا یونٹ شامل کریں',
     units: 'یونٹس',
     classesPerWeek: 'کلاسیں/ہفتہ',
@@ -5631,7 +6192,8 @@ export const translations = {
     somethingWentWrong: 'کچھ غلط ہو گیا',
     unexpectedError: 'ہمیں ایک غیر متوقع خرابی کا سامنا ہوا۔ براہ کرم صفحہ ریفریش کریں۔',
     appErrorDesc: 'ایک غیر متوقع خرابی آئی۔ براہ کرم دوبارہ کوشش کریں یا ہوم پیج پر واپس جائیں۔',
-    boundaryErrorDesc: 'ہمیں ایک غیر متوقع خرابی کا سامنا ہوا۔ یہ خودکار طور پر رپورٹ ہو گئی ہے اور ہم اسے ٹھیک کر رہے ہیں۔',
+    boundaryErrorDesc:
+      'ہمیں ایک غیر متوقع خرابی کا سامنا ہوا۔ یہ خودکار طور پر رپورٹ ہو گئی ہے اور ہم اسے ٹھیک کر رہے ہیں۔',
     oops: 'اوہ! کچھ غلط ہو گیا',
     retryAttempt: 'دوبارہ کوشش {{count}} از {{max}}',
     reset: 'ری سیٹ',
@@ -5683,7 +6245,8 @@ export const translations = {
     failedToSaveUnit: 'یونٹ محفوظ نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔',
     campusFeedDesc: '{{uniName}} میں کیمپس ایونٹس، اعلانات، اور مواقع کے بارے میں اپڈیٹ رہیں۔',
     stayConnected: 'منسلک رہیں:',
-    stayConnectedDesc: 'کیمپس میں ورکشاپس، کیریئر فیئرز، سماجی تقریبات، اور مفت کھانے کے مواقع دریافت کریں۔',
+    stayConnectedDesc:
+      'کیمپس میں ورکشاپس، کیریئر فیئرز، سماجی تقریبات، اور مفت کھانے کے مواقع دریافت کریں۔',
     filterEvents: 'ایونٹس فلٹر کریں',
     allEvents: 'تمام ایونٹس',
     categoryEvents: '{{category}} ایونٹس',
@@ -5751,7 +6314,8 @@ export const translations = {
     cards: 'کارڈز',
     cardTitle: 'کارڈ ٹائٹل',
     cardDescPlaceholder: 'کارڈ کی تفصیل یہاں آتی ہے',
-    cardContentPlaceholder: 'یہ کارڈ کا مواد ہے۔ کارڈز مختلف قسم کے مواد رکھ سکتے ہیں اور متعلقہ معلومات کو گروپ کرنے کے لیے بہترین ہیں۔',
+    cardContentPlaceholder:
+      'یہ کارڈ کا مواد ہے۔ کارڈز مختلف قسم کے مواد رکھ سکتے ہیں اور متعلقہ معلومات کو گروپ کرنے کے لیے بہترین ہیں۔',
     anotherCard: 'ایک اور کارڈ',
     anotherCardDesc: 'مختلف مواد کے ساتھ',
     featured: 'نمایاں',
@@ -5767,9 +6331,11 @@ export const translations = {
     information: 'معلومات',
     infoAlertDesc: 'یہ ایک معلوماتی الرٹ ہے۔ یہ صارفین کو مفید معلومات فراہم کرتا ہے۔',
     warning: 'انتباہ',
-    warningAlertDesc: 'یہ ایک انتباہی الرٹ ہے۔ یہ کسی ایسی چیز کی نشاندہی کرتا ہے جس پر توجہ درکار ہے۔',
+    warningAlertDesc:
+      'یہ ایک انتباہی الرٹ ہے۔ یہ کسی ایسی چیز کی نشاندہی کرتا ہے جس پر توجہ درکار ہے۔',
     success: 'کامیابی',
-    successAlertDesc: 'یہ ایک کامیابی کا الرٹ ہے۔ یہ تصدیق کرتا ہے کہ کوئی عمل کامیابی سے مکمل ہوا۔',
+    successAlertDesc:
+      'یہ ایک کامیابی کا الرٹ ہے۔ یہ تصدیق کرتا ہے کہ کوئی عمل کامیابی سے مکمل ہوا۔',
     error: 'خرابی',
     errorAlertDesc: 'یہ ایک خرابی کا الرٹ ہے۔ یہ بتاتا ہے کہ کچھ غلط ہو گیا۔',
     animations: 'اینیمیشنز',
@@ -5870,27 +6436,33 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'کیریئر فیئر 2026',
-    event_careerFair2026_desc: 'سرفہرست آجروں سے ملیں اور مختلف صنعتوں میں کیریئر کے مواقع دریافت کریں۔',
+    event_careerFair2026_desc:
+      'سرفہرست آجروں سے ملیں اور مختلف صنعتوں میں کیریئر کے مواقع دریافت کریں۔',
     event_freePizzaFriday_title: 'مفت پیزا جمعہ',
     event_freePizzaFriday_desc: 'مفت پیزا اور ساتھی طالب علموں کے ساتھ نیٹورکنگ کے لیے شامل ہوں!',
     event_studySkillsWorkshop_title: 'مطالعہ کی مہارتوں کی ورکشاپ',
     event_studySkillsWorkshop_desc: 'موثر مطالعہ کی تکنیکیں اور وقت کے انتظام کی حکمت عملی سیکھیں۔',
     event_internationalFoodFestival_title: 'بین الاقوامی کھانے کا میلہ',
-    event_internationalFoodFestival_desc: 'دنیا بھر کے کھانوں کے ساتھ تنوع کا جشن منائیں۔ مفت نمونے دستیاب!',
+    event_internationalFoodFestival_desc:
+      'دنیا بھر کے کھانوں کے ساتھ تنوع کا جشن منائیں۔ مفت نمونے دستیاب!',
     event_techNetworkingNight_title: 'ٹیک نیٹورکنگ نائٹ',
-    event_techNetworkingNight_desc: 'صنعت کے پیشہ ور افراد سے جڑیں اور ٹیک کیریئرز کے بارے میں جانیں۔',
+    event_techNetworkingNight_desc:
+      'صنعت کے پیشہ ور افراد سے جڑیں اور ٹیک کیریئرز کے بارے میں جانیں۔',
     event_studentClubWelcomeDay_title: 'اسٹوڈنٹ کلب ویلکم ڈے',
     event_studentClubWelcomeDay_desc: 'کیمپس میں کلبز اور سوسائٹیز دریافت کریں۔ مفت سنیکس فراہم!',
     event_researchSeminarAI_title: 'ریسرچ سیمینار: صحت کی دیکھ بھال میں اے آئی',
-    event_researchSeminarAI_desc: 'طب میں مصنوعی ذہانت کی ایپلیکیشنز پر جدید ترین تحقیق دریافت کریں۔',
+    event_researchSeminarAI_desc:
+      'طب میں مصنوعی ذہانت کی ایپلیکیشنز پر جدید ترین تحقیق دریافت کریں۔',
     event_movieNightSciFi_title: 'مووی نائٹ: سائی فائی میراتھن',
     event_movieNightSciFi_desc: 'مفت پاپ کارن کے ساتھ کلاسک سائنس فکشن فلموں کی رات میں شامل ہوں!',
     event_resumeWritingWorkshop_title: 'ریزیومے لکھنے کی ورکشاپ',
-    event_resumeWritingWorkshop_desc: 'اپنے خوابوں کی نوکری کے لیے بہترین ریزیومے بنانے کے ماہرانہ مشورے حاصل کریں۔',
+    event_resumeWritingWorkshop_desc:
+      'اپنے خوابوں کی نوکری کے لیے بہترین ریزیومے بنانے کے ماہرانہ مشورے حاصل کریں۔',
     event_freeCoffeeMorning_title: 'مفت کافی صبح',
     event_freeCoffeeMorning_desc: 'مفت کافی اور پیسٹریز کے ساتھ اپنے دن کی صحیح شروعات کریں!',
     event_alumniPanel_title: 'الومنی پینل: ڈیٹا اور پالیسی میں کیریئرز',
-    event_alumniPanel_desc: 'اینالیٹکس، پبلک پالیسی، اور کنسلٹنگ میں کام کرنے والے الومنی کی مختصر گفتگو سنیں۔ ہلکے پھلکے ریفریشمنٹس کے ساتھ سوال جواب اور نیٹورکنگ۔',
+    event_alumniPanel_desc:
+      'اینالیٹکس، پبلک پالیسی، اور کنسلٹنگ میں کام کرنے والے الومنی کی مختصر گفتگو سنیں۔ ہلکے پھلکے ریفریشمنٹس کے ساتھ سوال جواب اور نیٹورکنگ۔',
 
     // Tags
     technology: 'ٹیکنالوجی',
@@ -5915,6 +6487,52 @@ export const translations = {
     settingsError: 'ترتیبات کی خرابی',
     preferenceError: 'ترجیح محفوظ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔',
     preferenceUpdated: 'ترجیح اپڈیٹ ہو گئی',
+
+    // Storage Disabled
+    storageDisabled: 'اسٹوریج غیر فعال',
+    storageDisabledDesc: 'سیشن کے صرف موڈ کا استعمال۔ ڈیٹا محفوظ نہیں ہو گا۔',
+    storageEnabled: 'اسٹوریج فعال',
+    storageEnabledMsg: 'آپ کا ڈیٹا مقامی طور پر محفوظ ہو گا۔',
+    storageToggleWarning:
+      'مقامی اسٹوریج غیر فعال کرنے کی سفارش نہیں کی جاتی کیونکہ آپ کا ڈیٹا محفوظ نہیں ہو گا۔',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'یہ {{units}} یونٹس اور {{deadlines}} ڈیڈ لائنز ہٹ دے گا۔',
+    clearDataConfirmPlaceholder: 'تصدیق کے لیے CLEAR لکھیں',
+    clearDataConfirmRequired: 'تصدیق کے لیے براہ کرم CLEAR لکھیں',
+    exportReminder: 'پہلے اپنے ڈیٹا کی برآمد پر غور کریں۔',
+
+    // Account Section
+    account: 'اکاؤنٹ',
+    accountDesc: 'اپنے اکاؤنٹ اور توثیق کا انتظام کریں۔',
+    signedInAs: 'بطور لاگ ان',
+    signOutSuccess: 'کامیابی سے لاگ آؤٹ ہو گیا',
+    signOutError: 'لاگ آؤٹ نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔',
+    deleteAccount: 'اکاؤنٹ حذف کریں',
+    deleteAccountDesc: 'اپنا اکاؤنٹ اور تمام ڈیٹا مستقل طور پر حذف کریں',
+    deleteAccountWarning: 'یہ عمل واپس نہیں کیا جا سکتا۔',
+
+    // Security Section
+    security: 'سیکیورٹی',
+    securityDesc: 'اپنی سیکیورٹی ترتیبات کا انتظام کریں',
+    changePassword: 'پاس ورڈ تبدیل کریں',
+    changePasswordDesc: 'اپنا پاس ورڈ اپڈیٹ کریں',
+    manageSessions: 'سیشنز کا انتظام',
+    manageSessionsDesc: 'فعال سیشنز دیکھیں اور ان کا انتظام کریں',
+    twoFactorAuth: 'دو عنصر کی توثیق',
+    twoFactorAuthDesc: 'ایک اضافی سیکیورٹی لیئر شامل کریں',
+    privacyPolicy: 'پرائیسی پالیسی',
+    termsOfService: 'سروس کی شرائط',
+    dataRetention: 'ڈیٹا برقراری',
+    dataRetentionDesc: 'آپ کا ڈیٹا مقامی طور پر محفوظ ہے اور آپ کے ڈیوائس کو کبھی نہیں چھوڑتا۔',
+    encryptionNote: 'تمام ڈیٹا آپ کے ڈیوائس پر مقامی طور پر اینکرپٹ ہے۔',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'برآمد میں ترجیحات اور ترتیبات شامل ہیں',
+
+    // Clear Data Types
+    unitsCount: '{{count}} یونٹس',
+    deadlinesCount: '{{count}} ڈیڈ لائنز',
   },
   // ============================================
   // THAI - th
@@ -5941,6 +6559,7 @@ export const translations = {
     previous: 'ก่อนหน้า',
     search: 'ค้นหา',
     filter: 'กรอง',
+    view: 'ดู',
 
     // Colors
     colorUniversityRed: 'แดงมหาวิทยาลัย',
@@ -5954,7 +6573,8 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'อาคารวิทยาการคอมพิวเตอร์',
-    building_C5C_desc: 'บ้านของโปรแกรมวิทยาการคอมพิวเตอร์และไอที มีห้องปฏิบัติการทันสมัย ห้องบรรยาย และพื้นที่ศึกษา',
+    building_C5C_desc:
+      'บ้านของโปรแกรมวิทยาการคอมพิวเตอร์และไอที มีห้องปฏิบัติการทันสมัย ห้องบรรยาย และพื้นที่ศึกษา',
     building_C3C_name: 'ห้องสมุด',
     building_C3C_desc: 'ห้องสมุดกลางมีคอลเลกชันมากมาย พื้นที่ศึกษา และบริการสนับสนุนวิชาการ',
     building_C7A_name: 'ศูนย์กลางมหาวิทยาลัย',
@@ -5966,7 +6586,8 @@ export const translations = {
     building_E7B_name: 'อาคารวิศวกรรม B',
     building_E7B_desc: 'สถานที่วิศวกรรมเพิ่มเติมมีห้องปฏิบัติการวิจัยขั้นสูงและอุปกรณ์',
     building_W3A_name: 'อาชีพและการจ้างงาน',
-    building_W3A_desc: 'ศูนย์บริการอาชีพที่ให้ความช่วยเหลือในการหางาน เวิร์กช็อปเรซูเม่ และการเชื่อมต่อกับนายจ้าง',
+    building_W3A_desc:
+      'ศูนย์บริการอาชีพที่ให้ความช่วยเหลือในการหางาน เวิร์กช็อปเรซูเม่ และการเชื่อมต่อกับนายจ้าง',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'อาคารวิชาการมีห้องเรียนและห้องทำงานคณาจารย์',
     building_4WW_name: "4 Wally's Walk",
@@ -6027,7 +6648,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'ล้างข้อมูลทั้งหมด',
-    clearAllDataDialogDesc: 'คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลทั้งหมด? การดำเนินการนี้ไม่สามารถยกเลิกได้และจะลบหน่วย กำหนดส่ง และโปรไฟล์ทั้งหมด',
+    clearAllDataDialogDesc:
+      'คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลทั้งหมด? การดำเนินการนี้ไม่สามารถยกเลิกได้และจะลบหน่วย กำหนดส่ง และโปรไฟล์ทั้งหมด',
 
     // Quick Actions
     homeDashboard: '🏠 แดชบอร์ดหน้าแรก',
@@ -6157,15 +6779,19 @@ export const translations = {
     comingSoon: 'เร็วๆ นี้',
     // Geolocation Messages
     locationAccessDenied: 'การเข้าถึงตำแหน่งถูกปฏิเสธ',
-    locationDeniedDesc: 'สิทธิ์ยังถูกปฏิเสธ ตรวจสอบการตั้งค่าระบบ (ระดับ OS) เพื่อให้แน่ใจว่าเบราว์เซอร์ของคุณมีสิทธิ์เข้าถึงบริการตำแหน่ง',
-    locationDeniedHelp: 'กรุณาตรวจสอบ: 1) แถบที่อยู่เบราว์เซอร์ (ไอคอนแม่กุญแจ), 2) การตั้งค่าระบบ macOS → ความเป็นส่วนตัว → บริการตำแหน่ง',
+    locationDeniedDesc:
+      'สิทธิ์ยังถูกปฏิเสธ ตรวจสอบการตั้งค่าระบบ (ระดับ OS) เพื่อให้แน่ใจว่าเบราว์เซอร์ของคุณมีสิทธิ์เข้าถึงบริการตำแหน่ง',
+    locationDeniedHelp:
+      'กรุณาตรวจสอบ: 1) แถบที่อยู่เบราว์เซอร์ (ไอคอนแม่กุญแจ), 2) การตั้งค่าระบบ macOS → ความเป็นส่วนตัว → บริการตำแหน่ง',
     locationError: 'ข้อผิดพลาดเกี่ยวกับตำแหน่ง',
     positionUnavailable: 'ไม่สามารถระบุตำแหน่งได้',
-    positionUnavailableDesc: 'อุปกรณ์ของคุณไม่สามารถระบุตำแหน่งของตัวเองได้ ตรวจสอบว่าเปิดใช้งานบริการตำแหน่งแล้ว',
+    positionUnavailableDesc:
+      'อุปกรณ์ของคุณไม่สามารถระบุตำแหน่งของตัวเองได้ ตรวจสอบว่าเปิดใช้งานบริการตำแหน่งแล้ว',
     locationTimeout: 'การขอตำแหน่งหมดเวลา',
     locationTimeoutDesc: 'คำขอตำแหน่งหมดเวลา ลองย้ายไปยังพื้นที่ที่มีสัญญาณดีกว่า',
     insecureConnection: 'การเชื่อมต่อไม่ปลอดภัย',
-    insecureConnectionDesc: 'การระบุตำแหน่งทางภูมิศาสตร์ต้องการการเชื่อมต่อที่ปลอดภัย (HTTPS) หรือ localhost เบราว์เซอร์ของคุณบล็อกเพื่อความปลอดภัย',
+    insecureConnectionDesc:
+      'การระบุตำแหน่งทางภูมิศาสตร์ต้องการการเชื่อมต่อที่ปลอดภัย (HTTPS) หรือ localhost เบราว์เซอร์ของคุณบล็อกเพื่อความปลอดภัย',
     locating: 'กำลังค้นหาตำแหน่ง...',
     requestingPosition: 'กำลังขอตำแหน่งปัจจุบันของคุณ...',
     locationFound: 'พบตำแหน่งแล้ว',
@@ -6191,7 +6817,8 @@ export const translations = {
     signIn: 'ลงชื่อเข้าใช้',
     orSignWith: 'หรือ',
     oauthRequired: '🔧 ต้องการการกำหนดค่า OAuth',
-    googleOAuthDesc: 'การลงชื่อเข้าใช้ด้วย Google ต้องการการตั้งค่าผู้ให้บริการ OAuth ในแดชบอร์ด Supabase กำหนดค่า Google OAuth ในการยืนยันตัวตน → ผู้ให้บริการ เพื่อเปิดใช้งานฟีเจอร์นี้',
+    googleOAuthDesc:
+      'การลงชื่อเข้าใช้ด้วย Google ต้องการการตั้งค่าผู้ให้บริการ OAuth ในแดชบอร์ด Supabase กำหนดค่า Google OAuth ในการยืนยันตัวตน → ผู้ให้บริการ เพื่อเปิดใช้งานฟีเจอร์นี้',
     noAccount: 'ไม่มีบัญชี?',
     signUp: 'ลงทะเบียน',
     passwordsDoNotMatch: 'รหัสผ่านไม่ตรงกัน',
@@ -6217,7 +6844,8 @@ export const translations = {
     editProfileAria: 'แก้ไข {{name}}',
     useProfileAria: 'ใช้ {{name}}',
     deleteProfileAria: 'ลบ {{name}}',
-    deleteProfileConfirm: 'คุณแน่ใจหรือไม่ว่าต้องการลบโปรไฟล์นี้? การดำเนินการนี้ไม่สามารถยกเลิกได้',
+    deleteProfileConfirm:
+      'คุณแน่ใจหรือไม่ว่าต้องการลบโปรไฟล์นี้? การดำเนินการนี้ไม่สามารถยกเลิกได้',
     deleteProfile: 'ลบโปรไฟล์',
     loadingProfile: 'กำลังโหลดโปรไฟล์...',
     manageProfilesDesc: 'แก้ไขและจัดการโปรไฟล์ผู้ใช้ของคุณ',
@@ -6263,7 +6891,8 @@ export const translations = {
     dashboardOverview: 'ภาพรวมแดชบอร์ด',
     myUnits: 'หน่วยของฉัน',
     noUnitsYet: 'ยังไม่มีหน่วย',
-    addFirstUnitDesc: 'เพิ่มหน่วยแรกของคุณเพื่อเริ่มติดตามตาราง มันจะซิงค์กับปฏิทินและตารางวันนี้ของคุณ',
+    addFirstUnitDesc:
+      'เพิ่มหน่วยแรกของคุณเพื่อเริ่มติดตามตาราง มันจะซิงค์กับปฏิทินและตารางวันนี้ของคุณ',
     addYourFirstUnit: 'เพิ่มหน่วยแรกของคุณ',
     units: 'หน่วย',
     classesPerWeek: 'คลาส/สัปดาห์',
@@ -6400,7 +7029,8 @@ export const translations = {
     cards: 'การ์ด',
     cardTitle: 'ชื่อการ์ด',
     cardDescPlaceholder: 'คำอธิบายการ์ดอยู่ที่นี่',
-    cardContentPlaceholder: 'นี่คือเนื้อหาการ์ด การ์ดสามารถมีเนื้อหาหลายประเภทและเหมาะสำหรับการจัดกลุ่มข้อมูลที่เกี่ยวข้อง',
+    cardContentPlaceholder:
+      'นี่คือเนื้อหาการ์ด การ์ดสามารถมีเนื้อหาหลายประเภทและเหมาะสำหรับการจัดกลุ่มข้อมูลที่เกี่ยวข้อง',
     anotherCard: 'การ์ดอื่น',
     anotherCardDesc: 'มีเนื้อหาที่แตกต่าง',
     featured: 'แนะนำ',
@@ -6446,7 +7076,8 @@ export const translations = {
     addClassTime: 'เพิ่มเวลาคลาส',
     dueTime: 'เวลาครบกำหนด',
     markAsCompleted: 'ทำเครื่องหมายว่าเสร็จสิ้น',
-    deleteDeadlineConfirm: 'คุณแน่ใจหรือไม่ว่าต้องการลบกำหนดส่งนี้? การดำเนินการนี้ไม่สามารถยกเลิกได้',
+    deleteDeadlineConfirm:
+      'คุณแน่ใจหรือไม่ว่าต้องการลบกำหนดส่งนี้? การดำเนินการนี้ไม่สามารถยกเลิกได้',
     mon: 'จ.',
     tue: 'อ.',
     wed: 'พ.',
@@ -6527,7 +7158,8 @@ export const translations = {
     event_internationalFoodFestival_title: 'เทศกาลอาหารนานาชาติ',
     event_internationalFoodFestival_desc: 'ฉลองความหลากหลายด้วยอาหารจากทั่วโลก มีตัวอย่างฟรี!',
     event_techNetworkingNight_title: 'คืนสร้างเครือข่ายเทค',
-    event_techNetworkingNight_desc: 'เชื่อมต่อกับผู้เชี่ยวชาญในอุตสาหกรรมและเรียนรู้เกี่ยวกับอาชีพเทค',
+    event_techNetworkingNight_desc:
+      'เชื่อมต่อกับผู้เชี่ยวชาญในอุตสาหกรรมและเรียนรู้เกี่ยวกับอาชีพเทค',
     event_studentClubWelcomeDay_title: 'วันต้อนรับชมรมนักศึกษา',
     event_studentClubWelcomeDay_desc: 'ค้นพบชมรมและสมาคมในมหาวิทยาลัย มีขนมฟรี!',
     event_researchSeminarAI_title: 'สัมมนาวิจัย: AI ในสุขภาพ',
@@ -6535,11 +7167,13 @@ export const translations = {
     event_movieNightSciFi_title: 'คืนหนัง: มาราธอนไซไฟ',
     event_movieNightSciFi_desc: 'ร่วมคืนชมหนังไซไฟคลาสสิกพร้อมป๊อปคอร์นฟรี!',
     event_resumeWritingWorkshop_title: 'เวิร์กช็อปเขียนเรซูเม่',
-    event_resumeWritingWorkshop_desc: 'รับคำแนะนำจากผู้เชี่ยวชาญในการสร้างเรซูเม่ที่สมบูรณ์แบบสำหรับงานในฝัน',
+    event_resumeWritingWorkshop_desc:
+      'รับคำแนะนำจากผู้เชี่ยวชาญในการสร้างเรซูเม่ที่สมบูรณ์แบบสำหรับงานในฝัน',
     event_freeCoffeeMorning_title: 'เช้ากาแฟฟรี',
     event_freeCoffeeMorning_desc: 'เริ่มต้นวันดีๆ ด้วยกาแฟและเบเกอรี่ฟรี!',
     event_alumniPanel_title: 'แพลเนลศิษย์เก่า: อาชีพในข้อมูลและนโยบาย',
-    event_alumniPanel_desc: 'ฟังการพูดสั้นๆ จากศิษย์เก่าที่ทำงานในด้านการวิเคราะห์ นโยบายสาธารณะ และการให้คำปรึกษา ถาม-ตอบและสร้างเครือข่ายพร้อมอาหารว่าง',
+    event_alumniPanel_desc:
+      'ฟังการพูดสั้นๆ จากศิษย์เก่าที่ทำงานในด้านการวิเคราะห์ นโยบายสาธารณะ และการให้คำปรึกษา ถาม-ตอบและสร้างเครือข่ายพร้อมอาหารว่าง',
 
     // Tags
     technology: 'เทคโนโลยี',
@@ -6564,6 +7198,52 @@ export const translations = {
     settingsError: 'ข้อผิดพลาดการตั้งค่า',
     preferenceError: 'ไม่สามารถบันทึกความชอบ กรุณาลองอีกครั้ง',
     preferenceUpdated: 'อัปเดตความชอบแล้ว',
+
+    // Storage Disabled
+    storageDisabled: 'ปิดใช้งานพื้นที่จัดเก็บ',
+    storageDisabledDesc: 'ใช้โหมดเซสชันเท่านั้น ข้อมูลจะไม่ถูกบันทึก',
+    storageEnabled: 'เปิดใช้งานพื้นที่จัดเก็บ',
+    storageEnabledMsg: 'ข้อมูลของคุณจะถูกบันทึกในเครื่อง',
+    storageToggleWarning:
+      'ไม่แนะนำให้ปิดใช้งานพื้นที่จัดเก็บในเครื่องเนื่องจากข้อมูลจะไม่ถูกบันทึก',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'สิ่งนี้จะลบ {{units}} วิชา และ {{deadlines}} กำหนดส่ง',
+    clearDataConfirmPlaceholder: 'พิมพ์ CLEAR เพื่อยืนยัน',
+    clearDataConfirmRequired: 'กรุณาพิมพ์ CLEAR เพื่อยืนยัน',
+    exportReminder: 'พิจารณาส่งออกข้อมูลของคุณก่อน',
+
+    // Account Section
+    account: 'บัญชี',
+    accountDesc: 'จัดการบัญชีและการยืนยันตัวตน',
+    signedInAs: 'เข้าสู่ระบบในฐานะ',
+    signOutSuccess: 'ออกจากระบบสำเร็จ',
+    signOutError: 'ออกจากระบบล้มเหลว กรุณาลองอีกครั้ง',
+    deleteAccount: 'ลบบัญชี',
+    deleteAccountDesc: 'ลบบัญชีและข้อมูลทั้งหมดถาวร',
+    deleteAccountWarning: 'การดำเนินการนี้ไม่สามารถย้อนกลับได้',
+
+    // Security Section
+    security: 'ความปลอดภัย',
+    securityDesc: 'จัดการการตั้งค่าความปลอดภัย',
+    changePassword: 'เปลี่ยนรหัสผ่าน',
+    changePasswordDesc: 'อัปเดตรหัสผ่าน',
+    manageSessions: 'จัดการเซสชัน',
+    manageSessionsDesc: 'ดูและจัดการเซสชันที่ใช้งานอยู่',
+    twoFactorAuth: 'การยืนยันตัวตนแบบสองปัจจัย',
+    twoFactorAuthDesc: 'เพิ่มชั้นความปลอดภัย',
+    privacyPolicy: 'นโยบายความเป็นส่วนตัว',
+    termsOfService: 'ข้อตกลงการใช้บริการ',
+    dataRetention: 'การเก็บรักษาข้อมูล',
+    dataRetentionDesc: 'ข้อมูลของคุณถูกจัดเก็บในเครื่องและไม่เคยออกจากอุปกรณ์ของคุณ',
+    encryptionNote: 'ข้อมูลทั้งหมดเข้ารหัสในเครื่องบนอุปกรณ์ของคุณ',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'ส่งออกรวมถึงการตั้งค่าและความชอบ',
+
+    // Clear Data Types
+    unitsCount: '{{count}} วิชา',
+    deadlinesCount: '{{count}} กำหนดส่ง',
   },
   // ============================================
   // VIETNAMESE - vi
@@ -6590,6 +7270,7 @@ export const translations = {
     previous: 'Trước',
     search: 'Tìm kiếm',
     filter: 'Lọc',
+    view: 'Xem',
 
     // Colors
     colorUniversityRed: 'Đỏ đại học',
@@ -6603,11 +7284,14 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'Tòa nhà Khoa học Máy tính',
-    building_C5C_desc: 'Nơi đặt các chương trình khoa học máy tính và CNTT. Có phòng lab hiện đại, giảng đường và không gian học tập.',
+    building_C5C_desc:
+      'Nơi đặt các chương trình khoa học máy tính và CNTT. Có phòng lab hiện đại, giảng đường và không gian học tập.',
     building_C3C_name: 'Thư viện',
-    building_C3C_desc: 'Thư viện trung tâm với bộ sưu tập phong phú, khu vực học tập và dịch vụ hỗ trợ học thuật.',
+    building_C3C_desc:
+      'Thư viện trung tâm với bộ sưu tập phong phú, khu vực học tập và dịch vụ hỗ trợ học thuật.',
     building_C7A_name: 'Trung tâm Khuôn viên',
-    building_C7A_desc: 'Trung tâm dịch vụ sinh viên với văn phòng hành chính, hỗ trợ sinh viên và cơ sở giải trí.',
+    building_C7A_desc:
+      'Trung tâm dịch vụ sinh viên với văn phòng hành chính, hỗ trợ sinh viên và cơ sở giải trí.',
     building_W6A_name: 'Tòa nhà Wallumattagal',
     building_W6A_desc: 'Cơ sở giảng dạy với phòng học, giảng đường và không gian sinh viên.',
     building_E7A_name: 'Tòa nhà Kỹ thuật',
@@ -6615,13 +7299,15 @@ export const translations = {
     building_E7B_name: 'Tòa nhà Kỹ thuật B',
     building_E7B_desc: 'Cơ sở kỹ thuật bổ sung với phòng lab nghiên cứu tiên tiến và thiết bị.',
     building_W3A_name: 'Nghề nghiệp và Việc làm',
-    building_W3A_desc: 'Trung tâm dịch vụ nghề nghiệp cung cấp hỗ trợ tìm việc, workshop viết CV và kết nối nhà tuyển dụng.',
+    building_W3A_desc:
+      'Trung tâm dịch vụ nghề nghiệp cung cấp hỗ trợ tìm việc, workshop viết CV và kết nối nhà tuyển dụng.',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'Tòa nhà học thuật với phòng học và văn phòng giảng viên.',
     building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'Không gian giảng bài và hướng dẫn cho các ngành học khác nhau.',
     building_LIB_name: 'Thư viện',
-    building_LIB_desc: 'Thư viện trung tâm với bộ sưu tập phong phú, khu vực học tập và dịch vụ hỗ trợ học thuật.',
+    building_LIB_desc:
+      'Thư viện trung tâm với bộ sưu tập phong phú, khu vực học tập và dịch vụ hỗ trợ học thuật.',
     building_Sports_name: 'Khu thể thao',
     building_Sports_desc: 'Cơ sở vật chất thể thao bao gồm phòng gym, sân và khu giải trí.',
 
@@ -6676,7 +7362,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'Xóa tất cả dữ liệu',
-    clearAllDataDialogDesc: 'Bạn có chắc muốn xóa tất cả dữ liệu? Thao tác này không thể hoàn tác và sẽ xóa tất cả môn học, hạn nộp và hồ sơ.',
+    clearAllDataDialogDesc:
+      'Bạn có chắc muốn xóa tất cả dữ liệu? Thao tác này không thể hoàn tác và sẽ xóa tất cả môn học, hạn nộp và hồ sơ.',
 
     // Quick Actions
     homeDashboard: '🏠 Bảng điều khiển',
@@ -6782,7 +7469,8 @@ export const translations = {
     gettingStartedGuide: 'Hướng dẫn bắt đầu',
     noNotificationsYet: 'Chưa có thông báo',
     pageNotFound: 'Không tìm thấy trang',
-    pageNotFoundDescription: 'Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm. Nó có thể đã được di chuyển hoặc không tồn tại.',
+    pageNotFoundDescription:
+      'Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm. Nó có thể đã được di chuyển hoặc không tồn tại.',
     goHome: 'Về trang chủ',
     new: 'Mới',
 
@@ -6806,15 +7494,20 @@ export const translations = {
     comingSoon: 'Sắp ra mắt',
     // Geolocation Messages
     locationAccessDenied: 'Quyền truy cập vị trí bị từ chối',
-    locationDeniedDesc: 'Quyền vẫn bị từ chối. Kiểm tra Tùy chọn Hệ thống (cấp độ hệ điều hành) để đảm bảo trình duyệt của bạn có quyền truy cập Dịch vụ Vị trí.',
-    locationDeniedHelp: 'Vui lòng kiểm tra: 1) Thanh địa chỉ trình duyệt (biểu tượng ổ khóa), 2) Cài đặt Hệ thống macOS → Quyền riêng tư → Dịch vụ Vị trí.',
+    locationDeniedDesc:
+      'Quyền vẫn bị từ chối. Kiểm tra Tùy chọn Hệ thống (cấp độ hệ điều hành) để đảm bảo trình duyệt của bạn có quyền truy cập Dịch vụ Vị trí.',
+    locationDeniedHelp:
+      'Vui lòng kiểm tra: 1) Thanh địa chỉ trình duyệt (biểu tượng ổ khóa), 2) Cài đặt Hệ thống macOS → Quyền riêng tư → Dịch vụ Vị trí.',
     locationError: 'Lỗi vị trí',
     positionUnavailable: 'Vị trí không khả dụng',
-    positionUnavailableDesc: 'Thiết bị của bạn không thể xác định vị trí. Kiểm tra xem Dịch vụ Vị trí có được bật không.',
+    positionUnavailableDesc:
+      'Thiết bị của bạn không thể xác định vị trí. Kiểm tra xem Dịch vụ Vị trí có được bật không.',
     locationTimeout: 'Hết thời gian yêu cầu vị trí',
-    locationTimeoutDesc: 'Yêu cầu vị trí đã hết thời gian. Hãy thử di chuyển đến khu vực có tín hiệu tốt hơn.',
+    locationTimeoutDesc:
+      'Yêu cầu vị trí đã hết thời gian. Hãy thử di chuyển đến khu vực có tín hiệu tốt hơn.',
     insecureConnection: 'Kết nối không an toàn',
-    insecureConnectionDesc: 'Định vị địa lý yêu cầu kết nối an toàn (HTTPS) hoặc localhost. Trình duyệt của bạn đang chặn nó vì lý do bảo mật.',
+    insecureConnectionDesc:
+      'Định vị địa lý yêu cầu kết nối an toàn (HTTPS) hoặc localhost. Trình duyệt của bạn đang chặn nó vì lý do bảo mật.',
     locating: 'Đang xác định vị trí...',
     requestingPosition: 'Đang yêu cầu vị trí hiện tại của bạn...',
     locationFound: 'Đã tìm thấy vị trí',
@@ -6840,7 +7533,8 @@ export const translations = {
     signIn: 'Đăng nhập',
     orSignWith: 'Hoặc đăng nhập với',
     oauthRequired: '🔧 Cần cấu hình OAuth',
-    googleOAuthDesc: 'Đăng nhập Google yêu cầu cấu hình nhà cung cấp OAuth trong bảng điều khiển Supabase. Cấu hình Google OAuth trong Xác thực → Nhà cung cấp để bật tính năng này.',
+    googleOAuthDesc:
+      'Đăng nhập Google yêu cầu cấu hình nhà cung cấp OAuth trong bảng điều khiển Supabase. Cấu hình Google OAuth trong Xác thực → Nhà cung cấp để bật tính năng này.',
     noAccount: 'Chưa có tài khoản?',
     signUp: 'Đăng ký',
     passwordsDoNotMatch: 'Mật khẩu không khớp',
@@ -6912,7 +7606,8 @@ export const translations = {
     dashboardOverview: 'Tổng quan bảng điều khiển',
     myUnits: 'Môn học của tôi',
     noUnitsYet: 'Chưa có môn học',
-    addFirstUnitDesc: 'Thêm môn học đầu tiên để bắt đầu theo dõi lịch. Nó sẽ đồng bộ với lịch và lịch hôm nay.',
+    addFirstUnitDesc:
+      'Thêm môn học đầu tiên để bắt đầu theo dõi lịch. Nó sẽ đồng bộ với lịch và lịch hôm nay.',
     addYourFirstUnit: 'Thêm môn học đầu tiên',
     units: 'Môn học',
     classesPerWeek: 'Lớp/tuần',
@@ -6929,7 +7624,8 @@ export const translations = {
     somethingWentWrong: 'Đã xảy ra lỗi',
     unexpectedError: 'Chúng tôi gặp lỗi không mong đợi. Vui lòng làm mới trang.',
     appErrorDesc: 'Đã xảy ra lỗi không mong đợi. Vui lòng thử lại hoặc về trang chủ.',
-    boundaryErrorDesc: 'Chúng tôi gặp lỗi không mong đợi. Đã được báo cáo tự động và chúng tôi đang khắc phục.',
+    boundaryErrorDesc:
+      'Chúng tôi gặp lỗi không mong đợi. Đã được báo cáo tự động và chúng tôi đang khắc phục.',
     oops: 'Ôi! Đã xảy ra lỗi',
     retryAttempt: 'Thử lại {{count}} / {{max}}',
     reset: 'Đặt lại',
@@ -6981,7 +7677,8 @@ export const translations = {
     failedToSaveUnit: 'Không thể lưu môn học. Vui lòng thử lại.',
     campusFeedDesc: 'Cập nhật sự kiện, thông báo và cơ hội tại {{uniName}}.',
     stayConnected: 'Kết nối:',
-    stayConnectedDesc: 'Khám phá workshop, hội chợ việc làm, sự kiện xã hội và đồ ăn miễn phí trong trường.',
+    stayConnectedDesc:
+      'Khám phá workshop, hội chợ việc làm, sự kiện xã hội và đồ ăn miễn phí trong trường.',
     filterEvents: 'Lọc sự kiện',
     allEvents: 'Tất cả sự kiện',
     categoryEvents: 'Sự kiện {{category}}',
@@ -7018,11 +7715,13 @@ export const translations = {
     filterAndFindDesc: 'Tìm theo tiện nghi, tính năng truy cập và hơn thế.',
     noBuildingsFound: 'Không tìm thấy tòa nhà khớp với "{{query}}"',
     welcomeToUni: 'Chào mừng đến {{uniName}}',
-    uniDesc: 'Trải nghiệm giáo dục đẳng cấp thế giới với cơ sở vật chất hiện đại và phương pháp giảng dạy đổi mới.',
+    uniDesc:
+      'Trải nghiệm giáo dục đẳng cấp thế giới với cơ sở vật chất hiện đại và phương pháp giảng dạy đổi mới.',
     explorePrograms: 'Khám phá chương trình',
     learnMore: 'Tìm hiểu thêm',
     mqDesignSystem: 'Hệ thống thiết kế MQ',
-    mqDesignSystemDesc: 'Hệ thống thiết kế toàn diện được xây dựng với token thương hiệu Đại học Macquarie.',
+    mqDesignSystemDesc:
+      'Hệ thống thiết kế toàn diện được xây dựng với token thương hiệu Đại học Macquarie.',
     buttons: 'Nút',
     primaryButton: 'Nút chính',
     secondaryButton: 'Nút phụ',
@@ -7049,7 +7748,8 @@ export const translations = {
     cards: 'Thẻ',
     cardTitle: 'Tiêu đề thẻ',
     cardDescPlaceholder: 'Mô tả thẻ ở đây',
-    cardContentPlaceholder: 'Đây là nội dung thẻ. Thẻ có thể chứa nhiều loại nội dung và tuyệt vời để nhóm thông tin liên quan.',
+    cardContentPlaceholder:
+      'Đây là nội dung thẻ. Thẻ có thể chứa nhiều loại nội dung và tuyệt vời để nhóm thông tin liên quan.',
     anotherCard: 'Thẻ khác',
     anotherCardDesc: 'Với nội dung khác',
     featured: 'Nổi bật',
@@ -7168,27 +7868,36 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'Hội chợ nghề nghiệp 2026',
-    event_careerFair2026_desc: 'Gặp gỡ các nhà tuyển dụng hàng đầu và khám phá cơ hội nghề nghiệp trong nhiều ngành.',
+    event_careerFair2026_desc:
+      'Gặp gỡ các nhà tuyển dụng hàng đầu và khám phá cơ hội nghề nghiệp trong nhiều ngành.',
     event_freePizzaFriday_title: 'Pizza miễn phí thứ Sáu',
     event_freePizzaFriday_desc: 'Tham gia pizza miễn phí và kết nối với bạn sinh viên!',
     event_studySkillsWorkshop_title: 'Workshop kỹ năng học',
-    event_studySkillsWorkshop_desc: 'Học kỹ thuật học tập hiệu quả và chiến lược quản lý thời gian.',
+    event_studySkillsWorkshop_desc:
+      'Học kỹ thuật học tập hiệu quả và chiến lược quản lý thời gian.',
     event_internationalFoodFestival_title: 'Lễ hội ẩm thực quốc tế',
-    event_internationalFoodFestival_desc: 'Ăn mừng sự đa dạng với ẩm thực từ khắp nơi trên thế giới. Có mẫu thử miễn phí!',
+    event_internationalFoodFestival_desc:
+      'Ăn mừng sự đa dạng với ẩm thực từ khắp nơi trên thế giới. Có mẫu thử miễn phí!',
     event_techNetworkingNight_title: 'Đêm kết nối công nghệ',
-    event_techNetworkingNight_desc: 'Kết nối với chuyên gia trong ngành và tìm hiểu về nghề nghiệp công nghệ.',
+    event_techNetworkingNight_desc:
+      'Kết nối với chuyên gia trong ngành và tìm hiểu về nghề nghiệp công nghệ.',
     event_studentClubWelcomeDay_title: 'Ngày chào đón CLB sinh viên',
-    event_studentClubWelcomeDay_desc: 'Khám phá các câu lạc bộ và hội trong trường. Có đồ ăn nhẹ miễn phí!',
+    event_studentClubWelcomeDay_desc:
+      'Khám phá các câu lạc bộ và hội trong trường. Có đồ ăn nhẹ miễn phí!',
     event_researchSeminarAI_title: 'Seminar nghiên cứu: AI trong Y tế',
-    event_researchSeminarAI_desc: 'Khám phá nghiên cứu tiên tiến về ứng dụng trí tuệ nhân tạo trong y học.',
+    event_researchSeminarAI_desc:
+      'Khám phá nghiên cứu tiên tiến về ứng dụng trí tuệ nhân tạo trong y học.',
     event_movieNightSciFi_title: 'Đêm phim: Marathon Sci-Fi',
-    event_movieNightSciFi_desc: 'Tham gia đêm xem phim khoa học viễn tưởng kinh điển với bắp rang miễn phí!',
+    event_movieNightSciFi_desc:
+      'Tham gia đêm xem phim khoa học viễn tưởng kinh điển với bắp rang miễn phí!',
     event_resumeWritingWorkshop_title: 'Workshop viết CV',
-    event_resumeWritingWorkshop_desc: 'Nhận lời khuyên chuyên gia về cách tạo CV hoàn hảo cho công việc mơ ước.',
+    event_resumeWritingWorkshop_desc:
+      'Nhận lời khuyên chuyên gia về cách tạo CV hoàn hảo cho công việc mơ ước.',
     event_freeCoffeeMorning_title: 'Cà phê miễn phí buổi sáng',
     event_freeCoffeeMorning_desc: 'Bắt đầu ngày mới đúng cách với cà phê và bánh ngọt miễn phí!',
     event_alumniPanel_title: 'Panel cựu sinh viên: Nghề nghiệp trong Dữ liệu & Chính sách',
-    event_alumniPanel_desc: 'Nghe những bài nói ngắn từ cựu sinh viên làm việc trong phân tích, chính sách công và tư vấn. Q&A và kết nối với đồ ăn nhẹ.',
+    event_alumniPanel_desc:
+      'Nghe những bài nói ngắn từ cựu sinh viên làm việc trong phân tích, chính sách công và tư vấn. Q&A và kết nối với đồ ăn nhẹ.',
 
     // Tags
     technology: 'Công nghệ',
@@ -7213,6 +7922,52 @@ export const translations = {
     settingsError: 'Lỗi cài đặt',
     preferenceError: 'Không thể lưu tùy chọn. Vui lòng thử lại.',
     preferenceUpdated: 'Đã cập nhật tùy chọn',
+
+    // Storage Disabled
+    storageDisabled: 'Đã tắt lưu trữ',
+    storageDisabledDesc: 'Đang sử dụng chế độ chỉ phiên. Dữ liệu sẽ không được lưu.',
+    storageEnabled: 'Đã bật lưu trữ',
+    storageEnabledMsg: 'Dữ liệu của bạn sẽ được lưu cục bộ.',
+    storageToggleWarning:
+      'Không khuyến khích tắt lưu trữ cục bộ vì dữ liệu của bạn sẽ không được lưu.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'Thao tác này sẽ xóa {{units}} môn học và {{deadlines}} deadline.',
+    clearDataConfirmPlaceholder: 'Gõ CLEAR để xác nhận',
+    clearDataConfirmRequired: 'Vui lòng gõ CLEAR để xác nhận',
+    exportReminder: 'Hãy cân nhắc xuất dữ liệu trước.',
+
+    // Account Section
+    account: 'Tài khoản',
+    accountDesc: 'Quản lý tài khoản và xác thực.',
+    signedInAs: 'Đã đăng nhập với tư cách',
+    signOutSuccess: 'Đã đăng xuất thành công',
+    signOutError: 'Đăng xuất thất bại. Vui lòng thử lại.',
+    deleteAccount: 'Xóa tài khoản',
+    deleteAccountDesc: 'Xóa vĩnh viễn tài khoản và tất cả dữ liệu',
+    deleteAccountWarning: 'Hành động này không thể hoàn tác.',
+
+    // Security Section
+    security: 'Bảo mật',
+    securityDesc: 'Quản lý cài đặt bảo mật',
+    changePassword: 'Đổi mật khẩu',
+    changePasswordDesc: 'Cập nhật mật khẩu',
+    manageSessions: 'Quản lý phiên',
+    manageSessionsDesc: 'Xem và quản lý các phiên hoạt động',
+    twoFactorAuth: 'Xác thực hai yếu tố',
+    twoFactorAuthDesc: 'Thêm lớp bảo mật bổ sung',
+    privacyPolicy: 'Chính sách riêng tư',
+    termsOfService: 'Điều khoản dịch vụ',
+    dataRetention: 'Lưu giữ dữ liệu',
+    dataRetentionDesc: 'Dữ liệu của bạn được lưu cục bộ và không bao giờ rời khỏi thiết bị.',
+    encryptionNote: 'Tất cả dữ liệu được mã hóa cục bộ trên thiết bị.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'Xuất bao gồm tùy chọn và cài đặt',
+
+    // Clear Data Types
+    unitsCount: '{{count}} môn học',
+    deadlinesCount: '{{count}} deadline',
   },
   // ============================================
   // RUSSIAN - ru
@@ -7239,6 +7994,7 @@ export const translations = {
     previous: 'Предыдущий',
     search: 'Поиск',
     filter: 'Фильтр',
+    view: 'Просмотр',
 
     // Colors
     colorUniversityRed: 'Красный университета',
@@ -7252,25 +8008,33 @@ export const translations = {
 
     // Buildings
     building_C5C_name: 'Здание информатики',
-    building_C5C_desc: 'Здесь расположены программы по информатике и IT. Современные лаборатории, лекционные залы и учебные пространства.',
+    building_C5C_desc:
+      'Здесь расположены программы по информатике и IT. Современные лаборатории, лекционные залы и учебные пространства.',
     building_C3C_name: 'Библиотека',
-    building_C3C_desc: 'Центральная библиотека с обширными коллекциями, учебными зонами и академической поддержкой.',
+    building_C3C_desc:
+      'Центральная библиотека с обширными коллекциями, учебными зонами и академической поддержкой.',
     building_C7A_name: 'Центр кампуса',
-    building_C7A_desc: 'Центр обслуживания студентов с административными офисами, поддержкой студентов и местами отдыха.',
+    building_C7A_desc:
+      'Центр обслуживания студентов с административными офисами, поддержкой студентов и местами отдыха.',
     building_W6A_name: 'Здание Wallumattagal',
-    building_W6A_desc: 'Учебное здание с аудиториями, лекционными залами и студенческими пространствами.',
+    building_W6A_desc:
+      'Учебное здание с аудиториями, лекционными залами и студенческими пространствами.',
     building_E7A_name: 'Инженерное здание',
-    building_E7A_desc: 'Инженерная и дизайнерская студия со специализированными лабораториями и мастерскими.',
+    building_E7A_desc:
+      'Инженерная и дизайнерская студия со специализированными лабораториями и мастерскими.',
     building_E7B_name: 'Инженерное здание B',
-    building_E7B_desc: 'Дополнительное инженерное здание с передовыми исследовательскими лабораториями.',
+    building_E7B_desc:
+      'Дополнительное инженерное здание с передовыми исследовательскими лабораториями.',
     building_W3A_name: 'Карьера и трудоустройство',
-    building_W3A_desc: 'Карьерный центр с помощью в поиске работы, мастерскими по резюме и связями с работодателями.',
+    building_W3A_desc:
+      'Карьерный центр с помощью в поиске работы, мастерскими по резюме и связями с работодателями.',
     building_12WW_name: "12 Wally's Walk",
     building_12WW_desc: 'Академическое здание с аудиториями и кабинетами преподавателей.',
     building_4WW_name: "4 Wally's Walk",
     building_4WW_desc: 'Лекционные и учебные пространства для различных дисциплин.',
     building_LIB_name: 'Библиотека',
-    building_LIB_desc: 'Центральная библиотека с обширными коллекциями, учебными зонами и академической поддержкой.',
+    building_LIB_desc:
+      'Центральная библиотека с обширными коллекциями, учебными зонами и академической поддержкой.',
     building_Sports_name: 'Спортивная зона',
     building_Sports_desc: 'Спортивные сооружения включая тренажерный зал, площадки и зоны отдыха.',
 
@@ -7325,7 +8089,8 @@ export const translations = {
 
     // Clear Data Dialog
     clearAllDataTitle: 'Очистить все данные',
-    clearAllDataDialogDesc: 'Вы уверены, что хотите очистить все данные? Это действие нельзя отменить, и все предметы, дедлайны и профили будут удалены.',
+    clearAllDataDialogDesc:
+      'Вы уверены, что хотите очистить все данные? Это действие нельзя отменить, и все предметы, дедлайны и профили будут удалены.',
 
     // Quick Actions
     homeDashboard: '🏠 Главная панель',
@@ -7431,7 +8196,8 @@ export const translations = {
     gettingStartedGuide: 'Руководство по началу работы',
     noNotificationsYet: 'Пока нет уведомлений',
     pageNotFound: 'Страница не найдена',
-    pageNotFoundDescription: 'Извините, мы не смогли найти запрашиваемую страницу. Она могла быть перемещена или не существует.',
+    pageNotFoundDescription:
+      'Извините, мы не смогли найти запрашиваемую страницу. Она могла быть перемещена или не существует.',
     goHome: 'На главную',
     new: 'Новое',
 
@@ -7455,15 +8221,20 @@ export const translations = {
     comingSoon: 'Скоро',
     // Geolocation Messages
     locationAccessDenied: 'Доступ к местоположению запрещен',
-    locationDeniedDesc: 'Разрешение все еще отклонено. Проверьте системные настройки (на уровне ОС), чтобы убедиться, что браузер имеет доступ к службам геолокации.',
-    locationDeniedHelp: 'Пожалуйста, проверьте: 1) Адресную строку браузера (значок замка), 2) Системные настройки macOS → Конфиденциальность → Службы геолокации.',
+    locationDeniedDesc:
+      'Разрешение все еще отклонено. Проверьте системные настройки (на уровне ОС), чтобы убедиться, что браузер имеет доступ к службам геолокации.',
+    locationDeniedHelp:
+      'Пожалуйста, проверьте: 1) Адресную строку браузера (значок замка), 2) Системные настройки macOS → Конфиденциальность → Службы геолокации.',
     locationError: 'Ошибка определения местоположения',
     positionUnavailable: 'Местоположение недоступно',
-    positionUnavailableDesc: 'Ваше устройство не смогло определить свое местоположение. Проверьте, включены ли службы геолокации.',
+    positionUnavailableDesc:
+      'Ваше устройство не смогло определить свое местоположение. Проверьте, включены ли службы геолокации.',
     locationTimeout: 'Время ожидания истекло',
-    locationTimeoutDesc: 'Время ожидания запроса местоположения истекло. Попробуйте переместиться в зону с лучшим сигналом.',
+    locationTimeoutDesc:
+      'Время ожидания запроса местоположения истекло. Попробуйте переместиться в зону с лучшим сигналом.',
     insecureConnection: 'Небезопасное соединение',
-    insecureConnectionDesc: 'Геолокация требует безопасного соединения (HTTPS) или localhost. Ваш браузер блокирует его по соображениям безопасности.',
+    insecureConnectionDesc:
+      'Геолокация требует безопасного соединения (HTTPS) или localhost. Ваш браузер блокирует его по соображениям безопасности.',
     locating: 'Определение местоположения...',
     requestingPosition: 'Запрос текущего местоположения...',
     locationFound: 'Местоположение найдено',
@@ -7489,7 +8260,8 @@ export const translations = {
     signIn: 'Войти',
     orSignWith: 'Или войти через',
     oauthRequired: '🔧 Требуется настройка OAuth',
-    googleOAuthDesc: 'Вход через Google требует настройки провайдера OAuth в панели Supabase. Настройте Google OAuth в Аутентификация → Провайдеры для включения этой функции.',
+    googleOAuthDesc:
+      'Вход через Google требует настройки провайдера OAuth в панели Supabase. Настройте Google OAuth в Аутентификация → Провайдеры для включения этой функции.',
     noAccount: 'Нет аккаунта?',
     signUp: 'Регистрация',
     passwordsDoNotMatch: 'Пароли не совпадают',
@@ -7515,7 +8287,8 @@ export const translations = {
     editProfileAria: 'Редактировать {{name}}',
     useProfileAria: 'Использовать {{name}}',
     deleteProfileAria: 'Удалить {{name}}',
-    deleteProfileConfirm: 'Вы уверены, что хотите удалить этот профиль? Это действие нельзя отменить.',
+    deleteProfileConfirm:
+      'Вы уверены, что хотите удалить этот профиль? Это действие нельзя отменить.',
     deleteProfile: 'Удалить профиль',
     loadingProfile: 'Загрузка профиля...',
     manageProfilesDesc: 'Редактируйте и управляйте профилями.',
@@ -7561,7 +8334,8 @@ export const translations = {
     dashboardOverview: 'Обзор панели',
     myUnits: 'Мои предметы',
     noUnitsYet: 'Пока нет предметов',
-    addFirstUnitDesc: 'Добавьте первый предмет для отслеживания расписания. Он синхронизируется с календарем.',
+    addFirstUnitDesc:
+      'Добавьте первый предмет для отслеживания расписания. Он синхронизируется с календарем.',
     addYourFirstUnit: 'Добавить первый предмет',
     units: 'Предметы',
     classesPerWeek: 'Занятий/нед',
@@ -7630,7 +8404,8 @@ export const translations = {
     failedToSaveUnit: 'Не удалось сохранить предмет. Попробуйте снова.',
     campusFeedDesc: 'Новости событий, объявления и возможности в {{uniName}}.',
     stayConnected: 'Будьте на связи:',
-    stayConnectedDesc: 'Откройте для себя мастерские, ярмарки карьеры, социальные события и бесплатную еду.',
+    stayConnectedDesc:
+      'Откройте для себя мастерские, ярмарки карьеры, социальные события и бесплатную еду.',
     filterEvents: 'Фильтровать события',
     allEvents: 'Все события',
     categoryEvents: 'События {{category}}',
@@ -7667,7 +8442,8 @@ export const translations = {
     filterAndFindDesc: 'Поиск по удобствам, доступности и другим параметрам.',
     noBuildingsFound: 'Не найдено зданий по запросу "{{query}}"',
     welcomeToUni: 'Добро пожаловать в {{uniName}}',
-    uniDesc: 'Опыт образования мирового класса с современным оборудованием и инновационными методами обучения.',
+    uniDesc:
+      'Опыт образования мирового класса с современным оборудованием и инновационными методами обучения.',
     explorePrograms: 'Исследовать программы',
     learnMore: 'Узнать больше',
     mqDesignSystem: 'Дизайн-система MQ',
@@ -7698,7 +8474,8 @@ export const translations = {
     cards: 'Карточки',
     cardTitle: 'Заголовок карточки',
     cardDescPlaceholder: 'Описание карточки здесь',
-    cardContentPlaceholder: 'Это содержимое карточки. Карточки могут содержать различные типы контента и отлично подходят для группировки связанной информации.',
+    cardContentPlaceholder:
+      'Это содержимое карточки. Карточки могут содержать различные типы контента и отлично подходят для группировки связанной информации.',
     anotherCard: 'Другая карточка',
     anotherCardDesc: 'С другим содержимым',
     featured: 'Избранное',
@@ -7744,7 +8521,8 @@ export const translations = {
     addClassTime: 'Добавить время занятия',
     dueTime: 'Время сдачи',
     markAsCompleted: 'Отметить как выполненное',
-    deleteDeadlineConfirm: 'Вы уверены, что хотите удалить этот дедлайн? Это действие нельзя отменить.',
+    deleteDeadlineConfirm:
+      'Вы уверены, что хотите удалить этот дедлайн? Это действие нельзя отменить.',
     mon: 'Пн',
     tue: 'Вт',
     wed: 'Ср',
@@ -7817,27 +8595,33 @@ export const translations = {
 
     // Sample Events
     event_careerFair2026_title: 'Ярмарка карьеры 2026',
-    event_careerFair2026_desc: 'Встретьтесь с ведущими работодателями и изучите карьерные возможности.',
+    event_careerFair2026_desc:
+      'Встретьтесь с ведущими работодателями и изучите карьерные возможности.',
     event_freePizzaFriday_title: 'Бесплатная пицца в пятницу',
     event_freePizzaFriday_desc: 'Присоединяйтесь к бесплатной пицце и общению со студентами!',
     event_studySkillsWorkshop_title: 'Мастерская учебных навыков',
     event_studySkillsWorkshop_desc: 'Изучите эффективные техники обучения и управления временем.',
     event_internationalFoodFestival_title: 'Международный фестиваль еды',
-    event_internationalFoodFestival_desc: 'Празднуйте разнообразие с кухнями со всего мира. Бесплатные образцы!',
+    event_internationalFoodFestival_desc:
+      'Празднуйте разнообразие с кухнями со всего мира. Бесплатные образцы!',
     event_techNetworkingNight_title: 'Вечер технического нетворкинга',
-    event_techNetworkingNight_desc: 'Общайтесь с профессионалами отрасли и узнайте о технических карьерах.',
+    event_techNetworkingNight_desc:
+      'Общайтесь с профессионалами отрасли и узнайте о технических карьерах.',
     event_studentClubWelcomeDay_title: 'День приветствия студенческих клубов',
-    event_studentClubWelcomeDay_desc: 'Откройте для себя клубы и сообщества в кампусе. Бесплатные закуски!',
+    event_studentClubWelcomeDay_desc:
+      'Откройте для себя клубы и сообщества в кампусе. Бесплатные закуски!',
     event_researchSeminarAI_title: 'Исследовательский семинар: ИИ в здравоохранении',
     event_researchSeminarAI_desc: 'Исследуйте передовые разработки ИИ в медицине.',
     event_movieNightSciFi_title: 'Киновечер: Марафон научной фантастики',
-    event_movieNightSciFi_desc: 'Присоединяйтесь к просмотру классики научной фантастики с бесплатным попкорном!',
+    event_movieNightSciFi_desc:
+      'Присоединяйтесь к просмотру классики научной фантастики с бесплатным попкорном!',
     event_resumeWritingWorkshop_title: 'Мастерская написания резюме',
     event_resumeWritingWorkshop_desc: 'Получите советы экспертов по созданию идеального резюме.',
     event_freeCoffeeMorning_title: 'Бесплатный кофе утром',
     event_freeCoffeeMorning_desc: 'Начните день правильно с бесплатного кофе и выпечки!',
     event_alumniPanel_title: 'Панель выпускников: Карьера в данных и политике',
-    event_alumniPanel_desc: 'Послушайте короткие выступления выпускников, работающих в аналитике, государственной политике и консалтинге. Q&A и нетворкинг с закусками.',
+    event_alumniPanel_desc:
+      'Послушайте короткие выступления выпускников, работающих в аналитике, государственной политике и консалтинге. Q&A и нетворкинг с закусками.',
 
     // Tags
     technology: 'Технологии',
@@ -7862,9 +8646,66 @@ export const translations = {
     settingsError: 'Ошибка настроек',
     preferenceError: 'Не удалось сохранить настройки. Попробуйте снова.',
     preferenceUpdated: 'Настройки обновлены',
+
+    // Storage Disabled
+    storageDisabled: 'Хранилище отключено',
+    storageDisabledDesc: 'Используется только режим сессии. Данные не будут сохранены.',
+    storageEnabled: 'Хранилище включено',
+    storageEnabledMsg: 'Ваши данные будут сохранены локально.',
+    storageToggleWarning:
+      'Не рекомендуется отключать локальное хранилище, так как ваши данные не будут сохранены.',
+
+    // Clear Data Dialog Enhanced
+    clearDataSummary: 'Это удалит {{units}} предметов и {{deadlines}} сроков.',
+    clearDataConfirmPlaceholder: 'Введите CLEAR для подтверждения',
+    clearDataConfirmRequired: 'Пожалуйста, введите CLEAR для подтверждения',
+    exportReminder: 'Рассмотрите возможность экспорта данных.',
+
+    // Account Section
+    account: 'Аккаунт',
+    accountDesc: 'Управление аккаунтом и аутентификацией.',
+    signedInAs: 'Вы вошли как',
+    signOutSuccess: 'Успешно вышли из системы',
+    signOutError: 'Не удалось выйти. Попробуйте снова.',
+    deleteAccount: 'Удалить аккаунт',
+    deleteAccountDesc: 'Навсегда удалить аккаунт и все данные',
+    deleteAccountWarning: 'Это действие нельзя отменить.',
+
+    // Security Section
+    security: 'Безопасность',
+    securityDesc: 'Управление настройками безопасности',
+    changePassword: 'Изменить пароль',
+    changePasswordDesc: 'Обновить пароль',
+    manageSessions: 'Управление сессиями',
+    manageSessionsDesc: 'Просмотр и управление активными сессиями',
+    twoFactorAuth: 'Двухфакторная аутентификация',
+    twoFactorAuthDesc: 'Добавить дополнительный уровень безопасности',
+    privacyPolicy: 'Политика конфиденциальности',
+    termsOfService: 'Условия использования',
+    dataRetention: 'Хранение данных',
+    dataRetentionDesc: 'Ваши данные хранятся локально и никогда не покидают ваше устройство.',
+    encryptionNote: 'Все данные зашифрованы локально на вашем устройстве.',
+
+    // Export Enhanced
+    exportIncludesPrefs: 'Экспорт включает настройки и предпочтения',
+
+    // Clear Data Types
+    unitsCount: '{{count}} предметов',
+    deadlinesCount: '{{count}} сроков',
   },
 };
 
 export type TranslationKey = keyof typeof translations.en;
-export type Language = 'en' | 'es' | 'fa' | 'zh' | 'ar' | 'hi' | 'ko' | 'ja' | 'ur' | 'th' | 'vi' | 'ru';
-
+export type Language =
+  | 'en'
+  | 'es'
+  | 'fa'
+  | 'zh'
+  | 'ar'
+  | 'hi'
+  | 'ko'
+  | 'ja'
+  | 'ur'
+  | 'th'
+  | 'vi'
+  | 'ru';

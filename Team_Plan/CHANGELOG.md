@@ -15,6 +15,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Settings — Clear All Data subcard border (Raouf)**: Added a theme-aware border to the "Clear All Data" subcard so borders use the `border-mq-border` token and display correctly in dark mode. File changed: `app/settings/page.tsx`.
 
+### Changed
+
+#### Settings Page Professional Polish Audit (Raouf)
+
+Comprehensive audit implementation addressing all "must-fix" and "high-impact" recommendations:
+
+**Must-Fix Issues Resolved:**
+- **i18n Hardcoded Strings**: Added 50+ translation keys across all 12 languages for all visible strings, toast messages, and aria labels. Replaced hardcoded text with `t()` function calls throughout settings page.
+- **Notification Settings Clearing**: Fixed clear-all to properly remove `notification-deadlines`, `notification-classes`, `notification-events` keys from localStorage (previously only removed `notifications-storage`).
+- **Removed Unfinished Storage Toggle**: Replaced decorative/unfinished storage toggle with meaningful Privacy & Security content showing data retention info, encryption note, and functional security controls.
+- **Language Display**: Fixed language current label to properly display all 12 language names via `languageNames` mapping instead of raw language codes.
+
+**High-Impact Upgrades:**
+- **Account Section Added**: New Account card with signed-in user display, Sign Out button, and Delete Account option (wired to toast for now).
+- **Security Controls Added**: Enhanced Privacy & Security section with Change Password, Manage Sessions, Privacy Policy link, Data Retention info, and Encryption note.
+- **Export Enhanced**: Export now includes user preferences (theme, language, notification settings) alongside units and deadlines for complete data portability.
+- **Clear Data Dialog Enhanced**: Added summary showing units/deadlines counts, "Type CLEAR to confirm" confirmation input, and export reminder for user safety.
+- **SEO Cleanup**: Added `noindex, nofollow` meta tag to settings head.tsx for proper robots handling.
+
+**Files Changed:**
+- `app/settings/page.tsx` - Complete rewrite with all fixes
+- `app/settings/head.tsx` - Added noindex meta tag
+- `lib/i18n/translations.ts` - Added 50+ new translation keys
+- `lib/config.ts` - Added EXTERNAL_LINKS for docs/feedback/privacy
+
+**Verification:**
+- npm run lint (pass)
+- npm run build (pass)
+- All 12 languages properly translated
+- No hardcoded strings remain in settings UI
+
 ---
 
 ## [0.5.44] - 2026-01-06

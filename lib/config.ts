@@ -90,8 +90,8 @@ export const CAMPUS_BUILDINGS = [
   { code: 'E7A', name: 'Engineering Building', translationKey: 'building_E7A_name' },
   { code: 'E7B', name: 'Engineering Building B', translationKey: 'building_E7B_name' },
   { code: 'W3A', name: 'Careers & Employment', translationKey: 'building_W3A_name' },
-  { code: '12WW', name: '12 Wally\'s Walk', translationKey: 'building_12WW_name' },
-  { code: '4WW', name: '4 Wally\'s Walk', translationKey: 'building_4WW_name' },
+  { code: '12WW', name: "12 Wally's Walk", translationKey: 'building_12WW_name' },
+  { code: '4WW', name: "4 Wally's Walk", translationKey: 'building_4WW_name' },
   { code: 'LIB', name: 'Library', translationKey: 'building_LIB_name' },
   { code: 'Sports', name: 'Sports Precinct', translationKey: 'building_Sports_name' },
 ] as const;
@@ -122,4 +122,15 @@ export const SOCIAL_LINKS = {
   facebook: 'https://facebook.com/macquarieuniversity',
   instagram: 'https://instagram.com/macquarieuni',
   linkedin: 'https://linkedin.com/school/macquarie-university',
+} as const;
+
+/**
+ * External Links
+ * Links to documentation, feedback, and support
+ */
+export const EXTERNAL_LINKS = {
+  documentation: 'https://github.com/syllabus-sync/syllabus-sync#readme',
+  feedback: 'mailto:support@mq.edu.au?subject=Syllabus Sync Feedback',
+  privacy: 'https://www.mq.edu.au/privacy',
+  terms: 'https://www.mq.edu.au/terms',
 } as const;
