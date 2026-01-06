@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.44 | Last Updated: January 06, 2026
+Version: 0.5.46 | Last Updated: January 06, 2026
 
 ---
 
@@ -56,6 +56,12 @@ Version: 0.5.44 | Last Updated: January 06, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Calendar Dialog & Accessibility (v0.5.46)
+- **Restored edit dialog & accessibility (Raouf)**: Reintroduced the edit dialog flow on the Calendar page by wiring the `DeadlineForm` into `CalendarClient`, adding keyboard support and ARIA attributes (`aria-haspopup`, `aria-expanded`, `aria-label`) and providing a grid button with an accessible title. Files changed: `app/calendar/CalendarClient.tsx`, `components/deadlines/DeadlineForm.tsx`.
+- **Tests restored & improved (Raouf)**: Restored the previously skipped dialog tests and replaced brittle selectors with robust queries and `user-event` keyboard simulation. Added `@testing-library/user-event` as a dev dependency. Tests updated: `tests/CalendarPage.test.tsx`. Test-suite status: all tests pass locally (43/43).
+- **i18n keys added (Raouf)**: Added `markComplete`, `markIncomplete`, and `openEditDialog` to `locales/en/translations.json` to ensure accessible label strings are typed and available at build time.
+- **Lint & TS fixes (Raouf)**: Removed unused imports/variables and used the dialog close helper (`closeEdit`) to avoid ESLint warnings. Files changed: `app/calendar/CalendarClient.tsx`.
 
 #### ✅ Home Page Bug Fixes & Cleanup (v0.5.44)
 - **Removed unused import**: Pouya: Removed empty import from `@/components/ui/dropdown-menu` that was generating a warning.

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.46] - 2026-01-06
+
+### Added
+
+- **Calendar edit dialog & accessibility (Raouf)**: Restored the Calendar edit dialog flow and added accessibility improvements including `aria-haspopup`, `aria-expanded`, and clear `aria-label` values for interactive elements. Files changed: `app/calendar/CalendarClient.tsx`, `components/deadlines/DeadlineForm.tsx`.
+- **Tests & tooling (Raouf)**: Restored and improved dialog tests (`tests/CalendarPage.test.tsx`), added `@testing-library/user-event` as a dev dependency, and ensured tests are stable and run successfully (43/43 passing locally).
+- **i18n**: Added English keys `markComplete`, `markIncomplete`, and `openEditDialog` to `locales/en/translations.json` to support accessible labels.
+
+### Fixed
+
+- **Lint/Type cleanup (Raouf)**: Removed unused imports and variables from `CalendarClient` and used the `closeEdit` handler to satisfy ESLint rules.
+- **Build verification**: Confirmed `npm run build` completes successfully after changes.
+
 ## [0.5.45] - 2026-01-06
 
 ### Fixed
