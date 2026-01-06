@@ -5,8 +5,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![Version](https://img.shields.io/badge/version-0.5.0-blue)]()
-[![Tests](https://img.shields.io/badge/tests-36%2F36-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-0.5.45-blue)]()
+[![Tests](https://img.shields.io/badge/tests-41%2F41-brightgreen)]()
 [![Lint](https://img.shields.io/badge/eslint-0%20errors-brightgreen)]()
 
 ---
@@ -15,9 +15,10 @@
 
 **The Syllabus Sync** is a comprehensive campus management web application designed to help Macquarie University students seamlessly manage their academic and campus life. Built with enterprise-grade code quality and modern web technologies, it provides an all-in-one platform for schedule management, deadline tracking, event discovery, and campus navigation.
 
-**Current Status:** Production-ready application with comprehensive error handling, offline support, and enterprise-level code quality.
+**Current Version:** 0.5.45  
+**Current Status:** Production-ready application with comprehensive error handling, offline support, enterprise-level code quality, and 12-language internationalization support.
 
-**Demo Target:** Macquarie University Administration - February 2025
+**Demo Target:** Macquarie University Administration - February 2026
 
 ---
 
@@ -30,14 +31,15 @@ flowchart TB
   %% User Interface Layer
   subgraph "🎨 User Interface Layer"
     direction LR
-    Home["🏠 Home Dashboard<br/>Units & Schedule"]
+    Home["🏠 Home Dashboard<br/>Units & Schedule<br/>WelcomeHeader"]
     Calendar["📅 Calendar<br/>Deadlines Management"]
-    Map["🗺️ Campus Map<br/>Building Navigation"]
-    Feed["📡 Events Feed<br/>Campus Activities"]
+    Map["🗺️ Campus Map<br/>Building Navigation<br/>MapClient"]
+    Feed["📡 Events Feed<br/>Campus Activities<br/>FeedClient"]
     ManageProfiles["👤 Manage Profiles<br/>Profile CRUD"]
-    Settings["⚙️ Settings<br/>App Preferences"]
-    Header["📱 Header<br/>Navigation & Notifications"]
-    Sidebar["🧭 Sidebar<br/>Main Navigation"]
+    Settings["⚙️ Settings<br/>App Preferences<br/>Data Management"]
+    Login["🔐 Login/Signup<br/>Authentication<br/>Fingerprint Auth"]
+    Header["📱 Header<br/>Clock & Notifications"]
+    Sidebar["🧭 Sidebar<br/>Navigation<br/>SocialButtons"]
   end
 
   %% State Management Layer
@@ -48,17 +50,18 @@ flowchart TB
     ProfilesStore["👥 profilesStore<br/>User profiles<br/>Authentication"]
     NotificationsStore["🔔 notificationsStore<br/>System notifications"]
     ThemeStore["🌙 themeStore<br/>Dark mode & theming"]
+    LanguageStore["🌍 languageStore<br/>i18n (12 languages)<br/>RTL support"]
   end
 
-  %% Services & Utilities Layer
-  subgraph "🛠️ Services & Utilities Layer"
+  %% API & Services Layer
+  subgraph "🛠️ API & Services Layer"
     direction LR
+    API["⚡ Next.js API Routes<br/>/api/units<br/>/api/deadlines<br/>/api/events<br/>/api/notifications<br/>/api/auth"]
     ErrorBoundary["🚨 Error Boundary<br/>React error handling"]
     ToastSystem["🍞 Toast Notifications<br/>User feedback"]
     RetrySystem["🔄 Retry System<br/>Automatic retries"]
     ServiceWorker["📱 Service Worker<br/>Offline support<br/>Caching"]
-    ErrorHandler["⚠️ Error Handler<br/>Centralized logging"]
-    Utils["🔧 Utilities<br/>Helper functions"]
+    i18n["🌍 i18n System<br/>Translations<br/>520+ keys"]
   end
 
   %% Data Layer
@@ -68,25 +71,32 @@ flowchart TB
     SampleEvents["📅 sampleEvents.ts<br/>Campus events"]
     SampleNotifications["🔔 sampleNotifications.ts<br/>Demo notifications"]
     LocalStorage[("💽 localStorage<br/>Persistent storage")]
-    Supabase[("☁️ Supabase<br/>Future cloud storage")]
+    Supabase[("☁️ Supabase<br/>Future cloud storage<br/>Auth & Database")]
   end
 
   %% Navigation & Layout
+  Header --> Clock["🕒 Live Clock"]
   Header --> Sidebar
   Sidebar --> Home
   Sidebar --> Calendar
   Sidebar --> Map
   Sidebar --> Feed
   Sidebar --> Settings
+  Sidebar --> SocialButtons["🔗 Social Links"]
 
+  Header -.-> Login
   Header -.-> ManageProfiles
 
   %% UI to State connections
   Home --> UnitsStore
+  Home --> DeadlinesStore
   Calendar --> DeadlinesStore
+  Feed --> NotificationsStore
   ManageProfiles --> ProfilesStore
   Settings --> ThemeStore
+  Settings --> LanguageStore
   Header --> NotificationsStore
+  Login --> ProfilesStore
 
   %% State to Data connections
   UnitsStore --> LocalStorage
@@ -94,17 +104,29 @@ flowchart TB
   ProfilesStore --> LocalStorage
   NotificationsStore --> LocalStorage
   ThemeStore --> LocalStorage
+  LanguageStore --> LocalStorage
+
+  %% API connections
+  Home --> API
+  Calendar --> API
+  Feed --> API
+  Login --> API
 
   %% Services connections
-  ErrorBoundary --> ErrorHandler
-  ErrorHandler --> ToastSystem
+  ErrorBoundary --> ToastSystem
   ToastSystem --> Header
-  RetrySystem --> UnitsStore
-  RetrySystem --> DeadlinesStore
+  RetrySystem --> API
   ServiceWorker --> LocalStorage
+  i18n --> LanguageStore
+
+  %% Data sources
+  API --> SampleUnits
+  API --> SampleEvents
+  API --> SampleNotifications
 
   %% Future connections
   LocalStorage -.-> Supabase
+  API -.-> Supabase
 
   %% Styling
   classDef uiLayer fill:#e1f5fe,stroke:#01579b,stroke-width:2px
@@ -120,18 +142,20 @@ flowchart TB
 
 ### 🏛️ Architecture Layers Explained
 
-- **🎨 User Interface Layer**: React components with TypeScript, responsive design, and accessibility features
-- **🔄 State Management Layer**: Zustand stores providing centralized, type-safe state management
-- **🛠️ Services & Utilities Layer**: Enterprise-grade error handling, offline support, and user feedback systems
-- **💾 Data Layer**: Current localStorage implementation with planned Supabase cloud migration
+- **🎨 User Interface Layer**: React Server/Client Components with TypeScript, responsive design, accessibility features, and premium MQ gradient hover effects
+- **🔄 State Management Layer**: Zustand stores providing centralized, type-safe state management with localStorage persistence and 12-language internationalization
+- **🛠️ API & Services Layer**: Enterprise-grade RESTful API routes, error handling, offline support, toast notifications, and comprehensive i18n system
+- **💾 Data Layer**: Current localStorage implementation with planned Supabase cloud migration for authentication and real-time database synchronization
 
 ### 🔄 Data Flow
 
-1. **User Interaction** → UI Components
-2. **State Updates** → Zustand Stores
-3. **Persistence** → localStorage (current) / Supabase (planned)
-4. **Error Handling** → Toast Notifications + Error Boundaries
-5. **Offline Support** → Service Worker + Cache Management
+1. **User Interaction** → UI Components (Server/Client split)
+2. **State Updates** → Zustand Stores with language & theme support
+3. **API Requests** → Next.js API Routes with error handling & retry logic
+4. **Persistence** → localStorage (current) / Supabase (planned)
+5. **Error Handling** → Toast Notifications + Error Boundaries with auto-retry
+6. **Offline Support** → Service Worker + Cache Management
+7. **Internationalization** → Language Store → i18n System (12 languages, RTL support)
 
 ---
 
@@ -146,6 +170,7 @@ flowchart TB
 - **Events Feed:** Discover campus events across categories
 - **Stress Indicator:** Visual workload indicator based on deadlines
 - **Quick Actions:** Fast navigation to Calendar and Map
+- **Premium Hover Effects:** MQ red gradient border animations on all cards
 
 ### 📅 **Calendar & Deadlines** (Complete)
 
@@ -156,6 +181,7 @@ flowchart TB
 - **Priority & Type System:** Color-coded priority and deadline types
 - **Overdue Detection:** Automatic highlighting of overdue deadlines
 - **Stress Level Algorithm:** Dynamic workload assessment
+- **Interactive Cards:** Premium hover animations matching brand design
 
 ### 🔔 **Notifications System** (Complete)
 
@@ -171,6 +197,7 @@ flowchart TB
 - **Building Navigation:** Quick reference for all campus buildings
 - **Smart Query Parameters:** Direct navigation via `?building=XXX`
 - **Interactive Features:** Building highlights and selection states
+- **Premium Card Design:** Consistent hover effects across all map components
 
 ### 📱 **Events Feed** (Complete)
 
@@ -178,6 +205,8 @@ flowchart TB
 - **Location Integration:** Navigate to event buildings directly from feed
 - **Time & Location Details:** Complete event information display
 - **Cross-Page Navigation:** Seamless integration with map and calendar
+- **Interactive Cards:** Premium gradient hover effects on all feed components
+- **Event Categories Legend:** Visual guide to event types and priorities
 
 ### ⚙️ **Settings & Profile** (Complete)
 
@@ -185,6 +214,17 @@ flowchart TB
 - **Storage Status:** Real-time data storage information
 - **App Information:** Version, build status, and system info
 - **Profile Management:** User profile settings (framework ready)
+- **Theme-Aware Borders:** Consistent design tokens across light/dark modes
+- **Polished Social Buttons:** Premium animated social media links
+
+### 🌍 **Internationalization System** (Complete)
+
+- **12 Languages Fully Supported:** English, Spanish, Persian/Farsi, Chinese, Arabic, Hindi, Korean, Japanese, Urdu, Thai, Vietnamese, Russian
+- **520+ Translation Keys:** Complete coverage of all user-facing strings
+- **RTL Language Support:** Full right-to-left support for Arabic, Persian, and Urdu
+- **Professional Translations:** Native speaker-quality translations with academic terminology
+- **Zero Fallback Strings:** All languages have complete translations
+- **Instant Language Switching:** Real-time UI updates with localStorage persistence
 
 ### 🎯 **Quality Assurance Features**
 
@@ -193,6 +233,8 @@ flowchart TB
 - **Toast Notifications:** Comprehensive user feedback system
 - **Performance Monitoring:** Bundle analysis and optimization tracking
 - **Accessibility:** WCAG compliant with keyboard navigation and screen reader support
+- **Live Clock Display:** Real-time clock and date in header with locale support
+- **Suspense Boundaries:** Progressive streaming with skeleton loaders
 
 ---
 
@@ -310,10 +352,22 @@ This project uses GitHub Actions for comprehensive continuous integration and de
 
 ## 👥 Team
 
-| Role              | Member | Responsibilities                    |
-| ----------------- | ------ | ----------------------------------- |
-| **Frontend Lead** | Pouya  | UI/UX, Components, State Management |
-| **Backend Lead**  | Raouf  | Database, API, Configuration        |
+### Tab/Feature Ownership
+
+| Tab/Feature          | Owner                    | Status          |
+| -------------------- | ------------------------ | --------------- |
+| **Home Tab**         | Pouya                    | 🚧 In Progress  |
+| **Calendar Tab**     | Pouya                    | 🚧 In Progress  |
+| **Feed Tab**         | Pouya (50%) + Raouf (50%)| 🚧 Shared       |
+| **Map Tab**          | Raouf                    | 🚧 In Progress  |
+| **Settings Tab**     | Raouf                    | 🚧 In Progress  |
+| **AI Integration**   | Kit                      | 🔜 Demo Feature |
+
+### Team Members
+
+- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Infrastructure
+- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend), UI/UX, Components
+- **Kit**: AI Integration for Demo
 
 See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
 
@@ -390,12 +444,13 @@ See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
 
 ### 📊 Quality Metrics
 
-- **Test Coverage**: 36/36 tests passing (100% success rate)
+- **Test Coverage**: 41/41 tests passing (100% success rate)
 - **Code Quality**: 0 ESLint errors, 0 warnings (perfect compliance)
 - **Type Safety**: Full TypeScript strictness, no `any` types
 - **Performance**: Optimized bundles with code splitting and caching
 - **Accessibility**: WCAG compliant with screen reader support
 - **Build Status**: Production-ready with zero compilation errors
+- **Internationalization**: 12 languages with 520+ translation keys per language
 
 ---
 
@@ -417,29 +472,41 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 Project Status
 
-**Current Version:** 0.5.0
-**Last Updated:** January 01, 2026
+**Current Version:** 0.5.45  
+**Last Updated:** January 06, 2026  
 **Status:** ✅ Production Ready with CI/CD
 
 ### 🎯 **Quality Metrics Achieved**
 
 - **Code Quality**: 0 ESLint errors, 0 warnings (perfect compliance)
 - **Type Safety**: Full TypeScript strictness, no `any` types
-- **Test Coverage**: 36/36 unit tests passing (100% success rate)
+- **Test Coverage**: 41/41 unit tests passing (100% success rate)
 - **Performance**: Optimized bundles with code splitting and caching
 - **Accessibility**: WCAG 2.1 AA compliant with comprehensive support
 - **Build Status**: Production-ready with zero compilation errors
 - **CI/CD**: Comprehensive GitHub Actions pipeline with automated testing
+- **Internationalization**: 12 languages, 520+ translation keys, full RTL support
 
 ### 🏆 **Technical Achievements**
 
 - **Phase 1 Complete**: Enterprise-grade error handling and retry systems
 - **Phase 2 Complete**: Advanced features with offline support and performance optimization
+- **Complete i18n System**: 12 languages with professional translations and RTL support
+- **Enterprise API System**: RESTful architecture with versioning and comprehensive documentation
+- **Premium UI/UX**: Macquarie red gradient hover effects across all interactive cards
 - **CI/CD Pipeline**: Automated testing across multiple Node.js versions
 - **Performance Monitoring**: Lighthouse CI integration with performance budgets
 - **Accessibility Testing**: Automated axe-core accessibility scanning
 - **Security**: npm audit integration with vulnerability detection
 - **Bundle Analysis**: Webpack bundle size monitoring and optimization
+
+### 🚀 **Recent Updates (v0.5.45)**
+
+- **Social Buttons Polish**: Improved bottom-left social widgets with better accessibility, centered labels, keyboard focus expansion, and mobile-friendly behavior
+- **Settings Card Border**: Added theme-aware borders using design tokens for consistent dark mode display
+- **Home Page Bug Fixes**: Removed duplicate headings, fixed skip links, simplified validation, and improved layout structure
+- **TypeScript & ESLint Fixes**: Resolved all implicit `any` types and typing issues across the codebase
+- **Accessibility Improvements**: Enhanced contrast remediation, dark mode enforcement, and automated instrumentation
 
 ### 🚀 **Ready for Next Phase**
 
