@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.53] - 2026-01-07
+
+### Changed
+
+#### Sidebar Animation Refactor & Layout Fixes (Raouf)
+
+Refactored sidebar animations and fixed layout dimension issues for improved UX.
+
+**Layout Fixes:**
+
+- **Sidebar full-height (Raouf)**: Fixed sidebar to cover full viewport height using `h-screen` and `100dvh` (dynamic viewport height for mobile). Previously only covered half the page. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+
+- **Main content offset (Raouf)**: Added `md:ml-12` (48px) margin-left to main content area to properly offset the sidebar trigger width. Files changed: `app/client-layout.tsx`.
+
+- **Layout shift animation (Raouf)**: Changed layout shift from `transform: translateX()` to `margin-left` animation for smoother content push when sidebar opens. File changed: `app/globals.css`.
+
+**Sidebar Animation Improvements:**
+
+- **Removed MENU text (Raouf)**: Removed the rotating "MENU" text that was overlapping with hamburger bars. Kept only the 3-bar hamburger icon. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+
+- **Fixed sidebar sticking open (Raouf)**: Removed `:focus-within` selectors that caused sidebar to stay open after clicking links. Added `onMouseLeave` blur handler to prevent focus retention. File changed: `components/layout/Sidebar.tsx`.
+
+- **Simplified bar animation (Raouf)**: Hamburger bars now animate subtly on hover (top/bottom spread apart, middle grows) instead of fading out completely. File changed: `components/layout/animated-sidebar.module.css`.
+
+- **Accessibility fix (Raouf)**: Changed sidebar wrapper from `<div>` to semantic `<aside>` element to fix ESLint jsx-a11y warning about non-native interactive elements. File changed: `components/layout/Sidebar.tsx`.
+
+- **Dev email update (Raouf)**: Changed third dev email from `raoof.naushad@hdr.mq.edu.au` to `kit@mq.edu.au` in DEV_EMAILS whitelist. Files changed: `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`.
+
+Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`, `app/client-layout.tsx`, `app/globals.css`, `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`.
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes).
+
+---
+
 ## [0.5.52] - 2026-01-07
 
 ### Security

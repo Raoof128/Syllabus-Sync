@@ -1,114 +1,166 @@
 .sidebarShell {
   position: relative;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
 }
 
-/* Desktop sidebar animations */
+/* Desktop sidebar animations - ARKK style */
 @media (min-width: 768px) {
-  /* Panel slide animation - hidden by default, slides in on hover */
+  /* Panel slide animation - slides in from left */
   .panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
     transform: translateX(calc(-100% + 48px));
-    transition:
-      transform 600ms cubic-bezier(0.785, 0.135, 0.15, 0.86),
-      pointer-events 0ms 600ms; /* Delay pointer-events change until after close animation */
+    transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
   }
 
   .trigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    height: 100dvh;
     pointer-events: auto;
     cursor: pointer;
   }
 
-  /* Panel open state on hover/focus */
-  .sidebarShell:hover .panel,
-  .sidebarShell:focus-within .panel {
+  /* Panel open state - ONLY on hover, removed focus-within to prevent sticking */
+  .sidebarShell:hover .panel {
     transform: translateX(0);
     pointer-events: auto;
-    transition:
-      transform 600ms cubic-bezier(0.785, 0.135, 0.15, 0.86),
-      pointer-events 0ms 0ms; /* Immediate pointer-events on open */
   }
 
-  /* Force open state (for mobile toggle) */
+  /* Force open state */
   .panelOpen {
     transform: translateX(0) !important;
     pointer-events: auto !important;
   }
 
-  /* Hamburger bar base transition */
+  /* ============================================
+     HAMBURGER BARS ANIMATION
+     - Top/bottom bars move apart on hover
+     - Middle bar grows
+     ============================================ */
+  .bars {
+    transition: opacity 250ms ease-out;
+  }
+
   .barTop,
   .barMid,
   .barBottom {
     transition:
       transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      opacity 250ms ease-out;
     transform-origin: center;
   }
 
-  /* Top bar moves UP on hover */
-  .sidebarShell:hover .barTop,
-  .sidebarShell:focus-within .barTop {
+  /* Top bar: moves UP on hover */
+  .sidebarShell:hover .barTop {
     transform: translateY(-4px);
-    opacity: 0.6;
   }
 
-  /* Bottom bar moves DOWN on hover (opposite direction) */
-  .sidebarShell:hover .barBottom,
-  .sidebarShell:focus-within .barBottom {
+  /* Bottom bar: moves DOWN on hover */
+  .sidebarShell:hover .barBottom {
     transform: translateY(4px);
-    opacity: 0.6;
   }
 
-  /* Middle bar stretches */
-  .sidebarShell:hover .barMid,
-  .sidebarShell:focus-within .barMid {
-    transform: scaleY(1.3);
+  /* Middle bar: grows vertically */
+  .sidebarShell:hover .barMid {
+    transform: scaleY(1.5);
   }
 
-  /* Menu item entrance animation */
+  /* ============================================
+     MENU ITEMS - STAGGERED SLIDE-IN
+     ============================================ */
   .menuItem {
-    transform: translateY(8px);
+    transform: translateX(-20px);
     opacity: 0;
     transition:
-      transform 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      opacity 280ms ease-out,
-      background-color 200ms ease,
-      color 200ms ease,
-      box-shadow 200ms ease;
+      transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 300ms ease-out,
+      background-color 150ms ease,
+      color 150ms ease,
+      box-shadow 150ms ease;
     will-change: transform, opacity;
   }
 
   /* Menu items reveal on panel open */
-  .sidebarShell:hover .menuItem,
-  .sidebarShell:focus-within .menuItem {
-    transform: translateY(0);
+  .sidebarShell:hover .menuItem {
+    transform: translateX(0);
     opacity: 1;
   }
 
   /* Staggered entrance delays */
-  .menuItem:nth-child(1) {
+  .menuItem:nth-of-type(1) {
     transition-delay: 80ms, 80ms, 0ms, 0ms, 0ms;
   }
-  .menuItem:nth-child(2) {
+  .menuItem:nth-of-type(2) {
     transition-delay: 120ms, 120ms, 0ms, 0ms, 0ms;
   }
-  .menuItem:nth-child(3) {
+  .menuItem:nth-of-type(3) {
     transition-delay: 160ms, 160ms, 0ms, 0ms, 0ms;
   }
-  .menuItem:nth-child(4) {
+  .menuItem:nth-of-type(4) {
     transition-delay: 200ms, 200ms, 0ms, 0ms, 0ms;
   }
-  .menuItem:nth-child(5) {
+  .menuItem:nth-of-type(5) {
     transition-delay: 240ms, 240ms, 0ms, 0ms, 0ms;
   }
 
   /* Reset delays on close for snappy exit */
-  .sidebarShell:not(:hover):not(:focus-within) .menuItem {
+  .sidebarShell:not(:hover) .menuItem {
     transition-delay: 0ms;
   }
 
   /* Hover state for individual menu items */
   .menuItem:hover {
-    transform: translateY(-2px) translateX(4px) !important;
+    transform: translateX(6px) !important;
+  }
+
+  /* ============================================
+     LOGO ANIMATION
+     ============================================ */
+  .logo {
+    transform: translateX(-10px);
+    opacity: 0;
+    transition:
+      transform 350ms cubic-bezier(0.4, 0, 0.2, 1) 30ms,
+      opacity 300ms ease-out 30ms;
+  }
+
+  .sidebarShell:hover .logo {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  /* Reset delay on close */
+  .sidebarShell:not(:hover) .logo {
+    transition-delay: 0ms;
+  }
+
+  /* ============================================
+     SOCIAL BUTTONS ANIMATION
+     ============================================ */
+  .socialSection {
+    transform: translateX(-10px);
+    opacity: 0;
+    transition:
+      transform 350ms cubic-bezier(0.4, 0, 0.2, 1) 280ms,
+      opacity 300ms ease-out 280ms;
+  }
+
+  .sidebarShell:hover .socialSection {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  /* Reset delay on close */
+  .sidebarShell:not(:hover) .socialSection {
+    transition-delay: 0ms;
   }
 }
 
@@ -125,18 +177,29 @@
   transform: translateX(-100%);
 }
 
-/* Reduced motion preferences */
+/* ============================================
+   REDUCED MOTION PREFERENCES
+   ============================================ */
 @media (prefers-reduced-motion: reduce) {
+  .bars,
   .barTop,
   .barMid,
   .barBottom,
   .menuItem,
+  .logo,
+  .socialSection,
   .panel {
     transition: none !important;
     transform: none !important;
   }
 
-  .menuItem {
+  .bars {
+    opacity: 1 !important;
+  }
+
+  .menuItem,
+  .logo,
+  .socialSection {
     opacity: 1 !important;
   }
 

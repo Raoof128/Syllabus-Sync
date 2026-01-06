@@ -51,31 +51,38 @@ const Sidebar = memo(() => {
       )}
 
       {/* Sidebar */}
-      <div
+      <aside
         className={cn(
-          'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-full md:w-12 sidebar-shell',
+          'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell',
           styles.sidebarShell,
         )}
+        onMouseLeave={() => {
+          // Blur any focused element to prevent sidebar staying open
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
+        }}
       >
-        <button
-          type="button"
-          aria-label={t('openMenu')}
+        {/* Trigger area with hamburger bars */}
+        <div
+          aria-hidden="true"
           className={cn(
-            'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background z-50',
+            'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none',
             styles.trigger,
           )}
         >
-          <span className={cn('flex flex-col items-center gap-3', styles.bars)}>
-            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barTop)} />
-            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barMid)} />
-            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barBottom)} />
+          {/* Hamburger bars container */}
+          <span className={cn('flex flex-col items-center gap-2', styles.bars)}>
+            <span className={cn('h-5 w-0.5 rounded-full bg-mq-content', styles.barTop)} />
+            <span className={cn('h-5 w-0.5 rounded-full bg-mq-content', styles.barMid)} />
+            <span className={cn('h-5 w-0.5 rounded-full bg-mq-content', styles.barBottom)} />
           </span>
-          <span className="sr-only">{t('openMenu')}</span>
-        </button>
+        </div>
 
+        {/* Sliding panel */}
         <div
           className={cn(
-            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border min-h-screen p-4 md:pl-12 flex flex-col',
+            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col',
             // Desktop: use CSS module for hover-based animation
             'md:transition-none',
             styles.panel,
@@ -86,8 +93,8 @@ const Sidebar = memo(() => {
             'motion-reduce:transition-none motion-reduce:transform-none',
           )}
         >
-          {/* Logo and branding */}
-          <div className="mb-8">
+          {/* Logo and branding - animated */}
+          <div className={cn('mb-8', styles.logo)}>
             <Link href="/home" className="flex items-center gap-2">
               <Image
                 src="/MQ_Logo_Final.png"
@@ -99,6 +106,7 @@ const Sidebar = memo(() => {
             </Link>
           </div>
 
+          {/* Navigation with staggered menu items */}
           <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
             {navigation.map((item) => {
               const isActive =
@@ -133,12 +141,12 @@ const Sidebar = memo(() => {
             })}
           </nav>
 
-          {/* Social buttons at bottom */}
-          <div className="mt-auto pt-6 border-t border-mq-border">
+          {/* Social buttons at bottom - animated */}
+          <div className={cn('mt-auto pt-6 border-t border-mq-border', styles.socialSection)}>
             <SocialButtons />
           </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 });

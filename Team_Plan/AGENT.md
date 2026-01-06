@@ -2350,3 +2350,18 @@ Summary:
 Files: app/api/auth/signup/route.ts; app/api/auth/signin/route.ts; app/api/deadlines/route.ts; app/api/units/route.ts; app/login/LoginClient.tsx; app/api/navigate/route.ts.
 Verification: npm run lint (pass); npm run build (pass); npm audit (0 vulnerabilities).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Sidebar Animation Refactor & Layout Fixes (v0.5.53).
+Summary:
+  - Fixed sidebar to cover full viewport height (was only half page) using h-screen and 100dvh.
+  - Added md:ml-12 margin to main content to offset sidebar trigger width (48px).
+  - Changed layout shift animation from transform to margin-left for smoother content push.
+  - Removed MENU text that was overlapping with hamburger bars - kept only 3-bar icon.
+  - Fixed sidebar staying open after clicking links by removing :focus-within and adding onMouseLeave blur.
+  - Simplified hamburger bar animation (spread apart on hover instead of fading out).
+  - Changed sidebar wrapper from div to semantic aside element to fix ESLint a11y warning.
+  - Updated third dev email from raoof.naushad@hdr.mq.edu.au to kit@mq.edu.au in DEV_EMAILS.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css; app/client-layout.tsx; app/globals.css; app/api/auth/signup/route.ts; app/api/auth/signin/route.ts.
+Verification: npm run lint (0 errors, 0 warnings); npm run build (pass, 27 routes).
+Follow-ups: None.
