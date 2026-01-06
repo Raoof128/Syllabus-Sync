@@ -622,5 +622,12 @@
   "fillUnitDetails": "Isi butiran untuk menambah unit baru ke jadual anda.",
   "removeClassTime": "Buang masa kelas",
   "saving": "Menyimpan...",
-  "update": "Kemaskini"
+  "update": "Kemaskini",
+  "noSessions": "Tiada sesi untuk dipaparkan.",
+  "lastActive": "Aktif terakhir:",
+  "signOutAllSessions": "Log keluar semua sesi",
+  "confirmExport": "Sahkan Eksport",
+  "confirmExportDesc": "Anda akan mengeksport semua data anda termasuk unit, tarikh akhir dan keutamaan. Fail ini akan mengandungi tetapan peribadi anda.",
+  "proceedExport": "Teruskan dengan Eksport",
+  "loadingSettings": "Memuatkan tetapan..."
 }

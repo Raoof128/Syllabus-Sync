@@ -622,5 +622,12 @@
   "encryptionNote": "Tất cả dữ liệu được mã hóa cục bộ trên thiết bị.",
   "exportIncludesPrefs": "Xuất bao gồm tùy chọn và cài đặt",
   "unitsCount": "{{count}} môn học",
-  "deadlinesCount": "{{count}} deadline"
+  "deadlinesCount": "{{count}} deadline",
+  "noSessions": "Không có phiên nào để hiển thị.",
+  "lastActive": "Hoạt động cuối:",
+  "signOutAllSessions": "Đăng xuất tất cả phiên",
+  "confirmExport": "Xác nhận Xuất",
+  "confirmExportDesc": "Bạn sắp xuất tất cả dữ liệu bao gồm các đơn vị, thời hạn và tùy chọn. Tệp này sẽ chứa cài đặt cá nhân của bạn.",
+  "proceedExport": "Tiến hành Xuất",
+  "loadingSettings": "Đang tải cài đặt..."
 }

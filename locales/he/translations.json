@@ -622,5 +622,12 @@
   "encryptionNote": "כל הנתונים מוצפנים מקומית במכשיר שלך.",
   "exportIncludesPrefs": "הייצוא כולל העדפות והגדרות",
   "unitsCount": "{{count}} קורסים",
-  "deadlinesCount": "{{count}} דדליינים"
+  "deadlinesCount": "{{count}} דדליינים",
+  "noSessions": "אין הפעלות להצגה.",
+  "lastActive": "פעילות אחרונה:",
+  "signOutAllSessions": "התנתק מכל ההפעלות",
+  "confirmExport": "אשר ייצוא",
+  "confirmExportDesc": "אתה עומד לייצא את כל הנתונים שלך כולל יחידות, מועדים והעדפות. קובץ זה יכיל את ההגדרות האישיות שלך.",
+  "proceedExport": "המשך עם הייצוא",
+  "loadingSettings": "טוען הגדרות..."
 }

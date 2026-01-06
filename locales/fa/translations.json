@@ -622,5 +622,12 @@
   "encryptionNote": "همه داده‌ها به صورت محلی در دستگاه شما رمزنگاری می‌شوند.",
   "exportIncludesPrefs": "صادرات شامل ترجیحات و تنظیمات می‌شود",
   "unitsCount": "{{count}} درس",
-  "deadlinesCount": "{{count}} مهلت"
+  "deadlinesCount": "{{count}} مهلت",
+  "noSessions": "هیچ جلسه‌ای برای نمایش وجود ندارد.",
+  "lastActive": "آخرین فعالیت:",
+  "signOutAllSessions": "خروج از همه جلسات",
+  "confirmExport": "تأیید صادرات",
+  "confirmExportDesc": "شما در حال صادر کردن تمام داده‌های خود شامل واحدها، مهلت‌ها و تنظیمات هستید. این فایل شامل تنظیمات شخصی شما خواهد بود.",
+  "proceedExport": "ادامه با صادرات",
+  "loadingSettings": "در حال بارگذاری تنظیمات..."
 }

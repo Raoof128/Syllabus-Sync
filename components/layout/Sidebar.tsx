@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
+import styles from './animated-sidebar.module.css';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
@@ -52,58 +53,90 @@ const Sidebar = memo(() => {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed md:relative z-40 w-48 bg-mq-card-background border-r border-mq-border min-h-screen p-4 transition-transform duration-mq-fast flex flex-col',
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+          'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-full md:w-12 sidebar-shell',
+          styles.sidebarShell,
         )}
       >
-        {/* Logo and branding */}
-        <div className="mb-8">
-          <Link href="/home" className="flex items-center gap-2">
-            <Image
-              src="/MQ_Logo_Final.png"
-              alt={t('mqLogoAlt')}
-              width={128}
-              height={128}
-              style={{ objectFit: 'contain', borderRadius: '8px' }}
-            />
-          </Link>
-        </div>
+        <button
+          type="button"
+          aria-label={t('openMenu')}
+          className={cn(
+            'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background z-50',
+            styles.trigger,
+          )}
+        >
+          <span className={cn('flex flex-col items-center gap-3', styles.bars)}>
+            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barTop)} />
+            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barMid)} />
+            <span className={cn('h-6 w-1 rounded-full bg-mq-content', styles.barBottom)} />
+          </span>
+          <span className="sr-only">{t('openMenu')}</span>
+        </button>
 
-        <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || (pathname === '/' && item.href === '/home');
-            const Icon = item.icon;
+        <div
+          className={cn(
+            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border min-h-screen p-4 md:pl-12 flex flex-col',
+            // Desktop: use CSS module for hover-based animation
+            'md:transition-none',
+            styles.panel,
+            // Mobile: use dedicated mobile animation classes
+            'max-md:transition-transform max-md:duration-300 max-md:ease-[cubic-bezier(0.22,1,0.36,1)]',
+            mobileMenuOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
+            // Reduced motion
+            'motion-reduce:transition-none motion-reduce:transform-none',
+          )}
+        >
+          {/* Logo and branding */}
+          <div className="mb-8">
+            <Link href="/home" className="flex items-center gap-2">
+              <Image
+                src="/MQ_Logo_Final.png"
+                alt={t('mqLogoAlt')}
+                width={128}
+                height={128}
+                style={{ objectFit: 'contain', borderRadius: '8px' }}
+              />
+            </Link>
+          </div>
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] btn-premium',
-                  isActive
-                    ? 'bg-mq-primary text-white shadow-mq-sm'
-                    : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq hover:translate-x-1 active:scale-[0.98]',
-                )}
-                aria-current={isActive ? 'page' : undefined}
-                aria-label={t('navigateToItem', { name: t(item.name) })}
-              >
-                <Icon
+          <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
+            {navigation.map((item) => {
+              const isActive =
+                pathname === item.href || (pathname === '/' && item.href === '/home');
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    'h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap',
-                    isActive && 'animate-pulse-subtle',
+                    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium',
+                    styles.menuItem,
+                    isActive
+                      ? 'bg-mq-primary text-white shadow-mq-sm'
+                      : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
                   )}
-                  aria-hidden="true"
-                />
-                {t(item.name)}
-              </Link>
-            );
-          })}
-        </nav>
+                  aria-current={isActive ? 'page' : undefined}
+                  aria-label={t('navigateToItem', { name: t(item.name) })}
+                >
+                  <Icon
+                    className={cn(
+                      'h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap',
+                      isActive && 'animate-pulse-subtle',
+                    )}
+                    aria-hidden="true"
+                  />
+                  {t(item.name)}
+                </Link>
+              );
+            })}
+          </nav>
 
-        {/* Social buttons at bottom */}
-        <div className="mt-auto pt-6 border-t border-mq-border">
-          <SocialButtons />
+          {/* Social buttons at bottom */}
+          <div className="mt-auto pt-6 border-t border-mq-border">
+            <SocialButtons />
+          </div>
         </div>
       </div>
     </>

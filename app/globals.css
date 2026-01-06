@@ -1710,6 +1710,25 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 .settings-page [data-slot='button'][data-variant='destructive'] {
 }
 
+@media (min-width: 768px) {
+  .layout-main {
+    transition: transform 600ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+    will-change: transform;
+  }
+
+  .layout-shell:has(.sidebar-shell:hover) .layout-main,
+  .layout-shell:has(.sidebar-shell:focus-within) .layout-main {
+    transform: translateX(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout-main {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* Also apply to quick action buttons (they use asChild Link) */
 .settings-page .mq-magic-card .mq-magic-card-content .w-full.justify-start[data-slot='button'] {
 }

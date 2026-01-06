@@ -622,5 +622,12 @@
   "encryptionNote": "جميع البيانات مشفرة محلياً على جهازك.",
   "exportIncludesPrefs": "يتضمن التصدير التفضيلات والإعدادات",
   "unitsCount": "{{count}} وحدات",
-  "deadlinesCount": "{{count}} مواعيد نهائية"
+  "deadlinesCount": "{{count}} مواعيد نهائية",
+  "noSessions": "لا توجد جلسات لعرضها.",
+  "lastActive": "آخر نشاط:",
+  "signOutAllSessions": "تسجيل الخروج من جميع الجلسات",
+  "confirmExport": "تأكيد التصدير",
+  "confirmExportDesc": "أنت على وشك تصدير جميع بياناتك بما في ذلك الوحدات والمواعيد النهائية والتفضيلات. سيحتوي هذا الملف على إعداداتك الشخصية.",
+  "proceedExport": "المتابعة مع التصدير",
+  "loadingSettings": "جاري تحميل الإعدادات..."
 }

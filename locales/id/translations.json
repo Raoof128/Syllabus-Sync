@@ -622,5 +622,12 @@
   "fillUnitDetails": "Isi detail untuk menambahkan mata kuliah baru ke jadwal Anda.",
   "removeClassTime": "Hapus waktu kelas",
   "saving": "Menyimpan...",
-  "update": "Perbarui"
+  "update": "Perbarui",
+  "noSessions": "Tidak ada sesi untuk ditampilkan.",
+  "lastActive": "Terakhir aktif:",
+  "signOutAllSessions": "Keluar dari semua sesi",
+  "confirmExport": "Konfirmasi Ekspor",
+  "confirmExportDesc": "Anda akan mengekspor semua data Anda termasuk unit, tenggat waktu, dan preferensi. File ini akan berisi pengaturan pribadi Anda.",
+  "proceedExport": "Lanjutkan dengan Ekspor",
+  "loadingSettings": "Memuat pengaturan..."
 }

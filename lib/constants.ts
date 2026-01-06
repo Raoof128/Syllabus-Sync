@@ -77,3 +77,15 @@ export const DATE_FORMAT = {
   LONG: 'MMMM d, yyyy',
   FULL: 'EEEE, MMMM d, yyyy',
 } as const;
+
+// LocalStorage keys
+export const STORAGE_KEYS = {
+  SESSIONS: 'mq-sessions',
+  NOTIFICATION_DEADLINES: 'notification-deadlines',
+  NOTIFICATION_CLASSES: 'notification-classes',
+  NOTIFICATION_EVENTS: 'notification-events',
+  THEME: 'theme-storage',
+  LANGUAGE: 'language-storage',
+  UNITS: 'units-storage',
+  DEADLINES: 'deadlines-storage',
+} as const;

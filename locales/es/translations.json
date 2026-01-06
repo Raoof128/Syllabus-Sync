@@ -622,5 +622,12 @@
   "encryptionNote": "Todos los datos están encriptados localmente en tu dispositivo.",
   "exportIncludesPrefs": "La exportación incluye preferencias y configuración",
   "unitsCount": "{{count}} unidades",
-  "deadlinesCount": "{{count}} fechas límite"
+  "deadlinesCount": "{{count}} fechas límite",
+  "noSessions": "No hay sesiones para mostrar.",
+  "lastActive": "Última actividad:",
+  "signOutAllSessions": "Cerrar todas las sesiones",
+  "confirmExport": "Confirmar Exportación",
+  "confirmExportDesc": "Estás a punto de exportar todos tus datos incluyendo unidades, fechas límite y preferencias. Este archivo contendrá tu configuración personal.",
+  "proceedExport": "Proceder con la Exportación",
+  "loadingSettings": "Cargando configuración..."
 }

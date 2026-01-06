@@ -622,5 +622,12 @@
   "encryptionNote": "모든 데이터가 기기에서 로컬로 암호화됩니다.",
   "exportIncludesPrefs": "내보내기에 환경설정 및 설정 포함",
   "unitsCount": "{{count}}개 과목",
-  "deadlinesCount": "{{count}}개 마감일"
+  "deadlinesCount": "{{count}}개 마감일",
+  "noSessions": "표시할 세션이 없습니다.",
+  "lastActive": "마지막 활동:",
+  "signOutAllSessions": "모든 세션 로그아웃",
+  "confirmExport": "내보내기 확인",
+  "confirmExportDesc": "유닛, 마감일 및 환경설정을 포함한 모든 데이터를 내보내려고 합니다. 이 파일에는 개인 설정이 포함됩니다.",
+  "proceedExport": "내보내기 진행",
+  "loadingSettings": "설정 로딩 중..."
 }

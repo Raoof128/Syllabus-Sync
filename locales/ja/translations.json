@@ -622,5 +622,12 @@
   "encryptionNote": "すべてのデータはデバイス上でローカルに暗号化されています。",
   "exportIncludesPrefs": "エクスポートには設定が含まれています",
   "unitsCount": "{{count}}件の科目",
-  "deadlinesCount": "{{count}}件の締め切り"
+  "deadlinesCount": "{{count}}件の締め切り",
+  "noSessions": "表示するセッションがありません。",
+  "lastActive": "最終アクティブ：",
+  "signOutAllSessions": "すべてのセッションからサインアウト",
+  "confirmExport": "エクスポートの確認",
+  "confirmExportDesc": "ユニット、締め切り、設定を含むすべてのデータをエクスポートしようとしています。このファイルには個人設定が含まれます。",
+  "proceedExport": "エクスポートを続行",
+  "loadingSettings": "設定を読み込み中..."
 }

@@ -622,5 +622,12 @@
   "encryptionNote": "所有数据在您的设备上进行本地加密。",
   "exportIncludesPrefs": "导出包括偏好设置",
   "unitsCount": "{{count}} 个课程",
-  "deadlinesCount": "{{count}} 个截止日期"
+  "deadlinesCount": "{{count}} 个截止日期",
+  "noSessions": "没有可显示的会话。",
+  "lastActive": "最后活动：",
+  "signOutAllSessions": "退出所有会话",
+  "confirmExport": "确认导出",
+  "confirmExportDesc": "您即将导出所有数据，包括单元、截止日期和首选项。此文件将包含您的个人设置。",
+  "proceedExport": "继续导出",
+  "loadingSettings": "正在加载设置..."
 }

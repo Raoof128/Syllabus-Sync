@@ -622,5 +622,12 @@
   "encryptionNote": "تمام ڈیٹا آپ کے ڈیوائس پر مقامی طور پر اینکرپٹ ہے۔",
   "exportIncludesPrefs": "برآمد میں ترجیحات اور ترتیبات شامل ہیں",
   "unitsCount": "{{count}} یونٹس",
-  "deadlinesCount": "{{count}} ڈیڈ لائنز"
+  "deadlinesCount": "{{count}} ڈیڈ لائنز",
+  "noSessions": "دکھانے کے لیے کوئی سیشن نہیں۔",
+  "lastActive": "آخری سرگرمی:",
+  "signOutAllSessions": "تمام سیشنز سے سائن آؤٹ کریں",
+  "confirmExport": "ایکسپورٹ کی تصدیق کریں",
+  "confirmExportDesc": "آپ اپنے تمام ڈیٹا کو ایکسپورٹ کرنے والے ہیں جس میں یونٹس، ڈیڈ لائنز اور ترجیحات شامل ہیں۔ اس فائل میں آپ کی ذاتی سیٹنگز ہوں گی۔",
+  "proceedExport": "ایکسپورٹ کے ساتھ آگے بڑھیں",
+  "loadingSettings": "سیٹنگز لوڈ ہو رہی ہیں..."
 }

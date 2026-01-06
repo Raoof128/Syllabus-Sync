@@ -622,5 +622,12 @@
   "switchToTamil": "Passa alla lingua tamil",
   "switchToBengali": "Passa alla lingua bengalese",
   "switchToIndonesian": "Passa alla lingua indonesiana",
-  "switchToMalay": "Passa alla lingua malese"
+  "switchToMalay": "Passa alla lingua malese",
+  "noSessions": "Nessuna sessione da mostrare.",
+  "lastActive": "Ultima attività:",
+  "signOutAllSessions": "Disconnetti tutte le sessioni",
+  "confirmExport": "Conferma Esportazione",
+  "confirmExportDesc": "Stai per esportare tutti i tuoi dati incluse unità, scadenze e preferenze. Questo file conterrà le tue impostazioni personali.",
+  "proceedExport": "Procedi con l'Esportazione",
+  "loadingSettings": "Caricamento impostazioni..."
 }

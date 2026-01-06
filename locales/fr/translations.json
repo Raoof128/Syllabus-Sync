@@ -622,5 +622,12 @@
   "encryptionNote": "Toutes les données sont chiffrées localement sur votre appareil.",
   "exportIncludesPrefs": "L'exportation inclut les préférences et les paramètres",
   "unitsCount": "{{count}} cours",
-  "deadlinesCount": "{{count}} échéances"
+  "deadlinesCount": "{{count}} échéances",
+  "noSessions": "Aucune session à afficher.",
+  "lastActive": "Dernière activité :",
+  "signOutAllSessions": "Déconnecter toutes les sessions",
+  "confirmExport": "Confirmer l'exportation",
+  "confirmExportDesc": "Vous êtes sur le point d'exporter toutes vos données, y compris les unités, les échéances et les préférences. Ce fichier contiendra vos paramètres personnels.",
+  "proceedExport": "Procéder à l'exportation",
+  "loadingSettings": "Chargement des paramètres..."
 }

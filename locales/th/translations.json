@@ -622,5 +622,12 @@
   "encryptionNote": "ข้อมูลทั้งหมดเข้ารหัสในเครื่องบนอุปกรณ์ของคุณ",
   "exportIncludesPrefs": "ส่งออกรวมถึงการตั้งค่าและความชอบ",
   "unitsCount": "{{count}} วิชา",
-  "deadlinesCount": "{{count}} กำหนดส่ง"
+  "deadlinesCount": "{{count}} กำหนดส่ง",
+  "noSessions": "ไม่มีเซสชันที่จะแสดง",
+  "lastActive": "ใช้งานล่าสุด:",
+  "signOutAllSessions": "ออกจากระบบทุกเซสชัน",
+  "confirmExport": "ยืนยันการส่งออก",
+  "confirmExportDesc": "คุณกำลังจะส่งออกข้อมูลทั้งหมดรวมถึงหน่วย กำหนดเวลา และการตั้งค่า ไฟล์นี้จะมีการตั้งค่าส่วนตัวของคุณ",
+  "proceedExport": "ดำเนินการส่งออก",
+  "loadingSettings": "กำลังโหลดการตั้งค่า..."
 }

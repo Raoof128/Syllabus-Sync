@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.5.48] - 2026-01-06
+## [0.5.48] - 2026-01-07
 
 ### Fixed
+
+- **Sidebar hamburger animation (Raouf)**: Fixed desktop hamburger trigger where both top and bottom bars moved in same direction. Now top bar moves UP (-4px) and bottom bar moves DOWN (+4px) for proper expanding X animation. File changed: `components/layout/animated-sidebar.module.css`.
+- **Sidebar menu item animation (Raouf)**: Removed conflicting Tailwind hover classes from menu items that interfered with CSS module entrance animations. Hover transform now handled purely by CSS module for consistent `translateY(-2px) translateX(4px)` effect. File changed: `components/layout/Sidebar.tsx`.
+- **Sidebar mobile animation (Raouf)**: Separated mobile and desktop panel animations using `max-md:` prefixes to prevent CSS conflicts. Mobile uses dedicated Tailwind classes, desktop uses CSS module hover-based animation. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar panel transition (Raouf)**: Added delayed pointer-events transition (`0ms 600ms` on close) so panel remains interactive until close animation completes. Added reset delays for snappy exit when panel closes. File changed: `components/layout/animated-sidebar.module.css`.
 
 - **Settings language layout (Raouf)**: Switched the language selector to a 4-column grid so the 19 language codes render in the intended 4/4/4/4/3 ordering for consistent spacing on desktop. File changed: `app/settings/page.tsx`.
 - **Settings cleanup (Raouf)**: Removed the Account section and the data retention / encryption note / clear-all-data subcards from Settings to match the latest UI spec. File changed: `app/settings/page.tsx`.
@@ -22,6 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Quick actions fully rounded (Raouf)**: Updated Quick Actions buttons to use full rounding and padding so they no longer appear squared. File changed: `components/home/QuickActions.tsx`.
 - **Quick actions pill round (Raouf)**: Switched Quick Actions buttons to `rounded-full` to ensure visibly pill-shaped corners. File changed: `components/home/QuickActions.tsx`.
 - **Settings quick actions rounding (Raouf)**: Rounded the Settings quick actions buttons so they match the rest of the card styling. File changed: `app/settings/page.tsx`.
+- **Sidebar animation (Raouf)**: Added a desktop-only hover/focus trigger strip and staggered slide-in menu animation with reduced-motion support. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar trigger label (Raouf)**: Added a desktop trigger label and refined stagger/opacity to better match the reference animation while preserving reduced-motion behavior. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar drawer motion (Raouf)**: Updated the desktop sidebar to slide like a drawer from the trigger strip using a translateX offset and cubic-bezier easing. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar peek tightened (Raouf)**: Reduced the drawer peek width so the sidebar stays more hidden at rest. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar hover fix (Raouf)**: Prevented hover/focus states from sticking by disabling pointer events while the drawer is closed and reduced the peek width further. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar fully hidden (Raouf)**: Set the closed desktop drawer to translate fully offscreen so only the trigger strip is visible. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar drawer hint (Raouf)**: Added a subtle drawer indicator on the trigger strip so users notice the hidden menu. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar trigger cleanup (Raouf)**: Removed the arrow/label hints so the trigger matches the minimal three-bar reference. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar trigger visibility (Raouf)**: Adjusted drawer offset and trigger stacking so the three-bar handle stays visible when closed. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Sidebar handle clickability (Raouf)**: Ensured the trigger strip remains interactive and visible while the drawer is closed. File changed: `components/layout/animated-sidebar.module.css`.
+- **Sidebar handle visibility (Raouf)**: Anchored the trigger strip and boosted bar contrast so the three-bar handle stays visible when closed. File changed: `components/layout/Sidebar.tsx`.
+- **Layout shift on sidebar open (Raouf)**: Added a subtle desktop content shift tied to the sidebar hover/focus state for a responsive drawer reaction. Files changed: `app/client-layout.tsx`, `app/globals.css`, `components/layout/Sidebar.tsx`.
 
 ## [0.5.47] - 2026-01-06
 

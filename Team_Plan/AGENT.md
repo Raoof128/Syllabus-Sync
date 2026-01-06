@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.46 | Last Updated: January 06, 2026
+Version: 0.5.47 | Last Updated: January 07, 2026
 
 ---
 
@@ -57,7 +57,11 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
-#### ✅ Calendar Dialog & Accessibility (v0.5.46)
+#### ✅ Sidebar Menu Animation Fixes (v0.5.47)
+- **Hamburger bar animation (Raouf)**: Fixed the desktop hamburger trigger where both top and bottom bars were moving in the same direction (both UP). Now top bar moves UP and bottom bar moves DOWN X for proper expanding animation effect. Changed `translateY(-6px)` to `translateY(4px)` for bottom bar. Files changed: `components/layout/animated-sidebar.module.css`.
+- **Menu item stagger fix (Raouf)**: Removed conflicting Tailwind hover classes (`hover:translate-x-1`, `hover:-translate-y-0.5`) from menu items that interfered with CSS module entrance animations. Hover transform now handled purely by CSS module for consistent `translateY(-2px) translateX(4px)` effect. Files changed: `components/layout/Sidebar.tsx`.
+- **Mobile animation polish (Raouf)**: Separated mobile and desktop panel animations using `max-md:` prefixes to prevent CSS conflicts. Mobile panel now uses dedicated Tailwind transform classes for slide-in/out while desktop uses CSS module hover-based animation. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.
+- **Panel transition timing (Raouf)**: Added delayed pointer-events transition (`0ms 600ms` on close) to ensure panel remains interactive until close animation completes, preventing janky close behavior. Added reset delays for snappy exit when panel closes. Files changed: `components/layout/animated-sidebar.module.css`.
 - **Restored edit dialog & accessibility (Raouf)**: Reintroduced the edit dialog flow on the Calendar page by wiring the `DeadlineForm` into `CalendarClient`, adding keyboard support and ARIA attributes (`aria-haspopup`, `aria-expanded`, `aria-label`) and providing a grid button with an accessible title. Files changed: `app/calendar/CalendarClient.tsx`, `components/deadlines/DeadlineForm.tsx`.
 - **Tests restored & improved (Raouf)**: Restored the previously skipped dialog tests and replaced brittle selectors with robust queries and `user-event` keyboard simulation. Added `@testing-library/user-event` as a dev dependency. Tests updated: `tests/CalendarPage.test.tsx`. Test-suite status: all tests pass locally (43/43).
 - **i18n keys added (Raouf)**: Added `markComplete`, `markIncomplete`, and `openEditDialog` to `locales/en/translations.json` to ensure accessible label strings are typed and available at build time.
@@ -885,8 +889,17 @@ MIT License - See LICENSE file for details.
 
 ---
 
-**Last Updated:** January 06, 2026
-**Version:** 0.5.45
+**Last Updated:** January 07, 2026
+**Version:** 0.5.47
+
+---
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Sidebar menu animation debug and polish.
+Summary: Fixed hamburger bar animation where both top and bottom bars moved in same direction (both UP). Now top bar moves UP (-4px) and bottom bar moves DOWN (+4px) for proper expanding effect. Removed conflicting Tailwind hover classes from menu items that interfered with CSS module entrance animations. Separated mobile and desktop panel animations using max-md: prefixes. Added delayed pointer-events transition on close to prevent janky behavior, and reset delays for snappy exit.
+Files changed: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run build (pass).
+Follow-ups: None - sidebar animation now smooth and correct.
 
 ---
 
@@ -2212,4 +2225,107 @@ Summary:
   - Rounded the Settings quick actions buttons to align with other card styles.
 Files: app/settings/page.tsx.
 Verification: Not run (UI-only change).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Feature - Sidebar Desktop Animation.
+Summary:
+  - Added a desktop-only trigger strip with animated bars and a slide-in panel effect.
+  - Staggered sidebar menu item reveal on hover/focus while preserving routing and accessibility.
+  - Included reduced-motion fallbacks to keep the menu static when requested.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Trigger Label.
+Summary:
+  - Added a vertical trigger label tied to hover/focus and tuned the staggered reveal to match the reference motion.
+  - Preserved reduced-motion fallbacks and existing navigation behavior.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: Not run (UI-only change).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Drawer Motion.
+Summary:
+  - Shifted the desktop sidebar to a drawer-style translateX offset and slide-in on hover/focus.
+  - Kept mobile behavior unchanged and preserved reduced-motion handling.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Peek.
+Summary:
+  - Reduced the desktop drawer peek width to keep the sidebar more hidden at rest.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Sidebar Hover Sticky.
+Summary:
+  - Disabled pointer events while the drawer is closed to stop hover styles from sticking.
+  - Tightened the closed-state peek width for a more hidden drawer.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Hidden State.
+Summary:
+  - Moved the closed desktop drawer fully offscreen so only the trigger strip remains visible.
+  - Kept the drawer motion and focus behavior unchanged.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Drawer Hint.
+Summary:
+  - Added a subtle drawer indicator arrow on the trigger strip for discoverability.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Polish - Sidebar Trigger Minimal.
+Summary:
+  - Removed the trigger label/arrow so the closed state matches the minimal three-bar reference.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Sidebar Trigger Visibility.
+Summary:
+  - Ensured the three-bar trigger remains visible by offsetting the closed panel and layering the trigger above it.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Sidebar Handle Interactivity.
+Summary:
+  - Restored pointer events on the trigger strip so the three-bar handle stays visible and usable.
+Files: components/layout/animated-sidebar.module.css.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Sidebar Handle Visibility.
+Summary:
+  - Fixed desktop trigger positioning and increased bar contrast to prevent the handle from disappearing.
+Files: components/layout/Sidebar.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Feature - Layout Reaction.
+Summary:
+  - Shifted the main content slightly on desktop when the sidebar drawer opens to give a responsive layout reaction.
+  - Used hover/focus-within detection with reduced-motion safety.
+Files: app/client-layout.tsx; app/globals.css; components/layout/Sidebar.tsx.
+Verification: npm run lint -- --max-warnings=0 (pass).
 Follow-ups: None.

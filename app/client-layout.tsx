@@ -167,12 +167,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Render full layout for authenticated routes
   return (
     <ThemeProvider>
-      <div className="flex min-h-screen bg-mq-background">
+      <div className="layout-shell flex min-h-screen bg-mq-background">
         {/* Sidebar */}
         <Sidebar />
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
+        <div className="layout-main flex-1 flex flex-col overflow-hidden md:ml-0">
           <Header />
           <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
             <ErrorBoundary>{children}</ErrorBoundary>
