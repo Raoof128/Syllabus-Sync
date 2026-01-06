@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 type SettingsSkeletonProps = {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';

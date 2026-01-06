@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/mq/button';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
 import { useRetry } from '@/lib/hooks/use-retry';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,

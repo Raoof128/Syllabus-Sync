@@ -25,10 +25,8 @@ export async function fetchORSRoute(
   start: { lat: number; lng: number },
   end: { lat: number; lng: number },
 ): Promise<{ coordinates: [number, number][]; preview: RoutePreview | null; error?: string }> {
-  if (!process.env.NEXT_PUBLIC_ORS_API_KEY) {
-    console.error('ORS API Key is missing. Please set NEXT_PUBLIC_ORS_API_KEY.');
-    return { coordinates: [], preview: null, error: 'Missing API Key (Restart Server?)' };
-  }
+  // API key is handled server-side in /api/navigate route
+  // No need to check for NEXT_PUBLIC_ORS_API_KEY on the client
 
   try {
     // Call local proxy instead of external API to avoid CORS/Network errors

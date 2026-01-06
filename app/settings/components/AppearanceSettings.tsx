@@ -1,8 +1,8 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/mq/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Palette } from 'lucide-react';
 import { toastUtils } from '@/lib/utils/toast';
 import type { Language, TranslationKey } from '@/lib/i18n/translations';

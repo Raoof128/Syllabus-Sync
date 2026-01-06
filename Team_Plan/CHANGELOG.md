@@ -7,6 +7,111 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.58] - 2026-01-07
+
+### Fixed
+
+#### Map Geolocation Infinite Loop Fix (Raouf)
+
+Fixed "Maximum update depth exceeded" error in CampusMap component caused by `origin` state being in the useEffect dependency array while also being set inside the effect.
+
+**Root Cause**: The geolocation watchPosition callback called `setOrigin()` which triggered the effect to re-run since `origin` was in the dependency array, creating an infinite render loop.
+
+**Solution**:
+- Removed `origin` from the useEffect dependency array
+- Added `hasSetFallbackOrigin` ref to track if fallback origin has been set (prevents multiple fallback sets)
+- Effect now only depends on `mapInstance`
+
+**Additional improvements**:
+- Added debug logging with `console.warn` for geolocation events (position received, errors, marker creation)
+- Added position analysis logging (isInCampusBounds, distanceFromCampusCentre)
+- Increased geolocation timeout from 10s to 15s for slower GPS devices
+- Added "Outside Campus" toast notification when user location is outside campus bounds
+
+Files changed: `app/map/CampusMap.tsx`
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes); `npm test` (46/46 pass).
+
+---
+
+## [0.5.57] - 2026-01-07
+
+### Fixed
+
+#### Input Component MQ Import Audit (Raouf)
+
+Updated all form components to use MQ Input component instead of base Shadcn Input for consistent branding:
+
+- **LoginClient.tsx**: Updated Input import to use `@/components/ui/mq/input`
+- **SignupClient.tsx**: Updated Input import to use `@/components/ui/mq/input`
+- **UnitForm.tsx**: Updated Input import to use `@/components/ui/mq/input`
+- **DeadlineForm.tsx**: Updated Input import to use `@/components/ui/mq/input`
+
+Files changed: 4 form component files across `app/login/`, `app/signup/`, `components/units/`, `components/deadlines/`
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes); `npm test` (46/46 pass).
+
+---
+
+## [0.5.56] - 2026-01-07
+
+### Fixed
+
+#### Settings Components MQ Import Audit (Raouf)
+
+Updated all settings page components to use MQ design system components instead of base Shadcn UI components for consistent branding:
+
+- **SettingsSkeleton.tsx**: Updated Card imports to use `@/components/ui/mq/card`
+- **QuickActions.tsx**: Updated Button and Card imports to use MQ variants
+- **PrivacySettings.tsx**: Updated Button and Card imports to use MQ variants
+- **NotificationSettings.tsx**: Updated Button and Card imports to use MQ variants
+- **HelpSupport.tsx**: Updated Button and Card imports to use MQ variants
+- **AppearanceSettings.tsx**: Updated Button and Card imports to use MQ variants
+
+Files changed: 6 settings component files in `app/settings/components/`
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass); `npm test` (pass).
+
+---
+
+## [0.5.55] - 2026-01-07
+
+### Fixed
+
+#### Manage Profiles Page Audit (Raouf)
+
+Completed comprehensive audit of the manage-profiles page with the following fixes:
+
+- **SEO metadata (Raouf)**: Created `app/manage-profiles/head.tsx` with proper Metadata export including title, description, Open Graph tags, Twitter card, and `robots: { index: false, follow: false }` for profile management pages. Follows pattern from other head.tsx files.
+
+- **MQ Card import fix (Raouf)**: Updated ProfileCard.tsx to import Card, CardContent, CardHeader from `@/components/ui/mq/card` instead of base `@/components/ui/card` for consistent MQ design token usage.
+
+- **MQ Badge import fix (Raouf)**: Updated ProfileCard.tsx to import Badge from `@/components/ui/mq/badge` instead of base `@/components/ui/badge` for consistent MQ design token usage.
+
+- **Next.js Image optimization (Raouf)**: Replaced `<img>` element with Next.js `<Image>` component in ProfileCard.tsx for avatar display. Added `width={64}`, `height={64}`, and `unoptimized` prop (since avatars are base64 data URLs). Removed eslint-disable comment for `@next/next/no-img-element`.
+
+Files changed: `app/manage-profiles/head.tsx` (new), `components/ProfileCard.tsx`.
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes); `npm test` (46/46 pass).
+
+---
+
+## [0.5.54] - 2026-01-07
+
+### Fixed
+
+#### Map Geolocation Permission Fix (Raouf)
+
+- **Permissions-Policy header fix (Raouf)**: Fixed browser blocking location permission by changing `Permissions-Policy` header from `geolocation=()` (blocks all) to `geolocation=(self)` (allows same-origin requests). This was preventing `navigator.geolocation.watchPosition()` from working in CampusMap.tsx. File changed: `next.config.ts`.
+
+- **ORS client cleanup (Raouf)**: Removed unnecessary `NEXT_PUBLIC_ORS_API_KEY` check from client-side ORS service since API key is handled server-side in `/api/navigate` route. File changed: `lib/services/ors.ts`.
+
+Files changed: `next.config.ts`, `lib/services/ors.ts`, `package.json`.
+
+Verification: `npm run lint` (0 errors, 0 warnings); `npm run build` (pass, 27 routes).
+
+---
+
 ## [0.5.53] - 2026-01-07
 
 ### Changed

@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.51 | Last Updated: January 07, 2026
+Version: 0.5.58 | Last Updated: January 07, 2026
 
 ---
 
@@ -57,7 +57,11 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
-#### ✅ Sidebar Menu Animation Fixes (v0.5.47)
+#### ✅ Map Geolocation Permission Fix (v0.5.54)
+- **Permissions-Policy header fix (Raouf)**: Fixed browser blocking location permission by changing `Permissions-Policy` header from `geolocation=()` (blocks all) to `geolocation=(self)` (allows same-origin requests). This was preventing `navigator.geolocation.watchPosition()` from working in CampusMap.tsx. File changed: `next.config.ts`.
+- **ORS client cleanup (Raouf)**: Removed unnecessary `NEXT_PUBLIC_ORS_API_KEY` check from client-side ORS service since API key is handled server-side in `/api/navigate` route. File changed: `lib/services/ors.ts`.
+
+#### ✅ Sidebar Animation Fixes (v0.5.53)
 - **Hamburger bar animation (Raouf)**: Fixed the desktop hamburger trigger where both top and bottom bars were moving in the same direction (both UP). Now top bar moves UP and bottom bar moves DOWN X for proper expanding animation effect. Changed `translateY(-6px)` to `translateY(4px)` for bottom bar. Files changed: `components/layout/animated-sidebar.module.css`.
 - **Menu item stagger fix (Raouf)**: Removed conflicting Tailwind hover classes (`hover:translate-x-1`, `hover:-translate-y-0.5`) from menu items that interfered with CSS module entrance animations. Hover transform now handled purely by CSS module for consistent `translateY(-2px) translateX(4px)` effect. Files changed: `components/layout/Sidebar.tsx`.
 - **Mobile animation polish (Raouf)**: Separated mobile and desktop panel animations using `max-md:` prefixes to prevent CSS conflicts. Mobile panel now uses dedicated Tailwind transform classes for slide-in/out while desktop uses CSS module hover-based animation. Files changed: `components/layout/Sidebar.tsx`, `components/layout/animated-sidebar.module.css`.

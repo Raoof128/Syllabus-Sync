@@ -224,22 +224,44 @@ export default function CampusMap({
   const selectedIcon = useMemo(() => getMarkerIcon(true), []);
 
   // Live Location Tracking
+  // Use a ref to track if we've set a fallback origin to avoid infinite loops
+  const hasSetFallbackOrigin = useRef(false);
+
   useEffect(() => {
     if (!mapInstance || !navigator.geolocation) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (!navigator.geolocation) setLocationStatus('error');
+      if (!navigator.geolocation) {
+        console.warn('[Map] Geolocation API not available');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLocationStatus('error');
+      }
       return;
     }
 
+    console.warn('[Map] Starting geolocation watch...');
     setLocationStatus('searching');
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
+        console.warn('[Map] Position received:', {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        });
         setLocationStatus('found');
         const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
         setOrigin({ lat: latlng.lat, lng: latlng.lng });
 
+        // Check if position is within or near campus bounds
+        const latLngBounds = L.latLngBounds(CAMPUS_BOUNDS);
+        const isInBounds = latLngBounds.contains(latlng);
+        const distance = latlng.distanceTo(L.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng));
+        console.warn('[Map] Position analysis:', {
+          isInCampusBounds: isInBounds,
+          distanceFromCampusCentre: `${Math.round(distance)}m`,
+        });
+
         if (!userMarkerRef.current) {
+          console.warn('[Map] Creating user marker at:', latlng);
           userMarkerRef.current = L.marker(latlng, {
             icon: userIcon,
             zIndexOffset: 1000,
@@ -263,6 +285,20 @@ export default function CampusMap({
         }
       },
       (err) => {
+        console.warn('[Map] Geolocation error:', {
+          code: err.code,
+          message: err.message,
+          // 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
+          codeDescription:
+            err.code === 1
+              ? 'PERMISSION_DENIED'
+              : err.code === 2
+                ? 'POSITION_UNAVAILABLE'
+                : err.code === 3
+                  ? 'TIMEOUT'
+                  : 'UNKNOWN',
+        });
+
         // Permission denied (code 1) is expected when user blocks location or
         // when geolocation is disabled by permissions policy - don't log as error
         const isPermissionDenied = err.code === 1;
@@ -282,22 +318,29 @@ export default function CampusMap({
           setLocationStatus('error');
         }
 
-        if (!origin) {
+        // Set fallback origin only once to avoid re-triggering
+        if (!hasSetFallbackOrigin.current) {
+          hasSetFallbackOrigin.current = true;
           setOrigin(CAMPUS_CENTRE);
         }
       },
       {
         enableHighAccuracy: true,
         maximumAge: 2000,
-        timeout: 10000,
+        timeout: 15000, // Increased timeout to 15 seconds
       },
     );
 
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, [mapInstance, origin]);
+    return () => {
+      console.warn('[Map] Clearing geolocation watch');
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [mapInstance]); // Removed 'origin' from dependencies to prevent infinite loop
 
   // Center on User action
   const centerOnUser = useCallback(() => {
+    console.warn('[Map] centerOnUser called, status:', locationStatus, 'origin:', origin);
+
     if (locationStatus === 'denied') {
       toastUtils.error(t('locationAccessDenied'), t('locationDeniedDesc'));
       return;
@@ -314,11 +357,24 @@ export default function CampusMap({
     }
 
     if (userMarkerRef.current && mapInstance) {
-      mapInstance.setView(userMarkerRef.current.getLatLng(), 18, { animate: true });
+      const userLatLng = userMarkerRef.current.getLatLng();
+      console.warn('[Map] Centering on user at:', userLatLng);
+      mapInstance.setView(userLatLng, 18, { animate: true });
+
+      // Check if user is outside campus bounds
+      const latLngBounds = L.latLngBounds(CAMPUS_BOUNDS);
+      if (!latLngBounds.contains(userLatLng)) {
+        const distance = userLatLng.distanceTo(L.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng));
+        toastUtils.warning(
+          'Outside Campus',
+          `You are approximately ${Math.round(distance)}m from campus center`,
+        );
+      }
     } else {
+      console.warn('[Map] Cannot center - marker:', !!userMarkerRef.current, 'map:', !!mapInstance);
       toastUtils.warning(t('locationError'), t('positionUnavailableDesc'));
     }
-  }, [locationStatus, mapInstance, t]);
+  }, [locationStatus, mapInstance, origin, t]);
 
   // Retry route fetch
   const retryRoute = useCallback(async () => {

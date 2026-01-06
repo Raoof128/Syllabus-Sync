@@ -1,8 +1,8 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/mq/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Bell, Mail, Calendar, Info, CheckCircle, XCircle } from 'lucide-react';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';

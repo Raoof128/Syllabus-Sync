@@ -2,8 +2,8 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/mq/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 type QuickActionsProps = {

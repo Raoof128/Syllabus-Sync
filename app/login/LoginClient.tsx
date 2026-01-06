@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { FingerprintButton } from '@/components/auth/FingerprintButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
