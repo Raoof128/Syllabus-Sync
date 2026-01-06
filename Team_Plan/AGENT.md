@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.61 | Last Updated: January 07, 2026
+Version: 0.5.62 | Last Updated: January 07, 2026
 
 ---
 
@@ -56,6 +56,13 @@ Version: 0.5.61 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Header & Console Warning Fixes (v0.5.62)
+- **Hydration mismatch fix (Raouf)**: Fixed React hydration error in Header caused by `useId()` generating different IDs on server vs client for `aria-controls`. Replaced with stable constant `NOTIFICATION_MENU_ID`. File changed: `components/layout/Header.tsx`.
+- **LCP image optimization (Raouf)**: Added `priority` prop to MQ logo (detected as Largest Contentful Paint element) for eager loading. File changed: `components/layout/Header.tsx`.
+- **Logo sizing fix (Raouf)**: Fixed oversized logo in header. Now uses `h-[72px]` on mobile and `h-20` (80px) on desktop to fit properly within header. File changed: `components/layout/Header.tsx`.
+- **Auth error silencing (Raouf)**: Silenced 401 authentication errors in notifications store console output (expected when user is not logged in). File changed: `lib/store/notificationsStore.ts`.
+- **CI/CD cleanup (Raouf)**: Removed Vercel deploy job from CI/CD pipeline (no Vercel tokens configured). File changed: `.github/workflows/ci-cd.yml`.
 
 #### ✅ CI/CD Deploy Fix + i18n Translation Keys (v0.5.61)
 - **CI/CD workflow fix (Raouf)**: Fixed GitHub Actions "Deploy Preview" job that was always being skipped on push events. The job had `if: github.event_name == 'pull_request'` which only runs on PRs. Updated to deploy: Production (`--prod` flag) on push to `main`, Staging on push to `develop`, Preview on pull requests. File changed: `.github/workflows/ci-cd.yml`.

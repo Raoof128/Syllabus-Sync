@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.62] - 2026-01-07
+
+### Fixed
+
+#### Header & Console Warning Fixes (Raouf)
+
+**Hydration Mismatch Fix:**
+
+- **aria-controls hydration error (Raouf)**: Fixed React hydration mismatch in Header component where `useId()` was generating different IDs on server (`_R_3alb_`) vs client (`_R_qlb_`) for the notification menu's `aria-controls` attribute. Replaced dynamic `useId()` with stable constant `NOTIFICATION_MENU_ID = 'header-notification-menu'`.
+
+**Console Warning Fixes:**
+
+- **LCP image optimization (Raouf)**: Added `priority` prop to MQ logo Image component (detected as Largest Contentful Paint element) to enable eager loading and improve performance scores.
+
+- **Logo sizing (Raouf)**: Fixed oversized logo that was breaking header layout. Reduced from 128px to proper sizing: `h-[72px]` (72px) on mobile, `h-20` (80px) on desktop with `w-auto` for aspect ratio.
+
+- **Auth error silencing (Raouf)**: Silenced 401 authentication errors in notifications store. These errors are expected when user is not logged in and were cluttering console output.
+
+**CI/CD Cleanup:**
+
+- **Removed Vercel deploy job (Raouf)**: Removed the `deploy-preview` job from GitHub Actions CI/CD pipeline since Vercel tokens are not configured.
+
+**Files Changed:**
+- `components/layout/Header.tsx` - Hydration fix, LCP optimization, logo sizing
+- `lib/store/notificationsStore.ts` - Auth error silencing
+- `.github/workflows/ci-cd.yml` - Removed Vercel deploy job
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run test` (46/46 tests passing)
+
+---
+
 ## [0.5.61] - 2026-01-07
 
 ### Fixed
