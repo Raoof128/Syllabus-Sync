@@ -115,7 +115,10 @@ export default function SettingsPage() {
       | 'ta'
       | 'bn'
       | 'id'
-      | 'ms',
+      | 'ms'
+      | 'it'
+      | 'fr'
+      | 'he',
   ) => {
     if (newLanguage === language) return;
     setLanguage(newLanguage);
@@ -386,6 +389,9 @@ export default function SettingsPage() {
                         'bn',
                         'id',
                         'ms',
+                        'it',
+                        'fr',
+                        'he',
                       ] as const
                     ).map((lang) => (
                       <Button
