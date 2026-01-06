@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.48] - 2026-01-06
+
+### Fixed
+
+- **Settings language layout (Raouf)**: Switched the language selector to a 4-column grid so the 19 language codes render in the intended 4/4/4/4/3 ordering for consistent spacing on desktop. File changed: `app/settings/page.tsx`.
+- **Settings cleanup (Raouf)**: Removed the Account section and the data retention / encryption note / clear-all-data subcards from Settings to match the latest UI spec. File changed: `app/settings/page.tsx`.
+
 ## [0.5.47] - 2026-01-06
 
 ### Added

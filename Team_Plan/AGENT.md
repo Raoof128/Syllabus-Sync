@@ -2127,3 +2127,21 @@ Summary:
 Files: lib/i18n/translations.ts; locales/fr/translations.json; locales/he/translations.json; locales/*/translations.json (19 files created).
 Verification: npm run build (pass); npx tsc --noEmit (pass); npm run lint (pass); npm test (39 passed, 2 skipped).
 Follow-ups: Consider adding automated i18n coverage checks to CI pipeline.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Fix - Settings Language Grid.
+Summary:
+  - Switched the settings language selector to a 4-column grid so the 19 language codes render as 4/4/4/4/3 rows on desktop.
+  - Keeps the existing language order while enforcing consistent spacing and readability.
+Files: app/settings/page.tsx.
+Verification: Not run (UI-only layout change).
+Follow-ups: None.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: Cleanup - Settings UI.
+Summary:
+  - Removed the Account section card from Settings.
+  - Removed the data retention, encryption note, and clear-all-data subcards to simplify the Privacy & Security block per latest design.
+Files: app/settings/page.tsx.
+Verification: Not run (UI-only layout change).
+Follow-ups: None.

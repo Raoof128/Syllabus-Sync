@@ -5,16 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
@@ -28,17 +18,11 @@ import {
   Calendar,
   CheckCircle,
   Info,
-  Loader2,
   Palette,
   Shield,
   XCircle,
   Mail,
   Download,
-  Trash2,
-  Lock,
-  Key,
-  LogOut,
-  User,
 } from 'lucide-react';
 
 const languageNames: Record<string, string> = {
@@ -64,14 +48,8 @@ const languageNames: Record<string, string> = {
 };
 
 export default function SettingsPage() {
-  const [clearing, setClearing] = useState(false);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [clearConfirmText, setClearConfirmText] = useState('');
-
   const units = useUnitsStore((state) => state.units);
-  const removeUnit = useUnitsStore((state) => state.removeUnit);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
 
   const { theme, resolvedTheme, setTheme } = useThemeStore();
   const { t, language, setLanguage } = useTranslation();
@@ -148,54 +126,6 @@ export default function SettingsPage() {
     } catch (error) {
       errorHandler.logError(error as Error, 'Notification Prefs', 'low');
       toastUtils.error(t('settingsError'), t('preferenceError'));
-    }
-  };
-
-  const handleClearAllData = () => {
-    setClearConfirmText('');
-    setShowClearConfirm(true);
-  };
-
-  const confirmClearAllData = () => {
-    if (clearConfirmText !== 'CLEAR') {
-      toastUtils.error(t('clearDataConfirmRequired'), '');
-      return;
-    }
-
-    setClearing(true);
-    let cleared = false;
-
-    try {
-      units.forEach((unit) => removeUnit(unit.id));
-      deadlines.forEach((deadline) => removeDeadline(deadline.id));
-
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('units-storage');
-        localStorage.removeItem('deadlines-storage');
-        localStorage.removeItem('notifications-storage');
-        localStorage.removeItem('seed-disabled');
-        localStorage.removeItem('units-seeded');
-        localStorage.removeItem('deadlines-seeded');
-        localStorage.removeItem('notifications-seeded');
-        ['deadlines', 'classes', 'events'].forEach((k) =>
-          localStorage.removeItem(`notification-${k}`),
-        );
-      }
-
-      cleared = true;
-    } catch (error) {
-      errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to clear data'),
-        'Settings Clear Data',
-        'medium',
-      );
-      toastUtils.error(t('clearError'), t('clearErrorMsg'));
-    } finally {
-      setClearing(false);
-      if (cleared) {
-        setShowClearConfirm(false);
-        toastUtils.success(t('dataCleared'), t('dataClearedMsg'));
-      }
     }
   };
 
@@ -370,7 +300,7 @@ export default function SettingsPage() {
                       {t('current')}: {languageNames[language] || language}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1 sm:gap-2 max-w-[200px]">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {(
                       [
                         'en',
@@ -422,25 +352,6 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-mq-content">{t('dataRetention')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('dataRetentionDesc')}</p>
-                  </div>
-                  <Lock className="h-4 w-4 text-mq-success" />
-                </div>
-              </div>
-
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-mq-content">{t('encryptionNote')}</h4>
-                  </div>
-                  <Key className="h-4 w-4 text-mq-success" />
-                </div>
-              </div>
-
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
@@ -516,85 +427,11 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-mq-content">{t('clearAllData')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('clearAllDataDesc')}</p>
-                  </div>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleClearAllData}
-                    disabled={clearing}
-                    className="flex items-center gap-2"
-                  >
-                    {clearing && <Loader2 className="h-3 w-3 animate-spin" />}
-                    <Trash2 className="h-3 w-3" />
-                    {clearing ? t('clearing') : t('clearData')}
-                  </Button>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          <div className="mq-magic-card">
-            <Card className="mq-magic-card-content">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  {t('account')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
-                  <h4 className="font-semibold text-mq-content mb-1">{t('signedInAs')}</h4>
-                  <p className="text-mq-sm text-mq-content-secondary">{t('guest')}</p>
-                </div>
-
-                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-mq-content">{t('signOut')}</h4>
-                      <p className="text-mq-sm text-mq-content-secondary">{t('signOut')}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                      onClick={() => toastUtils.info(t('signOut'), t('comingSoon'))}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      {t('signOut')}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-mq-content">{t('deleteAccount')}</h4>
-                      <p className="text-mq-sm text-mq-content-secondary">
-                        {t('deleteAccountWarning')}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="bg-mq-error/10 text-mq-error hover:bg-mq-error/20"
-                      onClick={() => toastUtils.info(t('deleteAccount'), t('comingSoon'))}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      {t('delete')}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           <div className="mq-magic-card">
             <Card className="mq-magic-card-content">
               <CardHeader>
@@ -678,43 +515,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('clearAllDataTitle')}</DialogTitle>
-            <DialogDescription className="space-y-2">
-              <p>{t('clearAllDataDialogDesc')}</p>
-              <p className="text-mq-error font-medium">{t('exportReminder')}</p>
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('clearDataSummary')
-                  .replace('{{units}}', units.length.toString())
-                  .replace('{{deadlines}}', deadlines.length.toString())}
-              </p>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              placeholder={t('clearDataConfirmPlaceholder')}
-              value={clearConfirmText}
-              onChange={(e) => setClearConfirmText(e.target.value)}
-              className="text-center"
-            />
-          </div>
-          <DialogFooter className="flex gap-2">
-            <Button variant="secondary" onClick={() => setShowClearConfirm(false)}>
-              {t('cancel')}
-            </Button>
-            <Button
-              variant="default"
-              onClick={confirmClearAllData}
-              disabled={clearing || clearConfirmText !== 'CLEAR'}
-            >
-              {clearing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              {clearing ? t('clearing') : t('clearAllDataTitle')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
