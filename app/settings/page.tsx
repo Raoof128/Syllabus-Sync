@@ -100,25 +100,25 @@ export default function SettingsPage() {
 
   const handleLanguageChange = (
     newLanguage:
-      | 'ar'
-      | 'bn'
       | 'en'
       | 'es'
-      | 'fa'
       | 'fr'
-      | 'he'
-      | 'hi'
-      | 'id'
       | 'it'
+      | 'zh'
       | 'ja'
       | 'ko'
-      | 'ms'
-      | 'ru'
+      | 'vi'
+      | 'hi'
+      | 'ur'
+      | 'bn'
       | 'ta'
       | 'th'
-      | 'ur'
-      | 'vi'
-      | 'zh',
+      | 'id'
+      | 'ms'
+      | 'fa'
+      | 'ru'
+      | 'ar'
+      | 'he',
   ) => {
     if (newLanguage === language) return;
     setLanguage(newLanguage);
@@ -373,25 +373,25 @@ export default function SettingsPage() {
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2 max-w-[200px]">
                     {(
                       [
-                        'ar',
-                        'bn',
                         'en',
                         'es',
-                        'fa',
                         'fr',
-                        'he',
-                        'hi',
-                        'id',
                         'it',
+                        'zh',
                         'ja',
                         'ko',
-                        'ms',
-                        'ru',
+                        'vi',
+                        'hi',
+                        'ur',
+                        'bn',
                         'ta',
                         'th',
-                        'ur',
-                        'vi',
-                        'zh',
+                        'id',
+                        'ms',
+                        'fa',
+                        'ru',
+                        'ar',
+                        'he',
                       ] as const
                     ).map((lang) => (
                       <Button
