@@ -179,10 +179,10 @@ const Header = memo(() => {
           <Image
             src="/MQ_Logo_Final.png"
             alt={t('mqLogoAlt')}
-            width={56}
-            height={56}
+            width={72}
+            height={72}
             priority
-            className="h-12 w-auto sm:h-14"
+            className="h-16 w-auto sm:h-[72px]"
           />
           <div className="hidden sm:block">
             <h1 className="text-mq-lg font-semibold text-mq-content">{APP_CONFIG.name}</h1>
