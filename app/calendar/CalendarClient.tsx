@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 // import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
@@ -22,7 +21,6 @@ export default function CalendarClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
 
-  const units = useUnitsStore((s) => s.units);
 
   const hasHydrated = useHydration();
   const { t } = useTranslation();
@@ -143,8 +141,8 @@ export default function CalendarClient() {
       <DeadlineForm
         open={dialogOpen}
         onOpenChange={(v) => {
-          setDialogOpen(v);
-          if (!v) setEditDeadline(null);
+          if (v) setDialogOpen(true);
+          else closeEdit();
         }}
         editDeadline={editDeadline}
       />
