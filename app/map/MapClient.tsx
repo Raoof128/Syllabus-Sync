@@ -233,19 +233,8 @@ export default function MapClient() {
     <div className="container mx-auto p-4 max-w-7xl map-page">
       {/* Header */}
       <header className="mb-6">
-        <h1
-          className="text-mq-3xl font-bold text-mq-content mb-2"
-          style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-        >
-          {t('campusMap')}
-        </h1>
-        <p
-          className="text-mq-content-secondary"
-          style={{
-            color: 'var(--mq-content-secondary)',
-            WebkitTextFillColor: 'var(--mq-content-secondary)',
-          }}
-        >
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('campusMap')}</h1>
+        <p className="text-mq-content-secondary">
           {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
         </p>
       </header>
@@ -446,17 +435,11 @@ export default function MapClient() {
                       key={building.code}
                       href={`/map?building=${building.code}`}
                       aria-current={isSelected ? 'page' : undefined}
-                      className={`p-3 rounded-mq-lg transition-colors ${
+                      className={`p-3 rounded-mq-lg transition-colors text-mq-content ${
                         isSelected
                           ? 'bg-mq-success/10 border-2 border-mq-success'
                           : 'bg-mq-background-secondary hover:bg-mq-hover-background'
                       }`}
-                      style={{
-                        color: 'var(--mq-content)',
-                        WebkitTextFillColor: 'var(--mq-content)',
-                        opacity: 1,
-                        mixBlendMode: 'normal',
-                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="font-semibold text-mq-content">{building.code}</div>
@@ -498,26 +481,15 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div
-                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
-                    <h4
-                      className="font-semibold text-mq-content alabaster-readable"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
-                      {t('walkingDirections')}
-                    </h4>
-                    <p
-                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg border border-mq-border">
+                    <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
                       {t('walkingDirectionsDesc')}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary alabaster-readable">
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                     <Info className="h-4 w-4" />
-                    <span style={{ color: 'var(--mq-content)' }}>{t('comingSoon')}</span>
+                    <span>{t('comingSoon')}</span>
                   </div>
                 </div>
               </CardContent>
@@ -536,26 +508,15 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div
-                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
-                    <h4
-                      className="font-semibold text-mq-content alabaster-readable"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
-                      {t('realTimeTracking')}
-                    </h4>
-                    <p
-                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg border border-mq-border">
+                    <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
                       {t('realTimeTrackingDesc')}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary alabaster-readable">
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                     <Info className="h-4 w-4" />
-                    <span style={{ color: 'var(--mq-content)' }}>{t('comingSoon')}</span>
+                    <span>{t('comingSoon')}</span>
                   </div>
                 </div>
               </CardContent>
@@ -574,26 +535,15 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div
-                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
-                    <h4
-                      className="font-semibold text-mq-content alabaster-readable"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
-                      {t('filterAndFind')}
-                    </h4>
-                    <p
-                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
-                      style={{ color: 'var(--mq-content)' }}
-                    >
+                  <div className="p-3 bg-mq-background-secondary rounded-mq-lg border border-mq-border">
+                    <h4 className="font-semibold text-mq-content">{t('filterAndFind')}</h4>
+                    <p className="text-mq-sm text-mq-content-secondary mt-1">
                       {t('filterAndFindDesc')}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary alabaster-readable">
+                  <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                     <Info className="h-4 w-4" />
-                    <span style={{ color: 'var(--mq-content)' }}>{t('comingSoon')}</span>
+                    <span>{t('comingSoon')}</span>
                   </div>
                 </div>
               </CardContent>

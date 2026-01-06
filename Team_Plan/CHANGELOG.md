@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.51] - 2026-01-07
+
+### Fixed
+
+#### Full UI Code Quality Audit (Raouf)
+
+- **i18n - HomeClient (Raouf)**: Fixed hardcoded "Cancel" string in delete unit confirmation dialog to use `t('cancel')` translation key. File changed: `app/home/HomeClient.tsx`.
+
+- **Code cleanup - HomeClient (Raouf)**: Removed redundant inline `style={{ color: 'var(--mq-content)' }}` from unit stats grid since Tailwind classes already handle text colors. File changed: `app/home/HomeClient.tsx`.
+
+- **Code cleanup - CalendarClient (Raouf)**: Removed 5 redundant inline `style={{ color: 'var(--mq-content)' }}` props from page title, description, empty state, and deadline items. Tailwind `text-mq-content` classes already provide proper styling. File changed: `app/calendar/CalendarClient.tsx`.
+
+- **Code cleanup - CalendarClient (Raouf)**: Removed redundant `alabaster-readable` class from priority Badge component. File changed: `app/calendar/CalendarClient.tsx`.
+
+- **Code cleanup - FeedClient (Raouf)**: Removed 12+ redundant inline styles including `style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}` from info banner, event cards, and stats cards. File changed: `app/feed/FeedClient.tsx`.
+
+- **Code cleanup - FeedClient (Raouf)**: Removed unnecessary `alabaster-readable` classes from event card content, category badges, and stats sections. File changed: `app/feed/FeedClient.tsx`.
+
+- **i18n - FeedClient (Raouf)**: Fixed 4 hardcoded English category descriptions to use translation keys: "Workshops & Study" → `t('workshopsStudy')`, "Job & Internship" → `t('jobInternship')`, "Meetups & Networking" → `t('meetupsNetworking')`, "Meals & Snacks" → `t('mealsSnacks')`. File changed: `app/feed/FeedClient.tsx`.
+
+Files changed: `app/home/HomeClient.tsx`, `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`.
+
+Verification: `npm run lint` (pass); `npm run build` (pass).
+
+## [0.5.50] - 2026-01-07
+
+### Fixed
+
+- **Geolocation error logging (Raouf)**: Fixed console error spam for expected geolocation permission denials. Permission denied errors (code 1) are now silently handled since they're expected when user blocks location or when geolocation is disabled by browser permissions policy. Only unexpected errors (position unavailable, timeout) are logged to `errorHandler`. File changed: `app/map/CampusMap.tsx`.
+
+## [0.5.49] - 2026-01-07
+
+### Fixed
+
+#### Full Map Page Audit & Comprehensive Fixes (Raouf)
+
+- **Performance (Raouf)**: Cached marker icons using module-level cache (`iconCache` object) in `CampusMap.tsx` to avoid re-creating Leaflet Icon instances on every render, improving map performance significantly.
+
+- **Dark Mode (Raouf)**: Replaced all hardcoded `bg-white` backgrounds with `bg-mq-background-secondary` MQ tokens in MapClient.tsx "Coming Soon" feature cards, ensuring proper dark mode compatibility.
+
+- **Accessibility (Raouf)**: Added proper `aria-label` to "Center on Me" button and "Start Navigation" button in CampusMap.tsx. Added `role="application"` and `aria-label` to map container, and `role="region"` with `aria-label` to route panel for screen reader support.
+
+- **Mobile Responsiveness (Raouf)**: Made route navigation panel responsive by changing from fixed `w-80` to `w-80 md:w-80 right-4 left-4 md:right-auto md:left-4`, ensuring full-width on mobile devices with proper touch targets.
+
+- **UX Improvements (Raouf)**: Added route loading spinner with `isLoadingRoute` state, added retry button for failed route fetches, extended toast duration from 2s to 3s for better visibility, and improved route panel animation with responsive padding.
+
+- **i18n (Raouf)**: Replaced all hardcoded English strings in CampusMap.tsx with `t()` translation calls including location error toasts, navigation labels, and UI text. Added fallback to English for missing translations.
+
+- **Code Quality (Raouf)**: Replaced `console.warn` for geolocation errors with proper `errorHandler.logError` for centralized error logging. Standardized Badge imports to use `@/components/ui/mq/badge` consistently. Fixed Badge variant type error (`outline` → `secondary`).
+
+- **Code Quality (Raouf)**: Removed unnecessary `resolveCssColor` function and inline styles that were redundant with Tailwind classes. Cleaned up redundant `themeKey` state and simplified component logic.
+
+Files changed: app/map/CampusMap.tsx; app/map/MapClient.tsx; lib/services/ors.ts.
+
+Verification: npm run lint (pass); npm run build (pass).
+
 ## [0.5.48] - 2026-01-07
 
 ### Fixed

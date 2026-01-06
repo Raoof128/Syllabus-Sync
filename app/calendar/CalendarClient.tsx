@@ -37,15 +37,8 @@ export default function CalendarClient() {
   return (
     <div className="container mx-auto p-6 max-w-7xl calendar-page">
       <div className="mb-8">
-        <h1
-          className="text-mq-3xl font-bold text-mq-content mb-2"
-          style={{ color: 'var(--mq-content)' }}
-        >
-          {t('calendar')}
-        </h1>
-        <p className="text-mq-content-secondary" style={{ color: 'var(--mq-content)' }}>
-          {t('trackDeadlinesDesc')}
-        </p>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('calendar')}</h1>
+        <p className="text-mq-content-secondary">{t('trackDeadlinesDesc')}</p>
       </div>
 
       <div className="mq-magic-card">
@@ -61,18 +54,10 @@ export default function CalendarClient() {
               {hasHydrated && deadlines.length === 0 ? (
                 <div className="text-center py-12">
                   <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                  <h3
-                    className="text-mq-lg font-semibold text-mq-content mb-2"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                     {t('noDeadlinesYet')}
                   </h3>
-                  <p
-                    className="text-mq-content-secondary mb-4"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
-                    {t('addDeadlinesDesc')}
-                  </p>
+                  <p className="text-mq-content-secondary mb-4">{t('addDeadlinesDesc')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -87,7 +72,6 @@ export default function CalendarClient() {
                       <div
                         key={deadline.id}
                         className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border"
-                        style={{ color: 'var(--mq-content)' }}
                         role="button"
                         tabIndex={0}
                         aria-label={`${deadline.title} deadline`}
@@ -138,9 +122,7 @@ export default function CalendarClient() {
                             <Edit2 className="h-4 w-4" />
                           </button>
 
-                          <Badge
-                            className={`${PRIORITY_COLORS[deadline.priority]} alabaster-readable`}
-                          >
+                          <Badge className={PRIORITY_COLORS[deadline.priority]}>
                             {deadline.priority}
                           </Badge>
                         </div>

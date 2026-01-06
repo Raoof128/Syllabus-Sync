@@ -569,10 +569,7 @@ export default function HomeClient() {
               ) : (
                 <>
                   {/* Unit Stats */}
-                  <div
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border"
-                    style={{ color: 'var(--mq-content)' }}
-                  >
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
                     <div className="text-center">
                       <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
                       <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
@@ -648,7 +645,7 @@ export default function HomeClient() {
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="secondary" onClick={() => setDeleteUnitConfirm(null)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button variant="primary" onClick={confirmDeleteUnit}>
               {t('delete')}

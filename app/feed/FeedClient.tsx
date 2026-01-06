@@ -65,13 +65,10 @@ const FeedClient = memo(() => {
       </header>
 
       {/* Info Banner */}
-      <div
-        className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3 stay-connected-banner"
-        style={{ color: 'var(--mq-content)' }}
-      >
+      <div className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3 stay-connected-banner">
         <Info className="h-5 w-5 text-mq-content-secondary flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-mq-sm text-mq-content" style={{ color: 'var(--mq-content)' }}>
+          <p className="text-mq-sm text-mq-content">
             <strong>{t('stayConnected')}</strong> {t('stayConnectedDesc')}
           </p>
         </div>
@@ -132,15 +129,7 @@ const FeedClient = memo(() => {
                 {filteredEvents.length > 0 ? (
                   filteredEvents.map((event) => (
                     <div key={event.id} className="mq-magic-card">
-                      <div
-                        className="mq-magic-card-content p-4 alabaster-readable"
-                        style={{
-                          color: 'var(--mq-content)',
-                          WebkitTextFillColor: 'var(--mq-content)',
-                          opacity: 1,
-                          mixBlendMode: 'normal',
-                        }}
-                      >
+                      <div className="mq-magic-card-content p-4">
                         {/* Event Header */}
                         <div className="flex items-start justify-between gap-3 mb-3">
                           <h3 className="font-semibold text-mq-content text-mq-lg">
@@ -148,7 +137,7 @@ const FeedClient = memo(() => {
                             {t((event.translationKey || event.title) as any)}
                           </h3>
                           <Badge
-                            className={`${categoryColors[event.category as keyof typeof categoryColors]} alabaster-readable`}
+                            className={`${categoryColors[event.category as keyof typeof categoryColors]}`}
                           >
                             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             {t(`category_${event.category.replace(/ /g, '')}` as any)}
@@ -222,10 +211,7 @@ const FeedClient = memo(() => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div
-                  className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg alabaster-readable"
-                  style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                >
+                <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-mq-info" />
                     <span className="text-mq-sm font-medium text-mq-content">
@@ -234,10 +220,7 @@ const FeedClient = memo(() => {
                   </div>
                   <span className="text-mq-lg font-bold text-mq-info">{sampleEvents.length}</span>
                 </div>
-                <div
-                  className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg alabaster-readable"
-                  style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                >
+                <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-mq-purple" />
                     <span className="text-mq-sm font-medium text-mq-content">{t('thisWeek')}</span>
@@ -246,10 +229,7 @@ const FeedClient = memo(() => {
                     {thisWeeksEvents.length}
                   </span>
                 </div>
-                <div
-                  className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg alabaster-readable"
-                  style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                >
+                <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-mq-warning">🍕</span>
                     <span className="text-mq-sm font-medium text-mq-content">{t('freeFood')}</span>
@@ -309,44 +289,29 @@ const FeedClient = memo(() => {
                 <CardTitle>{t('eventCategories')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div
-                  className="flex items-center justify-between alabaster-readable"
-                  style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                >
-                  <Badge
-                    className="bg-mq-success/10 text-mq-success alabaster-readable"
-                    style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                  >
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-mq-success/10 text-mq-success">
                     {t('category_Academic')}
                   </Badge>
-                  <span className="text-mq-sm text-mq-content-secondary">Workshops & Study</span>
+                  <span className="text-mq-sm text-mq-content-secondary">
+                    {t('workshopsStudy')}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Badge
-                    className="bg-mq-info/10 text-mq-info alabaster-readable"
-                    style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                  >
-                    {t('category_Career')}
-                  </Badge>
-                  <span className="text-mq-sm text-mq-content-secondary">Job & Internship</span>
+                  <Badge className="bg-mq-info/10 text-mq-info">{t('category_Career')}</Badge>
+                  <span className="text-mq-sm text-mq-content-secondary">{t('jobInternship')}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Badge
-                    className="bg-mq-purple/10 text-mq-purple alabaster-readable"
-                    style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                  >
-                    {t('category_Social')}
-                  </Badge>
-                  <span className="text-mq-sm text-mq-content-secondary">Meetups & Networking</span>
+                  <Badge className="bg-mq-purple/10 text-mq-purple">{t('category_Social')}</Badge>
+                  <span className="text-mq-sm text-mq-content-secondary">
+                    {t('meetupsNetworking')}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Badge
-                    className="bg-mq-warning/10 text-mq-warning alabaster-readable"
-                    style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
-                  >
+                  <Badge className="bg-mq-warning/10 text-mq-warning">
                     {t('category_FreeFood')}
                   </Badge>
-                  <span className="text-mq-sm text-mq-content-secondary">Meals & Snacks</span>
+                  <span className="text-mq-sm text-mq-content-secondary">{t('mealsSnacks')}</span>
                 </div>
               </CardContent>
             </Card>

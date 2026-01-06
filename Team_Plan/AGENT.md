@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.47 | Last Updated: January 07, 2026
+Version: 0.5.51 | Last Updated: January 07, 2026
 
 ---
 
@@ -890,16 +890,23 @@ MIT License - See LICENSE file for details.
 ---
 
 **Last Updated:** January 07, 2026
-**Version:** 0.5.47
+**Version:** 0.5.50
 
 ---
 
 ### Raouf: 2026-01-07 (Australia/Sydney)
-Scope: Sidebar menu animation debug and polish.
-Summary: Fixed hamburger bar animation where both top and bottom bars moved in same direction (both UP). Now top bar moves UP (-4px) and bottom bar moves DOWN (+4px) for proper expanding effect. Removed conflicting Tailwind hover classes from menu items that interfered with CSS module entrance animations. Separated mobile and desktop panel animations using max-md: prefixes. Added delayed pointer-events transition on close to prevent janky behavior, and reset delays for snappy exit.
-Files changed: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
-Verification: npm run build (pass).
-Follow-ups: None - sidebar animation now smooth and correct.
+Scope: Geolocation error handling fix.
+Summary: Fixed console error spam for expected geolocation permission denials. Permission denied errors (code 1) including "Geolocation has been disabled by permissions policy" are now silently handled since they're expected browser behavior when user blocks location or when running in restricted iframes. Only unexpected errors (position unavailable, timeout) are logged to errorHandler. This prevents confusing console errors during normal operation.
+Files changed: app/map/CampusMap.tsx.
+Verification: npm run lint (pass); npm run build (pass).
+Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Full Map page audit and comprehensive fixes.
+Summary: Conducted complete audit of Map page (app/map/) addressing code quality, performance, accessibility, i18n, dark mode, mobile responsiveness, and UX issues. Fixed performance by caching marker icons with module-level cache to avoid re-creating on every render. Fixed dark mode by replacing `bg-white` hardcoded backgrounds with `bg-mq-background-secondary` MQ tokens in MapClient.tsx. Fixed accessibility by adding `aria-label` to "Center on Me" button, "Start Navigation" button, and proper roles for map container and route panel. Fixed mobile responsiveness by making route panel full-width on mobile (`right-4 left-4 md:right-auto`) with responsive padding. Added retry button for route errors, route loading state, and i18n for all hardcoded strings (location toasts, navigation labels). Replaced `console.warn` with proper `errorHandler.logError` for geolocation failures. Standardized Badge imports to use `@/components/ui/mq/badge` consistently.
+Files changed: app/map/CampusMap.tsx; app/map/MapClient.tsx; lib/services/ors.ts; lib/map/navigationHelpers.ts.
+Verification: npm run lint (pass); npm run build (pass).
+Follow-ups: Map page now meets enterprise code quality standards with proper i18n, accessibility, dark mode, and performance.
 
 ---
 
