@@ -181,7 +181,8 @@ const Header = memo(() => {
             alt={t('mqLogoAlt')}
             width={128}
             height={128}
-            style={{ objectFit: 'contain' }}
+            priority
+            style={{ objectFit: 'contain', width: 'auto', height: 'auto' }}
           />
           <div className="hidden sm:block">
             <h1 className="text-mq-lg font-semibold text-mq-content">{APP_CONFIG.name}</h1>

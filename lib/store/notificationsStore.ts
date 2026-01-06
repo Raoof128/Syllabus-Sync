@@ -50,9 +50,17 @@ export const useNotificationsStore = create<NotificationsState>()(
             .slice(0, MAX_NOTIFICATIONS);
           set({ notifications: normalized, hasLoaded: true });
         } catch (error) {
-          // Silently fail - keep persisted data if API is unavailable
-          // This allows the app to work with local data until database is set up
-          console.warn('Failed to load notifications from API, using persisted data:', error);
+          // Silently fail for auth errors (401) - expected when not logged in
+          // For other errors, keep persisted data if API is unavailable
+          const isAuthError =
+            error instanceof Error &&
+            (error.message.includes('401') ||
+              error.message.includes('authentication') ||
+              error.message.includes('Unauthorized'));
+
+          if (!isAuthError) {
+            console.warn('Failed to load notifications from API, using persisted data:', error);
+          }
           set({ hasLoaded: true }); // Mark as loaded to prevent retry
         } finally {
           set({ isLoading: false });
