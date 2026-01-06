@@ -6,7 +6,7 @@ import {
   jsonError,
   handleValidationError,
   handleDatabaseError,
-  ERROR_CODES
+  ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
@@ -55,7 +55,9 @@ export async function GET(request: Request) {
         type: url.searchParams.get('type') || undefined,
         read: url.searchParams.get('read') ? url.searchParams.get('read') === 'true' : undefined,
         limit: url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : undefined,
-        offset: url.searchParams.get('offset') ? parseInt(url.searchParams.get('offset')!) : undefined,
+        offset: url.searchParams.get('offset')
+          ? parseInt(url.searchParams.get('offset')!)
+          : undefined,
       });
 
       let queryBuilder = supabase
@@ -142,7 +144,8 @@ export async function POST(request: Request) {
           .single();
 
         if (error) {
-          if (error.code === '23505') { // Unique constraint violation
+          if (error.code === '23505') {
+            // Unique constraint violation
             return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
           }
           return handleDatabaseError(error);

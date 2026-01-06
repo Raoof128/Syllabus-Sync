@@ -20,13 +20,16 @@ export default function TestAuthPage() {
           email: 'test2@student.mq.edu.au',
           password: 'testpassword123',
           fullName: 'Test User 2',
-          studentId: '87654321'
-        })
+          studentId: '87654321',
+        }),
       });
       const data = await response.json();
       setResult({ action: 'signup', ...data });
     } catch (error) {
-      setResult({ action: 'signup', error: error instanceof Error ? error.message : String(error) });
+      setResult({
+        action: 'signup',
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
     setLoading(false);
   };
@@ -39,13 +42,16 @@ export default function TestAuthPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: 'test@student.mq.edu.au',
-          password: 'testpassword123'
-        })
+          password: 'testpassword123',
+        }),
       });
       const data = await response.json();
       setResult({ action: 'signin', ...data });
     } catch (error) {
-      setResult({ action: 'signin', error: error instanceof Error ? error.message : String(error) });
+      setResult({
+        action: 'signin',
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
     setLoading(false);
   };

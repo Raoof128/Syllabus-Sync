@@ -52,10 +52,7 @@ export default function SignupClient() {
         return;
       }
 
-      toastUtils.success(
-        t('accountCreated'),
-        t('verifyEmail')
-      );
+      toastUtils.success(t('accountCreated'), t('verifyEmail'));
       router.push('/login');
     } catch {
       setError(t('unexpectedError'));
@@ -124,11 +121,7 @@ export default function SignupClient() {
                 minLength={6}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? t('creatingAccount') : t('createAccount')}
             </Button>
           </form>

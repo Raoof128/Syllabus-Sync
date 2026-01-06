@@ -1,16 +1,15 @@
-
 const fs = require('fs');
 
 function random(max) {
-    return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * max);
 }
 
 function createShadows(n) {
-    let shadows = [];
-    for (let i = 0; i < n; i++) {
-        shadows.push(`${random(100)}vw ${random(100)}vh #FFF`);
-    }
-    return shadows.join(', ');
+  let shadows = [];
+  for (let i = 0; i < n; i++) {
+    shadows.push(`${random(100)}vw ${random(100)}vh #FFF`);
+  }
+  return shadows.join(', ');
 }
 
 const smallShadows = createShadows(100);

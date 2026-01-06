@@ -9,18 +9,18 @@ const linkVariants = cva(
     variants: {
       variant: {
         default: 'text-mq-primary hover:text-mq-red-bright hover:underline underline-offset-2',
-        subtle: 'text-mq-content-secondary hover:text-mq-content hover:underline underline-offset-2',
+        subtle:
+          'text-mq-content-secondary hover:text-mq-content hover:underline underline-offset-2',
       },
     },
     defaultVariants: {
       variant: 'default',
     },
-  }
+  },
 );
 
 export interface LinkProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
-    VariantProps<typeof linkVariants> {
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof linkVariants> {
   href: string;
   external?: boolean;
 }
@@ -42,10 +42,8 @@ const MQLink = React.forwardRef<HTMLAnchorElement, LinkProps>(
       );
     }
 
-    return (
-      <Link href={href} className={linkClass} ref={ref} {...props} />
-    );
-  }
+    return <Link href={href} className={linkClass} ref={ref} {...props} />;
+  },
 );
 MQLink.displayName = 'MQLink';
 

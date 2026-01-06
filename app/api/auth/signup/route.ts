@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
           student_id: studentId,
         },
         // Auto-confirm email for development
-        emailRedirectTo: undefined
-      }
+        emailRedirectTo: undefined,
+      },
     });
 
     // For development, auto-confirm the user
     if (data.user && !data.session && !error) {
       const { error: confirmError } = await supabase.auth.admin.updateUserById(data.user.id, {
-        email_confirm: true
+        email_confirm: true,
       });
 
       if (confirmError) {
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
           return jsonSuccess({
             user: sessionData.user,
             session: sessionData.session,
-            message: 'Signup successful (auto-confirmed for development)'
+            message: 'Signup successful (auto-confirmed for development)',
           });
         }
       }
@@ -66,14 +66,12 @@ export async function POST(request: NextRequest) {
 
     // Create profile record if user was created
     if (data.user && !data.user.email_confirmed_at) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: data.user.id,
-          email: data.user.email!,
-          full_name: fullName,
-          student_id: studentId,
-        });
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: data.user.id,
+        email: data.user.email!,
+        full_name: fullName,
+        student_id: studentId,
+      });
 
       if (profileError) {
         console.warn('Profile creation failed:', profileError);
@@ -83,9 +81,10 @@ export async function POST(request: NextRequest) {
     return jsonSuccess({
       user: data.user,
       session: data.session,
-      message: data.session ? 'Signup successful' : 'Please check your email to confirm your account'
+      message: data.session
+        ? 'Signup successful'
+        : 'Please check your email to confirm your account',
     });
-
   } catch (error) {
     console.error('Signup error:', error);
     return jsonError('Internal server error', 500);

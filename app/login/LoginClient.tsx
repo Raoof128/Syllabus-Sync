@@ -26,8 +26,6 @@ export default function LoginClient() {
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
 
-
-
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
@@ -35,7 +33,9 @@ export default function LoginClient() {
       // This prevents the "fast redirect" race condition the user reported
       if (isLoading) return;
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         router.push(redirectTo);
       }
@@ -50,14 +50,16 @@ export default function LoginClient() {
 
     try {
       // Enforce minimum 60s wait (1 minute) per user request
-      const minWait = new Promise(resolve => setTimeout(resolve, 6300));
+      const minWait = new Promise((resolve) => setTimeout(resolve, 6300));
 
       const [authResult] = await Promise.all([
-        supabase.auth.signInWithPassword({
-          email,
-          password,
-        }).catch((err: unknown) => ({ error: err as Error })), // Catch auth errors to prevent fail-fast
-        minWait
+        supabase.auth
+          .signInWithPassword({
+            email,
+            password,
+          })
+          .catch((err: unknown) => ({ error: err as Error })), // Catch auth errors to prevent fail-fast
+        minWait,
       ]);
 
       const { error } = authResult || {};
@@ -156,9 +158,7 @@ export default function LoginClient() {
 
           <div className="text-center text-sm text-mq-content-secondary mt-6 p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
             <div className="font-medium text-mq-info mb-1">{t('oauthRequired')}</div>
-            <div className="text-xs">
-              {t('googleOAuthDesc')}
-            </div>
+            <div className="text-xs">{t('googleOAuthDesc')}</div>
           </div>
 
           <div className="text-center text-sm text-mq-content-secondary">

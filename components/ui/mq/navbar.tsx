@@ -14,14 +14,9 @@ interface NavbarProps {
   actionLabel?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  title,
-  navItems,
-  onAction,
-  actionLabel,
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ title, navItems, onAction, actionLabel }) => {
   const { t } = useTranslation();
-  
+
   const defaultTitle = t('macquarieUniversity');
   const defaultNavItems = [
     { label: t('navHome'), href: '/' },
@@ -41,7 +36,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex h-16 justify-between">
           <div className="flex">
             <div className="flex flex-shrink-0 items-center">
-              <Link href="/" className="text-mq-xl font-bold text-mq-content hover:text-mq-primary transition-colors duration-mq-fast">
+              <Link
+                href="/"
+                className="text-mq-xl font-bold text-mq-content hover:text-mq-primary transition-colors duration-mq-fast"
+              >
                 {finalTitle}
               </Link>
             </div>
@@ -62,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Button variant="primary" size="sm" onClick={onAction}>
                 {finalActionLabel}
               </Button>
-            )}  
+            )}
           </div>
         </div>
       </div>

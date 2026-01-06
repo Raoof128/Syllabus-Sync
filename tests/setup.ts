@@ -33,7 +33,7 @@ if (!globalThis.fetch) {
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const method = init?.method ?? 'GET';
     const body = init?.body ? JSON.parse(String(init.body)) : null;
-    const responseBody = method === 'GET' ? [] : body ?? {};
+    const responseBody = method === 'GET' ? [] : (body ?? {});
     return {
       ok: true,
       status: 200,

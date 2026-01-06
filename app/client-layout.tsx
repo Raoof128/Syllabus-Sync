@@ -32,17 +32,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   // Auth routes that don't require authentication
   const authRoutes = ['/login', '/signup', '/reset-password'];
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
   // Protected routes that require authentication
   const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
     // Check authentication status
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const authenticated = !!session;
         setIsAuthenticated(authenticated);
 
@@ -63,19 +65,23 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: { user?: { id: string; email?: string } } | null) => {
-      const authenticated = !!session;
-      setIsAuthenticated(authenticated);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (event: string, session: { user?: { id: string; email?: string } } | null) => {
+        const authenticated = !!session;
+        setIsAuthenticated(authenticated);
 
-      /* 
+        /* 
          Raouf: Disabled auto-redirect for auth routes in the listener to prevent
          interrupting the fingerprint login animation. 
          LoginClient handles its own redirect after the animation completes.
       */
-      if (!authenticated && isProtectedRoute) {
-        router.push(`/login?redirectTo=${pathname}`);
-      }
-    });
+        if (!authenticated && isProtectedRoute) {
+          router.push(`/login?redirectTo=${pathname}`);
+        }
+      },
+    );
 
     return () => subscription.unsubscribe();
   }, [supabase.auth, router, pathname, isAuthRoute, isProtectedRoute]);
@@ -129,7 +135,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             <Header />
             <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
               <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="animate-pulse text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}>{t('loading')}</div>
+                <div
+                  className="animate-pulse text-mq-content alabaster-readable"
+                  style={{
+                    color: 'var(--mq-content)',
+                    WebkitTextFillColor: 'var(--mq-content)',
+                    opacity: 1,
+                    mixBlendMode: 'normal',
+                  }}
+                >
+                  {t('loading')}
+                </div>
               </div>
             </main>
           </div>

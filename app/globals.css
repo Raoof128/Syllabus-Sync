@@ -728,49 +728,49 @@
 
 /* Feed page (light mode) — Alabaster 2 backgrounds */
 html:not(.dark) .feed-page .mq-magic-card-content {
-  background-color: #EDEADE !important; /* Alabaster 2 */
-} 
+  background-color: #edeade !important; /* Alabaster 2 */
+}
 
 /* Make premium buttons match Alabaster 2 in light mode */
 html:not(.dark) .feed-page .btn-premium {
-  background-color: #EDEADE !important;
+  background-color: #edeade !important;
   color: var(--c-content) !important;
-} 
+}
 
 /* Ensure Button variant backgrounds used inside feed also get Alabaster */
 html:not(.dark) .feed-page .bg-mq-button-secondary,
 html:not(.dark) .feed-page .bg-mq-card-background,
-html:not(.dark) .feed-page [data-slot="button"] {
-  background-color: #EDEADE !important;
+html:not(.dark) .feed-page [data-slot='button'] {
+  background-color: #edeade !important;
   color: var(--c-content) !important;
-} 
+}
 
 /* Stay connected banner styling */
 html:not(.dark) .feed-page .stay-connected-banner {
-  background-color: #EDEADE !important;
+  background-color: #edeade !important;
   color: var(--c-content) !important;
-} 
+}
 
 /* Map & Calendar pages — Alabaster 2 backgrounds + black borders (light mode) */
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .calendar-page .mq-magic-card-content,
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .home-page .mq-magic-card-content {
-  background-color: #EDEADE !important; /* Alabaster 2 */
-} 
+  background-color: #edeade !important; /* Alabaster 2 */
+}
 
 html:not(.dark) .map-page .btn-premium,
 html:not(.dark) .calendar-page .btn-premium,
 html:not(.dark) .feed-page .btn-premium,
 html:not(.dark) .home-page .btn-premium {
-  background-color: #EDEADE !important;
+  background-color: #edeade !important;
   color: var(--c-content) !important;
-} 
+}
 
-html:not(.dark) .map-page [data-slot="button"],
-html:not(.dark) .calendar-page [data-slot="button"],
-html:not(.dark) .feed-page [data-slot="button"],
-html:not(.dark) .home-page [data-slot="button"],
+html:not(.dark) .map-page [data-slot='button'],
+html:not(.dark) .calendar-page [data-slot='button'],
+html:not(.dark) .feed-page [data-slot='button'],
+html:not(.dark) .home-page [data-slot='button'],
 html:not(.dark) .map-page .bg-mq-card-background,
 html:not(.dark) .calendar-page .bg-mq-card-background,
 html:not(.dark) .feed-page .bg-mq-card-background,
@@ -783,9 +783,9 @@ html:not(.dark) .map-page .bg-mq-success\/10,
 html:not(.dark) .calendar-page .bg-mq-success\/10,
 html:not(.dark) .feed-page .bg-mq-success\/10,
 html:not(.dark) .home-page .bg-mq-success\/10 {
-  background-color: #EDEADE !important;
+  background-color: #edeade !important;
   color: var(--c-content) !important;
-} 
+}
 
 /* Accessibility: ensure sufficient contrast on light-tinted pages */
 html:not(.dark) .feed-page .text-mq-content,
@@ -817,10 +817,10 @@ html:not(.dark) .home-page .bg-mq-background-secondary p {
 }
 
 /* Fallback: ensure any MQ text utility classes on these pages are readable */
-html:not(.dark) .feed-page [class*="text-mq-"],
-html:not(.dark) .map-page [class*="text-mq-"],
-html:not(.dark) .calendar-page [class*="text-mq-"],
-html:not(.dark) .home-page [class*="text-mq-"] {
+html:not(.dark) .feed-page [class*='text-mq-'],
+html:not(.dark) .map-page [class*='text-mq-'],
+html:not(.dark) .calendar-page [class*='text-mq-'],
+html:not(.dark) .home-page [class*='text-mq-'] {
   color: var(--c-content) !important;
 }
 
@@ -891,10 +891,10 @@ html:not(.dark) .home-page {
 }
 
 /* Make sure all MQ text utility classes render as black on Alabaster pages */
-html:not(.dark) .feed-page [class*="text-mq-content"],
-html:not(.dark) .map-page [class*="text-mq-content"],
-html:not(.dark) .calendar-page [class*="text-mq-content"],
-html:not(.dark) .home-page [class*="text-mq-content"] {
+html:not(.dark) .feed-page [class*='text-mq-content'],
+html:not(.dark) .map-page [class*='text-mq-content'],
+html:not(.dark) .calendar-page [class*='text-mq-content'],
+html:not(.dark) .home-page [class*='text-mq-content'] {
   color: #000 !important;
 }
 
@@ -943,17 +943,25 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 }
 
 /* Ensure skeleton/text placeholders are visible on Alabaster pages */
-html:not(.dark) .home-page .animate-pulse * { color: #000 !important; }
-html:not(.dark) .feed-page .animate-pulse * { color: #000 !important; }
-html:not(.dark) .map-page .animate-pulse * { color: #000 !important; }
-html:not(.dark) .calendar-page .animate-pulse * { color: #000 !important; }
+html:not(.dark) .home-page .animate-pulse * {
+  color: #000 !important;
+}
+html:not(.dark) .feed-page .animate-pulse * {
+  color: #000 !important;
+}
+html:not(.dark) .map-page .animate-pulse * {
+  color: #000 !important;
+}
+html:not(.dark) .calendar-page .animate-pulse * {
+  color: #000 !important;
+}
 
 /* Also force large/sized text utility classes and the main app wrapper text to black on Alabaster pages */
-html:not(.dark) [class*="text-mq-3xl"],
-html:not(.dark) [class*="text-mq-2xl"],
-html:not(.dark) [class*="text-mq-xl"],
-html:not(.dark) [class*="text-mq-lg"],
-html:not(.dark) [class*="text-mq-sm"],
+html:not(.dark) [class*='text-mq-3xl'],
+html:not(.dark) [class*='text-mq-2xl'],
+html:not(.dark) [class*='text-mq-xl'],
+html:not(.dark) [class*='text-mq-lg'],
+html:not(.dark) [class*='text-mq-sm'],
 html:not(.dark) .min-h-screen.bg-mq-background * {
   color: #000 !important;
 }
@@ -1000,10 +1008,10 @@ html:not(.dark) .home-page p {
 }
 
 /* Global catch-all for MQ text utilities inside these pages */
-html:not(.dark) .feed-page [class*="text-mq-content"],
-html:not(.dark) .map-page [class*="text-mq-content"],
-html:not(.dark) .calendar-page [class*="text-mq-content"],
-html:not(.dark) .home-page [class*="text-mq-content"] {
+html:not(.dark) .feed-page [class*='text-mq-content'],
+html:not(.dark) .map-page [class*='text-mq-content'],
+html:not(.dark) .calendar-page [class*='text-mq-content'],
+html:not(.dark) .home-page [class*='text-mq-content'] {
   color: #000 !important;
 }
 
@@ -1052,7 +1060,7 @@ html:not(.dark) .map-page .animate-pulse *,
 html:not(.dark) .calendar-page .animate-pulse *,
 html:not(.dark) .home-page .animate-pulse * {
   color: #000 !important;
-  background-color: #EDEADE !important;
+  background-color: #edeade !important;
 }
 
 /* Additional enforcement: ensure all descendants of bg-mq-background-secondary and mq-magic-card-content
@@ -1069,10 +1077,38 @@ html:not(.dark) .mq-magic-card .mq-magic-card-content * {
 }
 
 /* Very explicit selectors for Axe-reported failing nodes (fallback coverage) */
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary h4,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary p,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary span,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .alabaster-readable.gap-2.text-mq-sm > span,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  h4,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  p,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  span,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .alabaster-readable.gap-2.text-mq-sm
+  > span,
 html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full {
   background-color: #ffffff !important;
   color: #000 !important;
@@ -1091,7 +1127,6 @@ html:not(.dark) .mq-magic-card .text-mq-sm.text-mq-content-secondary {
   mix-blend-mode: normal !important;
 }
 
-
 /* Global wrapper fallback: ensure the main layout wrapper and all descendants use readable colors
    when in light mode (helps skeletons and header descriptions that are outside page-root classes) */
 html:not(.dark) .min-h-screen.bg-mq-background,
@@ -1109,16 +1144,57 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 }
 
 /* Very specific rule matching Axe-reported DOM paths for bg-mq-background-secondary inside cards */
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary h4,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary p,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary span,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary .text-mq-content-secondary {
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  h4,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  p,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  span,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  .text-mq-content-secondary {
   color: #1a1a1a !important; /* force primary content for these specific nodes */
 }
 
 /* On Alabaster pages, keep small inset utility cards (p-3 rounded boxes) as white to guarantee contrast */
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary,
-html:not(.dark) .mq-magic-card > .mq-magic-card-content.p-0.h-full > .border-0.shadow-none.bg-transparent > .pt-0.p-6 > .space-y-3 > .p-3.rounded-mq-lg.bg-mq-background-secondary * {
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary,
+html:not(.dark)
+  .mq-magic-card
+  > .mq-magic-card-content.p-0.h-full
+  > .border-0.shadow-none.bg-transparent
+  > .pt-0.p-6
+  > .space-y-3
+  > .p-3.rounded-mq-lg.bg-mq-background-secondary
+  * {
   background-color: #ffffff !important;
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
@@ -1138,7 +1214,6 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
   mix-blend-mode: normal !important;
   -webkit-font-smoothing: antialiased !important;
 }
-
 
 /* Broader rules to cover various nesting patterns and utility classes inside bg-mq-background-secondary */
 html:not(.dark) .mq-magic-card .bg-mq-background-secondary h4,
@@ -1193,10 +1268,10 @@ html:not(.dark) .home-page .bg-mq-info\/10 {
 }
 
 /* Light-mode: unify button text color for non-primary variants (keep primary buttons white) */
-html:not(.dark) .feed-page .btn-premium:not([class*="bg-mq-primary"]),
-html:not(.dark) .map-page .btn-premium:not([class*="bg-mq-primary"]),
-html:not(.dark) .home-page .btn-premium:not([class*="bg-mq-primary"]),
-html:not(.dark) .calendar-page .btn-premium:not([class*="bg-mq-primary"]) {
+html:not(.dark) .feed-page .btn-premium:not([class*='bg-mq-primary']),
+html:not(.dark) .map-page .btn-premium:not([class*='bg-mq-primary']),
+html:not(.dark) .home-page .btn-premium:not([class*='bg-mq-primary']),
+html:not(.dark) .calendar-page .btn-premium:not([class*='bg-mq-primary']) {
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
 }
@@ -1218,10 +1293,10 @@ html:not(.dark) .calendar-page .mq-magic-card .mq-magic-card-content {
 }
 
 /* Broad enforcement for common content tokens and components on Alabaster pages */
-html:not(.dark) .feed-page [class*="text-mq-content"],
-html:not(.dark) .map-page [class*="text-mq-content"],
-html:not(.dark) .home-page [class*="text-mq-content"],
-html:not(.dark) .calendar-page [class*="text-mq-content"],
+html:not(.dark) .feed-page [class*='text-mq-content'],
+html:not(.dark) .map-page [class*='text-mq-content'],
+html:not(.dark) .home-page [class*='text-mq-content'],
+html:not(.dark) .calendar-page [class*='text-mq-content'],
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .home-page .mq-magic-card-content,
@@ -1254,7 +1329,12 @@ html:not(.dark) .calendar-page :where(*:not(svg):not(path):not(circle):not(line)
 }
 
 /* Unified dark-mode text enforcement: make textual content use the unified MQ content token in dark mode */
-html.dark :where(*:not(svg):not(path):not(circle):not(line):not([role="img"]):not(button):not(a):not(input):not(textarea):not(select)) {
+html.dark
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ) {
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
   opacity: 1 !important;
@@ -1315,7 +1395,7 @@ html:not(.dark) .mq-magic-card .mq-magic-card-content a,
 html:not(.dark) .mq-magic-card .mq-magic-card-content li {
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
-} 
+}
 
 /* Force headings and small text in bg-mq-background-secondary to use the unified content token for contrast */
 html:not(.dark) .feed-page .bg-mq-background-secondary h4,
@@ -1383,7 +1463,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   isolation: isolate;
   transform-origin: center;
   transition:
-    width 240ms cubic-bezier(.22,.9,.36,1),
+    width 240ms cubic-bezier(0.22, 0.9, 0.36, 1),
     padding 180ms ease,
     background 240ms ease,
     box-shadow 240ms ease;
@@ -1392,9 +1472,11 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 /* Focus outline for keyboard users */
 .social-buttons li a:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(166,25,46,0.12), 0 10px 25px rgba(0,0,0,0.15);
+  box-shadow:
+    0 0 0 4px rgba(166, 25, 46, 0.12),
+    0 10px 25px rgba(0, 0, 0, 0.15);
   z-index: 80;
-} 
+}
 
 /* Expansion state - grows outwards from center */
 .social-buttons li:hover a,
@@ -1402,7 +1484,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   width: 160px; /* subtler expansion */
   padding: 0 12px;
   box-shadow: 0 8px 20px rgba(166, 25, 46, 0.28);
-  background: linear-gradient(90deg, rgba(166,25,46,1) 0%, rgba(214,0,28,1) 100%);
+  background: linear-gradient(90deg, rgba(166, 25, 46, 1) 0%, rgba(214, 0, 28, 1) 100%);
   z-index: 60; /* ensure it sits on top */
 }
 
@@ -1414,7 +1496,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 .social-buttons li:hover a::after,
 .social-buttons li:focus-within a::after {
   opacity: 0.45;
-}  
+}
 
 /* Also expand on keyboard focus for accessibility */
 .social-buttons li:focus-within a {
@@ -1429,7 +1511,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   opacity: 1;
   transform: translateY(-50%) translateX(0) scale(1);
   transition-delay: 0s;
-} 
+}
 
 /* Gradient background (moved to anchor tag) */
 .social-buttons li a::before {
@@ -1469,7 +1551,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   color: var(--c-content-secondary);
   font-size: 1.4em;
   transition:
-    transform 200ms cubic-bezier(.22,.9,.36,1),
+    transform 200ms cubic-bezier(0.22, 0.9, 0.36, 1),
     opacity 180ms ease;
   transition-delay: 0.04s;
   z-index: 10;
@@ -1483,7 +1565,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   opacity: 0.12;
   transition-delay: 0s;
   color: #fff;
-} 
+}
 
 /* Text Animation */
 .social-buttons li .social-title {
@@ -1498,7 +1580,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   text-transform: none; /* preserve natural casing to shorten long labels */
   opacity: 0;
   transition:
-    transform 200ms cubic-bezier(.22,.9,.36,1),
+    transform 200ms cubic-bezier(0.22, 0.9, 0.36, 1),
     opacity 200ms ease;
   transition-delay: 0s;
   z-index: 10;
@@ -1507,7 +1589,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   max-width: calc(100% - 72px); /* match reduced pill size */
   overflow: hidden;
   text-overflow: clip;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
 .social-buttons li:hover .social-title,
@@ -1520,9 +1602,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   overflow: visible;
   max-width: 72%;
   text-align: center;
-} 
-
-
+}
 
 /* Dark mode adjustments */
 .dark .social-buttons li a {
@@ -1579,9 +1659,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   background-color: #edeade !important;
   color: var(--c-content) !important;
   transition: background-color 0.15s ease;
-} 
-
-
+}
 
 .settings-page [data-slot='button']:hover,
 .settings-page button:hover {

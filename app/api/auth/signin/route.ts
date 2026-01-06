@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         if (user) {
           // Confirm the email
           await supabase.auth.admin.updateUserById(user.id, {
-            email_confirm: true
+            email_confirm: true,
           });
 
           // Try signin again
@@ -62,9 +62,8 @@ export async function POST(request: NextRequest) {
     return jsonSuccess({
       user: data.user,
       session: data.session,
-      message: 'Signin successful'
+      message: 'Signin successful',
     });
-
   } catch (error) {
     console.error('Signin error:', error);
     return jsonError('Internal server error', 500);

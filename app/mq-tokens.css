@@ -32,8 +32,8 @@
   --c-slate-500: #8d98a1;
 
   /* Semantic Mappings */
-  --c-background: #EDEADE;
-  --c-background-invert: #EDEADE;
+  --c-background: #edeade;
+  --c-background-invert: #edeade;
   --c-background-secondary: var(--c-sand-200);
   --c-background-tertiary: var(--c-sand-100);
   --c-content: var(--c-charcoal-900);
@@ -71,8 +71,8 @@
   --ring: 222.2 84% 4.9%;
 
   /* Typography - --f-[family] format */
-  --f-primary: "Work Sans", sans-serif;
-  --f-secondary: "Source Serif Pro", serif;
+  --f-primary: 'Work Sans', sans-serif;
+  --f-secondary: 'Source Serif Pro', serif;
 
   /* Font Sizes - --fs-[size] format */
   --fs-small: 0.875rem;
@@ -95,8 +95,8 @@
   --c-border: var(--c-charcoal-700);
   /* Darker border for visibility on Alabaster */
   --c-focus: var(--c-red);
-  --c-card-background: #EDEADE;
-  --c-input-background: #EDEADE;
+  --c-card-background: #edeade;
+  --c-input-background: #edeade;
   /* Make buttons slightly darker/different than background to pop */
   --c-button-secondary: var(--c-sand-200);
   --c-hover-background: var(--c-sand-100);
@@ -147,9 +147,9 @@
   --c-background: var(--c-charcoal-800);
   --c-background-secondary: var(--c-charcoal-700);
   --c-background-tertiary: var(--c-charcoal-600);
-  --c-background-invert: #EDEADE;
+  --c-background-invert: #edeade;
 
-  --c-content: #EDEADE;
+  --c-content: #edeade;
   --c-content-secondary: var(--c-charcoal-200);
   --c-content-tertiary: var(--c-charcoal-300);
   --c-content-faded: var(--c-charcoal-400);

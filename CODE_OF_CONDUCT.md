@@ -40,7 +40,7 @@ This Code of Conduct applies to all community spaces, including but not limited 
 
 If you experience or witness unacceptable behavior, please report it to:
 
-- **Project Maintainers**: 
+- **Project Maintainers**:
   - Pouya (Frontend Lead)
   - Raouf (Backend Lead)
 - **Email**: [project-email@example.com]

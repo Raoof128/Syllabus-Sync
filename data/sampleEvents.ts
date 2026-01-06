@@ -83,7 +83,8 @@ export const sampleEvents: Event[] = [
   {
     id: 'event-7',
     title: 'Research Seminar: AI in Healthcare',
-    description: 'Explore cutting-edge research on artificial intelligence applications in medicine.',
+    description:
+      'Explore cutting-edge research on artificial intelligence applications in medicine.',
     translationKey: 'event_researchSeminarAI_title',
     descriptionKey: 'event_researchSeminarAI_desc',
     date: getDate(4),

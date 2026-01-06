@@ -26,9 +26,7 @@ export default function Error({
       <div className="text-center">
         <AlertTriangle className="h-16 w-16 text-mq-error mx-auto mb-4" />
         <h1 className="text-mq-2xl font-bold text-mq-content mb-2">{t('somethingWentWrong')}!</h1>
-        <p className="text-mq-content-secondary mb-8 max-w-md">
-          {t('appErrorDesc')}
-        </p>
+        <p className="text-mq-content-secondary mb-8 max-w-md">{t('appErrorDesc')}</p>
 
         <div className="flex gap-4 justify-center">
           <Button onClick={reset} variant="secondary" className="gap-2">

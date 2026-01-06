@@ -17,6 +17,7 @@ Authorization: Bearer <jwt_token>
 All API responses follow a consistent format:
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -35,6 +36,7 @@ All API responses follow a consistent format:
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -68,6 +70,7 @@ All API responses follow a consistent format:
 ## Rate Limiting
 
 API endpoints are rate limited to prevent abuse:
+
 - 100 requests per 15 minutes per IP address
 - Rate limit headers are included in responses:
   - `X-RateLimit-Limit`: Maximum requests per window
@@ -81,6 +84,7 @@ API endpoints are rate limited to prevent abuse:
 List units with their schedules.
 
 **Query Parameters:**
+
 - `search` (optional): Search in unit code or name
 - `limit` (optional): Maximum results (1-100, default: 50)
 - `offset` (optional): Pagination offset (default: 0)
@@ -88,6 +92,7 @@ List units with their schedules.
 - `sortOrder` (optional): Sort order (`asc`, `desc`; default: `desc`)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -128,6 +133,7 @@ List units with their schedules.
 Create a new unit with schedule.
 
 **Request Body:**
+
 ```json
 {
   "code": "CSC101",
@@ -181,6 +187,7 @@ Delete a specific unit.
 List deadlines with filtering and pagination.
 
 **Query Parameters:**
+
 - `unitCode` (optional): Filter by unit code
 - `completed` (optional): Filter by completion status
 - `upcoming` (optional): Get only upcoming deadlines (true/false)
@@ -191,6 +198,7 @@ List deadlines with filtering and pagination.
 Create a new deadline.
 
 **Request Body:**
+
 ```json
 {
   "title": "Assignment 1",
@@ -208,6 +216,7 @@ Create a new deadline.
 List notifications with filtering.
 
 **Query Parameters:**
+
 - `type` (optional): Filter by notification type (`deadline`, `event`, `class`, `system`)
 - `read` (optional): Filter by read status
 - `limit`, `offset`: Pagination
@@ -227,11 +236,13 @@ Mark all notifications as read.
 List upcoming events.
 
 **Query Parameters:**
+
 - `limit`, `offset`: Pagination
 
 ## Versioning
 
 The API supports versioning via:
+
 - URL path: `/api/v1/units`
 - Accept header: `application/vnd.api.v1+json`
 - Custom header: `X-API-Version: v1`
@@ -248,19 +259,21 @@ const response = await fetch('/api/units', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
     code: 'CSC101',
     name: 'Introduction to Computer Science',
     color: '#3B82F6',
     location: { building: 'Eng', room: '101' },
-    schedule: [{
-      day: 'Monday',
-      startTime: '09:00',
-      endTime: '11:00'
-    }]
-  })
+    schedule: [
+      {
+        day: 'Monday',
+        startTime: '09:00',
+        endTime: '11:00',
+      },
+    ],
+  }),
 });
 
 const result = await response.json();

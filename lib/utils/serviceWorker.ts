@@ -22,7 +22,6 @@ export const registerServiceWorker = async () => {
         });
       }
     });
-
   } catch (error) {
     errorHandler.logError(
       error instanceof Error ? error : new Error('Service Worker registration failed'),

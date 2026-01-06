@@ -105,7 +105,9 @@ describe('UnitCard', () => {
   it('hides action buttons when showActions is false', () => {
     const mockOnEdit = vi.fn();
     const mockOnDelete = vi.fn();
-    const { container } = render(<UnitCard unit={mockUnit} onEdit={mockOnEdit} onDelete={mockOnDelete} showActions={false} />);
+    const { container } = render(
+      <UnitCard unit={mockUnit} onEdit={mockOnEdit} onDelete={mockOnDelete} showActions={false} />,
+    );
 
     const buttons = container.querySelectorAll('button');
     expect(buttons.length).toBe(0);
@@ -118,4 +120,3 @@ describe('UnitCard', () => {
     expect(colorIndicator).toBeInTheDocument();
   });
 });
-

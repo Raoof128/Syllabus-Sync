@@ -1,9 +1,22 @@
 import { useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
-import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents, Polyline } from 'react-leaflet';
+import {
+  MapContainer,
+  ImageOverlay,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+  Polyline,
+} from 'react-leaflet';
 import { Badge } from '@/components/ui/badge';
 import { buildings, Building } from '@/lib/map/buildings';
-import { RoutePreview, formatDistance, formatDuration, openBestNavApp } from '@/lib/map/navigationHelpers';
+import {
+  RoutePreview,
+  formatDistance,
+  formatDuration,
+  openBestNavApp,
+} from '@/lib/map/navigationHelpers';
 import { fetchORSRoute } from '@/lib/services/ors';
 import { toastUtils } from '@/lib/utils/toast';
 
@@ -44,7 +57,7 @@ const CAMPUS_IMAGE_URL = '/maps/raster/mq-campus.png';
 // Macquarie University coordinates (approximate bounds for campus)
 const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
   [-33.783, 151.105], // bottom-left
-  [-33.770, 151.125], // top-right
+  [-33.77, 151.125], // top-right
 ];
 
 // Fallback origin (Campus Hub/Centre approx)
@@ -81,7 +94,7 @@ const createMarkerIcon = (isSelected: boolean) => {
 
 // Google-style Blue Dot Icon
 const userIcon = L.divIcon({
-  className: "user-location-dot",
+  className: 'user-location-dot',
   html: `<div class="pulse"></div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],
@@ -93,7 +106,7 @@ function MapController({
   coordPickerMode,
   onMapClick,
   setMapInstance,
-  setPickedLocation
+  setPickedLocation,
 }: {
   selectedBuilding?: Building;
   coordPickerMode: boolean;
@@ -114,7 +127,7 @@ function MapController({
       if (coordPickerMode) {
         setPickedLocation(e.latlng);
       }
-      // Clean previous picked location if exiting mode or clicking elsewhere? 
+      // Clean previous picked location if exiting mode or clicking elsewhere?
       // Actually, standard behavior is usually to move the marker.
 
       onMapClick(e);
@@ -136,13 +149,16 @@ function MapController({
     // Set bounds to campus area
     map.setMaxBounds(CAMPUS_BOUNDS);
     map.setMinZoom(16);
-    map.setMaxZoom(20);  // Increased max zoom for more detail
+    map.setMaxZoom(20); // Increased max zoom for more detail
   }, [map]);
 
   useEffect(() => {
     if (selectedBuilding) {
       // Convert building pixel coordinates to lat/lng
-      const buildingLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
+      const buildingLatLng = pixelToLatLng(
+        selectedBuilding.position[0],
+        selectedBuilding.position[1],
+      );
       map.setView(buildingLatLng, 17);
 
       // Find and open the popup for this building
@@ -150,7 +166,11 @@ function MapController({
         if (layer instanceof L.Marker) {
           const marker = layer as L.Marker;
           const popupContent = marker.getPopup()?.getContent();
-          if (popupContent && typeof popupContent === 'string' && popupContent.includes(selectedBuilding.id)) {
+          if (
+            popupContent &&
+            typeof popupContent === 'string' &&
+            popupContent.includes(selectedBuilding.id)
+          ) {
             marker.openPopup();
           }
         }
@@ -175,7 +195,11 @@ interface CampusMapProps {
   onMapClick: (e: L.LeafletMouseEvent) => void;
 }
 
-export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClick }: CampusMapProps) {
+export default function CampusMap({
+  selectedBuilding,
+  coordPickerMode,
+  onMapClick,
+}: CampusMapProps) {
   const [themeKey, setThemeKey] = useState<'light' | 'dark'>('light');
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
   const [pickedLocation, setPickedLocation] = useState<L.LatLng | null>(null);
@@ -187,7 +211,9 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   const [routeError, setRouteError] = useState<string | null>(null);
 
   // Location Status State
-  const [locationStatus, setLocationStatus] = useState<'searching' | 'found' | 'denied' | 'error'>('searching');
+  const [locationStatus, setLocationStatus] = useState<'searching' | 'found' | 'denied' | 'error'>(
+    'searching',
+  );
 
   const userMarkerRef = useRef<L.Marker | null>(null);
   const accuracyCircleRef = useRef<L.Circle | null>(null);
@@ -206,10 +232,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         setLocationStatus('found');
-        const latlng = L.latLng(
-          pos.coords.latitude,
-          pos.coords.longitude
-        );
+        const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
 
         // Update app origin for routing
         setOrigin({ lat: latlng.lat, lng: latlng.lng });
@@ -229,7 +252,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         if (!accuracyCircleRef.current) {
           accuracyCircleRef.current = L.circle(latlng, {
             radius: accuracy,
-            color: "#1a73e8",
+            color: '#1a73e8',
             weight: 1,
             opacity: 0.4,
             fillOpacity: 0.1,
@@ -240,8 +263,9 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         }
       },
       (err) => {
-        console.warn("Location tracking disabled or failed", err);
-        if (err.code === 1) { // PERMISSION_DENIED
+        console.warn('Location tracking disabled or failed', err);
+        if (err.code === 1) {
+          // PERMISSION_DENIED
           setLocationStatus('denied');
         } else {
           setLocationStatus('error');
@@ -256,7 +280,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         enableHighAccuracy: true,
         maximumAge: 2000,
         timeout: 10000,
-      }
+      },
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
@@ -265,7 +289,10 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
   // "Center on Me" Button Action
   const centerOnUser = () => {
     if (locationStatus === 'denied') {
-      toastUtils.error('Permission Denied', 'Please enable location access in your browser settings to see your position.');
+      toastUtils.error(
+        'Permission Denied',
+        'Please enable location access in your browser settings to see your position.',
+      );
       return;
     }
 
@@ -275,7 +302,10 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
     }
 
     if (locationStatus === 'error') {
-      toastUtils.error('Location Error', 'Unable to retrieve your location. Please check your signal and try again.');
+      toastUtils.error(
+        'Location Error',
+        'Unable to retrieve your location. Please check your signal and try again.',
+      );
       return;
     }
 
@@ -283,14 +313,13 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       mapInstance.setView(
         userMarkerRef.current.getLatLng(),
         18, // Zoom in close for user view
-        { animate: true }
+        { animate: true },
       );
     } else {
       // Fallback catch-all
       toastUtils.warning('Location unavailable', 'Your location has not been determined yet.');
     }
   };
-
 
   // 2. Routing Logic when selectedBuilding changes
   useEffect(() => {
@@ -351,10 +380,7 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         }}
       >
         {/* Campus image overlay */}
-        <ImageOverlay
-          url={CAMPUS_IMAGE_URL}
-          bounds={CAMPUS_BOUNDS}
-        />
+        <ImageOverlay url={CAMPUS_IMAGE_URL} bounds={CAMPUS_BOUNDS} />
 
         <MapController
           selectedBuilding={selectedBuilding}
@@ -379,7 +405,8 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
               <div className="p-2">
                 <p className="font-semibold text-mq-content">Picked Location</p>
                 <p className="text-xs font-mono text-mq-content-secondary mt-1">
-                  {Math.round(pickedLocation.lat * 100000) / 100000}, {Math.round(pickedLocation.lng * 100000) / 100000}
+                  {Math.round(pickedLocation.lat * 100000) / 100000},{' '}
+                  {Math.round(pickedLocation.lng * 100000) / 100000}
                 </p>
               </div>
             </Popup>
@@ -398,9 +425,13 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
               <Popup>
                 <div className="p-2 min-w-[200px]">
                   <h3 className="font-semibold text-mq-content">{building.name}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary mb-2">Building {building.id}</p>
+                  <p className="text-mq-sm text-mq-content-secondary mb-2">
+                    Building {building.id}
+                  </p>
                   {building.description && (
-                    <p className="text-mq-sm text-mq-content-tertiary mb-3">{building.description}</p>
+                    <p className="text-mq-sm text-mq-content-tertiary mb-3">
+                      {building.description}
+                    </p>
                   )}
                   {building.tags && building.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
@@ -421,13 +452,23 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
       {/* Floating Action Button: Center on User */}
       <button
         onClick={centerOnUser}
-        className={`absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg transition-all active:scale-95 ${locationStatus === 'denied' || locationStatus === 'error'
-          ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
-          : 'bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-50'
-          }`}
+        className={`absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg transition-all active:scale-95 ${
+          locationStatus === 'denied' || locationStatus === 'error'
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
+            : 'bg-white dark:bg-gray-800 text-blue-600 hover:bg-gray-50'
+        }`}
         title="Center on my location"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className={locationStatus === 'searching' ? 'animate-pulse' : ''}
         >
           {locationStatus === 'denied' ? (
@@ -452,7 +493,6 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
         </svg>
       </button>
 
-
       {/* Hybrid Navigation Panel */}
       {selectedBuilding && (preview || routeError) && (
         <div
@@ -461,21 +501,34 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
             backgroundColor: 'var(--c-card-background)',
             borderColor: 'var(--c-border)',
             color: 'var(--c-content)',
-            boxShadow: 'var(--c-shadow-sm)'
+            boxShadow: 'var(--c-shadow-sm)',
           }}
         >
           {/* Header */}
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-bold text-xl leading-tight" style={{ fontFamily: 'var(--f-primary)', color: 'var(--c-content)' }}>
+              <h3
+                className="font-bold text-xl leading-tight"
+                style={{ fontFamily: 'var(--f-primary)', color: 'var(--c-content)' }}
+              >
                 {selectedBuilding.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="text-xs font-mono" style={{ borderColor: 'var(--c-border)', color: 'var(--c-content-secondary)' }}>
+                <Badge
+                  variant="outline"
+                  className="text-xs font-mono"
+                  style={{ borderColor: 'var(--c-border)', color: 'var(--c-content-secondary)' }}
+                >
                   {selectedBuilding.id}
                 </Badge>
                 {preview && (
-                  <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--c-slate-100)', color: 'var(--c-content-secondary)' }}>
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: 'var(--c-slate-100)',
+                      color: 'var(--c-content-secondary)',
+                    }}
+                  >
                     Walking
                   </span>
                 )}
@@ -490,15 +543,44 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
               className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
               aria-label="Close navigation"
             >
-              <svg className="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 opacity-60"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           {routeError ? (
-            <div className="p-3 rounded-lg flex items-start gap-3" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--c-error)' }}>
-              <svg className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--c-error)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            <div
+              className="p-3 rounded-lg flex items-start gap-3"
+              style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid var(--c-error)',
+              }}
+            >
+              <svg
+                className="w-5 h-5 flex-shrink-0"
+                style={{ color: 'var(--c-error)' }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
               <p className="text-sm font-medium" style={{ color: 'var(--c-error)' }}>
                 {routeError}
               </p>
@@ -508,10 +590,16 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
               <>
                 {/* Summary Stats */}
                 <div className="flex items-baseline gap-1 mb-5">
-                  <span className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--c-success)' }}>
+                  <span
+                    className="text-3xl font-extrabold tracking-tight"
+                    style={{ color: 'var(--c-success)' }}
+                  >
                     {formatDuration(preview.durationSeconds)}
                   </span>
-                  <span className="text-sm font-medium opacity-60 ml-1" style={{ color: 'var(--c-content-secondary)' }}>
+                  <span
+                    className="text-sm font-medium opacity-60 ml-1"
+                    style={{ color: 'var(--c-content-secondary)' }}
+                  >
                     ({formatDistance(preview.distanceMeters)})
                   </span>
                 </div>
@@ -519,7 +607,10 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                 {/* Call to Action */}
                 <button
                   onClick={() => {
-                    const destLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
+                    const destLatLng = pixelToLatLng(
+                      selectedBuilding.position[0],
+                      selectedBuilding.position[1],
+                    );
                     openBestNavApp(origin, { lat: destLatLng.lat, lng: destLatLng.lng });
                   }}
                   className="w-full font-bold py-3 px-4 rounded-xl mb-6 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-md hover:shadow-lg group"
@@ -529,28 +620,60 @@ export default function CampusMap({ selectedBuilding, coordPickerMode, onMapClic
                   }}
                 >
                   <span>Start Navigation</span>
-                  <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                  <svg
+                    className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
                 </button>
 
                 {/* Custom Timeline */}
                 {preview.steps.length > 0 && (
                   <div className="pt-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider mb-3 opacity-50" style={{ color: 'var(--c-content-tertiary)' }}>Turn-by-Turn</h4>
+                    <h4
+                      className="text-xs font-bold uppercase tracking-wider mb-3 opacity-50"
+                      style={{ color: 'var(--c-content-tertiary)' }}
+                    >
+                      Turn-by-Turn
+                    </h4>
                     <div className="relative space-y-6 ml-1">
                       {/* Vertical Line */}
-                      <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style={{ backgroundColor: 'var(--c-border)' }} />
+                      <div
+                        className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full"
+                        style={{ backgroundColor: 'var(--c-border)' }}
+                      />
 
                       {preview.steps.slice(0, 8).map((s, i) => (
                         <div key={i} className="relative pl-6 group">
                           {/* Dot */}
-                          <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 z-10 box-border transition-colors group-hover:scale-110"
+                          <div
+                            className="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 z-10 box-border transition-colors group-hover:scale-110"
                             style={{
                               backgroundColor: 'var(--c-card-background)',
-                              borderColor: i === 0 ? 'var(--c-success)' : 'var(--c-content-faded)'
-                            }} />
+                              borderColor: i === 0 ? 'var(--c-success)' : 'var(--c-content-faded)',
+                            }}
+                          />
 
-                          <p className="text-sm font-medium leading-snug" style={{ color: 'var(--c-content)' }}>{s.text}</p>
-                          <p className="text-xs font-mono mt-0.5 opacity-60" style={{ color: 'var(--c-content-secondary)' }}>{formatDistance(s.distance)}</p>
+                          <p
+                            className="text-sm font-medium leading-snug"
+                            style={{ color: 'var(--c-content)' }}
+                          >
+                            {s.text}
+                          </p>
+                          <p
+                            className="text-xs font-mono mt-0.5 opacity-60"
+                            style={{ color: 'var(--c-content-secondary)' }}
+                          >
+                            {formatDistance(s.distance)}
+                          </p>
                         </div>
                       ))}
                     </div>

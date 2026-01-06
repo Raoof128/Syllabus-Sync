@@ -19,9 +19,7 @@ describe('unitsStore', () => {
     name: 'Networking',
     color: '#A6192E',
     location: { building: 'C5C', room: '204' },
-    schedule: [
-      { id: 'schedule-1', day: 'Monday', startTime: '09:00', endTime: '11:00' },
-    ],
+    schedule: [{ id: 'schedule-1', day: 'Monday', startTime: '09:00', endTime: '11:00' }],
     createdAt: new Date(),
   };
 
@@ -194,9 +192,22 @@ describe('deadlinesStore', () => {
   });
 
   it('should get upcoming deadlines sorted by due date', () => {
-    const deadline1 = { ...mockDeadline, id: '22222222-2222-2222-2222-222222222222', dueDate: new Date(Date.now() + 86400000 * 5) };
-    const deadline2 = { ...mockDeadline, id: '33333333-3333-3333-3333-333333333333', dueDate: new Date(Date.now() + 86400000) };
-    const deadline3 = { ...mockDeadline, id: '44444444-4444-4444-4444-444444444444', dueDate: new Date(Date.now() + 86400000 * 3), completed: true };
+    const deadline1 = {
+      ...mockDeadline,
+      id: '22222222-2222-2222-2222-222222222222',
+      dueDate: new Date(Date.now() + 86400000 * 5),
+    };
+    const deadline2 = {
+      ...mockDeadline,
+      id: '33333333-3333-3333-3333-333333333333',
+      dueDate: new Date(Date.now() + 86400000),
+    };
+    const deadline3 = {
+      ...mockDeadline,
+      id: '44444444-4444-4444-4444-444444444444',
+      dueDate: new Date(Date.now() + 86400000 * 3),
+      completed: true,
+    };
 
     useDeadlinesStore.setState({ deadlines: [deadline1, deadline2, deadline3] });
 
@@ -216,10 +227,30 @@ describe('deadlinesStore', () => {
 
     // High stress - multiple urgent deadlines soon
     const urgentDeadlines = [
-      { ...mockDeadline, id: '55555555-5555-5555-5555-555555555555', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
-      { ...mockDeadline, id: '66666666-6666-6666-6666-666666666666', priority: 'Urgent' as const, dueDate: new Date(Date.now() + 86400000) },
-      { ...mockDeadline, id: '77777777-7777-7777-7777-777777777777', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
-      { ...mockDeadline, id: '88888888-8888-8888-8888-888888888888', priority: 'High' as const, dueDate: new Date(Date.now() + 86400000 * 2) },
+      {
+        ...mockDeadline,
+        id: '55555555-5555-5555-5555-555555555555',
+        priority: 'Urgent' as const,
+        dueDate: new Date(Date.now() + 86400000),
+      },
+      {
+        ...mockDeadline,
+        id: '66666666-6666-6666-6666-666666666666',
+        priority: 'Urgent' as const,
+        dueDate: new Date(Date.now() + 86400000),
+      },
+      {
+        ...mockDeadline,
+        id: '77777777-7777-7777-7777-777777777777',
+        priority: 'High' as const,
+        dueDate: new Date(Date.now() + 86400000 * 2),
+      },
+      {
+        ...mockDeadline,
+        id: '88888888-8888-8888-8888-888888888888',
+        priority: 'High' as const,
+        dueDate: new Date(Date.now() + 86400000 * 2),
+      },
     ];
     useDeadlinesStore.setState({ deadlines: urgentDeadlines });
     ({ getStressLevel } = useDeadlinesStore.getState());

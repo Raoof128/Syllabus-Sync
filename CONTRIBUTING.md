@@ -119,17 +119,20 @@ syllabus-sync/
 ## 🚀 Development Setup
 
 1. **Clone your fork**
+
    ```bash
    git clone https://github.com/your-username/syllabus-sync.git
    cd syllabus-sync
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start development server**
+
    ```bash
    npm run dev
    ```

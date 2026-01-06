@@ -12,7 +12,6 @@ export async function POST() {
     }
 
     return jsonSuccess({ message: 'Signout successful' });
-
   } catch (error) {
     console.error('Signout error:', error);
     return jsonError('Internal server error', 500);

@@ -3,7 +3,18 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Search, MapPin, Navigation, Building2, Info, Copy, X, Eye, EyeOff, Loader2 } from 'lucide-react';
+import {
+  Search,
+  MapPin,
+  Navigation,
+  Building2,
+  Info,
+  Copy,
+  X,
+  Eye,
+  EyeOff,
+  Loader2,
+} from 'lucide-react';
 import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -67,7 +78,7 @@ function useDebouncedSearch(searchFunction: (query: string) => Building[], delay
     isSearching,
     hasSearched,
     updateQuery,
-    clearSearch
+    clearSearch,
   };
 }
 
@@ -95,7 +106,7 @@ export default function MapClient() {
     isSearching,
     hasSearched,
     updateQuery,
-    clearSearch
+    clearSearch,
   } = useDebouncedSearch(searchBuildings, 300);
 
   // Handle coordinate picker click
@@ -134,13 +145,11 @@ export default function MapClient() {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedResultIndex(prev =>
-          prev < filteredBuildings.length - 1 ? prev + 1 : prev
-        );
+        setSelectedResultIndex((prev) => (prev < filteredBuildings.length - 1 ? prev + 1 : prev));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedResultIndex(prev => prev > 0 ? prev - 1 : -1);
+        setSelectedResultIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
       case 'Enter':
         e.preventDefault();
@@ -198,7 +207,6 @@ export default function MapClient() {
     }
   }, []);
 
-
   useEffect(() => {
     if (shouldRenderMap) return;
     const node = mapContainerRef.current;
@@ -224,8 +232,21 @@ export default function MapClient() {
     <div className="container mx-auto p-4 max-w-7xl map-page">
       {/* Header */}
       <header className="mb-6">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}>{t('campusMap')}</h1>
-        <p className="text-mq-content-secondary" style={{ color: 'var(--mq-content-secondary)', WebkitTextFillColor: 'var(--mq-content-secondary)' }}>{t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}</p>
+        <h1
+          className="text-mq-3xl font-bold text-mq-content mb-2"
+          style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
+        >
+          {t('campusMap')}
+        </h1>
+        <p
+          className="text-mq-content-secondary"
+          style={{
+            color: 'var(--mq-content-secondary)',
+            WebkitTextFillColor: 'var(--mq-content-secondary)',
+          }}
+        >
+          {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
+        </p>
       </header>
 
       {/* Selected Building Banner */}
@@ -238,7 +259,9 @@ export default function MapClient() {
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey as any)}</strong>
               </p>
-              <p className="text-mq-xs text-mq-success">{t('building')} {selectedBuilding.id}</p>
+              <p className="text-mq-xs text-mq-success">
+                {t('building')} {selectedBuilding.id}
+              </p>
             </div>
           </div>
           <Link href="/map">
@@ -256,8 +279,9 @@ export default function MapClient() {
         <div className="relative">
           {isSearching ? (
             <Loader2
-              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${prefersReducedMotion ? '' : 'animate-spin'
-                }`}
+              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
+                prefersReducedMotion ? '' : 'animate-spin'
+              }`}
             />
           ) : (
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
@@ -302,10 +326,9 @@ export default function MapClient() {
                   role="option"
                   aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
-                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${index === selectedResultIndex
-                    ? 'bg-mq-info/10'
-                    : 'hover:bg-mq-hover-background'
-                    }`}
+                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
+                    index === selectedResultIndex ? 'bg-mq-info/10' : 'hover:bg-mq-hover-background'
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -339,12 +362,8 @@ export default function MapClient() {
           <div className="flex items-center gap-3">
             <Info className="h-5 w-5 text-mq-info" />
             <div>
-              <p className="text-mq-sm font-medium text-mq-info">
-                {t('coordPickerMode')}
-              </p>
-              <p className="text-mq-xs text-mq-info">
-                {t('coordPickerDesc')}
-              </p>
+              <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
+              <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -355,7 +374,7 @@ export default function MapClient() {
               </div>
             )}
             <Button
-              variant={coordPickerMode ? "primary" : "secondary"}
+              variant={coordPickerMode ? 'primary' : 'secondary'}
               size="sm"
               onClick={() => setCoordPickerMode(!coordPickerMode)}
               className="gap-2"
@@ -426,20 +445,30 @@ export default function MapClient() {
                       key={building.code}
                       href={`/map?building=${building.code}`}
                       aria-current={isSelected ? 'page' : undefined}
-                      className={`p-3 rounded-mq-lg transition-colors ${isSelected
-                        ? 'bg-mq-success/10 border-2 border-mq-success'
-                        : 'bg-mq-background-secondary hover:bg-mq-hover-background'
-                        }`}
-                      style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}
+                      className={`p-3 rounded-mq-lg transition-colors ${
+                        isSelected
+                          ? 'bg-mq-success/10 border-2 border-mq-success'
+                          : 'bg-mq-background-secondary hover:bg-mq-hover-background'
+                      }`}
+                      style={{
+                        color: 'var(--mq-content)',
+                        WebkitTextFillColor: 'var(--mq-content)',
+                        opacity: 1,
+                        mixBlendMode: 'normal',
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="font-semibold text-mq-content">{building.code}</div>
                         {isSelected && (
-                          <Badge className="bg-mq-success text-white text-mq-xs">{t('selected')}</Badge>
+                          <Badge className="bg-mq-success text-white text-mq-xs">
+                            {t('selected')}
+                          </Badge>
                         )}
                       </div>
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      <div className="text-mq-sm text-mq-content-secondary">{t(building.translationKey as any)}</div>
+                      <div className="text-mq-sm text-mq-content-secondary">
+                        {t(building.translationKey as any)}
+                      </div>
                       {buildingData?.tags && buildingData.tags.length > 0 && (
                         <div className="mt-1">
                           <Badge variant="neutral" className="text-xs">
@@ -470,9 +499,20 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
-                    <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('walkingDirections')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
+                  <div
+                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
+                    style={{ color: 'var(--mq-content)' }}
+                  >
+                    <h4
+                      className="font-semibold text-mq-content alabaster-readable"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
+                      {t('walkingDirections')}
+                    </h4>
+                    <p
+                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
                       {t('walkingDirectionsDesc')}
                     </p>
                   </div>
@@ -497,9 +537,20 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
-                    <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('realTimeTracking')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
+                  <div
+                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
+                    style={{ color: 'var(--mq-content)' }}
+                  >
+                    <h4
+                      className="font-semibold text-mq-content alabaster-readable"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
+                      {t('realTimeTracking')}
+                    </h4>
+                    <p
+                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
                       {t('realTimeTrackingDesc')}
                     </p>
                   </div>
@@ -524,9 +575,20 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
-                    <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('filterAndFind')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
+                  <div
+                    className="p-3 bg-white rounded-mq-lg border border-mq-border"
+                    style={{ color: 'var(--mq-content)' }}
+                  >
+                    <h4
+                      className="font-semibold text-mq-content alabaster-readable"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
+                      {t('filterAndFind')}
+                    </h4>
+                    <p
+                      className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1"
+                      style={{ color: 'var(--mq-content)' }}
+                    >
                       {t('filterAndFindDesc')}
                     </p>
                   </div>

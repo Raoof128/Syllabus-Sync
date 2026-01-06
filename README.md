@@ -354,14 +354,14 @@ This project uses GitHub Actions for comprehensive continuous integration and de
 
 ### Tab/Feature Ownership
 
-| Tab/Feature          | Owner                    | Status          |
-| -------------------- | ------------------------ | --------------- |
-| **Home Tab**         | Pouya                    | 🚧 In Progress  |
-| **Calendar Tab**     | Pouya                    | 🚧 In Progress  |
-| **Feed Tab**         | Pouya (50%) + Raouf (50%)| 🚧 Shared       |
-| **Map Tab**          | Raouf                    | 🚧 In Progress  |
-| **Settings Tab**     | Raouf                    | 🚧 In Progress  |
-| **AI Integration**   | Kit                      | 🔜 Demo Feature |
+| Tab/Feature        | Owner                     | Status          |
+| ------------------ | ------------------------- | --------------- |
+| **Home Tab**       | Pouya                     | 🚧 In Progress  |
+| **Calendar Tab**   | Pouya                     | 🚧 In Progress  |
+| **Feed Tab**       | Pouya (50%) + Raouf (50%) | 🚧 Shared       |
+| **Map Tab**        | Raouf                     | 🚧 In Progress  |
+| **Settings Tab**   | Raouf                     | 🚧 In Progress  |
+| **AI Integration** | Kit                       | 🔜 Demo Feature |
 
 ### Team Members
 

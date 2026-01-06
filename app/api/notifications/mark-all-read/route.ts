@@ -17,6 +17,6 @@ export async function PUT() {
 
   return NextResponse.json({
     updated: data?.length ?? 0,
-    message: 'All notifications marked as read'
+    message: 'All notifications marked as read',
   });
 }

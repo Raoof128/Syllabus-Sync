@@ -12,7 +12,7 @@ export const API_VERSIONS = {
   CURRENT: 'v1', // Points to current stable version
 } as const;
 
-export type ApiVersion = typeof API_VERSIONS[keyof typeof API_VERSIONS];
+export type ApiVersion = (typeof API_VERSIONS)[keyof typeof API_VERSIONS];
 
 /**
  * Extract API version from request
@@ -52,12 +52,10 @@ export const isVersionSupported = (version: string): version is ApiVersion => {
 /**
  * API versioning middleware
  */
-export const apiVersioning = (
-  supportedVersions: ApiVersion[] = [API_VERSIONS.CURRENT]
-) => {
+export const apiVersioning = (supportedVersions: ApiVersion[] = [API_VERSIONS.CURRENT]) => {
   return async (
     request: NextRequest,
-    handler: (version: ApiVersion) => Promise<NextResponse>
+    handler: (version: ApiVersion) => Promise<NextResponse>,
   ): Promise<NextResponse> => {
     const version = getApiVersion(request);
 
@@ -74,7 +72,7 @@ export const apiVersioning = (
             supportedVersions,
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -90,9 +88,7 @@ export const apiVersioning = (
 /**
  * Version-specific route builder
  */
-export const createVersionedRoute = (
-  versions: Record<ApiVersion, () => Promise<NextResponse>>
-) => {
+export const createVersionedRoute = (versions: Record<ApiVersion, () => Promise<NextResponse>>) => {
   return async (request: NextRequest): Promise<NextResponse> => {
     return apiVersioning(Object.keys(versions) as ApiVersion[])(request, (version) => {
       return versions[version]();
@@ -109,11 +105,11 @@ export const createVersionedRoute = (
  */
 export const deprecated = (
   message: string = 'This endpoint is deprecated and will be removed in a future version.',
-  removalVersion?: string
+  removalVersion?: string,
 ) => {
   return async (
     request: NextRequest,
-    handler: () => Promise<NextResponse>
+    handler: () => Promise<NextResponse>,
   ): Promise<NextResponse> => {
     console.warn(`Deprecated endpoint called: ${request.method} ${request.nextUrl.pathname}`);
 

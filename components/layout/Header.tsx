@@ -45,7 +45,10 @@ const Header = memo(() => {
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
 
-  const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string; name?: string } } | null>(null);
+  const [user, setUser] = useState<{
+    email?: string;
+    user_metadata?: { full_name?: string; name?: string };
+  } | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,7 +67,9 @@ const Header = memo(() => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
         console.error('Failed to get user:', error);
@@ -76,10 +81,23 @@ const Header = memo(() => {
     getUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string; email?: string; user_metadata?: { full_name?: string; name?: string } } } | null) => {
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (
+        _event: string,
+        session: {
+          user: {
+            id: string;
+            email?: string;
+            user_metadata?: { full_name?: string; name?: string };
+          };
+        } | null,
+      ) => {
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      },
+    );
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
@@ -141,7 +159,9 @@ const Header = memo(() => {
       const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
       // Capitalize first letter
       if (nameWithoutNumbers.length > 0) {
-        return nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase();
+        return (
+          nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
+        );
       }
     }
     return null;
@@ -160,9 +180,7 @@ const Header = memo(() => {
             style={{ objectFit: 'contain' }}
           />
           <div className="hidden sm:block">
-            <h1 className="text-mq-lg font-semibold text-mq-content">
-              {APP_CONFIG.name}
-            </h1>
+            <h1 className="text-mq-lg font-semibold text-mq-content">{APP_CONFIG.name}</h1>
             <p className="text-mq-xs text-mq-content-secondary">{UNIVERSITY_CONFIG.shortName}</p>
           </div>
         </Link>
@@ -172,24 +190,35 @@ const Header = memo(() => {
           <div className="hidden md:flex items-center ml-4 pl-4 border-l border-mq-border">
             <span className="text-mq-sm font-medium text-mq-content-secondary">
               {new Date().toLocaleDateString(
-                language === 'fa' ? 'fa-IR'
-                  : language === 'es' ? 'es-ES'
-                    : language === 'zh' ? 'zh-CN'
-                      : language === 'ar' ? 'ar-SA'
-                        : language === 'hi' ? 'hi-IN'
-                          : language === 'ru' ? 'ru-RU'
-                            : language === 'ja' ? 'ja-JP'
-                              : language === 'ko' ? 'ko-KR'
-                                : language === 'ur' ? 'ur-PK'
-                                  : language === 'th' ? 'th-TH'
-                                    : language === 'vi' ? 'vi-VN'
+                language === 'fa'
+                  ? 'fa-IR'
+                  : language === 'es'
+                    ? 'es-ES'
+                    : language === 'zh'
+                      ? 'zh-CN'
+                      : language === 'ar'
+                        ? 'ar-SA'
+                        : language === 'hi'
+                          ? 'hi-IN'
+                          : language === 'ru'
+                            ? 'ru-RU'
+                            : language === 'ja'
+                              ? 'ja-JP'
+                              : language === 'ko'
+                                ? 'ko-KR'
+                                : language === 'ur'
+                                  ? 'ur-PK'
+                                  : language === 'th'
+                                    ? 'th-TH'
+                                    : language === 'vi'
+                                      ? 'vi-VN'
                                       : 'en-AU',
                 {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
-                }
+                },
               )}
             </span>
           </div>
@@ -198,7 +227,6 @@ const Header = memo(() => {
 
       {/* Right side - Actions (far right) */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>
           <button
@@ -231,7 +259,9 @@ const Header = memo(() => {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-mq-content-tertiary text-sm">{t('noNotificationsYet')}</div>
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm">
+                    {t('noNotificationsYet')}
+                  </div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
@@ -243,29 +273,32 @@ const Header = memo(() => {
                           markAsRead(notification.id);
                           setShowNotifications(false);
                         }}
-                        className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${!notification.read ? 'bg-mq-info/10' : ''
-                          }`}
+                        className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${
+                          !notification.read ? 'bg-mq-info/10' : ''
+                        }`}
                       >
                         <div className="flex gap-3">
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${notification.type === 'deadline'
-                              ? 'bg-mq-warning/20'
-                              : notification.type === 'event'
-                                ? 'bg-mq-purple/20'
-                                : notification.type === 'class'
-                                  ? 'bg-mq-info/20'
-                                  : 'bg-mq-background-secondary'
-                              }`}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              notification.type === 'deadline'
+                                ? 'bg-mq-warning/20'
+                                : notification.type === 'event'
+                                  ? 'bg-mq-purple/20'
+                                  : notification.type === 'class'
+                                    ? 'bg-mq-info/20'
+                                    : 'bg-mq-background-secondary'
+                            }`}
                           >
                             <Icon
-                              className={`w-4 h-4 ${notification.type === 'deadline'
-                                ? 'text-mq-warning'
-                                : notification.type === 'event'
-                                  ? 'text-mq-purple'
-                                  : notification.type === 'class'
-                                    ? 'text-mq-info'
-                                    : 'text-mq-content-secondary'
-                                }`}
+                              className={`w-4 h-4 ${
+                                notification.type === 'deadline'
+                                  ? 'text-mq-warning'
+                                  : notification.type === 'event'
+                                    ? 'text-mq-purple'
+                                    : notification.type === 'class'
+                                      ? 'text-mq-info'
+                                      : 'text-mq-content-secondary'
+                              }`}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -310,7 +343,11 @@ const Header = memo(() => {
               />
               <Moon
                 className={`absolute inset-0 w-5 h-5 text-mq-info transition-all duration-500 group-hover:-rotate-12 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
-                style={resolvedTheme === 'dark' ? { transform: 'translate(0.5px, 0.5px) scale(1) rotate(0deg)' } : { transform: 'translate(0.5px, 0.5px) scale(0) rotate(-90deg)' }}
+                style={
+                  resolvedTheme === 'dark'
+                    ? { transform: 'translate(0.5px, 0.5px) scale(1) rotate(0deg)' }
+                    : { transform: 'translate(0.5px, 0.5px) scale(0) rotate(-90deg)' }
+                }
               />
             </div>
           </button>
@@ -326,7 +363,9 @@ const Header = memo(() => {
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-mq-sm group-hover:shadow-mq"
-                  style={{ backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary }}
+                  style={{
+                    backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary,
+                  }}
                 >
                   {currentProfile?.avatar ? (
                     <Image

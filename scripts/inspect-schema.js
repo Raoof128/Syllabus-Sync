@@ -31,10 +31,7 @@ async function inspectSchema() {
       console.log(`📋 Inspecting table: ${table}`);
       try {
         // Try to get a sample row
-        const { data, error } = await supabase
-          .from(table)
-          .select('*')
-          .limit(1);
+        const { data, error } = await supabase.from(table).select('*').limit(1);
 
         if (error) {
           console.log(`   ❌ Error: ${error.message}`);
@@ -46,16 +43,12 @@ async function inspectSchema() {
           // Try to insert and immediately delete to see what columns are accepted
           try {
             const testInsert = { id: 'test-id-123' };
-            const { error: insertError } = await supabase
-              .from(table)
-              .insert(testInsert);
+            const { error: insertError } = await supabase.from(table).insert(testInsert);
 
             if (insertError) {
               console.log(`   🔍 Insert test error: ${insertError.message}`);
               // Try without ID
-              const { error: insertError2 } = await supabase
-                .from(table)
-                .insert({});
+              const { error: insertError2 } = await supabase.from(table).insert({});
 
               if (insertError2) {
                 console.log(`   🔍 Empty insert error: ${insertError2.message}`);
@@ -76,7 +69,6 @@ async function inspectSchema() {
     }
 
     console.log('🎯 Schema inspection complete!');
-
   } catch (error) {
     console.error('❌ Schema inspection failed:', error);
     process.exit(1);

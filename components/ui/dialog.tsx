@@ -44,7 +44,7 @@ const DialogContent = React.forwardRef<
   React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean;
   }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 >(({ className, children, showCloseButton = true, ...props }, ref) => {
   const { t } = useTranslation();
   return (

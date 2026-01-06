@@ -20,8 +20,18 @@ export const sampleUnits: Unit[] = [
       room: '204',
     },
     schedule: [
-      { id: '550e8400-e29b-41d4-a716-446655440101', day: 'Monday', startTime: '09:00', endTime: '11:00' },
-      { id: '550e8400-e29b-41d4-a716-446655440102', day: 'Wednesday', startTime: '14:00', endTime: '15:00' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440101',
+        day: 'Monday',
+        startTime: '09:00',
+        endTime: '11:00',
+      },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440102',
+        day: 'Wednesday',
+        startTime: '14:00',
+        endTime: '15:00',
+      },
     ],
     createdAt: getDate(-14),
   },
@@ -35,8 +45,18 @@ export const sampleUnits: Unit[] = [
       room: '112',
     },
     schedule: [
-      { id: '550e8400-e29b-41d4-a716-446655440201', day: 'Tuesday', startTime: '10:00', endTime: '12:00' },
-      { id: '550e8400-e29b-41d4-a716-446655440202', day: 'Thursday', startTime: '13:00', endTime: '14:30' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440201',
+        day: 'Tuesday',
+        startTime: '10:00',
+        endTime: '12:00',
+      },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440202',
+        day: 'Thursday',
+        startTime: '13:00',
+        endTime: '14:30',
+      },
     ],
     createdAt: getDate(-21),
   },
@@ -50,7 +70,12 @@ export const sampleUnits: Unit[] = [
       room: '301',
     },
     schedule: [
-      { id: '550e8400-e29b-41d4-a716-446655440301', day: 'Friday', startTime: '16:00', endTime: '18:00' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440301',
+        day: 'Friday',
+        startTime: '16:00',
+        endTime: '18:00',
+      },
     ],
     createdAt: getDate(-30),
   },

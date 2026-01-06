@@ -43,8 +43,6 @@ export default function ManageProfilesPage() {
     setCurrentProfile,
   } = useProfilesStore();
 
-
-
   const handleAddProfile = () => {
     if (formData.name && formData.email && formData.studentId) {
       addProfile({
@@ -113,9 +111,7 @@ export default function ManageProfilesPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <header className="mb-8">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-          {t('manageProfiles')}
-        </h1>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('manageProfiles')}</h1>
         <p className="text-mq-content">{t('manageProfilesDesc')}</p>
       </header>
 
@@ -176,9 +172,7 @@ export default function ManageProfilesPage() {
           <DialogHeader>
             <DialogTitle>{editingProfile ? t('editProfile') : t('createNewProfile')}</DialogTitle>
             <p id="profile-form-description" className="text-mq-sm text-mq-content-secondary">
-              {editingProfile
-                ? t('updateProfileDesc')
-                : t('fillProfileDetails')}
+              {editingProfile ? t('updateProfileDesc') : t('fillProfileDetails')}
             </p>
           </DialogHeader>
           <form
@@ -284,7 +278,9 @@ export default function ManageProfilesPage() {
               >
                 {t('cancel')}
               </Button>
-              <Button type="submit">{editingProfile ? t('updateProfile') : t('createProfile')}</Button>
+              <Button type="submit">
+                {editingProfile ? t('updateProfile') : t('createProfile')}
+              </Button>
             </div>
           </form>
         </DialogContent>

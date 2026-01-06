@@ -19,7 +19,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase environment variables');
-  console.error('Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local');
+  console.error(
+    'Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local',
+  );
   process.exit(1);
 }
 
@@ -46,7 +48,9 @@ async function setupDatabase() {
       .select('count', { count: 'exact', head: true });
 
     if (testError) {
-      console.log('📋 Database tables may not exist yet. This is expected for a new Supabase project.');
+      console.log(
+        '📋 Database tables may not exist yet. This is expected for a new Supabase project.',
+      );
       console.log('📝 To set up the database:');
       console.log('   1. Go to your Supabase dashboard');
       console.log('   2. Navigate to the SQL Editor');
@@ -67,11 +71,26 @@ async function setupDatabase() {
 
     // Test the connection by querying each table
     const tests = [
-      { table: 'profiles', query: () => supabase.from('profiles').select('count', { count: 'exact', head: true }) },
-      { table: 'units', query: () => supabase.from('units').select('count', { count: 'exact', head: true }) },
-      { table: 'deadlines', query: () => supabase.from('deadlines').select('count', { count: 'exact', head: true }) },
-      { table: 'events', query: () => supabase.from('events').select('count', { count: 'exact', head: true }) },
-      { table: 'notifications', query: () => supabase.from('notifications').select('count', { count: 'exact', head: true }) },
+      {
+        table: 'profiles',
+        query: () => supabase.from('profiles').select('count', { count: 'exact', head: true }),
+      },
+      {
+        table: 'units',
+        query: () => supabase.from('units').select('count', { count: 'exact', head: true }),
+      },
+      {
+        table: 'deadlines',
+        query: () => supabase.from('deadlines').select('count', { count: 'exact', head: true }),
+      },
+      {
+        table: 'events',
+        query: () => supabase.from('events').select('count', { count: 'exact', head: true }),
+      },
+      {
+        table: 'notifications',
+        query: () => supabase.from('notifications').select('count', { count: 'exact', head: true }),
+      },
     ];
 
     for (const test of tests) {
@@ -86,7 +105,6 @@ async function setupDatabase() {
         console.error(`❌ ${test.table} table test failed:`, err.message);
       }
     }
-
   } catch (error) {
     console.error('❌ Database setup failed:', error);
     process.exit(1);
@@ -104,7 +122,14 @@ async function runMigration() {
     // Read the migration file
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const migrationPath = join(__dirname, '..', 'lib', 'supabase', 'migrations', '001_initial_schema.sql');
+    const migrationPath = join(
+      __dirname,
+      '..',
+      'lib',
+      'supabase',
+      'migrations',
+      '001_initial_schema.sql',
+    );
 
     console.log('📖 Reading migration file...');
     const migrationSQL = readFileSync(migrationPath, 'utf8');
@@ -114,8 +139,8 @@ async function runMigration() {
     // Split SQL into individual statements and execute them
     const statements = migrationSQL
       .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0 && !stmt.startsWith('--'));
+      .map((stmt) => stmt.trim())
+      .filter((stmt) => stmt.length > 0 && !stmt.startsWith('--'));
 
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
@@ -136,7 +161,6 @@ async function runMigration() {
 
     // Test the setup
     await setupDatabase();
-
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);

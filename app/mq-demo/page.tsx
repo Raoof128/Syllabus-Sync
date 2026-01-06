@@ -129,7 +129,9 @@ export default function MQStyleGuidePage() {
                   <MQLink href="#default">{t('defaultLink')}</MQLink>
                 </div>
                 <div>
-                  <MQLink href="#subtle" variant="subtle">{t('subtleLink')}</MQLink>
+                  <MQLink href="#subtle" variant="subtle">
+                    {t('subtleLink')}
+                  </MQLink>
                 </div>
                 <div>
                   <MQLink href="https://mq.edu.au" external>
@@ -186,9 +188,7 @@ export default function MQStyleGuidePage() {
                 <CardContent>
                   <div className="space-y-2">
                     <Badge variant="brand">{t('featured')}</Badge>
-                    <p className="text-mq-sm text-mq-content-secondary">
-                      {t('cardDemoDesc')}
-                    </p>
+                    <p className="text-mq-sm text-mq-content-secondary">{t('cardDemoDesc')}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -236,30 +236,22 @@ export default function MQStyleGuidePage() {
             <div className="space-y-4">
               <Alert variant="info" className={fadeIn}>
                 <AlertTitle>{t('information')}</AlertTitle>
-                <AlertDescription>
-                  {t('infoAlertDesc')}
-                </AlertDescription>
+                <AlertDescription>{t('infoAlertDesc')}</AlertDescription>
               </Alert>
 
               <Alert variant="warning" className={fadeIn}>
                 <AlertTitle>{t('warning')}</AlertTitle>
-                <AlertDescription>
-                  {t('warningAlertDesc')}
-                </AlertDescription>
+                <AlertDescription>{t('warningAlertDesc')}</AlertDescription>
               </Alert>
 
               <Alert variant="success" className={fadeIn}>
                 <AlertTitle>{t('success')}</AlertTitle>
-                <AlertDescription>
-                  {t('successAlertDesc')}
-                </AlertDescription>
+                <AlertDescription>{t('successAlertDesc')}</AlertDescription>
               </Alert>
 
               <Alert variant="error" className={fadeIn}>
                 <AlertTitle>{t('error')}</AlertTitle>
-                <AlertDescription>
-                  {t('errorAlertDesc')}
-                </AlertDescription>
+                <AlertDescription>{t('errorAlertDesc')}</AlertDescription>
               </Alert>
             </div>
           </section>
@@ -276,9 +268,7 @@ export default function MQStyleGuidePage() {
                   <CardDescription>{t('hoverLiftDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('hoverLiftContent')}
-                  </p>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('hoverLiftContent')}</p>
                 </CardContent>
               </Card>
 
@@ -288,9 +278,7 @@ export default function MQStyleGuidePage() {
                   <CardDescription>{t('fadeInDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('fadeInContent')}
-                  </p>
+                  <p className="text-mq-sm text-mq-content-secondary">{t('fadeInContent')}</p>
                 </CardContent>
               </Card>
             </div>

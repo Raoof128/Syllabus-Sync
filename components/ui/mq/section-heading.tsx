@@ -16,8 +16,7 @@ const headingVariants = cva('', {
 });
 
 interface SectionHeadingProps
-  extends React.HTMLAttributes<HTMLHeadingElement>,
-    VariantProps<typeof headingVariants> {}
+  extends React.HTMLAttributes<HTMLHeadingElement>, VariantProps<typeof headingVariants> {}
 
 export const SectionHeading = React.forwardRef<HTMLHeadingElement, SectionHeadingProps>(
   ({ className, level = 'h2', ...props }, ref) => {
@@ -33,6 +32,6 @@ export const SectionHeading = React.forwardRef<HTMLHeadingElement, SectionHeadin
       default:
         return <h2 ref={ref} className={headingClass} {...props} />;
     }
-  }
+  },
 );
 SectionHeading.displayName = 'SectionHeading';

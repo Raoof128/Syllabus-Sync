@@ -57,8 +57,6 @@ import {
 import { Unit, Deadline } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
 
-
-
 export default function HomeClient() {
   const { t } = useTranslation();
 
@@ -68,7 +66,10 @@ export default function HomeClient() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // User state from Supabase
-  const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string; name?: string } } | null>(null);
+  const [user, setUser] = useState<{
+    email?: string;
+    user_metadata?: { full_name?: string; name?: string };
+  } | null>(null);
   const supabase = useMemo(() => createBrowserClient(), []);
 
   const units = useUnitsStore((state) => state.units);
@@ -88,7 +89,9 @@ export default function HomeClient() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
         console.error('Failed to get user:', error);
@@ -98,9 +101,22 @@ export default function HomeClient() {
     getUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string; email?: string; user_metadata?: { full_name?: string; name?: string } } } | null) => {
-      setUser(session?.user ?? null);
-    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (
+        _event: string,
+        session: {
+          user: {
+            id: string;
+            email?: string;
+            user_metadata?: { full_name?: string; name?: string };
+          };
+        } | null,
+      ) => {
+        setUser(session?.user ?? null);
+      },
+    );
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
@@ -117,7 +133,9 @@ export default function HomeClient() {
       const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
       // Capitalize first letter
       if (nameWithoutNumbers.length > 0) {
-        return nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase();
+        return (
+          nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
+        );
       }
     }
     return null;
@@ -149,7 +167,6 @@ export default function HomeClient() {
   // Live region for screen reader announcements
   const [announcements, setAnnouncements] = useState<string[]>([]);
 
-
   // Load sample data on first visit with comprehensive validation
   useEffect(() => {
     if (!hasHydrated || hasSeededRef.current || seedDisabled) {
@@ -164,22 +181,26 @@ export default function HomeClient() {
       const deadlinesSeeded = localStorage.getItem(deadlinesSeededKey) === 'true';
 
       // Validate sample data before adding
-      const validUnits = sampleUnits.filter(unit => {
-        return unit &&
+      const validUnits = sampleUnits.filter((unit) => {
+        return (
+          unit &&
           unit.code &&
           unit.name &&
           unit.color &&
           Array.isArray(unit.schedule) &&
-          unit.schedule.length > 0;
+          unit.schedule.length > 0
+        );
       });
 
-      const validDeadlines = sampleDeadlines.filter(deadline => {
-        return deadline &&
+      const validDeadlines = sampleDeadlines.filter((deadline) => {
+        return (
+          deadline &&
           deadline.title &&
           deadline.unitCode &&
           deadline.priority &&
           deadline.dueDate &&
-          !isNaN(new Date(deadline.dueDate).getTime());
+          !isNaN(new Date(deadline.dueDate).getTime())
+        );
       });
 
       if (!unitsSeeded && validUnits.length > 0) {
@@ -199,11 +220,11 @@ export default function HomeClient() {
       console.warn('Failed to load sample data, falling back to direct addition:', error);
       try {
         // Fallback: add data without localStorage
-        const validUnits = sampleUnits.filter(unit =>
-          unit && unit.code && unit.name && unit.color && Array.isArray(unit.schedule)
+        const validUnits = sampleUnits.filter(
+          (unit) => unit && unit.code && unit.name && unit.color && Array.isArray(unit.schedule),
         );
-        const validDeadlines = sampleDeadlines.filter(deadline =>
-          deadline && deadline.title && deadline.unitCode && deadline.dueDate
+        const validDeadlines = sampleDeadlines.filter(
+          (deadline) => deadline && deadline.title && deadline.unitCode && deadline.dueDate,
         );
 
         validUnits.forEach(addUnit);
@@ -294,7 +315,7 @@ export default function HomeClient() {
                 return hours;
               }
 
-              return hours + Math.max(0, (endH - startH) + (endM - startM) / 60);
+              return hours + Math.max(0, endH - startH + (endM - startM) / 60);
             } catch (error) {
               console.warn('Error calculating hours for schedule:', s, error);
               return hours;
@@ -317,11 +338,6 @@ export default function HomeClient() {
       };
     }
   }, [units]);
-
-
-
-
-
 
   // Error recovery function
   const handleErrorRecovery = () => {
@@ -367,10 +383,7 @@ export default function HomeClient() {
             <Button onClick={handleErrorRecovery} className="mr-3">
               {t('tryAgain')}
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => window.location.href = '/'}
-            >
+            <Button variant="secondary" onClick={() => (window.location.href = '/')}>
               {t('goHome')}
             </Button>
           </div>
@@ -379,18 +392,14 @@ export default function HomeClient() {
     );
   }
 
-
-
   // Function to announce actions to screen readers
   const announceToScreenReader = (message: string) => {
-    setAnnouncements(prev => [...prev, `${Date.now()}: ${message}`]);
+    setAnnouncements((prev) => [...prev, `${Date.now()}: ${message}`]);
     // Clear old announcements after 5 seconds
     setTimeout(() => {
-      setAnnouncements(prev => prev.filter(ann => !ann.startsWith(`${Date.now() - 5000}:`)));
+      setAnnouncements((prev) => prev.filter((ann) => !ann.startsWith(`${Date.now() - 5000}:`)));
     }, 5000);
   };
-
-
 
   const stressColors = {
     Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
@@ -430,7 +439,7 @@ export default function HomeClient() {
         errorHandler.logError(
           error instanceof Error ? error : new Error('Failed to delete unit'),
           'Home Delete Unit',
-          'medium'
+          'medium',
         );
         toastUtils.error(t('deleteFailed'), errorMessage);
         announceToScreenReader(errorMessage);
@@ -438,8 +447,6 @@ export default function HomeClient() {
       setDeleteUnitConfirm(null);
     }
   };
-
-
 
   return (
     <div className="home-page">
@@ -487,10 +494,15 @@ export default function HomeClient() {
       {/* Get Started Banner */}
       {!hasUnits && (
         <ScrollReveal delay={0.1}>
-          <section className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3" aria-labelledby="get-started-heading">
+          <section
+            className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3"
+            aria-labelledby="get-started-heading"
+          >
             <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
-              <h2 id="get-started-heading" className="sr-only">{t('gettingStartedGuide')}</h2>
+              <h2 id="get-started-heading" className="sr-only">
+                {t('gettingStartedGuide')}
+              </h2>
               <p className="text-mq-sm text-mq-info">
                 <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
               </p>
@@ -500,7 +512,10 @@ export default function HomeClient() {
       )}
 
       {/* Main Dashboard Grid (rendered inside page-level main) */}
-      <section className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" aria-label={t('dashboardOverview')}>
+      <section
+        className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6"
+        aria-label={t('dashboardOverview')}
+      >
         <ScrollReveal delay={0.1}>
           <TodaySchedule />
         </ScrollReveal>
@@ -540,7 +555,9 @@ export default function HomeClient() {
               ) : units.length === 0 ? (
                 <div className="text-center py-12">
                   <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noUnitsYet')}</h3>
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
+                    {t('noUnitsYet')}
+                  </h3>
                   <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
                     {t('addFirstUnitDesc')}
                   </p>
@@ -552,17 +569,24 @@ export default function HomeClient() {
               ) : (
                 <>
                   {/* Unit Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border" style={{ color: 'var(--mq-content)' }}>
+                  <div
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border"
+                    style={{ color: 'var(--mq-content)' }}
+                  >
                     <div className="text-center">
                       <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
                       <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.totalClasses}</p>
+                      <p className="text-mq-2xl font-bold text-mq-content">
+                        {unitStats.totalClasses}
+                      </p>
                       <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.studyHours}h</p>
+                      <p className="text-mq-2xl font-bold text-mq-content">
+                        {unitStats.studyHours}h
+                      </p>
                       <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
                     </div>
                   </div>
@@ -578,11 +602,7 @@ export default function HomeClient() {
                         variants={revealChildVariants}
                         className="relative z-0 hover:z-50 focus-within:z-50 h-full"
                       >
-                        <UnitCard
-                          unit={unit}
-                          onEdit={handleEditUnit}
-                          onDelete={handleDeleteUnit}
-                        />
+                        <UnitCard unit={unit} onEdit={handleEditUnit} onDelete={handleDeleteUnit} />
                       </motion.div>
                     ))}
                   </motion.div>
@@ -596,7 +616,9 @@ export default function HomeClient() {
       {/* Events Section */}
       <ScrollReveal delay={0.4}>
         <section aria-labelledby="events-section-heading" className="mb-8">
-          <h2 id="events-section-heading" className="sr-only">{t('todaysEvents')}</h2>
+          <h2 id="events-section-heading" className="sr-only">
+            {t('todaysEvents')}
+          </h2>
           <EventsFeed />
         </section>
       </ScrollReveal>

@@ -138,7 +138,7 @@ const config: Config = {
       },
       borderRadius: {
         'mq-sm': 'var(--c-radius-sm)',
-        'mq': 'var(--c-radius)',
+        mq: 'var(--c-radius)',
         'mq-lg': 'var(--c-radius-lg)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -146,7 +146,7 @@ const config: Config = {
       },
       boxShadow: {
         'mq-sm': 'var(--c-shadow-sm)',
-        'mq': 'var(--c-shadow)',
+        mq: 'var(--c-shadow)',
       },
       transitionTimingFunction: {
         'mq-ease': 'cubic-bezier(0.5, 0.5, 0, 1)',

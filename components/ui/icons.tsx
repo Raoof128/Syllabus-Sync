@@ -1,7 +1,4 @@
-import {
-  GraduationCap,
-  Chrome,
-} from 'lucide-react';
+import { GraduationCap, Chrome } from 'lucide-react';
 
 export const Icons = {
   Graduation: GraduationCap,

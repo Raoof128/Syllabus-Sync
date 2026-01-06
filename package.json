@@ -22,7 +22,8 @@
     "test:accessibility": "playwright test --grep accessibility",
     "test:ci": "npm run test && npm run test:e2e",
     "typecheck": "tsc --noEmit",
-    "prepush": "npm run build && npm run typecheck && npm run lint && npm run test",
+    "check:secrets": "node scripts/check-no-secret-prints.js",
+    "prepush": "npm run check:secrets && npm run build && npm run typecheck && npm run lint && npm run test",
     "lighthouse": "lhci autorun",
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json"
   },

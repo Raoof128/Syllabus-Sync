@@ -73,7 +73,12 @@ const ProfileCard = React.memo(
                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <Camera className="w-6 h-6 text-white" />
                 </div>
-                <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </label>
 
               {isCurrent && (
@@ -87,7 +92,10 @@ const ProfileCard = React.memo(
               <h3 className="font-semibold text-mq-content">{profile.name}</h3>
               <p className="text-sm text-mq-content-secondary">{profile.email}</p>
               <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
-                <span>{t('idPrefix')}{profile.studentId}</span>
+                <span>
+                  {t('idPrefix')}
+                  {profile.studentId}
+                </span>
                 <span>•</span>
                 <span>
                   {profile.course} • {profile.year}
@@ -150,7 +158,7 @@ const ProfileCard = React.memo(
                 <span
                   className={cn(
                     'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-                    profile.preferences.notifications ? 'translate-x-6' : 'translate-x-1'
+                    profile.preferences.notifications ? 'translate-x-6' : 'translate-x-1',
                   )}
                 />
               </button>
@@ -166,13 +174,15 @@ const ProfileCard = React.memo(
                 onClick={() => togglePreference('emailReminders')}
                 className={cn(
                   'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
-                  profile.preferences.emailReminders ? 'bg-mq-success' : 'bg-mq-background-tertiary',
+                  profile.preferences.emailReminders
+                    ? 'bg-mq-success'
+                    : 'bg-mq-background-tertiary',
                 )}
               >
                 <span
                   className={cn(
                     'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-                    profile.preferences.emailReminders ? 'translate-x-6' : 'translate-x-1'
+                    profile.preferences.emailReminders ? 'translate-x-6' : 'translate-x-1',
                   )}
                 />
               </button>
@@ -188,13 +198,15 @@ const ProfileCard = React.memo(
                 onClick={() => togglePreference('pushNotifications')}
                 className={cn(
                   'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
-                  profile.preferences.pushNotifications ? 'bg-mq-success' : 'bg-mq-background-tertiary',
+                  profile.preferences.pushNotifications
+                    ? 'bg-mq-success'
+                    : 'bg-mq-background-tertiary',
                 )}
               >
                 <span
                   className={cn(
                     'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-                    profile.preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1'
+                    profile.preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1',
                   )}
                 />
               </button>
@@ -212,9 +224,7 @@ const ProfileCard = React.memo(
 
         {deleteConfirm && (
           <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
-            <p className="text-sm text-mq-error mb-3 font-medium">
-              {t('deleteProfileConfirm')}
-            </p>
+            <p className="text-sm text-mq-error mb-3 font-medium">{t('deleteProfileConfirm')}</p>
             <div className="flex gap-2">
               <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(false)}>
                 {t('cancel')}

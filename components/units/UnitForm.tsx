@@ -208,16 +208,10 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     resetForm();
   };
 
-  const codeDescribedBy = [
-    errors.code ? 'unit-code-error' : '',
-    'unit-code-help',
-  ]
+  const codeDescribedBy = [errors.code ? 'unit-code-error' : '', 'unit-code-help']
     .filter(Boolean)
     .join(' ');
-  const buildingDescribedBy = [
-    errors.building ? 'unit-building-error' : '',
-    'unit-building-help',
-  ]
+  const buildingDescribedBy = [errors.building ? 'unit-building-error' : '', 'unit-building-help']
     .filter(Boolean)
     .join(' ');
 
@@ -227,9 +221,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         <DialogHeader>
           <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
           <DialogDescription>
-            {editUnit
-              ? t('updateUnitDetails')
-              : t('fillUnitDetails')}
+            {editUnit ? t('updateUnitDetails') : t('fillUnitDetails')}
           </DialogDescription>
         </DialogHeader>
 

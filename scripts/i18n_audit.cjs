@@ -15,5 +15,7 @@ locales.forEach((l) => {
   const extra = keys.filter((k) => !Object.prototype.hasOwnProperty.call(en, k));
   const empty = keys.filter((k) => obj[k] === '');
   const suspicious = keys.filter((k) => suspiciousRx.test(obj[k]));
-  console.log(`${l}\t${keys.length}\t${missing.length}\t${extra.length}\t${empty.length}\t${suspicious.length}`);
+  console.log(
+    `${l}\t${keys.length}\t${missing.length}\t${extra.length}\t${empty.length}\t${suspicious.length}`,
+  );
 });

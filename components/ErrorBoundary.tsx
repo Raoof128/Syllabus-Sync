@@ -22,14 +22,14 @@ interface State {
   retryCount: number;
 }
 
-function ErrorBoundaryUI({ 
-  error, 
-  errorInfo, 
-  retryCount, 
-  maxRetries, 
-  onRetry, 
-  onReset, 
-  showErrorDetails 
+function ErrorBoundaryUI({
+  error,
+  errorInfo,
+  retryCount,
+  maxRetries,
+  onRetry,
+  onReset,
+  showErrorDetails,
 }: {
   error: Error | null;
   errorInfo: ErrorInfo | null;
@@ -51,14 +51,10 @@ function ErrorBoundaryUI({
         </div>
 
         {/* Error Title */}
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-3">
-          {t('oops')}
-        </h1>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-3">{t('oops')}</h1>
 
         {/* Error Description */}
-        <p className="text-mq-content-secondary mb-6 text-mq-medium">
-          {t('boundaryErrorDesc')}
-        </p>
+        <p className="text-mq-content-secondary mb-6 text-mq-medium">{t('boundaryErrorDesc')}</p>
 
         {/* Retry Counter */}
         {retryCount > 0 && (
@@ -99,9 +95,7 @@ function ErrorBoundaryUI({
             </summary>
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-mq-content mb-1">
-                  {t('errorMessage')}
-                </h4>
+                <h4 className="font-medium text-mq-content mb-1">{t('errorMessage')}</h4>
                 <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
                   {error.message}
                 </code>
@@ -109,9 +103,7 @@ function ErrorBoundaryUI({
 
               {errorInfo && (
                 <div>
-                  <h4 className="font-medium text-mq-content mb-1">
-                    {t('componentStack')}
-                  </h4>
+                  <h4 className="font-medium text-mq-content mb-1">{t('componentStack')}</h4>
                   <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
                     {errorInfo.componentStack}
                   </pre>
@@ -119,9 +111,7 @@ function ErrorBoundaryUI({
               )}
 
               <div>
-                <h4 className="font-medium text-mq-content mb-1">
-                  {t('stackTrace')}
-                </h4>
+                <h4 className="font-medium text-mq-content mb-1">{t('stackTrace')}</h4>
                 <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
                   {error.stack}
                 </pre>

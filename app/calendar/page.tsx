@@ -40,7 +40,10 @@ function CalendarSkeleton() {
           <div className="h-8 bg-mq-background-secondary rounded-mq w-56 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-16 bg-mq-background-secondary rounded-mq border border-mq-border" />
+              <div
+                key={i}
+                className="h-16 bg-mq-background-secondary rounded-mq border border-mq-border"
+              />
             ))}
           </div>
         </div>
@@ -52,7 +55,12 @@ function CalendarSkeleton() {
 export default function CalendarPage() {
   return (
     <Suspense fallback={<CalendarSkeleton />}>
-      <main id="main-content" className="container mx-auto p-6 max-w-7xl calendar-page" role="main" aria-label="Calendar">
+      <main
+        id="main-content"
+        className="container mx-auto p-6 max-w-7xl calendar-page"
+        role="main"
+        aria-label="Calendar"
+      >
         <CalendarClient />
       </main>
     </Suspense>

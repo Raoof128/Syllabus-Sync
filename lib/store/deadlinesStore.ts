@@ -43,7 +43,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         try {
           const data = await apiRequest<Deadline[]>('/api/deadlines');
           // Ensure loaded data has valid UUIDs (filter out bad ones from API if any)
-          const validData = data.map(normalizeDeadline).filter(d => {
+          const validData = data.map(normalizeDeadline).filter((d) => {
             if (!isValidUUID(d.id)) {
               console.warn(`Filtered out invalid deadline ID from API: ${d.id}`);
               return false;
@@ -62,7 +62,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
 
       addDeadline: async (deadline) => {
         // Ensure new ID is a UUID
-        const id = (deadline.id && isValidUUID(deadline.id)) ? deadline.id : uuidv4();
+        const id = deadline.id && isValidUUID(deadline.id) ? deadline.id : uuidv4();
 
         const deadlineWithId: Deadline = {
           ...deadline,
@@ -112,7 +112,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           return;
         }
 
-        const deadlineToRemove = get().deadlines.find(d => d.id === id);
+        const deadlineToRemove = get().deadlines.find((d) => d.id === id);
         set((state) => ({
           deadlines: state.deadlines.filter((d) => d.id !== id),
         }));
@@ -196,15 +196,31 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           if (isNaN(now.getTime())) return 'Low';
 
           const priorityPoints: Record<Deadline['priority'], number> = {
-            Urgent: 4, High: 3, Medium: 2, Low: 1,
+            Urgent: 4,
+            High: 3,
+            Medium: 2,
+            Low: 1,
           };
 
           const totalPoints = upcoming.reduce((sum, deadline) => {
             try {
               const dueDate = new Date(deadline.dueDate);
               if (isNaN(dueDate.getTime())) return sum;
-              const daysUntil = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-              const timeWeight = daysUntil <= 0 ? 2.0 : daysUntil <= 1 ? 1.5 : daysUntil <= 3 ? 1.25 : daysUntil <= 7 ? 1 : daysUntil <= 14 ? 0.75 : 0.5;
+              const daysUntil = Math.ceil(
+                (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+              );
+              const timeWeight =
+                daysUntil <= 0
+                  ? 2.0
+                  : daysUntil <= 1
+                    ? 1.5
+                    : daysUntil <= 3
+                      ? 1.25
+                      : daysUntil <= 7
+                        ? 1
+                        : daysUntil <= 14
+                          ? 0.75
+                          : 0.5;
               return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
             } catch {
               return sum;

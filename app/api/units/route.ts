@@ -6,7 +6,7 @@ import {
   jsonError,
   handleValidationError,
   handleDatabaseError,
-  ERROR_CODES
+  ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { mapUnitRow, serializeUnit } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
@@ -36,7 +36,11 @@ const dateSchema = z.preprocess((value) => value, z.coerce.date());
 
 const unitSchema = z.object({
   id: z.string().uuid().optional(),
-  code: z.string().min(1).max(20).regex(/^[A-Z]{3,4}\d{3,4}$/, 'Unit code must be in format AAA123 or AAAA1234'),
+  code: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[A-Z]{3,4}\d{3,4}$/, 'Unit code must be in format AAA123 or AAAA1234'),
   name: z.string().min(1).max(200),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
   location: z.object({
@@ -74,7 +78,9 @@ export async function GET(request: Request) {
       const query = unitQuerySchema.parse({
         search: url.searchParams.get('search') || undefined,
         limit: url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : undefined,
-        offset: url.searchParams.get('offset') ? parseInt(url.searchParams.get('offset')!) : undefined,
+        offset: url.searchParams.get('offset')
+          ? parseInt(url.searchParams.get('offset')!)
+          : undefined,
         sortBy: url.searchParams.get('sortBy') || undefined,
         sortOrder: url.searchParams.get('sortOrder') || undefined,
       });
@@ -87,9 +93,7 @@ export async function GET(request: Request) {
 
       // Apply search filter
       if (query.search) {
-        unitsQuery = unitsQuery.or(
-          `code.ilike.%${query.search}%,name.ilike.%${query.search}%`
-        );
+        unitsQuery = unitsQuery.or(`code.ilike.%${query.search}%,name.ilike.%${query.search}%`);
       }
 
       // Apply pagination
@@ -102,7 +106,7 @@ export async function GET(request: Request) {
       }
 
       // Get unit IDs for class times query
-      const unitIds = unitsData?.map((unit: { id: unknown }) => String(unit.id)) ?? []; 
+      const unitIds = unitsData?.map((unit: { id: unknown }) => String(unit.id)) ?? [];
 
       // Get class times for these units
       const { data: classTimesData, error: classTimesError } = await supabase
@@ -116,20 +120,55 @@ export async function GET(request: Request) {
       }
 
       // Group class times by unit_id
-      const classTimesByUnit = ((classTimesData ?? []) as unknown[]).reduce((acc: Record<string, Array<{ id: string; day: 'Monday'|'Tuesday'|'Wednesday'|'Thursday'|'Friday'|'Saturday'|'Sunday'; startTime: string; endTime: string }>>, ct: unknown) => {
-        const c = ct as Record<string, unknown>;
-        const unitId = String(c.unit_id);
-        if (!acc[unitId]) acc[unitId] = [];
+      const classTimesByUnit = ((classTimesData ?? []) as unknown[]).reduce(
+        (
+          acc: Record<
+            string,
+            Array<{
+              id: string;
+              day:
+                | 'Monday'
+                | 'Tuesday'
+                | 'Wednesday'
+                | 'Thursday'
+                | 'Friday'
+                | 'Saturday'
+                | 'Sunday';
+              startTime: string;
+              endTime: string;
+            }>
+          >,
+          ct: unknown,
+        ) => {
+          const c = ct as Record<string, unknown>;
+          const unitId = String(c.unit_id);
+          if (!acc[unitId]) acc[unitId] = [];
 
-        acc[unitId].push({
-          id: String(c.id),
-          day: String(c.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
-          startTime: String(c.start_time),
-          endTime: String(c.end_time),
-        });
-        return acc;
-      }, {} as Record<string, Array<{ id: string; day: 'Monday'|'Tuesday'|'Wednesday'|'Thursday'|'Friday'|'Saturday'|'Sunday'; startTime: string; endTime: string }>>);
-
+          acc[unitId].push({
+            id: String(c.id),
+            day: String(c.day) as
+              | 'Monday'
+              | 'Tuesday'
+              | 'Wednesday'
+              | 'Thursday'
+              | 'Friday'
+              | 'Saturday'
+              | 'Sunday',
+            startTime: String(c.start_time),
+            endTime: String(c.end_time),
+          });
+          return acc;
+        },
+        {} as Record<
+          string,
+          Array<{
+            id: string;
+            day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+            startTime: string;
+            endTime: string;
+          }>
+        >,
+      );
 
       // Map units with their class times
       const units = (unitsData ?? []).map((unit: unknown) => {
@@ -205,13 +244,20 @@ export async function POST(request: Request) {
           .single();
 
         if (unitError) {
-          if (unitError.code === '23505') { // Unique constraint violation
+          if (unitError.code === '23505') {
+            // Unique constraint violation
             return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
           }
           return handleDatabaseError(unitError);
         }
 
-        let createdClassTimes: Array<{ id: string; day: string; startTime: string; endTime: string; unit_id?: string }> = [];
+        let createdClassTimes: Array<{
+          id: string;
+          day: string;
+          startTime: string;
+          endTime: string;
+          unit_id?: string;
+        }> = [];
 
         // Insert class times if any
         if (schedule && schedule.length > 0) {
@@ -233,21 +279,32 @@ export async function POST(request: Request) {
             return handleDatabaseError(classTimesError);
           }
 
-          createdClassTimes = classTimesData?.map((ct: unknown) => {
-            const c = ct as Record<string, unknown>;
-            return {
-              id: String(c.id),
-              day: String(c.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
-              startTime: String(c.start_time),
-              endTime: String(c.end_time),
-            };
-          }) ?? []; 
+          createdClassTimes =
+            classTimesData?.map((ct: unknown) => {
+              const c = ct as Record<string, unknown>;
+              return {
+                id: String(c.id),
+                day: String(c.day) as
+                  | 'Monday'
+                  | 'Tuesday'
+                  | 'Wednesday'
+                  | 'Thursday'
+                  | 'Friday'
+                  | 'Saturday'
+                  | 'Sunday',
+                startTime: String(c.start_time),
+                endTime: String(c.end_time),
+              };
+            }) ?? [];
         }
 
-        return jsonSuccess({
-          ...mapUnitRow(unitData),
-          schedule: createdClassTimes,
-        }, 201);
+        return jsonSuccess(
+          {
+            ...mapUnitRow(unitData),
+            schedule: createdClassTimes,
+          },
+          201,
+        );
       } catch (error) {
         console.error('POST /api/units error:', error);
         return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);

@@ -47,7 +47,7 @@ export const ERROR_CODES = {
   EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
 } as const;
 
-export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 
 /**
  * Create a success response
@@ -55,7 +55,7 @@ export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
 export const jsonSuccess = <T = unknown>(
   data: T,
   status: number = 200,
-  meta?: Partial<ApiResponse['meta']>
+  meta?: Partial<ApiResponse['meta']>,
 ): NextResponse<ApiResponse<T>> => {
   return NextResponse.json(
     {
@@ -66,7 +66,7 @@ export const jsonSuccess = <T = unknown>(
         ...meta,
       },
     },
-    { status }
+    { status },
   );
 };
 
@@ -77,7 +77,7 @@ export const jsonError = (
   message: string,
   status: number = 500,
   code?: ErrorCode,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): NextResponse<ApiResponse<never>> => {
   const errorCode = code || getErrorCodeFromStatus(status);
 
@@ -93,7 +93,7 @@ export const jsonError = (
         timestamp: new Date().toISOString(),
       },
     },
-    { status }
+    { status },
   );
 };
 
@@ -101,19 +101,17 @@ export const jsonError = (
  * Handle Zod validation errors
  */
 export const handleValidationError = (error: ZodError): NextResponse<ApiResponse<never>> => {
-  const details = error.issues.reduce((acc, err) => {
-    const field = err.path.join('.');
-    if (!acc[field]) acc[field] = [];
-    acc[field].push(err.message);
-    return acc;
-  }, {} as Record<string, string[]>);
-
-  return jsonError(
-    'Validation failed',
-    400,
-    ERROR_CODES.VALIDATION_ERROR,
-    { fields: details }
+  const details = error.issues.reduce(
+    (acc, err) => {
+      const field = err.path.join('.');
+      if (!acc[field]) acc[field] = [];
+      acc[field].push(err.message);
+      return acc;
+    },
+    {} as Record<string, string[]>,
   );
+
+  return jsonError('Validation failed', 400, ERROR_CODES.VALIDATION_ERROR, { fields: details });
 };
 
 /**
@@ -127,21 +125,27 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
     'A database error occurred',
     500,
     ERROR_CODES.DATABASE_ERROR,
-    process.env.NODE_ENV === 'development' ? { originalError: error instanceof Error ? error.message : String(error) } : undefined
+    process.env.NODE_ENV === 'development'
+      ? { originalError: error instanceof Error ? error.message : String(error) }
+      : undefined,
   );
 };
 
 /**
  * Handle authentication errors
  */
-export const jsonUnauthorized = (message: string = 'Authentication required'): NextResponse<ApiResponse<never>> => {
+export const jsonUnauthorized = (
+  message: string = 'Authentication required',
+): NextResponse<ApiResponse<never>> => {
   return jsonError(message, 401, ERROR_CODES.UNAUTHORIZED);
 };
 
 /**
  * Handle forbidden access errors
  */
-export const jsonForbidden = (message: string = 'Access denied'): NextResponse<ApiResponse<never>> => {
+export const jsonForbidden = (
+  message: string = 'Access denied',
+): NextResponse<ApiResponse<never>> => {
   return jsonError(message, 403, ERROR_CODES.FORBIDDEN);
 };
 
@@ -159,7 +163,7 @@ export const jsonPaginated = <T = unknown>(
   data: T[],
   page: number,
   limit: number,
-  total: number
+  total: number,
 ): NextResponse<ApiResponse<T[]>> => {
   const totalPages = Math.ceil(total / limit);
 

@@ -16,7 +16,8 @@ const buttonVariants = cva(
           'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         secondary:
           'bg-mq-card-background text-mq-content hover:bg-mq-hover-background hover:shadow-mq-sm active:scale-[0.98] transition-all duration-mq-mid',
-        ghost: 'bg-mq-card-background hover:bg-mq-hover-background text-mq-content dark:bg-mq-card-background dark:hover:bg-mq-hover-background dark:text-mq-content hover:shadow-mq-sm transition-all duration-mq-mid',
+        ghost:
+          'bg-mq-card-background hover:bg-mq-hover-background text-mq-content dark:bg-mq-card-background dark:hover:bg-mq-hover-background dark:text-mq-content hover:shadow-mq-sm transition-all duration-mq-mid',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

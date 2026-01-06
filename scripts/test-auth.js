@@ -35,9 +35,9 @@ async function testAuthentication() {
       options: {
         data: {
           full_name: 'Test User',
-          student_id: '12345678'
-        }
-      }
+          student_id: '12345678',
+        },
+      },
     });
 
     if (signupError) {
@@ -55,7 +55,7 @@ async function testAuthentication() {
       console.log('\n🔑 Testing user sign in...');
       const { data: signinData, error: signinError } = await supabase.auth.signInWithPassword({
         email: testEmail,
-        password: testPassword
+        password: testPassword,
       });
 
       if (signinError) {
@@ -63,7 +63,8 @@ async function testAuthentication() {
       } else {
         console.log('✅ User signed in successfully');
         console.log('   Session created:', !!signinData.session);
-        console.log('   Access token present:', !!signinData.session?.access_token);
+        const hasAccessToken = !!signinData.session?.access_token;
+        console.log('   Access token present:', hasAccessToken ? '[REDACTED]' : '[none]');
       }
 
       // Test 3: User Profile Access
@@ -93,7 +94,9 @@ async function testAuthentication() {
       }
     } else {
       console.log('\n⚠️  Email confirmation required before sign in');
-      console.log('   Check your email for confirmation link, or configure Supabase to auto-confirm emails');
+      console.log(
+        '   Check your email for confirmation link, or configure Supabase to auto-confirm emails',
+      );
     }
 
     console.log('\n📋 Authentication Test Summary:');
@@ -101,8 +104,7 @@ async function testAuthentication() {
     console.log('   ✅ User registration: Working');
     console.log('   ✅ Database tables: Accessible');
     console.log('   ⚠️  OAuth providers: Not configured (Google, etc.)');
-    console.log('   💡 Email/password auth: Fully functional');
-
+    console.log('   💡 Email auth: Fully functional');
   } catch (error) {
     console.error('❌ Authentication test failed:', error);
   }

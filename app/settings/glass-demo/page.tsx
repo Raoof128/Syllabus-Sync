@@ -12,7 +12,9 @@ export default function GlassDemoPage() {
         <p className="text-mq-sm text-mq-content-secondary mt-2">This demo has been removed.</p>
       </header>
       <div>
-        <Link href="/settings" className="text-mq-primary underline">Back to Settings</Link>
+        <Link href="/settings" className="text-mq-primary underline">
+          Back to Settings
+        </Link>
       </div>
     </div>
   );

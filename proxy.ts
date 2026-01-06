@@ -14,43 +14,41 @@ export async function proxy(request: NextRequest) {
   // Check if Supabase is properly configured
   // Valid URL should contain supabase.co and not be a placeholder
   // Valid key should be a JWT starting with "eyJ"
-  const hasValidUrl = supabaseUrl && supabaseUrl.includes('supabase.co') && !supabaseUrl.includes('your-project-id');
-  const hasValidKey = supabaseAnonKey && supabaseAnonKey.startsWith('eyJ') && !supabaseAnonKey.includes('PASTE');
+  const hasValidUrl =
+    supabaseUrl && supabaseUrl.includes('supabase.co') && !supabaseUrl.includes('your-project-id');
+  const hasValidKey =
+    supabaseAnonKey && supabaseAnonKey.startsWith('eyJ') && !supabaseAnonKey.includes('PASTE');
 
   if (!hasValidUrl || !hasValidKey) {
     console.warn(
       '⚠️ Supabase not configured. Running in demo mode without authentication.\n' +
-      'To enable auth, update .env.local with your Supabase credentials from:\n' +
-      'https://supabase.com/dashboard/project/_/settings/api\n' +
-      'Note: The anon key should start with "eyJ" (it\'s a JWT token)'
+        'To enable auth, update .env.local with your Supabase credentials from:\n' +
+        'https://supabase.com/dashboard/project/_/settings/api\n' +
+        'Note: The anon key should start with "eyJ" (it\'s a JWT token)',
     );
     return response;
   }
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => {
+          request.cookies.set(name, value);
+        });
+        response = NextResponse.next({
+          request: {
+            headers: request.headers,
+          },
+        });
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
 
   // Refresh session if expired - required for Server Components
   const {
@@ -59,7 +57,9 @@ export async function proxy(request: NextRequest) {
 
   // Protect routes that require authentication
   const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
-  const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route),
+  );
 
   if (isProtectedRoute && !session) {
     // Redirect to login if accessing protected route without session
@@ -70,7 +70,7 @@ export async function proxy(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   const authRoutes = ['/login', '/signup', '/reset-password'];
-  const isAuthRoute = authRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
   if (isAuthRoute && session) {
     // Redirect to home if already authenticated

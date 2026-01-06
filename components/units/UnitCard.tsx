@@ -101,7 +101,9 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
             <div className="flex items-center gap-2 text-mq-sm">
               <MapPin className="w-4 h-4 text-mq-content-tertiary" />
               <span className="font-medium text-mq-content">{unit.location.building}</span>
-              <span className="text-mq-content-tertiary">{t('room')} {unit.location.room}</span>
+              <span className="text-mq-content-tertiary">
+                {t('room')} {unit.location.room}
+              </span>
             </div>
 
             {/* Class Times */}

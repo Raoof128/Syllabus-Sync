@@ -6,21 +6,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import {
-  Home,
-  MapPin,
-  Calendar,
-  MessageSquare,
-  Settings,
-  Menu,
-  X,
-} from 'lucide-react';
+import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
-const navigation: { name: TranslationKey; href: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const navigation: {
+  name: TranslationKey;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
   { name: 'home', href: '/home', icon: Home },
   { name: 'calendar', href: '/calendar', icon: Calendar },
   { name: 'map', href: '/map', icon: MapPin },
@@ -92,7 +88,13 @@ const Sidebar = memo(() => {
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={t('navigateToItem', { name: t(item.name) })}
               >
-                <Icon className={cn("h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap", isActive && "animate-pulse-subtle")} aria-hidden="true" />
+                <Icon
+                  className={cn(
+                    'h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap',
+                    isActive && 'animate-pulse-subtle',
+                  )}
+                  aria-hidden="true"
+                />
                 {t(item.name)}
               </Link>
             );

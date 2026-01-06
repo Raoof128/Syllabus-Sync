@@ -21,7 +21,7 @@ export const sampleNotifications: Notification[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440011',
     title: 'Career Fair Tomorrow',
-    message: 'Don\'t miss the Career Fair 2026 at Campus Hub. Meet top employers!',
+    message: "Don't miss the Career Fair 2026 at Campus Hub. Meet top employers!",
     type: 'event',
     read: false,
     createdAt: getDate(2),
@@ -48,7 +48,7 @@ export const sampleNotifications: Notification[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440014',
     title: 'Assignment Due Soon',
-    message: 'Reminder: Your assignment is due in 2 days. Don\'t forget to submit!',
+    message: "Reminder: Your assignment is due in 2 days. Don't forget to submit!",
     type: 'deadline',
     read: false,
     createdAt: getDate(3),
@@ -66,7 +66,8 @@ export const sampleNotifications: Notification[] = [
   {
     id: 'notif-7',
     title: 'Tech Networking Night',
-    message: 'Join us for Tech Networking Night this Friday at 6:00 PM. Great opportunity to meet industry professionals!',
+    message:
+      'Join us for Tech Networking Night this Friday at 6:00 PM. Great opportunity to meet industry professionals!',
     type: 'event',
     read: false,
     createdAt: getDate(4),
@@ -93,7 +94,8 @@ export const sampleNotifications: Notification[] = [
   {
     id: 'notif-10',
     title: 'International Food Festival',
-    message: 'Don\'t miss the International Food Festival tomorrow! Free samples from around the world.',
+    message:
+      "Don't miss the International Food Festival tomorrow! Free samples from around the world.",
     type: 'event',
     read: false,
     createdAt: getDate(5),
@@ -120,7 +122,8 @@ export const sampleNotifications: Notification[] = [
   {
     id: 'notif-13',
     title: 'Research Seminar: AI in Healthcare',
-    message: 'Join us for an exciting research seminar on AI applications in medicine this Thursday.',
+    message:
+      'Join us for an exciting research seminar on AI applications in medicine this Thursday.',
     type: 'event',
     read: true,
     createdAt: getDate(48),

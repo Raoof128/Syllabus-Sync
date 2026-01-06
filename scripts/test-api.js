@@ -17,8 +17,15 @@ const AUTH_TOKEN = process.env.SUPABASE_ANON_KEY || 'mock-token-for-testing';
 
 const API_HEADERS = {
   'Content-Type': 'application/json',
-  'Authorization': `Bearer ${AUTH_TOKEN}`,
+  Authorization: `Bearer ${AUTH_TOKEN}`,
 };
+
+function maskToken(token) {
+  if (!token) return '[none]';
+  if (typeof token !== 'string') return '[REDACTED]';
+  if (token.length <= 12) return '[REDACTED]';
+  return `${token.slice(0, 4)}...${token.slice(-4)}`;
+}
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -63,9 +70,9 @@ function assertSuccess(result, description) {
 function assertResponseFormat(result, expectedFields = []) {
   if (!result.success || !result.data) return false;
 
-  const hasRequiredFields = ['success', 'data', 'meta'].every(field => field in result.data);
+  const hasRequiredFields = ['success', 'data', 'meta'].every((field) => field in result.data);
   const hasTimestamp = result.data.meta?.timestamp;
-  const hasExpectedFields = expectedFields.every(field => field in result.data.data);
+  const hasExpectedFields = expectedFields.every((field) => field in result.data.data);
 
   return hasRequiredFields && hasTimestamp && hasExpectedFields;
 }
@@ -104,20 +111,20 @@ async function testUnitsAPI() {
     color: '#FF6B6B',
     location: {
       building: 'Test Building',
-      room: 'T101'
+      room: 'T101',
     },
     schedule: [
       {
         day: 'Monday',
         startTime: '10:00',
-        endTime: '12:00'
-      }
-    ]
+        endTime: '12:00',
+      },
+    ],
   };
 
   const createUnitResult = await makeRequest('/api/units', {
     method: 'POST',
-    body: JSON.stringify(newUnit)
+    body: JSON.stringify(newUnit),
   });
 
   let createdUnitId = null;
@@ -136,7 +143,7 @@ async function testUnitsAPI() {
 
   const invalidResult = await makeRequest('/api/units', {
     method: 'POST',
-    body: JSON.stringify(invalidUnit)
+    body: JSON.stringify(invalidUnit),
   });
 
   if (!invalidResult.success && invalidResult.status === 400) {
@@ -152,12 +159,12 @@ async function testUnitsAPI() {
 
     // Test PUT update
     const updateData = {
-      name: 'Updated Test Unit Name'
+      name: 'Updated Test Unit Name',
     };
 
     const updateResult = await makeRequest(`/api/units/${createdUnitId}`, {
       method: 'PUT',
-      body: JSON.stringify(updateData)
+      body: JSON.stringify(updateData),
     });
 
     assertSuccess(updateResult, `PUT /api/units/${createdUnitId} updates unit`);
@@ -177,12 +184,12 @@ async function testDeadlinesAPI() {
     description: 'Testing deadline creation',
     unitCode: 'TEST101',
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week from now
-    completed: false
+    completed: false,
   };
 
   const createDeadlineResult = await makeRequest('/api/deadlines', {
     method: 'POST',
-    body: JSON.stringify(newDeadline)
+    body: JSON.stringify(newDeadline),
   });
 
   assertSuccess(createDeadlineResult, 'POST /api/deadlines creates deadline');
@@ -200,19 +207,19 @@ async function testNotificationsAPI() {
     title: 'Test Notification',
     message: 'This is a test notification',
     type: 'system',
-    read: false
+    read: false,
   };
 
   const createNotificationResult = await makeRequest('/api/notifications', {
     method: 'POST',
-    body: JSON.stringify(newNotification)
+    body: JSON.stringify(newNotification),
   });
 
   assertSuccess(createNotificationResult, 'POST /api/notifications creates notification');
 
   // Test mark all read
   const markReadResult = await makeRequest('/api/notifications/mark-all-read', {
-    method: 'PUT'
+    method: 'PUT',
   });
 
   assertSuccess(markReadResult, 'PUT /api/notifications/mark-all-read works');
@@ -235,9 +242,7 @@ async function testRateLimiting() {
   }
 
   const results = await Promise.all(promises);
-  const rateLimited = results.some(result =>
-    !result.success && result.status === 429
-  );
+  const rateLimited = results.some((result) => !result.success && result.status === 429);
 
   if (rateLimited) {
     console.log('✅ Rate limiting is working');
@@ -261,7 +266,7 @@ async function testErrorHandling() {
   const invalidJsonResult = await makeRequest('/api/units', {
     method: 'POST',
     body: 'invalid json',
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!invalidJsonResult.success) {
@@ -277,9 +282,9 @@ async function testErrorHandling() {
 
 async function runTests() {
   console.log('🚀 Starting Syllabus Sync API Tests');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
   console.log(`Base URL: ${BASE_URL}`);
-  console.log(`Auth Token: ${AUTH_TOKEN.substring(0, 20)}...`);
+  console.log(`Auth Token: ${maskToken(AUTH_TOKEN)}`);
 
   const startTime = Date.now();
 
@@ -296,7 +301,6 @@ async function runTests() {
     console.log('\n' + '='.repeat(50));
     console.log(`✅ All tests completed in ${duration}ms`);
     console.log('Check the output above for detailed results.');
-
   } catch (error) {
     console.error('\n💥 Test runner failed:', error);
     process.exit(1);
@@ -308,4 +312,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   runTests();
 }
 
-export { runTests, makeRequest };
+export { runTests, makeRequest, maskToken };

@@ -186,22 +186,13 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     resetForm();
   };
 
-  const titleDescribedBy = [
-    errors.title ? 'deadline-title-error' : '',
-    'deadline-title-help',
-  ]
+  const titleDescribedBy = [errors.title ? 'deadline-title-error' : '', 'deadline-title-help']
     .filter(Boolean)
     .join(' ');
-  const unitDescribedBy = [
-    errors.unitCode ? 'deadline-unit-error' : '',
-    'deadline-unit-help',
-  ]
+  const unitDescribedBy = [errors.unitCode ? 'deadline-unit-error' : '', 'deadline-unit-help']
     .filter(Boolean)
     .join(' ');
-  const dateDescribedBy = [
-    errors.dueDate ? 'deadline-date-error' : '',
-    'deadline-date-help',
-  ]
+  const dateDescribedBy = [errors.dueDate ? 'deadline-date-error' : '', 'deadline-date-help']
     .filter(Boolean)
     .join(' ');
 
@@ -212,9 +203,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
           <DialogHeader>
             <DialogTitle>{editDeadline ? t('editDeadline') : t('addNewDeadline')}</DialogTitle>
             <DialogDescription>
-              {editDeadline
-                ? t('updateDeadlineDetails')
-                : t('fillDeadlineDetails')}
+              {editDeadline ? t('updateDeadlineDetails') : t('fillDeadlineDetails')}
             </DialogDescription>
           </DialogHeader>
 
@@ -388,9 +377,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t('deleteDeadline')}</DialogTitle>
-            <DialogDescription>
-              {t('deleteDeadlineConfirm')}
-            </DialogDescription>
+            <DialogDescription>{t('deleteDeadlineConfirm')}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>

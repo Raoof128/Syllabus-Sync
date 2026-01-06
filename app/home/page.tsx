@@ -30,14 +30,23 @@ function HomeSkeleton() {
     <div className="container mx-auto p-6 max-w-7xl animate-pulse">
       {/* Header skeleton */}
       <div className="mb-8">
-        <div className="h-10 bg-mq-background-secondary rounded-mq w-64 mb-2" style={{ color: 'var(--mq-content)' }} />
-        <div className="h-5 bg-mq-background-secondary rounded-mq w-96" style={{ color: 'var(--mq-content)' }} />
+        <div
+          className="h-10 bg-mq-background-secondary rounded-mq w-64 mb-2"
+          style={{ color: 'var(--mq-content)' }}
+        />
+        <div
+          className="h-5 bg-mq-background-secondary rounded-mq w-96"
+          style={{ color: 'var(--mq-content)' }}
+        />
       </div>
 
       {/* Widget grid skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-32 bg-mq-background-secondary rounded-mq-lg border border-mq-border" />
+          <div
+            key={i}
+            className="h-32 bg-mq-background-secondary rounded-mq-lg border border-mq-border"
+          />
         ))}
       </div>
 
@@ -65,7 +74,12 @@ export default function HomePage() {
       >
         Skip to main content
       </a>
-      <main id="main-content" className="container mx-auto p-6 max-w-7xl" role="main" aria-label="Dashboard overview">
+      <main
+        id="main-content"
+        className="container mx-auto p-6 max-w-7xl"
+        role="main"
+        aria-label="Dashboard overview"
+      >
         <HomeClient />
       </main>
     </Suspense>

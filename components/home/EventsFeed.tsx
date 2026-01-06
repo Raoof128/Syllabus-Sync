@@ -56,7 +56,12 @@ const EventsFeed = memo(() => {
                     key={event.id}
                     href="/feed"
                     className="group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm alabaster-readable focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
-                    style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}
+                    style={{
+                      color: 'var(--mq-content)',
+                      WebkitTextFillColor: 'var(--mq-content)',
+                      opacity: 1,
+                      mixBlendMode: 'normal',
+                    }}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-semibold text-mq-content">
@@ -65,7 +70,11 @@ const EventsFeed = memo(() => {
                       </h3>
                       <Badge className={`${categoryColors[event.category]} alabaster-readable`}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {t(typeof event.category === 'string' ? `category_${event.category.replace(/ /g, '')}` as any : event.category)}
+                        {t(
+                          typeof event.category === 'string'
+                            ? (`category_${event.category.replace(/ /g, '')}` as any)
+                            : event.category,
+                        )}
                       </Badge>
                     </div>
 

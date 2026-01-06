@@ -15,7 +15,9 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase environment variables');
-  console.error('Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local');
+  console.error(
+    'Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local',
+  );
   process.exit(1);
 }
 
@@ -65,7 +67,7 @@ async function testDatabase() {
         const { count, error } = await supabase
           .from(table)
           .select('*', { count: 'exact', head: true });
-        dataCounts[table] = error ? '❌ Error' : (count || 0);
+        dataCounts[table] = error ? '❌ Error' : count || 0;
       } catch (err) {
         dataCounts[table] = '❌ Error';
       }
@@ -146,7 +148,10 @@ async function testDatabase() {
     try {
       const notificationsResponse = await fetch('http://localhost:3001/api/notifications');
       const notificationsResult = await notificationsResponse.json();
-      if (notificationsResult.success === false && notificationsResult.error?.message?.includes('Authentication')) {
+      if (
+        notificationsResult.success === false &&
+        notificationsResult.error?.message?.includes('Authentication')
+      ) {
         console.log('✅ Notifications: Correctly requires authentication');
       } else {
         console.log('❌ Notifications endpoint unexpected response');
@@ -162,7 +167,6 @@ async function testDatabase() {
     console.log('   - Public API endpoints (deadlines) work correctly');
     console.log('   - Protected API endpoints require authentication as expected');
     console.log('   - Application should now work with both API data and persisted local data');
-
   } catch (error) {
     console.error('❌ Database testing failed:', error);
     process.exit(1);

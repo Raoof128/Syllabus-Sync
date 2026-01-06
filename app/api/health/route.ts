@@ -9,14 +9,12 @@ export async function GET(request: Request) {
     const supabase = await createServerClient();
 
     // Simple query to test database connectivity
-    const { error } = await supabase
-      .from('units')
-      .select('count', { count: 'exact', head: true });
+    const { error } = await supabase.from('units').select('count', { count: 'exact', head: true });
 
     if (error) {
       return jsonError('Database connection failed', 500, 'DATABASE_ERROR', {
         message: error.message,
-        code: error.code
+        code: error.code,
       });
     }
 
@@ -24,13 +22,12 @@ export async function GET(request: Request) {
       status: 'healthy',
       database: 'connected',
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || '0.5.2'
+      version: process.env.npm_package_version || '0.5.2',
     });
   } catch (error) {
     console.error('Health check error:', error);
     return jsonError('Health check failed', 500, 'INTERNAL_ERROR', {
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }
-

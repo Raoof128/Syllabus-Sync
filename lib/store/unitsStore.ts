@@ -6,6 +6,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Unit, ClassTime } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
+import { z } from 'zod';
 
 interface UnitsState {
   units: Unit[];
@@ -100,7 +101,7 @@ export const useUnitsStore = create<UnitsState>()(
           await apiRequest<{ id: string }>(`/api/units/${id}`, { method: 'DELETE' });
         } catch (error) {
           // On error, restore the unit to local state
-          const unitToRestore = get().units.find(u => u.id === id);
+          const unitToRestore = get().units.find((u) => u.id === id);
           if (unitToRestore) {
             set((state) => ({ units: [...state.units, unitToRestore] }));
           }
@@ -114,7 +115,7 @@ export const useUnitsStore = create<UnitsState>()(
 
       updateUnit: async (id, updatedUnit) => {
         // Update local state immediately
-        const currentUnit = get().units.find(u => u.id === id);
+        const currentUnit = get().units.find((u) => u.id === id);
         if (!currentUnit) return null;
 
         const optimisticUpdate = { ...currentUnit, ...updatedUnit };
@@ -182,45 +183,60 @@ export const useUnitsStore = create<UnitsState>()(
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
           // Migration from version 1 to 2: Convert old string IDs to UUIDs
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const state = persistedState as { state: { units: any[] } };
-          if (version < 2) {
-            if (state?.state?.units && Array.isArray(state.state.units)) {
-              const idMap: Record<string, string> = {
-                'unit-comp2310': '550e8400-e29b-41d4-a716-446655440100',
-                'unit-math1001': '550e8400-e29b-41d4-a716-446655440200',
-                'unit-hist2002': '550e8400-e29b-41d4-a716-446655440300',
-              };
+          const StateSchema = z.object({
+            state: z
+              .object({
+                units: z
+                  .array(
+                    z.object({
+                      id: z.string().optional(),
+                      schedule: z.array(z.object({ id: z.string().optional() })).optional(),
+                    }),
+                  )
+                  .optional(),
+              })
+              .optional(),
+          });
 
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              state.state.units = state.state.units.map((unit: any) => {
-                if (unit.id && idMap[unit.id]) {
-                  // Also update schedule IDs
-                  const updatedUnit = { ...unit, id: idMap[unit.id] };
-                  if (updatedUnit.schedule && Array.isArray(updatedUnit.schedule)) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    updatedUnit.schedule = updatedUnit.schedule.map((schedule: any) => {
-                      if (schedule.id) {
-                        // Convert schedule IDs to UUIDs
-                        const scheduleIdMap: Record<string, string> = {
-                          'comp2310-lecture': '550e8400-e29b-41d4-a716-446655440101',
-                          'comp2310-tutorial': '550e8400-e29b-41d4-a716-446655440102',
-                          'math1001-lecture': '550e8400-e29b-41d4-a716-446655440201',
-                          'math1001-workshop': '550e8400-e29b-41d4-a716-446655440202',
-                          'hist2002-lecture': '550e8400-e29b-41d4-a716-446655440301',
-                        };
-                        if (scheduleIdMap[schedule.id]) {
-                          return { ...schedule, id: scheduleIdMap[schedule.id] };
-                        }
-                      }
-                      return schedule;
-                    });
-                  }
-                  return updatedUnit;
+          const parsed = StateSchema.safeParse(persistedState);
+          if (!parsed.success) {
+            // If persisted state doesn't match expected shape, skip migration to avoid runtime errors
+            return persistedState;
+          }
+
+          const state = parsed.data;
+          if (state?.state?.units && Array.isArray(state.state.units)) {
+            const idMap: Record<string, string> = {
+              'unit-comp2310': '550e8400-e29b-41d4-a716-446655440100',
+              'unit-math1001': '550e8400-e29b-41d4-a716-446655440200',
+              'unit-hist2002': '550e8400-e29b-41d4-a716-446655440300',
+            };
+
+            state.state.units = state.state.units.map((unit) => {
+              if (unit.id && idMap[unit.id]) {
+                // Also update schedule IDs
+                const updatedUnit = { ...unit, id: idMap[unit.id] };
+                if (updatedUnit.schedule && Array.isArray(updatedUnit.schedule)) {
+                  const scheduleIdMap: Record<string, string> = {
+                    'comp2310-lecture': '550e8400-e29b-41d4-a716-446655440101',
+                    'comp2310-tutorial': '550e8400-e29b-41d4-a716-446655440102',
+                    'math1001-lecture': '550e8400-e29b-41d4-a716-446655440201',
+                    'math1001-workshop': '550e8400-e29b-41d4-a716-446655440202',
+                    'hist2002-lecture': '550e8400-e29b-41d4-a716-446655440301',
+                  };
+                  updatedUnit.schedule = updatedUnit.schedule.map((schedule) => {
+                    if (schedule.id && scheduleIdMap[schedule.id]) {
+                      return { ...schedule, id: scheduleIdMap[schedule.id] };
+                    }
+                    return schedule;
+                  });
                 }
-                return unit;
-              });
-            }
+                return updatedUnit;
+              }
+              return unit;
+            });
+
+            return state;
           }
         }
         return persistedState;

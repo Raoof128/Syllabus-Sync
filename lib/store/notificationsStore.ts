@@ -21,7 +21,10 @@ interface NotificationsState {
 
 const normalizeNotification = (notification: Notification): Notification => ({
   ...notification,
-  createdAt: notification.createdAt instanceof Date ? notification.createdAt : new Date(notification.createdAt),
+  createdAt:
+    notification.createdAt instanceof Date
+      ? notification.createdAt
+      : new Date(notification.createdAt),
 });
 
 export const useNotificationsStore = create<NotificationsState>((set, get) => ({
@@ -63,7 +66,9 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
       });
       const serverNormalized = normalizeNotification(created);
       set((state) => ({
-        notifications: state.notifications.map((n) => (n.id === normalized.id ? serverNormalized : n)),
+        notifications: state.notifications.map((n) =>
+          n.id === normalized.id ? serverNormalized : n,
+        ),
       }));
       return serverNormalized;
     } catch (error) {
@@ -79,9 +84,7 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
   markAsRead: async (id) => {
     // Update local state immediately
     set((state) => ({
-      notifications: state.notifications.map((n) =>
-        n.id === id ? { ...n, read: true } : n
-      ),
+      notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
     }));
 
     try {
@@ -93,9 +96,7 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
     } catch (error) {
       // Revert on error
       set((state) => ({
-        notifications: state.notifications.map((n) =>
-          n.id === id ? { ...n, read: false } : n
-        ),
+        notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: false } : n)),
       }));
       errorHandler.logError(
         error instanceof Error ? error : new Error(`Failed to mark notification ${id} as read`),
@@ -130,7 +131,7 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
 
   removeNotification: async (id) => {
     // Remove from local state immediately
-    const notificationToRemove = get().notifications.find(n => n.id === id);
+    const notificationToRemove = get().notifications.find((n) => n.id === id);
     set((state) => ({
       notifications: state.notifications.filter((n) => n.id !== id),
     }));

@@ -60,7 +60,7 @@ export const useProfilesStore = create<ProfilesState>()(
         set((state) => ({
           ...state,
           profiles: state.profiles.map((profile) =>
-            profile.id === id ? { ...profile, ...updates } : profile
+            profile.id === id ? { ...profile, ...updates } : profile,
           ),
         }));
       },
@@ -68,8 +68,7 @@ export const useProfilesStore = create<ProfilesState>()(
       deleteProfile: (id) => {
         set((state) => {
           const newProfiles = state.profiles.filter((profile) => profile.id !== id);
-          const newCurrentProfileId =
-            state.currentProfileId === id ? null : state.currentProfileId;
+          const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
 
           return {
             ...state,
@@ -102,7 +101,7 @@ export const useProfilesStore = create<ProfilesState>()(
           profiles: state.profiles.map((profile) =>
             profile.id === currentProfileId
               ? { ...profile, ...updates, lastLogin: new Date() }
-              : profile
+              : profile,
           ),
         }));
       },
@@ -110,6 +109,6 @@ export const useProfilesStore = create<ProfilesState>()(
     {
       name: 'profiles-storage',
       storage: createJSONStorage(() => localStorage),
-    }
+    },
   ),
 );
