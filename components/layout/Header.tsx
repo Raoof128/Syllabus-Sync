@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, memo, useMemo, useId } from 'react';
+import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -39,10 +39,12 @@ const notificationIcons = {
   system: Info,
 };
 
+// Stable ID for notification menu (avoids useId hydration mismatch)
+const NOTIFICATION_MENU_ID = 'header-notification-menu';
+
 const Header = memo(() => {
   const { t, language } = useTranslation();
   const router = useRouter();
-  const notificationMenuId = useId();
 
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
@@ -211,7 +213,7 @@ const Header = memo(() => {
             aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
             aria-expanded={showNotifications}
             aria-haspopup="menu"
-            aria-controls={notificationMenuId}
+            aria-controls={NOTIFICATION_MENU_ID}
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell
@@ -231,13 +233,13 @@ const Header = memo(() => {
           {/* Notifications Dropdown */}
           {showNotifications && (
             <div
-              id={notificationMenuId}
+              id={NOTIFICATION_MENU_ID}
               role="menu"
               aria-label={t('notifications')}
               className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden"
             >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
-                <h3 className="font-semibold text-mq-content" id={`${notificationMenuId}-title`}>
+                <h3 className="font-semibold text-mq-content" id={`${NOTIFICATION_MENU_ID}-title`}>
                   {t('notifications')}
                 </h3>
                 {unreadCount > 0 && (
@@ -253,7 +255,7 @@ const Header = memo(() => {
               <div
                 className="max-h-72 overflow-y-auto"
                 role="list"
-                aria-labelledby={`${notificationMenuId}-title`}
+                aria-labelledby={`${NOTIFICATION_MENU_ID}-title`}
               >
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-mq-content-tertiary text-sm" role="listitem">
