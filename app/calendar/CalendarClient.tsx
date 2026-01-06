@@ -69,21 +69,10 @@ export default function CalendarClient() {
                     });
 
                     return (
-                      <div
+                      <article
                         key={deadline.id}
                         className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border"
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`${deadline.title} deadline`}
-                        aria-haspopup="dialog"
-                        aria-expanded={dialogOpen && editDeadline?.id === deadline.id}
-                        onKeyDown={(e) => {
-                          // Only open edit on Enter to avoid intercepting Space (used by buttons)
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            openEdit(deadline);
-                          }
-                        }}
+                        aria-label={`${deadline.title} deadline - ${deadline.completed ? t('completed') : t('due')} ${due.toLocaleDateString()}`}
                       >
                         <div className="flex items-center gap-3">
                           <button
@@ -91,12 +80,15 @@ export default function CalendarClient() {
                             aria-label={
                               deadline.completed ? t('markIncomplete') : t('markComplete')
                             }
-                            className="text-mq-content-secondary hover:text-mq-content transition-colors"
+                            className="text-mq-content-secondary hover:text-mq-content transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 rounded-full"
                           >
                             {deadline.completed ? (
-                              <CheckCircle2 className="h-5 w-5 text-mq-success" />
+                              <CheckCircle2
+                                className="h-5 w-5 text-mq-success"
+                                aria-hidden="true"
+                              />
                             ) : (
-                              <Circle className="h-5 w-5" />
+                              <Circle className="h-5 w-5" aria-hidden="true" />
                             )}
                           </button>
                           <div>
@@ -112,21 +104,21 @@ export default function CalendarClient() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                          {/* Grid button with title so tests can target it */}
+                          {/* Edit button */}
                           <button
                             title={`${deadline.title} (${time})`}
-                            aria-label={t('openEditDialog')}
+                            aria-label={`${t('openEditDialog')} ${deadline.title}`}
                             onClick={() => openEdit(deadline)}
-                            className="text-mq-content-secondary hover:text-mq-content transition-colors"
+                            className="text-mq-content-secondary hover:text-mq-content transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 rounded-mq p-1"
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <Edit2 className="h-4 w-4" aria-hidden="true" />
                           </button>
 
                           <Badge className={PRIORITY_COLORS[deadline.priority]}>
                             {deadline.priority}
                           </Badge>
                         </div>
-                      </div>
+                      </article>
                     );
                   })}
                 </div>

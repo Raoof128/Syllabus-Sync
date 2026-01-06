@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header';
 import ThemeProvider from '@/components/theme/ThemeProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
+import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useUnitsStore } from '@/lib/store/unitsStore';
@@ -167,6 +168,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Render full layout for authenticated routes
   return (
     <ThemeProvider>
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-mq focus:shadow-mq-lg focus:outline-none"
+      >
+        {t('skipToContent')}
+      </a>
       <div className="layout-shell flex min-h-screen bg-mq-background">
         {/* Sidebar */}
         <Sidebar />
@@ -180,6 +188,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
       <Toaster />
+      <OfflineIndicator />
     </ThemeProvider>
   );
 }

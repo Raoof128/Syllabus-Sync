@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
+import React, { useEffect, useState, useRef, memo, useMemo, useId } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -23,6 +23,7 @@ import { useThemeStore } from '@/lib/store/themeStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
+import { getLocaleString } from '@/lib/utils/locale';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +42,7 @@ const notificationIcons = {
 const Header = memo(() => {
   const { t, language } = useTranslation();
   const router = useRouter();
+  const notificationMenuId = useId();
 
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
@@ -189,37 +191,12 @@ const Header = memo(() => {
         {isClient && (
           <div className="hidden md:flex items-center ml-4 pl-4 border-l border-mq-border">
             <span className="text-mq-sm font-medium text-mq-content-secondary">
-              {new Date().toLocaleDateString(
-                language === 'fa'
-                  ? 'fa-IR'
-                  : language === 'es'
-                    ? 'es-ES'
-                    : language === 'zh'
-                      ? 'zh-CN'
-                      : language === 'ar'
-                        ? 'ar-SA'
-                        : language === 'hi'
-                          ? 'hi-IN'
-                          : language === 'ru'
-                            ? 'ru-RU'
-                            : language === 'ja'
-                              ? 'ja-JP'
-                              : language === 'ko'
-                                ? 'ko-KR'
-                                : language === 'ur'
-                                  ? 'ur-PK'
-                                  : language === 'th'
-                                    ? 'th-TH'
-                                    : language === 'vi'
-                                      ? 'vi-VN'
-                                      : 'en-AU',
-                {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                },
-              )}
+              {new Date().toLocaleDateString(getLocaleString(language), {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
             </span>
           </div>
         )}
@@ -231,12 +208,21 @@ const Header = memo(() => {
         <div className="relative" ref={dropdownRef}>
           <button
             className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
-            aria-label={t('notifications')}
+            aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+            aria-expanded={showNotifications}
+            aria-haspopup="menu"
+            aria-controls={notificationMenuId}
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <Bell className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95" />
+            <Bell
+              className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
+              aria-hidden="true"
+            />
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium">
+              <span
+                className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
+                aria-hidden="true"
+              >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -244,9 +230,16 @@ const Header = memo(() => {
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden">
+            <div
+              id={notificationMenuId}
+              role="menu"
+              aria-label={t('notifications')}
+              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden"
+            >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
-                <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
+                <h3 className="font-semibold text-mq-content" id={`${notificationMenuId}-title`}>
+                  {t('notifications')}
+                </h3>
                 {unreadCount > 0 && (
                   <button
                     onClick={() => markAllAsRead()}
@@ -257,9 +250,13 @@ const Header = memo(() => {
                   </button>
                 )}
               </div>
-              <div className="max-h-72 overflow-y-auto">
+              <div
+                className="max-h-72 overflow-y-auto"
+                role="list"
+                aria-labelledby={`${notificationMenuId}-title`}
+              >
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-mq-content-tertiary text-sm">
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm" role="listitem">
                     {t('noNotificationsYet')}
                   </div>
                 ) : (
@@ -269,6 +266,7 @@ const Header = memo(() => {
                       <Link
                         key={notification.id}
                         href={notification.link || '#'}
+                        role="menuitem"
                         onClick={() => {
                           markAsRead(notification.id);
                           setShowNotifications(false);
@@ -288,6 +286,7 @@ const Header = memo(() => {
                                     ? 'bg-mq-info/20'
                                     : 'bg-mq-background-secondary'
                             }`}
+                            aria-hidden="true"
                           >
                             <Icon
                               className={`w-4 h-4 ${
@@ -317,7 +316,10 @@ const Header = memo(() => {
                             </p>
                           </div>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2" />
+                            <div
+                              className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
+                              aria-label="Unread"
+                            />
                           )}
                         </div>
                       </Link>
@@ -383,7 +385,10 @@ const Header = memo(() => {
                     <User className="w-5 h-5 text-white" />
                   )}
                 </div>
-                <div className="text-sm font-medium text-mq-content-secondary hidden sm:inline">
+                <div
+                  className="text-sm font-medium text-mq-content-secondary hidden sm:inline max-w-[120px] truncate"
+                  title={displayName || t('guest')}
+                >
                   {displayName || t('guest')}
                 </div>
               </button>

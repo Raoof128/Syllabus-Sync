@@ -930,6 +930,15 @@ Follow-ups: Project now meets enterprise code quality standards with all audit i
 
 ---
 
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Comprehensive UI/UX audit and accessibility fixes.
+Summary: Completed full audit addressing critical accessibility issues and UX improvements. Added skip-to-content link with proper ARIA, implemented RTL language direction scripts, enhanced input components with aria-invalid/aria-describedby, added focus trap to mobile sidebar menu, created locale utility function to replace complex ternary, improved header notification dropdown with proper ARIA roles, created offline indicator component using useSyncExternalStore, fixed calendar deadline row semantic HTML, made btn-premium effect opt-in via premium prop. All changes verified with lint (0 errors) and tests (46/46 pass).
+Files changed: locales/en/translations.json; app/layout.tsx; app/client-layout.tsx; components/ui/mq/input.tsx; components/layout/Sidebar.tsx; lib/utils/locale.ts (new); components/layout/Header.tsx; components/ui/OfflineIndicator.tsx (new); app/calendar/CalendarClient.tsx; components/ui/mq/button.tsx; tests/CalendarPage.test.tsx.
+Verification: npm run lint (pass); npm test (46/46 pass); npm run build (success).
+Follow-ups: None - UI/UX audit fully completed.
+
+---
+
 **Questions?** Contact the team leads:
 - Frontend: Pouya
 - Backend: Raouf

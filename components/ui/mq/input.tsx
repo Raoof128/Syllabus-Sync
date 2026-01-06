@@ -4,12 +4,26 @@ import { cn } from '@/lib/utils';
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  /** Optional ID for error message element (for aria-describedby) */
+  errorId?: string;
+  /** Optional hint text displayed below the input */
+  hint?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, id, ...props }, ref) => {
+  ({ className, type, label, error, errorId, hint, id, ...props }, ref) => {
     const generatedId = useId();
     const inputId = id ?? generatedId;
+    const generatedErrorId = `${inputId}-error`;
+    const generatedHintId = `${inputId}-hint`;
+    const finalErrorId = errorId ?? generatedErrorId;
+
+    // Build aria-describedby from hint and error
+    const describedByIds: string[] = [];
+    if (hint) describedByIds.push(generatedHintId);
+    if (error) describedByIds.push(finalErrorId);
+    const ariaDescribedBy = describedByIds.length > 0 ? describedByIds.join(' ') : undefined;
+
     return (
       <div className="space-y-2">
         {label && (
@@ -26,9 +40,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           id={inputId}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={ariaDescribedBy}
           {...props}
         />
-        {error && <p className="text-mq-sm text-mq-error">{error}</p>}
+        {hint && !error && (
+          <p id={generatedHintId} className="text-mq-sm text-mq-content-secondary">
+            {hint}
+          </p>
+        )}
+        {error && (
+          <p id={finalErrorId} className="text-mq-sm text-mq-error" role="alert">
+            {error}
+          </p>
+        )}
       </div>
     );
   },

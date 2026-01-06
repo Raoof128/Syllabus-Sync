@@ -102,12 +102,13 @@ describe('CalendarPage', () => {
     expect(deadlinesState.toggleComplete).toHaveBeenCalledWith('deadline-1');
   });
 
-  it('opens edit dialog with keyboard interaction', async () => {
+  it('opens edit dialog with keyboard interaction on edit button', async () => {
     render(<CalendarPage />);
 
-    const cardButton = screen.getByRole('button', { name: /Assignment 1 deadline/i });
+    // Find the edit button by its aria-label which now includes the deadline title
+    const editButton = screen.getByRole('button', { name: /Open edit dialog Assignment 1/i });
     const user = userEvent.setup();
-    cardButton.focus();
+    editButton.focus();
     await user.keyboard('{Enter}');
 
     await waitFor(() => {

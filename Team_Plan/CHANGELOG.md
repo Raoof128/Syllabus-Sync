@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.60] - 2026-01-07
+
+### Fixed
+
+#### Comprehensive UI/UX Audit & Accessibility Fixes (Raouf)
+
+Conducted full UI/UX audit of the Syllabus Sync web application and implemented critical accessibility and UX improvements across the entire codebase.
+
+**Accessibility Fixes (CRITICAL):**
+
+1. **Skip-to-content link (Raouf)**: Added keyboard-accessible skip link in `client-layout.tsx` that appears on focus, allowing keyboard users to bypass navigation and jump directly to main content. Fixed missing translation key by adding `skipToContent` to all locale files.
+
+2. **RTL language direction (Raouf)**: Added inline scripts in `layout.tsx` to set `dir="rtl"` attribute based on stored language preference (Arabic, Persian, Urdu, Hebrew). Scripts run before React hydration to prevent flash.
+
+3. **Input ARIA attributes (Raouf)**: Enhanced `components/ui/mq/input.tsx` with proper `aria-invalid`, `aria-describedby`, and `role="alert"` for error states. Added optional `hint` prop for additional context.
+
+4. **Mobile menu focus trap (Raouf)**: Added comprehensive focus trap to Sidebar mobile menu with Escape key handling, Tab navigation cycling, and proper ARIA attributes (`aria-expanded`, `aria-controls`, `aria-modal`, `role="dialog"`).
+
+**Theme & Localization:**
+
+5. **Theme flash prevention (Raouf)**: Added inline script in `layout.tsx` that applies theme class (`dark`/`light`) and `colorScheme` before React hydration, eliminating the flash of incorrect theme on page load.
+
+6. **Locale utility function (Raouf)**: Created `lib/utils/locale.ts` with `getLocaleString()`, `isRTLLanguage()`, and formatting helpers. Replaced 12-level ternary in Header with clean utility function call.
+
+**UX Enhancements:**
+
+7. **Header improvements (Raouf)**: Added proper ARIA roles to notification dropdown (`role="menu"`, `role="list"`), fixed profile name truncation with `max-w-[120px]`, and improved keyboard navigation.
+
+8. **Offline indicator (Raouf)**: Created `components/ui/OfflineIndicator.tsx` component that displays a banner when user goes offline and shows "Back online" message when connectivity is restored. Uses `useSyncExternalStore` for proper SSR compatibility.
+
+9. **Calendar row accessibility (Raouf)**: Fixed role conflict in `CalendarClient.tsx` by converting deadline row from `div role="button"` to semantic `<article>`. Edit button now has proper `aria-label` including the deadline title.
+
+10. **Premium button refactor (Raouf)**: Made `btn-premium` glow effect opt-in via `premium` prop (default: `false`) instead of being hardcoded to all buttons. Reduces visual noise and improves performance.
+
+**Files Changed:**
+- `locales/en/translations.json` - Added translation keys
+- `app/layout.tsx` - Theme/RTL scripts + suppressHydrationWarning
+- `app/client-layout.tsx` - Skip link + OfflineIndicator
+- `components/ui/mq/input.tsx` - ARIA attributes
+- `components/layout/Sidebar.tsx` - Focus trap
+- `lib/utils/locale.ts` - NEW locale utilities
+- `components/layout/Header.tsx` - Locale function, ARIA, truncation
+- `components/ui/OfflineIndicator.tsx` - NEW component
+- `app/calendar/CalendarClient.tsx` - Semantic HTML
+- `components/ui/mq/button.tsx` - Premium prop
+- `tests/CalendarPage.test.tsx` - Updated test for new structure
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run test` (46/46 tests passing)
+- `npm run build` (success)
+
+---
+
 ## [0.5.59] - 2026-01-07
 
 ### Fixed

@@ -1,7 +1,7 @@
 // components/layout/Sidebar.tsx
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -29,14 +29,76 @@ const Sidebar = memo(() => {
   const { t } = useTranslation();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const firstFocusableRef = useRef<HTMLAnchorElement>(null);
+
+  // Focus trap for mobile menu
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    // Get all focusable elements within the sidebar
+    const getFocusableElements = () => {
+      return sidebar.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+    };
+
+    // Focus the first nav link when menu opens
+    const focusableElements = getFocusableElements();
+    if (focusableElements.length > 0) {
+      (focusableElements[0] as HTMLElement).focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Close on Escape
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
+
+      // Focus trap on Tab
+      if (e.key === 'Tab') {
+        const focusable = getFocusableElements();
+        if (focusable.length === 0) return;
+
+        const firstElement = focusable[0];
+        const lastElement = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  // Close menu when clicking outside
+  const handleOverlayClick = useCallback(() => {
+    setMobileMenuOpen(false);
+    menuButtonRef.current?.focus();
+  }, []);
 
   return (
     <>
       {/* Mobile menu button */}
       <button
+        ref={menuButtonRef}
         className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center btn-premium"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
+        aria-expanded={mobileMenuOpen}
+        aria-controls="mobile-sidebar"
       >
         {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
@@ -45,8 +107,9 @@ const Sidebar = memo(() => {
       {mobileMenuOpen && (
         <div
           className="md:hidden fixed inset-0 bg-mq-content/60 z-40 backdrop-blur-sm"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={handleOverlayClick}
           role="presentation"
+          aria-hidden="true"
         />
       )}
 
@@ -81,6 +144,11 @@ const Sidebar = memo(() => {
 
         {/* Sliding panel */}
         <div
+          ref={sidebarRef}
+          id="mobile-sidebar"
+          role="dialog"
+          aria-modal={mobileMenuOpen ? 'true' : undefined}
+          aria-label={t('mainNavigation')}
           className={cn(
             'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col',
             // Desktop: use CSS module for hover-based animation
@@ -95,7 +163,12 @@ const Sidebar = memo(() => {
         >
           {/* Logo and branding - animated */}
           <div className={cn('mb-8', styles.logo)}>
-            <Link href="/home" className="flex items-center gap-2">
+            <Link
+              href="/home"
+              className="flex items-center gap-2"
+              ref={firstFocusableRef}
+              onClick={() => setMobileMenuOpen(false)}
+            >
               <Image
                 src="/MQ_Logo_Final.png"
                 alt={t('mqLogoAlt')}
