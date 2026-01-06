@@ -26,10 +26,10 @@ export default function CalendarClient() {
 
   // For now, just show a simple calendar view
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-6 max-w-7xl calendar-page">
       <div className="mb-8">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('calendar')}</h1>
-        <p className="text-mq-content-secondary">
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2" style={{ color: 'var(--mq-content)' }}>{t('calendar')}</h1>
+        <p className="text-mq-content-secondary" style={{ color: 'var(--mq-content)' }}>
           {t('trackDeadlinesDesc')}
         </p>
       </div>
@@ -47,15 +47,15 @@ export default function CalendarClient() {
               {hasHydrated && deadlines.length === 0 ? (
                 <div className="text-center py-12">
                   <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{t('noDeadlinesYet')}</h3>
-                  <p className="text-mq-content-secondary mb-4">
+                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2" style={{ color: 'var(--mq-content)' }}>{t('noDeadlinesYet')}</h3>
+                  <p className="text-mq-content-secondary mb-4" style={{ color: 'var(--mq-content)' }}>
                     {t('addDeadlinesDesc')}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {deadlines.slice(0, 5).map((deadline) => (
-                    <div key={deadline.id} className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border">
+                    <div key={deadline.id} className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq border border-mq-border" style={{ color: 'var(--mq-content)' }}>
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => toggleComplete(deadline.id)}
@@ -76,7 +76,7 @@ export default function CalendarClient() {
                           </p>
                         </div>
                       </div>
-                      <Badge className={PRIORITY_COLORS[deadline.priority]}>
+                      <Badge className={`${PRIORITY_COLORS[deadline.priority]} alabaster-readable`}>
                         {deadline.priority}
                       </Badge>
                     </div>

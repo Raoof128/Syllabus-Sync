@@ -60,7 +60,7 @@ const NextDeadline = memo(() => {
     <div className="mq-magic-card">
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }} >
             <CardTitle>{t('nextDeadline')}</CardTitle>
             <Link
               href="/calendar"
@@ -72,10 +72,10 @@ const NextDeadline = memo(() => {
           <CardContent>
             {!isHydrated ? (
               <div className="h-32 flex items-center justify-center">
-                <p className="text-mq-content">{t('loading')}</p>
+                <p className="text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}>{t('loading')}</p>
               </div>
             ) : !nextDeadline ? (
-              <div className="text-center py-8">
+              <div className="text-center py-8 alabaster-readable" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}>
                 <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noUpcomingDeadlines')}</h3>
                 <p className="text-mq-content mb-4">
@@ -94,20 +94,20 @@ const NextDeadline = memo(() => {
                 className="block focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:rounded-lg"
                 aria-label={t('viewDeadlineDetails', { title: nextDeadline.title })}
               >
-                <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-mq-hover-background transition-colors">
+                <div className="space-y-3 p-3 -m-3 rounded-lg hover:bg-mq-hover-background transition-colors alabaster-readable" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}>
                   {/* Deadline info */}
                   <div>
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-semibold text-mq-content">
+                      <h3 className="font-semibold text-mq-content" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}>
                         {nextDeadline.unitCode} — {nextDeadline.title}
                       </h3>
-                      <Badge className={PRIORITY_COLORS[nextDeadline.priority]}>
+                      <Badge className={`${PRIORITY_COLORS[nextDeadline.priority]} alabaster-readable`}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {t(typeof nextDeadline.priority === 'string' ? `priority_${nextDeadline.priority}` as any : nextDeadline.priority)}
                       </Badge>
                     </div>
 
-                    <p className="text-sm text-mq-content-secondary mt-1">
+                    <p className="text-sm text-mq-content-secondary mt-1" style={{ color: 'var(--mq-content-secondary)', WebkitTextFillColor: 'var(--mq-content-secondary)' }}>
                       {t('due')} {hasValidDate ? format(dueDate as Date, 'MMM dd, h:mm a', { locale: currentLocale }) : t('invalidDate')}
                     </p>
                   </div>

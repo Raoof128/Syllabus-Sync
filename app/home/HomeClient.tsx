@@ -314,7 +314,7 @@ export default function HomeClient() {
   // If there's an error, show error UI
   if (hasError) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
+      <div className="container mx-auto p-6 max-w-7xl home-page">
         <div className="text-center py-12">
           <div className="text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-mq-content mb-4">{t('somethingWentWrong')}</h1>
@@ -400,7 +400,7 @@ export default function HomeClient() {
 
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-6 max-w-7xl home-page">
       {/* Screen reader announcements */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {announcements.map((announcement, index) => (
@@ -417,6 +417,7 @@ export default function HomeClient() {
       </a>
 
       {/* Header */}
+      <h1 className="text-mq-sm text-mq-content mb-2">Home</h1>
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
           <WelcomeHeader name={currentProfile?.name} fallbackName={DEMO_USER.name} />
@@ -465,8 +466,8 @@ export default function HomeClient() {
         </ScrollReveal>
       )}
 
-      {/* Main Dashboard Grid */}
-      <section id="main-content" className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" role="main" aria-label={t('dashboardOverview')}>
+      {/* Main Dashboard Grid (rendered inside page-level main) */}
+      <section className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6" aria-label={t('dashboardOverview')}>
         <ScrollReveal delay={0.1}>
           <TodaySchedule />
         </ScrollReveal>
@@ -509,7 +510,7 @@ export default function HomeClient() {
               ) : (
                 <>
                   {/* Unit Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border" style={{ color: 'var(--mq-content)' }}>
                     <div className="text-center">
                       <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
                       <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>

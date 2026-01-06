@@ -7,7 +7,7 @@ export default function Loading() {
       <div className="text-center" role="status" aria-live="polite">
         {/* CSS-only spinner - no client JS needed */}
         <div className="h-8 w-8 mx-auto mb-4 rounded-full border-4 border-mq-border border-t-mq-primary animate-spin" />
-        <p className="text-mq-content-secondary sr-only">Loading...</p>
+        <p className="text-mq-content-secondary sr-only alabaster-readable" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}>Loading...</p>
       </div>
     </div>
   );

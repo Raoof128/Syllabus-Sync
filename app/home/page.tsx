@@ -30,8 +30,8 @@ function HomeSkeleton() {
     <div className="container mx-auto p-6 max-w-7xl animate-pulse">
       {/* Header skeleton */}
       <div className="mb-8">
-        <div className="h-10 bg-mq-background-secondary rounded-mq w-64 mb-2" />
-        <div className="h-5 bg-mq-background-secondary rounded-mq w-96" />
+        <div className="h-10 bg-mq-background-secondary rounded-mq w-64 mb-2" style={{ color: 'var(--mq-content)' }} />
+        <div className="h-5 bg-mq-background-secondary rounded-mq w-96" style={{ color: 'var(--mq-content)' }} />
       </div>
 
       {/* Widget grid skeleton */}
@@ -58,7 +58,10 @@ function HomeSkeleton() {
 export default function HomePage() {
   return (
     <Suspense fallback={<HomeSkeleton />}>
-      <HomeClient />
+      <main id="main-content" className="container mx-auto p-6 max-w-7xl home-page" role="main" aria-label="Dashboard overview">
+        <h1 className="text-mq-sm text-mq-content mb-2">Home</h1>
+        <HomeClient />
+      </main>
     </Suspense>
   );
 }

@@ -30,8 +30,8 @@ function FeedSkeleton() {
     <div className="container mx-auto p-6 max-w-7xl animate-pulse">
       {/* Header skeleton */}
       <div className="mb-8">
-        <div className="h-10 bg-mq-background-secondary rounded-mq w-56 mb-2" />
-        <div className="h-5 bg-mq-background-secondary rounded-mq w-96" />
+        <div className="h-10 bg-mq-background-secondary rounded-mq w-56 mb-2" style={{ color: 'var(--mq-content)' }} />
+        <div className="h-5 bg-mq-background-secondary rounded-mq w-96" style={{ color: 'var(--mq-content)' }} />
       </div>
 
       {/* Filter skeleton */}
@@ -60,7 +60,9 @@ function FeedSkeleton() {
 export default function FeedPage() {
   return (
     <Suspense fallback={<FeedSkeleton />}>
-      <FeedClient />
+      <main id="main-content" className="container mx-auto p-6 max-w-7xl feed-page" role="main" aria-label="Campus Feed">
+        <FeedClient />
+      </main>
     </Suspense>
   );
 }
