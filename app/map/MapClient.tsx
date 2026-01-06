@@ -470,7 +470,7 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-black" style={{ color: 'var(--mq-content)' }}>
+                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
                     <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('walkingDirections')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
                       {t('walkingDirectionsDesc')}
@@ -497,7 +497,7 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-black" style={{ color: 'var(--mq-content)' }}>
+                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
                     <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('realTimeTracking')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
                       {t('realTimeTrackingDesc')}
@@ -524,7 +524,7 @@ export default function MapClient() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-mq-lg border border-black" style={{ color: 'var(--mq-content)' }}>
+                  <div className="p-3 bg-white rounded-mq-lg border border-mq-border" style={{ color: 'var(--mq-content)' }}>
                     <h4 className="font-semibold text-mq-content alabaster-readable" style={{ color: 'var(--mq-content)' }}>{t('filterAndFind')}</h4>
                     <p className="text-mq-sm text-mq-content-secondary alabaster-readable mt-1" style={{ color: 'var(--mq-content)' }}>
                       {t('filterAndFindDesc')}

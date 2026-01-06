@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.45] - 2026-01-06
+
+### Fixed
+
+- **Social buttons polish (Raouf)**: Improved the bottom-left social widgets to be more robust and accessible — reduced expansion width, prevented premature truncation, centred labels inside the expanded pill, added keyboard focus expansion, suppressed native link tooltips, and refined icon→label transitions for a smoother experience. Files changed: `components/layout/SocialButtons.tsx`, `app/globals.css`.
+
+- **Settings — Clear All Data subcard border (Raouf)**: Added a theme-aware border to the "Clear All Data" subcard so borders use the `border-mq-border` token and display correctly in dark mode. File changed: `app/settings/page.tsx`.
+
+---
+
 ## [0.5.44] - 2026-01-06
 
 ### Fixed

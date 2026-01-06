@@ -64,6 +64,7 @@ const SocialButtons = memo(() => {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={link.label}
+                            title=""
                         >
                             <Icon className="social-icon h-5 w-5" aria-hidden="true" />
                             <span className="social-title">{link.label}</span>

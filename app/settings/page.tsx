@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [storageEnabled, setStorageEnabled] = useState(true);
 
+
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
@@ -200,7 +201,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Mail className="h-4 w-4 text-mq-content-tertiary" />
@@ -238,7 +239,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-4 w-4 text-mq-content-tertiary" />
@@ -276,7 +277,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Info className="h-4 w-4 text-mq-content-tertiary" />
@@ -327,7 +328,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('darkMode')}</h4>
@@ -364,7 +365,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('language')}</h4>
@@ -568,6 +569,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+
             </CardContent>
           </Card>
         </div>
@@ -582,7 +584,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('dataStorage')}</h4>
@@ -615,7 +617,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('exportData')}</h4>
@@ -665,7 +667,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-mq-card-background rounded-mq-lg hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-mq-content">{t('clearAllData')}</h4>
@@ -725,13 +727,13 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-3 bg-mq-card-background rounded-mq-lg">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
                 <h4 className="font-semibold text-mq-content mb-1">{t('aboutTitle')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary">
                   {t('version')} {APP_CONFIG.version} - {t('aboutDesc')}
                 </p>
               </div>
-              <div className="p-3 bg-mq-card-background rounded-mq-lg">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <h4 className="font-semibold text-mq-content mb-1">{t('needHelp')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mb-2">{t('helpDesc')}</p>
                 <Button
@@ -749,7 +751,7 @@ export default function SettingsPage() {
                   {t('viewDocumentation')}
                 </Button>
               </div>
-              <div className="p-3 bg-mq-card-background rounded-mq-lg">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <h4 className="font-semibold text-mq-content mb-1">{t('feedback')}</h4>
                 <p className="text-mq-sm text-mq-content-secondary mb-2">{t('feedbackDesc')}</p>
                 <Button

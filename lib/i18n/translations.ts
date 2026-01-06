@@ -138,6 +138,8 @@ export const translations = {
     aboutTitle: 'About Syllabus Sync',
     aboutDesc: 'Macquarie University Campus Management',
     version: 'Version',
+
+
     needHelp: 'Need Help?',
     helpDesc: 'Visit our documentation or contact support.',
     viewDocumentation: 'View Documentation',

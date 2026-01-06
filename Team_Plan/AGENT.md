@@ -65,6 +65,10 @@ Macquarie University Administration - February 2025
 - **Improved layout structure**: Pouya: Removed redundant container wrapper from HomeClient.tsx since page.tsx already provides the container.
 - **Build Status**: ✅ Build compiles successfully with no errors. All 27 routes generated successfully.
 
+#### ✅ UI Polish & Bug Fixes (v0.5.45)
+- **Social buttons polish (Raouf)**: Polished the bottom-left social widgets — reduced expansion width, prevented premature truncation, centred labels, added keyboard-focus expansion, suppressed native link tooltips (`title=""`), improved icon→label animation, and added mobile-friendly behavior. Files changed: `components/layout/SocialButtons.tsx`, `app/globals.css`.
+- **Settings card border (Raouf)**: Added a theme-aware border to the `Clear All Data` subcard so it uses the `border-mq-border` token and displays consistently in dark mode. File changed: `app/settings/page.tsx`.
+
 #### ✅ Removed GitHub social button & fixed TypeScript/ESLint issues (v0.5.43)
 - **Removed GitHub button**: Raouf removed the GitHub social button from the sidebar by editing `components/layout/SocialButtons.tsx` and cleaning up unused imports; the sidebar no longer shows a GitHub button.
 - **TypeScript & ESLint fixes**: Fixed implicit `any` types and typing issues across server and client code; key files updated include `app/api/units/route.ts`, `app/api/auth/signin/route.ts`, `app/login/LoginClient.tsx`, `app/client-layout.tsx`, `components/layout/SocialButtons.tsx`, and several `components/ui/*` files.
