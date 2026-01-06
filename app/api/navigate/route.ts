@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const ORS_API_KEY = process.env.NEXT_PUBLIC_ORS_API_KEY;
+// Use server-only env var (no NEXT_PUBLIC_ prefix) for security
+// The API key is only used on the server side, so it should not be exposed to the client
+const ORS_API_KEY = process.env.ORS_API_KEY || process.env.NEXT_PUBLIC_ORS_API_KEY;
 const ORS_BASE_URL = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
 
 export async function POST(request: NextRequest) {

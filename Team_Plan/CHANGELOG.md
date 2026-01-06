@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.52] - 2026-01-07
+
+### Security
+
+#### Comprehensive Security Audit & Vulnerability Fixes (Raouf)
+
+Conducted full security audit of the application and fixed 6 vulnerabilities across critical, high, and medium severity levels.
+
+**Critical Fixes:**
+
+- **Dev-only auto-confirm in signup (Raouf)**: Restricted auto-confirm functionality to only work in development mode AND only for whitelisted developer emails (`DEV_EMAILS` array). Previously, auto-confirm could potentially be triggered in production. Added `isDevelopment` check and `isDevEmail()` validation function. File changed: `app/api/auth/signup/route.ts`.
+
+- **Dev-only auto-confirm in signin (Raouf)**: Applied same dev-only restriction pattern to signin route. Auto-confirm now requires both `NODE_ENV === 'development'` and email to be in `DEV_EMAILS` whitelist. File changed: `app/api/auth/signin/route.ts`.
+
+**High Severity Fixes:**
+
+- **Missing auth on deadlines API (Raouf)**: Added `requireAuth` middleware wrapper to both GET and POST handlers in deadlines API route. Previously, endpoints were accessible without authentication. File changed: `app/api/deadlines/route.ts`.
+
+- **SQL injection in units search (Raouf)**: Added `sanitizeSearchInput()` function that escapes SQL wildcard characters (`%`, `_`, `\`) before passing user input to Supabase `.ilike()` queries. Prevents potential SQL injection via search parameter. File changed: `app/api/units/route.ts`.
+
+**Medium Severity Fixes:**
+
+- **Open redirect vulnerability (Raouf)**: Added `isValidRedirect()` function to validate redirect URLs in login flow. Only allows paths starting with `/` and blocks `//` or `:` to prevent open redirects to external domains. File changed: `app/login/LoginClient.tsx`.
+
+- **ORS API key exposure (Raouf)**: Changed navigation API route to prefer server-only `ORS_API_KEY` environment variable instead of `NEXT_PUBLIC_ORS_API_KEY`. Falls back to public key for backward compatibility but encourages server-side key storage. File changed: `app/api/navigate/route.ts`.
+
+**Security Items Already Configured (Verified):**
+- Security headers in `next.config.ts` ✅
+- Rate limiting middleware ✅
+- CORS configuration ✅
+- Zod validation on API routes ✅
+- `npm audit` returns 0 vulnerabilities ✅
+
+Files changed: `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`, `app/api/deadlines/route.ts`, `app/api/units/route.ts`, `app/login/LoginClient.tsx`, `app/api/navigate/route.ts`.
+
+Verification: `npm run lint` (pass); `npm run build` (pass); `npm audit` (0 vulnerabilities).
+
+---
+
 ## [0.5.51] - 2026-01-07
 
 ### Fixed

@@ -10,6 +10,20 @@ const signupSchema = z.object({
   studentId: z.string().optional(),
 });
 
+// Developer emails that can bypass email confirmation in development
+const DEV_EMAILS = [
+  'raouf@mq.edu.au',
+  'pouya@mq.edu.au',
+  'kit@mq.edu.au',
+  // Add any other dev emails here
+];
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+function isDevEmail(email: string): boolean {
+  return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail.toLowerCase());
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
@@ -35,8 +49,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // For development, auto-confirm the user
-    if (data.user && !data.session && !error) {
+    // Auto-confirm ONLY in development AND only for developer emails
+    if (data.user && !data.session && !error && isDevelopment && isDevEmail(email)) {
+      console.warn(`🔧 Development mode: auto-confirming developer email (${email})...`);
+
       const { error: confirmError } = await supabase.auth.admin.updateUserById(data.user.id, {
         email_confirm: true,
       });

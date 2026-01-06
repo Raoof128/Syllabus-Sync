@@ -60,6 +60,14 @@ const unitQuerySchema = z.object({
 });
 
 /**
+ * Sanitize search input to prevent SQL injection via LIKE patterns
+ * Escapes special characters: %, _, \
+ */
+function sanitizeSearchInput(input: string): string {
+  return input.replace(/[%_\\]/g, '\\$&');
+}
+
+/**
  * GET /api/units - List units with their schedules
  *
  * Query Parameters:
@@ -91,9 +99,12 @@ export async function GET(request: Request) {
         .select('*', { count: 'exact' })
         .order(query.sortBy, { ascending: query.sortOrder === 'asc' });
 
-      // Apply search filter
+      // Apply search filter (sanitized to prevent SQL injection)
       if (query.search) {
-        unitsQuery = unitsQuery.or(`code.ilike.%${query.search}%,name.ilike.%${query.search}%`);
+        const sanitizedSearch = sanitizeSearchInput(query.search);
+        unitsQuery = unitsQuery.or(
+          `code.ilike.%${sanitizedSearch}%,name.ilike.%${sanitizedSearch}%`,
+        );
       }
 
       // Apply pagination

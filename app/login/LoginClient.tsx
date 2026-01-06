@@ -21,7 +21,18 @@ export default function LoginClient() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/home';
+
+  // Validate redirect URL to prevent open redirect attacks
+  // Only allow relative paths that start with / and don't start with // (protocol-relative)
+  const isValidRedirect = (url: string | null): boolean => {
+    if (!url) return false;
+    // Must start with single slash, not double slash (protocol-relative URL)
+    // Must not contain protocol indicators
+    return url.startsWith('/') && !url.startsWith('//') && !url.includes(':');
+  };
+
+  const rawRedirect = searchParams.get('redirectTo');
+  const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
 
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);

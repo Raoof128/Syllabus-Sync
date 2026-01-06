@@ -2336,3 +2336,17 @@ Summary:
 Files: app/client-layout.tsx; app/globals.css; components/layout/Sidebar.tsx.
 Verification: npm run lint -- --max-warnings=0 (pass).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Security Audit & Vulnerability Fixes (v0.5.52).
+Summary:
+  - Conducted comprehensive security audit and fixed 6 vulnerabilities.
+  - (1) Restricted dev auto-confirm in signup to development mode + whitelisted DEV_EMAILS only.
+  - (2) Restricted dev auto-confirm in signin to development mode + whitelisted DEV_EMAILS only.
+  - (3) Added requireAuth middleware to deadlines API GET/POST endpoints.
+  - (4) Added sanitizeSearchInput() to escape SQL wildcards in units search preventing SQL injection.
+  - (5) Added isValidRedirect() to prevent open redirects in login flow.
+  - (6) Changed navigate API to prefer server-only ORS_API_KEY over client-exposed key.
+Files: app/api/auth/signup/route.ts; app/api/auth/signin/route.ts; app/api/deadlines/route.ts; app/api/units/route.ts; app/login/LoginClient.tsx; app/api/navigate/route.ts.
+Verification: npm run lint (pass); npm run build (pass); npm audit (0 vulnerabilities).
+Follow-ups: None.

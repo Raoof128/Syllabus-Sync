@@ -8,6 +8,20 @@ const signinSchema = z.object({
   password: z.string().min(1),
 });
 
+// Developer emails that can bypass email confirmation in development
+const DEV_EMAILS = [
+  'raouf@mq.edu.au',
+  'pouya@mq.edu.au',
+  'kit@mq.edu.au',
+  // Add any other dev emails here
+];
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+function isDevEmail(email: string): boolean {
+  return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail.toLowerCase());
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
@@ -20,15 +34,20 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     const { email, password } = parsed.data;
 
-    // For development: try password signin first
+    // Try password signin first
     let { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    // If email not confirmed, try admin signin (development only)
-    if (error && error.message.includes('Email not confirmed')) {
-      console.warn('🔧 Development mode: attempting to confirm email and signin...');
+    // Auto-confirm ONLY in development AND only for developer emails
+    if (
+      error &&
+      error.message.includes('Email not confirmed') &&
+      isDevelopment &&
+      isDevEmail(email)
+    ) {
+      console.warn(`🔧 Development mode: auto-confirming developer email (${email})...`);
 
       // Get user by email to confirm
       const { data: users, error: userError } = await supabase.auth.admin.listUsers();

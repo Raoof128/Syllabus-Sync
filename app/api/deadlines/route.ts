@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError } from '@/app/api/_lib/response';
 import { mapDeadlineRow, serializeDeadline } from '@/app/api/_lib/mappers';
+import { requireAuth } from '@/app/api/_lib/middleware';
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
@@ -16,44 +17,50 @@ const deadlineSchema = z.object({
   createdAt: dateSchema.optional(),
 });
 
-export async function GET() {
-  const supabase = await createServerClient();
-  const { data, error } = await supabase
-    .from('deadlines')
-    .select('*')
-    .order('due_date', { ascending: true });
+export async function GET(request: Request) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return requireAuth(request, async (_userId) => {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+      .from('deadlines')
+      .select('*')
+      .order('due_date', { ascending: true });
 
-  if (error) {
-    return jsonError(error.message, 500);
-  }
+    if (error) {
+      return jsonError(error.message, 500);
+    }
 
-  return NextResponse.json(data?.map(mapDeadlineRow) ?? []);
+    return NextResponse.json(data?.map(mapDeadlineRow) ?? []);
+  });
 }
 
 export async function POST(request: Request) {
-  const supabase = await createServerClient();
-  const body = await request.json().catch(() => null);
-  const parsed = deadlineSchema.safeParse(body);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return requireAuth(request, async (_userId) => {
+    const supabase = await createServerClient();
+    const body = await request.json().catch(() => null);
+    const parsed = deadlineSchema.safeParse(body);
 
-  if (!parsed.success) {
-    return jsonError('Invalid deadline payload.', 400);
-  }
+    if (!parsed.success) {
+      return jsonError('Invalid deadline payload.', 400);
+    }
 
-  const payload = {
-    ...parsed.data,
-    id: parsed.data.id ?? crypto.randomUUID(),
-    createdAt: parsed.data.createdAt ?? new Date(),
-  };
+    const payload = {
+      ...parsed.data,
+      id: parsed.data.id ?? crypto.randomUUID(),
+      createdAt: parsed.data.createdAt ?? new Date(),
+    };
 
-  const { data, error } = await supabase
-    .from('deadlines')
-    .insert(serializeDeadline(payload))
-    .select('*')
-    .single();
+    const { data, error } = await supabase
+      .from('deadlines')
+      .insert(serializeDeadline(payload))
+      .select('*')
+      .single();
 
-  if (error) {
-    return jsonError(error.message, 500);
-  }
+    if (error) {
+      return jsonError(error.message, 500);
+    }
 
-  return NextResponse.json(mapDeadlineRow(data));
+    return NextResponse.json(mapDeadlineRow(data));
+  });
 }
