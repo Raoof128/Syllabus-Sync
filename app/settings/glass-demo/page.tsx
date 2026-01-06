@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useTranslation } from '@/lib/hooks/useTranslation';
 
 export default function GlassDemoPage() {
   // Demo removed — route retained as a lightweight redirect back to Settings
