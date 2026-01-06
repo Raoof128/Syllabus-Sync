@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-toast'],
+    optimizePackageImports: ['@radix-ui/react-dialog', '@radix-ui/react-toast'],
   },
 
   // Empty turbopack config to acknowledge Turbopack usage

@@ -28,7 +28,7 @@ Responsible for Home tab, Calendar tab, and half of Feed tab. Focus on user-faci
 ### Primary Responsibilities
 - ✅ **Home Tab Development**: Dashboard, units management, today's schedule, deadlines widget
 - ✅ **Calendar Tab Development**: Calendar view, deadline management, scheduling
-- ✅ **Feed Tab (Frontend)**: Events display, UI components, user interactions
+- ✅ **Feed Tab (Frontend)**: Events display, UI components, user interactions (50%)
 - ✅ **Unit Management**: UnitCard, UnitForm, CRUD operations
 - ✅ **Deadline Management**: DeadlineForm, deadline tracking, stress level indicator
 - ✅ **UI/UX Polish**: User experience improvements, accessibility
@@ -43,7 +43,7 @@ Responsible for Map tab, Settings tab, half of Feed tab, backend architecture, s
 ### Primary Responsibilities
 - ✅ **Map Tab Development**: Interactive campus map, building navigation, search functionality
 - ✅ **Settings Tab Development**: User preferences, theme settings, data management
-- ✅ **Feed Tab (Backend)**: Events API, data architecture, filtering logic
+- ✅ **Feed Tab (Backend)**: Events API, data architecture, filtering logic (50%)
 - ✅ **Backend Architecture**: TypeScript types, state management, error handling systems
 - ✅ **System Integration**: API design, performance optimization, build configuration
 - ✅ **Quality Assurance**: Testing, linting, code quality, documentation

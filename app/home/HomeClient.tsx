@@ -55,6 +55,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Unit, Deadline } from '@/lib/types';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 
 
@@ -65,6 +66,10 @@ export default function HomeClient() {
   // Global error boundary for home page
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // User state from Supabase
+  const [user, setUser] = useState<{ email?: string; user_metadata?: { full_name?: string; name?: string } } | null>(null);
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   const units = useUnitsStore((state) => state.units);
   const addUnit = useUnitsStore((state) => state.addUnit);
@@ -78,6 +83,45 @@ export default function HomeClient() {
   const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
   const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
+
+  // Load user authentication state
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Failed to get user:', error);
+      }
+    };
+
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: { user: { id: string; email?: string; user_metadata?: { full_name?: string; name?: string } } } | null) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  // Get display name for welcome message: profile name > user metadata > email extraction > fallback
+  const displayName = useMemo(() => {
+    if (currentProfile?.name) return currentProfile.name;
+    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+    if (user?.user_metadata?.name) return user.user_metadata.name;
+    // Extract name from email prefix and capitalize it
+    if (user?.email) {
+      const emailPrefix = user.email.split('@')[0];
+      // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
+      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
+      // Capitalize first letter
+      if (nameWithoutNumbers.length > 0) {
+        return nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase();
+      }
+    }
+    return null;
+  }, [currentProfile, user]);
 
   // Auto-select first profile if profiles exist but none is selected (migration for existing users)
   useEffect(() => {
@@ -409,7 +453,7 @@ export default function HomeClient() {
       {/* Header */}
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
-          <WelcomeHeader name={currentProfile?.name} fallbackName={DEMO_USER.name} />
+          <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name} />
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Stress Level Indicator */}
             {hasHydrated && deadlines.length > 0 && (
@@ -474,7 +518,16 @@ export default function HomeClient() {
                 <BookOpen className="h-5 w-5" aria-hidden="true" />
                 {t('myUnits')}
               </CardTitle>
-
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1"
+                onClick={handleAddUnit}
+                aria-label={t('addUnit')}
+              >
+                <Plus className="h-4 w-4" />
+                {t('addUnit')}
+              </Button>
             </CardHeader>
             <CardContent>
               {!hasHydrated ? (
@@ -516,14 +569,14 @@ export default function HomeClient() {
 
                   {/* Units Grid */}
                   <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr"
                     variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
                   >
                     {units.map((unit) => (
                       <motion.div
                         key={unit.id}
                         variants={revealChildVariants}
-                        className="relative z-0 hover:z-50 focus-within:z-50"
+                        className="relative z-0 hover:z-50 focus-within:z-50 h-full"
                       >
                         <UnitCard
                           unit={unit}

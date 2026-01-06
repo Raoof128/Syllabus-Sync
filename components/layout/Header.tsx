@@ -128,19 +128,29 @@ const Header = memo(() => {
   // Only calculate unread count on client to avoid hydration mismatch
   const unreadCount = isClient ? getUnreadCount() : 0;
 
-  // Get display name: prioritize profile name, then Supabase user metadata, then email prefix
+  // Get display name: prioritize profile name, then Supabase user metadata full_name/name, then extract from email
+  // Extract a proper name from the email prefix (capitalize first letter)
   const displayName = useMemo(() => {
     if (currentProfile?.name) return currentProfile.name;
     if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user?.user_metadata?.name) return user.user_metadata.name;
-    if (user?.email) return user.email.split('@')[0];
+    // Extract name from email prefix and capitalize it
+    if (user?.email) {
+      const emailPrefix = user.email.split('@')[0];
+      // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
+      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
+      // Capitalize first letter
+      if (nameWithoutNumbers.length > 0) {
+        return nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase();
+      }
+    }
     return null;
-  }, [currentProfile?.name, user?.user_metadata?.full_name, user?.user_metadata?.name, user?.email]);
+  }, [currentProfile, user]);
 
   return (
-    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between pl-2 pr-4 sm:pl-3 sm:pr-6 relative z-10">
+    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-4 sm:px-6 relative z-10">
       {/* Left side - Logo and title (far left) */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <Link href="/" className="flex items-center gap-2 sm:gap-3">
           <Image
             src="/MQ_Logo_Final.png"
@@ -187,7 +197,7 @@ const Header = memo(() => {
       </div>
 
       {/* Right side - Actions (far right) */}
-      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
 
         {/* Notifications */}
         <div className="relative" ref={dropdownRef}>

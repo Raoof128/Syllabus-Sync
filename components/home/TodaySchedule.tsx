@@ -4,10 +4,11 @@
 import React, { useMemo, memo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Clock, MapPin, BookOpen } from 'lucide-react';
+import { Clock, MapPin, BookOpen, Plus } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import Link from 'next/link';
 
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
@@ -34,8 +35,24 @@ const TodaySchedule = memo(() => {
     <div className="mq-magic-card">
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{t('todaysClasses')}</CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('add-unit'));
+                } catch (error) {
+                  console.warn('Failed to trigger add unit event:', error);
+                }
+              }}
+              aria-label={t('addUnit')}
+            >
+              <Plus className="h-4 w-4" />
+              {t('addUnit')}
+            </Button>
           </CardHeader>
           <CardContent className="space-y-3">
             {!isHydrated ? (
@@ -89,11 +106,14 @@ const TodaySchedule = memo(() => {
                 </Button>
               </div>
             ) : (
-              todayClasses.map((cls) => (
-                <div
-                  key={`${cls.id}-${cls.code}`}
-                  className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm"
-                >
+              <div className="space-y-3">
+                {todayClasses.map((cls) => (
+                  <Link
+                    key={`${cls.id}-${cls.code}`}
+                    href="/calendar"
+                    className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
+                    aria-label={`${cls.code} - ${cls.name}, ${cls.startTime} - ${cls.endTime} at ${cls.location.building} ${cls.location.room}`}
+                  >
                   {/* Color indicator */}
                   <div
                     className="w-1 h-full rounded-full flex-shrink-0"
@@ -117,8 +137,9 @@ const TodaySchedule = memo(() => {
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                </Link>
+              ))}
+              </div>
             )}
           </CardContent>
         </Card>

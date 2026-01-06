@@ -35,9 +35,9 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
   };
 
   return (
-    <div className="mq-magic-card">
-      <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent">
+    <div className="mq-magic-card h-full">
+      <div className="mq-magic-card-content h-full">
+        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
           {/* Color indicator bar */}
           <div className="h-2 rounded-t-mq-lg" style={{ backgroundColor: unit.color }} />
 
@@ -96,7 +96,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 flex-grow">
             {/* Location */}
             <div className="flex items-center gap-2 text-mq-sm">
               <MapPin className="w-4 h-4 text-mq-content-tertiary" />

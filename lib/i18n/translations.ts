@@ -208,6 +208,7 @@ export const translations = {
     noUpcomingDeadlines: 'No upcoming deadlines',
     noDeadlinesDesc: 'All caught up! Add your first deadline to stay on top of your work.',
     addDeadline: 'Add Deadline',
+    addEvent: 'Add Event',
     noEventsToday: 'No events scheduled for today',
     navigateTo: 'Navigate to',
 

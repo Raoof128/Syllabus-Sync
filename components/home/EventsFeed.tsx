@@ -4,7 +4,7 @@
 import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { MapPin, Clock, Navigation } from 'lucide-react';
+import { MapPin, Clock, Plus } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { isToday } from 'date-fns';
 import Link from 'next/link';
@@ -29,9 +29,22 @@ const EventsFeed = memo(() => {
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{t('eventsToday')}</CardTitle>
-            <Link href="/feed" className="text-sm text-mq-info hover:text-mq-info/80 hover:underline">
-              {t('viewAllEvents')}
-            </Link>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('add-event'));
+                } catch (error) {
+                  console.warn('Failed to trigger add event:', error);
+                }
+              }}
+              aria-label={t('addEvent' as 'addDeadline')}
+            >
+              <Plus className="h-4 w-4" />
+              {t('addEvent' as 'addDeadline')}
+            </Button>
           </CardHeader>
           <CardContent>
             {todayEvents.length === 0 ? (
@@ -39,9 +52,10 @@ const EventsFeed = memo(() => {
             ) : (
               <div className="space-y-3">
                 {todayEvents.map((event) => (
-                  <div
+                  <Link
                     key={event.id}
-                    className="group p-3 bg-mq-background-secondary rounded-lg hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm alabaster-readable"
+                    href="/feed"
+                    className="group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm alabaster-readable focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                     style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)', opacity: 1, mixBlendMode: 'normal' }}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -65,25 +79,7 @@ const EventsFeed = memo(() => {
                         {event.location}
                       </div>
                     </div>
-
-                    {/* Navigation to Map */}
-                    {event.building && (
-                      <div className="mt-2">
-                        <Button
-                          asChild
-                          variant="secondary"
-                          size="sm"
-                          className="gap-1 text-xs h-7 focus:ring-2 focus:ring-mq-primary/50"
-                          aria-label={t('navigateToBuildingAria', { building: event.building })}
-                        >
-                          <Link href={`/map?building=${event.building}`}>
-                            <Navigation className="h-3 w-3" />
-                            {t('navigateTo')} {event.building}
-                          </Link>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

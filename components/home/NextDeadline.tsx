@@ -6,7 +6,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Clock, AlertCircle } from 'lucide-react';
+import { Clock, AlertCircle, Plus } from 'lucide-react';
 import { formatDistanceToNow, format, isValid } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
@@ -62,12 +62,22 @@ const NextDeadline = memo(() => {
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between" style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }} >
             <CardTitle>{t('nextDeadline')}</CardTitle>
-            <Link
-              href="/calendar"
-              className="text-sm text-mq-info hover:text-mq-info/80 hover:underline"
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1"
+              onClick={() => {
+                try {
+                  window.dispatchEvent(new CustomEvent('add-deadline'));
+                } catch (error) {
+                  console.warn('Failed to trigger add deadline event:', error);
+                }
+              }}
+              aria-label={t('addDeadline')}
             >
-              {t('viewAll')}
-            </Link>
+              <Plus className="h-4 w-4" />
+              {t('addDeadline')}
+            </Button>
           </CardHeader>
           <CardContent>
             {!isHydrated ? (
@@ -81,12 +91,6 @@ const NextDeadline = memo(() => {
                 <p className="text-mq-content mb-4">
                   {t('noDeadlinesDesc')}
                 </p>
-                <Button asChild>
-                  <Link href="/calendar" className="gap-2">
-                    <Clock className="h-4 w-4" />
-                    {t('addDeadline')}
-                  </Link>
-                </Button>
               </div>
             ) : (
               <Link
