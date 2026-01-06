@@ -2179,3 +2179,20 @@ Follow-ups: None.
 
 
 Raouf: Grand Finale (Task 2.6) — Added missing Russian (ru) geolocation Map Page translation keys to complete the 12-language rollout. Verified with ESLint (Lint OK) and grep count reaching 12 occurrences of locationAccessDenied. Date: 2026-01-05.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: i18n File Structure Migration & Coverage Audit.
+Summary:
+  - **Major Refactor**: Migrated i18n system from a single 13,807-line TypeScript file to a per-language JSON structure.
+  - **19 Languages**: en, es, fa, zh, ar, hi, ko, ja, ur, th, vi, ru, ta, bn, id, ms, it, fr, he.
+  - **RTL Support**: fa (Persian), ar (Arabic), ur (Urdu), he (Hebrew).
+  - **Coverage Audit**: Verified all 19 languages against English baseline (621 keys).
+  - **French (fr) Patched**: Added 197 missing keys, removed 73 obsolete keys.
+  - **Hebrew (he) Patched**: Added 197 missing keys, removed 73 obsolete keys.
+  - **Result**: All 19 locales have 621 keys with full parity.
+  - **New File Structure**:
+    - `lib/i18n/translations.ts` (55 lines - imports/exports)
+    - `locales/{lang}/translations.json` (19 files)
+Files: lib/i18n/translations.ts; locales/*/translations.json (19 files created); locales/fr/translations.json; locales/he/translations.json.
+Verification: npm run build (pass); npx tsc --noEmit (pass); npm run lint (pass); npm test (39 passed, 2 skipped).
+Follow-ups: Consider automated i18n coverage checks in CI.

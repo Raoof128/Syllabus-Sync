@@ -2097,3 +2097,20 @@ Follow-ups: None.
 
 
 Raouf: Grand Finale (Task 2.6) — Added missing Russian (ru) geolocation Map Page translation keys to complete the 12-language rollout. Verified with ESLint (Lint OK) and grep count reaching 12 occurrences of locationAccessDenied. Date: 2026-01-05.
+
+Raouf: 2026-01-06 (Australia/Sydney)
+Scope: i18n File Structure Migration & Coverage Audit.
+Summary:
+  - **File Structure Migration**: Migrated internationalization system from a single monolithic TypeScript file (`lib/i18n/translations.ts` at 13,807 lines) to a per-language JSON file structure at `locales/{lang}/translations.json` for all 19 languages.
+  - **19 Languages Supported**: en, es, fa, zh, ar, hi, ko, ja, ur, th, vi, ru, ta, bn, id, ms, it, fr, he.
+  - **RTL Languages**: fa (Persian), ar (Arabic), ur (Urdu), he (Hebrew) with proper text direction support.
+  - **Coverage Audit**: Audited all 19 languages against English baseline (621 keys canonical).
+  - **French (fr) Patched**: Added 197 missing keys using English fallback values, removed 73 obsolete keys, reordered to match English structure.
+  - **Hebrew (he) Patched**: Added 197 missing keys using English fallback values, removed 73 obsolete keys, reordered to match English structure.
+  - **Result**: All 19 locales now have exactly 621 keys with full parity.
+  - **New Structure**:
+    - `lib/i18n/translations.ts` (55 lines - imports and re-exports only)
+    - `locales/{lang}/translations.json` - 19 separate JSON files
+Files: lib/i18n/translations.ts; locales/fr/translations.json; locales/he/translations.json; locales/*/translations.json (19 files created).
+Verification: npm run build (pass); npx tsc --noEmit (pass); npm run lint (pass); npm test (39 passed, 2 skipped).
+Follow-ups: Consider adding automated i18n coverage checks to CI pipeline.
