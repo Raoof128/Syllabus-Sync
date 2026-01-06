@@ -8,13 +8,13 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
 
   // Utility: in-page computation to extract styles, pseudo-element info and ancestor states
   async function computeViaSelector(sel: string) {
-    return await page.evaluate(({ sel }) => {
+    return await page.evaluate(({ sel }: { sel: string }) => {
       function findVisible(nodes: Element[]) {
-        return nodes.find((n) => {
+        return nodes.find((n: Element) => {
           try {
             const rect = (n as HTMLElement).getBoundingClientRect();
             return rect.width > 0 || rect.height > 0;
-          } catch (e) {
+          } catch {
             return false;
           }
         });
@@ -74,9 +74,9 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
         const computed = computeForEl(visible);
 
         // collect text-bearing descendants for more granular color checks
-        const descendants = Array.from(visible.querySelectorAll('*')).filter((el) => {
-          try { return (el.textContent || '').trim().length > 0; } catch (e) { return false; }
-        }).slice(0, 30).map((el) => {
+        const descendants = Array.from(visible.querySelectorAll('*')).filter((el: Element) => {
+          try { return (el.textContent || '').trim().length > 0; } catch { return false; }
+        }).slice(0, 30).map((el: Element) => {
           const cs = getComputedStyle(el as Element);
           const rect = (el as HTMLElement).getBoundingClientRect();
           return {
@@ -97,7 +97,7 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
   }
 
   async function computeViaSnippet(snippet: string, debugAttr: string) {
-    return await page.evaluate(({ snippet, debugAttr }) => {
+    return await page.evaluate(({ snippet, debugAttr }: { snippet: string; debugAttr: string }) => {
       function getBgColor(el: Element | null) {
         let cur: any = el;
         while (cur) {
@@ -105,7 +105,8 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
             const cs = getComputedStyle(cur);
             const bg = cs.backgroundColor;
             if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
-          } catch (e) {}
+          } catch {
+          }
           cur = cur.parentElement;
         }
         return getComputedStyle(document.documentElement).backgroundColor || 'transparent';
@@ -214,7 +215,7 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
               await page.locator(`[${matched.debugAttr}='1']`).first().screenshot({ path: pngPath });
               info.screenshot = pngPath;
               // remove debug attribute
-              await page.evaluate(({ dbgAttr }) => { const n = document.querySelector(`[${dbgAttr}='1']`); if (n) n.removeAttribute(dbgAttr); }, { dbgAttr: matched.debugAttr });
+              await page.evaluate(({ dbgAttr }: { dbgAttr: string }) => { const n = document.querySelector(`[${dbgAttr}='1']`); if (n) n.removeAttribute(dbgAttr); }, { dbgAttr: matched.debugAttr });
             } catch (err) {
               info.screenshotError = String(err);
             }

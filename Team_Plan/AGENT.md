@@ -70,6 +70,13 @@ Macquarie University Administration - February 2025
 - **TypeScript & ESLint fixes**: Fixed implicit `any` types and typing issues across server and client code; key files updated include `app/api/units/route.ts`, `app/api/auth/signin/route.ts`, `app/login/LoginClient.tsx`, `app/client-layout.tsx`, `components/layout/SocialButtons.tsx`, and several `components/ui/*` files.
 - **Verification**: Ran `npm run lint` and `npm run typecheck` — Lint OK; TypeScript passes.
 
+#### ✅ Accessibility & Alabaster theme fixes (v0.5.44)
+- **Automated accessibility instrumentation**: Added richer Playwright + axe instrumentation that captures computed styles, pseudo-elements, ancestor opacity/blend states, and per-violation screenshots and JSON artifacts to `test-results/` for precise diagnostics (files: `tests/accessibility.spec.ts` changes).
+- **Contrast remediation**: Replaced many hard-coded inline colors with design tokens (`var(--mq-content)`, `var(--mq-content-secondary)`), added a unified dark-mode enforcement rule (`html.dark ... color: var(--mq-content)`), and scoped Alabaster (light) fallbacks to ensure compliant contrast on `Feed`, `Map`, `Home`, `Calendar` pages via `app/globals.css` edits.
+- **Stability fixes**: Fixed a nested `<head>` (removed from `app/map/page.tsx` and ensured `<title>` via `app/map/head.tsx`), made the `#main-content` landmark visible during auth loading in `ClientLayout` to reduce E2E flakiness, and made the E2E test (`tests/e2e.spec.ts`) resilient to unauthenticated redirects (accepts login or dashboard flows).
+- **Reverts & polish**: Reverted previously applied black border rules on request (preserved other token unification and dark-mode changes); committed as `chore: revert black border rules added for Alabaster light mode`.
+- **Verification**: Re-ran Playwright E2E targeted tests (`Home|Feed|Calendar|Map`) — all passed after changes. Artifacts for failing contrast checks are persisted to `test-results/` for follow-up.
+
 #### ✅ Events Feed Page - MQ Magic Card Hover + Critical JSX Fix (v0.5.41)
 - **Hover Effects**: Raouf: Extended the premium gradient border hover animation to all Events Feed page cards (Filter Tabs, Events List Container, Individual Event Cards, Quick Stats Sidebar, Announcements Sidebar). All cards now feature the Macquarie red gradient (`#a6192e` → `#d6001c`) with 3D content scale (98%) and soft glow effect matching the consistent interaction pattern established on Home and Map pages.
 - **Critical Bug Fix**: Raouf: Resolved build-blocking JSX parsing error ("Unexpected token at line 196") caused by missing closing `</div>` tag for the outer `mq-magic-card` wrapper in the `filteredEvents.map()` block. Used SubAgent MCP ContextAgent with complete file content (no truncation) to identify exact JSX structure imbalance, then applied targeted EditFile fix to restore proper tag balance.
@@ -489,6 +496,24 @@ git push origin feature/your-feature-name
 - `refactor:` Code refactoring
 - `test:` Test updates
 - `chore:` Build/config changes
+
+### Commit & Changelog Template (Raouf:)
+
+In addition to the Conventional Commits format above, the project requires that any entry added to the changelog or key agent docs describing code changes use the **`Raouf:`** template. This ensures consistent, auditable release notes and agent logs.
+
+Required fields for a `Raouf:` entry:
+- **Date** (Australia/Sydney)
+- **Scope** (area or component)
+- **Short summary** (1 sentence)
+- **Files changed** (list)
+- **Verification** (commands and results)
+
+Example:
+```
+Raouf: [2026-01-06] (Feed) Applied Playwright+axe instrumentation and contrast fixes — Files: tests/accessibility.spec.ts, app/globals.css — Verified: npm run test:e2e -- --grep "Home|Feed|Calendar|Map"
+```
+
+See `.agent/rules/raouf-change-protocol.md` for the full protocol and mandatory postflight logging steps.
 
 ---
 
