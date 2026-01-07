@@ -16,6 +16,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
@@ -125,6 +126,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       void loadNotifications();
     }
   }, [isAuthenticated, loadUnits, loadDeadlines, loadNotifications]);
+
+  // Initialize notification scheduler for push notifications
+  useNotificationScheduler();
 
   // Show loading state while checking authentication — keep the main landmark present to avoid test flakiness
   if (isAuthenticated === null) {

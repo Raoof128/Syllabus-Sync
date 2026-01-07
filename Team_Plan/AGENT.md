@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.62 | Last Updated: January 07, 2026
+Version: 0.5.66 | Last Updated: January 07, 2026
 
 ---
 
@@ -2389,3 +2389,16 @@ Summary:
 Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css; app/client-layout.tsx; app/globals.css; app/api/auth/signup/route.ts; app/api/auth/signin/route.ts.
 Verification: npm run lint (0 errors, 0 warnings); npm run build (pass, 27 routes).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Notification System Integration & TypeScript Fixes (v0.5.63).
+Summary:
+  - Fixed TypeScript errors in useNotificationScheduler.ts by correcting Unit type property access.
+  - Changed `u.classTimes` to `u.schedule` to match Unit type definition.
+  - Changed `unit.building`/`unit.room` to `unit.location.building`/`unit.location.room` (nested structure).
+  - Integrated notification scheduler into app by adding useNotificationScheduler() hook call to client-layout.tsx.
+  - Exported useNotificationScheduler hook from lib/hooks/index.ts for proper module access.
+  - Bumped version from 0.5.62 to 0.5.63.
+Files: lib/hooks/useNotificationScheduler.ts; app/client-layout.tsx; lib/hooks/index.ts; Team_Plan/AGENT.md.
+Verification: npm run build (pass, 27 routes generated, no TypeScript errors).
+Follow-ups: Update CHANGELOG.md; test notification flow in browser; add translation keys for notification settings.

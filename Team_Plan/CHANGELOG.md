@@ -7,6 +7,122 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.66] - 2026-01-07
+
+### Fixed
+
+#### Notification Settings UI Styling Improvements (Raouf)
+
+**Button Styling:**
+
+- **Enable/Disable toggle buttons (Raouf)**: Added proper `border-2` styling to all notification toggle buttons. Enabled state shows green background with green border (`border-mq-success`), disabled state shows red background with red border (`border-mq-error`). Added `rounded-md` for consistent border radius.
+
+- **On/Off master toggle (Raouf)**: Fixed master push notification toggle to show red with red border when off (was previously grey). Now matches the pattern of individual notification toggles.
+
+- **Enable button (Raouf)**: Added border styling to the "Enable" button that appears when notifications permission hasn't been requested yet.
+
+**Banner Styling:**
+
+- **Notification permission banner (Raouf)**: Increased background opacity from `/10` to `/15` and border opacity from `/20` to `/40` with `border-2` thickness. This makes the banner more visible and less transparent, better matching the overall theme.
+
+**Files Changed:**
+- `app/settings/components/NotificationSettings.tsx` - Button and banner styling updates
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success, 27 routes)
+
+---
+
+## [0.5.65] - 2026-01-07
+
+### Fixed
+
+#### ESLint Error & Warning Fixes (Raouf)
+
+**React Hooks Lint Fix:**
+
+- **setState in effect error (Raouf)**: Fixed ESLint `react-hooks/set-state-in-effect` error in `NotificationSettings.tsx`. Replaced `useState` + `useEffect` pattern for client detection with `useSyncExternalStore` hook, which is the recommended approach for hydration-safe client detection without causing cascading renders.
+
+**Unused Variable Warnings:**
+
+- **Destructuring unused vars (Raouf)**: Fixed 4 `@typescript-eslint/no-unused-vars` warnings in `notificationPreferencesStore.ts`. Renamed destructured `_` variables to `_removed` and added `void _removed` statements to explicitly silence the warnings while maintaining clean object rest spread operations.
+
+**Files Changed:**
+- `app/settings/components/NotificationSettings.tsx` - Replaced useState with useSyncExternalStore
+- `lib/store/notificationPreferencesStore.ts` - Fixed unused variable warnings
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success, 27 routes)
+
+---
+
+## [0.5.64] - 2026-01-07
+
+### Added
+
+#### NotificationSettings i18n Internationalization (Raouf)
+
+**i18n Translation Keys:**
+
+- **Notification settings localization (Raouf)**: Added 25 new translation keys for the NotificationSettings component to support full internationalization of the push notification UI. Keys include: `pushNotificationsActive`, `pushNotificationsBlocked`, `enablePushNotifications`, `pushActiveDesc`, `pushBlockedDesc`, `pushPromptDesc`, `notificationsEnabled`, `notificationsEnabledMsg`, `permissionDenied`, `permissionDeniedMsg`, `pushNotificationsToggle`, `reminderTimingUpdated`, `reminderTimingUpdatedMsg`, `remindMe`, `before`, `on`, `off`, `reminderTimingFor`, `browserNotificationInfo`, and timing options (`timing15min`, `timing30min`, `timing1hour`, `timing2hours`, `timing1day`, `timing2days`).
+
+- **Updated NotificationSettings.tsx (Raouf)**: Replaced all hardcoded English strings with translation function calls (`t()`). Reminder timing options now use `labelKey` instead of `label` for translation lookup.
+
+**Files Changed:**
+- `locales/en/translations.json` - Added 25 new keys
+- `locales/ar/translations.json` - Arabic translations
+- `locales/bn/translations.json` - Bengali translations
+- `locales/es/translations.json` - Spanish translations
+- `locales/fa/translations.json` - Persian translations
+- `locales/fr/translations.json` - French translations
+- `locales/he/translations.json` - Hebrew translations
+- `locales/hi/translations.json` - Hindi translations
+- `locales/id/translations.json` - Indonesian translations
+- `locales/it/translations.json` - Italian translations
+- `locales/ja/translations.json` - Japanese translations
+- `locales/ko/translations.json` - Korean translations
+- `locales/ms/translations.json` - Malay translations
+- `locales/ru/translations.json` - Russian translations
+- `locales/ta/translations.json` - Tamil translations
+- `locales/th/translations.json` - Thai translations
+- `locales/ur/translations.json` - Urdu translations
+- `locales/vi/translations.json` - Vietnamese translations
+- `locales/zh/translations.json` - Chinese translations
+- `app/settings/components/NotificationSettings.tsx` - i18n integration
+
+**Verification:**
+- `npm run build` (success, 27 routes)
+
+---
+
+## [0.5.63] - 2026-01-07
+
+### Fixed
+
+#### Notification System Integration & TypeScript Fixes (Raouf)
+
+**TypeScript Fixes:**
+
+- **useNotificationScheduler type errors (Raouf)**: Fixed TypeScript errors in notification scheduler hook caused by incorrect property access on Unit type. Changed `u.classTimes` to `u.schedule` and `unit.building`/`unit.room` to `unit.location.building`/`unit.location.room` to match the actual Unit type structure.
+
+**Integration:**
+
+- **Scheduler hook integration (Raouf)**: Integrated `useNotificationScheduler()` hook into `client-layout.tsx` to enable automatic scheduling of browser push notifications for upcoming deadlines and classes based on user preferences.
+
+- **Hook export (Raouf)**: Added export for `useNotificationScheduler` from `lib/hooks/index.ts` for proper module access.
+
+**Files Changed:**
+- `lib/hooks/useNotificationScheduler.ts` - TypeScript fixes
+- `app/client-layout.tsx` - Hook integration
+- `lib/hooks/index.ts` - Export added
+
+**Verification:**
+- `npm run build` (success, 27 routes)
+
+---
+
 ## [0.5.62] - 2026-01-07
 
 ### Fixed
