@@ -1,4 +1,25 @@
 // components/layout/Sidebar.tsx
+// ============================================================================
+// SIDEBAR COMPONENT
+// ============================================================================
+// Premium expandable sidebar with hover-triggered animations on desktop
+// and slide-out drawer on mobile.
+//
+// FEATURES:
+// - Desktop: Hover to expand, animated hamburger bars, staggered menu items
+// - Mobile: Hamburger button toggles slide-out drawer with overlay
+// - Accessibility: Focus trap, keyboard navigation, ARIA attributes
+// - Performance: Memoized component, CSS-based animations (no JS animation libs)
+//
+// CSS CLASSES (defined in globals.css):
+// - .sidebar-shell      → Main container, detects :hover
+// - .sidebar-trigger    → Always-visible 48px strip with hamburger
+// - .sidebar-panel      → Sliding content panel
+// - .sidebar-bar-*      → Animated hamburger bars
+// - .sidebar-menu-item  → Navigation links with staggered animation
+// - .sidebar-logo       → Logo with bounce-in animation
+// - .sidebar-social     → Social buttons at bottom
+// ============================================================================
 'use client';
 
 import { useState, useRef, useEffect, useCallback, memo } from 'react';
@@ -12,6 +33,8 @@ import SocialButtons from './SocialButtons';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
+// Navigation items configuration
+// Each item maps to a route and displays with an icon
 const navigation: {
   name: TranslationKey;
   href: string;
@@ -24,15 +47,33 @@ const navigation: {
   { name: 'settings', href: '/settings', icon: Settings },
 ];
 
+/**
+ * Sidebar Component
+ *
+ * A responsive sidebar navigation that:
+ * - On desktop (md+): Shows a collapsed trigger strip that expands on hover
+ * - On mobile: Shows a hamburger button that opens a full slide-out drawer
+ *
+ * The component is memoized to prevent unnecessary re-renders since it
+ * only depends on pathname and translation state.
+ */
 const Sidebar = memo(() => {
   const { t } = useTranslation();
   const pathname = usePathname();
+
+  // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Refs for focus management
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
-  // Focus trap for mobile menu
+  // ============================================================================
+  // FOCUS TRAP FOR MOBILE MENU
+  // ============================================================================
+  // When mobile menu opens, trap focus within the sidebar for accessibility.
+  // Pressing Escape closes the menu, Tab cycles through focusable elements.
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
@@ -53,14 +94,14 @@ const Sidebar = memo(() => {
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Close on Escape
+      // Close on Escape key
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
-        menuButtonRef.current?.focus();
+        menuButtonRef.current?.focus(); // Return focus to trigger button
         return;
       }
 
-      // Focus trap on Tab
+      // Focus trap on Tab key
       if (e.key === 'Tab') {
         const focusable = getFocusableElements();
         if (focusable.length === 0) return;
@@ -68,10 +109,13 @@ const Sidebar = memo(() => {
         const firstElement = focusable[0];
         const lastElement = focusable[focusable.length - 1];
 
+        // Shift+Tab on first element → go to last
         if (e.shiftKey && document.activeElement === firstElement) {
           e.preventDefault();
           lastElement.focus();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
+        }
+        // Tab on last element → go to first
+        else if (!e.shiftKey && document.activeElement === lastElement) {
           e.preventDefault();
           firstElement.focus();
         }
@@ -82,7 +126,7 @@ const Sidebar = memo(() => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
-  // Close menu when clicking outside
+  // Close menu when clicking the overlay backdrop
   const handleOverlayClick = useCallback(() => {
     setMobileMenuOpen(false);
     menuButtonRef.current?.focus();
@@ -90,7 +134,12 @@ const Sidebar = memo(() => {
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* ========================================================================
+          MOBILE MENU BUTTON
+          ========================================================================
+          Fixed hamburger/X button in top-left corner on mobile devices.
+          Toggles the slide-out drawer open/closed.
+          ======================================================================== */}
       <button
         ref={menuButtonRef}
         className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center btn-premium"
@@ -102,7 +151,12 @@ const Sidebar = memo(() => {
         {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Mobile menu overlay */}
+      {/* ========================================================================
+          MOBILE OVERLAY BACKDROP
+          ========================================================================
+          Semi-transparent backdrop that appears behind the sidebar on mobile.
+          Clicking it closes the menu.
+          ======================================================================== */}
       {mobileMenuOpen && (
         <div
           className="md:hidden fixed inset-0 bg-mq-content/60 z-40 backdrop-blur-sm"
@@ -112,22 +166,32 @@ const Sidebar = memo(() => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* ========================================================================
+          SIDEBAR CONTAINER
+          ========================================================================
+          The main sidebar wrapper. On desktop, hovering this container triggers
+          all child animations via CSS :hover selectors in globals.css.
+          ======================================================================== */}
       <aside
         className="relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell"
         onMouseLeave={() => {
-          // Blur any focused element to prevent sidebar staying open
+          // Blur any focused element to prevent sidebar staying open via :focus-within
           if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur();
           }
         }}
       >
-        {/* Trigger area with hamburger bars */}
+        {/* ----------------------------------------------------------------------
+            DESKTOP TRIGGER STRIP
+            ----------------------------------------------------------------------
+            Always-visible 48px strip on the left edge with animated hamburger bars.
+            Hovering this area triggers the sidebar to expand.
+            ---------------------------------------------------------------------- */}
         <div
           aria-hidden="true"
           className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
         >
-          {/* Hamburger bars container */}
+          {/* Hamburger bars - animate on hover (expand outward) */}
           <span className="flex flex-col items-center gap-2 sidebar-bars">
             <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-top" />
             <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-mid" />
@@ -135,7 +199,12 @@ const Sidebar = memo(() => {
           </span>
         </div>
 
-        {/* Sliding panel */}
+        {/* ----------------------------------------------------------------------
+            SLIDING PANEL
+            ----------------------------------------------------------------------
+            The main sidebar content that slides in from the left on hover (desktop)
+            or when mobileMenuOpen is true (mobile).
+            ---------------------------------------------------------------------- */}
         <div
           ref={sidebarRef}
           id="mobile-sidebar"
@@ -147,7 +216,7 @@ const Sidebar = memo(() => {
             mobileMenuOpen && 'sidebar-panel-open',
           )}
         >
-          {/* Logo and branding - animated */}
+          {/* Logo - bounces in with slight overshoot */}
           <div className="mb-8 sidebar-logo">
             <Link
               href="/home"
@@ -166,7 +235,7 @@ const Sidebar = memo(() => {
             </Link>
           </div>
 
-          {/* Navigation with staggered menu items */}
+          {/* Navigation Links - staggered slide-in animation */}
           <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
             {navigation.map((item) => {
               const isActive =
@@ -200,7 +269,7 @@ const Sidebar = memo(() => {
             })}
           </nav>
 
-          {/* Social buttons at bottom - animated */}
+          {/* Social Buttons - fades in last after menu items */}
           <div className="mt-auto pt-6 border-t border-mq-border sidebar-social">
             <SocialButtons />
           </div>
@@ -210,6 +279,7 @@ const Sidebar = memo(() => {
   );
 });
 
+// Display name for React DevTools
 Sidebar.displayName = 'Sidebar';
 
 export default Sidebar;

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.78] - 2026-01-07
+
+### Changed
+
+- **Sidebar animation polish & documentation (Raouf)**: Comprehensive refactor of sidebar animation CSS with detailed comments and improved animations.
+
+**CSS Improvements (`app/globals.css`):**
+- Added ASCII architecture diagram showing component hierarchy
+- Added animation timeline documentation (0ms → 400ms breakdown)
+- Improved hamburger bar animation: bars now move ±6px (was ±4px) for more visible effect
+- Logo now uses bounce overshoot easing: `cubic-bezier(0.34, 1.56, 0.64, 1)`
+- Menu item hover now includes subtle lift: `translateY(-2px)` in addition to `translateX(6px)`
+- Added `:focus-within` selectors for keyboard accessibility alongside `:hover`
+- Section-by-section comments explaining each animation
+
+**Component Documentation (`components/layout/Sidebar.tsx`):**
+- Added file header with feature list and CSS class reference
+- Added JSDoc for the Sidebar component
+- Added inline comments for focus trap logic, overlay, and each UI section
+- Explained the memoization rationale
+
+**Files Changed:**
+- `app/globals.css` - Comprehensive sidebar animation documentation and polish
+- `components/layout/Sidebar.tsx` - Added documentation comments throughout
+
+---
+
 ## [0.5.77] - 2026-01-07
 
 ### Fixed

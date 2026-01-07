@@ -1722,15 +1722,22 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
 .settings-page [data-slot='button'][data-variant='destructive'] {
 }
 
+/* ============================================================================
+   LAYOUT MAIN CONTENT SHIFT
+   ============================================================================
+   When sidebar expands on hover, push main content to the right smoothly.
+   Uses :has() selector to detect sidebar hover state from parent.
+   ---------------------------------------------------------------------------- */
 @media (min-width: 768px) {
   .layout-main {
-    transition: margin-left 500ms cubic-bezier(0.77, 0, 0.175, 1);
+    transition: margin-left 500ms cubic-bezier(0.77, 0, 0.175, 1); /* Smooth ease-in-out */
     will-change: margin-left;
   }
 
+  /* Shift main content when sidebar is hovered or focused */
   .layout-shell:has(.sidebar-shell:hover) .layout-main,
   .layout-shell:has(.sidebar-shell:focus-within) .layout-main {
-    margin-left: calc(14rem + 12px); /* 224px (w-56) + 12px gap */
+    margin-left: calc(14rem + 12px); /* 224px (w-56 sidebar) + 12px breathing room */
   }
 }
 
@@ -1740,46 +1747,115 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
   }
 }
 
-/* ============================================
-   SIDEBAR ANIMATIONS (Non-CSS-module version)
-   Fixes hydration mismatch in Next.js 16 Turbopack
-   ============================================ */
+/* ============================================================================
+   SIDEBAR ANIMATIONS
+   ============================================================================
+   Premium expandable sidebar with hover-triggered animations.
+   
+   ARCHITECTURE:
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ .sidebar-shell (container - detects hover)                              │
+   │ ┌─────────────────────────────────────────────────────────────────────┐ │
+   │ │ .sidebar-trigger (always visible 48px strip with hamburger bars)   │ │
+   │ │ ┌─────────────────────────────────────────────────────────────────┐ │ │
+   │ │ │ .sidebar-bars > .sidebar-bar-top/mid/bottom (animated bars)    │ │ │
+   │ │ └─────────────────────────────────────────────────────────────────┘ │ │
+   │ └─────────────────────────────────────────────────────────────────────┘ │
+   │ ┌─────────────────────────────────────────────────────────────────────┐ │
+   │ │ .sidebar-panel (slides in from left on hover)                      │ │
+   │ │ ├── .sidebar-logo (fade + slide, 30ms delay)                       │ │
+   │ │ ├── .sidebar-menu-item × 5 (staggered fade + slide, 80-240ms)      │ │
+   │ │ └── .sidebar-social (fade + slide, 280ms delay)                    │ │
+   │ └─────────────────────────────────────────────────────────────────────┘ │
+   └─────────────────────────────────────────────────────────────────────────┘
+   
+   ANIMATION TIMELINE (on hover):
+   ────────────────────────────────────────────────────────────────────────────
+   0ms     Panel starts sliding in (400ms duration)
+   30ms    Logo fades in
+   80ms    Menu item 1 slides in
+   120ms   Menu item 2 slides in
+   160ms   Menu item 3 slides in
+   200ms   Menu item 4 slides in
+   240ms   Menu item 5 slides in
+   280ms   Social section fades in
+   400ms   Panel fully open
+   ────────────────────────────────────────────────────────────────────────────
+   
+   NOTES:
+   - Uses non-CSS-module classes to prevent hydration mismatch in Next.js 16
+   - Hamburger bars expand outward to hint at expandable panel
+   - All timings use cubic-bezier(0.4, 0, 0.2, 1) for natural Material motion
+   - pointer-events toggled to prevent accidental clicks during animation
+   ============================================================================ */
 
+/* ----------------------------------------------------------------------------
+   SIDEBAR SHELL - Main Container
+   The outer wrapper that detects :hover state for all child animations.
+   ---------------------------------------------------------------------------- */
 .sidebar-shell {
   position: relative;
   height: 100vh;
-  height: 100dvh;
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
 }
 
-/* Desktop sidebar animations */
+/* ============================================================================
+   DESKTOP SIDEBAR ANIMATIONS (768px and up)
+   ============================================================================ */
 @media (min-width: 768px) {
+  /* --------------------------------------------------------------------------
+     SLIDING PANEL
+     The main sidebar content area that slides in from the left.
+     Default state: hidden behind the trigger strip (only 48px visible).
+     -------------------------------------------------------------------------- */
   .sidebar-panel {
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     height: 100dvh;
+    /* Hide panel, leaving only 48px (w-12) trigger strip visible */
     transform: translateX(calc(-100% + 48px));
+    /* Smooth slide with slight deceleration at end */
     transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* Prevent clicks on hidden panel */
     pointer-events: none;
   }
 
+  /* --------------------------------------------------------------------------
+     TRIGGER STRIP
+     The always-visible 48px strip with hamburger icon.
+     Acts as hover target and visual affordance.
+     -------------------------------------------------------------------------- */
   .sidebar-trigger {
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     height: 100dvh;
-    pointer-events: auto;
+    pointer-events: auto; /* Always clickable/hoverable */
     cursor: pointer;
   }
 
-  .sidebar-shell:hover .sidebar-panel {
+  /* Panel expands on shell hover */
+  .sidebar-shell:hover .sidebar-panel,
+  .sidebar-shell:focus-within .sidebar-panel {
     transform: translateX(0);
-    pointer-events: auto;
+    pointer-events: auto; /* Enable clicks when visible */
   }
 
-  /* Hamburger bars animation */
+  /* --------------------------------------------------------------------------
+     HAMBURGER BARS ANIMATION
+     Three vertical bars that expand outward on hover to indicate
+     the sidebar will expand. Creates a "breathing" effect.
+     
+     Default:  ║   On hover:  │
+               ║              │ (top moves up)
+               ║              │
+               ║              │ (mid stretches)
+               ║              │
+               ║              │ (bottom moves down)
+     -------------------------------------------------------------------------- */
   .sidebar-bars {
     transition: opacity 250ms ease-out;
   }
@@ -1793,36 +1869,51 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
     transform-origin: center;
   }
 
-  .sidebar-shell:hover .sidebar-bar-top {
-    transform: translateY(-4px);
+  /* Top bar moves UP on hover */
+  .sidebar-shell:hover .sidebar-bar-top,
+  .sidebar-shell:focus-within .sidebar-bar-top {
+    transform: translateY(-6px);
   }
 
-  .sidebar-shell:hover .sidebar-bar-bottom {
-    transform: translateY(4px);
+  /* Bottom bar moves DOWN on hover */
+  .sidebar-shell:hover .sidebar-bar-bottom,
+  .sidebar-shell:focus-within .sidebar-bar-bottom {
+    transform: translateY(6px);
   }
 
-  .sidebar-shell:hover .sidebar-bar-mid {
-    transform: scaleY(1.5);
+  /* Middle bar stretches vertically on hover */
+  .sidebar-shell:hover .sidebar-bar-mid,
+  .sidebar-shell:focus-within .sidebar-bar-mid {
+    transform: scaleY(1.8);
   }
 
-  /* Menu items staggered slide-in */
+  /* --------------------------------------------------------------------------
+     MENU ITEMS - Staggered Slide Animation
+     Each nav link slides in from left with increasing delay.
+     Creates a cascading "waterfall" entrance effect.
+     -------------------------------------------------------------------------- */
   .sidebar-menu-item {
+    /* Hidden state: shifted left and invisible */
     transform: translateX(-20px);
     opacity: 0;
+    /* Multiple transitions with different timings */
     transition:
       transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
       opacity 300ms ease-out,
       background-color 150ms ease,
-      color 150ms ease,
+      /* For hover state changes */ color 150ms ease,
       box-shadow 150ms ease;
     will-change: transform, opacity;
   }
 
-  .sidebar-shell:hover .sidebar-menu-item {
+  /* Visible state on shell hover */
+  .sidebar-shell:hover .sidebar-menu-item,
+  .sidebar-shell:focus-within .sidebar-menu-item {
     transform: translateX(0);
     opacity: 1;
   }
 
+  /* Staggered delays: 80ms between each item for waterfall effect */
   .sidebar-menu-item:nth-of-type(1) {
     transition-delay: 80ms, 80ms, 0ms, 0ms, 0ms;
   }
@@ -1839,64 +1930,87 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
     transition-delay: 240ms, 240ms, 0ms, 0ms, 0ms;
   }
 
-  .sidebar-shell:not(:hover) .sidebar-menu-item {
+  /* Instant hide on mouse leave (no stagger delay) */
+  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-menu-item {
     transition-delay: 0ms;
   }
 
+  /* Individual item hover: subtle lift effect */
   .sidebar-menu-item:hover {
-    transform: translateX(6px) !important;
+    transform: translateX(6px) translateY(-2px) !important;
   }
 
-  /* Logo animation */
+  /* --------------------------------------------------------------------------
+     LOGO ANIMATION
+     Fades and slides in early (30ms delay) to establish branding first.
+     -------------------------------------------------------------------------- */
   .sidebar-logo {
-    transform: translateX(-10px);
+    transform: translateX(-10px) scale(0.95);
     opacity: 0;
     transition:
-      transform 350ms cubic-bezier(0.4, 0, 0.2, 1) 30ms,
-      opacity 300ms ease-out 30ms;
+      transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      /* Bounce overshoot */ opacity 300ms ease-out;
+    transition-delay: 30ms;
   }
 
-  .sidebar-shell:hover .sidebar-logo {
-    transform: translateX(0);
+  .sidebar-shell:hover .sidebar-logo,
+  .sidebar-shell:focus-within .sidebar-logo {
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover) .sidebar-logo {
+  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-logo {
     transition-delay: 0ms;
   }
 
-  /* Social section animation */
+  /* --------------------------------------------------------------------------
+     SOCIAL SECTION ANIMATION
+     Fades in last (280ms delay) after all menu items are visible.
+     -------------------------------------------------------------------------- */
   .sidebar-social {
     transform: translateX(-10px);
     opacity: 0;
     transition:
-      transform 350ms cubic-bezier(0.4, 0, 0.2, 1) 280ms,
-      opacity 300ms ease-out 280ms;
+      transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 300ms ease-out;
+    transition-delay: 280ms;
   }
 
-  .sidebar-shell:hover .sidebar-social {
+  .sidebar-shell:hover .sidebar-social,
+  .sidebar-shell:focus-within .sidebar-social {
     transform: translateX(0);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover) .sidebar-social {
+  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-social {
     transition-delay: 0ms;
   }
 }
 
-/* Mobile panel animation */
+/* ============================================================================
+   MOBILE SIDEBAR ANIMATIONS (below 768px)
+   ============================================================================
+   On mobile, sidebar is toggled by hamburger button (not hover).
+   Uses .sidebar-panel-open class added via JavaScript.
+   ---------------------------------------------------------------------------- */
 @media (max-width: 767px) {
   .sidebar-panel {
-    transform: translateX(-100%);
-    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateX(-100%); /* Fully hidden off-screen */
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1); /* Smooth ease-out */
   }
 
+  /* Open state triggered by mobileMenuOpen state in React */
   .sidebar-panel-open {
     transform: translateX(0);
   }
 }
 
-/* Reduced motion */
+/* ============================================================================
+   REDUCED MOTION ACCESSIBILITY
+   ============================================================================
+   Respects user's system preference for reduced motion.
+   Disables all animations but maintains visibility states.
+   ---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .sidebar-bars,
   .sidebar-bar-top,
@@ -1910,6 +2024,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
     transform: none !important;
   }
 
+  /* Ensure visibility without animation */
   .sidebar-bars {
     opacity: 1 !important;
   }
@@ -1920,6 +2035,7 @@ html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-conte
     opacity: 1 !important;
   }
 
+  /* Mobile panel positioning without animation */
   .sidebar-panel:not(.sidebar-panel-open) {
     transform: translateX(-100%) !important;
   }

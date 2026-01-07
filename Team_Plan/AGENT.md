@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.77 | Last Updated: January 07, 2026
+Version: 0.5.78 | Last Updated: January 07, 2026
 
 ---
 
@@ -56,6 +56,13 @@ Version: 0.5.77 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Sidebar Animation Polish & Documentation (v0.5.78)
+- **Comprehensive CSS comments (Raouf)**: Added detailed documentation to sidebar animations in `globals.css` including ASCII architecture diagram, animation timeline, and section-by-section explanations.
+- **Animation polish (Raouf)**: Improved hamburger bar animation (bars now move ±6px instead of ±4px), logo now has bounce overshoot effect using `cubic-bezier(0.34, 1.56, 0.64, 1)`, menu item hover now includes subtle lift (`translateY(-2px)`).
+- **Focus-within support (Raouf)**: Added `:focus-within` selectors alongside `:hover` for keyboard accessibility.
+- **Component documentation (Raouf)**: Added comprehensive JSDoc and inline comments to `Sidebar.tsx` explaining architecture, features, and each section's purpose.
+- **Files changed**: `app/globals.css`, `components/layout/Sidebar.tsx`.
 
 #### ✅ Supabase Publishable Key Support (v0.5.77)
 - **sb_ key format support (Raouf)**: Updated `proxy.ts` validation to accept both JWT keys (`eyJ...`) and new Supabase publishable keys (`sb_...`). Previously only JWT format was accepted, causing false "demo mode" warnings for valid `sb_publishable_` keys.
