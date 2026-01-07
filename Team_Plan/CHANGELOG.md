@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.79] - 2026-01-08
+
+### Fixed
+
+#### Settings Page i18n Translations Completion (Raouf)
+
+- **Password strength indicator i18n (Raouf)**: Added 4 new translation keys for password strength levels:
+  - `passwordWeak` - "Weak password"
+  - `passwordFair` - "Fair password"
+  - `passwordGood` - "Good password"
+  - `passwordStrong` - "Strong password"
+
+- **Security messages i18n (Raouf)**: Added 3 new translation keys for security and privacy:
+  - `tooManyAttempts` - "Too many attempts. Please try again in 15 minutes."
+  - `privacyPolicyDesc` - "View our privacy policy"
+  - `exportWarning` - Warning message about exported file containing personal data
+
+- **Complete localization (Raouf)**: Added all 7 new keys to all 18 language locales:
+  - Vietnamese (vi), Russian (ru), Tamil (ta), Bengali (bn), Indonesian (id), Malay (ms), Italian (it), French (fr), Hebrew (he)
+  - All 9 previously missing languages now have complete Settings page translations
+
+**Files Changed:**
+- `locales/vi/translations.json` - Vietnamese translations
+- `locales/ru/translations.json` - Russian translations
+- `locales/ta/translations.json` - Tamil translations
+- `locales/bn/translations.json` - Bengali translations
+- `locales/id/translations.json` - Indonesian translations
+- `locales/ms/translations.json` - Malay translations
+- `locales/it/translations.json` - Italian translations
+- `locales/fr/translations.json` - French translations
+- `locales/he/translations.json` - Hebrew translations
+
+**Verification:**
+- `npm run build` (success, 27 routes)
+- `npm test` (119/119 tests passing)
+
+---
+
 ## [0.5.78] - 2026-01-07
 
 ### Changed

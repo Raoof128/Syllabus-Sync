@@ -669,5 +669,12 @@
   "newPassword": "Mật khẩu mới",
   "confirmNewPassword": "Xác nhận mật khẩu mới",
   "changePasswordTitle": "Đổi mật khẩu",
-  "changePasswordDialogDesc": "Nhập mật khẩu hiện tại và chọn mật khẩu mới"
+  "changePasswordDialogDesc": "Nhập mật khẩu hiện tại và chọn mật khẩu mới",
+  "passwordWeak": "Mật khẩu yếu",
+  "passwordFair": "Mật khẩu trung bình",
+  "passwordGood": "Mật khẩu tốt",
+  "passwordStrong": "Mật khẩu mạnh",
+  "tooManyAttempts": "Quá nhiều lần thử. Vui lòng thử lại sau 15 phút.",
+  "privacyPolicyDesc": "Xem chính sách bảo mật của chúng tôi",
+  "exportWarning": "Tệp xuất sẽ chứa tất cả dữ liệu cá nhân của bạn bao gồm môn học, hạn nộp và tùy chọn. Giữ tệp này an toàn và không chia sẻ với người khác."
 }

@@ -669,5 +669,12 @@
   "newPassword": "Nuova Password",
   "confirmNewPassword": "Conferma Nuova Password",
   "changePasswordTitle": "Cambia Password",
-  "changePasswordDialogDesc": "Inserisci la password attuale e scegline una nuova"
+  "changePasswordDialogDesc": "Inserisci la password attuale e scegline una nuova",
+  "passwordWeak": "Password debole",
+  "passwordFair": "Password discreta",
+  "passwordGood": "Password buona",
+  "passwordStrong": "Password forte",
+  "tooManyAttempts": "Troppi tentativi. Riprova tra 15 minuti.",
+  "privacyPolicyDesc": "Visualizza la nostra informativa sulla privacy",
+  "exportWarning": "Il file esportato conterrà tutti i tuoi dati personali inclusi corsi, scadenze e preferenze. Mantieni questo file al sicuro e non condividerlo con altri."
 }

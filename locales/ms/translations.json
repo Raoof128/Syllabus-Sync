@@ -669,5 +669,12 @@
   "newPassword": "Kata Laluan Baharu",
   "confirmNewPassword": "Sahkan Kata Laluan Baharu",
   "changePasswordTitle": "Tukar Kata Laluan",
-  "changePasswordDialogDesc": "Masukkan kata laluan semasa dan pilih yang baharu"
+  "changePasswordDialogDesc": "Masukkan kata laluan semasa dan pilih yang baharu",
+  "passwordWeak": "Kata laluan lemah",
+  "passwordFair": "Kata laluan sederhana",
+  "passwordGood": "Kata laluan baik",
+  "passwordStrong": "Kata laluan kuat",
+  "tooManyAttempts": "Terlalu banyak percubaan. Sila cuba lagi dalam 15 minit.",
+  "privacyPolicyDesc": "Lihat dasar privasi kami",
+  "exportWarning": "Fail yang dieksport akan mengandungi semua data peribadi anda termasuk unit, tarikh akhir dan pilihan. Simpan fail ini dengan selamat dan jangan kongsi dengan orang lain."
 }

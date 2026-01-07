@@ -669,5 +669,12 @@
   "newPassword": "新密码",
   "confirmNewPassword": "确认新密码",
   "changePasswordTitle": "更改密码",
-  "changePasswordDialogDesc": "输入当前密码并选择新密码"
+  "changePasswordDialogDesc": "输入当前密码并选择新密码",
+  "passwordWeak": "密码强度弱",
+  "passwordFair": "密码强度一般",
+  "passwordGood": "密码强度良好",
+  "passwordStrong": "密码强度高",
+  "tooManyAttempts": "尝试次数过多。请15分钟后重试。",
+  "privacyPolicyDesc": "查看我们的隐私政策",
+  "exportWarning": "导出的文件将包含您的所有个人数据，包括课程、截止日期和偏好设置。请妥善保管此文件，不要与他人分享。"
 }

@@ -669,5 +669,12 @@
   "newPassword": "새 비밀번호",
   "confirmNewPassword": "새 비밀번호 확인",
   "changePasswordTitle": "비밀번호 변경",
-  "changePasswordDialogDesc": "현재 비밀번호를 입력하고 새 비밀번호를 선택하세요"
+  "changePasswordDialogDesc": "현재 비밀번호를 입력하고 새 비밀번호를 선택하세요",
+  "passwordWeak": "약한 비밀번호",
+  "passwordFair": "보통 비밀번호",
+  "passwordGood": "좋은 비밀번호",
+  "passwordStrong": "강한 비밀번호",
+  "tooManyAttempts": "시도 횟수가 너무 많습니다. 15분 후에 다시 시도해 주세요.",
+  "privacyPolicyDesc": "개인정보 보호정책 보기",
+  "exportWarning": "내보낸 파일에는 유닛, 마감일, 환경 설정을 포함한 모든 개인 데이터가 포함됩니다. 이 파일을 안전하게 보관하고 다른 사람과 공유하지 마세요."
 }

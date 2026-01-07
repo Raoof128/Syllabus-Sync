@@ -669,5 +669,12 @@
   "newPassword": "Nouveau mot de passe",
   "confirmNewPassword": "Confirmer le nouveau mot de passe",
   "changePasswordTitle": "Changer le mot de passe",
-  "changePasswordDialogDesc": "Entrez votre mot de passe actuel et choisissez-en un nouveau"
+  "changePasswordDialogDesc": "Entrez votre mot de passe actuel et choisissez-en un nouveau",
+  "passwordWeak": "Mot de passe faible",
+  "passwordFair": "Mot de passe moyen",
+  "passwordGood": "Bon mot de passe",
+  "passwordStrong": "Mot de passe fort",
+  "tooManyAttempts": "Trop de tentatives. Veuillez réessayer dans 15 minutes.",
+  "privacyPolicyDesc": "Voir notre politique de confidentialité",
+  "exportWarning": "Le fichier exporté contiendra toutes vos données personnelles, y compris les cours, les échéances et les préférences. Gardez ce fichier en sécurité et ne le partagez pas avec d'autres."
 }

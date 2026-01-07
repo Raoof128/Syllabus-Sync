@@ -679,5 +679,12 @@
   "newPassword": "Nueva Contraseña",
   "confirmNewPassword": "Confirmar Nueva Contraseña",
   "changePasswordTitle": "Cambiar Contraseña",
-  "changePasswordDialogDesc": "Ingrese su contraseña actual y elija una nueva"
+  "changePasswordDialogDesc": "Ingrese su contraseña actual y elija una nueva",
+  "passwordWeak": "Contraseña débil",
+  "passwordFair": "Contraseña aceptable",
+  "passwordGood": "Contraseña buena",
+  "passwordStrong": "Contraseña segura",
+  "tooManyAttempts": "Demasiados intentos. Por favor, inténtelo de nuevo en 15 minutos.",
+  "privacyPolicyDesc": "Ver nuestra política de privacidad",
+  "exportWarning": "El archivo exportado contendrá todos sus datos personales, incluyendo unidades, fechas límite y preferencias. Mantenga este archivo seguro y no lo comparta con otros."
 }

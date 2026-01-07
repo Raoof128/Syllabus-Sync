@@ -669,5 +669,12 @@
   "newPassword": "新しいパスワード",
   "confirmNewPassword": "新しいパスワードの確認",
   "changePasswordTitle": "パスワードを変更",
-  "changePasswordDialogDesc": "現在のパスワードを入力し、新しいパスワードを選択してください"
+  "changePasswordDialogDesc": "現在のパスワードを入力し、新しいパスワードを選択してください",
+  "passwordWeak": "弱いパスワード",
+  "passwordFair": "まあまあのパスワード",
+  "passwordGood": "良いパスワード",
+  "passwordStrong": "強いパスワード",
+  "tooManyAttempts": "試行回数が多すぎます。15分後にもう一度お試しください。",
+  "privacyPolicyDesc": "プライバシーポリシーを見る",
+  "exportWarning": "エクスポートされたファイルには、ユニット、締め切り、設定を含むすべての個人データが含まれます。このファイルを安全に保管し、他の人と共有しないでください。"
 }

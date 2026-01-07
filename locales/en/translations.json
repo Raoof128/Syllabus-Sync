@@ -686,5 +686,12 @@
   "toggleNewPasswordVisibility": "Toggle new password visibility",
   "toggleConfirmPasswordVisibility": "Toggle confirm password visibility",
   "addFilter": "Add {{filter}} filter",
-  "removeFilter": "Remove {{filter}} filter"
+  "removeFilter": "Remove {{filter}} filter",
+  "passwordWeak": "Weak password",
+  "passwordFair": "Fair password",
+  "passwordGood": "Good password",
+  "passwordStrong": "Strong password",
+  "tooManyAttempts": "Too many attempts. Please try again in 15 minutes.",
+  "privacyPolicyDesc": "View our privacy policy",
+  "exportWarning": "The exported file will contain all your personal data including units, deadlines, and preferences. Keep this file secure and do not share it with others."
 }

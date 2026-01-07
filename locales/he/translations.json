@@ -669,5 +669,12 @@
   "newPassword": "סיסמה חדשה",
   "confirmNewPassword": "אשר סיסמה חדשה",
   "changePasswordTitle": "שנה סיסמה",
-  "changePasswordDialogDesc": "הזן את הסיסמה הנוכחית ובחר סיסמה חדשה"
+  "changePasswordDialogDesc": "הזן את הסיסמה הנוכחית ובחר סיסמה חדשה",
+  "passwordWeak": "סיסמה חלשה",
+  "passwordFair": "סיסמה בינונית",
+  "passwordGood": "סיסמה טובה",
+  "passwordStrong": "סיסמה חזקה",
+  "tooManyAttempts": "יותר מדי ניסיונות. נסה שוב בעוד 15 דקות.",
+  "privacyPolicyDesc": "צפה במדיניות הפרטיות שלנו",
+  "exportWarning": "הקובץ המיוצא יכיל את כל הנתונים האישיים שלך כולל קורסים, דדליינים והעדפות. שמור על קובץ זה בטוח ואל תשתף אותו עם אחרים."
 }

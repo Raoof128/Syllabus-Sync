@@ -669,5 +669,12 @@
   "newPassword": "نیا پاس ورڈ",
   "confirmNewPassword": "نیا پاس ورڈ تصدیق کریں",
   "changePasswordTitle": "پاس ورڈ تبدیل کریں",
-  "changePasswordDialogDesc": "موجودہ پاس ورڈ درج کریں اور نیا منتخب کریں"
+  "changePasswordDialogDesc": "موجودہ پاس ورڈ درج کریں اور نیا منتخب کریں",
+  "passwordWeak": "کمزور پاس ورڈ",
+  "passwordFair": "ٹھیک پاس ورڈ",
+  "passwordGood": "اچھا پاس ورڈ",
+  "passwordStrong": "مضبوط پاس ورڈ",
+  "tooManyAttempts": "بہت زیادہ کوششیں۔ براہ کرم 15 منٹ بعد دوبارہ کوشش کریں۔",
+  "privacyPolicyDesc": "ہماری رازداری کی پالیسی دیکھیں",
+  "exportWarning": "برآمد شدہ فائل میں آپ کا تمام ذاتی ڈیٹا شامل ہوگا جس میں یونٹس، ڈیڈ لائنز اور ترجیحات شامل ہیں۔ اس فائل کو محفوظ رکھیں اور دوسروں کے ساتھ شیئر نہ کریں۔"
 }

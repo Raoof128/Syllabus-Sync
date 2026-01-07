@@ -669,5 +669,12 @@
   "newPassword": "Kata Sandi Baru",
   "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
   "changePasswordTitle": "Ubah Kata Sandi",
-  "changePasswordDialogDesc": "Masukkan kata sandi saat ini dan pilih yang baru"
+  "changePasswordDialogDesc": "Masukkan kata sandi saat ini dan pilih yang baru",
+  "passwordWeak": "Kata sandi lemah",
+  "passwordFair": "Kata sandi cukup",
+  "passwordGood": "Kata sandi baik",
+  "passwordStrong": "Kata sandi kuat",
+  "tooManyAttempts": "Terlalu banyak percobaan. Silakan coba lagi dalam 15 menit.",
+  "privacyPolicyDesc": "Lihat kebijakan privasi kami",
+  "exportWarning": "File yang diekspor akan berisi semua data pribadi Anda termasuk mata kuliah, deadline, dan preferensi. Simpan file ini dengan aman dan jangan bagikan kepada orang lain."
 }

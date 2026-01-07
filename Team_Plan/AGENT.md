@@ -948,6 +948,12 @@ MIT License - See LICENSE file for details.
 
 ---
 
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Settings page i18n translations completion.
+Summary: Completed internationalization of Settings page by adding 7 new translation keys (passwordWeak, passwordFair, passwordGood, passwordStrong, tooManyAttempts, privacyPolicyDesc, exportWarning) to all 18 language locales. All 9 remaining languages (vi, ru, ta, bn, id, ms, it, fr, he) now have complete translations for the Settings page password strength indicator, rate limit error message, privacy policy link, and data export warning.
+Files changed: locales/vi/translations.json; locales/ru/translations.json; locales/ta/translations.json; locales/bn/translations.json; locales/id/translations.json; locales/ms/translations.json; locales/it/translations.json; locales/fr/translations.json; locales/he/translations.json.
+Verification: npm run build (pass); npm test (119/119 pass); all Settings page strings now properly internationalized.
+
 ### Raouf: 2026-01-07 (Australia/Sydney)
 Scope: Geolocation error handling fix.
 Summary: Fixed console error spam for expected geolocation permission denials. Permission denied errors (code 1) including "Geolocation has been disabled by permissions policy" are now silently handled since they're expected browser behavior when user blocks location or when running in restricted iframes. Only unexpected errors (position unavailable, timeout) are logged to errorHandler. This prevents confusing console errors during normal operation.
