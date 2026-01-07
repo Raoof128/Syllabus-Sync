@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.70] - 2026-01-07
+
+### Fixed
+
+#### Sidebar Hydration Mismatch Fix (Raouf)
+
+**CSS Module Hydration Issue:**
+
+- **Mounted state pattern (Raouf)**: Fixed React hydration mismatch error in Sidebar component caused by CSS module class name differences between server and client rendering (Next.js 16 Turbopack). CSS module classes are now only applied after component mounts, ensuring server and client render identical HTML.
+
+**Implementation Details:**
+- Added `mounted` state that starts `false` and becomes `true` after first render
+- CSS module classes (`styles.panel`, `styles.panelMobile`, etc.) are conditionally applied only when `mounted` is true
+- Before mount, mobile sidebar uses Tailwind `-translate-x-full` to stay hidden
+- Hamburger animation classes, menu item animations, and social section animations all deferred to client-side
+
+**Files Changed:**
+- `components/layout/Sidebar.tsx` - Added mounted state pattern for hydration safety
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success, 27 routes)
+- `npm run test` (46/46 tests passing)
+
+---
+
 ## [0.5.69] - 2026-01-07
 
 ### Fixed
