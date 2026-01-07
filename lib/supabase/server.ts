@@ -4,6 +4,9 @@ import { cookies } from 'next/headers';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
+// One-time warning flag to prevent console spam
+let serverWarningShown = false;
+
 // Check if Supabase is properly configured (not placeholder values)
 function isSupabaseConfigured(): boolean {
   // Check URL is valid
@@ -13,10 +16,10 @@ function isSupabaseConfigured(): boolean {
     !supabaseUrl.includes('your-project-id')
   );
 
-  // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ"
+  // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ" or publishable keys starting with "sb_"
   const hasValidKey = !!(
     supabaseAnonKey &&
-    supabaseAnonKey.startsWith('eyJ') &&
+    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
     supabaseAnonKey !== 'your-anon-key-here' &&
     !supabaseAnonKey.includes('PASTE')
   );
@@ -26,10 +29,13 @@ function isSupabaseConfigured(): boolean {
 
 export async function createServerClient() {
   if (!isSupabaseConfigured()) {
-    console.warn(
-      '⚠️ Supabase not configured for server. Auth features disabled.\n' +
-      'To enable auth, update .env.local with your Supabase credentials.'
-    );
+    if (!serverWarningShown) {
+      console.warn(
+        '⚠️ Supabase not configured for server. Auth features disabled.\n' +
+          'To enable auth, update .env.local with your Supabase credentials.'
+      );
+      serverWarningShown = true;
+    }
     // Return a mock client for demo mode
     return {
       auth: {

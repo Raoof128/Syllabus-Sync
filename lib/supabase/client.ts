@@ -3,6 +3,12 @@ import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ss
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
+// One-time warning flag to prevent console spam
+let browserWarningShown = false;
+
+// Singleton pattern to prevent multiple client instances
+let browserClient: ReturnType<typeof createSupabaseBrowserClient> | null = null;
+
 // Check if Supabase is properly configured (not placeholder values)
 export function isSupabaseConfigured(): boolean {
   // Check URL is valid
@@ -24,12 +30,20 @@ export function isSupabaseConfigured(): boolean {
 }
 
 export function createBrowserClient() {
+  // Return existing singleton if available (browser only)
+  if (typeof window !== 'undefined' && browserClient) {
+    return browserClient;
+  }
+
   if (!isSupabaseConfigured()) {
-    console.warn(
-      '⚠️ Supabase not configured. Auth features disabled.\n' +
-      'To enable auth, update .env.local with your Supabase credentials from:\n' +
-      'https://supabase.com/dashboard/project/_/settings/api'
-    );
+    if (!browserWarningShown) {
+      console.warn(
+        '⚠️ Supabase not configured. Auth features disabled.\n' +
+          'To enable auth, update .env.local with your Supabase credentials from:\n' +
+          'https://supabase.com/dashboard/project/_/settings/api'
+      );
+      browserWarningShown = true;
+    }
     // Return a mock client that provides meaningful errors for auth operations
     return {
       auth: {
@@ -69,5 +83,12 @@ export function createBrowserClient() {
     } as unknown as ReturnType<typeof createSupabaseBrowserClient>;
   }
 
-  return createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
+  const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
+
+  // Store as singleton in browser environment
+  if (typeof window !== 'undefined') {
+    browserClient = client;
+  }
+
+  return client;
 }

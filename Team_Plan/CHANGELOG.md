@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.69] - 2026-01-07
+
+### Fixed
+
+#### Supabase Client & Service Worker Fixes (Raouf)
+
+**Supabase `sb_` Key Format Support:**
+
+- **Server client fix (Raouf)**: Updated `lib/supabase/server.ts` to support new Supabase publishable key format (`sb_` prefix) in addition to legacy JWT format (`eyJ` prefix). This fixes Supabase configuration detection when using newer project keys.
+
+- **One-time warning flag (Raouf)**: Added `serverWarningShown` flag to `lib/supabase/server.ts` to prevent console spam from repeated "Supabase not configured" warnings during development.
+
+- **Browser client singleton (Raouf)**: Implemented singleton pattern in `lib/supabase/client.ts` to prevent multiple Supabase client instances. Added `browserWarningShown` flag to reduce console noise.
+
+**Service Worker Fix:**
+
+- **Manifest path fix (Raouf)**: Updated `public/sw.js` to request `/manifest.webmanifest` instead of `/manifest.json`, eliminating 404 errors in the console.
+
+**Files Changed:**
+- `lib/supabase/server.ts` - Added `sb_` key support + one-time warning
+- `lib/supabase/client.ts` - Added singleton pattern + one-time warning
+- `public/sw.js` - Fixed manifest path
+- `package.json` - Version bump to 0.5.69
+- `lib/config.ts` - Version bump to 0.5.69
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success)
+- `npm run test` (all tests passing)
+
+---
+
 ## [0.5.68] - 2026-01-07
 
 ### Fixed

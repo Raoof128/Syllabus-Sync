@@ -11,7 +11,7 @@ const STATIC_ASSETS = [
   '/settings',
   '/feed',
   '/map',
-  '/manifest.json',
+  '/manifest.webmanifest',
   '/favicon.ico',
 ];
 
