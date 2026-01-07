@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.76] - 2026-01-07
+
+### Fixed
+
+- **Zustand hydration mismatch - root cause fix (Raouf)**: Finally resolved the persistent React hydration mismatch in Sidebar by implementing Zustand's `skipHydration` pattern. The root cause was that `useLanguageStore` (which persists to localStorage) was automatically hydrating on client mount before React's first render, causing `t('mainNavigation')` and other translated strings to differ between SSR (always 'en') and CSR (stored language from localStorage).
+
+**Solution:**
+- Added `skipHydration: true` to the persist middleware configuration to prevent automatic localStorage hydration
+- Added `_hasHydrated` state and `onRehydrateStorage` callback for hydration tracking
+- Updated `useTranslation` hook to manually trigger `rehydrate()` in a `useEffect` after first render
+- This ensures SSR and initial client render always use the default 'en' language, then updates to stored language after hydration
+
+**Files Changed:**
+- `lib/store/languageStore.ts` - Added skipHydration, _hasHydrated tracking, onRehydrateStorage callback
+- `lib/hooks/useTranslation.ts` - Added manual rehydration trigger, exposed hasHydrated
+
+---
+
 ## [0.5.75] - 2026-01-07
 
 ### Fixed

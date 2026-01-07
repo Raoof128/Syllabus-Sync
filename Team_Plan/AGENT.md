@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.75 | Last Updated: January 07, 2026
+Version: 0.5.76 | Last Updated: January 07, 2026
 
 ---
 
@@ -56,6 +56,11 @@ Version: 0.5.75 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Zustand Hydration Fix (v0.5.76)
+- **skipHydration pattern (Raouf)**: Fixed persistent React hydration mismatch in Sidebar by implementing Zustand's `skipHydration` pattern for `useLanguageStore`. The root cause was localStorage hydration happening before React's first render, causing `t('mainNavigation')` and other translated aria-labels to differ between SSR (default 'en') and CSR (stored language).
+- **Controlled rehydration (Raouf)**: Added manual rehydration trigger in `useTranslation` hook via `useEffect` to ensure consistent initial render.
+- **Files changed**: `lib/store/languageStore.ts` (added skipHydration, _hasHydrated tracking), `lib/hooks/useTranslation.ts` (added rehydration trigger, exposed hasHydrated).
 
 #### ✅ Map Features Activated (v0.5.71)
 - **Feature status update (Raouf)**: All 3 map features (Turn-by-Turn Navigation, Live Location, Advanced Search) are now marked as "Active" instead of "Coming Soon".

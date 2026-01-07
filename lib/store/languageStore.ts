@@ -6,6 +6,8 @@ interface LanguageState {
   language: Language;
   setLanguage: (language: Language) => void;
   isRTL: boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useLanguageStore = create<LanguageState>()(
@@ -13,6 +15,8 @@ export const useLanguageStore = create<LanguageState>()(
     (set) => ({
       language: 'en',
       isRTL: false,
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
       setLanguage: (language) =>
         set({
           language,
@@ -23,6 +27,11 @@ export const useLanguageStore = create<LanguageState>()(
       name: 'language-storage',
       storage: createJSONStorage(() => localStorage),
       version: 1,
+      // Skip automatic hydration - we'll control it manually to prevent hydration mismatch
+      skipHydration: true,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );
