@@ -162,7 +162,7 @@ const ProfileCard = React.memo(
                 >
                   <span
                     className={cn(
-                      'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
                       profile.preferences.notifications ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />
@@ -186,7 +186,7 @@ const ProfileCard = React.memo(
                 >
                   <span
                     className={cn(
-                      'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
                       profile.preferences.emailReminders ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />
@@ -212,7 +212,7 @@ const ProfileCard = React.memo(
                 >
                   <span
                     className={cn(
-                      'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
                       profile.preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />

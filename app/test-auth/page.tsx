@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { Button } from '@/components/ui/mq/button';
 
 export default function TestAuthPage() {
   const { t } = useTranslation();
@@ -73,33 +74,21 @@ export default function TestAuthPage() {
       <h1 className="text-2xl font-bold mb-4">{t('authenticationApiTest')}</h1>
 
       <div className="space-x-4 mb-8">
-        <button
-          onClick={testSignup}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-        >
+        <Button onClick={testSignup} disabled={loading} variant="primary">
           {t('testSignup')}
-        </button>
+        </Button>
 
-        <button
-          onClick={testSignin}
-          disabled={loading}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-        >
+        <Button onClick={testSignin} disabled={loading} variant="secondary">
           {t('testSignin')}
-        </button>
+        </Button>
 
-        <button
-          onClick={testUser}
-          disabled={loading}
-          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
-        >
+        <Button onClick={testUser} disabled={loading} variant="outline">
           {t('testUser')}
-        </button>
+        </Button>
       </div>
 
       {result && (
-        <div className="bg-gray-100 p-4 rounded">
+        <div className="bg-mq-background-secondary p-4 rounded-mq">
           <h2 className="font-bold mb-2">{t('resultAction', { action: result.action })}</h2>
           <pre className="text-sm overflow-auto">{JSON.stringify(result, null, 2)}</pre>
         </div>

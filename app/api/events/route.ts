@@ -17,23 +17,25 @@ const eventSchema = z.object({
   createdAt: z.date().optional(),
 });
 
-export async function GET() {
-  try {
-    const supabase = await createServerClient();
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .order('event_date', { ascending: true });
+export async function GET(request: Request) {
+  return requireAuth(request, async (_userId) => {
+    try {
+      const supabase = await createServerClient();
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
 
-    if (error) {
-      return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+      if (error) {
+        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+      }
+
+      return jsonSuccess(data?.map(mapEventRow) ?? []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return jsonError('Failed to fetch events', 500, ERROR_CODES.INTERNAL_ERROR);
     }
-
-    return jsonSuccess(data?.map(mapEventRow) ?? []);
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    return jsonError('Failed to fetch events', 500, ERROR_CODES.INTERNAL_ERROR);
-  }
+  });
 }
 
 export async function POST(request: Request) {

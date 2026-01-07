@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.72] - 2026-01-07
+
+### Fixed
+
+#### Audit Fixes: Security, Accessibility, UI Consistency (Raouf)
+
+**Security Improvements:**
+
+- **Authentication for GET /api/events (Raouf)**: Added `requireAuth` wrapper to the events API endpoint, ensuring all event data access requires authentication like other protected endpoints.
+
+- **Security headers in next.config.ts (Raouf)**: Added comprehensive security headers including:
+  - `X-XSS-Protection: 1; mode=block`
+  - `Strict-Transport-Security: max-age=31536000; includeSubDomains`
+  - Content Security Policy (CSP) with directives for script-src, style-src, img-src, connect-src, frame-ancestors, base-uri, and form-action
+
+**Accessibility Improvements:**
+
+- **Password toggle aria-labels (Raouf)**: Added descriptive aria-labels to 3 password visibility toggle buttons in PrivacySettings component (`toggleCurrentPasswordVisibility`, `toggleNewPasswordVisibility`, `toggleConfirmPasswordVisibility`).
+
+- **Filter button aria-labels (Raouf)**: Added `aria-label` and `aria-pressed` attributes to filter category buttons in MapClient component. Added new translation keys `addFilter` and `removeFilter` with interpolation support.
+
+**Code Quality:**
+
+- **Removed console.log statements (Raouf)**: Cleaned up development logging from HomeClient.tsx sample data seeding code to reduce production console noise.
+
+**UI Consistency:**
+
+- **MQ-branded buttons in test-auth page (Raouf)**: Replaced raw Tailwind color classes (`bg-blue-600`, `bg-green-600`, `bg-purple-600`) with MQ Button component variants (`primary`, `secondary`, `outline`). Updated result container to use MQ tokens (`bg-mq-background-secondary`, `rounded-mq`).
+
+- **ProfileCard toggle switches dark mode support (Raouf)**: Replaced hardcoded `bg-white` with `bg-mq-background` on 3 toggle switch circles to support dark mode theming. Added `shadow-sm` for better visibility.
+
+**Files Changed:**
+- `app/api/events/route.ts` - Added authentication wrapper
+- `next.config.ts` - Added security headers (CSP, HSTS, X-XSS-Protection)
+- `app/settings/components/PrivacySettings.tsx` - Added 3 aria-labels for password toggles
+- `app/map/MapClient.tsx` - Added aria-labels to filter buttons
+- `locales/en/translations.json` - Added 7 new translation keys
+- `app/home/HomeClient.tsx` - Removed 3 console.log statements
+- `app/test-auth/page.tsx` - Migrated to MQ Button component
+- `components/ProfileCard.tsx` - Fixed toggle switches for dark mode
+- `package.json` - Version bump to 0.5.72
+- `lib/config.ts` - Version bump to 0.5.72
+
+**Verification:**
+- `npm run lint` (0 errors, 1 warning - intentional unused param)
+- `npm run build` (success, 27 routes)
+- `npm run test` (46/46 tests passing)
+
+---
+
 ## [0.5.71] - 2026-01-07
 
 ### Added

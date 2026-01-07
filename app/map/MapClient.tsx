@@ -645,18 +645,25 @@ export default function MapClient() {
                         {FILTER_CATEGORIES.map((category) => {
                           const Icon = category.icon;
                           const isActive = activeFilters.includes(category.id);
+                          const categoryLabel = t(category.label as TranslationKey);
                           return (
                             <button
                               key={category.id}
                               onClick={() => toggleFilter(category.id)}
+                              aria-label={
+                                isActive
+                                  ? t('removeFilter', { filter: categoryLabel })
+                                  : t('addFilter', { filter: categoryLabel })
+                              }
+                              aria-pressed={isActive}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-mq-xs font-medium transition-colors ${
                                 isActive
                                   ? 'bg-mq-primary text-white'
                                   : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background'
                               }`}
                             >
-                              <Icon className="h-3 w-3" />
-                              {t(category.label as TranslationKey)}
+                              <Icon className="h-3 w-3" aria-hidden="true" />
+                              {categoryLabel}
                             </button>
                           );
                         })}

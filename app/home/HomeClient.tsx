@@ -207,15 +207,11 @@ export default function HomeClient() {
       if (!unitsSeeded && validUnits.length > 0) {
         validUnits.forEach(addUnit);
         localStorage.setItem(unitsSeededKey, 'true');
-        // eslint-disable-next-line no-console
-        console.log(`Loaded ${validUnits.length} sample units`);
       }
 
       if (!deadlinesSeeded && validDeadlines.length > 0) {
         validDeadlines.forEach(addDeadline);
         localStorage.setItem(deadlinesSeededKey, 'true');
-        // eslint-disable-next-line no-console
-        console.log(`Loaded ${validDeadlines.length} sample deadlines`);
       }
     } catch (error) {
       console.warn('Failed to load sample data, falling back to direct addition:', error);
@@ -230,8 +226,6 @@ export default function HomeClient() {
 
         validUnits.forEach(addUnit);
         validDeadlines.forEach(addDeadline);
-        // eslint-disable-next-line no-console
-        console.log('Fallback: loaded sample data without localStorage persistence');
       } catch (fallbackError) {
         console.error('Critical error: Could not load sample data:', fallbackError);
       }

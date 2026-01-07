@@ -412,6 +412,7 @@ const PrivacySettings = memo(
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                    aria-label={t('toggleCurrentPasswordVisibility')}
                   >
                     {showCurrentPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -441,6 +442,7 @@ const PrivacySettings = memo(
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                    aria-label={t('toggleNewPasswordVisibility')}
                   >
                     {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -466,6 +468,7 @@ const PrivacySettings = memo(
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                    aria-label={t('toggleConfirmPasswordVisibility')}
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="h-4 w-4" />

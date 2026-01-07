@@ -679,5 +679,12 @@
   "newPassword": "New Password",
   "confirmNewPassword": "Confirm New Password",
   "changePasswordTitle": "Change Your Password",
-  "changePasswordDialogDesc": "Enter your current password and choose a new one"
+  "changePasswordDialogDesc": "Enter your current password and choose a new one",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "toggleCurrentPasswordVisibility": "Toggle current password visibility",
+  "toggleNewPasswordVisibility": "Toggle new password visibility",
+  "toggleConfirmPasswordVisibility": "Toggle confirm password visibility",
+  "addFilter": "Add {{filter}} filter",
+  "removeFilter": "Remove {{filter}} filter"
 }
