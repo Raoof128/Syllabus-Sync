@@ -5,8 +5,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![Version](https://img.shields.io/badge/version-0.5.45-blue)]()
-[![Tests](https://img.shields.io/badge/tests-41%2F41-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-0.5.69-blue)]()
+[![Tests](https://img.shields.io/badge/tests-46%2F46-brightgreen)]()
 [![Lint](https://img.shields.io/badge/eslint-0%20errors-brightgreen)]()
 
 ---
@@ -15,8 +15,8 @@
 
 **The Syllabus Sync** is a comprehensive campus management web application designed to help Macquarie University students seamlessly manage their academic and campus life. Built with enterprise-grade code quality and modern web technologies, it provides an all-in-one platform for schedule management, deadline tracking, event discovery, and campus navigation.
 
-**Current Version:** 0.5.45  
-**Current Status:** Production-ready application with comprehensive error handling, offline support, enterprise-level code quality, and 12-language internationalization support.
+**Current Version:** 0.5.69  
+**Current Status:** Production-ready application with comprehensive error handling, offline support, enterprise-level code quality, and 19-language internationalization support.
 
 **Demo Target:** Macquarie University Administration - February 2026
 
@@ -246,19 +246,42 @@ flowchart TB
 
 ### Installation
 
-1. **Install dependencies**
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/mrpouyaalavi/syllabus-sync.git
+   cd syllabus-sync
+   ```
+
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-2. **Run development server**
+3. **Set up environment variables**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local` and add your credentials:
+
+   | Variable                        | Description          | Where to get it                                                             |
+   | ------------------------------- | -------------------- | --------------------------------------------------------------------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL | [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key  | Same as above                                                               |
+   | `NEXT_PUBLIC_ORS_API_KEY`       | OpenRouteService key | [ORS Sign Up](https://openrouteservice.org/dev/#/signup)                    |
+
+   > **Note:** Supabase keys support both legacy JWT format (`eyJ...`) and new publishable format (`sb_...`).
+
+4. **Run development server**
 
    ```bash
    npm run dev
    ```
 
-3. **Open in browser**
+5. **Open in browser**
    ```
    http://localhost:3000
    ```

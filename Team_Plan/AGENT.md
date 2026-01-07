@@ -842,11 +842,25 @@ npm run test:coverage
 ## Deployment
 
 ### Environment Variables
+
+Copy the template and fill in your values:
+
 ```bash
-# .env.local
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-key
+cp .env.example .env.local
 ```
+
+Required variables (see `.env.example` for full list):
+
+| Variable | Description | Notes |
+|----------|-------------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | From [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key | Supports both `eyJ...` (JWT) and `sb_...` (publishable) formats |
+| `NEXT_PUBLIC_ORS_API_KEY` | OpenRouteService API key | From [ORS](https://openrouteservice.org/dev/#/signup) |
+
+Optional server-side variables:
+- `ORS_API_KEY` - Server-only ORS key (more secure, not exposed to browser)
+- `ORS_BASE_URL` - Custom ORS API URL (defaults to openrouteservice.org)
+- `CORS_ALLOWED_ORIGINS` - Comma-separated CORS origins
 
 ### Build & Deploy
 ```bash
