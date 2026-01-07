@@ -18,6 +18,23 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 
+// Silence known Next.js 16 internal warnings that we cannot fix
+// These are framework issues, not application bugs
+if (typeof window !== 'undefined') {
+  const originalConsoleError = console.error;
+  console.error = (...args: unknown[]) => {
+    // Filter out the OuterLayoutRouter key warning - this is a Next.js 16 Turbopack internal issue
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('Each child in a list should have a unique "key" prop') &&
+      args.some((arg) => typeof arg === 'string' && arg.includes('OuterLayoutRouter'))
+    ) {
+      return; // Silently ignore this specific warning
+    }
+    originalConsoleError.apply(console, args);
+  };
+}
+
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
