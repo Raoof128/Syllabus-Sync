@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.73 | Last Updated: January 07, 2026
+Version: 0.5.74 | Last Updated: January 07, 2026
 
 ---
 
@@ -2473,3 +2473,16 @@ Summary:
 Files: components/home/EventsFeed.tsx; components/layout/SocialButtons.tsx; app/layout.tsx; app/login/LoginClient.tsx; app/api/navigate/route.ts; app/api/_lib/middleware.ts; package.json; lib/config.ts.
 Verification: npm run lint (0 errors, 0 warnings); npm run test (46/46 pass); npm run build (success, 27 routes).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Fix - Sidebar Hydration Mismatch (v0.5.74).
+Summary:
+  - Fixed React hydration error in Sidebar component caused by conditional CSS module class application.
+  - Root cause: `mounted` state was `false` on server but `true` on client, causing different class strings from `cn(BASE_CLASSES.bar, mounted && styles.barTop)`.
+  - Removed `mounted` state pattern entirely - CSS module classes are now always applied consistently on both server and client.
+  - Added default `transform: translateX(-100%)` to mobile panel in CSS module for SSR consistency.
+  - Removed all `suppressHydrationWarning` attributes that were masking the real issue.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint (0 errors); npm run build (success, 27 routes).
+Follow-ups: None.
+

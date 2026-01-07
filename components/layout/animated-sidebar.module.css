@@ -164,8 +164,13 @@
   }
 }
 
-/* Mobile panel animation - only when mounted */
+/* Mobile panel animation */
 @media (max-width: 767px) {
+  .panel {
+    /* Default closed state for SSR consistency */
+    transform: translateX(-100%);
+  }
+
   .panelMobile {
     transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }

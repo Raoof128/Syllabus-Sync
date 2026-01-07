@@ -25,7 +25,7 @@ const navigation: {
   { name: 'settings', href: '/settings', icon: Settings },
 ];
 
-// Static class names for SSR - no CSS modules to avoid hydration mismatch
+// Static class names for consistent SSR/CSR rendering
 const BASE_CLASSES = {
   aside:
     'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell',
@@ -45,16 +45,9 @@ const Sidebar = memo(() => {
   const { t } = useTranslation();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
-
-  // Track mounted state to avoid hydration mismatch with CSS modules
-  // This is an intentional pattern for hydration safety
-  useEffect(() => {
-    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
-  }, []);
 
   // Focus trap for mobile menu
   useEffect(() => {
@@ -112,13 +105,8 @@ const Sidebar = memo(() => {
     menuButtonRef.current?.focus();
   }, []);
 
-  // Get mobile panel classes - only apply CSS module classes when mounted
+  // Get mobile panel classes based on open state
   const getMobilePanelClasses = () => {
-    if (!mounted) {
-      // SSR/initial render: use Tailwind for hidden state
-      return '-translate-x-full md:translate-x-0';
-    }
-    // Client after mount: use CSS module classes
     return cn(
       styles.panel,
       styles.panelMobile,
@@ -152,35 +140,21 @@ const Sidebar = memo(() => {
 
       {/* Sidebar */}
       <aside
-        className={cn(BASE_CLASSES.aside, mounted && styles.sidebarShell)}
+        className={cn(BASE_CLASSES.aside, styles.sidebarShell)}
         onMouseLeave={() => {
           // Blur any focused element to prevent sidebar staying open
           if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur();
           }
         }}
-        suppressHydrationWarning
       >
         {/* Trigger area with hamburger bars */}
-        <div
-          aria-hidden="true"
-          className={cn(BASE_CLASSES.trigger, mounted && styles.trigger)}
-          suppressHydrationWarning
-        >
+        <div aria-hidden="true" className={cn(BASE_CLASSES.trigger, styles.trigger)}>
           {/* Hamburger bars container */}
-          <span className={cn(BASE_CLASSES.bars, mounted && styles.bars)} suppressHydrationWarning>
-            <span
-              className={cn(BASE_CLASSES.bar, mounted && styles.barTop)}
-              suppressHydrationWarning
-            />
-            <span
-              className={cn(BASE_CLASSES.bar, mounted && styles.barMid)}
-              suppressHydrationWarning
-            />
-            <span
-              className={cn(BASE_CLASSES.bar, mounted && styles.barBottom)}
-              suppressHydrationWarning
-            />
+          <span className={cn(BASE_CLASSES.bars, styles.bars)}>
+            <span className={cn(BASE_CLASSES.bar, styles.barTop)} />
+            <span className={cn(BASE_CLASSES.bar, styles.barMid)} />
+            <span className={cn(BASE_CLASSES.bar, styles.barBottom)} />
           </span>
         </div>
 
@@ -192,10 +166,9 @@ const Sidebar = memo(() => {
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(BASE_CLASSES.panel, getMobilePanelClasses())}
-          suppressHydrationWarning
         >
           {/* Logo and branding - animated */}
-          <div className={cn(BASE_CLASSES.logo, mounted && styles.logo)} suppressHydrationWarning>
+          <div className={cn(BASE_CLASSES.logo, styles.logo)}>
             <Link
               href="/home"
               className="flex items-center gap-2"
@@ -214,12 +187,7 @@ const Sidebar = memo(() => {
           </div>
 
           {/* Navigation with staggered menu items */}
-          <nav
-            className="space-y-2"
-            role="navigation"
-            aria-label={t('mainNavigation')}
-            suppressHydrationWarning
-          >
+          <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href || (pathname === '/' && item.href === '/home');
@@ -232,7 +200,7 @@ const Sidebar = memo(() => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     BASE_CLASSES.menuItem,
-                    mounted && styles.menuItem,
+                    styles.menuItem,
                     isActive
                       ? 'bg-mq-primary text-white shadow-mq-sm'
                       : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
@@ -254,10 +222,7 @@ const Sidebar = memo(() => {
           </nav>
 
           {/* Social buttons at bottom - animated */}
-          <div
-            className={cn(BASE_CLASSES.social, mounted && styles.socialSection)}
-            suppressHydrationWarning
-          >
+          <div className={cn(BASE_CLASSES.social, styles.socialSection)}>
             <SocialButtons />
           </div>
         </div>

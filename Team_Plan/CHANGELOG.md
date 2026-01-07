@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.74] - 2026-01-07
+
+### Fixed
+
+- **Sidebar hydration mismatch (Raouf)**: Fixed React hydration error in Sidebar component caused by conditional CSS module class application based on `mounted` state. Removed the `mounted` state pattern and always apply CSS module classes consistently on both server and client. Added default `transform: translateX(-100%)` to mobile panel in CSS for SSR consistency.
+
+**Files Changed:**
+- `components/layout/Sidebar.tsx` - Removed mounted state, always apply CSS module classes
+- `components/layout/animated-sidebar.module.css` - Added default closed state for mobile panel
+
+---
+
 ## [0.5.73] - 2026-01-07
 
 ### Fixed
