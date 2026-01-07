@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.71] - 2026-01-07
+
+### Added
+
+#### Map Features Activated (Raouf)
+
+**Turn-by-Turn Navigation, Live Location, and Advanced Search are now ACTIVE:**
+
+- **Feature status update (Raouf)**: Replaced "Coming Soon" badges with "Active" badges for Turn-by-Turn Navigation, Live Location, and Advanced Search cards on the Campus Map page.
+
+- **Advanced Search filter UI (Raouf)**: Added interactive filter chips for building categories (academic, services, sports, study, labs, accessibility). Users can toggle filters to narrow down the Campus Buildings grid.
+
+- **Filter-aware buildings grid (Raouf)**: Updated Campus Buildings grid to dynamically filter based on selected tags. Shows result count when filters are active and provides "Clear Filters" action when no buildings match.
+
+- **New translation keys (Raouf)**: Added i18n support for new map feature labels including `active`, `routeReady`, `selectBuildingToNavigate`, `locationTrackingEnabled`, `showFilters`, `hideFilters`, `clearAll`, `results`, `noMatchingBuildings`, `clearFilters`.
+
+**Implementation Details:**
+- Added `FILTER_CATEGORIES` constant with 6 filter types and corresponding icons
+- Added `activeFilters` and `showFilters` state management
+- Added `filteredBuildingsForGrid`, `toggleFilter`, `clearFilters` functions
+- Buildings grid now uses filtered data from `lib/map/buildings.ts` instead of static `CAMPUS_BUILDINGS` config
+- Feature cards show contextual status (e.g., "Route ready" when building selected)
+
+**Files Changed:**
+- `app/map/MapClient.tsx` - Complete map features UI overhaul
+- `locales/en/translations.json` - Added 11 new translation keys
+- `locales/es/translations.json` - Added 11 new Spanish translations
+- `package.json` - Version bump to 0.5.71
+- `lib/config.ts` - Version bump to 0.5.71
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success, 27 routes)
+- `npm run test` (46/46 tests passing)
+
+---
+
 ## [0.5.70] - 2026-01-07
 
 ### Fixed

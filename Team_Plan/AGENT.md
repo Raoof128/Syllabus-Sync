@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.67 | Last Updated: January 07, 2026
+Version: 0.5.71 | Last Updated: January 07, 2026
 
 ---
 
@@ -30,7 +30,7 @@ Version: 0.5.67 | Last Updated: January 07, 2026
 | **Home Tab** | Pouya | 🚧 In Progress |
 | **Calendar Tab** | Pouya | 🚧 In Progress |
 | **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
-| **Map Tab** | Raouf | 🚧 In Progress |
+| **Map Tab** | Raouf | ✅ Core Features Complete |
 | **Settings Tab** | Raouf | 🚧 In Progress |
 | **AI Integration** | Kit | 🔜 Demo Feature |
 
@@ -56,6 +56,15 @@ Version: 0.5.67 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Map Features Activated (v0.5.71)
+- **Feature status update (Raouf)**: All 3 map features (Turn-by-Turn Navigation, Live Location, Advanced Search) are now marked as "Active" instead of "Coming Soon".
+- **Advanced Search filter UI (Raouf)**: Added interactive filter chips for 6 building categories (academic, services, sports, study, labs, accessibility).
+- **Filter-aware buildings grid (Raouf)**: Campus Buildings grid now dynamically filters based on selected tags with result count display.
+- **New i18n keys (Raouf)**: Added 11 translation keys for map features to English and Spanish locales.
+
+#### ✅ Sidebar Hydration Fix (v0.5.70)
+- **Mounted state pattern (Raouf)**: Fixed React hydration mismatch in Sidebar by deferring CSS module class application until after first render.
 
 #### ✅ Header & Console Warning Fixes (v0.5.62)
 - **Hydration mismatch fix (Raouf)**: Fixed React hydration error in Header caused by `useId()` generating different IDs on server vs client for `aria-controls`. Replaced with stable constant `NOTIFICATION_MENU_ID`. File changed: `components/layout/Header.tsx`.
