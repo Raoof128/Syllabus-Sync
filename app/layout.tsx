@@ -114,8 +114,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         {/* Theme and RTL scripts run before body to prevent flash */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script dangerouslySetInnerHTML={{ __html: rtlScript }} />
+        <script key="theme-script" dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: rtlScript }} />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <script
