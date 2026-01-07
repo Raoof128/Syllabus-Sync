@@ -38,7 +38,8 @@
   --c-background-tertiary: var(--c-sand-100);
   --c-content: var(--c-charcoal-900);
   --c-content-secondary: var(--c-charcoal-800);
-  --c-content-tertiary: var(--c-charcoal-700);
+  /* Tertiary text improved from #5a5c55 to #4d4f49 for WCAG AA 4.5:1 contrast ratio */
+  --c-content-tertiary: #4d4f49;
   --c-content-faded: var(--c-charcoal-600);
 
   /* Tailwind CSS Variable Mappings - Light Mode */
@@ -125,6 +126,15 @@
   --mq-error: var(--c-error);
   --mq-info: var(--c-info);
 
+  /* ============================================
+     SPACING SCALE GUIDE
+     Use consistent spacing throughout the app:
+     - gap-2 (0.5rem): Tight spacing within components
+     - gap-3 (0.75rem): Standard component internal spacing
+     - gap-4 (1rem): Standard section/card padding
+     - gap-6 (1.5rem): Major section separation
+     ============================================ */
+
   /* Spacing (approximated) */
   --c-space-1: 0.25rem;
   --c-space-2: 0.5rem;
@@ -151,7 +161,8 @@
 
   --c-content: #edeade;
   --c-content-secondary: var(--c-charcoal-200);
-  --c-content-tertiary: var(--c-charcoal-300);
+  /* Tertiary text improved for WCAG AA 4.5:1 contrast ratio on dark backgrounds */
+  --c-content-tertiary: #a8aaa3;
   --c-content-faded: var(--c-charcoal-400);
 
   --c-border: var(--c-charcoal-600);

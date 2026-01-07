@@ -207,6 +207,7 @@ const Sidebar = memo(() => {
                 alt={t('mqLogoAlt')}
                 width={128}
                 height={128}
+                priority
                 style={{ objectFit: 'contain', borderRadius: '8px' }}
               />
             </Link>

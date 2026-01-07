@@ -31,13 +31,12 @@ export function ScrollReveal({
       opacity: 0,
       y: yOffset,
       scale: 0.98,
-      filter: 'blur(2px)',
+      // Removed filter: 'blur(2px)' to prevent repaints and improve performance
     },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      filter: 'blur(0px)',
       transition: {
         duration,
         ease,

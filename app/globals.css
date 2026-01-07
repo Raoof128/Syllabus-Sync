@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   PERFORMANCE OPTIMIZATION: will-change hints
+   Applied to commonly animated elements
+   ============================================ */
+.animate-fade-in,
+.animate-slide-up,
+.animate-scale-in,
+.btn-premium,
+.mq-magic-card {
+  will-change: transform, opacity;
+}
+
 /* Custom animations */
 @keyframes fade-in {
   from {

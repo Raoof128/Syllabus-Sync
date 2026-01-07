@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.71 | Last Updated: January 07, 2026
+Version: 0.5.73 | Last Updated: January 07, 2026
 
 ---
 
@@ -2439,6 +2439,26 @@ Summary:
 Files: components/ui/toast.tsx; app/settings/components/PrivacySettings.tsx; locales/*/translations.json (19 files).
 Verification: npm run lint (0 errors); npm run test (46/46 pass); npm run build (27 routes).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Comprehensive UI/UX Audit & Accessibility Fixes (v0.5.73).
+Summary:
+  - Conducted full UI/UX audit covering architecture, accessibility (WCAG AA), responsive design, navigation, user flows, and performance.
+  - Overall Grade: B+ (8.2/10) with 11 issues identified and fixed.
+  - (1) Button touch targets: Added responsive sizing `h-11 sm:h-10` for 44px mobile, 40px desktop.
+  - (2) Missing aria-required: Added `aria-required="true"` to all required form fields, enhanced Input component with `isRequired` prop.
+  - (3) Toast accessibility: Added `aria-live="polite"`, `role="alert"`, `aria-atomic="true"` to toast notifications.
+  - (4) Tertiary text contrast: Changed `--c-content-tertiary` from #5a5c55 to #4d4f49 (light) and #a8aaa3 (dark) for WCAG AA compliance.
+  - (5) Missing footer landmark: Added `<footer role="contentinfo">` (sr-only) to client-layout.
+  - (6) Sidebar logo priority: Added `priority` prop to Image for LCP optimization.
+  - (7) 2xl breakpoint for ultrawide: Added `2xl:max-w-[1600px]` and `2xl:grid-cols-4` to HomeClient.
+  - (8) ScrollReveal blur removal: Removed `filter: 'blur(2px)'` to prevent GPU repaints.
+  - (9) will-change hints: Added `will-change: transform, opacity` to animated elements in globals.css.
+  - (10) Spacing documentation: Added inline documentation for gap usage in mq-tokens.css.
+  - (11) Focus indicators: Standardized to `focus-visible:` pattern in toast.tsx.
+Files: components/ui/mq/button.tsx; components/ui/mq/input.tsx; components/deadlines/DeadlineForm.tsx; components/units/UnitForm.tsx; components/ui/toast.tsx; components/layout/Sidebar.tsx; components/ui/ScrollReveal.tsx; app/client-layout.tsx; app/mq-tokens.css; app/globals.css; app/home/HomeClient.tsx; Team_Plan/CHANGELOG.md; package.json.
+Verification: npm run lint (0 errors); npm test (46/46 pass); npm run build (success).
+Follow-ups: None - all 11 UI/UX audit issues fully resolved.
 
 ### Raouf: 2026-01-07 (Australia/Sydney)
 Scope: Codebase Audit & Improvements (v0.5.68).

@@ -8,15 +8,20 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   errorId?: string;
   /** Optional hint text displayed below the input */
   hint?: string;
+  /** Mark the field as required (adds aria-required and visual indicator) */
+  isRequired?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, errorId, hint, id, ...props }, ref) => {
+  ({ className, type, label, error, errorId, hint, id, isRequired, required, ...props }, ref) => {
     const generatedId = useId();
     const inputId = id ?? generatedId;
     const generatedErrorId = `${inputId}-error`;
     const generatedHintId = `${inputId}-hint`;
     const finalErrorId = errorId ?? generatedErrorId;
+
+    // Determine if field is required (either via isRequired prop or native required)
+    const fieldRequired = isRequired || required;
 
     // Build aria-describedby from hint and error
     const describedByIds: string[] = [];
@@ -29,6 +34,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label className="text-mq-sm font-medium text-mq-content" htmlFor={inputId}>
             {label}
+            {fieldRequired && (
+              <span className="text-mq-error ml-1" aria-hidden="true">
+                *
+              </span>
+            )}
           </label>
         )}
         <input
@@ -40,6 +50,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           id={inputId}
+          required={required}
+          aria-required={fieldRequired ? 'true' : undefined}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={ariaDescribedBy}
           {...props}

@@ -196,17 +196,23 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       >
         {t('skipToContent')}
       </a>
-      <div className="layout-shell flex min-h-screen bg-mq-background">
-        {/* Sidebar */}
-        <Sidebar />
+      <div className="layout-shell flex min-h-screen flex-col bg-mq-background">
+        <div className="flex flex-1">
+          {/* Sidebar */}
+          <Sidebar />
 
-        {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
-        <div className="layout-main flex-1 flex flex-col overflow-hidden md:ml-12">
-          <Header />
-          <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
-            <ErrorBoundary>{children}</ErrorBoundary>
-          </main>
+          {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
+          <div className="layout-main flex-1 flex flex-col overflow-hidden md:ml-12">
+            <Header />
+            <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </main>
+          </div>
         </div>
+        {/* Footer landmark for accessibility - screen reader only */}
+        <footer role="contentinfo" className="sr-only" aria-label="Footer">
+          <p>&copy; {new Date().getFullYear()} Syllabus Sync - Macquarie University</p>
+        </footer>
       </div>
       <Toaster />
       <OfflineIndicator />

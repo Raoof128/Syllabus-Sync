@@ -219,6 +219,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 onChange={(e) => setTitle(e.target.value)}
                 aria-describedby={titleDescribedBy}
                 aria-invalid={Boolean(errors.title)}
+                aria-required="true"
                 className={errors.title ? 'border-mq-error' : ''}
               />
               <p id="deadline-title-help" className="text-xs text-mq-content-tertiary">
@@ -240,6 +241,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   className={errors.unitCode ? 'border-mq-error' : ''}
                   aria-describedby={unitDescribedBy}
                   aria-invalid={Boolean(errors.unitCode)}
+                  aria-required="true"
                 >
                   <SelectValue placeholder={t('selectUnit')} />
                 </SelectTrigger>
@@ -272,6 +274,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 onChange={(e) => setDueDate(e.target.value)}
                 aria-describedby={dateDescribedBy}
                 aria-invalid={Boolean(errors.dueDate)}
+                aria-required="true"
                 className={errors.dueDate ? 'border-mq-error' : ''}
               />
               <p id="deadline-date-help" className="text-xs text-mq-content-tertiary">

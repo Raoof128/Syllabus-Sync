@@ -238,6 +238,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               onChange={(e) => setCode(e.target.value)}
               aria-describedby={codeDescribedBy}
               aria-invalid={Boolean(errors.code)}
+              aria-required="true"
               className={errors.code ? 'border-mq-error' : ''}
             />
             <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
@@ -260,6 +261,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               placeholder={t('unitNamePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              aria-required="true"
+              aria-invalid={Boolean(errors.name)}
               className={errors.name ? 'border-mq-error' : ''}
             />
             {errors.name && <p className="text-sm text-mq-error">{errors.name}</p>}
@@ -278,6 +281,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 onChange={(e) => setBuilding(e.target.value)}
                 aria-describedby={buildingDescribedBy}
                 aria-invalid={Boolean(errors.building)}
+                aria-required="true"
                 className={errors.building ? 'border-mq-error' : ''}
               />
               <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
@@ -299,6 +303,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 placeholder={t('roomPlaceholder')}
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
+                aria-required="true"
+                aria-invalid={Boolean(errors.room)}
                 className={errors.room ? 'border-mq-error' : ''}
               />
               {errors.room && <p className="text-sm text-mq-error">{errors.room}</p>}

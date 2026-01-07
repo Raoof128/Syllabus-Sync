@@ -17,6 +17,10 @@ const ToastViewport = React.forwardRef<
       'fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
       className,
     )}
+    aria-live="polite"
+    aria-atomic="true"
+    role="region"
+    aria-label="Notifications"
     {...props}
   />
 ));
@@ -48,6 +52,8 @@ const Toast = React.forwardRef<
     <ToastPrimitives.Root
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
+      role="alert"
+      aria-live={variant === 'destructive' ? 'assertive' : 'polite'}
       {...props}
     />
   );
@@ -76,13 +82,14 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      'absolute right-2 top-2 rounded-mq-sm p-1 text-mq-content-tertiary opacity-0 transition-opacity hover:text-mq-content focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-mq-focus group-hover:opacity-100 group-[.destructive]:text-mq-error/80 group-[.destructive]:hover:text-mq-error group-[.destructive]:focus:ring-mq-error',
+      'absolute right-2 top-2 rounded-mq-sm p-1 text-mq-content-tertiary opacity-0 transition-opacity hover:text-mq-content focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus group-hover:opacity-100 group-[.destructive]:text-mq-error/80 group-[.destructive]:hover:text-mq-error group-[.destructive]:focus-visible:ring-mq-error',
       className,
     )}
     toast-close=""
+    aria-label="Close notification"
     {...props}
   >
-    <X className="h-4 w-4" />
+    <X className="h-4 w-4" aria-hidden="true" />
   </ToastPrimitives.Close>
 ));
 ToastClose.displayName = ToastPrimitives.Close.displayName;

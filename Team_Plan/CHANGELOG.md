@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.73] - 2026-01-07
+
+### Fixed
+
+#### Comprehensive UI/UX Audit Fixes (Raouf)
+
+**Accessibility (WCAG AA Compliance):**
+
+- **Button touch targets (Raouf)**: Updated MQ Button component with 44px minimum touch targets on mobile (h-11/44px), gracefully scaling down on desktop (sm:h-10/40px). Applies to all size variants including icon buttons.
+
+- **aria-required on form fields (Raouf)**: Added `aria-required="true"` attribute to all required form inputs in DeadlineForm (title, unit, dueDate) and UnitForm (code, name, building, room). Enhanced Input component with `isRequired` prop for automatic aria-required and visual indicator.
+
+- **Toast accessibility (Raouf)**: Added `aria-live="polite"`, `aria-atomic="true"`, and `role="region"` to ToastViewport. Added `role="alert"` and dynamic `aria-live` (assertive for destructive, polite otherwise) to Toast component. Added `aria-label="Close notification"` to ToastClose button.
+
+- **Text contrast WCAG AA (Raouf)**: Improved tertiary text color from #5a5c55 to #4d4f49 in light mode and #a8aaa3 in dark mode to meet 4.5:1 contrast ratio against backgrounds.
+
+- **Footer landmark (Raouf)**: Added semantic `<footer role="contentinfo">` element (screen-reader only) to client-layout for complete landmark structure.
+
+**Performance:**
+
+- **Sidebar logo priority (Raouf)**: Added `priority` prop to Sidebar MQ logo Image for LCP optimization on desktop view.
+
+- **ScrollReveal blur removed (Raouf)**: Removed `filter: 'blur(2px)'` from ScrollReveal animation variants to prevent expensive repaints and improve animation performance.
+
+- **will-change optimization (Raouf)**: Added `will-change: transform, opacity` CSS hint to `.animate-fade-in`, `.animate-slide-up`, `.animate-scale-in`, `.btn-premium`, and `.mq-magic-card` classes in globals.css.
+
+**Responsive Design:**
+
+- **2xl breakpoint support (Raouf)**: Added `2xl:max-w-[1600px] 2xl:mx-auto` to dashboard grid and `2xl:grid-cols-4` to units grid for better ultrawide screen utilization.
+
+**Developer Experience:**
+
+- **Spacing scale documentation (Raouf)**: Added inline documentation in mq-tokens.css explaining the spacing scale usage (gap-2 for tight, gap-3 standard, gap-4 cards, gap-6 sections).
+
+- **Focus indicator standardization (Raouf)**: Updated ToastClose to use `focus-visible:` instead of `focus:` for consistent keyboard focus behavior.
+
+**Files Changed:**
+- `components/ui/mq/button.tsx` - Touch target sizes
+- `components/ui/mq/input.tsx` - isRequired prop and aria-required support
+- `components/deadlines/DeadlineForm.tsx` - aria-required attributes
+- `components/units/UnitForm.tsx` - aria-required attributes  
+- `components/ui/toast.tsx` - Accessibility attributes
+- `components/layout/Sidebar.tsx` - Logo priority prop
+- `components/ui/ScrollReveal.tsx` - Removed blur filter
+- `app/client-layout.tsx` - Footer landmark
+- `app/mq-tokens.css` - Contrast fixes, spacing docs
+- `app/globals.css` - will-change hints
+- `app/home/HomeClient.tsx` - 2xl breakpoint support
+
+---
+
 ## [0.5.72] - 2026-01-07
 
 ### Fixed

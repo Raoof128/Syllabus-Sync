@@ -20,10 +20,11 @@ const buttonVariants = cva(
           'text-mq-content-secondary hover:bg-mq-red hover:text-white hover:shadow-mq-sm active:scale-[0.98]',
       },
       size: {
-        sm: 'h-8 px-3 text-[length:var(--fs-small)]',
-        default: 'h-10 px-4 py-2 text-[length:var(--fs-regular)]',
+        // Touch target sizes: 44px minimum on mobile for WCAG compliance, smaller on desktop
+        sm: 'h-10 sm:h-8 px-3 text-[length:var(--fs-small)] min-h-[44px] sm:min-h-0',
+        default: 'h-11 sm:h-10 px-4 py-2 text-[length:var(--fs-regular)] min-h-[44px] sm:min-h-0',
         lg: 'h-12 px-6 text-[length:var(--fs-large)]',
-        icon: 'h-10 w-10',
+        icon: 'h-11 w-11 sm:h-10 sm:w-10 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0',
       },
     },
     defaultVariants: {

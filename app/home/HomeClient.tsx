@@ -511,7 +511,7 @@ export default function HomeClient() {
 
       {/* Main Dashboard Grid (rendered inside page-level main) */}
       <section
-        className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6"
+        className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
         aria-label={t('dashboardOverview')}
       >
         <ScrollReveal delay={0.1}>
@@ -588,7 +588,7 @@ export default function HomeClient() {
 
                   {/* Units Grid */}
                   <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-fr"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
                     variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
                   >
                     {units.map((unit) => (
