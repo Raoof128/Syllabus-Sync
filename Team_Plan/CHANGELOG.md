@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.77] - 2026-01-07
+
+### Fixed
+
+- **Supabase publishable key support (Raouf)**: Updated `proxy.ts` to accept both Supabase key formats:
+  - JWT format: keys starting with `eyJ` (legacy)
+  - Publishable format: keys starting with `sb_` (new format)
+  
+  Previously, valid `sb_publishable_` keys triggered the "⚠️ Supabase not configured. Running in demo mode" warning because the validation only checked for JWT format.
+
+**Files Changed:**
+- `proxy.ts` - Updated `hasValidKey` validation to accept `sb_` prefix, updated warning message
+
+---
+
 ## [0.5.76] - 2026-01-07
 
 ### Fixed

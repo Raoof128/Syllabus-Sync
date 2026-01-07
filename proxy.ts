@@ -13,18 +13,23 @@ export async function proxy(request: NextRequest) {
 
   // Check if Supabase is properly configured
   // Valid URL should contain supabase.co and not be a placeholder
-  // Valid key should be a JWT starting with "eyJ"
+  // Valid key can be either:
+  //   - JWT format: starts with "eyJ"
+  //   - New publishable format: starts with "sb_"
   const hasValidUrl =
     supabaseUrl && supabaseUrl.includes('supabase.co') && !supabaseUrl.includes('your-project-id');
   const hasValidKey =
-    supabaseAnonKey && supabaseAnonKey.startsWith('eyJ') && !supabaseAnonKey.includes('PASTE');
+    supabaseAnonKey &&
+    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
+    !supabaseAnonKey.includes('PASTE') &&
+    !supabaseAnonKey.includes('your');
 
   if (!hasValidUrl || !hasValidKey) {
     console.warn(
       '⚠️ Supabase not configured. Running in demo mode without authentication.\n' +
         'To enable auth, update .env.local with your Supabase credentials from:\n' +
         'https://supabase.com/dashboard/project/_/settings/api\n' +
-        'Note: The anon key should start with "eyJ" (it\'s a JWT token)',
+        'Note: The anon key should start with "eyJ" (JWT) or "sb_" (publishable)',
     );
     return response;
   }

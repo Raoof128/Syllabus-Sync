@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.76 | Last Updated: January 07, 2026
+Version: 0.5.77 | Last Updated: January 07, 2026
 
 ---
 
@@ -56,6 +56,10 @@ Version: 0.5.76 | Last Updated: January 07, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Supabase Publishable Key Support (v0.5.77)
+- **sb_ key format support (Raouf)**: Updated `proxy.ts` validation to accept both JWT keys (`eyJ...`) and new Supabase publishable keys (`sb_...`). Previously only JWT format was accepted, causing false "demo mode" warnings for valid `sb_publishable_` keys.
+- **Files changed**: `proxy.ts` (updated hasValidKey validation and warning message).
 
 #### ✅ Zustand Hydration Fix (v0.5.76)
 - **skipHydration pattern (Raouf)**: Fixed persistent React hydration mismatch in Sidebar by implementing Zustand's `skipHydration` pattern for `useLanguageStore`. The root cause was localStorage hydration happening before React's first render, causing `t('mainNavigation')` and other translated aria-labels to differ between SSR (default 'en') and CSR (stored language).
