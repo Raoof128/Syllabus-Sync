@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.75] - 2026-01-07
+
+### Fixed
+
+- **Sidebar hydration mismatch - complete fix (Raouf)**: Completely eliminated hydration errors by migrating from CSS modules to regular CSS classes. CSS module class names were generating different hashes between server and client in Next.js 16 Turbopack. Moved all sidebar animation styles to `globals.css` using static class names (`sidebar-shell`, `sidebar-panel`, `sidebar-trigger`, `sidebar-bars`, `sidebar-bar-top/mid/bottom`, `sidebar-menu-item`, `sidebar-logo`, `sidebar-social`, `sidebar-panel-open`).
+
+**Files Changed:**
+- `components/layout/Sidebar.tsx` - Removed CSS module import, use static class names
+- `components/layout/animated-sidebar.module.css` - Deleted (no longer needed)
+- `app/globals.css` - Added all sidebar animation styles as regular CSS classes
+
+---
+
 ## [0.5.74] - 2026-01-07
 
 ### Fixed

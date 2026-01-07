@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.74 | Last Updated: January 07, 2026
+Version: 0.5.75 | Last Updated: January 07, 2026
 
 ---
 
@@ -2483,6 +2483,18 @@ Summary:
   - Added default `transform: translateX(-100%)` to mobile panel in CSS module for SSR consistency.
   - Removed all `suppressHydrationWarning` attributes that were masking the real issue.
 Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css.
+Verification: npm run lint (0 errors); npm run build (success, 27 routes).
+Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Fix - Sidebar Hydration Mismatch Complete Fix (v0.5.75).
+Summary:
+  - Completely eliminated hydration errors by migrating from CSS modules to regular CSS classes.
+  - Root cause: CSS module class names generate different hashes between server and client in Next.js 16 Turbopack, even when always applied.
+  - Solution: Moved all sidebar animation styles to `globals.css` using static class names.
+  - New static classes: `sidebar-shell`, `sidebar-panel`, `sidebar-trigger`, `sidebar-bars`, `sidebar-bar-top/mid/bottom`, `sidebar-menu-item`, `sidebar-logo`, `sidebar-social`, `sidebar-panel-open`.
+  - Deleted `animated-sidebar.module.css` as it's no longer needed.
+Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.css (deleted); app/globals.css.
 Verification: npm run lint (0 errors); npm run build (success, 27 routes).
 Follow-ups: None.
 

@@ -9,7 +9,6 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
-import styles from './animated-sidebar.module.css';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
@@ -24,22 +23,6 @@ const navigation: {
   { name: 'feed', href: '/feed', icon: MessageSquare },
   { name: 'settings', href: '/settings', icon: Settings },
 ];
-
-// Static class names for consistent SSR/CSR rendering
-const BASE_CLASSES = {
-  aside:
-    'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell',
-  trigger:
-    'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none',
-  bars: 'flex flex-col items-center gap-2',
-  bar: 'h-5 w-0.5 rounded-full bg-mq-content',
-  panel:
-    'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none',
-  logo: 'mb-8',
-  menuItem:
-    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium',
-  social: 'mt-auto pt-6 border-t border-mq-border',
-};
 
 const Sidebar = memo(() => {
   const { t } = useTranslation();
@@ -105,15 +88,6 @@ const Sidebar = memo(() => {
     menuButtonRef.current?.focus();
   }, []);
 
-  // Get mobile panel classes based on open state
-  const getMobilePanelClasses = () => {
-    return cn(
-      styles.panel,
-      styles.panelMobile,
-      mobileMenuOpen ? styles.panelMobileOpen : styles.panelMobileClosed,
-    );
-  };
-
   return (
     <>
       {/* Mobile menu button */}
@@ -140,7 +114,7 @@ const Sidebar = memo(() => {
 
       {/* Sidebar */}
       <aside
-        className={cn(BASE_CLASSES.aside, styles.sidebarShell)}
+        className="relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell"
         onMouseLeave={() => {
           // Blur any focused element to prevent sidebar staying open
           if (document.activeElement instanceof HTMLElement) {
@@ -149,12 +123,15 @@ const Sidebar = memo(() => {
         }}
       >
         {/* Trigger area with hamburger bars */}
-        <div aria-hidden="true" className={cn(BASE_CLASSES.trigger, styles.trigger)}>
+        <div
+          aria-hidden="true"
+          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
+        >
           {/* Hamburger bars container */}
-          <span className={cn(BASE_CLASSES.bars, styles.bars)}>
-            <span className={cn(BASE_CLASSES.bar, styles.barTop)} />
-            <span className={cn(BASE_CLASSES.bar, styles.barMid)} />
-            <span className={cn(BASE_CLASSES.bar, styles.barBottom)} />
+          <span className="flex flex-col items-center gap-2 sidebar-bars">
+            <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-top" />
+            <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-mid" />
+            <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-bottom" />
           </span>
         </div>
 
@@ -165,10 +142,13 @@ const Sidebar = memo(() => {
           role="dialog"
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
-          className={cn(BASE_CLASSES.panel, getMobilePanelClasses())}
+          className={cn(
+            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none sidebar-panel',
+            mobileMenuOpen && 'sidebar-panel-open',
+          )}
         >
           {/* Logo and branding - animated */}
-          <div className={cn(BASE_CLASSES.logo, styles.logo)}>
+          <div className="mb-8 sidebar-logo">
             <Link
               href="/home"
               className="flex items-center gap-2"
@@ -199,8 +179,7 @@ const Sidebar = memo(() => {
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    BASE_CLASSES.menuItem,
-                    styles.menuItem,
+                    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item',
                     isActive
                       ? 'bg-mq-primary text-white shadow-mq-sm'
                       : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
@@ -222,7 +201,7 @@ const Sidebar = memo(() => {
           </nav>
 
           {/* Social buttons at bottom - animated */}
-          <div className={cn(BASE_CLASSES.social, styles.socialSection)}>
+          <div className="mt-auto pt-6 border-t border-mq-border sidebar-social">
             <SocialButtons />
           </div>
         </div>
