@@ -25,6 +25,22 @@ const navigation: {
   { name: 'settings', href: '/settings', icon: Settings },
 ];
 
+// Static class names for SSR - no CSS modules to avoid hydration mismatch
+const BASE_CLASSES = {
+  aside:
+    'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell',
+  trigger:
+    'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none',
+  bars: 'flex flex-col items-center gap-2',
+  bar: 'h-5 w-0.5 rounded-full bg-mq-content',
+  panel:
+    'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none',
+  logo: 'mb-8',
+  menuItem:
+    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium',
+  social: 'mt-auto pt-6 border-t border-mq-border',
+};
+
 const Sidebar = memo(() => {
   const { t } = useTranslation();
   const pathname = usePathname();
@@ -35,7 +51,7 @@ const Sidebar = memo(() => {
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
   // Track mounted state to avoid hydration mismatch with CSS modules
-  // This is an intentional pattern for hydration safety - disable lint rule
+  // This is an intentional pattern for hydration safety
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
@@ -96,6 +112,20 @@ const Sidebar = memo(() => {
     menuButtonRef.current?.focus();
   }, []);
 
+  // Get mobile panel classes - only apply CSS module classes when mounted
+  const getMobilePanelClasses = () => {
+    if (!mounted) {
+      // SSR/initial render: use Tailwind for hidden state
+      return '-translate-x-full md:translate-x-0';
+    }
+    // Client after mount: use CSS module classes
+    return cn(
+      styles.panel,
+      styles.panelMobile,
+      mobileMenuOpen ? styles.panelMobileOpen : styles.panelMobileClosed,
+    );
+  };
+
   return (
     <>
       {/* Mobile menu button */}
@@ -122,10 +152,7 @@ const Sidebar = memo(() => {
 
       {/* Sidebar */}
       <aside
-        className={cn(
-          'relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell',
-          mounted && styles.sidebarShell,
-        )}
+        className={cn(BASE_CLASSES.aside, mounted && styles.sidebarShell)}
         onMouseLeave={() => {
           // Blur any focused element to prevent sidebar staying open
           if (document.activeElement instanceof HTMLElement) {
@@ -134,24 +161,12 @@ const Sidebar = memo(() => {
         }}
       >
         {/* Trigger area with hamburger bars */}
-        <div
-          aria-hidden="true"
-          className={cn(
-            'hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none',
-            mounted && styles.trigger,
-          )}
-        >
+        <div aria-hidden="true" className={cn(BASE_CLASSES.trigger, mounted && styles.trigger)}>
           {/* Hamburger bars container */}
-          <span className={cn('flex flex-col items-center gap-2', mounted && styles.bars)}>
-            <span
-              className={cn('h-5 w-0.5 rounded-full bg-mq-content', mounted && styles.barTop)}
-            />
-            <span
-              className={cn('h-5 w-0.5 rounded-full bg-mq-content', mounted && styles.barMid)}
-            />
-            <span
-              className={cn('h-5 w-0.5 rounded-full bg-mq-content', mounted && styles.barBottom)}
-            />
+          <span className={cn(BASE_CLASSES.bars, mounted && styles.bars)}>
+            <span className={cn(BASE_CLASSES.bar, mounted && styles.barTop)} />
+            <span className={cn(BASE_CLASSES.bar, mounted && styles.barMid)} />
+            <span className={cn(BASE_CLASSES.bar, mounted && styles.barBottom)} />
           </span>
         </div>
 
@@ -162,22 +177,10 @@ const Sidebar = memo(() => {
           role="dialog"
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
-          className={cn(
-            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col',
-            // Desktop: use CSS module for hover-based animation (only after mount)
-            'md:transition-none',
-            mounted && styles.panel,
-            // Mobile: use CSS module classes for animation (only after mount)
-            mounted && styles.panelMobile,
-            mounted && (mobileMenuOpen ? styles.panelMobileOpen : styles.panelMobileClosed),
-            // Before mount on mobile: hide sidebar off-screen
-            !mounted && '-translate-x-full md:translate-x-0',
-            // Reduced motion
-            'motion-reduce:transition-none motion-reduce:transform-none',
-          )}
+          className={cn(BASE_CLASSES.panel, getMobilePanelClasses())}
         >
           {/* Logo and branding - animated */}
-          <div className={cn('mb-8', mounted && styles.logo)}>
+          <div className={cn(BASE_CLASSES.logo, mounted && styles.logo)}>
             <Link
               href="/home"
               className="flex items-center gap-2"
@@ -207,7 +210,7 @@ const Sidebar = memo(() => {
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium',
+                    BASE_CLASSES.menuItem,
                     mounted && styles.menuItem,
                     isActive
                       ? 'bg-mq-primary text-white shadow-mq-sm'
@@ -230,12 +233,7 @@ const Sidebar = memo(() => {
           </nav>
 
           {/* Social buttons at bottom - animated */}
-          <div
-            className={cn(
-              'mt-auto pt-6 border-t border-mq-border',
-              mounted && styles.socialSection,
-            )}
-          >
+          <div className={cn(BASE_CLASSES.social, mounted && styles.socialSection)}>
             <SocialButtons />
           </div>
         </div>

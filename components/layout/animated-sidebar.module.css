@@ -164,7 +164,7 @@
   }
 }
 
-/* Mobile panel animation */
+/* Mobile panel animation - only when mounted */
 @media (max-width: 767px) {
   .panelMobile {
     transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);

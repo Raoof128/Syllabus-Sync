@@ -19,12 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Implementation Details:**
 - Added `mounted` state that starts `false` and becomes `true` after first render
+- Created `BASE_CLASSES` constant with static Tailwind classes for SSR consistency
 - CSS module classes (`styles.panel`, `styles.panelMobile`, etc.) are conditionally applied only when `mounted` is true
-- Before mount, mobile sidebar uses Tailwind `-translate-x-full` to stay hidden
+- Before mount, mobile sidebar uses Tailwind `-translate-x-full md:translate-x-0` to stay hidden
+- Refactored `getMobilePanelClasses()` helper for cleaner conditional logic
 - Hamburger animation classes, menu item animations, and social section animations all deferred to client-side
 
 **Files Changed:**
-- `components/layout/Sidebar.tsx` - Added mounted state pattern for hydration safety
+- `components/layout/Sidebar.tsx` - Added mounted state pattern with BASE_CLASSES for hydration safety
 
 **Verification:**
 - `npm run lint` (0 errors, 0 warnings)
