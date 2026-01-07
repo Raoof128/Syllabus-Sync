@@ -15,7 +15,7 @@ import {
   EyeOff,
   Loader2,
   CheckCircle2,
-  Filter,
+  Filter as FilterIcon,
   Accessibility,
   Coffee,
   BookOpen,
@@ -40,7 +40,7 @@ const FILTER_CATEGORIES = [
   { id: 'services', icon: Briefcase, label: 'services' },
   { id: 'sports', icon: Dumbbell, label: 'sports' },
   { id: 'study', icon: Coffee, label: 'study' },
-  { id: 'labs', icon: Filter, label: 'labs' },
+  { id: 'labs', icon: FilterIcon, label: 'labs' },
   { id: 'accessibility', icon: Accessibility, label: 'accessibility' },
 ] as const;
 
@@ -519,7 +519,7 @@ export default function MapClient() {
                 </div>
               ) : (
                 <div className="text-center py-8 text-mq-content-secondary">
-                  <Filter className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                  <FilterIcon className="h-8 w-8 mx-auto mb-3 opacity-50" />
                   <p className="text-mq-sm">{t('noMatchingBuildings')}</p>
                   <Button
                     variant="secondary"
@@ -609,7 +609,7 @@ export default function MapClient() {
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-mq-primary" />
+                  <FilterIcon className="h-5 w-5 text-mq-primary" />
                   {t('advancedSearch')}
                   <Badge className="ml-auto bg-mq-primary/10 text-mq-primary border-mq-primary/20">
                     {t('active')}
@@ -632,7 +632,7 @@ export default function MapClient() {
                       onClick={() => setShowFilters(!showFilters)}
                       className="w-full gap-2"
                     >
-                      <Filter className="h-4 w-4" />
+                      <FilterIcon className="h-4 w-4" />
                       {showFilters ? t('hideFilters') : t('showFilters')}
                       {activeFilters.length > 0 && (
                         <Badge className="ml-1 bg-white/20 text-current">

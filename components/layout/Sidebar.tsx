@@ -159,14 +159,28 @@ const Sidebar = memo(() => {
             document.activeElement.blur();
           }
         }}
+        suppressHydrationWarning
       >
         {/* Trigger area with hamburger bars */}
-        <div aria-hidden="true" className={cn(BASE_CLASSES.trigger, mounted && styles.trigger)}>
+        <div
+          aria-hidden="true"
+          className={cn(BASE_CLASSES.trigger, mounted && styles.trigger)}
+          suppressHydrationWarning
+        >
           {/* Hamburger bars container */}
-          <span className={cn(BASE_CLASSES.bars, mounted && styles.bars)}>
-            <span className={cn(BASE_CLASSES.bar, mounted && styles.barTop)} />
-            <span className={cn(BASE_CLASSES.bar, mounted && styles.barMid)} />
-            <span className={cn(BASE_CLASSES.bar, mounted && styles.barBottom)} />
+          <span className={cn(BASE_CLASSES.bars, mounted && styles.bars)} suppressHydrationWarning>
+            <span
+              className={cn(BASE_CLASSES.bar, mounted && styles.barTop)}
+              suppressHydrationWarning
+            />
+            <span
+              className={cn(BASE_CLASSES.bar, mounted && styles.barMid)}
+              suppressHydrationWarning
+            />
+            <span
+              className={cn(BASE_CLASSES.bar, mounted && styles.barBottom)}
+              suppressHydrationWarning
+            />
           </span>
         </div>
 
@@ -178,9 +192,10 @@ const Sidebar = memo(() => {
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(BASE_CLASSES.panel, getMobilePanelClasses())}
+          suppressHydrationWarning
         >
           {/* Logo and branding - animated */}
-          <div className={cn(BASE_CLASSES.logo, mounted && styles.logo)}>
+          <div className={cn(BASE_CLASSES.logo, mounted && styles.logo)} suppressHydrationWarning>
             <Link
               href="/home"
               className="flex items-center gap-2"
@@ -198,7 +213,12 @@ const Sidebar = memo(() => {
           </div>
 
           {/* Navigation with staggered menu items */}
-          <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
+          <nav
+            className="space-y-2"
+            role="navigation"
+            aria-label={t('mainNavigation')}
+            suppressHydrationWarning
+          >
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href || (pathname === '/' && item.href === '/home');
@@ -233,7 +253,10 @@ const Sidebar = memo(() => {
           </nav>
 
           {/* Social buttons at bottom - animated */}
-          <div className={cn(BASE_CLASSES.social, mounted && styles.socialSection)}>
+          <div
+            className={cn(BASE_CLASSES.social, mounted && styles.socialSection)}
+            suppressHydrationWarning
+          >
             <SocialButtons />
           </div>
         </div>
