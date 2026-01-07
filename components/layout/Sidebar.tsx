@@ -154,9 +154,9 @@ const Sidebar = memo(() => {
             // Desktop: use CSS module for hover-based animation
             'md:transition-none',
             styles.panel,
-            // Mobile: use dedicated mobile animation classes
-            'max-md:transition-transform max-md:duration-300 max-md:ease-[cubic-bezier(0.22,1,0.36,1)]',
-            mobileMenuOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
+            // Mobile: use CSS module classes for animation
+            styles.panelMobile,
+            mobileMenuOpen ? styles.panelMobileOpen : styles.panelMobileClosed,
             // Reduced motion
             'motion-reduce:transition-none motion-reduce:transform-none',
           )}

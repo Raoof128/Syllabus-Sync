@@ -165,16 +165,18 @@
 }
 
 /* Mobile panel animation */
-.panelMobile {
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-}
+@media (max-width: 767px) {
+  .panelMobile {
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-.panelMobileOpen {
-  transform: translateX(0) !important;
-}
+  .panelMobileOpen {
+    transform: translateX(0);
+  }
 
-.panelMobileClosed {
-  transform: translateX(-100%);
+  .panelMobileClosed {
+    transform: translateX(-100%);
+  }
 }
 
 /* ============================================
