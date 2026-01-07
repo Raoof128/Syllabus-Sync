@@ -113,7 +113,7 @@ export default function HomeClient() {
   }, [supabase.auth]);
 
   // Get display name for welcome message: profile name > user metadata > email extraction > fallback
-  const displayName = useMemo(() => {
+  const displayName = (() => {
     if (currentProfile?.name) return currentProfile.name;
     if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user?.user_metadata?.name) return user.user_metadata.name;
@@ -130,7 +130,7 @@ export default function HomeClient() {
       }
     }
     return null;
-  }, [currentProfile, user]);
+  })();
 
   // Auto-select first profile if profiles exist but none is selected (migration for existing users)
   useEffect(() => {

@@ -152,7 +152,8 @@ const Header = memo(() => {
 
   // Get display name: prioritize profile name, then Supabase user metadata full_name/name, then extract from email
   // Extract a proper name from the email prefix (capitalize first letter)
-  const displayName = useMemo(() => {
+  // Only calculate on client to avoid hydration mismatch
+  const displayName = isClient ? (() => {
     if (currentProfile?.name) return currentProfile.name;
     if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user?.user_metadata?.name) return user.user_metadata.name;
@@ -169,7 +170,7 @@ const Header = memo(() => {
       }
     }
     return null;
-  }, [currentProfile, user]);
+  })() : null;
 
   return (
     <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-4 sm:px-6 relative z-10">

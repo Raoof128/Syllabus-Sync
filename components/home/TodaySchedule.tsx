@@ -109,11 +109,11 @@ const TodaySchedule = memo(() => {
               </div>
             ) : (
               <div className="space-y-3">
-                {todayClasses.map((cls) => (
+                {todayClasses.map((cls, index) => (
                   <Link
                     key={`${cls.id}-${cls.code}`}
                     href="/calendar"
-                    className="group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
+                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
                     aria-label={`${cls.code} - ${cls.name}, ${cls.startTime} - ${cls.endTime} at ${cls.location.building} ${cls.location.room}`}
                   >
                     {/* Color indicator */}
