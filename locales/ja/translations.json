@@ -658,5 +658,16 @@
   "timing1hour": "1時間",
   "timing2hours": "2時間",
   "timing1day": "1日",
-  "timing2days": "2日"
+  "timing2days": "2日",
+  "allFieldsRequired": "すべての項目を入力してください",
+  "passwordTooShort": "パスワードは6文字以上必要です",
+  "passwordsDoNotMatch": "新しいパスワードが一致しません",
+  "notSignedIn": "パスワードを変更するにはサインインが必要です",
+  "currentPasswordIncorrect": "現在のパスワードが正しくありません",
+  "passwordChangedSuccess": "パスワードが正常に変更されました",
+  "currentPassword": "現在のパスワード",
+  "newPassword": "新しいパスワード",
+  "confirmNewPassword": "新しいパスワードの確認",
+  "changePasswordTitle": "パスワードを変更",
+  "changePasswordDialogDesc": "現在のパスワードを入力し、新しいパスワードを選択してください"
 }

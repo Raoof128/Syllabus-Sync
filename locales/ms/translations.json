@@ -658,5 +658,16 @@
   "timing1hour": "1 jam",
   "timing2hours": "2 jam",
   "timing1day": "1 hari",
-  "timing2days": "2 hari"
+  "timing2days": "2 hari",
+  "allFieldsRequired": "Sila isi semua ruangan",
+  "passwordTooShort": "Kata laluan mesti sekurang-kurangnya 6 aksara",
+  "passwordsDoNotMatch": "Kata laluan baharu tidak sepadan",
+  "notSignedIn": "Anda mesti log masuk untuk menukar kata laluan",
+  "currentPasswordIncorrect": "Kata laluan semasa tidak betul",
+  "passwordChangedSuccess": "Kata laluan anda telah berjaya ditukar",
+  "currentPassword": "Kata Laluan Semasa",
+  "newPassword": "Kata Laluan Baharu",
+  "confirmNewPassword": "Sahkan Kata Laluan Baharu",
+  "changePasswordTitle": "Tukar Kata Laluan",
+  "changePasswordDialogDesc": "Masukkan kata laluan semasa dan pilih yang baharu"
 }

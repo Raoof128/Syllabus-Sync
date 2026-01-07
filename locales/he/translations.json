@@ -658,5 +658,16 @@
   "timing1hour": "שעה אחת",
   "timing2hours": "שעתיים",
   "timing1day": "יום אחד",
-  "timing2days": "יומיים"
+  "timing2days": "יומיים",
+  "allFieldsRequired": "אנא מלא את כל השדות",
+  "passwordTooShort": "הסיסמה חייבת להכיל לפחות 6 תווים",
+  "passwordsDoNotMatch": "הסיסמאות החדשות אינן תואמות",
+  "notSignedIn": "עליך להיות מחובר כדי לשנות את הסיסמה",
+  "currentPasswordIncorrect": "הסיסמה הנוכחית שגויה",
+  "passwordChangedSuccess": "הסיסמה שלך שונתה בהצלחה",
+  "currentPassword": "סיסמה נוכחית",
+  "newPassword": "סיסמה חדשה",
+  "confirmNewPassword": "אשר סיסמה חדשה",
+  "changePasswordTitle": "שנה סיסמה",
+  "changePasswordDialogDesc": "הזן את הסיסמה הנוכחית ובחר סיסמה חדשה"
 }

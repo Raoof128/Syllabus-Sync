@@ -658,5 +658,16 @@
   "timing1hour": "1 hora",
   "timing2hours": "2 horas",
   "timing1day": "1 día",
-  "timing2days": "2 días"
+  "timing2days": "2 días",
+  "allFieldsRequired": "Por favor complete todos los campos",
+  "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden",
+  "notSignedIn": "Debe iniciar sesión para cambiar su contraseña",
+  "currentPasswordIncorrect": "La contraseña actual es incorrecta",
+  "passwordChangedSuccess": "Su contraseña ha sido cambiada exitosamente",
+  "currentPassword": "Contraseña Actual",
+  "newPassword": "Nueva Contraseña",
+  "confirmNewPassword": "Confirmar Nueva Contraseña",
+  "changePasswordTitle": "Cambiar Contraseña",
+  "changePasswordDialogDesc": "Ingrese su contraseña actual y elija una nueva"
 }

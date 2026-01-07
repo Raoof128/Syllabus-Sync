@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.66 | Last Updated: January 07, 2026
+Version: 0.5.67 | Last Updated: January 07, 2026
 
 ---
 
@@ -2402,3 +2402,17 @@ Summary:
 Files: lib/hooks/useNotificationScheduler.ts; app/client-layout.tsx; lib/hooks/index.ts; Team_Plan/AGENT.md.
 Verification: npm run build (pass, 27 routes generated, no TypeScript errors).
 Follow-ups: Update CHANGELOG.md; test notification flow in browser; add translation keys for notification settings.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Toast Styling Fix & Change Password Implementation (v0.5.67).
+Summary:
+  - Fixed toast notifications to use solid backgrounds instead of transparent (bg-mq-card-background).
+  - Changed border from `border` to `border-2` for better visibility.
+  - Implemented fully functional Change Password feature with Supabase auth integration.
+  - Added password change dialog with current/new/confirm password fields and show/hide toggles.
+  - Added proper validation: field required, min 6 chars, passwords must match, verify current password.
+  - Added 11 new translation keys for password change feature across all 19 locales.
+  - Bumped version from 0.5.66 to 0.5.67.
+Files: components/ui/toast.tsx; app/settings/components/PrivacySettings.tsx; locales/*/translations.json (19 files).
+Verification: npm run lint (0 errors); npm run test (46/46 pass); npm run build (27 routes).
+Follow-ups: None.

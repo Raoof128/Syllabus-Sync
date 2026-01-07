@@ -658,5 +658,16 @@
   "timing1hour": "۱ ساعت",
   "timing2hours": "۲ ساعت",
   "timing1day": "۱ روز",
-  "timing2days": "۲ روز"
+  "timing2days": "۲ روز",
+  "allFieldsRequired": "لطفاً همه فیلدها را پر کنید",
+  "passwordTooShort": "رمز عبور باید حداقل ۶ کاراکتر باشد",
+  "passwordsDoNotMatch": "رمزهای عبور جدید مطابقت ندارند",
+  "notSignedIn": "برای تغییر رمز عبور باید وارد شوید",
+  "currentPasswordIncorrect": "رمز عبور فعلی نادرست است",
+  "passwordChangedSuccess": "رمز عبور شما با موفقیت تغییر کرد",
+  "currentPassword": "رمز عبور فعلی",
+  "newPassword": "رمز عبور جدید",
+  "confirmNewPassword": "تأیید رمز عبور جدید",
+  "changePasswordTitle": "تغییر رمز عبور",
+  "changePasswordDialogDesc": "رمز عبور فعلی را وارد کنید و یک رمز جدید انتخاب کنید"
 }

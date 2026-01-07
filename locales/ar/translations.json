@@ -658,5 +658,16 @@
   "timing1hour": "ساعة واحدة",
   "timing2hours": "ساعتان",
   "timing1day": "يوم واحد",
-  "timing2days": "يومان"
+  "timing2days": "يومان",
+  "allFieldsRequired": "يرجى ملء جميع الحقول",
+  "passwordTooShort": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+  "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
+  "notSignedIn": "يجب تسجيل الدخول لتغيير كلمة المرور",
+  "currentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
+  "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح",
+  "currentPassword": "كلمة المرور الحالية",
+  "newPassword": "كلمة المرور الجديدة",
+  "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "changePasswordTitle": "تغيير كلمة المرور",
+  "changePasswordDialogDesc": "أدخل كلمة المرور الحالية واختر كلمة مرور جديدة"
 }

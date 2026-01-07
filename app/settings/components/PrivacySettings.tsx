@@ -11,10 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Shield, Download } from 'lucide-react';
+import { Shield, Download, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
+import { createBrowserClient } from '@/lib/supabase/client';
 import type { Unit, Deadline } from '@/lib/types';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
@@ -49,6 +50,91 @@ const PrivacySettings = memo(
   }: PrivacySettingsProps) => {
     const [showSessionsDialog, setShowSessionsDialog] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
+    const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    const openPasswordDialog = useCallback(() => {
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPasswordDialog(true);
+    }, []);
+
+    const handleChangePassword = useCallback(async () => {
+      // Validation
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        toastUtils.error(t('settingsError'), t('allFieldsRequired'));
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        toastUtils.error(t('settingsError'), t('passwordTooShort'));
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        toastUtils.error(t('settingsError'), t('passwordsDoNotMatch'));
+        return;
+      }
+
+      setIsChangingPassword(true);
+
+      try {
+        const supabase = createBrowserClient();
+
+        // First, verify current password by re-authenticating
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user?.email) {
+          toastUtils.error(t('settingsError'), t('notSignedIn'));
+          setIsChangingPassword(false);
+          return;
+        }
+
+        // Try to sign in with current password to verify it
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword,
+        });
+
+        if (signInError) {
+          toastUtils.error(t('settingsError'), t('currentPasswordIncorrect'));
+          setIsChangingPassword(false);
+          return;
+        }
+
+        // Update password
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+
+        if (updateError) {
+          errorHandler.logError(updateError as Error, 'Change Password', 'medium');
+          toastUtils.error(t('settingsError'), updateError.message);
+          setIsChangingPassword(false);
+          return;
+        }
+
+        toastUtils.success(t('changePassword'), t('passwordChangedSuccess'));
+        setShowPasswordDialog(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } catch (error) {
+        errorHandler.logError(error as Error, 'Change Password', 'medium');
+        toastUtils.error(t('settingsError'), t('preferenceError'));
+      } finally {
+        setIsChangingPassword(false);
+      }
+    }, [currentPassword, newPassword, confirmPassword, t]);
 
     const openSessions = useCallback(() => {
       if (typeof window !== 'undefined') {
@@ -153,7 +239,7 @@ const PrivacySettings = memo(
                     variant="ghost"
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                    onClick={() => toastUtils.info(t('changePassword'), t('comingSoon'))}
+                    onClick={openPasswordDialog}
                   >
                     {t('changePassword')}
                   </Button>
@@ -293,6 +379,121 @@ const PrivacySettings = memo(
               <Button onClick={handleExportData}>
                 <Download className="h-4 w-4 mr-2" />
                 {t('proceedExport')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Change Password Dialog */}
+        <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t('changePasswordTitle')}</DialogTitle>
+              <DialogDescription>{t('changePasswordDialogDesc')}</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              {/* Current Password */}
+              <div className="space-y-2">
+                <label htmlFor="current-password" className="text-sm font-medium text-mq-content">
+                  {t('currentPassword')}
+                </label>
+                <div className="relative">
+                  <input
+                    id="current-password"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                  >
+                    {showCurrentPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div className="space-y-2">
+                <label htmlFor="new-password" className="text-sm font-medium text-mq-content">
+                  {t('newPassword')}
+                </label>
+                <div className="relative">
+                  <input
+                    id="new-password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm New Password */}
+              <div className="space-y-2">
+                <label htmlFor="confirm-password" className="text-sm font-medium text-mq-content">
+                  {t('confirmNewPassword')}
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="flex justify-end gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setShowPasswordDialog(false)}
+                disabled={isChangingPassword}
+              >
+                {t('cancel')}
+              </Button>
+              <Button onClick={handleChangePassword} disabled={isChangingPassword}>
+                {isChangingPassword ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('loading')}
+                  </>
+                ) : (
+                  t('changePassword')
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -658,5 +658,16 @@
   "timing1hour": "1 ชั่วโมง",
   "timing2hours": "2 ชั่วโมง",
   "timing1day": "1 วัน",
-  "timing2days": "2 วัน"
+  "timing2days": "2 วัน",
+  "allFieldsRequired": "กรุณากรอกข้อมูลทุกช่อง",
+  "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+  "passwordsDoNotMatch": "รหัสผ่านใหม่ไม่ตรงกัน",
+  "notSignedIn": "คุณต้องเข้าสู่ระบบเพื่อเปลี่ยนรหัสผ่าน",
+  "currentPasswordIncorrect": "รหัสผ่านปัจจุบันไม่ถูกต้อง",
+  "passwordChangedSuccess": "เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว",
+  "currentPassword": "รหัสผ่านปัจจุบัน",
+  "newPassword": "รหัสผ่านใหม่",
+  "confirmNewPassword": "ยืนยันรหัสผ่านใหม่",
+  "changePasswordTitle": "เปลี่ยนรหัสผ่าน",
+  "changePasswordDialogDesc": "ใส่รหัสผ่านปัจจุบันและเลือกรหัสผ่านใหม่"
 }

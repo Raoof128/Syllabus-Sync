@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.67] - 2026-01-07
+
+### Fixed
+
+#### Toast Notification Styling (Raouf)
+
+**Background Fix:**
+
+- **Solid backgrounds (Raouf)**: Fixed toast notifications to use solid `bg-mq-card-background` instead of transparent backgrounds (`bg-mq-success/10`, etc.). This matches the overall theme and improves readability.
+
+- **Border thickness (Raouf)**: Increased border from `border` to `border-2` for better visibility and consistency with other UI elements.
+
+- **Color inheritance (Raouf)**: Added `[&>div]:text-mq-*` selectors to ensure child text elements inherit the correct variant colors.
+
+**Files Changed:**
+- `components/ui/toast.tsx` - Toast variant styling updates
+
+### Added
+
+#### Change Password Feature (Raouf)
+
+**Functionality:**
+
+- **Password change dialog (Raouf)**: Implemented fully functional Change Password feature in Privacy & Security settings. Replaces the previous "Coming Soon" placeholder.
+
+- **Form fields (Raouf)**: Dialog includes current password, new password, and confirm password fields with show/hide toggles for each.
+
+- **Validation (Raouf)**: Comprehensive validation including: all fields required, minimum 6 characters, passwords must match, current password verification via Supabase re-authentication.
+
+- **Supabase integration (Raouf)**: Uses `supabase.auth.signInWithPassword()` to verify current password, then `supabase.auth.updateUser()` to update the password.
+
+- **Loading states (Raouf)**: Shows loading spinner during password change operation with proper disabled states.
+
+**i18n Support:**
+
+- **Translation keys (Raouf)**: Added 11 new translation keys for password change feature:
+  - `allFieldsRequired`, `passwordTooShort`, `passwordsDoNotMatch`
+  - `notSignedIn`, `currentPasswordIncorrect`, `passwordChangedSuccess`
+  - `currentPassword`, `newPassword`, `confirmNewPassword`
+  - `changePasswordTitle`, `changePasswordDialogDesc`
+
+- **All locales updated (Raouf)**: Translations added to all 19 supported languages.
+
+**Files Changed:**
+- `app/settings/components/PrivacySettings.tsx` - Change password implementation
+- `locales/en/translations.json` - English translations
+- `locales/ar/translations.json` - Arabic translations
+- `locales/bn/translations.json` - Bengali translations
+- `locales/es/translations.json` - Spanish translations
+- `locales/fa/translations.json` - Persian translations
+- `locales/fr/translations.json` - French translations
+- `locales/he/translations.json` - Hebrew translations
+- `locales/hi/translations.json` - Hindi translations
+- `locales/id/translations.json` - Indonesian translations
+- `locales/it/translations.json` - Italian translations
+- `locales/ja/translations.json` - Japanese translations
+- `locales/ko/translations.json` - Korean translations
+- `locales/ms/translations.json` - Malay translations
+- `locales/ru/translations.json` - Russian translations
+- `locales/ta/translations.json` - Tamil translations
+- `locales/th/translations.json` - Thai translations
+- `locales/ur/translations.json` - Urdu translations
+- `locales/vi/translations.json` - Vietnamese translations
+- `locales/zh/translations.json` - Chinese translations
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run test` (46/46 tests passing)
+- `npm run build` (success, 27 routes)
+
+---
+
 ## [0.5.66] - 2026-01-07
 
 ### Fixed

@@ -658,5 +658,16 @@
   "timing1hour": "1 jam",
   "timing2hours": "2 jam",
   "timing1day": "1 hari",
-  "timing2days": "2 hari"
+  "timing2days": "2 hari",
+  "allFieldsRequired": "Harap isi semua kolom",
+  "passwordTooShort": "Kata sandi minimal 6 karakter",
+  "passwordsDoNotMatch": "Kata sandi baru tidak cocok",
+  "notSignedIn": "Anda harus masuk untuk mengubah kata sandi",
+  "currentPasswordIncorrect": "Kata sandi saat ini salah",
+  "passwordChangedSuccess": "Kata sandi Anda berhasil diubah",
+  "currentPassword": "Kata Sandi Saat Ini",
+  "newPassword": "Kata Sandi Baru",
+  "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
+  "changePasswordTitle": "Ubah Kata Sandi",
+  "changePasswordDialogDesc": "Masukkan kata sandi saat ini dan pilih yang baru"
 }

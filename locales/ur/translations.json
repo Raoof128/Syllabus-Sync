@@ -658,5 +658,16 @@
   "timing1hour": "1 گھنٹہ",
   "timing2hours": "2 گھنٹے",
   "timing1day": "1 دن",
-  "timing2days": "2 دن"
+  "timing2days": "2 دن",
+  "allFieldsRequired": "براہ کرم تمام فیلڈز پُر کریں",
+  "passwordTooShort": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
+  "passwordsDoNotMatch": "نئے پاس ورڈ مماثل نہیں ہیں",
+  "notSignedIn": "پاس ورڈ تبدیل کرنے کے لیے سائن ان ضروری ہے",
+  "currentPasswordIncorrect": "موجودہ پاس ورڈ غلط ہے",
+  "passwordChangedSuccess": "آپ کا پاس ورڈ کامیابی سے تبدیل ہو گیا",
+  "currentPassword": "موجودہ پاس ورڈ",
+  "newPassword": "نیا پاس ورڈ",
+  "confirmNewPassword": "نیا پاس ورڈ تصدیق کریں",
+  "changePasswordTitle": "پاس ورڈ تبدیل کریں",
+  "changePasswordDialogDesc": "موجودہ پاس ورڈ درج کریں اور نیا منتخب کریں"
 }

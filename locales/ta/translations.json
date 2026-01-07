@@ -658,5 +658,16 @@
   "timing1hour": "1 மணி நேரம்",
   "timing2hours": "2 மணி நேரம்",
   "timing1day": "1 நாள்",
-  "timing2days": "2 நாட்கள்"
+  "timing2days": "2 நாட்கள்",
+  "allFieldsRequired": "அனைத்து புலங்களையும் நிரப்பவும்",
+  "passwordTooShort": "கடவுச்சொல் குறைந்தது 6 எழுத்துக்கள் இருக்க வேண்டும்",
+  "passwordsDoNotMatch": "புதிய கடவுச்சொற்கள் பொருந்தவில்லை",
+  "notSignedIn": "கடவுச்சொல்லை மாற்ற உள்நுழைய வேண்டும்",
+  "currentPasswordIncorrect": "தற்போதைய கடவுச்சொல் தவறானது",
+  "passwordChangedSuccess": "உங்கள் கடவுச்சொல் வெற்றிகரமாக மாற்றப்பட்டது",
+  "currentPassword": "தற்போதைய கடவுச்சொல்",
+  "newPassword": "புதிய கடவுச்சொல்",
+  "confirmNewPassword": "புதிய கடவுச்சொல்லை உறுதிப்படுத்து",
+  "changePasswordTitle": "கடவுச்சொல்லை மாற்று",
+  "changePasswordDialogDesc": "தற்போதைய கடவுச்சொல்லை உள்ளிட்டு புதியதைத் தேர்வுசெய்க"
 }

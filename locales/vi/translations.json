@@ -658,5 +658,16 @@
   "timing1hour": "1 giờ",
   "timing2hours": "2 giờ",
   "timing1day": "1 ngày",
-  "timing2days": "2 ngày"
+  "timing2days": "2 ngày",
+  "allFieldsRequired": "Vui lòng điền tất cả các trường",
+  "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+  "passwordsDoNotMatch": "Mật khẩu mới không khớp",
+  "notSignedIn": "Bạn phải đăng nhập để thay đổi mật khẩu",
+  "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
+  "passwordChangedSuccess": "Mật khẩu của bạn đã được thay đổi thành công",
+  "currentPassword": "Mật khẩu hiện tại",
+  "newPassword": "Mật khẩu mới",
+  "confirmNewPassword": "Xác nhận mật khẩu mới",
+  "changePasswordTitle": "Đổi mật khẩu",
+  "changePasswordDialogDesc": "Nhập mật khẩu hiện tại và chọn mật khẩu mới"
 }

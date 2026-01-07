@@ -658,5 +658,16 @@
   "timing1hour": "1 час",
   "timing2hours": "2 часа",
   "timing1day": "1 день",
-  "timing2days": "2 дня"
+  "timing2days": "2 дня",
+  "allFieldsRequired": "Пожалуйста, заполните все поля",
+  "passwordTooShort": "Пароль должен содержать не менее 6 символов",
+  "passwordsDoNotMatch": "Новые пароли не совпадают",
+  "notSignedIn": "Вы должны войти, чтобы изменить пароль",
+  "currentPasswordIncorrect": "Текущий пароль неверен",
+  "passwordChangedSuccess": "Ваш пароль был успешно изменен",
+  "currentPassword": "Текущий пароль",
+  "newPassword": "Новый пароль",
+  "confirmNewPassword": "Подтвердите новый пароль",
+  "changePasswordTitle": "Изменить пароль",
+  "changePasswordDialogDesc": "Введите текущий пароль и выберите новый"
 }

@@ -658,5 +658,16 @@
   "timing1hour": "1小时",
   "timing2hours": "2小时",
   "timing1day": "1天",
-  "timing2days": "2天"
+  "timing2days": "2天",
+  "allFieldsRequired": "请填写所有字段",
+  "passwordTooShort": "密码必须至少6个字符",
+  "passwordsDoNotMatch": "新密码不匹配",
+  "notSignedIn": "您必须登录才能更改密码",
+  "currentPasswordIncorrect": "当前密码不正确",
+  "passwordChangedSuccess": "您的密码已成功更改",
+  "currentPassword": "当前密码",
+  "newPassword": "新密码",
+  "confirmNewPassword": "确认新密码",
+  "changePasswordTitle": "更改密码",
+  "changePasswordDialogDesc": "输入当前密码并选择新密码"
 }

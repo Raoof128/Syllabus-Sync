@@ -658,5 +658,16 @@
   "timing1hour": "1 घंटा",
   "timing2hours": "2 घंटे",
   "timing1day": "1 दिन",
-  "timing2days": "2 दिन"
+  "timing2days": "2 दिन",
+  "allFieldsRequired": "कृपया सभी फ़ील्ड भरें",
+  "passwordTooShort": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+  "passwordsDoNotMatch": "नए पासवर्ड मेल नहीं खाते",
+  "notSignedIn": "पासवर्ड बदलने के लिए साइन इन करना होगा",
+  "currentPasswordIncorrect": "वर्तमान पासवर्ड गलत है",
+  "passwordChangedSuccess": "आपका पासवर्ड सफलतापूर्वक बदल दिया गया है",
+  "currentPassword": "वर्तमान पासवर्ड",
+  "newPassword": "नया पासवर्ड",
+  "confirmNewPassword": "नया पासवर्ड पुष्टि करें",
+  "changePasswordTitle": "पासवर्ड बदलें",
+  "changePasswordDialogDesc": "अपना वर्तमान पासवर्ड दर्ज करें और नया चुनें"
 }

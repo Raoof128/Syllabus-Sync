@@ -658,5 +658,16 @@
   "timing1hour": "১ ঘন্টা",
   "timing2hours": "২ ঘন্টা",
   "timing1day": "১ দিন",
-  "timing2days": "২ দিন"
+  "timing2days": "২ দিন",
+  "allFieldsRequired": "সব ক্ষেত্র পূরণ করুন",
+  "passwordTooShort": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে",
+  "passwordsDoNotMatch": "নতুন পাসওয়ার্ড মিলছে না",
+  "notSignedIn": "পাসওয়ার্ড পরিবর্তন করতে সাইন ইন করতে হবে",
+  "currentPasswordIncorrect": "বর্তমান পাসওয়ার্ড ভুল",
+  "passwordChangedSuccess": "পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে",
+  "currentPassword": "বর্তমান পাসওয়ার্ড",
+  "newPassword": "নতুন পাসওয়ার্ড",
+  "confirmNewPassword": "নতুন পাসওয়ার্ড নিশ্চিত করুন",
+  "changePasswordTitle": "পাসওয়ার্ড পরিবর্তন করুন",
+  "changePasswordDialogDesc": "বর্তমান পাসওয়ার্ড দিন এবং নতুন পাসওয়ার্ড বেছে নিন"
 }
