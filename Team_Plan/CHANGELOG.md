@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.68] - 2026-01-07
+
+### Fixed
+
+#### Codebase Audit & Improvements (Raouf)
+
+**Code Quality Fixes:**
+
+- **Translation key casting (Raouf)**: Fixed improper type casting in EventsFeed.tsx where `addEvent` was cast as `addDeadline`. Now uses correct `t('addEvent')` call without casting. File: `components/home/EventsFeed.tsx`.
+
+- **Hardcoded URLs (Raouf)**: Replaced hardcoded social media URLs in SocialButtons.tsx with `SOCIAL_LINKS` and `UNIVERSITY_CONFIG` from centralized config. URLs for Twitter, LinkedIn, website, and support email now come from `lib/config.ts`. File: `components/layout/SocialButtons.tsx`.
+
+- **Empty catch blocks (Raouf)**: Added descriptive comments to empty catch blocks in layout.tsx explaining why errors are intentionally ignored (localStorage/parsing errors fall back to system defaults). File: `app/layout.tsx`.
+
+- **Hardcoded alt text (Raouf)**: Translated hardcoded "Macquarie University Logo" alt text in LoginClient.tsx to use `t('mqLogoAlt')` translation key for i18n support. File: `app/login/LoginClient.tsx`.
+
+**Configuration Improvements:**
+
+- **ORS API URL (Raouf)**: Moved hardcoded OpenRouteService API URL to environment variable `ORS_BASE_URL` with fallback to default value. File: `app/api/navigate/route.ts`.
+
+- **CORS origins (Raouf)**: Moved hardcoded CORS allowed origins to environment variable `CORS_ALLOWED_ORIGINS` (comma-separated) with fallback to localhost defaults. File: `app/api/_lib/middleware.ts`.
+
+**Files Changed:**
+- `components/home/EventsFeed.tsx`
+- `components/layout/SocialButtons.tsx`
+- `app/layout.tsx`
+- `app/login/LoginClient.tsx`
+- `app/api/navigate/route.ts`
+- `app/api/_lib/middleware.ts`
+- `package.json` - Version bump
+- `lib/config.ts` - Version bump
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run test` (46/46 tests passing)
+- `npm run build` (success, 27 routes)
+
+---
+
 ## [0.5.67] - 2026-01-07
 
 ### Fixed

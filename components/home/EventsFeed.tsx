@@ -41,10 +41,10 @@ const EventsFeed = memo(() => {
                   console.warn('Failed to trigger add event:', error);
                 }
               }}
-              aria-label={t('addEvent' as 'addDeadline')}
+              aria-label={t('addEvent')}
             >
               <Plus className="h-4 w-4" />
-              {t('addEvent' as 'addDeadline')}
+              {t('addEvent')}
             </Button>
           </CardHeader>
           <CardContent>

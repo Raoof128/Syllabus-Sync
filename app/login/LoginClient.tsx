@@ -101,7 +101,7 @@ export default function LoginClient() {
               {/* Use consistent MQ branding logo */}
               <Image
                 src="/MQ_Logo_Final.png"
-                alt="Macquarie University Logo"
+                alt={t('mqLogoAlt')}
                 width={260}
                 height={260}
                 className="object-contain w-full h-full drop-shadow-xl"

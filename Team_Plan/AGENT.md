@@ -2416,3 +2416,17 @@ Summary:
 Files: components/ui/toast.tsx; app/settings/components/PrivacySettings.tsx; locales/*/translations.json (19 files).
 Verification: npm run lint (0 errors); npm run test (46/46 pass); npm run build (27 routes).
 Follow-ups: None.
+
+### Raouf: 2026-01-07 (Australia/Sydney)
+Scope: Codebase Audit & Improvements (v0.5.68).
+Summary:
+  - Fixed translation key casting in EventsFeed.tsx (removed improper `as 'addDeadline'` cast on `addEvent`).
+  - Replaced hardcoded social media URLs in SocialButtons.tsx with SOCIAL_LINKS and UNIVERSITY_CONFIG from centralized config.
+  - Added error handling comments to empty catch blocks in layout.tsx (localStorage/parsing errors).
+  - Translated hardcoded alt text in LoginClient.tsx to use i18n key `mqLogoAlt`.
+  - Moved ORS API URL to environment variable `ORS_BASE_URL` with fallback.
+  - Moved CORS origins to environment variable `CORS_ALLOWED_ORIGINS` (comma-separated) with fallback.
+  - Version bumped to 0.5.68.
+Files: components/home/EventsFeed.tsx; components/layout/SocialButtons.tsx; app/layout.tsx; app/login/LoginClient.tsx; app/api/navigate/route.ts; app/api/_lib/middleware.ts; package.json; lib/config.ts.
+Verification: npm run lint (0 errors, 0 warnings); npm run test (46/46 pass); npm run build (success, 27 routes).
+Follow-ups: None.

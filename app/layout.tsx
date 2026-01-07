@@ -77,7 +77,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
         document.documentElement.classList.add(resolved);
         document.documentElement.style.colorScheme = resolved;
-      } catch (e) {}
+      } catch (e) {
+        // Ignore localStorage/parsing errors - will fall back to system default
+      }
     })();
   `;
 
@@ -98,7 +100,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             document.documentElement.lang = lang;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        // Ignore localStorage/parsing errors - will fall back to LTR English
+      }
     })();
   `;
 

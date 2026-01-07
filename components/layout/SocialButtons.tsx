@@ -3,6 +3,7 @@
 
 import { memo } from 'react';
 import { Globe, Linkedin, Mail } from 'lucide-react';
+import { SOCIAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -24,25 +25,25 @@ const socialLinks: SocialLink[] = [
   {
     name: 'x',
     icon: XIcon,
-    href: 'https://x.com/Macquarie_Uni',
+    href: SOCIAL_LINKS.twitter,
     label: 'X',
   },
   {
     name: 'linkedin',
     icon: Linkedin,
-    href: 'https://www.linkedin.com/school/macquarie-university/',
+    href: SOCIAL_LINKS.linkedin,
     label: 'LinkedIn',
   },
   {
     name: 'website',
     icon: Globe,
-    href: 'https://www.mq.edu.au',
+    href: UNIVERSITY_CONFIG.website,
     label: 'MQ Website',
   },
   {
     name: 'email',
     icon: Mail,
-    href: 'mailto:support@mq.edu.au',
+    href: `mailto:${UNIVERSITY_CONFIG.supportEmail}`,
     label: 'Email',
   },
 ];

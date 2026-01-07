@@ -161,8 +161,14 @@ interface CorsConfig {
  * Apply CORS headers to API routes
  */
 export const cors = (config: CorsConfig = {}) => {
+  // Parse CORS_ALLOWED_ORIGINS from environment variable if available
+  // Format: comma-separated URLs, e.g., "http://localhost:3000,https://myapp.com"
+  const defaultOrigins = process.env.CORS_ALLOWED_ORIGINS
+    ? process.env.CORS_ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+    : ['http://localhost:3000', 'https://localhost:3000'];
+
   const {
-    allowedOrigins = ['http://localhost:3000', 'https://localhost:3000'],
+    allowedOrigins = defaultOrigins,
     allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders = [],
