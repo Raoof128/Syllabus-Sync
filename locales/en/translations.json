@@ -247,6 +247,8 @@
   "requestingPosition": "Requesting your current position...",
   "locationFound": "Location Found",
   "centeredOnPosition": "Centered on your position.",
+  "outsideCampus": "Outside Campus",
+  "outsideCampusDistance": "You are approximately {{distance}}m from campus center",
   "unknownError": "Unknown error occurred.",
   "campusFeed": "Campus Feed",
   "info": "Info",

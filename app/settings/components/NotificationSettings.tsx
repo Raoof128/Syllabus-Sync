@@ -17,12 +17,7 @@ import {
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
-
-type NotificationPreferences = {
-  deadlines: boolean;
-  classes: boolean;
-  events: boolean;
-};
+import type { NotificationPreferences } from '@/lib/types';
 
 type NotificationSettingsProps = {
   notifications: NotificationPreferences;
@@ -38,7 +33,7 @@ const REMINDER_TIMING_OPTIONS = [
   { value: 120, labelKey: 'timing2hours' as const },
   { value: 1440, labelKey: 'timing1day' as const },
   { value: 2880, labelKey: 'timing2days' as const },
-];
+] as const;
 
 // Helper for detecting client-side rendering without setState in effect
 const emptySubscribe = () => () => {};
@@ -71,20 +66,31 @@ const NotificationSettings = memo(
       setEventReminderTiming,
     } = useNotificationPreferencesStore();
 
-    // Initialize on mount
+    // Initialize on mount - single source of truth from store
     useEffect(() => {
       initialize();
     }, [initialize]);
 
-    // Sync local state with store
+    // Sync parent state with store values only once after initialization
     useEffect(() => {
       if (isClient) {
-        setNotifications({
+        // Only update if values differ to prevent infinite loops
+        const storeState = {
           deadlines: deadlinesEnabled,
           classes: classesEnabled,
           events: eventsEnabled,
-        });
+        };
+
+        if (
+          notifications.deadlines !== storeState.deadlines ||
+          notifications.classes !== storeState.classes ||
+          notifications.events !== storeState.events
+        ) {
+          setNotifications(storeState);
+        }
       }
+      // Only run when store values change, not when notifications changes
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isClient, deadlinesEnabled, classesEnabled, eventsEnabled, setNotifications]);
 
     const handleRequestPermission = useCallback(async () => {
@@ -115,8 +121,8 @@ const NotificationSettings = memo(
           events: setEventsEnabled,
         };
 
+        // Update store (single source of truth)
         setters[type](enabled);
-        setNotifications((prev) => ({ ...prev, [type]: enabled }));
 
         const typeLabels: Record<string, string> = {
           deadlines: t('deadlineReminders'),
@@ -129,7 +135,7 @@ const NotificationSettings = memo(
           `${typeLabels[type]} ${enabled ? t('enabled').toLowerCase() : t('disabled').toLowerCase()}`,
         );
       },
-      [setDeadlinesEnabled, setClassesEnabled, setEventsEnabled, setNotifications, t],
+      [setDeadlinesEnabled, setClassesEnabled, setEventsEnabled, t],
     );
 
     const handleTimingChange = useCallback(
@@ -151,6 +157,13 @@ const NotificationSettings = memo(
       },
       [setDeadlineReminderTiming, setClassReminderTiming, setEventReminderTiming, t],
     );
+
+    // Use store values directly for rendering (single source of truth)
+    const currentNotifications = {
+      deadlines: deadlinesEnabled,
+      classes: classesEnabled,
+      events: eventsEnabled,
+    };
 
     const notificationItems = [
       {
@@ -183,15 +196,15 @@ const NotificationSettings = memo(
       isClient && typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-      <div className="mq-magic-card">
+      <div className="mq-magic-card" data-testid="notification-settings">
         <Card className="mq-magic-card-content">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              {t('notifications')}
+              <Bell className="h-5 w-5" aria-hidden="true" />
+              <span id="notifications-heading">{t('notifications')}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4" role="region" aria-labelledby="notifications-heading">
             {/* Push Notification Permission Banner */}
             {isClient && (
               <div
@@ -202,15 +215,16 @@ const NotificationSettings = memo(
                       ? 'bg-mq-error/15 border-mq-error/40'
                       : 'bg-mq-warning/15 border-mq-warning/40'
                 }`}
+                data-testid="push-notification-banner"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     {permissionStatus === 'granted' ? (
-                      <Bell className="h-5 w-5 text-mq-success" />
+                      <Bell className="h-5 w-5 text-mq-success" aria-hidden="true" />
                     ) : permissionStatus === 'denied' ? (
-                      <BellOff className="h-5 w-5 text-mq-error" />
+                      <BellOff className="h-5 w-5 text-mq-error" aria-hidden="true" />
                     ) : (
-                      <AlertTriangle className="h-5 w-5 text-mq-warning" />
+                      <AlertTriangle className="h-5 w-5 text-mq-warning" aria-hidden="true" />
                     )}
                     <div>
                       <p className="text-mq-sm font-medium text-mq-content">
@@ -239,15 +253,18 @@ const NotificationSettings = memo(
                           ? 'bg-mq-success text-white border-mq-success hover:bg-mq-success/80 hover:border-mq-success/80'
                           : 'bg-mq-error text-white border-mq-error hover:bg-mq-error/80 hover:border-mq-error/80'
                       }`}
+                      aria-pressed={pushEnabled}
+                      aria-label={`${t('pushNotifications')} ${pushEnabled ? t('enabled') : t('disabled')}`}
+                      data-testid="toggle-push-notifications"
                     >
                       {pushEnabled ? (
                         <>
-                          <CheckCircle className="h-3 w-3" />
+                          <CheckCircle className="h-3 w-3" aria-hidden="true" />
                           {t('on')}
                         </>
                       ) : (
                         <>
-                          <XCircle className="h-3 w-3" />
+                          <XCircle className="h-3 w-3" aria-hidden="true" />
                           {t('off')}
                         </>
                       )}
@@ -258,6 +275,7 @@ const NotificationSettings = memo(
                       size="sm"
                       onClick={handleRequestPermission}
                       className="px-3 py-1 text-xs bg-mq-primary text-white border-2 border-mq-primary rounded-md hover:bg-mq-primary/80 hover:border-mq-primary/80"
+                      data-testid="enable-notifications-button"
                     >
                       {t('enable')}
                     </Button>
@@ -271,10 +289,14 @@ const NotificationSettings = memo(
               <div
                 key={key}
                 className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors"
+                data-testid={`notification-item-${key}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    <Icon className="h-4 w-4 text-mq-content-tertiary flex-shrink-0" />
+                    <Icon
+                      className="h-4 w-4 text-mq-content-tertiary flex-shrink-0"
+                      aria-hidden="true"
+                    />
                     <div className="flex-1 min-w-0">
                       <p className="text-mq-sm font-medium text-mq-content">{label}</p>
                       <p className="text-mq-xs text-mq-content-secondary mt-0.5">{desc}</p>
@@ -283,23 +305,24 @@ const NotificationSettings = memo(
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleNotificationPreference(key, !notifications[key])}
+                    onClick={() => handleNotificationPreference(key, !currentNotifications[key])}
                     className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 flex-shrink-0 border-2 rounded-md ${
-                      notifications[key]
+                      currentNotifications[key]
                         ? 'bg-mq-success text-white border-mq-success hover:bg-mq-success/80 hover:border-mq-success/80'
                         : 'bg-mq-error text-white border-mq-error hover:bg-mq-error/80 hover:border-mq-error/80'
                     }`}
-                    aria-label={`${label} ${t('notifications').toLowerCase()} ${t('are')} ${notifications[key] ? t('enabled') : t('disabled')}. ${t('clickTo')} ${notifications[key] ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                    aria-pressed={notifications[key]}
+                    aria-label={`${label} ${t('notifications').toLowerCase()} ${t('are')} ${currentNotifications[key] ? t('enabled') : t('disabled')}. ${t('clickTo')} ${currentNotifications[key] ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
+                    aria-pressed={currentNotifications[key]}
+                    data-testid={`toggle-${key}-notifications`}
                   >
-                    {notifications[key] ? (
+                    {currentNotifications[key] ? (
                       <>
-                        <CheckCircle className="h-3 w-3" />
+                        <CheckCircle className="h-3 w-3" aria-hidden="true" />
                         {t('enabled')}
                       </>
                     ) : (
                       <>
-                        <XCircle className="h-3 w-3" />
+                        <XCircle className="h-3 w-3" aria-hidden="true" />
                         {t('disabled')}
                       </>
                     )}
@@ -307,16 +330,23 @@ const NotificationSettings = memo(
                 </div>
 
                 {/* Reminder Timing Selector - only show when enabled */}
-                {notifications[key] && permissionStatus === 'granted' && (
+                {currentNotifications[key] && permissionStatus === 'granted' && (
                   <div className="mt-3 pt-3 border-t border-mq-border/50">
                     <div className="flex items-center gap-2">
-                      <Clock className="h-3 w-3 text-mq-content-tertiary" />
-                      <span className="text-mq-xs text-mq-content-secondary">{t('remindMe')}</span>
+                      <Clock className="h-3 w-3 text-mq-content-tertiary" aria-hidden="true" />
+                      <label
+                        htmlFor={`timing-${key}`}
+                        className="text-mq-xs text-mq-content-secondary"
+                      >
+                        {t('remindMe')}
+                      </label>
                       <select
+                        id={`timing-${key}`}
                         value={timing}
                         onChange={(e) => setTiming(Number(e.target.value))}
                         className="text-mq-xs bg-mq-background border border-mq-border rounded-mq px-2 py-1 text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                         aria-label={t('reminderTimingFor', { type: label })}
+                        data-testid={`timing-select-${key}`}
                       >
                         {REMINDER_TIMING_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>

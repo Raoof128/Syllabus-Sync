@@ -161,7 +161,7 @@
   "allEvents": "Todos los Eventos",
   "categoryEvents": "Eventos {{category}}",
   "eventsCount": "{{count}} eventos",
-  "remindMe": "Recordarme",
+  "remindMe": "Recordarme:",
   "navigate": "Navegar",
   "noEventsFound": "No se encontraron eventos para esta categoría.",
   "thisWeek": "Esta Semana",
@@ -657,7 +657,6 @@
   "pushNotificationsToggle": "Notificaciones push {{status}}",
   "reminderTimingUpdated": "Tiempo de recordatorio actualizado",
   "reminderTimingUpdatedMsg": "Recordatorios configurados a {{timing}} antes",
-  "remindMe": "Recordarme:",
   "before": "antes",
   "on": "Activado",
   "off": "Desactivado",
@@ -670,8 +669,6 @@
   "timing1day": "1 día",
   "timing2days": "2 días",
   "allFieldsRequired": "Por favor complete todos los campos",
-  "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
-  "passwordsDoNotMatch": "Las contraseñas no coinciden",
   "notSignedIn": "Debe iniciar sesión para cambiar su contraseña",
   "currentPasswordIncorrect": "La contraseña actual es incorrecta",
   "passwordChangedSuccess": "Su contraseña ha sido cambiada exitosamente",
@@ -686,5 +683,7 @@
   "passwordStrong": "Contraseña segura",
   "tooManyAttempts": "Demasiados intentos. Por favor, inténtelo de nuevo en 15 minutos.",
   "privacyPolicyDesc": "Ver nuestra política de privacidad",
-  "exportWarning": "El archivo exportado contendrá todos sus datos personales, incluyendo unidades, fechas límite y preferencias. Mantenga este archivo seguro y no lo comparta con otros."
+  "exportWarning": "El archivo exportado contendrá todos sus datos personales, incluyendo unidades, fechas límite y preferencias. Mantenga este archivo seguro y no lo comparta con otros.",
+  "outsideCampus": "Fuera del Campus",
+  "outsideCampusDistance": "Estás aproximadamente a {{distance}}m del centro del campus"
 }

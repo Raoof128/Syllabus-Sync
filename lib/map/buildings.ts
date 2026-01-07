@@ -1,11 +1,13 @@
+import type { TranslationKey } from '@/lib/i18n/translations';
+
 export type Building = {
   id: string;
   name: string;
-  position: [number, number]; // [y, x] in CRS.Simple pixel space
+  position: [number, number]; // [x, y] pixel coordinates for map placement
   description?: string;
   tags?: string[];
-  translationKey: string;
-  descriptionKey: string;
+  translationKey: TranslationKey;
+  descriptionKey: TranslationKey;
 };
 
 export const buildings: Building[] = [
@@ -94,16 +96,6 @@ export const buildings: Building[] = [
     tags: ['academic', 'teaching'],
     translationKey: 'building_4WW_name',
     descriptionKey: 'building_4WW_desc',
-  },
-  {
-    id: 'LIB',
-    name: 'Library',
-    position: [1400, 2100],
-    description:
-      'Central library with extensive collections, study areas, and academic support services.',
-    tags: ['academic', 'study', 'resources'],
-    translationKey: 'building_LIB_name',
-    descriptionKey: 'building_LIB_desc',
   },
   {
     id: 'Sports',

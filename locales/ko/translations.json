@@ -263,7 +263,7 @@
   "googleOAuthDesc": "Google 로그인은 Supabase 대시보드에서 OAuth 제공자 설정이 필요합니다. 이 기능을 활성화하려면 인증 → 제공자에서 Google OAuth를 구성하세요.",
   "noAccount": "계정이 없으신가요?",
   "signUp": "가입하기",
-  "passwordsDoNotMatch": "비밀번호가 일치하지 않습니다",
+  "passwordsDoNotMatch": "새 비밀번호가 일치하지 않습니다",
   "passwordTooShort": "비밀번호는 최소 6자 이상이어야 합니다",
   "accountCreated": "계정 생성됨!",
   "verifyEmail": "이메일을 확인하여 계정을 인증해 주세요.",
@@ -393,7 +393,7 @@
   "allEvents": "모든 이벤트",
   "categoryEvents": "{{category}} 이벤트",
   "eventsCount": "{{count}} 이벤트",
-  "remindMe": "알림 설정",
+  "remindMe": "알림:",
   "navigate": "탐색",
   "noEventsFound": "이 카테고리에 대한 이벤트를 찾을 수 없습니다.",
   "thisWeek": "이번 주",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "푸시 알림 {{status}}",
   "reminderTimingUpdated": "알림 시간 업데이트됨",
   "reminderTimingUpdatedMsg": "알림이 {{timing}} 전으로 설정됨",
-  "remindMe": "알림:",
   "before": "전",
   "on": "켜짐",
   "off": "꺼짐",
@@ -660,8 +659,6 @@
   "timing1day": "1일",
   "timing2days": "2일",
   "allFieldsRequired": "모든 필드를 입력해주세요",
-  "passwordTooShort": "비밀번호는 최소 6자 이상이어야 합니다",
-  "passwordsDoNotMatch": "새 비밀번호가 일치하지 않습니다",
   "notSignedIn": "비밀번호를 변경하려면 로그인해야 합니다",
   "currentPasswordIncorrect": "현재 비밀번호가 올바르지 않습니다",
   "passwordChangedSuccess": "비밀번호가 성공적으로 변경되었습니다",
@@ -676,5 +673,7 @@
   "passwordStrong": "강한 비밀번호",
   "tooManyAttempts": "시도 횟수가 너무 많습니다. 15분 후에 다시 시도해 주세요.",
   "privacyPolicyDesc": "개인정보 보호정책 보기",
-  "exportWarning": "내보낸 파일에는 유닛, 마감일, 환경 설정을 포함한 모든 개인 데이터가 포함됩니다. 이 파일을 안전하게 보관하고 다른 사람과 공유하지 마세요."
+  "exportWarning": "내보낸 파일에는 유닛, 마감일, 환경 설정을 포함한 모든 개인 데이터가 포함됩니다. 이 파일을 안전하게 보관하고 다른 사람과 공유하지 마세요.",
+  "outsideCampus": "캠퍼스 외부",
+  "outsideCampusDistance": "캠퍼스 중심에서 약 {{distance}}m 떨어져 있습니다"
 }

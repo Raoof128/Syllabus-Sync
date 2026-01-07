@@ -15,6 +15,8 @@ import { useThemeStore } from '@/lib/store/themeStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import type { SessionInfo, NotificationPreferences } from '@/lib/types';
 
 import {
   NotificationSettings,
@@ -24,14 +26,6 @@ import {
   HelpSupport,
   SettingsSkeleton,
 } from './components';
-
-type SessionInfo = { id: string; device: string; lastActive: string; current: boolean };
-
-type NotificationPreferences = {
-  deadlines: boolean;
-  classes: boolean;
-  events: boolean;
-};
 
 // Helper to get device label
 const getDeviceLabel = () => {
@@ -93,7 +87,7 @@ const initializeNotifications = (): NotificationPreferences => {
   };
 };
 
-export default function SettingsPage() {
+function SettingsContent() {
   const isClient = useIsClient();
 
   // Store data
@@ -113,7 +107,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="settings-page container mx-auto p-6 max-w-7xl">
+    <div className="settings-page container mx-auto p-6 max-w-7xl" data-testid="settings-page">
       <header className="mb-8">
         <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('settingsTitle')}</h1>
         <p className="text-mq-content-secondary">{t('settingsSubtitle')}</p>
@@ -158,5 +152,13 @@ export default function SettingsPage() {
         <HelpSupport t={t} />
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <ErrorBoundary>
+      <SettingsContent />
+    </ErrorBoundary>
   );
 }

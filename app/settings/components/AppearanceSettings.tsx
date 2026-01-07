@@ -106,26 +106,30 @@ const AppearanceSettings = memo(
     );
 
     return (
-      <div className="mq-magic-card">
+      <div className="mq-magic-card" data-testid="appearance-settings">
         <Card className="mq-magic-card-content">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              {t('appearance')}
+              <Palette className="h-5 w-5" aria-hidden="true" />
+              <span id="appearance-heading">{t('appearance')}</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3" role="region" aria-labelledby="appearance-heading">
             {/* Theme Selection */}
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">{t('darkMode')}</h4>
+                  <h3 className="font-semibold text-mq-content">{t('darkMode')}</h3>
                   <p className="text-mq-sm text-mq-content-secondary">
                     {t('current')}:{' '}
                     {theme === 'system' ? `${t('system')} (${resolvedTheme})` : resolvedTheme}
                   </p>
                 </div>
-                <div className="flex items-center gap-2" role="group" aria-label={t('darkMode')}>
+                <div
+                  className="flex items-center gap-2"
+                  role="radiogroup"
+                  aria-label={t('darkMode')}
+                >
                   {(['light', 'system', 'dark'] as const).map((mode) => (
                     <Button
                       key={mode}
@@ -133,8 +137,10 @@ const AppearanceSettings = memo(
                       size="sm"
                       onClick={() => handleThemeChange(mode)}
                       className={`px-3 py-1 text-xs ${theme === mode ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
-                      aria-pressed={theme === mode}
+                      role="radio"
+                      aria-checked={theme === mode}
                       aria-label={`${t(mode)} ${t('darkMode').toLowerCase()}`}
+                      data-testid={`theme-${mode}`}
                     >
                       {t(mode)}
                     </Button>
@@ -147,14 +153,14 @@ const AppearanceSettings = memo(
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold text-mq-content">{t('language')}</h4>
+                  <h3 className="font-semibold text-mq-content">{t('language')}</h3>
                   <p className="text-mq-sm text-mq-content-secondary">
                     {t('current')}: {languageNames[language] || language}
                   </p>
                 </div>
                 <div
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"
-                  role="group"
+                  role="radiogroup"
                   aria-label={t('language')}
                 >
                   {SUPPORTED_LANGUAGES.map((lang) => (
@@ -168,8 +174,10 @@ const AppearanceSettings = memo(
                           ? 'bg-mq-primary text-white'
                           : 'text-mq-content-secondary hover:bg-mq-primary/10'
                       }`}
-                      aria-pressed={language === lang}
+                      role="radio"
+                      aria-checked={language === lang}
                       aria-label={`${t(languageAriaLabelKeys[lang])}${language === lang ? ` ${t('currentlySelected')}` : ''}`}
+                      data-testid={`language-${lang}`}
                     >
                       {lang.toUpperCase()}
                     </Button>

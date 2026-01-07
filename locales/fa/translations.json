@@ -195,7 +195,7 @@
   "allEvents": "همه رویدادها",
   "categoryEvents": "رویدادهای {{category}}",
   "eventsCount": "{{count}} رویداد",
-  "remindMe": "یادآوری کن",
+  "remindMe": "یادآوری کن:",
   "navigate": "مسیریابی",
   "noEventsFound": "هیچ رویدادی برای این دسته‌بندی یافت نشد.",
   "thisWeek": "این هفته",
@@ -417,7 +417,7 @@
   "googleOAuthDesc": "ورود با گوگل نیاز به پیکربندی ارائه‌دهنده OAuth در داشبورد Supabase دارد. Google OAuth را در تأیید هویت → ارائه‌دهندگان پیکربندی کنید.",
   "noAccount": "حساب کاربری ندارید؟",
   "signUp": "ثبت‌نام",
-  "passwordsDoNotMatch": "رمزهای عبور مطابقت ندارند",
+  "passwordsDoNotMatch": "رمزهای عبور جدید مطابقت ندارند",
   "passwordTooShort": "رمز عبور باید حداقل ۶ کاراکتر باشد",
   "accountCreated": "حساب ایجاد شد!",
   "verifyEmail": "لطفاً ایمیل خود را برای تأیید حساب بررسی کنید.",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "اعلان‌های فوری {{status}}",
   "reminderTimingUpdated": "زمان یادآوری به‌روز شد",
   "reminderTimingUpdatedMsg": "یادآوری‌ها روی {{timing}} قبل تنظیم شدند",
-  "remindMe": "یادآوری کن:",
   "before": "قبل",
   "on": "روشن",
   "off": "خاموش",
@@ -660,8 +659,6 @@
   "timing1day": "۱ روز",
   "timing2days": "۲ روز",
   "allFieldsRequired": "لطفاً همه فیلدها را پر کنید",
-  "passwordTooShort": "رمز عبور باید حداقل ۶ کاراکتر باشد",
-  "passwordsDoNotMatch": "رمزهای عبور جدید مطابقت ندارند",
   "notSignedIn": "برای تغییر رمز عبور باید وارد شوید",
   "currentPasswordIncorrect": "رمز عبور فعلی نادرست است",
   "passwordChangedSuccess": "رمز عبور شما با موفقیت تغییر کرد",
@@ -676,5 +673,7 @@
   "passwordStrong": "رمز عبور قوی",
   "tooManyAttempts": "تلاش‌های زیادی انجام شده است. لطفاً ۱۵ دقیقه دیگر دوباره امتحان کنید.",
   "privacyPolicyDesc": "مشاهده سیاست حفظ حریم خصوصی ما",
-  "exportWarning": "فایل خروجی شامل تمام اطلاعات شخصی شما از جمله واحدها، مهلت‌ها و تنظیمات خواهد بود. این فایل را امن نگه دارید و با دیگران به اشتراک نگذارید."
+  "exportWarning": "فایل خروجی شامل تمام اطلاعات شخصی شما از جمله واحدها، مهلت‌ها و تنظیمات خواهد بود. این فایل را امن نگه دارید و با دیگران به اشتراک نگذارید.",
+  "outsideCampus": "خارج از پردیس",
+  "outsideCampusDistance": "شما تقریباً {{distance}} متر از مرکز پردیس فاصله دارید"
 }

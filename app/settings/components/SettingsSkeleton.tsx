@@ -8,12 +8,30 @@ type SettingsSkeletonProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
+const SKELETON_COUNTS = {
+  notifications: 3,
+  appearance: 2,
+  privacy: 4,
+  quickActions: 5,
+} as const;
+
 const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
   return (
-    <div className="settings-page container mx-auto p-6 max-w-7xl">
+    <div
+      className="settings-page container mx-auto p-6 max-w-7xl"
+      data-testid="settings-skeleton"
+      aria-busy="true"
+      aria-label={t('loading')}
+    >
       <header className="mb-8">
-        <div className="h-8 w-48 bg-mq-card-background rounded-mq-lg animate-pulse mb-2" />
-        <div className="h-4 w-64 bg-mq-card-background rounded-mq-lg animate-pulse" />
+        <div
+          className="h-8 w-48 bg-mq-card-background rounded-mq-lg animate-pulse mb-2"
+          aria-hidden="true"
+        />
+        <div
+          className="h-4 w-64 bg-mq-card-background rounded-mq-lg animate-pulse"
+          aria-hidden="true"
+        />
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
@@ -27,9 +45,9 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[1, 2, 3].map((i) => (
+              {Array.from({ length: SKELETON_COUNTS.notifications }).map((_, i) => (
                 <div
-                  key={i}
+                  key={`notification-${i}`}
                   className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border"
                 >
                   <div className="flex items-center justify-between">
@@ -58,9 +76,9 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[1, 2].map((i) => (
+              {Array.from({ length: SKELETON_COUNTS.appearance }).map((_, i) => (
                 <div
-                  key={i}
+                  key={`appearance-${i}`}
                   className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border"
                 >
                   <div className="flex items-center justify-between">
@@ -71,7 +89,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
                     <div className="flex gap-2">
                       {[1, 2, 3].map((j) => (
                         <div
-                          key={j}
+                          key={`appearance-btn-${j}`}
                           className="h-8 w-16 bg-mq-hover-background rounded animate-pulse"
                         />
                       ))}
@@ -93,9 +111,9 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[1, 2, 3, 4].map((i) => (
+              {Array.from({ length: SKELETON_COUNTS.privacy }).map((_, i) => (
                 <div
-                  key={i}
+                  key={`privacy-${i}`}
                   className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border"
                 >
                   <div className="flex items-center justify-between">
@@ -118,9 +136,9 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
               <div className="h-6 w-32 bg-mq-card-background rounded-mq-lg animate-pulse" />
             </CardHeader>
             <CardContent className="space-y-2">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {Array.from({ length: SKELETON_COUNTS.quickActions }).map((_, i) => (
                 <div
-                  key={i}
+                  key={`action-${i}`}
                   className="h-10 w-full bg-mq-card-background rounded-mq-lg border border-mq-border animate-pulse"
                 />
               ))}
@@ -130,7 +148,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
       </div>
 
       {/* Loading indicator */}
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-center" role="status">
         <p className="text-mq-sm text-mq-content-secondary animate-pulse">{t('loadingSettings')}</p>
       </div>
     </div>

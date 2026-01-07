@@ -248,7 +248,7 @@
   "googleOAuthDesc": "การลงชื่อเข้าใช้ด้วย Google ต้องการการตั้งค่าผู้ให้บริการ OAuth ในแดชบอร์ด Supabase กำหนดค่า Google OAuth ในการยืนยันตัวตน → ผู้ให้บริการ เพื่อเปิดใช้งานฟีเจอร์นี้",
   "noAccount": "ไม่มีบัญชี?",
   "signUp": "ลงทะเบียน",
-  "passwordsDoNotMatch": "รหัสผ่านไม่ตรงกัน",
+  "passwordsDoNotMatch": "รหัสผ่านใหม่ไม่ตรงกัน",
   "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
   "accountCreated": "สร้างบัญชีแล้ว!",
   "verifyEmail": "กรุณาตรวจสอบอีเมลของคุณเพื่อยืนยันบัญชี",
@@ -378,7 +378,7 @@
   "allEvents": "กิจกรรมทั้งหมด",
   "categoryEvents": "กิจกรรม {{category}}",
   "eventsCount": "{{count}} กิจกรรม",
-  "remindMe": "เตือนฉัน",
+  "remindMe": "เตือนฉัน:",
   "navigate": "นำทาง",
   "noEventsFound": "ไม่พบกิจกรรมสำหรับหมวดหมู่นี้",
   "thisWeek": "สัปดาห์นี้",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "การแจ้งเตือนแบบพุช{{status}}",
   "reminderTimingUpdated": "อัปเดตเวลาเตือนแล้ว",
   "reminderTimingUpdatedMsg": "ตั้งการเตือน {{timing}} ก่อน",
-  "remindMe": "เตือนฉัน:",
   "before": "ก่อน",
   "on": "เปิด",
   "off": "ปิด",
@@ -660,8 +659,6 @@
   "timing1day": "1 วัน",
   "timing2days": "2 วัน",
   "allFieldsRequired": "กรุณากรอกข้อมูลทุกช่อง",
-  "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
-  "passwordsDoNotMatch": "รหัสผ่านใหม่ไม่ตรงกัน",
   "notSignedIn": "คุณต้องเข้าสู่ระบบเพื่อเปลี่ยนรหัสผ่าน",
   "currentPasswordIncorrect": "รหัสผ่านปัจจุบันไม่ถูกต้อง",
   "passwordChangedSuccess": "เปลี่ยนรหัสผ่านของคุณเรียบร้อยแล้ว",
@@ -676,5 +673,7 @@
   "passwordStrong": "รหัสผ่านแข็งแกร่ง",
   "tooManyAttempts": "พยายามมากเกินไป กรุณาลองใหม่ใน 15 นาที",
   "privacyPolicyDesc": "ดูนโยบายความเป็นส่วนตัวของเรา",
-  "exportWarning": "ไฟล์ที่ส่งออกจะมีข้อมูลส่วนตัวทั้งหมดของคุณ รวมถึงหน่วย กำหนดเส้นตาย และการตั้งค่า เก็บไฟล์นี้ไว้อย่างปลอดภัยและอย่าแชร์กับผู้อื่น"
+  "exportWarning": "ไฟล์ที่ส่งออกจะมีข้อมูลส่วนตัวทั้งหมดของคุณ รวมถึงหน่วย กำหนดเส้นตาย และการตั้งค่า เก็บไฟล์นี้ไว้อย่างปลอดภัยและอย่าแชร์กับผู้อื่น",
+  "outsideCampus": "นอกวิทยาเขต",
+  "outsideCampusDistance": "คุณอยู่ห่างจากศูนย์กลางวิทยาเขตประมาณ {{distance}} เมตร"
 }

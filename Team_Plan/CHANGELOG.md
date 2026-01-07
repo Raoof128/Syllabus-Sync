@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.80] - 2026-01-08
+
+### Fixed
+
+#### Codebase Audit Phase 2 - Legacy Files & Utilities (Raouf)
+
+- **Deleted 4 legacy head.tsx files (Raouf)**: Removed obsolete Pages Router `head.tsx` files that are not used in App Router:
+  - `app/feed/head.tsx` - duplicate metadata (already in `page.tsx`)
+  - `app/home/head.tsx` - duplicate metadata (already in `page.tsx`)
+  - `app/settings/head.tsx` - migrated to `layout.tsx`
+  - `app/manage-profiles/head.tsx` - migrated to `layout.tsx`
+
+- **Created proper layout.tsx for client-only pages (Raouf)**: Added metadata exports to layout files for pages that use `'use client'`:
+  - `app/settings/layout.tsx` - Settings page metadata with noindex robots
+  - `app/manage-profiles/layout.tsx` - Manage Profiles page metadata with noindex robots
+
+- **Created shared devLog utility (Raouf)**: Added `lib/utils/devLog.ts` for consistent development-only logging:
+  - Pre-configured loggers: `devLog.map`, `devLog.home`, `devLog.auth`, `devLog.api`, `devLog.store`, `devLog.ui`
+  - Factory function: `createDevLogger(prefix)` for custom modules
+  - All logging suppressed in production builds
+
+- **Updated CampusMap.tsx to use shared devLog (Raouf)**: Replaced local `devLog` function with `devLog.map` from shared utility
+
+**Files Changed:**
+- `app/feed/head.tsx` - **DELETED**
+- `app/home/head.tsx` - **DELETED**
+- `app/settings/head.tsx` - **DELETED**
+- `app/manage-profiles/head.tsx` - **DELETED**
+- `app/settings/layout.tsx` - **CREATED** (metadata export)
+- `app/manage-profiles/layout.tsx` - **CREATED** (metadata export)
+- `lib/utils/devLog.ts` - **CREATED** (shared logging utility)
+- `app/map/CampusMap.tsx` - Updated to use shared devLog
+
+**Verification:**
+- `npm run lint` (success)
+- `npm test` (143/143 tests passing)
+
+---
+
 ## [0.5.79] - 2026-01-08
 
 ### Fixed

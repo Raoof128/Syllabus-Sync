@@ -248,7 +248,7 @@
   "googleOAuthDesc": "Đăng nhập Google yêu cầu cấu hình nhà cung cấp OAuth trong bảng điều khiển Supabase. Cấu hình Google OAuth trong Xác thực → Nhà cung cấp để bật tính năng này.",
   "noAccount": "Chưa có tài khoản?",
   "signUp": "Đăng ký",
-  "passwordsDoNotMatch": "Mật khẩu không khớp",
+  "passwordsDoNotMatch": "Mật khẩu mới không khớp",
   "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
   "accountCreated": "Đã tạo tài khoản!",
   "verifyEmail": "Vui lòng kiểm tra email để xác minh tài khoản.",
@@ -378,7 +378,7 @@
   "allEvents": "Tất cả sự kiện",
   "categoryEvents": "Sự kiện {{category}}",
   "eventsCount": "{{count}} sự kiện",
-  "remindMe": "Nhắc tôi",
+  "remindMe": "Nhắc tôi:",
   "navigate": "Điều hướng",
   "noEventsFound": "Không tìm thấy sự kiện cho danh mục này.",
   "thisWeek": "Tuần này",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "Thông báo đẩy {{status}}",
   "reminderTimingUpdated": "Đã cập nhật thời gian nhắc nhở",
   "reminderTimingUpdatedMsg": "Nhắc nhở được đặt trước {{timing}}",
-  "remindMe": "Nhắc tôi:",
   "before": "trước",
   "on": "Bật",
   "off": "Tắt",
@@ -660,8 +659,6 @@
   "timing1day": "1 ngày",
   "timing2days": "2 ngày",
   "allFieldsRequired": "Vui lòng điền tất cả các trường",
-  "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
-  "passwordsDoNotMatch": "Mật khẩu mới không khớp",
   "notSignedIn": "Bạn phải đăng nhập để thay đổi mật khẩu",
   "currentPasswordIncorrect": "Mật khẩu hiện tại không đúng",
   "passwordChangedSuccess": "Mật khẩu của bạn đã được thay đổi thành công",
@@ -676,5 +673,7 @@
   "passwordStrong": "Mật khẩu mạnh",
   "tooManyAttempts": "Quá nhiều lần thử. Vui lòng thử lại sau 15 phút.",
   "privacyPolicyDesc": "Xem chính sách bảo mật của chúng tôi",
-  "exportWarning": "Tệp xuất sẽ chứa tất cả dữ liệu cá nhân của bạn bao gồm môn học, hạn nộp và tùy chọn. Giữ tệp này an toàn và không chia sẻ với người khác."
+  "exportWarning": "Tệp xuất sẽ chứa tất cả dữ liệu cá nhân của bạn bao gồm môn học, hạn nộp và tùy chọn. Giữ tệp này an toàn và không chia sẻ với người khác.",
+  "outsideCampus": "Ngoài khuôn viên",
+  "outsideCampusDistance": "Bạn đang ở cách trung tâm khuôn viên khoảng {{distance}}m"
 }

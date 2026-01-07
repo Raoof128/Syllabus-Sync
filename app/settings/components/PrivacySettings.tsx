@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import {
@@ -11,20 +11,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Shield, Download, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Shield, Download, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
+import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
-import { createBrowserClient } from '@/lib/supabase/client';
-import type { Unit, Deadline } from '@/lib/types';
+import type { Unit, Deadline, SessionInfo, PasswordStrength } from '@/lib/types';
 import type { TranslationKey } from '@/lib/i18n/translations';
-
-type SessionInfo = {
-  id: string;
-  device: string;
-  lastActive: string;
-  current: boolean;
-};
 
 type PrivacySettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -36,6 +29,63 @@ type PrivacySettingsProps = {
   language: string;
   notifications: { deadlines: boolean; classes: boolean; events: boolean };
 };
+
+// Password strength calculation
+function calculatePasswordStrength(password: string): {
+  strength: PasswordStrength;
+  score: number;
+  feedback: string[];
+} {
+  const feedback: string[] = [];
+  let score = 0;
+
+  if (password.length >= 8) {
+    score += 1;
+  } else {
+    feedback.push('Use at least 8 characters');
+  }
+
+  if (password.length >= 12) {
+    score += 1;
+  }
+
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('Include uppercase and lowercase letters');
+  }
+
+  if (/\d/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('Include at least one number');
+  }
+
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('Include a special character');
+  }
+
+  // Check for common patterns
+  if (/(.)\1{2,}/.test(password)) {
+    score = Math.max(0, score - 1);
+    feedback.push('Avoid repeated characters');
+  }
+
+  let strength: PasswordStrength;
+  if (score <= 1) {
+    strength = 'weak';
+  } else if (score === 2) {
+    strength = 'fair';
+  } else if (score === 3) {
+    strength = 'good';
+  } else {
+    strength = 'strong';
+  }
+
+  return { strength, score: Math.min(score, 4), feedback };
+}
 
 const PrivacySettings = memo(
   ({
@@ -59,6 +109,26 @@ const PrivacySettings = memo(
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
+    // Password strength indicator
+    const passwordStrength = useMemo(() => {
+      if (!newPassword) return null;
+      return calculatePasswordStrength(newPassword);
+    }, [newPassword]);
+
+    const strengthColors: Record<PasswordStrength, string> = {
+      weak: 'bg-mq-error',
+      fair: 'bg-mq-warning',
+      good: 'bg-mq-info',
+      strong: 'bg-mq-success',
+    };
+
+    const strengthLabels: Record<PasswordStrength, TranslationKey> = {
+      weak: 'passwordWeak',
+      fair: 'passwordFair',
+      good: 'passwordGood',
+      strong: 'passwordStrong',
+    };
+
     const openPasswordDialog = useCallback(() => {
       setCurrentPassword('');
       setNewPassword('');
@@ -66,75 +136,71 @@ const PrivacySettings = memo(
       setShowPasswordDialog(true);
     }, []);
 
-    const handleChangePassword = useCallback(async () => {
-      // Validation
-      if (!currentPassword || !newPassword || !confirmPassword) {
-        toastUtils.error(t('settingsError'), t('allFieldsRequired'));
-        return;
-      }
+    const handleChangePassword = useCallback(
+      async (e?: React.FormEvent) => {
+        if (e) {
+          e.preventDefault();
+        }
 
-      if (newPassword.length < 6) {
-        toastUtils.error(t('settingsError'), t('passwordTooShort'));
-        return;
-      }
-
-      if (newPassword !== confirmPassword) {
-        toastUtils.error(t('settingsError'), t('passwordsDoNotMatch'));
-        return;
-      }
-
-      setIsChangingPassword(true);
-
-      try {
-        const supabase = createBrowserClient();
-
-        // First, verify current password by re-authenticating
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user?.email) {
-          toastUtils.error(t('settingsError'), t('notSignedIn'));
-          setIsChangingPassword(false);
+        // Validation
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          toastUtils.error(t('settingsError'), t('allFieldsRequired'));
           return;
         }
 
-        // Try to sign in with current password to verify it
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: user.email,
-          password: currentPassword,
-        });
-
-        if (signInError) {
-          toastUtils.error(t('settingsError'), t('currentPasswordIncorrect'));
-          setIsChangingPassword(false);
+        if (newPassword.length < 6) {
+          toastUtils.error(t('settingsError'), t('passwordTooShort'));
           return;
         }
 
-        // Update password
-        const { error: updateError } = await supabase.auth.updateUser({
-          password: newPassword,
-        });
-
-        if (updateError) {
-          errorHandler.logError(updateError as Error, 'Change Password', 'medium');
-          toastUtils.error(t('settingsError'), updateError.message);
-          setIsChangingPassword(false);
+        if (newPassword !== confirmPassword) {
+          toastUtils.error(t('settingsError'), t('passwordsDoNotMatch'));
           return;
         }
 
-        toastUtils.success(t('changePassword'), t('passwordChangedSuccess'));
-        setShowPasswordDialog(false);
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      } catch (error) {
-        errorHandler.logError(error as Error, 'Change Password', 'medium');
-        toastUtils.error(t('settingsError'), t('preferenceError'));
-      } finally {
-        setIsChangingPassword(false);
-      }
-    }, [currentPassword, newPassword, confirmPassword, t]);
+        setIsChangingPassword(true);
+
+        try {
+          // Use server-side password verification and change API
+          const response = await fetch('/api/auth/password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              currentPassword,
+              newPassword,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            if (response.status === 429) {
+              toastUtils.error(t('settingsError'), t('tooManyAttempts'));
+            } else if (result.error?.message) {
+              toastUtils.error(t('settingsError'), result.error.message);
+            } else {
+              toastUtils.error(t('settingsError'), t('preferenceError'));
+            }
+            setIsChangingPassword(false);
+            return;
+          }
+
+          toastUtils.success(t('changePassword'), t('passwordChangedSuccess'));
+          setShowPasswordDialog(false);
+          setCurrentPassword('');
+          setNewPassword('');
+          setConfirmPassword('');
+        } catch (error) {
+          errorHandler.logError(error as Error, 'Change Password', 'medium');
+          toastUtils.error(t('settingsError'), t('preferenceError'));
+        } finally {
+          setIsChangingPassword(false);
+        }
+      },
+      [currentPassword, newPassword, confirmPassword, t],
+    );
 
     const openSessions = useCallback(() => {
       if (typeof window !== 'undefined') {
@@ -148,7 +214,7 @@ const PrivacySettings = memo(
           setSessions((prev) => {
             const remaining = prev.filter((session) => session.id !== id || session.current);
             if (typeof window !== 'undefined') {
-              window.localStorage.setItem('mq-sessions', JSON.stringify(remaining));
+              window.localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(remaining));
             }
             return remaining;
           });
@@ -166,7 +232,7 @@ const PrivacySettings = memo(
         const currentOnly = sessions.filter((s) => s.current);
         setSessions(currentOnly);
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem('mq-sessions', JSON.stringify(currentOnly));
+          window.localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(currentOnly));
         }
         toastUtils.success(t('manageSessions'), t('preferenceUpdated'));
       } catch (error) {
@@ -217,20 +283,24 @@ const PrivacySettings = memo(
 
     return (
       <>
-        <div className="mq-magic-card">
+        <div className="mq-magic-card" data-testid="privacy-settings">
           <Card className="mq-magic-card-content">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                {t('privacySecurity')}
+                <Shield className="h-5 w-5" aria-hidden="true" />
+                <span id="privacy-security-heading">{t('privacySecurity')}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent
+              className="space-y-3"
+              role="region"
+              aria-labelledby="privacy-security-heading"
+            >
               {/* Change Password */}
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-mq-content">{t('changePassword')}</h4>
+                    <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
                     <p className="text-mq-sm text-mq-content-secondary">
                       {t('changePasswordDesc')}
                     </p>
@@ -240,6 +310,7 @@ const PrivacySettings = memo(
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
                     onClick={openPasswordDialog}
+                    data-testid="change-password-button"
                   >
                     {t('changePassword')}
                   </Button>
@@ -250,7 +321,7 @@ const PrivacySettings = memo(
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-mq-content">{t('manageSessions')}</h4>
+                    <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
                     <p className="text-mq-sm text-mq-content-secondary">
                       {t('manageSessionsDesc')}
                     </p>
@@ -260,6 +331,7 @@ const PrivacySettings = memo(
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
                     onClick={openSessions}
+                    data-testid="manage-sessions-button"
                   >
                     {t('manageSessions')}
                   </Button>
@@ -270,8 +342,8 @@ const PrivacySettings = memo(
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-mq-content">{t('privacyPolicy')}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('privacyPolicy')}</p>
+                    <h3 className="font-semibold text-mq-content">{t('privacyPolicy')}</h3>
+                    <p className="text-mq-sm text-mq-content-secondary">{t('privacyPolicyDesc')}</p>
                   </div>
                   <Button
                     variant="ghost"
@@ -280,6 +352,7 @@ const PrivacySettings = memo(
                     onClick={() =>
                       window.open(EXTERNAL_LINKS.privacy, '_blank', 'noopener,noreferrer')
                     }
+                    data-testid="privacy-policy-button"
                   >
                     {t('view')}
                   </Button>
@@ -290,7 +363,7 @@ const PrivacySettings = memo(
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-semibold text-mq-content">{t('exportData')}</h4>
+                    <h3 className="font-semibold text-mq-content">{t('exportData')}</h3>
                     <p className="text-mq-sm text-mq-content-secondary">{t('exportDataDesc')}</p>
                   </div>
                   <Button
@@ -298,8 +371,9 @@ const PrivacySettings = memo(
                     size="sm"
                     className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
                     onClick={openExportDialog}
+                    data-testid="export-data-button"
                   >
-                    <Download className="h-4 w-4 mr-2" />
+                    <Download className="h-4 w-4 mr-2" aria-hidden="true" />
                     {t('export')}
                   </Button>
                 </div>
@@ -310,13 +384,13 @@ const PrivacySettings = memo(
 
         {/* Sessions Dialog */}
         <Dialog open={showSessionsDialog} onOpenChange={setShowSessionsDialog}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg" data-testid="sessions-dialog">
             <DialogHeader>
               <DialogTitle>{t('manageSessions')}</DialogTitle>
               <DialogDescription>{t('manageSessionsDesc')}</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-3">
+            <div className="space-y-3" role="list" aria-label={t('manageSessions')}>
               {sessions.length === 0 ? (
                 <p className="text-mq-sm text-mq-content-secondary">{t('noSessions')}</p>
               ) : (
@@ -324,6 +398,8 @@ const PrivacySettings = memo(
                   <div
                     key={session.id}
                     className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2"
+                    role="listitem"
+                    data-testid={`session-${session.id}`}
                   >
                     <div>
                       <p className="font-semibold text-mq-content">
@@ -340,6 +416,8 @@ const PrivacySettings = memo(
                       className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
                       disabled={session.current}
                       onClick={() => endSession(session.id)}
+                      aria-label={`${t('signOut')} ${session.device}`}
+                      data-testid={`end-session-${session.id}`}
                     >
                       {t('signOut')}
                     </Button>
@@ -354,6 +432,7 @@ const PrivacySettings = memo(
                 size="sm"
                 disabled={sessions.length === 0}
                 onClick={endAllSessions}
+                data-testid="end-all-sessions-button"
               >
                 {t('signOutAllSessions')}
               </Button>
@@ -366,18 +445,27 @@ const PrivacySettings = memo(
 
         {/* Export Confirmation Dialog */}
         <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md" data-testid="export-dialog">
             <DialogHeader>
               <DialogTitle>{t('confirmExport')}</DialogTitle>
               <DialogDescription>{t('confirmExportDesc')}</DialogDescription>
             </DialogHeader>
 
+            {/* Warning about sensitive data */}
+            <div className="flex items-start gap-3 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
+              <AlertTriangle
+                className="h-5 w-5 text-mq-warning flex-shrink-0 mt-0.5"
+                aria-hidden="true"
+              />
+              <p className="text-mq-sm text-mq-content-secondary">{t('exportWarning')}</p>
+            </div>
+
             <DialogFooter className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setShowExportDialog(false)}>
                 {t('cancel')}
               </Button>
-              <Button onClick={handleExportData}>
-                <Download className="h-4 w-4 mr-2" />
+              <Button onClick={handleExportData} data-testid="confirm-export-button">
+                <Download className="h-4 w-4 mr-2" aria-hidden="true" />
                 {t('proceedExport')}
               </Button>
             </DialogFooter>
@@ -386,13 +474,13 @@ const PrivacySettings = memo(
 
         {/* Change Password Dialog */}
         <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md" data-testid="password-dialog">
             <DialogHeader>
               <DialogTitle>{t('changePasswordTitle')}</DialogTitle>
               <DialogDescription>{t('changePasswordDialogDesc')}</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
+            <form onSubmit={handleChangePassword} className="space-y-4 py-4">
               {/* Current Password */}
               <div className="space-y-2">
                 <label htmlFor="current-password" className="text-sm font-medium text-mq-content">
@@ -407,17 +495,20 @@ const PrivacySettings = memo(
                     className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
                     placeholder="••••••••"
                     autoComplete="current-password"
+                    required
+                    data-testid="current-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
-                    aria-label={t('toggleCurrentPasswordVisibility')}
+                    aria-label={showCurrentPassword ? t('hidePassword') : t('showPassword')}
+                    data-testid="toggle-current-password"
                   >
                     {showCurrentPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4" aria-hidden="true" />
                     )}
                   </button>
                 </div>
@@ -437,16 +528,63 @@ const PrivacySettings = memo(
                     className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
                     placeholder="••••••••"
                     autoComplete="new-password"
+                    minLength={6}
+                    required
+                    data-testid="new-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
-                    aria-label={t('toggleNewPasswordVisibility')}
+                    aria-label={showNewPassword ? t('hidePassword') : t('showPassword')}
+                    data-testid="toggle-new-password"
                   >
-                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showNewPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
+
+                {/* Password Strength Indicator */}
+                {passwordStrength && (
+                  <div className="space-y-1" data-testid="password-strength">
+                    <div className="flex gap-1">
+                      {[0, 1, 2, 3].map((index) => (
+                        <div
+                          key={index}
+                          className={`h-1 flex-1 rounded-full transition-colors ${
+                            index < passwordStrength.score
+                              ? strengthColors[passwordStrength.strength]
+                              : 'bg-mq-border'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p
+                      className={`text-mq-xs ${
+                        passwordStrength.strength === 'weak'
+                          ? 'text-mq-error'
+                          : passwordStrength.strength === 'fair'
+                            ? 'text-mq-warning'
+                            : passwordStrength.strength === 'good'
+                              ? 'text-mq-info'
+                              : 'text-mq-success'
+                      }`}
+                    >
+                      {t(strengthLabels[passwordStrength.strength])}
+                    </p>
+                    {passwordStrength.feedback.length > 0 &&
+                      passwordStrength.strength !== 'strong' && (
+                        <ul className="text-mq-xs text-mq-content-secondary list-disc list-inside">
+                          {passwordStrength.feedback.slice(0, 2).map((tip, idx) => (
+                            <li key={idx}>{tip}</li>
+                          ))}
+                        </ul>
+                      )}
+                  </div>
+                )}
               </div>
 
               {/* Confirm New Password */}
@@ -460,45 +598,63 @@ const PrivacySettings = memo(
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
+                    className={`w-full px-3 py-2 pr-10 rounded-mq border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary ${
+                      confirmPassword && newPassword !== confirmPassword
+                        ? 'border-mq-error'
+                        : 'border-mq-border'
+                    }`}
                     placeholder="••••••••"
                     autoComplete="new-password"
+                    required
+                    data-testid="confirm-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
-                    aria-label={t('toggleConfirmPasswordVisibility')}
+                    aria-label={showConfirmPassword ? t('hidePassword') : t('showPassword')}
+                    data-testid="toggle-confirm-password"
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4" aria-hidden="true" />
                     )}
                   </button>
                 </div>
-              </div>
-            </div>
-
-            <DialogFooter className="flex justify-end gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => setShowPasswordDialog(false)}
-                disabled={isChangingPassword}
-              >
-                {t('cancel')}
-              </Button>
-              <Button onClick={handleChangePassword} disabled={isChangingPassword}>
-                {isChangingPassword ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t('loading')}
-                  </>
-                ) : (
-                  t('changePassword')
+                {confirmPassword && newPassword !== confirmPassword && (
+                  <p className="text-mq-xs text-mq-error">{t('passwordsDoNotMatch')}</p>
                 )}
-              </Button>
-            </DialogFooter>
+              </div>
+
+              <DialogFooter className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowPasswordDialog(false)}
+                  disabled={isChangingPassword}
+                >
+                  {t('cancel')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    isChangingPassword ||
+                    (confirmPassword !== '' && newPassword !== confirmPassword)
+                  }
+                  data-testid="submit-password-change"
+                >
+                  {isChangingPassword ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                      {t('loading')}
+                    </>
+                  ) : (
+                    t('changePassword')
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </>

@@ -356,7 +356,7 @@
   "googleOAuthDesc": "Google Sign-In memerlukan persediaan penyedia OAuth dalam papan pemuka Supabase. Konfigurasikan Google OAuth di bawah Authentication → Providers untuk mengaktifkan ciri ini.",
   "noAccount": "Tiada akaun?",
   "signUp": "Daftar",
-  "passwordsDoNotMatch": "Kata laluan tidak sepadan",
+  "passwordsDoNotMatch": "Kata laluan baharu tidak sepadan",
   "passwordTooShort": "Kata laluan mesti sekurang-kurangnya 6 aksara",
   "accountCreated": "Akaun dicipta!",
   "verifyEmail": "Sila periksa e-mel anda untuk mengesahkan akaun.",
@@ -486,7 +486,7 @@
   "allEvents": "Semua Acara",
   "categoryEvents": "Acara {{category}}",
   "eventsCount": "{{count}} acara",
-  "remindMe": "Ingatkan Saya",
+  "remindMe": "Ingatkan saya:",
   "navigate": "Navigasi",
   "noEventsFound": "Tiada acara dijumpai untuk kategori ini.",
   "thisWeek": "Minggu Ini",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "Pemberitahuan push {{status}}",
   "reminderTimingUpdated": "Masa Peringatan Dikemas Kini",
   "reminderTimingUpdatedMsg": "Peringatan ditetapkan kepada {{timing}} sebelum",
-  "remindMe": "Ingatkan saya:",
   "before": "sebelum",
   "on": "Hidup",
   "off": "Mati",
@@ -660,8 +659,6 @@
   "timing1day": "1 hari",
   "timing2days": "2 hari",
   "allFieldsRequired": "Sila isi semua ruangan",
-  "passwordTooShort": "Kata laluan mesti sekurang-kurangnya 6 aksara",
-  "passwordsDoNotMatch": "Kata laluan baharu tidak sepadan",
   "notSignedIn": "Anda mesti log masuk untuk menukar kata laluan",
   "currentPasswordIncorrect": "Kata laluan semasa tidak betul",
   "passwordChangedSuccess": "Kata laluan anda telah berjaya ditukar",
@@ -676,5 +673,7 @@
   "passwordStrong": "Kata laluan kuat",
   "tooManyAttempts": "Terlalu banyak percubaan. Sila cuba lagi dalam 15 minit.",
   "privacyPolicyDesc": "Lihat dasar privasi kami",
-  "exportWarning": "Fail yang dieksport akan mengandungi semua data peribadi anda termasuk unit, tarikh akhir dan pilihan. Simpan fail ini dengan selamat dan jangan kongsi dengan orang lain."
+  "exportWarning": "Fail yang dieksport akan mengandungi semua data peribadi anda termasuk unit, tarikh akhir dan pilihan. Simpan fail ini dengan selamat dan jangan kongsi dengan orang lain.",
+  "outsideCampus": "Di Luar Kampus",
+  "outsideCampusDistance": "Anda berada kira-kira {{distance}}m dari pusat kampus"
 }

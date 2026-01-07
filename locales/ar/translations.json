@@ -263,7 +263,7 @@
   "googleOAuthDesc": "يتطلب تسجيل الدخول بـ Google إعداد موفر OAuth في لوحة Supabase. قم بإعداد Google OAuth ضمن المصادقة ← الموفرين لتفعيل هذه الميزة.",
   "noAccount": "ليس لديك حساب؟",
   "signUp": "إنشاء حساب",
-  "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+  "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
   "passwordTooShort": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
   "accountCreated": "تم إنشاء الحساب!",
   "verifyEmail": "يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك.",
@@ -393,7 +393,7 @@
   "allEvents": "جميع الأحداث",
   "categoryEvents": "أحداث {{category}}",
   "eventsCount": "{{count}} أحداث",
-  "remindMe": "ذكرني",
+  "remindMe": "ذكّرني:",
   "navigate": "انتقل",
   "noEventsFound": "لم يتم العثور على أحداث لهذه الفئة.",
   "thisWeek": "هذا الأسبوع",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "الإشعارات الفورية {{status}}",
   "reminderTimingUpdated": "تم تحديث توقيت التذكير",
   "reminderTimingUpdatedMsg": "تم ضبط التذكيرات على {{timing}} قبل",
-  "remindMe": "ذكّرني:",
   "before": "قبل",
   "on": "مفعّل",
   "off": "معطّل",
@@ -660,8 +659,6 @@
   "timing1day": "يوم واحد",
   "timing2days": "يومان",
   "allFieldsRequired": "يرجى ملء جميع الحقول",
-  "passwordTooShort": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
-  "passwordsDoNotMatch": "كلمات المرور الجديدة غير متطابقة",
   "notSignedIn": "يجب تسجيل الدخول لتغيير كلمة المرور",
   "currentPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
   "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح",
@@ -676,5 +673,7 @@
   "passwordStrong": "كلمة مرور قوية",
   "tooManyAttempts": "محاولات كثيرة جداً. يرجى المحاولة مرة أخرى بعد 15 دقيقة.",
   "privacyPolicyDesc": "عرض سياسة الخصوصية الخاصة بنا",
-  "exportWarning": "سيحتوي الملف المصدّر على جميع بياناتك الشخصية بما في ذلك الوحدات والمواعيد النهائية والتفضيلات. احتفظ بهذا الملف بشكل آمن ولا تشاركه مع الآخرين."
+  "exportWarning": "سيحتوي الملف المصدّر على جميع بياناتك الشخصية بما في ذلك الوحدات والمواعيد النهائية والتفضيلات. احتفظ بهذا الملف بشكل آمن ولا تشاركه مع الآخرين.",
+  "outsideCampus": "خارج الحرم الجامعي",
+  "outsideCampusDistance": "أنت على بعد حوالي {{distance}} متر من مركز الحرم الجامعي"
 }

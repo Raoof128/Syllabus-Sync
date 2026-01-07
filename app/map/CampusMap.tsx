@@ -21,10 +21,15 @@ import { fetchORSRoute } from '@/lib/services/ors';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { devLog } from '@/lib/utils/devLog';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 // Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
+// Map-specific logger
+const mapLog = devLog.map;
 
 // Map dimensions (image size)
 const MAP_WIDTH = 4678;
@@ -57,12 +62,12 @@ const pixelToLatLng = (x: number, y: number) => {
   return L.latLng(lat, lng);
 };
 
-// Fix for default markers in react-leaflet
+// Fix for default markers in react-leaflet - use self-hosted images
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl: '/images/leaflet/marker-icon-2x.png',
+  iconUrl: '/images/leaflet/marker-icon.png',
+  shadowUrl: '/images/leaflet/marker-shadow.png',
 });
 
 // Module-level icon cache for performance (avoid re-creating on every render)
@@ -94,7 +99,7 @@ const getMarkerIcon = (isSelected: boolean): L.Icon => {
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    shadowUrl: '/images/leaflet/marker-shadow.png',
     shadowSize: [41, 41],
   });
 
@@ -230,19 +235,19 @@ export default function CampusMap({
   useEffect(() => {
     if (!mapInstance || !navigator.geolocation) {
       if (!navigator.geolocation) {
-        console.warn('[Map] Geolocation API not available');
+        mapLog.log('Geolocation API not available');
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocationStatus('error');
       }
       return;
     }
 
-    console.warn('[Map] Starting geolocation watch...');
+    mapLog.log('Starting geolocation watch...');
     setLocationStatus('searching');
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        console.warn('[Map] Position received:', {
+        mapLog.log('Position received:', {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           accuracy: pos.coords.accuracy,
@@ -255,13 +260,13 @@ export default function CampusMap({
         const latLngBounds = L.latLngBounds(CAMPUS_BOUNDS);
         const isInBounds = latLngBounds.contains(latlng);
         const distance = latlng.distanceTo(L.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng));
-        console.warn('[Map] Position analysis:', {
+        mapLog.log('Position analysis:', {
           isInCampusBounds: isInBounds,
           distanceFromCampusCentre: `${Math.round(distance)}m`,
         });
 
         if (!userMarkerRef.current) {
-          console.warn('[Map] Creating user marker at:', latlng);
+          mapLog.log('Creating user marker at:', latlng);
           userMarkerRef.current = L.marker(latlng, {
             icon: userIcon,
             zIndexOffset: 1000,
@@ -285,7 +290,7 @@ export default function CampusMap({
         }
       },
       (err) => {
-        console.warn('[Map] Geolocation error:', {
+        mapLog.log('Geolocation error:', {
           code: err.code,
           message: err.message,
           // 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
@@ -332,14 +337,14 @@ export default function CampusMap({
     );
 
     return () => {
-      console.warn('[Map] Clearing geolocation watch');
+      mapLog.log('Clearing geolocation watch');
       navigator.geolocation.clearWatch(watchId);
     };
   }, [mapInstance]); // Removed 'origin' from dependencies to prevent infinite loop
 
   // Center on User action
   const centerOnUser = useCallback(() => {
-    console.warn('[Map] centerOnUser called, status:', locationStatus, 'origin:', origin);
+    mapLog.log('centerOnUser called', { status: locationStatus, origin });
 
     if (locationStatus === 'denied') {
       toastUtils.error(t('locationAccessDenied'), t('locationDeniedDesc'));
@@ -358,7 +363,7 @@ export default function CampusMap({
 
     if (userMarkerRef.current && mapInstance) {
       const userLatLng = userMarkerRef.current.getLatLng();
-      console.warn('[Map] Centering on user at:', userLatLng);
+      mapLog.log('Centering on user at:', userLatLng);
       mapInstance.setView(userLatLng, 18, { animate: true });
 
       // Check if user is outside campus bounds
@@ -366,12 +371,15 @@ export default function CampusMap({
       if (!latLngBounds.contains(userLatLng)) {
         const distance = userLatLng.distanceTo(L.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng));
         toastUtils.warning(
-          'Outside Campus',
-          `You are approximately ${Math.round(distance)}m from campus center`,
+          t('outsideCampus'),
+          t('outsideCampusDistance', { distance: Math.round(distance).toString() }),
         );
       }
     } else {
-      console.warn('[Map] Cannot center - marker:', !!userMarkerRef.current, 'map:', !!mapInstance);
+      mapLog.log('Cannot center - marker:', {
+        hasMarker: !!userMarkerRef.current,
+        hasMap: !!mapInstance,
+      });
       toastUtils.warning(t('locationError'), t('positionUnavailableDesc'));
     }
   }, [locationStatus, mapInstance, origin, t]);
@@ -490,20 +498,20 @@ export default function CampusMap({
             >
               <Popup>
                 <div className="p-2 min-w-[200px]">
-                  <h3 className="font-semibold text-mq-content">{building.name}</h3>
+                  <h3 className="font-semibold text-mq-content">{t(building.translationKey)}</h3>
                   <p className="text-mq-sm text-mq-content-secondary mb-2">
                     {t('building')} {building.id}
                   </p>
-                  {building.description && (
+                  {building.descriptionKey && (
                     <p className="text-mq-sm text-mq-content-tertiary mb-3">
-                      {building.description}
+                      {t(building.descriptionKey)}
                     </p>
                   )}
                   {building.tags && building.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {building.tags.map((tag) => (
                         <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
+                          {t(tag as TranslationKey)}
                         </Badge>
                       ))}
                     </div>
@@ -571,7 +579,7 @@ export default function CampusMap({
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="font-bold text-lg md:text-xl leading-tight text-mq-content">
-                {selectedBuilding.name}
+                {t(selectedBuilding.translationKey)}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="secondary" className="text-xs font-mono border border-mq-border">

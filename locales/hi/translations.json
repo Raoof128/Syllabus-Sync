@@ -263,7 +263,7 @@
   "googleOAuthDesc": "Google साइन-इन के लिए Supabase डैशबोर्ड में OAuth प्रदाता सेटअप आवश्यक है। इस सुविधा को सक्षम करने के लिए प्रमाणीकरण → प्रदाताओं के तहत Google OAuth कॉन्फ़िगर करें।",
   "noAccount": "खाता नहीं है?",
   "signUp": "साइन अप",
-  "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+  "passwordsDoNotMatch": "नए पासवर्ड मेल नहीं खाते",
   "passwordTooShort": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
   "accountCreated": "खाता बनाया गया!",
   "verifyEmail": "कृपया अपना खाता सत्यापित करने के लिए अपना ईमेल जांचें।",
@@ -393,7 +393,7 @@
   "allEvents": "सभी इवेंट",
   "categoryEvents": "{{category}} इवेंट",
   "eventsCount": "{{count}} इवेंट",
-  "remindMe": "मुझे याद दिलाएं",
+  "remindMe": "मुझे याद दिलाएं:",
   "navigate": "नेविगेट",
   "noEventsFound": "इस श्रेणी के लिए कोई इवेंट नहीं मिला।",
   "thisWeek": "इस सप्ताह",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "पुश नोटिफिकेशन {{status}}",
   "reminderTimingUpdated": "रिमाइंडर समय अपडेट किया गया",
   "reminderTimingUpdatedMsg": "रिमाइंडर {{timing}} पहले सेट किए गए",
-  "remindMe": "मुझे याद दिलाएं:",
   "before": "पहले",
   "on": "चालू",
   "off": "बंद",
@@ -660,8 +659,6 @@
   "timing1day": "1 दिन",
   "timing2days": "2 दिन",
   "allFieldsRequired": "कृपया सभी फ़ील्ड भरें",
-  "passwordTooShort": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
-  "passwordsDoNotMatch": "नए पासवर्ड मेल नहीं खाते",
   "notSignedIn": "पासवर्ड बदलने के लिए साइन इन करना होगा",
   "currentPasswordIncorrect": "वर्तमान पासवर्ड गलत है",
   "passwordChangedSuccess": "आपका पासवर्ड सफलतापूर्वक बदल दिया गया है",
@@ -676,5 +673,7 @@
   "passwordStrong": "मजबूत पासवर्ड",
   "tooManyAttempts": "बहुत अधिक प्रयास। कृपया 15 मिनट बाद पुनः प्रयास करें।",
   "privacyPolicyDesc": "हमारी गोपनीयता नीति देखें",
-  "exportWarning": "निर्यात की गई फ़ाइल में आपकी सभी व्यक्तिगत जानकारी शामिल होगी जिसमें यूनिट्स, डेडलाइन और प्राथमिकताएं शामिल हैं। इस फ़ाइल को सुरक्षित रखें और दूसरों के साथ साझा न करें।"
+  "exportWarning": "निर्यात की गई फ़ाइल में आपकी सभी व्यक्तिगत जानकारी शामिल होगी जिसमें यूनिट्स, डेडलाइन और प्राथमिकताएं शामिल हैं। इस फ़ाइल को सुरक्षित रखें और दूसरों के साथ साझा न करें।",
+  "outsideCampus": "कैंपस के बाहर",
+  "outsideCampusDistance": "आप कैंपस केंद्र से लगभग {{distance}}m दूर हैं"
 }

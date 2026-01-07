@@ -79,22 +79,10 @@ export const UNIT_COLORS = [
 
 /**
  * Campus Buildings
- * List of buildings on campus for location selection
- * Add or modify buildings for your campus
+ * @deprecated Use `buildings` from '@/lib/map/buildings' instead.
+ * This export is kept for backwards compatibility but imports from the canonical source.
  */
-export const CAMPUS_BUILDINGS = [
-  { code: 'C5C', name: 'Computer Science Building', translationKey: 'building_C5C_name' },
-  { code: 'C3C', name: 'Library', translationKey: 'building_C3C_name' },
-  { code: 'C7A', name: 'Campus Hub', translationKey: 'building_C7A_name' },
-  { code: 'W6A', name: 'Wallumattagal Building', translationKey: 'building_W6A_name' },
-  { code: 'E7A', name: 'Engineering Building', translationKey: 'building_E7A_name' },
-  { code: 'E7B', name: 'Engineering Building B', translationKey: 'building_E7B_name' },
-  { code: 'W3A', name: 'Careers & Employment', translationKey: 'building_W3A_name' },
-  { code: '12WW', name: "12 Wally's Walk", translationKey: 'building_12WW_name' },
-  { code: '4WW', name: "4 Wally's Walk", translationKey: 'building_4WW_name' },
-  { code: 'LIB', name: 'Library', translationKey: 'building_LIB_name' },
-  { code: 'Sports', name: 'Sports Precinct', translationKey: 'building_Sports_name' },
-] as const;
+export { buildings as CAMPUS_BUILDINGS } from '@/lib/map/buildings';
 
 /**
  * Feature Flags

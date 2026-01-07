@@ -1,3 +1,4 @@
+// app/manage-profiles/layout.tsx
 import { Metadata } from 'next';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
@@ -24,3 +25,7 @@ export const metadata: Metadata = {
     follow: false,
   },
 };
+
+export default function ManageProfilesLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

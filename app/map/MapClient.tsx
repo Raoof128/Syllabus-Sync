@@ -36,33 +36,49 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 
 // Filter categories for Advanced Search
 const FILTER_CATEGORIES = [
-  { id: 'academic', icon: BookOpen, label: 'academic' },
-  { id: 'services', icon: Briefcase, label: 'services' },
-  { id: 'sports', icon: Dumbbell, label: 'sports' },
-  { id: 'study', icon: Coffee, label: 'study' },
-  { id: 'labs', icon: FilterIcon, label: 'labs' },
-  { id: 'accessibility', icon: Accessibility, label: 'accessibility' },
+  { id: 'academic', icon: BookOpen, label: 'academic' as TranslationKey },
+  { id: 'services', icon: Briefcase, label: 'services' as TranslationKey },
+  { id: 'sports', icon: Dumbbell, label: 'sports' as TranslationKey },
+  { id: 'study', icon: Coffee, label: 'study' as TranslationKey },
+  { id: 'labs', icon: FilterIcon, label: 'labs' as TranslationKey },
+  { id: 'accessibility', icon: Accessibility, label: 'accessibility' as TranslationKey },
 ] as const;
 
-// Custom hook for debounced search
-// eslint-disable react-hooks/set-state-in-effect
+// Custom hook for debounced search with proper state management
 function useDebouncedSearch(searchFunction: (query: string) => Building[], delay: number = 300) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounce the query
+  // Update query and manage searching state
+  const updateQuery = useCallback(
+    (newQuery: string) => {
+      setQuery(newQuery);
+      setIsSearching(true);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setDebouncedQuery(newQuery);
+        setHasSearched(true);
+        setIsSearching(false);
+      }, delay);
+    },
+    [delay],
+  );
+
+  // Cleanup timeout on unmount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsSearching(true);
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-      setHasSearched(true);
-    }, delay);
-
-    return () => clearTimeout(timer);
-  }, [query, delay]);
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Perform search when debounced query changes
   const results = useMemo(() => {
@@ -73,21 +89,14 @@ function useDebouncedSearch(searchFunction: (query: string) => Building[], delay
     }
   }, [debouncedQuery, searchFunction]);
 
-  // Set searching to false after search completes
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsSearching(false);
-  }, [results]);
-
-  const updateQuery = useCallback((newQuery: string) => {
-    setQuery(newQuery);
-  }, []);
-
   const clearSearch = useCallback(() => {
     setQuery('');
     setDebouncedQuery('');
     setHasSearched(false);
     setIsSearching(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
   }, []);
 
   return {
@@ -294,8 +303,7 @@ export default function MapClient() {
             <Navigation className="h-5 w-5 text-mq-success" />
             <div>
               <p className="text-mq-sm font-medium text-mq-success">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey as any)}</strong>
+                {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey)}</strong>
               </p>
               <p className="text-mq-xs text-mq-success">
                 {t('building')} {selectedBuilding.id}
@@ -355,6 +363,7 @@ export default function MapClient() {
               id="map-search-results"
               role="listbox"
               aria-label={t('buildingResults')}
+              aria-live="polite"
               className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
             >
               {filteredBuildings.map((building, index: number) => (
@@ -371,17 +380,14 @@ export default function MapClient() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-mq-content truncate">
-                        {/* Note: Highlight match logic runs on English names for now */}
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {highlightMatch(t(building.translationKey as any))}
+                        {highlightMatch(t(building.translationKey))}
                       </div>
                       <div className="text-mq-sm text-mq-content-secondary">
                         {highlightMatch(building.id)}
                       </div>
                     </div>
                     <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {t((building.tags?.[0] || 'building') as any)}
+                      {t((building.tags?.[0] || 'building') as TranslationKey)}
                     </Badge>
                   </div>
                 </button>
@@ -503,8 +509,7 @@ export default function MapClient() {
                           )}
                         </div>
                         <div className="text-mq-sm text-mq-content-secondary">
-                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                          {t(building.translationKey as any)}
+                          {t(building.translationKey)}
                         </div>
                         {building.tags && building.tags.length > 0 && (
                           <div className="mt-1">

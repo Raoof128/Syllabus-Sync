@@ -87,3 +87,26 @@ export type FormErrors = {
 };
 
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+// Settings types
+export type SessionInfo = {
+  id: string;
+  device: string;
+  lastActive: string;
+  current: boolean;
+};
+
+export type NotificationPreferences = {
+  deadlines: boolean;
+  classes: boolean;
+  events: boolean;
+};
+
+// Password strength levels
+export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
+
+export type PasswordStrengthResult = {
+  strength: PasswordStrength;
+  score: number; // 0-4
+  feedback: string[];
+};

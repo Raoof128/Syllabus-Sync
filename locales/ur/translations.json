@@ -248,7 +248,7 @@
   "googleOAuthDesc": "گوگل سائن ان کے لیے Supabase ڈیش بورڈ میں OAuth فراہم کنندہ کی ترتیب درکار ہے۔ یہ خصوصیت فعال کرنے کے لیے تصدیق → فراہم کنندگان میں گوگل OAuth ترتیب دیں۔",
   "noAccount": "اکاؤنٹ نہیں ہے؟",
   "signUp": "سائن اپ",
-  "passwordsDoNotMatch": "پاس ورڈز میل نہیں کھاتے",
+  "passwordsDoNotMatch": "نئے پاس ورڈ مماثل نہیں ہیں",
   "passwordTooShort": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
   "accountCreated": "اکاؤنٹ بن گیا!",
   "verifyEmail": "براہ کرم اپنا اکاؤنٹ تصدیق کرنے کے لیے اپنا ای میل چیک کریں۔",
@@ -378,7 +378,7 @@
   "allEvents": "تمام ایونٹس",
   "categoryEvents": "{{category}} ایونٹس",
   "eventsCount": "{{count}} ایونٹس",
-  "remindMe": "مجھے یاد دلائیں",
+  "remindMe": "مجھے یاد دلائیں:",
   "navigate": "تشریف لے جائیں",
   "noEventsFound": "اس کیٹیگری کے لیے کوئی ایونٹ نہیں ملے۔",
   "thisWeek": "اس ہفتے",
@@ -647,7 +647,6 @@
   "pushNotificationsToggle": "پش نوٹیفیکیشنز {{status}}",
   "reminderTimingUpdated": "یاد دہانی کا وقت اپڈیٹ ہوا",
   "reminderTimingUpdatedMsg": "یاد دہانیاں {{timing}} پہلے سیٹ کی گئیں",
-  "remindMe": "مجھے یاد دلائیں:",
   "before": "پہلے",
   "on": "آن",
   "off": "آف",
@@ -660,8 +659,6 @@
   "timing1day": "1 دن",
   "timing2days": "2 دن",
   "allFieldsRequired": "براہ کرم تمام فیلڈز پُر کریں",
-  "passwordTooShort": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
-  "passwordsDoNotMatch": "نئے پاس ورڈ مماثل نہیں ہیں",
   "notSignedIn": "پاس ورڈ تبدیل کرنے کے لیے سائن ان ضروری ہے",
   "currentPasswordIncorrect": "موجودہ پاس ورڈ غلط ہے",
   "passwordChangedSuccess": "آپ کا پاس ورڈ کامیابی سے تبدیل ہو گیا",
@@ -676,5 +673,7 @@
   "passwordStrong": "مضبوط پاس ورڈ",
   "tooManyAttempts": "بہت زیادہ کوششیں۔ براہ کرم 15 منٹ بعد دوبارہ کوشش کریں۔",
   "privacyPolicyDesc": "ہماری رازداری کی پالیسی دیکھیں",
-  "exportWarning": "برآمد شدہ فائل میں آپ کا تمام ذاتی ڈیٹا شامل ہوگا جس میں یونٹس، ڈیڈ لائنز اور ترجیحات شامل ہیں۔ اس فائل کو محفوظ رکھیں اور دوسروں کے ساتھ شیئر نہ کریں۔"
+  "exportWarning": "برآمد شدہ فائل میں آپ کا تمام ذاتی ڈیٹا شامل ہوگا جس میں یونٹس، ڈیڈ لائنز اور ترجیحات شامل ہیں۔ اس فائل کو محفوظ رکھیں اور دوسروں کے ساتھ شیئر نہ کریں۔",
+  "outsideCampus": "کیمپس سے باہر",
+  "outsideCampusDistance": "آپ کیمپس کے مرکز سے تقریباً {{distance}} میٹر دور ہیں"
 }
