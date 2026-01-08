@@ -7,6 +7,266 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.4] - 2026-01-08
+
+### Fixed
+
+#### Mouse-Following Glow & Dark Mode Fixes (Raouf)
+
+**MagicCard Interactive Glow Fixes:**
+- Fixed mouse-following red glow effect not working on Calendar page, QuickActions component, and Manage Profiles page
+- Root cause: These pages used raw CSS classes (`className="mq-magic-card mq-liquid-enhanced"`) instead of the `MagicCard` React component which handles the JavaScript mouse tracking via `onMouseMove` event
+- Solution: Replaced raw divs with `MagicCard` component imports and proper `isLiquidEnhanced` prop usage
+
+**Dark Mode Header Background Fix:**
+- Fixed dark mode showing a visible black/dark rectangular background behind the "Welcome, Raoof.r!" and "Evening study session in progress" text
+- Root cause: Generic CSS rule `.dark header { background-color: var(--c-background) }` was affecting ALL `<header>` elements including page content headers
+- Solution: Made header background rule more specific to target only the top navigation (`layout-main > header`, `header.h-16`) and added explicit transparent backgrounds for page content headers
+
+**Code Cleanup:**
+- Removed unused `useEffect` import from `MagicCard.tsx`
+- Removed unused `CardContent`, `CardHeader` imports from `UnitCard.tsx`
+- ESLint auto-fixed boolean attributes (`isLiquidEnhanced={true}` → `isLiquidEnhanced`)
+
+**Files Changed:**
+- `app/calendar/CalendarClient.tsx` - Added MagicCard import, replaced raw div
+- `components/home/QuickActions.tsx` - Added MagicCard import, replaced raw div
+- `app/manage-profiles/page.tsx` - Added MagicCard import, replaced raw div
+- `app/home/HomeClient.tsx` - Wrapped My Units section with MagicCard
+- `components/ui/MagicCard.tsx` - Removed unused import
+- `components/units/UnitCard.tsx` - Removed unused imports
+- `app/styles/dark-mode.css` - Fixed header background specificity
+
+**Verification:**
+- `npm run prepush`: All checks passed (secrets, format, typecheck, lint, test 143/143, build 28/28)
+
+---
+
+## [0.8.3] - 2026-01-08
+
+### Added
+
+#### Interactive Home - Mouse Tracking (Raouf)
+
+- **Home Page Upgrade**: Extended the `MagicCard` interactive glow effect to all dashboard cards on the Home page.
+  - Today's Schedule, Next Deadline, Events Feed, and My Units (including individual Unit Cards) now feature the "mouse-following" red border glow.
+- **Unified Interaction**: Completed the full rollout of the interactive glow system across the entire application (Home, Calendar, Map, Feed, Settings, Profiles).
+- **Files Changed**: `components/home/TodaySchedule.tsx`, `components/home/NextDeadline.tsx`, `components/home/EventsFeed.tsx`, `components/units/UnitCard.tsx`, `app/home/HomeClient.tsx` (via components).
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.8.2] - 2026-01-08
+
+### Added
+
+#### Interactive Calendar - Mouse Tracking (Raouf)
+
+- **Calendar Page Upgrade**: Extended the `MagicCard` interactive glow effect to the upcoming deadlines list on the Calendar page.
+- **Unified Experience**: All dashboard cards across Home, Map, Feed, Settings, and Calendar now share the consistent "Apple Liquid Glass 2025" visual language with mouse-tracking red glow.
+- **Files Changed**: `app/calendar/CalendarClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.8.1] - 2026-01-08
+
+### Changed
+
+#### Map & Feed Page Improvements (Raouf)
+
+- **Map Page Polish**: Updated Map page cards (Selected Building, Coordinate Picker, Map, Campus Buildings, Active Features) to use the `MagicCard` component for consistent interactive glow effects.
+- **Header Update**: Changed Map page header from "Campus Map" to "Map" as requested.
+- **Feed Page Interactive**: Updated all Feed page cards (Filter, Events, Stats, Announcements, Legend) to use `MagicCard`.
+- **Files Changed**: `app/map/MapClient.tsx`, `app/feed/FeedClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.8.0] - 2026-01-08
+
+### Added
+
+#### Interactive Map - Mouse Tracking & Header Update (Raouf)
+
+- **Map Page Upgrade**: Extended the `MagicCard` interactive glow effect to all cards on the Map page.
+  - Map View, Building Search, Coordinate Picker, and Filter cards now feature the "mouse-following" red border glow.
+- **Header Rename**: Changed page title from "Campus Map" to "Map" for a cleaner, more concise header.
+- **Files Changed**: `app/map/MapClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.9] - 2026-01-08
+
+### Added
+
+#### Interactive Feed - Mouse Tracking (Raouf)
+
+- **Feed Page Upgrade**: Extended the `MagicCard` interactive glow effect to all cards on the Events Feed page.
+  - Filter Tabs, Events List, Quick Stats, Announcements, and Category Legend now feature the "mouse-following" red border glow.
+  - Maintains the "Apple Liquid Glass" aesthetic while adding premium interactivity.
+- **Files Changed**: `app/feed/FeedClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.8] - 2026-01-08
+
+### Added
+
+#### Interactive Mouse-Tracking Glow (Raouf)
+
+- **MagicCard Component**: Created a new `MagicCard` client component that tracks mouse position and exposes `--mouse-x` and `--mouse-y` CSS variables.
+- **Settings Page Polish**: Refactored all Settings page widgets (`NotificationSettings`, `AppearanceSettings`, `PrivacySettings`, `QuickActions`, `HelpSupport`) to use `MagicCard`, enabling the "red hover that follows the mouse" effect requested by the user.
+- **Unified Interaction**: The settings page now features the same premium interactive glow as seen in modern design trends, enhancing the "Liquid Glass" aesthetic.
+- **Files Changed**: `components/ui/MagicCard.tsx`, `app/settings/components/*.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.7] - 2026-01-08
+
+### Added
+
+#### Liquid Glass Physics Upgrade (Raouf)
+
+- **Physics-Based Refraction**: Upgraded the `mq-liquid-distortion` SVG filter to implement true physics-based liquid simulation logic from the "Liquid Glass 2025" article.
+- **Specular Highlights**: Added `feSpecularLighting` to the filter chain to generate realistic surface shine (specular highlights) based on the liquid topology.
+- **Smoother Topology**: Reduced `feTurbulence` base frequency from 0.015 to 0.007 for a smoother, more "lens-like" surface quality rather than noise.
+- **Composite Rendering**: Implemented `feComposite` with arithmetic blending to layer the specular shine naturally over the refracted background.
+- **Files Changed**: `components/ui/LiquidFilter.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.6] - 2026-01-08
+
+### Added
+
+#### Liquid Glass Extension - Full App (Raouf)
+
+- **Feed Page Upgrade**: Enhanced event feed items with "frosted strip" styling (`bg-mq-background-secondary/50 backdrop-blur-sm`) to match the Calendar look.
+- **Settings Page Upgrade**: Updated all internal settings panels (Notifications, Appearance, Privacy, Help) to use frosted glass containers for a multi-layered depth effect.
+- **Manage Profiles Upgrade**: Wrapped the main profiles grid in the full `mq-magic-card mq-liquid-enhanced` shell.
+- **Unified Experience**: Completed the rollout of "Apple Liquid Glass 2025" across all authenticated pages (Home, Calendar, Map, Feed, Settings, Profiles).
+- **Files Changed**: `app/feed/FeedClient.tsx`, `app/manage-profiles/page.tsx`, `app/settings/components/*.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.5] - 2026-01-08
+
+### Added
+
+#### Liquid Glass Extension - Campus & Calendar (Raouf)
+
+- **Map Page Integration**: Wrapped the "Selected Building Banner" and "Coordinate Picker" sections in the `mq-magic-card mq-liquid-enhanced` shell to match the new design system.
+- **Calendar Page Polish**: Enhanced deadline list items with a subtle glassmorphic effect (`bg-mq-background-secondary/50 backdrop-blur-sm`) to create "frosted strips" inside the main glass container.
+- **Unified Aesthetic**: Ensured all major interactive sections across Home, Map, and Calendar now share the consistent "Apple Liquid Glass 2025" visual language.
+- **Files Changed**: `app/map/MapClient.tsx`, `app/calendar/CalendarClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.4] - 2026-01-08
+
+### Added
+
+#### Apple Liquid Glass 2025 Implementation (Raouf)
+
+- **Liquid Glass Upgrade**: Upgraded the glass material system to match 2025 design trends.
+  - **Saturation Boost**: Increased `backdrop-filter: saturate()` from 180% to 210% for vibrant, Apple-like translucency.
+  - **Translucency Tuning**: Adjusted background opacity to `0.65` (was 0.85) to let more of the fluid mesh show through.
+  - **Cut-Glass Edge**: Added a crisp inner white highlight (`inset 0 1px 1px rgba(255, 255, 255, 0.9)`) to simulate physical glass edges.
+  - **Deeper Blur**: Increased blur radius to 30px for a softer, deeper depth of field.
+- **Fluid Mesh Animation**: Enhanced the background mesh gradient with organic rotation and faster, fluid timing (45s-80s cycles) for a "living" background feel.
+- **Home Page Integration**: Wrapped the "My Units" section in the `mq-magic-card` shell, unifying the home dashboard with the new liquid glass aesthetic.
+- **Files Changed**: `app/styles/liquid-glass.css`, `components/ui/MeshGradient.tsx`, `app/home/HomeClient.tsx`.
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.3] - 2026-01-08
+
+### Fixed
+
+#### UI Polish - Enhanced Red Glow (Raouf)
+
+- **Supercharged Red Glow**: Upgraded the card hover effect with a multi-layered box-shadow for a deeper, more "neon" look.
+  - **Layer 1**: Tight, strong red shadow (`rgba(166, 25, 46, 0.5)`).
+  - **Layer 2**: Soft, wide ambient glow (`rgba(166, 25, 46, 0.3)`).
+  - **Layer 3**: Subtle crisp ring (`1px`) for edge definition.
+  - **Gradient**: Enriched the background gradient with an extra bright red stop (`#e60022`) for more vibrancy.
+  - **Lift**: Increased hover lift from `-2px` to `-3px`.
+  - **Files Changed**: `app/styles/magic-card.css`
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.2] - 2026-01-08
+
+### Fixed
+
+#### UI Polish Restoration (Raouf)
+
+- **Restored Magic Card Hover Effects**: Re-enabled the premium 3D interaction on `mq-magic-card` components.
+  - **Glow**: Restored soft red box-shadow (`rgba(166, 25, 46, 0.3)`) on hover.
+  - **Scale**: Restored inner content scaling (`scale(0.98)`) on hover for depth effect.
+  - **Files Changed**: `app/styles/magic-card.css`
+
+**Verification:**
+- `npm run build`: Success.
+
+---
+
+## [0.7.1] - 2026-01-08
+
+### Fixed
+
+#### Middleware Conflict & Asset Warnings Fixes (Raouf)
+
+**Middleware Resolution:**
+- **Moved proxy.ts**: Moved `proxy.ts` from root to `lib/proxy.ts` to resolve collision with `middleware.ts`. Next.js 16 was detecting both and flagging a conflict.
+- **Updated Middleware**: Updated `middleware.ts` to import `proxy` from `@/lib/proxy`.
+
+**Asset Fixes:**
+- **Logo Aspect Ratio**: Added explicit `style={{ width: 'auto' }}` to `Header.tsx` logo image to satisfy Next.js Image component warning about modified dimensions.
+- **Favicon**: Explicitly added `icons` configuration to `app/layout.tsx` metadata to ensure consistent favicon loading.
+
+**Files Changed:**
+- `middleware.ts` - Updated import path
+- `lib/proxy.ts` - **MOVED** from root `proxy.ts`
+- `components/layout/Header.tsx` - Added auto width style
+- `app/layout.tsx` - Added favicon metadata
+
+**Verification:**
+- `npm run build`: Success (28 routes) - Middleware conflict resolved, API routes confirmed present.
+
+---
+
 ## [0.7.0] - 2026-01-08
 
 ### Security Hardening Release (Raouf)

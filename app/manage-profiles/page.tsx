@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { UserProfile } from '@/lib/store/profilesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 export default function ManageProfilesPage() {
   const { t } = useTranslation();
@@ -115,51 +116,55 @@ export default function ManageProfilesPage() {
         <p className="text-mq-content">{t('manageProfilesDesc')}</p>
       </header>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <Users className="h-5 w-5" aria-hidden="true" />
-            {t('allProfiles', { count: profiles.length })}
-          </h2>
-          {profiles.length > 0 && (
-            <Button size="sm" onClick={() => setShowAddDialog(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('createProfile')}
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent>
-          {profiles.length === 0 ? (
-            <div className="text-center py-12">
-              <User className="h-16 w-16 text-mq-content-tertiary mx-auto mb-4" />
-              <h3 className="text-mq-xl font-semibold text-mq-content mb-2">
-                {t('noProfilesYet')}
-              </h3>
-              <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-                {t('createFirstProfile')}
-              </p>
-              <Button onClick={() => setShowAddDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t('createProfile')}
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {profiles.map((profile) => (
-                <ProfileCard
-                  key={profile.id}
-                  profile={profile}
-                  isCurrent={profile.id === currentProfileId}
-                  onEdit={handleEditProfile}
-                  onDelete={handleDeleteProfile}
-                  onSetCurrent={handleSetCurrentProfile}
-                  onUpdate={updateProfile}
-                />
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <MagicCard isLiquidEnhanced>
+        <div className="mq-magic-card-content p-0">
+          <Card className="border-0 shadow-none bg-transparent">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Users className="h-5 w-5" aria-hidden="true" />
+                {t('allProfiles', { count: profiles.length })}
+              </h2>
+              {profiles.length > 0 && (
+                <Button size="sm" onClick={() => setShowAddDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('createProfile')}
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              {profiles.length === 0 ? (
+                <div className="text-center py-12">
+                  <User className="h-16 w-16 text-mq-content-tertiary mx-auto mb-4" />
+                  <h3 className="text-mq-xl font-semibold text-mq-content mb-2">
+                    {t('noProfilesYet')}
+                  </h3>
+                  <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
+                    {t('createFirstProfile')}
+                  </p>
+                  <Button onClick={() => setShowAddDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('createProfile')}
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {profiles.map((profile) => (
+                    <ProfileCard
+                      key={profile.id}
+                      profile={profile}
+                      isCurrent={profile.id === currentProfileId}
+                      onEdit={handleEditProfile}
+                      onDelete={handleDeleteProfile}
+                      onSetCurrent={handleSetCurrentProfile}
+                      onUpdate={updateProfile}
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </MagicCard>
 
       <Dialog
         open={showAddDialog}

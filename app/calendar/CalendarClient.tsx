@@ -12,6 +12,7 @@ import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 export default function CalendarClient() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
@@ -75,7 +76,7 @@ export default function CalendarClient() {
       </ScrollReveal>
 
       <ScrollReveal delay={0.1}>
-        <div className="mq-magic-card mq-liquid-enhanced">
+        <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0">
             <Card className="border-0 shadow-none bg-transparent">
               <CardHeader>
@@ -127,12 +128,12 @@ export default function CalendarClient() {
                         <article
                           key={deadline.id}
                           role="listitem"
-                          className={`flex items-center justify-between p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg border transition-all duration-mq-fast ${
+                          className={`flex items-center justify-between p-3 sm:p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border transition-all duration-mq-fast ${
                             deadline.completed
                               ? 'border-mq-border opacity-60'
                               : isOverdue
-                                ? 'border-mq-error/50 bg-mq-error/5'
-                                : 'border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm'
+                                ? 'border-mq-error/50 bg-mq-error/5 hover:shadow-[0_0_15px_rgba(166,25,46,0.15)]'
+                                : 'border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]'
                           }`}
                           aria-label={`${deadline.title} - ${deadline.completed ? t('completed') : isOverdue ? t('overdue') : t('due')} ${due.toLocaleDateString(getLocaleString())}`}
                         >
@@ -198,7 +199,7 @@ export default function CalendarClient() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </MagicCard>
       </ScrollReveal>
 
       <DeadlineForm

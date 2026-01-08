@@ -186,6 +186,7 @@ const Header = memo(() => {
             height={80}
             priority
             className="h-[72px] w-auto sm:h-20"
+            style={{ width: 'auto' }}
           />
           <div className="hidden sm:block">
             <h1 className="text-mq-lg font-semibold text-mq-content">{APP_CONFIG.name}</h1>

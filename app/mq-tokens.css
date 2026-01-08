@@ -124,6 +124,10 @@
   --c-button-secondary: var(--c-sand-200);
   --c-hover-background: var(--c-sand-100);
 
+  /* Sub-card hover colors - subtle grey for interactive sub-elements */
+  --c-subcard-hover: rgba(0, 0, 0, 0.04);
+  --c-subcard-active: rgba(0, 0, 0, 0.08);
+
   /* MQ Token aliases for globals.css compatibility */
   --mq-background: var(--c-background);
   --mq-content: var(--c-content);
@@ -293,6 +297,10 @@
   --c-input-background: var(--c-charcoal-800);
   --c-button-secondary: var(--c-charcoal-700);
   --c-hover-background: var(--c-charcoal-700);
+
+  /* Sub-card hover colors - subtle grey for interactive sub-elements in dark mode */
+  --c-subcard-hover: rgba(255, 255, 255, 0.06);
+  --c-subcard-active: rgba(255, 255, 255, 0.12);
 }
 
 /* Focus and Interaction States */

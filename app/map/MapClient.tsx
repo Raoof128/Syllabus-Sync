@@ -33,6 +33,7 @@ import Link from 'next/link';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 // Filter categories for Advanced Search
 const FILTER_CATEGORIES = [
@@ -259,7 +260,7 @@ export default function MapClient() {
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
     try {
-      document.title = `${APP_CONFIG.name} - Campus Map`;
+      document.title = `${APP_CONFIG.name} - Map`;
     } catch {
       // ignore
     }
@@ -290,7 +291,7 @@ export default function MapClient() {
     <div className="container mx-auto p-4 max-w-7xl map-page">
       {/* Header */}
       <header className="mb-6">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('campusMap')}</h1>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('map')}</h1>
         <p className="text-mq-content-secondary">
           {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
         </p>
@@ -298,25 +299,27 @@ export default function MapClient() {
 
       {/* Selected Building Banner */}
       {selectedBuilding && (
-        <div className="mb-4 p-4 bg-mq-success/10 border border-mq-success/20 rounded-mq-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Navigation className="h-5 w-5 text-mq-success" />
-            <div>
-              <p className="text-mq-sm font-medium text-mq-success">
-                {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey)}</strong>
-              </p>
-              <p className="text-mq-xs text-mq-success">
-                {t('building')} {selectedBuilding.id}
-              </p>
+        <MagicCard isLiquidEnhanced className="mb-4">
+          <div className="mq-magic-card-content p-4 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Navigation className="h-5 w-5 text-mq-success" />
+              <div>
+                <p className="text-mq-sm font-medium text-mq-success">
+                  {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey)}</strong>
+                </p>
+                <p className="text-mq-xs text-mq-success">
+                  {t('building')} {selectedBuilding.id}
+                </p>
+              </div>
             </div>
+            <Link href="/map">
+              <Button variant="secondary" size="sm" className="gap-1">
+                <X className="h-4 w-4" />
+                {t('clear')}
+              </Button>
+            </Link>
           </div>
-          <Link href="/map">
-            <Button variant="secondary" size="sm" className="gap-1">
-              <X className="h-4 w-4" />
-              {t('clear')}
-            </Button>
-          </Link>
-        </div>
+        </MagicCard>
       )}
 
       {/* Search and Coordinate Picker */}
@@ -338,7 +341,7 @@ export default function MapClient() {
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 bg-mq-background-secondary/50 backdrop-blur-sm"
             role="combobox"
             aria-expanded={hasSearched && searchQuery.length > 0}
             aria-controls="map-search-results"
@@ -364,7 +367,7 @@ export default function MapClient() {
               role="listbox"
               aria-label={t('buildingResults')}
               aria-live="polite"
-              className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
+              className="absolute top-full left-0 right-0 mt-1 bg-mq-background/95 backdrop-blur-md border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
             >
               {filteredBuildings.map((building, index: number) => (
                 <button
@@ -373,8 +376,10 @@ export default function MapClient() {
                   role="option"
                   aria-selected={index === selectedResultIndex}
                   onClick={() => handleBuildingSelect(building)}
-                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-colors ${
-                    index === selectedResultIndex ? 'bg-mq-info/10' : 'hover:bg-mq-hover-background'
+                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-all duration-300 ${
+                    index === selectedResultIndex
+                      ? 'bg-mq-info/10'
+                      : 'hover:bg-mq-hover-background hover:shadow-[0_0_10px_rgba(166,25,46,0.08)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -395,52 +400,54 @@ export default function MapClient() {
             </div>
           )}
           {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background/95 backdrop-blur-md border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
               {t('noBuildingsFound', { query: searchQuery })}
             </div>
           )}
         </div>
 
         {/* Coordinate Picker */}
-        <div className="flex items-center justify-between p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg">
-          <div className="flex items-center gap-3">
-            <Info className="h-5 w-5 text-mq-info" />
-            <div>
-              <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
-              <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Info className="h-5 w-5 text-mq-info" />
+              <div>
+                <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
+                <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {copiedCoords && (
+                <div className="flex items-center gap-2 text-mq-sm text-mq-success">
+                  <Copy className="h-4 w-4" />
+                  {t('copied')} {copiedCoords}
+                </div>
+              )}
+              <Button
+                variant={coordPickerMode ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => setCoordPickerMode(!coordPickerMode)}
+                className="gap-2"
+              >
+                {coordPickerMode ? (
+                  <>
+                    <Eye className="h-4 w-4" />
+                    {t('enabled')}
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="h-4 w-4" />
+                    {t('disabled')}
+                  </>
+                )}
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {copiedCoords && (
-              <div className="flex items-center gap-2 text-mq-sm text-mq-success">
-                <Copy className="h-4 w-4" />
-                {t('copied')} {copiedCoords}
-              </div>
-            )}
-            <Button
-              variant={coordPickerMode ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setCoordPickerMode(!coordPickerMode)}
-              className="gap-2"
-            >
-              {coordPickerMode ? (
-                <>
-                  <Eye className="h-4 w-4" />
-                  {t('enabled')}
-                </>
-              ) : (
-                <>
-                  <EyeOff className="h-4 w-4" />
-                  {t('disabled')}
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+        </MagicCard>
       </div>
 
       {/* Map */}
-      <div className="mq-magic-card mq-liquid-enhanced mb-6">
+      <MagicCard isLiquidEnhanced className="mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -467,10 +474,10 @@ export default function MapClient() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </MagicCard>
 
       {/* Campus Buildings Quick Reference */}
-      <div className="mq-magic-card mq-liquid-enhanced mb-6">
+      <MagicCard isLiquidEnhanced className="mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -494,10 +501,10 @@ export default function MapClient() {
                         key={building.id}
                         href={`/map?building=${building.id}`}
                         aria-current={isSelected ? 'page' : undefined}
-                        className={`p-3 rounded-mq-lg transition-colors text-mq-content ${
+                        className={`p-3 rounded-mq-lg transition-all duration-300 text-mq-content border ${
                           isSelected
                             ? 'bg-mq-success/10 border-2 border-mq-success'
-                            : 'bg-mq-background-secondary hover:bg-mq-hover-background'
+                            : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -540,12 +547,12 @@ export default function MapClient() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </MagicCard>
 
       {/* Active Map Features */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Turn-by-Turn Navigation - ACTIVE */}
-        <div className="mq-magic-card mq-liquid-enhanced">
+        <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
@@ -575,10 +582,10 @@ export default function MapClient() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </MagicCard>
 
         {/* Live Location - ACTIVE */}
-        <div className="mq-magic-card mq-liquid-enhanced">
+        <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
@@ -606,10 +613,10 @@ export default function MapClient() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </MagicCard>
 
         {/* Advanced Search - ACTIVE */}
-        <div className="mq-magic-card mq-liquid-enhanced">
+        <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
@@ -688,7 +695,7 @@ export default function MapClient() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </MagicCard>
       </div>
     </div>
   );

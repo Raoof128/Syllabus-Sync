@@ -63,9 +63,10 @@ const MeshGradient = memo(() => {
           x: [0, 50, 20, -30, 0],
           y: [0, 30, -20, 40, 0],
           scale: [1, 1.1, 0.95, 1.05, 1],
+          rotate: [0, 45, 0, -45, 0],
         }}
         transition={{
-          duration: 60,
+          duration: 45,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
@@ -78,9 +79,10 @@ const MeshGradient = memo(() => {
           x: [0, -40, 30, -20, 0],
           y: [0, -30, 20, -40, 0],
           scale: [1, 0.95, 1.1, 1, 1],
+          rotate: [0, -30, 10, 30, 0],
         }}
         transition={{
-          duration: 75,
+          duration: 55,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
@@ -93,9 +95,10 @@ const MeshGradient = memo(() => {
           x: [0, 30, -40, 20, 0],
           y: [0, -40, 30, -20, 0],
           scale: [1, 1.05, 0.9, 1.08, 1],
+          rotate: [0, 20, -20, 10, 0],
         }}
         transition={{
-          duration: 90,
+          duration: 65,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
@@ -108,10 +111,11 @@ const MeshGradient = memo(() => {
           x: [0, 60, -30, 40, 0],
           y: [0, 20, -50, 30, 0],
           scale: [1, 1.15, 0.95, 1.1, 1],
-          opacity: [0.3, 0.4, 0.25, 0.35, 0.3],
+          opacity: [0.3, 0.5, 0.25, 0.45, 0.3],
+          rotate: [0, -60, 30, -30, 0],
         }}
         transition={{
-          duration: 120,
+          duration: 80,
           repeat: Infinity,
           ease: 'easeInOut',
         }}

@@ -22,6 +22,7 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info',
@@ -118,7 +119,7 @@ const FeedClient = memo(() => {
         <div className="lg:col-span-2 space-y-6">
           {/* Filter Tabs */}
           <ScrollReveal delay={0.15}>
-            <div className="mq-magic-card mq-liquid-enhanced">
+            <MagicCard isLiquidEnhanced>
               <div className="mq-magic-card-content p-0">
                 <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
@@ -156,12 +157,12 @@ const FeedClient = memo(() => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </MagicCard>
           </ScrollReveal>
 
           {/* Events List */}
           <ScrollReveal delay={0.2}>
-            <div className="mq-magic-card mq-liquid-enhanced">
+            <MagicCard isLiquidEnhanced>
               <div className="mq-magic-card-content p-0">
                 <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
@@ -194,7 +195,7 @@ const FeedClient = memo(() => {
                         filteredEvents.map((event, index) => (
                           <article
                             key={event.id}
-                            className="p-4 bg-mq-background-secondary rounded-mq-lg border border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm transition-all duration-mq-fast"
+                            className="p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm transition-all duration-mq-fast"
                             aria-posinset={index + 1}
                             aria-setsize={filteredEvents.length}
                           >
@@ -284,7 +285,7 @@ const FeedClient = memo(() => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </MagicCard>
           </ScrollReveal>
         </div>
 
@@ -292,7 +293,7 @@ const FeedClient = memo(() => {
         <aside className="space-y-6" aria-label="Event statistics and announcements">
           {/* Quick Stats */}
           <ScrollReveal delay={0.25}>
-            <div className="mq-magic-card mq-liquid-enhanced">
+            <MagicCard isLiquidEnhanced>
               <div className="mq-magic-card-content p-0">
                 <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
@@ -349,12 +350,12 @@ const FeedClient = memo(() => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </MagicCard>
           </ScrollReveal>
 
           {/* Announcements */}
           <ScrollReveal delay={0.3}>
-            <div className="mq-magic-card mq-liquid-enhanced">
+            <MagicCard isLiquidEnhanced>
               <div className="mq-magic-card-content p-0">
                 <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
@@ -395,12 +396,12 @@ const FeedClient = memo(() => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </MagicCard>
           </ScrollReveal>
 
           {/* Event Categories Legend */}
           <ScrollReveal delay={0.35}>
-            <div className="mq-magic-card mq-liquid-enhanced">
+            <MagicCard isLiquidEnhanced>
               <div className="mq-magic-card-content p-0">
                 <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
@@ -450,7 +451,7 @@ const FeedClient = memo(() => {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </MagicCard>
           </ScrollReveal>
         </aside>
       </div>

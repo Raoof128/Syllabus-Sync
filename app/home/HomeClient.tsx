@@ -45,6 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { MagicCard } from '@/components/ui/MagicCard';
 import { Unit, Deadline } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
 
@@ -524,87 +525,99 @@ export default function HomeClient() {
 
       {/* My Units Section */}
       <ScrollReveal delay={0.3} staggerChildren={0.1}>
-        <section aria-labelledby="units-section-heading">
-          <Card className="mb-6">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle id="units-section-heading" className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" aria-hidden="true" />
-                {t('myUnits')}
-              </CardTitle>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1"
-                onClick={handleAddUnit}
-                aria-label={t('addUnit')}
-              >
-                <Plus className="h-4 w-4" />
-                {t('addUnit')}
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {!hasHydrated ? (
-                <div className="h-32 flex items-center justify-center">
-                  <div className="animate-pulse space-y-3 w-full max-w-md">
-                    <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
-                    <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
-                  </div>
-                </div>
-              ) : units.length === 0 ? (
-                <div className="text-center py-12">
-                  <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                  <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                    {t('noUnitsYet')}
-                  </h3>
-                  <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                    {t('addFirstUnitDesc')}
-                  </p>
-                  <Button onClick={handleAddUnit} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    {t('addYourFirstUnit')}
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  {/* Unit Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
-                    <div className="text-center">
-                      <p className="text-mq-2xl font-bold text-mq-content">{unitStats.unitCount}</p>
-                      <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-mq-2xl font-bold text-mq-content">
-                        {unitStats.totalClasses}
-                      </p>
-                      <p className="text-mq-xs text-mq-content-secondary">{t('classesPerWeek')}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-mq-2xl font-bold text-mq-content">
-                        {unitStats.studyHours}h
-                      </p>
-                      <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
-                    </div>
-                  </div>
-
-                  {/* Units Grid */}
-                  <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
-                    variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+        <section aria-labelledby="units-section-heading" className="mb-6">
+          <MagicCard isLiquidEnhanced>
+            <div className="mq-magic-card-content">
+              <Card className="border-0 shadow-none bg-transparent">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle id="units-section-heading" className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" aria-hidden="true" />
+                    {t('myUnits')}
+                  </CardTitle>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1"
+                    onClick={handleAddUnit}
+                    aria-label={t('addUnit')}
                   >
-                    {units.map((unit) => (
+                    <Plus className="h-4 w-4" />
+                    {t('addUnit')}
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {!hasHydrated ? (
+                    <div className="h-32 flex items-center justify-center">
+                      <div className="animate-pulse space-y-3 w-full max-w-md">
+                        <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
+                        <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
+                      </div>
+                    </div>
+                  ) : units.length === 0 ? (
+                    <div className="text-center py-12">
+                      <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                      <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
+                        {t('noUnitsYet')}
+                      </h3>
+                      <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                        {t('addFirstUnitDesc')}
+                      </p>
+                      <Button onClick={handleAddUnit} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        {t('addYourFirstUnit')}
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Unit Stats */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                        <div className="text-center">
+                          <p className="text-mq-2xl font-bold text-mq-content">
+                            {unitStats.unitCount}
+                          </p>
+                          <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-mq-2xl font-bold text-mq-content">
+                            {unitStats.totalClasses}
+                          </p>
+                          <p className="text-mq-xs text-mq-content-secondary">
+                            {t('classesPerWeek')}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-mq-2xl font-bold text-mq-content">
+                            {unitStats.studyHours}h
+                          </p>
+                          <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+                        </div>
+                      </div>
+
+                      {/* Units Grid */}
                       <motion.div
-                        key={unit.id}
-                        variants={revealChildVariants}
-                        className="relative z-0 hover:z-50 focus-within:z-50 h-full"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
+                        variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
                       >
-                        <UnitCard unit={unit} onEdit={handleEditUnit} onDelete={handleDeleteUnit} />
+                        {units.map((unit) => (
+                          <motion.div
+                            key={unit.id}
+                            variants={revealChildVariants}
+                            className="relative z-0 hover:z-50 focus-within:z-50 h-full"
+                          >
+                            <UnitCard
+                              unit={unit}
+                              onEdit={handleEditUnit}
+                              onDelete={handleDeleteUnit}
+                            />
+                          </motion.div>
+                        ))}
                       </motion.div>
-                    ))}
-                  </motion.div>
-                </>
-              )}
-            </CardContent>
-          </Card>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </MagicCard>
         </section>
       </ScrollReveal>
 

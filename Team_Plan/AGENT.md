@@ -2595,6 +2595,108 @@ Follow-ups: None.
 
 
 ### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Interactive UI Extension.
+Summary: Extended `MagicCard` to Map and Feed pages for consistent interactive glow. Renamed Map page header to "Map".
+Files changed: app/map/MapClient.tsx, app/feed/FeedClient.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Interactive UI Completion.
+Summary: Extended `MagicCard` to Home page widgets (Today, Deadline, Events, Units). Completed full app rollout of interactive glow effects.
+Files changed: components/home/*.tsx, components/units/UnitCard.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Interactive UI Extension.
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Interactive UI Upgrade.
+Summary: Implemented "mouse-following" red glow for Settings page cards. Created reusable `MagicCard` component and refactored all settings widgets to use it.
+Files changed: components/ui/MagicCard.tsx, app/settings/components/*.tsx.
+Verification: npm run build (success).
+Follow-ups: Consider extending MagicCard to Home and Map dashboards for consistent interactivity.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Visual Physics Upgrade.
+Summary: Implemented physics-based "Liquid Glass" refraction and specular highlighting in the SVG filter engine. Added surface shine and smoothed out turbulence for a realistic wet glass look.
+Files changed: components/ui/LiquidFilter.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Design System Completion.
+Summary: Rolled out "Apple Liquid Glass 2025" design to all remaining pages (Feed, Settings, Manage Profiles). Implemented consistent frosted glass strips for list items and wrapped main containers in the liquid shell.
+Files changed: app/feed/FeedClient.tsx, app/manage-profiles/page.tsx, app/settings/components/*.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Design System Extension.
+Summary: Extended "Apple Liquid Glass 2025" design to Map and Calendar pages. Wrapped key Map UI elements in the liquid shell and added frosted glass effect to Calendar list items.
+Files changed: app/map/MapClient.tsx, app/calendar/CalendarClient.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Design System Upgrade.
+Summary: Implemented "Apple Liquid Glass 2025" design language. Upgraded glass material with 210% saturation, high translucency, and cut-glass edges. Enhanced mesh gradient with fluid rotation. Unified Home dashboard widgets with the new liquid glass shell.
+Files changed: app/styles/liquid-glass.css, components/ui/MeshGradient.tsx, app/home/HomeClient.tsx.
+Verification: npm run build (success).
+Follow-ups: Monitor performance of the enhanced blur/saturation on lower-end devices.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: UI Polish.
+Summary: Enhanced card hover effects with layered "neon" red glow and richer gradient for premium feel.
+Files changed: app/styles/magic-card.css.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: UI Restoration.
+Summary: Restored "Magic Card" hover effects (red glow + 3D scale) which were previously disabled in CSS.
+Files changed: app/styles/magic-card.css.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Interactive UI Extension.
+Summary: Extended `MagicCard` to Calendar page for consistent interactive glow.
+Files changed: app/calendar/CalendarClient.tsx.
+Verification: npm run build (success).
+Follow-ups: None.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Middleware conflict, Image warnings, Favicon.
+Summary: Resolved critical build conflict between middleware.ts and proxy.ts by moving proxy logic to lib/. Fixed Next.js Image warning in Header by adding explicit auto-width. Added explicit favicon metadata to layout.
+Files changed: middleware.ts, lib/proxy.ts (moved), components/layout/Header.tsx, app/layout.tsx.
+Verification: npm run build (success).
+Follow-ups: Monitor for any regression in CSP headers now that proxy is imported from lib.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
 Scope: Comprehensive Security Audit & IDOR Vulnerability Fix (v0.5.82).
 Summary:
   - Conducted comprehensive security audit identifying critical IDOR vulnerability across all API endpoints.
@@ -2611,6 +2713,21 @@ Summary:
 Files: app/api/units/route.ts; app/api/deadlines/route.ts; app/api/events/route.ts; app/api/_lib/mappers.ts; app/login/LoginClient.tsx; database-schema.sql; public/sw.js; supabase/migrations/*.sql (3 migrations).
 Verification: npm run build (pass); npm run lint (pass); RLS test confirms anonymous access blocked to user-scoped tables.
 Follow-ups: New users automatically receive sample data on signup.
+
+---
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+
+Scope: MagicCard Glow Fix & Dark Mode Header Fix (v0.8.4).
+Summary:
+
+- Fixed mouse-following red glow effect not working on Calendar page, QuickActions component, and Manage Profiles page. Root cause: pages used raw CSS classes instead of MagicCard React component which handles JavaScript mouse tracking.
+- Fixed dark mode showing black rectangular background behind WelcomeHeader text. Root cause: generic `.dark header` CSS rule affected all header elements. Made rule more specific to target only top navigation.
+- Code cleanup: removed unused imports (useEffect from MagicCard, CardContent/CardHeader from UnitCard).
+- ESLint auto-fixed boolean attributes (isLiquidEnhanced={true} → isLiquidEnhanced).
+  Files changed: app/calendar/CalendarClient.tsx; components/home/QuickActions.tsx; app/manage-profiles/page.tsx; app/home/HomeClient.tsx; components/ui/MagicCard.tsx; components/units/UnitCard.tsx; app/styles/dark-mode.css; Team_Plan/CHANGELOG.md.
+  Verification: npm run prepush (all checks passed: secrets, format, typecheck, lint 0 errors, test 143/143, build 28/28).
+  Follow-ups: None.
 
 **Questions?** Contact the team leads:
 - Frontend: Pouya

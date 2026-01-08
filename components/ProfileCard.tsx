@@ -10,6 +10,7 @@ import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'luc
 import { UserProfile } from '@/lib/store/profilesStore';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { LiquidGlassCard, SubCard } from '@/components/ui/LiquidGlassCard';
 
 interface ProfileCardProps {
   profile: UserProfile;
@@ -46,11 +47,11 @@ const ProfileCard = React.memo(
     };
 
     return (
-      <div className="mq-magic-card mq-liquid-enhanced">
+      <LiquidGlassCard liquidGlass className={cn(isCurrent && 'ring-2 ring-mq-primary')}>
         <Card
           className={cn(
-            'mq-magic-card-content relative transition-all duration-300',
-            isCurrent ? 'ring-2 ring-mq-primary bg-mq-primary/5 shadow-mq-lg' : '',
+            'relative transition-all duration-300 border-0 shadow-none bg-transparent',
+            isCurrent ? 'bg-mq-primary/5' : '',
           )}
         >
           <CardHeader className="flex flex-row items-start justify-between">
@@ -141,8 +142,8 @@ const ProfileCard = React.memo(
           </CardHeader>
 
           <CardContent className="pt-0">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
+            <div className="space-y-2">
+              <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-mq-content-tertiary" />
                   <span className="text-sm text-mq-content-secondary">
@@ -167,8 +168,8 @@ const ProfileCard = React.memo(
                     )}
                   />
                 </button>
-              </div>
-              <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
+              </SubCard>
+              <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-mq-content-tertiary" />
                   <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
@@ -191,8 +192,8 @@ const ProfileCard = React.memo(
                     )}
                   />
                 </button>
-              </div>
-              <div className="flex items-center justify-between rounded-mq-lg border border-mq-border bg-mq-card-background px-3 py-2">
+              </SubCard>
+              <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4 text-mq-content-tertiary" />
                   <span className="text-sm text-mq-content-secondary">
@@ -217,7 +218,7 @@ const ProfileCard = React.memo(
                     )}
                   />
                 </button>
-              </div>
+              </SubCard>
             </div>
           </CardContent>
 
@@ -255,7 +256,7 @@ const ProfileCard = React.memo(
             </div>
           )}
         </Card>
-      </div>
+      </LiquidGlassCard>
     );
   },
 );

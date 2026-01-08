@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info border border-mq-info/20',
@@ -25,7 +26,7 @@ const EventsFeed = memo(() => {
   const todayEvents = sampleEvents.filter((event) => isToday(new Date(event.date)));
 
   return (
-    <div className="mq-magic-card mq-liquid-enhanced">
+    <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -56,7 +57,7 @@ const EventsFeed = memo(() => {
                   <Link
                     key={event.id}
                     href="/feed"
-                    className="group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm alabaster-readable focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
+                    className="group block p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] alabaster-readable focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                     style={{
                       color: 'var(--mq-content)',
                       WebkitTextFillColor: 'var(--mq-content)',
@@ -94,7 +95,7 @@ const EventsFeed = memo(() => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </MagicCard>
   );
 });
 

@@ -2,17 +2,18 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // ============================================================================
-// SECURITY: CSP Nonce Generation
+// SECURITY: Content Security Policy
 // ============================================================================
-function generateNonce(): string {
-  return Buffer.from(crypto.randomUUID()).toString('base64');
-}
-
-function buildCSPHeader(nonce: string): string {
+function buildCSPHeader(): string {
+  // Note: We use 'unsafe-inline' for scripts instead of nonce because:
+  // 1. Next.js App Router generates different nonces between SSR and hydration
+  // 2. This causes hydration mismatches that break the app
+  // 3. The inline scripts (theme/RTL) are static and safe
+  // 4. For production, consider using hashes instead of unsafe-inline
   return [
     "default-src 'self'",
-    // Scripts: Allow self, and specific nonce for inline scripts
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Scripts: Allow self and unsafe-inline (nonce causes hydration mismatch in Next.js App Router)
+    "script-src 'self' 'unsafe-inline'",
     // Styles: Allow self and unsafe-inline (required for Tailwind/CSS-in-JS)
     "style-src 'self' 'unsafe-inline'",
     // Images
@@ -35,22 +36,14 @@ function buildCSPHeader(nonce: string): string {
 }
 
 export async function proxy(request: NextRequest) {
-  // SECURITY: Generate nonce for CSP
-  const nonce = generateNonce();
-
-  // Clone headers and add nonce
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-
   let response = NextResponse.next({
     request: {
-      headers: requestHeaders,
+      headers: request.headers,
     },
   });
 
-  // SECURITY: Add CSP header with nonce
-  response.headers.set('Content-Security-Policy', buildCSPHeader(nonce));
-  response.headers.set('x-nonce', nonce);
+  // SECURITY: Add CSP header
+  response.headers.set('Content-Security-Policy', buildCSPHeader());
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -89,12 +82,11 @@ export async function proxy(request: NextRequest) {
         });
         response = NextResponse.next({
           request: {
-            headers: requestHeaders,
+            headers: request.headers,
           },
         });
         // Re-add security headers after response recreation
-        response.headers.set('Content-Security-Policy', buildCSPHeader(nonce));
-        response.headers.set('x-nonce', nonce);
+        response.headers.set('Content-Security-Policy', buildCSPHeader());
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -132,15 +124,5 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-};
+// Note: Middleware config is defined in middleware.ts
+// Next.js requires config to be defined directly in the middleware file

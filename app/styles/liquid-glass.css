@@ -53,16 +53,18 @@
   --alabaster-light: #f5f4ed;
 
   /* Glass Surface Properties - Light Mode (Alabaster-based) */
-  --liquid-glass-bg: rgba(237, 234, 222, 0.85);
-  --liquid-glass-bg-hover: rgba(237, 234, 222, 0.92);
-  --liquid-glass-border: rgba(0, 0, 0, 0.08);
-  --liquid-glass-border-hover: rgba(0, 0, 0, 0.12);
-  --liquid-glass-blur: 25px;
-  --liquid-glass-saturation: 180%;
+  --liquid-glass-bg: rgba(237, 234, 222, 0.65); /* More translucent for 2025 look */
+  --liquid-glass-bg-hover: rgba(237, 234, 222, 0.75);
+  --liquid-glass-border: rgba(255, 255, 255, 0.4); /* Stronger edge definition */
+  --liquid-glass-border-hover: rgba(255, 255, 255, 0.6);
+  --liquid-glass-blur: 30px; /* Deeper blur */
+  --liquid-glass-saturation: 210%; /* Vibrant Apple-style saturation */
 
   /* Shadow Layers - Light Mode */
-  --liquid-glass-shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.6);
-  --liquid-glass-shadow-outer: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+  --liquid-glass-shadow-inset:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.2);
+  --liquid-glass-shadow-outer:
+    0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
   --liquid-glass-shadow-glow: 0 0 30px rgba(166, 25, 46, 0.1);
 
   /* Security Shield (Navy tint) */

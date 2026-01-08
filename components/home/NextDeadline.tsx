@@ -14,6 +14,7 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 const NextDeadline = memo(() => {
   const isHydrated = useHydration();
@@ -58,7 +59,7 @@ const NextDeadline = memo(() => {
   const calendarDate = hasValidDate ? format(dueDate as Date, 'yyyy-MM-dd') : null;
 
   return (
-    <div className="mq-magic-card mq-liquid-enhanced">
+    <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader
@@ -121,7 +122,7 @@ const NextDeadline = memo(() => {
                 aria-label={t('viewDeadlineDetails', { title: nextDeadline.title })}
               >
                 <div
-                  className="space-y-3 p-3 -m-3 rounded-lg hover:bg-mq-hover-background transition-colors alabaster-readable"
+                  className="space-y-3 p-3 -m-3 rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300 alabaster-readable"
                   style={{
                     color: 'var(--mq-content)',
                     WebkitTextFillColor: 'var(--mq-content)',
@@ -194,7 +195,7 @@ const NextDeadline = memo(() => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </MagicCard>
   );
 });
 

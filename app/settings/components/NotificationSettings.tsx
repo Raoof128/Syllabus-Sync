@@ -18,6 +18,7 @@ import { useNotificationPreferencesStore } from '@/lib/store/notificationPrefere
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import type { NotificationPreferences } from '@/lib/types';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 type NotificationSettingsProps = {
   notifications: NotificationPreferences;
@@ -196,7 +197,7 @@ const NotificationSettings = memo(
       isClient && typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-      <div className="mq-magic-card mq-liquid-enhanced" data-testid="notification-settings">
+      <MagicCard data-testid="notification-settings">
         <Card className="mq-magic-card-content">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -288,7 +289,7 @@ const NotificationSettings = memo(
             {notificationItems.map(({ key, icon: Icon, label, desc, timing, setTiming }) => (
               <div
                 key={key}
-                className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors"
+                className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
                 data-testid={`notification-item-${key}`}
               >
                 <div className="flex items-center justify-between">
@@ -368,7 +369,7 @@ const NotificationSettings = memo(
             )}
           </CardContent>
         </Card>
-      </div>
+      </MagicCard>
     );
   },
 );

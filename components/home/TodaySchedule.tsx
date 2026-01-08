@@ -9,6 +9,7 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
@@ -32,7 +33,7 @@ const TodaySchedule = memo(() => {
   }, [todayLabel, units]);
 
   return (
-    <div className="mq-magic-card mq-liquid-enhanced">
+    <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -113,7 +114,7 @@ const TodaySchedule = memo(() => {
                   <Link
                     key={`${cls.id}-${cls.code}`}
                     href="/calendar"
-                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-mq-sm focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
+                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
                     aria-label={`${cls.code} - ${cls.name}, ${cls.startTime} - ${cls.endTime} at ${cls.location.building} ${cls.location.room}`}
                   >
                     {/* Color indicator */}
@@ -146,7 +147,7 @@ const TodaySchedule = memo(() => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </MagicCard>
   );
 });
 

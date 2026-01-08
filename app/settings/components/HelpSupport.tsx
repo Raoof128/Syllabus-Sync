@@ -7,6 +7,7 @@ import { Info, ExternalLink, MessageSquare } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 type HelpSupportProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -24,7 +25,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
   }, [t]);
 
   return (
-    <div className="mq-magic-card mq-liquid-enhanced" data-testid="help-support">
+    <MagicCard data-testid="help-support">
       <Card className="mq-magic-card-content">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -34,7 +35,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
         </CardHeader>
         <CardContent className="space-y-3" role="region" aria-labelledby="help-support-heading">
           {/* About */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
+          <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
             <h3 className="font-semibold text-mq-content mb-1">{t('aboutTitle')}</h3>
             <p className="text-mq-sm text-mq-content-secondary">
               {t('version')} {APP_CONFIG.version} - {t('aboutDesc')}
@@ -42,7 +43,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
           </div>
 
           {/* Need Help */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
+          <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
             <h3 className="font-semibold text-mq-content mb-1">{t('needHelp')}</h3>
             <p className="text-mq-sm text-mq-content-secondary mb-2">{t('helpDesc')}</p>
             <Button
@@ -58,7 +59,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
           </div>
 
           {/* Feedback */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
+          <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
             <h3 className="font-semibold text-mq-content mb-1">{t('feedback')}</h3>
             <p className="text-mq-sm text-mq-content-secondary mb-2">{t('feedbackDesc')}</p>
             <Button
@@ -74,7 +75,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </MagicCard>
   );
 });
 

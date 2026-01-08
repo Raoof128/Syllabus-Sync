@@ -34,10 +34,22 @@
   background-color: var(--c-background);
 }
 
-/* Header - MQ token styling */
-.dark header {
+/* Header - MQ token styling (only for the top navigation header, not page content headers) */
+.dark .layout-main > header,
+.dark header.h-16 {
   background-color: var(--c-background);
   border-color: var(--c-border);
+}
+
+/* Page content headers should be transparent */
+.dark .home-page header,
+.dark .calendar-page header,
+.dark .feed-page header,
+.dark .map-page header,
+.dark main header,
+.dark header[role='banner']:not(.h-16) {
+  background-color: transparent;
+  background: transparent;
 }
 
 /* Cards & Surfaces - MQ backgrounds */
@@ -134,4 +146,54 @@ html.dark
   -webkit-text-fill-color: var(--mq-content) !important;
   opacity: 1 !important;
   mix-blend-mode: normal !important;
+}
+
+/* ============================================
+   DARK MODE - Ensure no black backgrounds on headers
+   Fix for header text having visible dark backgrounds
+   ============================================ */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark p,
+html.dark span,
+html.dark label,
+html.dark .text-mq-content,
+html.dark .text-mq-content-secondary,
+html.dark .text-mq-3xl,
+html.dark .text-mq-2xl,
+html.dark .text-mq-lg {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Fix for WelcomeHeader and page header areas having dark backgrounds */
+html.dark .home-page > header,
+html.dark .home-page header[role='banner'],
+html.dark .calendar-page > header,
+html.dark .calendar-page header[role='banner'],
+html.dark .feed-page > header,
+html.dark .feed-page header[role='banner'],
+html.dark .map-page > header,
+html.dark .map-page header[role='banner'],
+html.dark .flex-1.min-w-0,
+html.dark [class*='ScrollReveal'] > header,
+html.dark .container.mx-auto > header {
+  background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Ensure main content containers are transparent in dark mode */
+html.dark main#main-content,
+html.dark .container.mx-auto,
+html.dark .home-page,
+html.dark .calendar-page,
+html.dark .feed-page,
+html.dark .map-page {
+  background-color: transparent !important;
+  background: transparent !important;
 }

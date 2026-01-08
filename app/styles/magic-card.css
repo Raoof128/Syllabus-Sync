@@ -7,6 +7,8 @@
  * 2. Card content wrapper
  * 3. Hover animations
  * 4. Active states
+ * 5. Red hover animation (reusable)
+ * 6. SubCard red hover styles
  */
 
 /* ============================================
@@ -31,9 +33,12 @@
 /* Magic Card Animation ENABLED - Complete Red Hover Effect for Event Cards */
 
 .mq-magic-card:hover {
-  background: linear-gradient(135deg, #a6192e, #d6001c);
-  box-shadow: none;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #a6192e, #e60022, #d6001c);
+  box-shadow:
+    0 10px 40px -10px rgba(166, 25, 46, 0.5),
+    0 0 20px 0 rgba(166, 25, 46, 0.3),
+    0 0 0 1px rgba(166, 25, 46, 0.2);
+  transform: translateY(-3px);
 }
 
 .mq-magic-card-content {
@@ -53,7 +58,7 @@
 }
 
 .mq-magic-card:hover .mq-magic-card-content {
-  transform: none !important;
+  transform: scale(0.98) !important;
   border-radius: calc(var(--c-radius-lg) - 3px);
   border-color: transparent;
   box-shadow: none;
@@ -152,4 +157,294 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
   opacity: 1 !important;
   mix-blend-mode: normal !important;
   -webkit-font-smoothing: antialiased !important;
+}
+
+/* ============================================
+   5. REUSABLE RED HOVER ANIMATION
+   Apply to any element for MQ red hover effect
+   ============================================ */
+
+/* Red border glow on hover - subtle version for subcards and items */
+.mq-red-hover {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mq-red-hover:hover {
+  box-shadow:
+    inset 0 0 0 1px rgba(166, 25, 46, 0.25),
+    0 0 15px rgba(166, 25, 46, 0.12),
+    0 4px 12px -2px rgba(166, 25, 46, 0.1);
+}
+
+/* Strong red hover - for primary interactive elements */
+.mq-red-hover-strong {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mq-red-hover-strong:hover {
+  box-shadow:
+    inset 0 0 0 2px rgba(166, 25, 46, 0.35),
+    0 0 25px rgba(166, 25, 46, 0.2),
+    0 8px 20px -4px rgba(166, 25, 46, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   6. SUBCARD RED HOVER STYLES
+   For nested interactive elements
+   ============================================ */
+
+/* SubCard items within magic cards */
+.mq-magic-card .mq-subcard-item,
+.mq-subcard-item {
+  position: relative;
+  border-radius: var(--c-radius-lg);
+  padding: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+}
+
+.mq-magic-card .mq-subcard-item:hover,
+.mq-subcard-item:hover {
+  background: rgba(166, 25, 46, 0.04);
+  box-shadow:
+    inset 0 0 0 1px rgba(166, 25, 46, 0.15),
+    0 0 10px rgba(166, 25, 46, 0.06);
+}
+
+.dark .mq-magic-card .mq-subcard-item:hover,
+.dark .mq-subcard-item:hover {
+  background: rgba(166, 25, 46, 0.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(166, 25, 46, 0.2),
+    0 0 12px rgba(166, 25, 46, 0.1);
+}
+
+/* Active/selected state */
+.mq-subcard-item.active,
+.mq-subcard-item[data-active='true'] {
+  background: rgba(166, 25, 46, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(166, 25, 46, 0.2);
+}
+
+.dark .mq-subcard-item.active,
+.dark .mq-subcard-item[data-active='true'] {
+  background: rgba(166, 25, 46, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(166, 25, 46, 0.25);
+}
+
+/* ============================================
+   7. LIST ITEM RED HOVER
+   For event items, schedule items, etc.
+   ============================================ */
+
+/* Event list items within cards */
+.mq-magic-card .mq-list-item,
+.mq-list-item {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: var(--c-radius);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.mq-magic-card .mq-list-item:hover,
+.mq-list-item:hover {
+  background: var(--c-hover-background);
+  border-color: rgba(166, 25, 46, 0.15);
+  box-shadow: 0 0 12px rgba(166, 25, 46, 0.08);
+  transform: translateX(2px);
+}
+
+.dark .mq-magic-card .mq-list-item:hover,
+.dark .mq-list-item:hover {
+  background: var(--c-hover-background);
+  border-color: rgba(166, 25, 46, 0.2);
+  box-shadow: 0 0 15px rgba(166, 25, 46, 0.12);
+}
+
+/* ============================================
+   8. CARD NESTED ELEMENTS RED HOVER
+   Auto-apply to common nested patterns
+   ============================================ */
+
+/* Links inside magic cards */
+.mq-magic-card a:not(.mq-magic-card-content):not([class*='btn']):not([class*='button']) {
+  transition: all 0.3s ease;
+}
+
+.mq-magic-card a:not(.mq-magic-card-content):not([class*='btn']):not([class*='button']):hover {
+  color: #a6192e;
+}
+
+/* Interactive rows/items with bg-mq-background-secondary */
+.mq-magic-card .bg-mq-background-secondary {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.mq-magic-card .bg-mq-background-secondary:hover {
+  border-color: rgba(166, 25, 46, 0.12);
+  box-shadow: 0 0 10px rgba(166, 25, 46, 0.05);
+}
+
+.dark .mq-magic-card .bg-mq-background-secondary:hover {
+  border-color: rgba(166, 25, 46, 0.18);
+  box-shadow: 0 0 12px rgba(166, 25, 46, 0.08);
+}
+
+/* ============================================
+   9. MOUSE-TRACKING GLOW EFFECT (Linear-style)
+   Spotlight effect that follows cursor across card groups
+   ============================================ */
+
+/* Container for cards with mouse tracking */
+.mouse-glow-container {
+  /* Enable hover detection on container level */
+}
+
+.mouse-glow-container:hover > .mouse-glow-card::after {
+  opacity: 1;
+}
+
+/* Individual cards with mouse glow */
+.mouse-glow-card {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.mouse-glow-card::before,
+.mouse-glow-card::after {
+  border-radius: inherit;
+  content: '';
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: opacity 400ms ease;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* Surface glow - visible red fill that follows mouse */
+.mouse-glow-card::before {
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.15),
+    transparent 40%
+  );
+  z-index: 3;
+}
+
+.mouse-glow-card:hover::before {
+  opacity: 1;
+}
+
+/* Border glow - strong red edge highlight */
+.mouse-glow-card::after {
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.5),
+    transparent 40%
+  );
+  z-index: 1;
+}
+
+/* Card content sits above the glow layers */
+.mouse-glow-card > .mouse-glow-content {
+  background-color: var(--c-card-background);
+  border-radius: inherit;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  inset: 1px;
+  padding: 0;
+  position: absolute;
+  z-index: 2;
+  height: calc(100% - 2px);
+  width: calc(100% - 2px);
+}
+
+/* Dark mode adjustments - more visible red glow */
+.dark .mouse-glow-card::before {
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.2),
+    transparent 40%
+  );
+}
+
+.dark .mouse-glow-card::after {
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.6),
+    transparent 40%
+  );
+}
+
+/* ============================================
+   10. MQ MAGIC CARD WITH MOUSE GLOW
+   Combined effect for main cards
+   ============================================ */
+
+/* Apply mouse glow to magic cards */
+.mq-magic-card.mouse-glow-card {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .mq-magic-card.mouse-glow-card {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Ensure content layer is properly positioned */
+.mq-magic-card.mouse-glow-card > .mq-magic-card-content {
+  position: relative;
+  z-index: 2;
+  background-color: var(--c-card-background) !important;
+}
+
+/* ============================================
+   11. SUBCARD MOUSE GLOW VARIANT
+   Subtle mouse tracking for nested cards
+   ============================================ */
+
+.mouse-glow-subcard {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mouse-glow-subcard::before {
+  border-radius: inherit;
+  content: '';
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  transition: opacity 300ms ease;
+  width: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.15),
+    transparent 50%
+  );
+  z-index: 0;
+}
+
+.mouse-glow-subcard:hover::before {
+  opacity: 1;
+}
+
+.dark .mouse-glow-subcard::before {
+  background: radial-gradient(
+    350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(166, 25, 46, 0.2),
+    transparent 50%
+  );
 }

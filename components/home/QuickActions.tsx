@@ -3,18 +3,19 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { Map, Calendar } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 export default function QuickActions() {
   const { t } = useTranslation();
   return (
-    <div className="mq-magic-card mq-liquid-enhanced h-auto">
+    <MagicCard isLiquidEnhanced className="h-auto">
       <div className="mq-magic-card-content p-4 items-center justify-center">
         <div className="flex flex-col gap-3 w-full">
           <Button
             asChild
             variant="glass"
             size="lg"
-            className="rounded-full justify-start px-5 py-3"
+            className="rounded-full justify-start px-5 py-3 border border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
           >
             <Link href="/map" className="gap-2">
               <Map className="h-5 w-5" />
@@ -26,7 +27,7 @@ export default function QuickActions() {
             asChild
             variant="glass"
             size="lg"
-            className="rounded-full justify-start px-5 py-3"
+            className="rounded-full justify-start px-5 py-3 border border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
           >
             <Link href="/calendar" className="gap-2">
               <Calendar className="h-5 w-5" />
@@ -35,6 +36,6 @@ export default function QuickActions() {
           </Button>
         </div>
       </div>
-    </div>
+    </MagicCard>
   );
 }

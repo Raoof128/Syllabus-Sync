@@ -83,6 +83,8 @@ const config: Config = {
           'input-background': 'var(--c-input-background)',
           'button-secondary': 'var(--c-button-secondary)',
           'hover-background': 'var(--c-hover-background)',
+          'subcard-hover': 'var(--c-subcard-hover)',
+          'subcard-active': 'var(--c-subcard-active)',
           charcoal: {
             600: 'var(--c-charcoal-600)',
             700: 'var(--c-charcoal-700)',

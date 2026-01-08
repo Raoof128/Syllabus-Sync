@@ -43,7 +43,12 @@ export async function fetchORSRoute(
       let errorMessage = `Route Failed: ${response.status}`;
       try {
         const errorJson = await response.json();
-        if (errorJson.error) errorMessage = errorJson.error;
+        // API returns { error: { code, message } } structure
+        if (errorJson.error?.message) {
+          errorMessage = errorJson.error.message;
+        } else if (typeof errorJson.error === 'string') {
+          errorMessage = errorJson.error;
+        }
       } catch {
         /* ignore parse error */
       }

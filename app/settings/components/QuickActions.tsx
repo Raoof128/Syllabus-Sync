@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Home, Calendar, Newspaper, Map, Users } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
 
 type QuickActionsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -21,7 +22,7 @@ const quickActionLinks: { href: string; labelKey: TranslationKey; icon: typeof H
 
 const QuickActions = memo(({ t }: QuickActionsProps) => {
   return (
-    <div className="mq-magic-card mq-liquid-enhanced" data-testid="quick-actions">
+    <MagicCard data-testid="quick-actions">
       <Card className="mq-magic-card-content">
         <CardHeader>
           <CardTitle id="quick-actions-heading">{t('quickActions')}</CardTitle>
@@ -41,7 +42,7 @@ const QuickActions = memo(({ t }: QuickActionsProps) => {
               <Button
                 key={href}
                 variant="ghost"
-                className="w-full justify-start rounded-mq-lg bg-mq-card-background text-mq-content border border-mq-border hover:border-mq-border-secondary transition-colors"
+                className="w-full justify-start rounded-mq-lg bg-mq-card-background text-mq-content border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
                 asChild
               >
                 <Link href={href} data-testid={`quick-action-${href.replace('/', '')}`}>
@@ -53,7 +54,7 @@ const QuickActions = memo(({ t }: QuickActionsProps) => {
           })}
         </CardContent>
       </Card>
-    </div>
+    </MagicCard>
   );
 });
 
