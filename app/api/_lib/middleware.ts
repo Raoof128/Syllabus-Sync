@@ -159,6 +159,9 @@ interface CorsConfig {
 
 /**
  * Apply CORS headers to API routes
+ * SECURITY: This middleware enforces strict origin validation
+ * - Never allows '*' with credentials=true (browser security violation)
+ * - Validates origins against explicit allowlist
  */
 export const cors = (config: CorsConfig = {}) => {
   // Parse CORS_ALLOWED_ORIGINS from environment variable if available
@@ -176,16 +179,33 @@ export const cors = (config: CorsConfig = {}) => {
     maxAge = 86400, // 24 hours
   } = config;
 
+  // SECURITY: Disallow wildcard origin with credentials
+  // This is a browser security requirement - warn developers
+  const sanitizedOrigins = allowedOrigins.filter((origin) => {
+    if (origin === '*' && credentials) {
+      console.warn(
+        'SECURITY WARNING: CORS wildcard (*) origin is not allowed with credentials=true. ' +
+          'Removing wildcard from allowed origins.',
+      );
+      return false;
+    }
+    return true;
+  });
+
+  // SECURITY: If no valid origins remain after sanitization, use defaults
+  const finalOrigins = sanitizedOrigins.length > 0 ? sanitizedOrigins : defaultOrigins;
+
   return async (
     request: NextRequest,
     handler: () => Promise<NextResponse>,
   ): Promise<NextResponse> => {
+    const origin = request.headers.get('origin');
+
+    // SECURITY: Validate origin against allowlist
+    const isAllowedOrigin = !origin || finalOrigins.includes(origin);
+
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
-      const origin = request.headers.get('origin');
-      const isAllowedOrigin =
-        !origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin);
-
       if (!isAllowedOrigin) {
         return jsonError('Origin not allowed', 403, ERROR_CODES.FORBIDDEN);
       }
@@ -193,7 +213,7 @@ export const cors = (config: CorsConfig = {}) => {
       return new NextResponse(null, {
         status: 200,
         headers: {
-          'Access-Control-Allow-Origin': origin || allowedOrigins[0],
+          'Access-Control-Allow-Origin': origin || finalOrigins[0],
           'Access-Control-Allow-Methods': allowedMethods.join(', '),
           'Access-Control-Allow-Headers': allowedHeaders.join(', '),
           'Access-Control-Allow-Credentials': credentials.toString(),
@@ -204,16 +224,10 @@ export const cors = (config: CorsConfig = {}) => {
 
     const response = await handler();
 
-    // Add CORS headers to actual response
-    const origin = request.headers.get('origin');
-    const isAllowedOrigin =
-      !origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin);
-
-    if (isAllowedOrigin) {
+    // Add CORS headers to actual response only if origin is allowed
+    if (isAllowedOrigin && origin) {
       const corsHeaders: Record<string, string> = {
-        'Access-Control-Allow-Origin': allowedOrigins.includes('*')
-          ? '*'
-          : origin || allowedOrigins[0],
+        'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': allowedMethods.join(', '),
         'Access-Control-Allow-Headers': allowedHeaders.join(', '),
         'Access-Control-Allow-Credentials': credentials.toString(),

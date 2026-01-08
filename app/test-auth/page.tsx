@@ -1,15 +1,25 @@
 // Test page for authentication API
+// SECURITY: This page is only accessible in development mode
 'use client';
 
 import { useState } from 'react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Button } from '@/components/ui/mq/button';
+import { notFound } from 'next/navigation';
+
+// SECURITY: Gate this page to development only at module level
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export default function TestAuthPage() {
   const { t } = useTranslation();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  // SECURITY: Return 404 in production - this check happens on server and client
+  if (!isDevelopment) {
+    notFound();
+  }
 
   const testSignup = async () => {
     setLoading(true);
@@ -19,7 +29,7 @@ export default function TestAuthPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: 'test2@student.mq.edu.au',
-          password: 'testpassword123',
+          password: 'testpassword123!',
           fullName: 'Test User 2',
           studentId: '87654321',
         }),
@@ -71,6 +81,10 @@ export default function TestAuthPage() {
 
   return (
     <div className="p-8">
+      <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-md text-yellow-800 text-sm">
+        <strong>Development Only:</strong> This page is only accessible in development mode.
+      </div>
+
       <h1 className="text-2xl font-bold mb-4">{t('authenticationApiTest')}</h1>
 
       <div className="space-x-4 mb-8">

@@ -48,3 +48,78 @@ export const unregisterServiceWorker = async () => {
     );
   }
 };
+
+/**
+ * SECURITY: Clear all service worker caches
+ * Call this on logout to remove any cached sensitive data
+ */
+export const clearAllCaches = async (): Promise<void> => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    // Method 1: Tell service worker to clear caches
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_ALL_CACHES' });
+    }
+
+    // Method 2: Also clear from main thread (backup)
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+    }
+  } catch (error) {
+    errorHandler.logError(
+      error instanceof Error ? error : new Error('Cache clearing failed'),
+      'ServiceWorker',
+      'medium',
+    );
+  }
+};
+
+/**
+ * SECURITY: Clear all client-side storage on logout
+ * This includes localStorage, sessionStorage, IndexedDB, and caches
+ */
+export const clearAllClientStorage = async (): Promise<void> => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    // Clear service worker caches
+    await clearAllCaches();
+
+    // Clear IndexedDB databases (if any)
+    if ('indexedDB' in window) {
+      const databases = await indexedDB.databases?.();
+      if (databases) {
+        await Promise.all(
+          databases.map((db) => {
+            if (db.name) {
+              return new Promise<void>((resolve, reject) => {
+                const request = indexedDB.deleteDatabase(db.name!);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+              });
+            }
+            return Promise.resolve();
+          }),
+        );
+      }
+    }
+  } catch (error) {
+    errorHandler.logError(
+      error instanceof Error ? error : new Error('Client storage clearing failed'),
+      'Security',
+      'high',
+    );
+  }
+};

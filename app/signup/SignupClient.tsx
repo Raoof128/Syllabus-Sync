@@ -35,7 +35,7 @@ export default function SignupClient() {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 12) {
       setError(t('passwordTooShort'));
       setIsLoading(false);
       return;
@@ -106,7 +106,7 @@ export default function SignupClient() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={12}
               />
             </div>
             <div className="space-y-2">
@@ -118,7 +118,7 @@ export default function SignupClient() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={12}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>

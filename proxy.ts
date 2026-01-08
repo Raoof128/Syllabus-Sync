@@ -1,12 +1,56 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// ============================================================================
+// SECURITY: CSP Nonce Generation
+// ============================================================================
+function generateNonce(): string {
+  return Buffer.from(crypto.randomUUID()).toString('base64');
+}
+
+function buildCSPHeader(nonce: string): string {
+  return [
+    "default-src 'self'",
+    // Scripts: Allow self, and specific nonce for inline scripts
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Styles: Allow self and unsafe-inline (required for Tailwind/CSS-in-JS)
+    "style-src 'self' 'unsafe-inline'",
+    // Images
+    "img-src 'self' data: blob: https:",
+    // Fonts
+    "font-src 'self' data:",
+    // Connect (API, WebSocket)
+    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org wss://*.supabase.co",
+    // Frame ancestors (clickjacking protection)
+    "frame-ancestors 'self'",
+    // Base URI
+    "base-uri 'self'",
+    // Form actions
+    "form-action 'self'",
+    // Object sources
+    "object-src 'none'",
+    // Upgrade insecure requests in production
+    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+  ].join('; ');
+}
+
 export async function proxy(request: NextRequest) {
+  // SECURITY: Generate nonce for CSP
+  const nonce = generateNonce();
+
+  // Clone headers and add nonce
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+
   let response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   });
+
+  // SECURITY: Add CSP header with nonce
+  response.headers.set('Content-Security-Policy', buildCSPHeader(nonce));
+  response.headers.set('x-nonce', nonce);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -45,9 +89,12 @@ export async function proxy(request: NextRequest) {
         });
         response = NextResponse.next({
           request: {
-            headers: request.headers,
+            headers: requestHeaders,
           },
         });
+        // Re-add security headers after response recreation
+        response.headers.set('Content-Security-Policy', buildCSPHeader(nonce));
+        response.headers.set('x-nonce', nonce);
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });

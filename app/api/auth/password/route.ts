@@ -3,9 +3,10 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { z } from 'zod';
 
+// SECURITY: Stronger password policy - min 12 chars
 const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string().min(6, 'New password must be at least 6 characters'),
+  newPassword: z.string().min(12, 'New password must be at least 12 characters'),
 });
 
 // Rate limiting map (in production, use Redis or similar)

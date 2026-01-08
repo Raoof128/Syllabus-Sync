@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import { Work_Sans, Source_Serif_4 } from 'next/font/google';
+import { headers } from 'next/headers';
 import './globals.css';
 import './mq-tokens.css';
 import ClientLayout from './client-layout';
@@ -51,7 +52,11 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Get nonce from middleware for CSP compliance
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') || '';
+
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -114,12 +119,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         {/* Theme and RTL scripts run before body to prevent flash */}
-        <script key="theme-script" dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: rtlScript }} />
+        {/* SECURITY: Scripts use nonce from middleware for CSP compliance */}
+        <script
+          key="theme-script"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
+        <script key="rtl-script" nonce={nonce} dangerouslySetInnerHTML={{ __html: rtlScript }} />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <ClientLayout>{children}</ClientLayout>

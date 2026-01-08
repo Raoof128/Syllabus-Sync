@@ -7,6 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.0] - 2026-01-08
+
+### Security Hardening Release (Raouf)
+
+**Rationale:** Comprehensive security audit remediation addressing 2 high-risk, 6 medium-risk, and 4 low-risk findings to improve the security posture from 6.3/10 to production-ready.
+
+#### HIGH RISK FIXES
+
+**ORS Proxy Protection (`app/api/navigate/route.ts`):**
+- Added authentication requirement via `requireAuth()` middleware
+- Implemented per-user rate limiting (30 requests/minute)
+- Added campus geofence validation (2km buffer around Macquarie University)
+- Added route caching (5-minute TTL) to reduce API key usage
+- Returns generic error messages to prevent information disclosure
+
+**Auth Endpoint Rate Limiting:**
+- `app/api/auth/signin/route.ts`: Added per-IP rate limiting (5 attempts/15 min)
+- `app/api/auth/signup/route.ts`: Added per-IP rate limiting (3 attempts/hour)
+- Both endpoints now return generic "Invalid email or password" errors to prevent account enumeration
+
+#### MEDIUM RISK FIXES
+
+**CSP Hardening (`proxy.ts`, `next.config.ts`):**
+- Removed `unsafe-inline` and `unsafe-eval` from script-src
+- Implemented nonce-based CSP via proxy middleware
+- Added `strict-dynamic` for trusted script execution
+- Moved CSP from static headers to dynamic middleware for nonce injection
+- Updated `app/layout.tsx` to use nonces from request headers
+
+**Service Worker Security (`public/sw.js`):**
+- Removed HTML pages from cache (were caching `/home`, `/calendar`, etc.)
+- Now only caches static assets (JS, CSS, fonts, images)
+- Added `CLEAR_ALL_CACHES` message handler for logout cleanup
+- Implemented `clearAllClientStorage()` utility for logout (`lib/utils/serviceWorker.ts`)
+- Uses stale-while-revalidate strategy for static assets only
+
+**Account Enumeration Prevention:**
+- Signin/signup return generic messages regardless of actual error
+- Server-side logging preserves debugging capability
+- Rate limit headers inform clients without leaking state
+
+**Health Endpoint Sanitization (`app/api/health/route.ts`):**
+- Removed database error details from production responses
+- Removed version information from production
+- Only includes debug hints in development mode
+
+**Test Auth Page Protection (`app/test-auth/page.tsx`):**
+- Added `NODE_ENV === 'development'` check
+- Returns 404 in production via `notFound()`
+- Added warning banner in development
+
+#### LOW RISK FIXES
+
+**CORS Middleware (`app/api/_lib/middleware.ts`):**
+- Added security validation to prevent `*` origin with credentials
+- Logs warning and removes invalid wildcard configurations
+- Enforces explicit origin allowlist
+
+**Password Policy (`app/api/auth/signup/route.ts`, `app/api/auth/password/route.ts`):**
+- Increased minimum password length from 6 to 12 characters
+- Updated client-side validation in `SignupClient.tsx`
+
+**.env.example Documentation:**
+- Deprecated `NEXT_PUBLIC_ORS_API_KEY` with clear warning
+- Documented server-only `ORS_API_KEY` as the required approach
+- Added security rationale for server-side key usage
+
+**Files Changed:**
+- `app/api/navigate/route.ts` - Complete rewrite with auth, rate limiting, geofencing, caching
+- `app/api/auth/signin/route.ts` - Rate limiting, generic errors
+- `app/api/auth/signup/route.ts` - Rate limiting, generic errors, stronger password policy
+- `app/api/auth/password/route.ts` - Stronger password policy
+- `app/api/health/route.ts` - Sanitized error responses
+- `app/api/_lib/middleware.ts` - CORS security validation
+- `app/test-auth/page.tsx` - Production gating
+- `app/layout.tsx` - CSP nonce integration
+- `app/signup/SignupClient.tsx` - 12-char password minimum
+- `proxy.ts` - CSP nonce generation and injection
+- `next.config.ts` - Removed static CSP (moved to proxy)
+- `public/sw.js` - Complete rewrite with security-focused caching
+- `lib/utils/serviceWorker.ts` - Added cache/storage clearing utilities
+- `.env.example` - Deprecated client-side ORS key
+
+**Verification:**
+- `npm run lint`: 0 errors, 0 warnings
+- `npm run build`: Success (28 routes)
+- `npm test`: 143/143 tests passing
+
+---
+
 ## [0.5.83] - 2026-01-08
 
 ### Fixed

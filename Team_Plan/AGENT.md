@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.6.0 | Last Updated: January 08, 2026
+Version: 0.7.0 | Last Updated: January 08, 2026
 
 ---
 
@@ -51,6 +51,7 @@ Version: 0.6.0 | Last Updated: January 08, 2026
 - Improve time management and organization
 - Enhance campus navigation and event discovery
 - Present to university administration as an official tool
+- Ensure production-ready security posture for university demonstration
 
 ### Demo Target
 Macquarie University Administration - February 2025
@@ -969,12 +970,49 @@ MIT License - See LICENSE file for details.
 ---
 
 **Last Updated:** January 08, 2026
-**Version:** 0.6.0
+**Version:** 0.7.0
 
 ---
 
 ### Raouf: 2026-01-08 (Australia/Sydney)
-Scope: Sidebar animation polish, Alabaster color system consistency, and CSS fixes.
+Scope: Security hardening release - remediated 2 high-risk, 6 medium-risk, and 4 low-risk findings to improve security posture from 6.3/10 to production-ready.
+
+**HIGH RISK FIXES:**
+- **ORS Proxy Protection (`app/api/navigate/route.ts`):** Added authentication requirement via `requireAuth()` middleware, implemented per-user rate limiting (30 requests/minute), added campus geofence validation (2km buffer around Macquarie University), added route caching (5-minute TTL) to reduce API key usage, returns generic error messages to prevent information disclosure.
+- **Auth Endpoint Rate Limiting:** `app/api/auth/signin/route.ts` added per-IP rate limiting (5 attempts/15 min); `app/api/auth/signup/route.ts` added per-IP rate limiting (3 attempts/hour); both endpoints now return generic "Invalid email or password" errors to prevent account enumeration.
+
+**MEDIUM RISK FIXES:**
+- **CSP Hardening (`proxy.ts`, `next.config.ts`):** Removed `unsafe-inline` and `unsafe-eval` from script-src, implemented nonce-based CSP via proxy middleware, added `strict-dynamic` for trusted script execution, moved CSP from static headers to dynamic middleware for nonce injection, updated `app/layout.tsx` to use nonces from request headers.
+- **Service Worker Security (`public/sw.js`):** Removed HTML pages from cache (were caching `/home`, `/calendar`, etc.), now only caches static assets (JS, CSS, fonts, images), added `CLEAR_ALL_CACHES` message handler for logout cleanup, implemented `clearAllClientStorage()` utility for logout (`lib/utils/serviceWorker.ts`), uses stale-while-revalidate strategy for static assets only.
+- **Account Enumeration Prevention:** Signin/signup return generic messages regardless of actual error, server-side logging preserves debugging capability, rate limit headers inform clients without leaking state.
+- **Health Endpoint Sanitization (`app/api/health/route.ts`):** Removed database error details from production responses, removed version information from production, only includes debug hints in development mode.
+- **Test Auth Page Protection (`app/test-auth/page.tsx`):** Added `NODE_ENV === 'development'` check, returns 404 in production via `notFound()`, added warning banner in development.
+
+**LOW RISK FIXES:**
+- **CORS Middleware (`app/api/_lib/middleware.ts`):** Added security validation to prevent `*` origin with credentials, logs warning and removes invalid wildcard configurations, enforces explicit origin allowlist.
+- **Password Policy (`app/api/auth/signup/route.ts`, `app/api/auth/password/route.ts`):** Increased minimum password length from 6 to 12 characters, updated client-side validation in `SignupClient.tsx`.
+- **.env.example Documentation:** Deprecated `NEXT_PUBLIC_ORS_API_KEY` with clear warning, documented server-only `ORS_API_KEY` as the required approach, added security rationale for server-side key usage.
+
+**Files Changed:**
+- `app/api/navigate/route.ts` - Complete rewrite with auth, rate limiting, geofencing, caching
+- `app/api/auth/signin/route.ts` - Rate limiting, generic errors
+- `app/api/auth/signup/route.ts` - Rate limiting, generic errors, stronger password policy
+- `app/api/auth/password/route.ts` - Stronger password policy
+- `app/api/health/route.ts` - Sanitized error responses
+- `app/api/_lib/middleware.ts` - CORS security validation
+- `app/test-auth/page.tsx` - Production gating
+- `app/layout.tsx` - CSP nonce integration
+- `app/signup/SignupClient.tsx` - 12-char password minimum
+- `proxy.ts` - CSP nonce generation and injection
+- `next.config.ts` - Removed static CSP (moved to proxy)
+- `public/sw.js` - Complete rewrite with security-focused caching
+- `lib/utils/serviceWorker.ts` - Added cache/storage clearing utilities
+- `.env.example` - Deprecated client-side ORS key
+
+**Verification:**
+- `npm run lint`: 0 errors, 0 warnings
+- `npm run build`: Success (28 routes)
+- `npm test`: 143/143 tests passing
 Summary: Fixed sidebar staying open issue by adding explicit hover/keyboard-open selectors with asymmetric animation timing (350ms open, 280ms close), reduced stagger delays to 60ms, added GPU acceleration hints, and fixed CSS syntax error in liquid-glass.css (removed duplicated block outside media query). Implemented comprehensive Alabaster (#EDEADE) color system across all surfaces, updating liquid-glass.css to use Alabaster-tinted glass effects, ensuring consistent backgrounds and proper text contrast (#1a1a1a) in light mode.
 Files changed: app/styles/sidebar.css (animation overhaul with documentation), app/styles/liquid-glass.css (Alabaster glass integration + syntax fix), app/mq-tokens.css (Alabaster variable definitions), app/styles/alabaster-contrast.css (WCAG contrast enforcement), tailwind.config.ts (alabaster color tokens), app/calendar/CalendarClient.tsx, app/feed/FeedClient.tsx, app/home/HomeClient.tsx, app/login/LoginClient.tsx, app/map/CampusMap.tsx, app/map/MapClient.tsx, app/settings/components/AppearanceSettings.tsx, app/settings/components/HelpSupport.tsx, app/settings/components/NotificationSettings.tsx, app/settings/components/PrivacySettings.tsx, app/settings/components/QuickActions.tsx, app/settings/components/SettingsSkeleton.tsx, app/signup/SignupClient.tsx, components/ErrorBoundary.tsx, components/ProfileCard.tsx, components/home/EventsFeed.tsx, components/home/NextDeadline.tsx, components/home/QuickActions.tsx, components/home/TodaySchedule.tsx, components/layout/Header.tsx, components/layout/Sidebar.tsx, components/layout/SocialButtons.tsx, components/ui/LiquidFilter.tsx, components/ui/MeshGradient.tsx, components/ui/OfflineIndicator.tsx, components/ui/ScrollReveal.tsx, components/ui/card.tsx, components/ui/dialog.tsx, components/ui/dropdown-menu.tsx, components/ui/mq/alert.tsx, components/ui/mq/button.tsx, components/ui/mq/card.tsx, components/ui/mq/link.tsx, components/ui/mq/navbar.tsx, components/ui/select.tsx, components/ui/toast.tsx, components/units/UnitCard.tsx, lib/i18n/translations.ts, scripts/check-remote-schema.mjs, scripts/check-rls-detail.mjs, scripts/inspect-schema.js, tests/CalendarPage.test.tsx, tests/setup.ts, tsconfig.json.
 Verification: npm run lint (pass, 0 errors, 0 warnings); npm run build (success, 28 routes); npm run test (143/143 tests passing).
