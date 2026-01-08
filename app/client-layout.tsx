@@ -9,6 +9,8 @@ import ThemeProvider from '@/components/theme/ThemeProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
+import LiquidFilter from '@/components/ui/LiquidFilter';
+import MeshGradient from '@/components/ui/MeshGradient';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useUnitsStore } from '@/lib/store/unitsStore';
@@ -189,6 +191,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Render full layout for authenticated routes
   return (
     <ThemeProvider>
+      {/* Global SVG filters for liquid glass effects */}
+      <LiquidFilter />
+
+      {/* Animated mesh gradient background */}
+      <MeshGradient />
+
       {/* Skip to main content link for accessibility */}
       <a
         href="#main-content"
@@ -196,7 +204,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       >
         {t('skipToContent')}
       </a>
-      <div className="layout-shell flex min-h-screen flex-col bg-mq-background">
+      <div className="layout-shell flex min-h-screen flex-col">
         <div className="flex flex-1">
           {/* Sidebar */}
           <Sidebar />

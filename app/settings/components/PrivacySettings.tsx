@@ -283,11 +283,12 @@ const PrivacySettings = memo(
 
     return (
       <>
-        <div className="mq-magic-card" data-testid="privacy-settings">
-          <Card className="mq-magic-card-content">
+        {/* Security Shield Liquid Glass Variant */}
+        <div className="mq-magic-card mq-liquid-enhanced" data-testid="privacy-settings">
+          <Card className="mq-magic-card-content mq-liquid-glass mq-liquid-glass-security">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" aria-hidden="true" />
+                <Shield className="h-5 w-5 security-indicator" aria-hidden="true" />
                 <span id="privacy-security-heading">{t('privacySecurity')}</span>
               </CardTitle>
             </CardHeader>

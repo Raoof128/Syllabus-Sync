@@ -1,0 +1,571 @@
+/**
+ * liquid-glass.css
+ * Premium "Liquid Glass" UI System for Syllabus Sync
+ * 
+ * OVERVIEW:
+ * This stylesheet implements an advanced glassmorphism system with organic
+ * refraction effects. The "liquid" effect comes from animated SVG filters
+ * that distort the backdrop, combined with dynamic mesh gradient backgrounds.
+ * 
+ * ARCHITECTURE:
+ * ┌────────────────────────────────────────────────────────────────────────┐
+ * │ Background Layer (mesh gradient blobs - animated with Framer Motion)  │
+ * ├────────────────────────────────────────────────────────────────────────┤
+ * │ Refraction Layer (::before pseudo-element with SVG filter)            │
+ * ├────────────────────────────────────────────────────────────────────────┤
+ * │ Glass Surface (.mq-liquid-glass with backdrop-filter)                 │
+ * ├────────────────────────────────────────────────────────────────────────┤
+ * │ Content Layer (actual UI elements)                                    │
+ * └────────────────────────────────────────────────────────────────────────┘
+ * 
+ * BRAND COLORS:
+ * - MQ Navy: #002A45 (primary brand, security contexts)
+ * - MQ Red: #a6192e (accent, CTAs)
+ * - Charcoal: #1a1a1a (dark surfaces)
+ * - Gold: #D4AF37 (premium accents)
+ * 
+ * CONTENTS:
+ * 1. CSS Custom Properties (Liquid Glass tokens)
+ * 2. Base Liquid Glass Surface
+ * 3. Liquid Glass Variants (security, elevated, subtle)
+ * 4. Liquid Button System
+ * 5. Mesh Gradient Background
+ * 6. GPU Acceleration & Performance
+ * 7. Reduced Motion Fallbacks
+ * 
+ * @version 0.6.0
+ */
+
+/* ============================================================================
+   1. CSS CUSTOM PROPERTIES - Liquid Glass Tokens
+   ============================================================================ */
+:root {
+  /* Brand Colors for Liquid Glass */
+  --mq-navy: #002a45;
+  --mq-navy-light: #003d66;
+  --mq-navy-dark: #001a2e;
+  --mq-gold: #d4af37;
+  --mq-gold-muted: rgba(212, 175, 55, 0.3);
+
+  /* Glass Surface Properties */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.05);
+  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.08);
+  --liquid-glass-border: rgba(255, 255, 255, 0.12);
+  --liquid-glass-border-hover: rgba(255, 255, 255, 0.18);
+  --liquid-glass-blur: 25px;
+  --liquid-glass-saturation: 180%;
+
+  /* Shadow Layers */
+  --liquid-glass-shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  --liquid-glass-shadow-outer: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
+  --liquid-glass-shadow-glow: 0 0 30px rgba(166, 25, 46, 0.15);
+
+  /* Security Shield (Navy tint) */
+  --security-glass-bg: rgba(0, 42, 69, 0.15);
+  --security-glass-border: rgba(0, 61, 102, 0.25);
+  --security-glass-glow: 0 0 40px rgba(0, 42, 69, 0.2);
+
+  /* Animation Timing */
+  --liquid-transition-fast: 200ms;
+  --liquid-transition-mid: 400ms;
+  --liquid-transition-slow: 600ms;
+  --liquid-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --liquid-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --liquid-ease-heavy: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Dark mode adjustments */
+.dark {
+  --liquid-glass-bg: rgba(255, 255, 255, 0.03);
+  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.06);
+  --liquid-glass-border: rgba(255, 255, 255, 0.08);
+  --liquid-glass-border-hover: rgba(255, 255, 255, 0.12);
+  --liquid-glass-shadow-outer: 0 15px 35px -5px rgba(0, 0, 0, 0.4);
+  --security-glass-bg: rgba(0, 42, 69, 0.25);
+}
+
+/* Light mode - slightly more opaque */
+html:not(.dark) {
+  --liquid-glass-bg: rgba(255, 255, 255, 0.6);
+  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.75);
+  --liquid-glass-border: rgba(0, 0, 0, 0.08);
+  --liquid-glass-border-hover: rgba(0, 0, 0, 0.12);
+  --liquid-glass-shadow-outer: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+  --security-glass-bg: rgba(0, 42, 69, 0.08);
+}
+
+/* ============================================================================
+   2. BASE LIQUID GLASS SURFACE
+   ============================================================================
+   The core glass effect with backdrop blur, saturation boost, and subtle
+   border for edge definition. The ::before pseudo-element applies the
+   liquid distortion filter to create organic refraction.
+   ---------------------------------------------------------------------------- */
+.mq-liquid-glass {
+  position: relative;
+  isolation: isolate;
+
+  /* Glass surface */
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+  -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+
+  /* Edge definition */
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--c-radius-lg);
+
+  /* Layered shadows for depth */
+  box-shadow: var(--liquid-glass-shadow-inset), var(--liquid-glass-shadow-outer);
+
+  /* GPU acceleration hints */
+  will-change: backdrop-filter, transform;
+  contain: layout style paint;
+
+  /* Smooth transitions */
+  transition:
+    background var(--liquid-transition-mid) var(--liquid-ease),
+    border-color var(--liquid-transition-mid) var(--liquid-ease),
+    box-shadow var(--liquid-transition-mid) var(--liquid-ease),
+    transform var(--liquid-transition-mid) var(--liquid-ease);
+}
+
+/* Refraction pseudo-element - applies liquid distortion to backdrop */
+.mq-liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  filter: url(#mq-liquid-distortion);
+  opacity: 0.5;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity var(--liquid-transition-mid) var(--liquid-ease);
+}
+
+/* Hover state - enhanced glow and slightly more visible */
+.mq-liquid-glass:hover {
+  background: var(--liquid-glass-bg-hover);
+  border-color: var(--liquid-glass-border-hover);
+  box-shadow:
+    var(--liquid-glass-shadow-inset), var(--liquid-glass-shadow-outer),
+    var(--liquid-glass-shadow-glow);
+}
+
+.mq-liquid-glass:hover::before {
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   3. LIQUID GLASS VARIANTS
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   Security Shield Variant
+   --------------------------------------------------------------------------
+   Navy-tinted glass for Settings and security-related UI.
+   Conveys "encrypted space" and heightened security.
+   -------------------------------------------------------------------------- */
+.mq-liquid-glass-security {
+  background: var(--security-glass-bg);
+  border-color: var(--security-glass-border);
+  box-shadow: var(--liquid-glass-shadow-inset), var(--security-glass-glow);
+}
+
+.mq-liquid-glass-security::before {
+  filter: url(#mq-security-shield);
+  opacity: 0.4;
+}
+
+.mq-liquid-glass-security:hover {
+  background: rgba(0, 42, 69, 0.2);
+  box-shadow:
+    var(--liquid-glass-shadow-inset),
+    0 0 60px rgba(0, 42, 69, 0.3),
+    0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+/* Shield icon glow effect for security contexts */
+.mq-liquid-glass-security .security-indicator {
+  animation: security-pulse 3s ease-in-out infinite;
+}
+
+@keyframes security-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(0, 42, 69, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(0, 42, 69, 0.8));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Elevated Variant
+   --------------------------------------------------------------------------
+   Higher elevation with stronger blur and deeper shadows.
+   For modals, dropdowns, and floating elements.
+   -------------------------------------------------------------------------- */
+.mq-liquid-glass-elevated {
+  backdrop-filter: blur(35px) saturate(200%);
+  -webkit-backdrop-filter: blur(35px) saturate(200%);
+  box-shadow:
+    var(--liquid-glass-shadow-inset),
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 10px 20px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   Subtle Variant
+   --------------------------------------------------------------------------
+   Minimal glass effect for inline elements and smaller components.
+   -------------------------------------------------------------------------- */
+.mq-liquid-glass-subtle {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--liquid-glass-shadow-inset);
+}
+
+.mq-liquid-glass-subtle::before {
+  filter: url(#mq-liquid-subtle);
+  opacity: 0.3;
+}
+
+/* ============================================================================
+   4. LIQUID BUTTON SYSTEM
+   ============================================================================
+   Premium buttons with high-saturation blur and bloom glow on hover.
+   The "bloom" effect uses a combination of box-shadow layers and
+   filter: url(#mq-glow) on hover.
+   ---------------------------------------------------------------------------- */
+.mq-liquid-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+
+  /* Glass surface */
+  background: rgba(166, 25, 46, 0.15);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+
+  /* Shape and edge */
+  border: 1px solid rgba(166, 25, 46, 0.3);
+  border-radius: 9999px; /* Pill shape */
+
+  /* Typography */
+  font-weight: 600;
+  font-size: var(--mq-text-sm);
+  color: var(--c-content);
+
+  /* Shadows */
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    0 4px 15px -3px rgba(166, 25, 46, 0.2);
+
+  /* Interaction */
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+
+  /* GPU acceleration */
+  will-change: transform, box-shadow, filter;
+
+  /* Transitions */
+  transition:
+    transform var(--liquid-transition-fast) var(--liquid-ease),
+    box-shadow var(--liquid-transition-mid) var(--liquid-ease),
+    background var(--liquid-transition-fast) var(--liquid-ease),
+    border-color var(--liquid-transition-fast) var(--liquid-ease);
+}
+
+/* Hover: Bloom glow effect */
+.mq-liquid-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(166, 25, 46, 0.25);
+  border-color: rgba(166, 25, 46, 0.5);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    0 8px 25px -5px rgba(166, 25, 46, 0.35),
+    0 0 40px rgba(166, 25, 46, 0.2),
+    0 0 80px rgba(166, 25, 46, 0.1);
+  filter: url(#mq-glow);
+}
+
+/* Active: Press effect */
+.mq-liquid-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 2px 10px -3px rgba(166, 25, 46, 0.3);
+}
+
+/* Focus: Accessibility ring */
+.mq-liquid-btn:focus-visible {
+  outline: 2px solid var(--mq-navy);
+  outline-offset: 2px;
+}
+
+/* Primary variant - solid MQ Red */
+.mq-liquid-btn-primary {
+  background: linear-gradient(135deg, var(--c-red), var(--c-bright-red));
+  color: white;
+  border-color: transparent;
+}
+
+.mq-liquid-btn-primary:hover {
+  background: linear-gradient(135deg, var(--c-bright-red), var(--c-red));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 8px 25px -5px rgba(166, 25, 46, 0.5),
+    0 0 50px rgba(166, 25, 46, 0.3),
+    0 0 100px rgba(166, 25, 46, 0.15);
+}
+
+/* Navy variant - for security contexts */
+.mq-liquid-btn-navy {
+  background: rgba(0, 42, 69, 0.8);
+  color: white;
+  border-color: rgba(0, 61, 102, 0.5);
+}
+
+.mq-liquid-btn-navy:hover {
+  background: var(--mq-navy);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    0 8px 25px -5px rgba(0, 42, 69, 0.4),
+    0 0 40px rgba(0, 42, 69, 0.25),
+    0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+/* ============================================================================
+   5. MESH GRADIENT BACKGROUND
+   ============================================================================
+   Animated mesh gradient that creates movement behind glass surfaces.
+   The gradient blobs drift slowly via Framer Motion, making the liquid
+   refraction visible and dynamic.
+   ---------------------------------------------------------------------------- */
+.mq-mesh-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--c-background);
+}
+
+/* Gradient blob base styles */
+.mq-mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  will-change: transform;
+  mix-blend-mode: multiply;
+}
+
+.dark .mq-mesh-blob {
+  filter: blur(100px);
+  opacity: 0.4;
+  mix-blend-mode: screen;
+}
+
+/* Navy blob - top left */
+.mq-mesh-blob-navy {
+  width: 50vw;
+  height: 50vh;
+  background: radial-gradient(circle, var(--mq-navy) 0%, transparent 70%);
+  top: -15%;
+  left: -10%;
+}
+
+/* Red blob - bottom right */
+.mq-mesh-blob-red {
+  width: 45vw;
+  height: 45vh;
+  background: radial-gradient(circle, rgba(166, 25, 46, 0.4) 0%, transparent 70%);
+  bottom: -10%;
+  right: -10%;
+}
+
+/* Charcoal blob - center */
+.mq-mesh-blob-charcoal {
+  width: 40vw;
+  height: 40vh;
+  background: radial-gradient(circle, rgba(26, 26, 26, 0.3) 0%, transparent 70%);
+  top: 40%;
+  left: 30%;
+}
+
+/* Gold accent blob - subtle */
+.mq-mesh-blob-gold {
+  width: 30vw;
+  height: 30vh;
+  background: radial-gradient(circle, var(--mq-gold-muted) 0%, transparent 70%);
+  bottom: 20%;
+  left: 10%;
+  opacity: 0.3;
+}
+
+/* ============================================================================
+   6. GPU ACCELERATION & PERFORMANCE
+   ============================================================================ */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Promote to compositor layer for smooth animations */
+.mq-liquid-glass,
+.mq-liquid-btn,
+.mq-mesh-blob {
+  transform: translateZ(0);
+}
+
+/* Contain paint to prevent layout thrashing */
+.mq-liquid-glass,
+.sidebar-panel.mq-liquid-glass {
+  contain: layout style paint;
+}
+
+/* ============================================================================
+   7. REDUCED MOTION FALLBACKS
+   ============================================================================
+   For users who prefer reduced motion, we disable animations and
+   replace glass effects with solid backgrounds.
+   ---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all liquid animations */
+  .mq-liquid-glass,
+  .mq-liquid-glass::before,
+  .mq-liquid-btn,
+  .mq-mesh-blob {
+    transition: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  /* Remove refraction filter */
+  .mq-liquid-glass::before {
+    filter: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Solid fallback backgrounds */
+  .mq-liquid-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--c-charcoal-800) !important;
+    border-color: var(--c-border) !important;
+  }
+
+  html:not(.dark) .mq-liquid-glass {
+    background: var(--c-card-background) !important;
+  }
+
+  .mq-liquid-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Static mesh gradient */
+  .mq-mesh-blob {
+    transform: none !important;
+    filter: blur(120px) !important;
+  }
+
+  /* Disable security pulse */
+  .mq-liquid-glass-security .security-indicator {
+    animation: none !important;
+    filter: none !important;
+  }
+}
+
+/* ============================================================================
+   8. MAGIC CARD LIQUID ENHANCEMENT
+   ============================================================================
+   Upgrade existing mq-magic-card to inherit liquid glass properties.
+   ---------------------------------------------------------------------------- */
+.mq-magic-card.mq-liquid-enhanced {
+  background: transparent;
+}
+
+.mq-magic-card.mq-liquid-enhanced .mq-magic-card-content {
+  background: var(--liquid-glass-bg) !important;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-color: var(--liquid-glass-border);
+  box-shadow:
+    var(--liquid-glass-shadow-inset),
+    0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  transition:
+    backdrop-filter var(--liquid-transition-mid) var(--liquid-ease),
+    box-shadow var(--liquid-transition-mid) var(--liquid-ease);
+}
+
+.mq-magic-card.mq-liquid-enhanced:hover .mq-magic-card-content {
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  box-shadow:
+    var(--liquid-glass-shadow-inset),
+    0 15px 35px -5px rgba(0, 0, 0, 0.2),
+    0 0 30px rgba(166, 25, 46, 0.1);
+}
+
+/* ============================================================================
+   9. SIDEBAR LIQUID GLASS INTEGRATION
+   ============================================================================
+   Specific styles for sidebar panel when using liquid glass.
+   The slide-in animation is enhanced to feel "heavy" and fluid.
+   ---------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  .sidebar-panel.mq-liquid-glass {
+    /* Override default background */
+    background: var(--liquid-glass-bg) !important;
+
+    /* Stronger blur for sidebar */
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+
+    /* Enhanced shadow for floating effect */
+    box-shadow:
+      var(--liquid-glass-shadow-inset),
+      0 0 50px rgba(0, 0, 0, 0.2),
+      15px 0 35px -5px rgba(0, 0, 0, 0.15);
+
+    /* Border only on right edge */
+    border: none;
+    border-right: 1px solid var(--liquid-glass-border);
+    border-radius: 0;
+
+    /* Heavy, fluid slide animation */
+    transition: transform 500ms var(--liquid-ease-heavy) !important;
+  }
+
+  .sidebar-panel.mq-liquid-glass::before {
+    border-radius: 0;
+  }
+
+  /* Trigger strip glass effect */
+  .sidebar-trigger.mq-liquid-glass-subtle {
+    background: var(--liquid-glass-bg);
+    border-right: 1px solid var(--liquid-glass-border);
+  }
+}
+
+/* Mobile sidebar glass */
+@media (max-width: 767px) {
+  .sidebar-panel.mq-liquid-glass {
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    background: var(--liquid-glass-bg) !important;
+    box-shadow:
+      var(--liquid-glass-shadow-inset),
+      10px 0 40px rgba(0, 0, 0, 0.3);
+  }
+}

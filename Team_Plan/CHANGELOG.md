@@ -7,6 +7,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-01-08
+
+### Added
+
+#### Liquid Glass UI System (Raouf)
+
+Implemented a premium "Liquid Glass" UI system with organic refraction effects and animated gradient backgrounds for a modern, premium visual experience.
+
+**New Components:**
+
+1. **LiquidFilter Component** (`components/ui/LiquidFilter.tsx`):
+   - SVG filter definitions for organic liquid distortion effects
+   - 4 filter variants:
+     - `#mq-liquid-distortion` - Primary filter with feTurbulence + feDisplacementMap for organic glass refraction
+     - `#mq-liquid-subtle` - Gentler version for smaller UI elements
+     - `#mq-liquid-security` - Navy-tinted filter for security/privacy contexts
+     - `#mq-glow` - Bloom effect for premium button interactions
+   - Respects `prefers-reduced-motion` media query for accessibility
+
+2. **MeshGradient Component** (`components/ui/MeshGradient.tsx`):
+   - Animated gradient background using Framer Motion
+   - 4 gradient blobs matching MQ brand colors:
+     - Navy (`#002A45`)
+     - Red (`#a6192e`)
+     - Charcoal (`#1a1a1a`)
+     - Gold (`#D4AF37`)
+   - Slow drift animations (60-120s duration) for premium ambient effect
+   - Uses `useReducedMotion` hook for accessibility compliance
+
+3. **liquid-glass.css** (`app/styles/liquid-glass.css`):
+   - Complete CSS styling system for liquid glass effects
+   - Glass effect classes:
+     - `.mq-liquid-glass` - Base glass effect with backdrop blur and transparency
+     - `.mq-liquid-glass-security` - Navy-tinted variant for security contexts
+     - `.mq-liquid-glass-elevated` - Stronger blur for modals and elevated surfaces
+     - `.mq-liquid-glass-subtle` - Light effect for triggers and small elements
+   - Button classes:
+     - `.mq-liquid-btn` - Base liquid button with hover glow
+     - `.mq-liquid-btn-primary` - MQ Red gradient primary action
+     - `.mq-liquid-btn-navy` - Navy variant for security actions
+   - Enhancement wrapper: `.mq-liquid-enhanced` for combining with magic cards
+   - GPU acceleration hints and reduced motion fallbacks
+
+**Integration:**
+
+- **globals.css**: Added `@import './styles/liquid-glass.css'` for CSS module loading
+- **client-layout.tsx**: Added `<LiquidFilter />` (SVG defs) and `<MeshGradient />` (animated background) components
+- **Sidebar.tsx**: Applied `mq-liquid-glass` classes to navigation panel for glass effect
+- **PrivacySettings.tsx**: Applied Security Shield variant (`mq-liquid-glass-security`) to privacy section
+
+**CSS Class Quick Reference:**
+
+```css
+/* Glass effects */
+.mq-liquid-glass              /* Base glass effect */
+.mq-liquid-glass-security     /* Navy-tinted for security */
+.mq-liquid-glass-elevated     /* Stronger blur for modals */
+.mq-liquid-glass-subtle       /* Light effect for triggers */
+
+/* Buttons */
+.mq-liquid-btn                /* Base liquid button */
+.mq-liquid-btn-primary        /* MQ Red gradient */
+.mq-liquid-btn-navy           /* Navy for security */
+
+/* Enhancement wrapper */
+.mq-liquid-enhanced           /* Add to .mq-magic-card */
+```
+
+**Brand Colors Used:**
+
+| Color | Hex | CSS Variable | Usage |
+|-------|-----|--------------|-------|
+| MQ Navy | `#002A45` | `--mq-navy` | Security contexts |
+| MQ Red | `#a6192e` | `--mq-red` | Accent, CTAs |
+| Charcoal | `#1a1a1a` | `--mq-charcoal` | Dark surfaces |
+| Gold | `#D4AF37` | `--mq-gold` | Premium accents |
+
+**Files Created:**
+- `components/ui/LiquidFilter.tsx`
+- `components/ui/MeshGradient.tsx`
+- `app/styles/liquid-glass.css`
+
+**Files Modified:**
+- `app/globals.css` - CSS import, version bump to 0.6.0
+- `app/client-layout.tsx` - Component integration
+- `components/layout/Sidebar.tsx` - Glass effect application
+- `app/settings/components/PrivacySettings.tsx` - Security variant application
+
+**Verification:**
+- `npm run typecheck` (pass)
+- `npm run build` (pass, 28 routes)
+- `npm run test` (143/143 tests passing)
+
+---
+
 ## [0.5.82] - 2026-01-08
 
 ### Security

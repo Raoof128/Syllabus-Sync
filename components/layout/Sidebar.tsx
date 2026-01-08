@@ -1,24 +1,23 @@
 // components/layout/Sidebar.tsx
 // ============================================================================
-// SIDEBAR COMPONENT
+// SIDEBAR COMPONENT - LIQUID GLASS EDITION
 // ============================================================================
-// Premium expandable sidebar with hover-triggered animations on desktop
-// and slide-out drawer on mobile.
+// Premium expandable sidebar with "Liquid Glass" effect. Features organic
+// refraction, backdrop blur, and fluid animations powered by CSS.
 //
 // FEATURES:
-// - Desktop: Hover to expand, animated hamburger bars, staggered menu items
+// - Desktop: Hover to expand with heavy, fluid slide animation
 // - Mobile: Hamburger button toggles slide-out drawer with overlay
+// - Liquid Glass: Backdrop blur, refraction filter, layered shadows
 // - Accessibility: Focus trap, keyboard navigation, ARIA attributes
-// - Performance: Memoized component, CSS-based animations (no JS animation libs)
+// - Performance: GPU-accelerated animations, respects prefers-reduced-motion
 //
-// CSS CLASSES (defined in globals.css):
-// - .sidebar-shell      → Main container, detects :hover
-// - .sidebar-trigger    → Always-visible 48px strip with hamburger
-// - .sidebar-panel      → Sliding content panel
-// - .sidebar-bar-*      → Animated hamburger bars
-// - .sidebar-menu-item  → Navigation links with staggered animation
-// - .sidebar-logo       → Logo with bounce-in animation
-// - .sidebar-social     → Social buttons at bottom
+// CSS CLASSES (defined in sidebar.css + liquid-glass.css):
+// - .sidebar-shell           → Main container, detects :hover
+// - .sidebar-trigger         → Always-visible 48px strip with hamburger
+// - .sidebar-panel           → Sliding content panel with liquid glass
+// - .mq-liquid-glass         → Backdrop blur + refraction effect
+// - .mq-liquid-glass-subtle  → Lighter glass for trigger strip
 // ============================================================================
 'use client';
 
@@ -186,10 +185,11 @@ const Sidebar = memo(() => {
             ----------------------------------------------------------------------
             Always-visible 48px strip on the left edge with animated hamburger bars.
             Hovering this area triggers the sidebar to expand.
+            Uses .mq-liquid-glass-subtle for a lighter glass effect.
             ---------------------------------------------------------------------- */}
         <div
           aria-hidden="true"
-          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
+          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger mq-liquid-glass-subtle"
         >
           {/* Hamburger bars - animate on hover (expand outward) */}
           <span className="flex flex-col items-center gap-2 sidebar-bars">
@@ -200,10 +200,11 @@ const Sidebar = memo(() => {
         </div>
 
         {/* ----------------------------------------------------------------------
-            SLIDING PANEL
+            SLIDING PANEL - LIQUID GLASS
             ----------------------------------------------------------------------
             The main sidebar content that slides in from the left on hover (desktop)
             or when mobileMenuOpen is true (mobile).
+            Uses .mq-liquid-glass for premium backdrop blur and refraction.
             ---------------------------------------------------------------------- */}
         <div
           ref={sidebarRef}
@@ -212,7 +213,7 @@ const Sidebar = memo(() => {
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(
-            'fixed md:relative z-40 w-56 bg-mq-card-background border-r border-mq-border h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none sidebar-panel',
+            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none sidebar-panel mq-liquid-glass',
             mobileMenuOpen && 'sidebar-panel-open',
           )}
         >

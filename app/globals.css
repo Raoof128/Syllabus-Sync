@@ -16,9 +16,10 @@
  * ├── social-buttons.css  - Social media button animations
  * ├── sidebar.css         - Sidebar navigation animations
  * ├── settings-page.css   - Settings page specific styles
- * └── alabaster-contrast.css - WCAG contrast enforcement
+ * ├── alabaster-contrast.css - WCAG contrast enforcement
+ * └── liquid-glass.css    - Premium Liquid Glass UI system
  * 
- * @version 0.5.81
+ * @version 0.6.0
  * @see Team_Plan/CHANGELOG.md for version history
  */
 
@@ -36,6 +37,7 @@
 @import './styles/sidebar.css';
 @import './styles/settings-page.css';
 @import './styles/alabaster-contrast.css';
+@import './styles/liquid-glass.css';
 
 /* ============================================
    TAILWIND CSS LAYERS
