@@ -18,13 +18,15 @@ const eventSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return requireAuth(request, async (_userId) => {
+  return requireAuth(request, async (userId) => {
     try {
       const supabase = await createServerClient();
+      // Security: Return public events (user_id IS NULL) OR user's own events
+      // This allows shared campus events while protecting user-specific data
       const { data, error } = await supabase
         .from('events')
         .select('*')
+        .or(`user_id.is.null,user_id.eq.${userId}`)
         .order('event_date', { ascending: true });
 
       if (error) {
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  return requireAuth(request, async () => {
+  return requireAuth(request, async (userId) => {
     try {
       const body = await request.json().catch(() => null);
       const parsed = eventSchema.safeParse(body);
@@ -54,6 +56,7 @@ export async function POST(request: Request) {
       const payload = {
         ...parsed.data,
         id: parsed.data.id ?? crypto.randomUUID(),
+        user_id: userId, // Security: Associate event with current user
         createdAt: parsed.data.createdAt ?? new Date(),
       };
 
@@ -61,6 +64,7 @@ export async function POST(request: Request) {
         .from('events')
         .insert({
           id: payload.id,
+          user_id: payload.user_id, // Security: Required for user-scoped data
           title: payload.title,
           description: payload.description,
           event_date: payload.date.toISOString().split('T')[0], // Date only

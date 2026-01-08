@@ -15,6 +15,9 @@ const STATIC_ASSETS = [
   '/favicon.ico',
 ];
 
+// Security: Paths that should NEVER be cached (authenticated/sensitive data)
+const NO_CACHE_PATHS = ['/api/', '/auth/'];
+
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -50,25 +53,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first strategy for API calls
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache successful responses
-          if (response.ok) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache if network fails
-          return caches.match(request);
-        })
-    );
+  // Security: NEVER cache API or auth routes - they contain authenticated/sensitive data
+  // This prevents stale user data from persisting after logout and protects privacy
+  if (NO_CACHE_PATHS.some(path => url.pathname.startsWith(path))) {
+    event.respondWith(fetch(request));
     return;
   }
 

@@ -23,12 +23,33 @@ export default function LoginClient() {
   const searchParams = useSearchParams();
 
   // Validate redirect URL to prevent open redirect attacks
-  // Only allow relative paths that start with / and don't start with // (protocol-relative)
+  // Security: Use URL parsing for robust validation instead of string checks
   const isValidRedirect = (url: string | null): boolean => {
     if (!url) return false;
-    // Must start with single slash, not double slash (protocol-relative URL)
-    // Must not contain protocol indicators
-    return url.startsWith('/') && !url.startsWith('//') && !url.includes(':');
+    try {
+      // Decode URL to catch encoded bypass attempts (e.g., %2F%2F for //)
+      const decodedUrl = decodeURIComponent(url);
+
+      // Must start with single slash (relative path)
+      if (!decodedUrl.startsWith('/')) return false;
+
+      // Must not be protocol-relative URL (//)
+      if (decodedUrl.startsWith('//')) return false;
+
+      // Parse as URL to validate it resolves to same origin
+      const parsed = new URL(decodedUrl, window.location.origin);
+
+      // Must be same origin - prevents javascript:, data:, and external URLs
+      if (parsed.origin !== window.location.origin) return false;
+
+      // Additional check: pathname must match (catches edge cases)
+      if (!parsed.pathname.startsWith('/')) return false;
+
+      return true;
+    } catch {
+      // URL parsing failed - reject as invalid
+      return false;
+    }
   };
 
   const rawRedirect = searchParams.get('redirectTo');

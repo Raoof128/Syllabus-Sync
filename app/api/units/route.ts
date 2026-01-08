@@ -78,8 +78,7 @@ function sanitizeSearchInput(input: string): string {
  * - sortOrder: Sort order (asc, desc; default: desc)
  */
 export async function GET(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return requireAuth(request, async (_userId) => {
+  return requireAuth(request, async (userId) => {
     try {
       const supabase = await createServerClient();
       const url = new URL(request.url);
@@ -93,10 +92,11 @@ export async function GET(request: Request) {
         sortOrder: url.searchParams.get('sortOrder') || undefined,
       });
 
-      // Get units with pagination and search
+      // Get units with pagination and search - SECURITY: filter by user_id to prevent IDOR
       let unitsQuery = supabase
         .from('units')
         .select('*', { count: 'exact' })
+        .eq('user_id', userId) // Security: Only return user's own units
         .order(query.sortBy, { ascending: query.sortOrder === 'asc' });
 
       // Apply search filter (sanitized to prevent SQL injection)
@@ -235,8 +235,7 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return requireAuth(request, async (_userId) => {
+  return requireAuth(request, async (userId) => {
     return validateRequest(unitSchema)(request, async (validatedData) => {
       try {
         const supabase = await createServerClient();
@@ -244,6 +243,7 @@ export async function POST(request: Request) {
         const payload = {
           ...unitData,
           id: unitData.id ?? crypto.randomUUID(),
+          user_id: userId, // Security: Associate unit with current user
           createdAt: unitData.createdAt ?? new Date(),
         };
 

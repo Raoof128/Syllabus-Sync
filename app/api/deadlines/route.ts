@@ -18,12 +18,13 @@ const deadlineSchema = z.object({
 });
 
 export async function GET(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return requireAuth(request, async (_userId) => {
+  return requireAuth(request, async (userId) => {
     const supabase = await createServerClient();
+    // Security: Filter by user_id to prevent IDOR - only return user's own deadlines
     const { data, error } = await supabase
       .from('deadlines')
       .select('*')
+      .eq('user_id', userId)
       .order('due_date', { ascending: true });
 
     if (error) {
@@ -35,8 +36,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return requireAuth(request, async (_userId) => {
+  return requireAuth(request, async (userId) => {
     const supabase = await createServerClient();
     const body = await request.json().catch(() => null);
     const parsed = deadlineSchema.safeParse(body);
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     const payload = {
       ...parsed.data,
       id: parsed.data.id ?? crypto.randomUUID(),
+      user_id: userId, // Security: Associate deadline with current user
       createdAt: parsed.data.createdAt ?? new Date(),
     };
 

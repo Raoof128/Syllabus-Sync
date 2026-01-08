@@ -19,7 +19,8 @@ CREATE TABLE public.profiles (
 
 CREATE TABLE public.units (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  code text NOT NULL UNIQUE,
+  user_id uuid NOT NULL, -- Owner of this unit (security: user-scoped data)
+  code text NOT NULL,
   name text NOT NULL,
   color text NOT NULL DEFAULT '#3B82F6',
   description text,
@@ -27,8 +28,10 @@ CREATE TABLE public.units (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT units_pkey PRIMARY KEY (id),
+  CONSTRAINT units_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
   CONSTRAINT units_code_format CHECK (code ~ '^[A-Z]{3,4}\d{3,4}$'),
-  CONSTRAINT units_color_format CHECK (color ~ '^#[0-9A-Fa-f]{6}$')
+  CONSTRAINT units_color_format CHECK (color ~ '^#[0-9A-Fa-f]{6}$'),
+  CONSTRAINT units_user_code_unique UNIQUE (user_id, code) -- Each user can have unique unit codes
 );
 
 CREATE TABLE public.class_times (
@@ -49,6 +52,7 @@ CREATE TABLE public.class_times (
 
 CREATE TABLE public.deadlines (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL, -- Owner of this deadline (security: user-scoped data)
   title text NOT NULL,
   description text,
   unit_code text NOT NULL, -- References unit code (soft reference for flexibility)
@@ -58,11 +62,13 @@ CREATE TABLE public.deadlines (
   completed boolean NOT NULL DEFAULT false,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT deadlines_pkey PRIMARY KEY (id)
+  CONSTRAINT deadlines_pkey PRIMARY KEY (id),
+  CONSTRAINT deadlines_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE public.events (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid, -- Owner of this event (NULL = public/shared event, security: user-scoped data)
   title text NOT NULL,
   description text NOT NULL,
   event_date date NOT NULL,
@@ -74,6 +80,7 @@ CREATE TABLE public.events (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT events_pkey PRIMARY KEY (id),
+  CONSTRAINT events_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
   -- Accept both 24h format (HH:MM) and 12h format (H:MM AM/PM)
   CONSTRAINT events_time_format CHECK (event_time ~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]$|^(1[0-2]|0?[1-9]):[0-5][0-9] [AP]M$')
 );
@@ -106,12 +113,118 @@ CREATE TABLE public.user_preferences (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_units_code ON public.units(code);
+CREATE INDEX IF NOT EXISTS idx_units_user_id ON public.units(user_id);
 CREATE INDEX IF NOT EXISTS idx_class_times_unit_id ON public.class_times(unit_id);
 CREATE INDEX IF NOT EXISTS idx_class_times_day ON public.class_times(day);
 CREATE INDEX IF NOT EXISTS idx_deadlines_unit_code ON public.deadlines(unit_code);
 CREATE INDEX IF NOT EXISTS idx_deadlines_due_date ON public.deadlines(due_date);
 CREATE INDEX IF NOT EXISTS idx_deadlines_completed ON public.deadlines(completed);
+CREATE INDEX IF NOT EXISTS idx_deadlines_user_id ON public.deadlines(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON public.notifications(read);
 CREATE INDEX IF NOT EXISTS idx_events_date ON public.events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_category ON public.events(category);
+CREATE INDEX IF NOT EXISTS idx_events_user_id ON public.events(user_id);
+
+-- ============================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- CRITICAL: These must be enabled in production to prevent IDOR attacks
+-- ============================================================================
+
+-- Enable RLS on all user-scoped tables
+ALTER TABLE public.units ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deadlines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Units: Users can only access their own units
+CREATE POLICY "Users can view their own units"
+  ON public.units FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own units"
+  ON public.units FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own units"
+  ON public.units FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own units"
+  ON public.units FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Deadlines: Users can only access their own deadlines
+CREATE POLICY "Users can view their own deadlines"
+  ON public.deadlines FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own deadlines"
+  ON public.deadlines FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own deadlines"
+  ON public.deadlines FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own deadlines"
+  ON public.deadlines FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Events: Users can view public events (user_id IS NULL) or their own events
+CREATE POLICY "Users can view public or their own events"
+  ON public.events FOR SELECT
+  USING (user_id IS NULL OR auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own events"
+  ON public.events FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own events"
+  ON public.events FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own events"
+  ON public.events FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Notifications: Users can only access their own notifications
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own notifications"
+  ON public.notifications FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notifications"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own notifications"
+  ON public.notifications FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- User Preferences: Users can only access their own preferences
+CREATE POLICY "Users can view their own preferences"
+  ON public.user_preferences FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own preferences"
+  ON public.user_preferences FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own preferences"
+  ON public.user_preferences FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Profiles: Users can only access their own profile
+CREATE POLICY "Users can view their own profile"
+  ON public.profiles FOR SELECT
+  USING (auth.uid() = id);
+
+CREATE POLICY "Users can update their own profile"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id);

@@ -74,8 +74,9 @@ export const mapNotificationRow = (row: Row): Notification => ({
   relatedId: row.related_id ? String(row.related_id) : undefined,
 });
 
-export const serializeUnit = (unit: Omit<Unit, 'schedule'>) => ({
+export const serializeUnit = (unit: Omit<Unit, 'schedule'> & { user_id?: string }) => ({
   id: unit.id,
+  user_id: unit.user_id, // Security: Required for user-scoped data
   code: unit.code,
   name: unit.name,
   color: unit.color,
@@ -83,8 +84,9 @@ export const serializeUnit = (unit: Omit<Unit, 'schedule'>) => ({
   created_at: unit.createdAt.toISOString(),
 });
 
-export const serializeDeadline = (deadline: Deadline) => ({
+export const serializeDeadline = (deadline: Deadline & { user_id?: string }) => ({
   id: deadline.id,
+  user_id: deadline.user_id, // Security: Required for user-scoped data
   title: deadline.title,
   unit_code: deadline.unitCode,
   due_date: deadline.dueDate.toISOString(),
