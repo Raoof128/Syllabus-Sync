@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "Voir notre politique de confidentialité",
   "exportWarning": "Le fichier exporté contiendra toutes vos données personnelles, y compris les cours, les échéances et les préférences. Gardez ce fichier en sécurité et ne le partagez pas avec d'autres.",
   "outsideCampus": "Hors Campus",
-  "outsideCampusDistance": "Vous êtes à environ {{distance}}m du centre du campus"
+  "outsideCampusDistance": "Vous êtes à environ {{distance}}m du centre du campus",
+  "pending": "en attente",
+  "addYourFirstDeadline": "Ajoutez votre première échéance",
+  "overdue": "en retard",
+  "at": "à"
 }

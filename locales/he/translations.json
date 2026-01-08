@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "צפה במדיניות הפרטיות שלנו",
   "exportWarning": "הקובץ המיוצא יכיל את כל הנתונים האישיים שלך כולל קורסים, דדליינים והעדפות. שמור על קובץ זה בטוח ואל תשתף אותו עם אחרים.",
   "outsideCampus": "מחוץ לקמפוס",
-  "outsideCampusDistance": "אתה נמצא בערך {{distance}} מטר ממרכז הקמפוס"
+  "outsideCampusDistance": "אתה נמצא בערך {{distance}} מטר ממרכז הקמפוס",
+  "pending": "ממתין",
+  "addYourFirstDeadline": "הוסף את הדדליין הראשון שלך",
+  "overdue": "באיחור",
+  "at": "ב"
 }

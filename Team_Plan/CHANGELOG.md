@@ -7,6 +7,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.83] - 2026-01-08
+
+### Fixed
+
+#### Sidebar Animation Polish & Alabaster Color System (Raouf)
+
+**Sidebar Animation Fixes:**
+
+- **Fixed sidebar staying open**: Added explicit `:not(:hover):not([data-keyboard-open='true'])` selectors to prevent sidebar from staying open after clicking links. Fixed by properly handling focus-within states and removing hover/focus state retention.
+- **Asymmetric animation timing**: Implemented different timing for open (350ms) vs close (280ms) for smoother UX. Open animations use cubic-bezier(0.4, 0, 0.2, 1) for fluid feel, close uses linear(0, 1, 1) for snappy exit.
+- **Reduced stagger delays**: Changed menu item entrance stagger from 80ms to 60ms for faster perceived response.
+- **Main content shift**: Adjusted main content margin animation from 500ms to 350ms to match sidebar open timing.
+- **GPU acceleration**: Added `will-change: transform, opacity` and `backface-visibility: hidden` hints to animated elements for better performance.
+- **Explicit transform resets**: Added transform resets for logo, menu items, and social section on close to ensure snappy exit.
+
+**CSS Syntax Error Fix:**
+
+- **Removed duplicate block**: Fixed critical CSS syntax error in `liquid-glass.css` where lines 633-681 contained duplicated CSS rules placed outside of any media query, causing PostCSS to fail with "Unexpected }" at line 667. Removed the entire duplicated block.
+
+**Alabaster Color System Updates:**
+
+- **CSS variables added**: Defined `--alabaster: #EDEADE`, `--alabaster-dark: #e5e2d4`, `--alabaster-light: #f5f4ed` in `mq-tokens.css` for consistent Alabaster theming.
+- **Background tokens updated**: Updated `--c-background`, `--c-card-background`, `--c-input-background` to use `var(--alabaster)` in light mode.
+- **Text color fixes**: Changed `--c-content` to `#1a1a1a` (was using charcoal-900 which was lighter) for proper WCAG contrast on Alabaster background.
+- **Liquid glass Alabaster integration**: Updated glass backgrounds to use `rgba(237, 234, 222, 0.85)` (Alabaster-tinted) in light mode instead of white.
+- **Sidebar glass Alabaster**: Applied Alabaster-tinted glass effects (`rgba(237, 234, 222, 0.92)` for light mode, `rgba(55, 58, 54, 0.92)` for dark mode) to sidebar panels.
+- **Border color adjustment**: Updated `--c-border` to use `--c-charcoal-300` for better visibility on Alabaster surfaces.
+- **Tailwind tokens**: Added `mq-alabaster`, `mq-alabaster-dark`, `mq-alabaster-light` color tokens to `tailwind.config.ts`.
+
+**Files Changed:**
+- `app/styles/sidebar.css` - Complete animation overhaul with explicit selectors, asymmetric timing, GPU acceleration
+- `app/styles/liquid-glass.css` - Fixed CSS syntax error (removed duplicate block), Alabaster glass integration
+- `app/mq-tokens.css` - Added Alabaster variables, updated background/text tokens
+- `app/styles/alabaster-contrast.css` - Simplified and fixed WCAG contrast enforcement
+- `tailwind.config.ts` - Added Alabaster color tokens
+
+**Additional files updated with Alabaster consistency:**
+- `app/calendar/CalendarClient.tsx`
+- `app/feed/FeedClient.tsx`
+- `app/home/HomeClient.tsx`
+- `app/login/LoginClient.tsx`
+- `app/map/CampusMap.tsx`
+- `app/map/MapClient.tsx`
+- `app/settings/components/AppearanceSettings.tsx`
+- `app/settings/components/HelpSupport.tsx`
+- `app/settings/components/NotificationSettings.tsx`
+- `app/settings/components/PrivacySettings.tsx`
+- `app/settings/components/QuickActions.tsx`
+- `app/settings/components/SettingsSkeleton.tsx`
+- `app/signup/SignupClient.tsx`
+- `components/ErrorBoundary.tsx`
+- `components/ProfileCard.tsx`
+- `components/home/EventsFeed.tsx`
+- `components/home/NextDeadline.tsx`
+- `components/home/QuickActions.tsx`
+- `components/home/TodaySchedule.tsx`
+- `components/layout/Header.tsx`
+- `components/layout/Sidebar.tsx`
+- `components/layout/SocialButtons.tsx`
+- `components/ui/card.tsx`
+- `components/ui/dialog.tsx`
+- `components/ui/dropdown-menu.tsx`
+- `components/ui/mq/alert.tsx`
+- `components/ui/mq/button.tsx`
+- `components/ui/mq/card.tsx`
+- `components/ui/mq/link.tsx`
+- `components/ui/mq/navbar.tsx`
+- `components/ui/select.tsx`
+- `components/ui/toast.tsx`
+- `components/units/UnitCard.tsx`
+- `lib/i18n/translations.ts`
+- `scripts/check-remote-schema.mjs`
+- `scripts/check-rls-detail.mjs`
+- `scripts/inspect-schema.js`
+- `tests/CalendarPage.test.tsx`
+- `tests/setup.ts`
+- `tsconfig.json`
+- `locales/*/translations.json` (19 locale files)
+
+**Verification:**
+- `npm run lint` (pass, 0 errors, 0 warnings)
+- `npm run build` (success, 28 routes)
+- `npm run test` (143/143 tests passing)
+
+---
+
 ## [0.6.0] - 2026-01-08
 
 ### Added

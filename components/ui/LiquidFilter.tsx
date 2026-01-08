@@ -19,7 +19,17 @@
 // ============================================================================
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useSyncExternalStore } from 'react';
+
+// Helper for detecting reduced motion preference without setState in effect
+const subscribeToReducedMotion = (callback: () => void) => {
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+};
+const getReducedMotionSnapshot = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const getReducedMotionServerSnapshot = () => false;
 
 /**
  * LiquidFilter Component
@@ -34,20 +44,11 @@ import { memo, useEffect, useState } from 'react';
  * - scale: 15 (displacement intensity)
  */
 const LiquidFilter = memo(() => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    // Check and listen for reduced motion preference
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   // Don't render filter for users who prefer reduced motion
   if (prefersReducedMotion) {

@@ -31,6 +31,7 @@ type PrivacySettingsProps = {
 };
 
 // Password strength calculation
+// Note: feedback messages should be added to translations.ts for full i18n support
 function calculatePasswordStrength(password: string): {
   strength: PasswordStrength;
   score: number;
@@ -298,7 +299,7 @@ const PrivacySettings = memo(
               aria-labelledby="privacy-security-heading"
             >
               {/* Change Password */}
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
@@ -319,7 +320,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Manage Sessions */}
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
@@ -340,7 +341,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Privacy Policy */}
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('privacyPolicy')}</h3>
@@ -361,7 +362,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Export Data */}
-              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('exportData')}</h3>
@@ -403,10 +404,14 @@ const PrivacySettings = memo(
                     data-testid={`session-${session.id}`}
                   >
                     <div>
-                      <p className="font-semibold text-mq-content">
-                        {session.current ? t('current') : t('manageSessions')}
+                      <p className="font-semibold text-mq-content flex items-center gap-2">
+                        {session.device}
+                        {session.current && (
+                          <span className="text-xs font-normal px-1.5 py-0.5 bg-mq-success/10 text-mq-success rounded-mq">
+                            {t('current')}
+                          </span>
+                        )}
                       </p>
-                      <p className="text-mq-sm text-mq-content-secondary">{session.device}</p>
                       <p className="text-mq-xs text-mq-content-tertiary">
                         {t('lastActive')} {new Date(session.lastActive).toLocaleString()}
                       </p>

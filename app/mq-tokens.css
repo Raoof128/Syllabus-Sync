@@ -2,6 +2,14 @@
 /* Source: MQ variables.css - Exact naming convention */
 
 :root {
+  /* ============================================
+     ALABASTER - Primary Background Color
+     The signature warm off-white background
+     ============================================ */
+  --alabaster: #edeade;
+  --alabaster-dark: #e5e2d4;
+  --alabaster-light: #f5f4ed;
+
   /* Brand Colors - --c-[name] format */
   --c-red: #a6192e;
   --c-bright-red: #d6001c;
@@ -14,15 +22,25 @@
   --c-brand-secondary: var(--c-sand-200);
 
   /* Neutral Palettes - --c-[palette]-[weight] format */
+  /* Full charcoal palette for light/dark mode support */
+  --c-charcoal-100: #e8e9e7;
+  --c-charcoal-200: #c4c6c0;
+  --c-charcoal-300: #a0a29c;
+  --c-charcoal-400: #8a8c86;
+  --c-charcoal-500: #6d6f69;
   --c-charcoal-600: #71736b;
-  --c-charcoal-700: #5a5c55;
-  --c-charcoal-800: #43453f;
+  --c-charcoal-700: #535650; /* Aligned with official MQ brand */
+  --c-charcoal-800: #373a36; /* Aligned with official MQ brand */
   --c-charcoal-900: #262826;
 
+  /* Primary alias for brand consistency */
+  --c-primary: var(--c-red);
+
+  /* Sand palette - aligned with official MQ brand */
   --c-sand-100: #f7f6f3;
-  --c-sand-200: #e8e6e2;
-  --c-sand-300: #d9d4cb;
-  --c-sand-400: #cac2b4;
+  --c-sand-200: #eae8e1; /* Aligned with official MQ brand */
+  --c-sand-300: #d6d2c4; /* Aligned with official MQ brand */
+  --c-sand-400: #b3b1a5; /* Aligned with official MQ brand */
   --c-sand-500: #919288;
 
   --c-slate-100: #ecf2f6;
@@ -31,15 +49,19 @@
   --c-slate-400: #b3cbdb;
   --c-slate-500: #8d98a1;
 
-  /* Semantic Mappings */
-  --c-background: #edeade;
-  --c-background-invert: #edeade;
+  /* ============================================
+     SEMANTIC MAPPINGS - Light Mode (Alabaster)
+     ============================================ */
+  --c-background: var(--alabaster);
+  --c-background-invert: var(--alabaster);
   --c-background-secondary: var(--c-sand-200);
   --c-background-tertiary: var(--c-sand-100);
-  --c-content: var(--c-charcoal-900);
-  --c-content-secondary: var(--c-charcoal-800);
-  /* Tertiary text improved from #5a5c55 to #4d4f49 for WCAG AA 4.5:1 contrast ratio */
-  --c-content-tertiary: #4d4f49;
+
+  /* Content colors for Alabaster background */
+  --c-content: #1a1a1a;
+  --c-content-secondary: #2b2b2b;
+  /* Tertiary text improved for WCAG AA 4.5:1 contrast ratio */
+  --c-content-tertiary: #4a4a44;
   --c-content-faded: var(--c-charcoal-600);
 
   /* Tailwind CSS Variable Mappings - Light Mode */
@@ -93,12 +115,12 @@
   --t-snap-fast: 0.15s cubic-bezier(0, 0, 0, 1);
 
   /* Additional tokens for complete UI */
-  --c-border: var(--c-charcoal-700);
-  /* Darker border for visibility on Alabaster */
+  --c-border: var(--c-charcoal-300);
+  /* Visible border for Alabaster background */
   --c-focus: var(--c-red);
-  --c-card-background: #edeade;
-  --c-input-background: #edeade;
-  /* Make buttons slightly darker/different than background to pop */
+  --c-card-background: var(--alabaster);
+  --c-input-background: var(--alabaster);
+  /* Make buttons slightly different than background to pop */
   --c-button-secondary: var(--c-sand-200);
   --c-hover-background: var(--c-sand-100);
 
@@ -141,7 +163,8 @@
   --c-space-3: 0.75rem;
   --c-space-4: 1rem;
 
-  /* Border radius */
+  /* Border radius - used by Tailwind config */
+  --radius: 0.5rem;
   --c-radius-sm: 0.125rem;
   --c-radius: 0.25rem;
   --c-radius-lg: 0.5rem;
@@ -149,17 +172,22 @@
   /* Shadows */
   --c-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --c-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --c-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --mq-shadow-md: var(--c-shadow-md);
 }
 
 /* Dark Mode Overrides - mq-dark variants */
 .dark {
-  /* Base semantic tokens - Unified charcoal palette for consistency */
+  /* ============================================
+     DARK MODE - Charcoal Background
+     ============================================ */
   --c-background: var(--c-charcoal-800);
   --c-background-secondary: var(--c-charcoal-700);
   --c-background-tertiary: var(--c-charcoal-600);
-  --c-background-invert: #edeade;
+  --c-background-invert: var(--alabaster);
 
-  --c-content: #edeade;
+  /* Content colors for dark background - using Alabaster for text */
+  --c-content: var(--alabaster);
   --c-content-secondary: var(--c-charcoal-200);
   /* Tertiary text improved for WCAG AA 4.5:1 contrast ratio on dark backgrounds */
   --c-content-tertiary: #a8aaa3;

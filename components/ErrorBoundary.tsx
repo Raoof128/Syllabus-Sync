@@ -44,7 +44,7 @@ function ErrorBoundaryUI({
 
   return (
     <div className="flex items-center justify-center min-h-[60vh] px-4 animate-fade-in">
-      <div className="text-center max-w-lg mx-auto">
+      <div className="text-center max-w-lg mx-auto mq-liquid-glass-elevated p-8 rounded-mq-lg">
         {/* Error Icon */}
         <div className="mx-auto w-20 h-20 bg-mq-error/10 rounded-full flex items-center justify-center mb-6">
           <AlertTriangle className="w-10 h-10 text-mq-error" />

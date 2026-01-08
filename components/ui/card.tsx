@@ -2,12 +2,19 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
+function Card({
+  className,
+  glass = false,
+  ...props
+}: React.ComponentProps<'div'> & { glass?: boolean }) {
   return (
     <div
       data-slot="card"
       className={cn(
-        'bg-mq-card-background text-mq-content flex flex-col gap-6 rounded-mq-lg border-mq-border p-6 shadow-mq-sm transition-all duration-mq-mid hover:shadow-mq-md hover:-translate-y-0.5',
+        'text-mq-content flex flex-col gap-6 rounded-mq-lg p-6 transition-all duration-mq-mid hover:-translate-y-0.5',
+        glass
+          ? 'mq-liquid-glass'
+          : 'bg-mq-card-background border-mq-border shadow-mq-sm hover:shadow-mq-md',
         className,
       )}
       {...props}

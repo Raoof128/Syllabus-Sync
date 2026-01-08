@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "개인정보 보호정책 보기",
   "exportWarning": "내보낸 파일에는 유닛, 마감일, 환경 설정을 포함한 모든 개인 데이터가 포함됩니다. 이 파일을 안전하게 보관하고 다른 사람과 공유하지 마세요.",
   "outsideCampus": "캠퍼스 외부",
-  "outsideCampusDistance": "캠퍼스 중심에서 약 {{distance}}m 떨어져 있습니다"
+  "outsideCampusDistance": "캠퍼스 중심에서 약 {{distance}}m 떨어져 있습니다",
+  "pending": "대기 중",
+  "addYourFirstDeadline": "첫 번째 마감일 추가하기",
+  "overdue": "기한 초과",
+  "at": "에"
 }

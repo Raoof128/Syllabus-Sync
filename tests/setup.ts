@@ -41,3 +41,59 @@ if (!globalThis.fetch) {
     } as Response;
   }) as typeof fetch;
 }
+
+// Mock IntersectionObserver for framer-motion's whileInView feature
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  class MockIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | Document | null = null;
+    readonly rootMargin: string = '';
+    readonly thresholds: ReadonlyArray<number> = [];
+
+    constructor(
+      private callback: IntersectionObserverCallback,
+      private options?: IntersectionObserverInit,
+    ) {}
+
+    observe(target: Element): void {
+      // Immediately trigger with isIntersecting: true to show elements
+      this.callback(
+        [
+          {
+            isIntersecting: true,
+            boundingClientRect: target.getBoundingClientRect(),
+            intersectionRatio: 1,
+            intersectionRect: target.getBoundingClientRect(),
+            rootBounds: null,
+            target,
+            time: Date.now(),
+          },
+        ],
+        this,
+      );
+    }
+
+    unobserve(): void {}
+    disconnect(): void {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+
+  globalThis.IntersectionObserver =
+    MockIntersectionObserver as unknown as typeof IntersectionObserver;
+}
+
+// Mock matchMedia for prefers-reduced-motion and other media queries
+if (typeof globalThis.matchMedia === 'undefined') {
+  globalThis.matchMedia = (query: string): MediaQueryList =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true,
+    }) as MediaQueryList;
+}

@@ -36,7 +36,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* Notification Settings Skeleton */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <Card className="mq-magic-card-content">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
         </div>
 
         {/* Appearance Settings Skeleton */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <Card className="mq-magic-card-content">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
         </div>
 
         {/* Privacy Settings Skeleton */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <Card className="mq-magic-card-content">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
         </div>
 
         {/* Quick Actions Skeleton */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <Card className="mq-magic-card-content">
             <CardHeader>
               <div className="h-6 w-32 bg-mq-card-background rounded-mq-lg animate-pulse" />

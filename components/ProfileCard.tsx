@@ -46,7 +46,7 @@ const ProfileCard = React.memo(
     };
 
     return (
-      <div className="mq-magic-card">
+      <div className="mq-magic-card mq-liquid-enhanced">
         <Card
           className={cn(
             'mq-magic-card-content relative transition-all duration-300',

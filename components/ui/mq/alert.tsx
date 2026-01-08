@@ -2,13 +2,13 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const alertVariants = cva('relative w-full rounded-mq-lg border p-4', {
+const alertVariants = cva('relative w-full rounded-mq-lg border p-4 mq-liquid-glass-subtle', {
   variants: {
     variant: {
-      info: 'border-mq-info bg-mq-info/10 text-mq-info',
-      warning: 'border-mq-warning bg-mq-warning/10 text-mq-warning',
-      success: 'border-mq-success bg-mq-success/10 text-mq-success',
-      error: 'border-mq-error bg-mq-error/10 text-mq-error',
+      info: 'border-mq-info text-mq-info',
+      warning: 'border-mq-warning text-mq-warning',
+      success: 'border-mq-success text-mq-success',
+      error: 'border-mq-error text-mq-error',
     },
   },
   defaultVariants: {

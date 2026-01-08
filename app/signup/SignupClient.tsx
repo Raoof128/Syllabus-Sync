@@ -63,7 +63,7 @@ export default function SignupClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mq-liquid-glass-elevated">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <div className="w-12 h-12 bg-mq-primary rounded-mq-lg flex items-center justify-center">

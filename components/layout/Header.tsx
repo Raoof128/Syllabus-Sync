@@ -153,27 +153,29 @@ const Header = memo(() => {
   // Get display name: prioritize profile name, then Supabase user metadata full_name/name, then extract from email
   // Extract a proper name from the email prefix (capitalize first letter)
   // Only calculate on client to avoid hydration mismatch
-  const displayName = isClient ? (() => {
-    if (currentProfile?.name) return currentProfile.name;
-    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
-    if (user?.user_metadata?.name) return user.user_metadata.name;
-    // Extract name from email prefix and capitalize it
-    if (user?.email) {
-      const emailPrefix = user.email.split('@')[0];
-      // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
-      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
-      // Capitalize first letter
-      if (nameWithoutNumbers.length > 0) {
-        return (
-          nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
-        );
-      }
-    }
-    return null;
-  })() : null;
+  const displayName = isClient
+    ? (() => {
+        if (currentProfile?.name) return currentProfile.name;
+        if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+        if (user?.user_metadata?.name) return user.user_metadata.name;
+        // Extract name from email prefix and capitalize it
+        if (user?.email) {
+          const emailPrefix = user.email.split('@')[0];
+          // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
+          const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
+          // Capitalize first letter
+          if (nameWithoutNumbers.length > 0) {
+            return (
+              nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
+            );
+          }
+        }
+        return null;
+      })()
+    : null;
 
   return (
-    <header className="h-16 bg-mq-background border-b border-mq-border flex items-center justify-between px-4 sm:px-6 relative z-10">
+    <header className="h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between px-4 sm:px-6 relative z-10">
       {/* Left side - Logo and title (far left) */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         <Link href="/" className="flex items-center gap-2 sm:gap-3">
@@ -238,7 +240,7 @@ const Header = memo(() => {
               id={NOTIFICATION_MENU_ID}
               role="menu"
               aria-label={t('notifications')}
-              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg shadow-mq-lg border border-mq-border z-50 max-h-96 overflow-hidden"
+              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] mq-liquid-glass-elevated rounded-mq-lg border border-[var(--liquid-glass-border)] z-50 max-h-96 overflow-hidden"
             >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
                 <h3 className="font-semibold text-mq-content" id={`${NOTIFICATION_MENU_ID}-title`}>

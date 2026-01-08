@@ -440,7 +440,7 @@ export default function MapClient() {
       </div>
 
       {/* Map */}
-      <div className="mq-magic-card mb-6">
+      <div className="mq-magic-card mq-liquid-enhanced mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -470,7 +470,7 @@ export default function MapClient() {
       </div>
 
       {/* Campus Buildings Quick Reference */}
-      <div className="mq-magic-card mb-6">
+      <div className="mq-magic-card mq-liquid-enhanced mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -545,7 +545,7 @@ export default function MapClient() {
       {/* Active Map Features */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Turn-by-Turn Navigation - ACTIVE */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
@@ -578,7 +578,7 @@ export default function MapClient() {
         </div>
 
         {/* Live Location - ACTIVE */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>
@@ -609,7 +609,7 @@ export default function MapClient() {
         </div>
 
         {/* Advanced Search - ACTIVE */}
-        <div className="mq-magic-card">
+        <div className="mq-magic-card mq-liquid-enhanced">
           <div className="mq-magic-card-content p-0 h-full">
             <Card className="border-0 shadow-none bg-transparent h-full">
               <CardHeader>

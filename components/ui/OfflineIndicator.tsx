@@ -78,7 +78,7 @@ export function OfflineIndicator() {
       aria-live="polite"
       aria-atomic="true"
       className={cn(
-        'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-mq-lg shadow-mq-lg border flex items-center gap-3 transition-all duration-300 ease-mq-ease',
+        'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-mq-lg shadow-mq-lg border flex items-center gap-3 transition-all duration-300 ease-mq-ease mq-liquid-glass',
         'animate-in slide-in-from-bottom-4 fade-in',
         isOnline
           ? 'bg-mq-success/10 border-mq-success text-mq-success'

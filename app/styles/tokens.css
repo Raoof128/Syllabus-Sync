@@ -1,114 +1,24 @@
 /**
  * tokens.css
- * Macquarie University Design Tokens
+ * Animation-specific tokens that complement mq-tokens.css
  * 
- * CONTENTS:
- * 1. Animation colors
- * 2. Brand colors (MQ red family)
- * 3. Light mode semantic colors
- * 4. Dark mode semantic colors
- * 5. Spacing and radius tokens
+ * NOTE: All primary design tokens (colors, typography, spacing) are defined in
+ * mq-tokens.css which is the authoritative source for MQ brand values.
+ * This file only contains animation-specific variables to avoid duplication.
+ * 
+ * @see mq-tokens.css for all color, typography, and spacing tokens
  */
 
 /* ============================================
-   CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+   ANIMATION-SPECIFIC TOKENS
    ============================================ */
 
 :root {
   /* Animation colors (prefixed for clarity) */
-  --mq-anim-primary: #a6192e;
-  /* --c-red */
-  --mq-anim-secondary: #d6001c;
-  /* --c-bright-red */
+  --mq-anim-primary: var(--c-red, #a6192e);
+  --mq-anim-secondary: var(--c-bright-red, #d6001c);
 
   /* Legacy aliases (deprecated, use --mq-anim-* instead) */
   --anim-primary: var(--mq-anim-primary);
   --anim-secondary: var(--mq-anim-secondary);
-
-  /* Macquarie University Design Tokens */
-  --c-red: #a6192e;
-  --c-bright-red: #d6001c;
-  --c-deep-red: #8a1425;
-  --c-magenta: #c6007e;
-  --c-purple: #a966bd;
-
-  /* Light mode colors */
-  --c-background: #ffffff;
-  --c-background-secondary: #f8f9fa;
-  --c-background-tertiary: #e9ecef;
-  --c-background-invert: #1a1a1a;
-  --c-card-background: #ffffff;
-  --c-input-background: #ffffff;
-  --c-hover-background: #f1f3f5;
-
-  --c-content: #1a1a1a;
-  --c-content-secondary: #495057;
-  --c-content-tertiary: #6c757d;
-  --c-content-faded: #adb5bd;
-
-  --c-border: #dee2e6;
-  --c-border-secondary: #e9ecef;
-
-  --c-focus: #a6192e;
-  --c-success: #28a745;
-  --c-warning: #ffc107;
-  --c-error: #dc3545;
-  --c-info: #17a2b8;
-
-  --c-button-secondary: #6c757d;
-
-  /* Charcoal shades */
-  --c-charcoal-600: #495057;
-  --c-charcoal-700: #343a40;
-  --c-charcoal-800: #212529;
-  --c-charcoal-900: #1a1a1a;
-
-  /* Sand shades */
-  --c-sand-100: #f8f9fa;
-  --c-sand-200: #e9ecef;
-  --c-sand-300: #dee2e6;
-  --c-sand-400: #ced4da;
-  --c-sand-500: #adb5bd;
-
-  /* Slate shades */
-  --c-slate-100: #f1f3f5;
-  --c-slate-200: #e9ecef;
-  --c-slate-300: #dee2e6;
-  --c-slate-400: #ced4da;
-  --c-slate-500: #adb5bd;
-
-  /* Radius */
-  --c-radius-sm: 0.375rem;
-  --c-radius-md: 0.5rem;
-  --c-radius-lg: 0.75rem;
-  --c-radius-xl: 1rem;
-
-  /* Spacing */
-  --c-space-1: 0.25rem;
-  --c-space-2: 0.5rem;
-  --c-space-3: 0.75rem;
-  --c-space-4: 1rem;
-}
-
-/* ============================================
-   DARK MODE TOKEN OVERRIDES
-   ============================================ */
-
-.dark {
-  /* Dark mode colors */
-  --c-background: #0a0a0a;
-  --c-background-secondary: #1a1a1a;
-  --c-background-tertiary: #2a2a2a;
-  --c-background-invert: #ffffff;
-  --c-card-background: #141414;
-  --c-input-background: #1a1a1a;
-  --c-hover-background: #252525;
-
-  --c-content: #e9ecef;
-  --c-content-secondary: #adb5bd;
-  --c-content-tertiary: #6c757d;
-  --c-content-faded: #495057;
-
-  --c-border: #2a2a2a;
-  --c-border-secondary: #1a1a1a;
 }

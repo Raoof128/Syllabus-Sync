@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "プライバシーポリシーを見る",
   "exportWarning": "エクスポートされたファイルには、ユニット、締め切り、設定を含むすべての個人データが含まれます。このファイルを安全に保管し、他の人と共有しないでください。",
   "outsideCampus": "キャンパス外",
-  "outsideCampusDistance": "キャンパス中心から約{{distance}}m離れています"
+  "outsideCampusDistance": "キャンパス中心から約{{distance}}m離れています",
+  "pending": "保留中",
+  "addYourFirstDeadline": "最初の締め切りを追加",
+  "overdue": "期限切れ",
+  "at": "に"
 }

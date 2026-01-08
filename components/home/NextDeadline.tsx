@@ -58,7 +58,7 @@ const NextDeadline = memo(() => {
   const calendarDate = hasValidDate ? format(dueDate as Date, 'yyyy-MM-dd') : null;
 
   return (
-    <div className="mq-magic-card">
+    <div className="mq-magic-card mq-liquid-enhanced">
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader

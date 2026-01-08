@@ -645,7 +645,7 @@ export default function HomeClient() {
             <Button variant="secondary" onClick={() => setDeleteUnitConfirm(null)}>
               {t('cancel')}
             </Button>
-            <Button variant="primary" onClick={confirmDeleteUnit}>
+            <Button variant="destructive" onClick={confirmDeleteUnit}>
               {t('delete')}
             </Button>
           </DialogFooter>

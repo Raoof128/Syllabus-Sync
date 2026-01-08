@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "Visualizza la nostra informativa sulla privacy",
   "exportWarning": "Il file esportato conterrà tutti i tuoi dati personali inclusi corsi, scadenze e preferenze. Mantieni questo file al sicuro e non condividerlo con altri.",
   "outsideCampus": "Fuori dal Campus",
-  "outsideCampusDistance": "Ti trovi a circa {{distance}}m dal centro del campus"
+  "outsideCampusDistance": "Ti trovi a circa {{distance}}m dal centro del campus",
+  "pending": "in attesa",
+  "addYourFirstDeadline": "Aggiungi la tua prima scadenza",
+  "overdue": "scaduto",
+  "at": "alle"
 }

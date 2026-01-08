@@ -1,6 +1,6 @@
 /**
  * sidebar.css
- * Premium expandable sidebar with hover-triggered animations
+ * Premium expandable sidebar with hover-triggered animations & liquid glass
  * 
  * ARCHITECTURE:
  * ┌─────────────────────────────────────────────────────────────────────────┐
@@ -21,7 +21,7 @@
  * 
  * ANIMATION TIMELINE (on hover):
  * ────────────────────────────────────────────────────────────────────────────
- * 0ms     Panel starts sliding in (400ms duration)
+ * 0ms     Panel starts sliding in (350ms duration)
  * 30ms    Logo fades in
  * 80ms    Menu item 1 slides in
  * 120ms   Menu item 2 slides in
@@ -29,13 +29,19 @@
  * 200ms   Menu item 4 slides in
  * 240ms   Menu item 5 slides in
  * 280ms   Social section fades in
- * 400ms   Panel fully open
+ * 350ms   Panel fully open
  * ────────────────────────────────────────────────────────────────────────────
+ * 
+ * FEATURES:
+ * - Liquid glass backdrop blur effect
+ * - Permanent shadow on trigger strip and panel
+ * - Smooth close animation (panel closes properly on mouse leave)
+ * - GPU-accelerated transforms for 60fps performance
  * 
  * NOTES:
  * - Uses non-CSS-module classes to prevent hydration mismatch in Next.js 16
  * - Hamburger bars expand outward to hint at expandable panel
- * - All timings use cubic-bezier(0.4, 0, 0.2, 1) for natural Material motion
+ * - All timings use cubic-bezier for natural fluid motion
  * - pointer-events toggled to prevent accidental clicks during animation
  */
 
@@ -47,13 +53,13 @@
    ---------------------------------------------------------------------------- */
 @media (min-width: 768px) {
   .layout-main {
-    transition: margin-left 500ms cubic-bezier(0.77, 0, 0.175, 1); /* Smooth ease-in-out */
+    transition: margin-left 350ms cubic-bezier(0.4, 0, 0.2, 1); /* Smooth ease-out */
     will-change: margin-left;
   }
 
-  /* Shift main content when sidebar is hovered or focused */
+  /* Shift main content when sidebar is hovered */
   .layout-shell:has(.sidebar-shell:hover) .layout-main,
-  .layout-shell:has(.sidebar-shell:focus-within) .layout-main {
+  .layout-shell:has(.sidebar-shell[data-keyboard-open='true']) .layout-main {
     margin-left: calc(14rem + 12px); /* 224px (w-56 sidebar) + 12px breathing room */
   }
 }
@@ -72,6 +78,7 @@
   position: relative;
   height: 100vh;
   height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  z-index: 40;
 }
 
 /* ============================================================================
@@ -91,16 +98,25 @@
     height: 100dvh;
     /* Hide panel, leaving only 48px (w-12) trigger strip visible */
     transform: translateX(calc(-100% + 48px));
-    /* Smooth slide with slight deceleration at end */
-    transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* Smooth slide with natural deceleration - CLOSE animation */
+    transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
     /* Prevent clicks on hidden panel */
     pointer-events: none;
+    /* GPU acceleration for smooth animation */
+    will-change: transform;
+    backface-visibility: hidden;
+    /* Permanent shadow - always visible */
+    box-shadow:
+      4px 0 20px rgba(0, 0, 0, 0.15),
+      8px 0 40px rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
   }
 
   /* --------------------------------------------------------------------------
      TRIGGER STRIP
      The always-visible 48px strip with hamburger icon.
      Acts as hover target and visual affordance.
+     Has permanent shadow for depth.
      -------------------------------------------------------------------------- */
   .sidebar-trigger {
     position: fixed;
@@ -110,13 +126,43 @@
     height: 100dvh;
     pointer-events: auto; /* Always clickable/hoverable */
     cursor: pointer;
+    /* Permanent shadow on trigger strip */
+    box-shadow:
+      2px 0 12px rgba(0, 0, 0, 0.12),
+      4px 0 24px rgba(0, 0, 0, 0.08);
+    /* GPU acceleration */
+    will-change: box-shadow;
+    transition: box-shadow 250ms ease;
   }
 
-  /* Panel expands on shell hover */
+  /* Enhanced trigger shadow on hover */
+  .sidebar-shell:hover .sidebar-trigger,
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-trigger {
+    box-shadow:
+      3px 0 16px rgba(0, 0, 0, 0.18),
+      6px 0 32px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Panel expands on shell hover or keyboard navigation */
   .sidebar-shell:hover .sidebar-panel,
-  .sidebar-shell:focus-within .sidebar-panel {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-panel {
     transform: translateX(0);
     pointer-events: auto; /* Enable clicks when visible */
+    /* OPEN animation - slightly slower for fluid feel */
+    transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* Enhanced shadow when open */
+    box-shadow:
+      6px 0 30px rgba(0, 0, 0, 0.2),
+      12px 0 50px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Ensure panel closes properly when hover ends */
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-panel {
+    transform: translateX(calc(-100% + 48px));
+    pointer-events: none;
+    /* Faster close transition for snappy feel */
+    transition: transform 280ms cubic-bezier(0.4, 0, 0.6, 1);
   }
 
   /* --------------------------------------------------------------------------
@@ -146,20 +192,27 @@
 
   /* Top bar moves UP on hover */
   .sidebar-shell:hover .sidebar-bar-top,
-  .sidebar-shell:focus-within .sidebar-bar-top {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-top {
     transform: translateY(-6px);
   }
 
   /* Bottom bar moves DOWN on hover */
   .sidebar-shell:hover .sidebar-bar-bottom,
-  .sidebar-shell:focus-within .sidebar-bar-bottom {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-bottom {
     transform: translateY(6px);
   }
 
   /* Middle bar stretches vertically on hover */
   .sidebar-shell:hover .sidebar-bar-mid,
-  .sidebar-shell:focus-within .sidebar-bar-mid {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-mid {
     transform: scaleY(1.8);
+  }
+
+  /* Reset bars when not hovering */
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-top,
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-mid,
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-bottom {
+    transform: none;
   }
 
   /* --------------------------------------------------------------------------
@@ -173,40 +226,42 @@
     opacity: 0;
     /* Multiple transitions with different timings */
     transition:
-      transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 300ms ease-out,
+      transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 250ms ease-out,
       background-color 150ms ease,
       /* For hover state changes */ color 150ms ease,
       box-shadow 150ms ease;
     will-change: transform, opacity;
   }
 
-  /* Visible state on shell hover */
+  /* Visible state on shell hover or keyboard navigation */
   .sidebar-shell:hover .sidebar-menu-item,
-  .sidebar-shell:focus-within .sidebar-menu-item {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-menu-item {
     transform: translateX(0);
     opacity: 1;
   }
 
-  /* Staggered delays: 80ms between each item for waterfall effect */
+  /* Staggered delays: 60ms between each item for waterfall effect */
   .sidebar-menu-item:nth-of-type(1) {
-    transition-delay: 80ms, 80ms, 0ms, 0ms, 0ms;
+    transition-delay: 60ms, 60ms, 0ms, 0ms, 0ms;
   }
   .sidebar-menu-item:nth-of-type(2) {
-    transition-delay: 120ms, 120ms, 0ms, 0ms, 0ms;
+    transition-delay: 100ms, 100ms, 0ms, 0ms, 0ms;
   }
   .sidebar-menu-item:nth-of-type(3) {
-    transition-delay: 160ms, 160ms, 0ms, 0ms, 0ms;
+    transition-delay: 140ms, 140ms, 0ms, 0ms, 0ms;
   }
   .sidebar-menu-item:nth-of-type(4) {
-    transition-delay: 200ms, 200ms, 0ms, 0ms, 0ms;
+    transition-delay: 180ms, 180ms, 0ms, 0ms, 0ms;
   }
   .sidebar-menu-item:nth-of-type(5) {
-    transition-delay: 240ms, 240ms, 0ms, 0ms, 0ms;
+    transition-delay: 220ms, 220ms, 0ms, 0ms, 0ms;
   }
 
   /* Instant hide on mouse leave (no stagger delay) */
-  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-menu-item {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-menu-item {
+    transform: translateX(-20px);
+    opacity: 0;
     transition-delay: 0ms;
   }
 
@@ -223,41 +278,45 @@
     transform: translateX(-10px) scale(0.95);
     opacity: 0;
     transition:
-      transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      /* Bounce overshoot */ opacity 300ms ease-out;
+      transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      /* Bounce overshoot */ opacity 280ms ease-out;
     transition-delay: 30ms;
   }
 
   .sidebar-shell:hover .sidebar-logo,
-  .sidebar-shell:focus-within .sidebar-logo {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-logo {
     transform: translateX(0) scale(1);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-logo {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-logo {
+    transform: translateX(-10px) scale(0.95);
+    opacity: 0;
     transition-delay: 0ms;
   }
 
   /* --------------------------------------------------------------------------
      SOCIAL SECTION ANIMATION
-     Fades in last (280ms delay) after all menu items are visible.
+     Fades in last (260ms delay) after all menu items are visible.
      -------------------------------------------------------------------------- */
   .sidebar-social {
     transform: translateX(-10px);
     opacity: 0;
     transition:
-      transform 350ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 300ms ease-out;
-    transition-delay: 280ms;
+      transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 250ms ease-out;
+    transition-delay: 260ms;
   }
 
   .sidebar-shell:hover .sidebar-social,
-  .sidebar-shell:focus-within .sidebar-social {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-social {
     transform: translateX(0);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover):not(:focus-within) .sidebar-social {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-social {
+    transform: translateX(-10px);
+    opacity: 0;
     transition-delay: 0ms;
   }
 }
@@ -271,12 +330,28 @@
 @media (max-width: 767px) {
   .sidebar-panel {
     transform: translateX(-100%); /* Fully hidden off-screen */
-    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1); /* Smooth ease-out */
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1); /* Smooth ease-out */
+    /* Permanent shadow for mobile */
+    box-shadow:
+      4px 0 20px rgba(0, 0, 0, 0.2),
+      8px 0 40px rgba(0, 0, 0, 0.15);
   }
 
   /* Open state triggered by mobileMenuOpen state in React */
   .sidebar-panel-open {
     transform: translateX(0);
+    /* Enhanced shadow when open */
+    box-shadow:
+      6px 0 30px rgba(0, 0, 0, 0.25),
+      12px 0 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* Ensure menu items are visible on mobile */
+  .sidebar-panel-open .sidebar-menu-item,
+  .sidebar-panel-open .sidebar-logo,
+  .sidebar-panel-open .sidebar-social {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -285,6 +360,7 @@
    ============================================================================
    Respects user's system preference for reduced motion.
    Disables all animations but maintains visibility states.
+   Keeps permanent shadows for visual hierarchy.
    ---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .sidebar-bars,
@@ -294,8 +370,15 @@
   .sidebar-menu-item,
   .sidebar-logo,
   .sidebar-social,
-  .sidebar-panel {
+  .sidebar-panel,
+  .sidebar-trigger {
     transition: none !important;
+  }
+
+  /* Remove transforms but keep shadows */
+  .sidebar-bar-top,
+  .sidebar-bar-mid,
+  .sidebar-bar-bottom {
     transform: none !important;
   }
 
@@ -304,18 +387,43 @@
     opacity: 1 !important;
   }
 
-  .sidebar-menu-item,
-  .sidebar-logo,
-  .sidebar-social {
-    opacity: 1 !important;
+  /* Desktop: Show content when hovering without animation */
+  @media (min-width: 768px) {
+    .sidebar-shell:hover .sidebar-menu-item,
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-menu-item,
+    .sidebar-shell:hover .sidebar-logo,
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-logo,
+    .sidebar-shell:hover .sidebar-social,
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-social {
+      transform: none !important;
+      opacity: 1 !important;
+    }
+
+    .sidebar-shell:hover .sidebar-panel,
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-panel {
+      transform: translateX(0) !important;
+    }
+
+    .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-panel {
+      transform: translateX(calc(-100% + 48px)) !important;
+    }
   }
 
   /* Mobile panel positioning without animation */
-  .sidebar-panel:not(.sidebar-panel-open) {
-    transform: translateX(-100%) !important;
-  }
+  @media (max-width: 767px) {
+    .sidebar-panel:not(.sidebar-panel-open) {
+      transform: translateX(-100%) !important;
+    }
 
-  .sidebar-panel-open {
-    transform: translateX(0) !important;
+    .sidebar-panel-open {
+      transform: translateX(0) !important;
+    }
+
+    .sidebar-panel-open .sidebar-menu-item,
+    .sidebar-panel-open .sidebar-logo,
+    .sidebar-panel-open .sidebar-social {
+      transform: none !important;
+      opacity: 1 !important;
+    }
   }
 }

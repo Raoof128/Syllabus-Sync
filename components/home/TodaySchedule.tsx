@@ -32,7 +32,7 @@ const TodaySchedule = memo(() => {
   }, [todayLabel, units]);
 
   return (
-    <div className="mq-magic-card">
+    <div className="mq-magic-card mq-liquid-enhanced">
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">

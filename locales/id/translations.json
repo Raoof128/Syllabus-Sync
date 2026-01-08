@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "Lihat kebijakan privasi kami",
   "exportWarning": "File yang diekspor akan berisi semua data pribadi Anda termasuk mata kuliah, deadline, dan preferensi. Simpan file ini dengan aman dan jangan bagikan kepada orang lain.",
   "outsideCampus": "Di Luar Kampus",
-  "outsideCampusDistance": "Anda berada sekitar {{distance}}m dari pusat kampus"
+  "outsideCampusDistance": "Anda berada sekitar {{distance}}m dari pusat kampus",
+  "pending": "tertunda",
+  "addYourFirstDeadline": "Tambahkan deadline pertama Anda",
+  "overdue": "terlambat",
+  "at": "pukul"
 }

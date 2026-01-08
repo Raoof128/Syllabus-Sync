@@ -31,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title, navItems, onAction, actio
   const finalActionLabel = actionLabel || defaultActionLabel;
 
   return (
-    <nav className="bg-mq-background border-b border-mq-border">
+    <nav className="mq-liquid-glass border-b border-[var(--liquid-glass-border)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between">
           <div className="flex">

@@ -5,6 +5,8 @@
  * This file contains all the light-mode contrast rules for pages
  * using the Alabaster (#EDEADE) background color.
  * 
+ * ALABASTER COLOR: #EDEADE - The warm off-white signature background
+ * 
  * AFFECTED PAGES:
  * - .feed-page
  * - .map-page
@@ -31,27 +33,42 @@
   html:not(.dark) .calendar-page,
   html:not(.dark) .home-page
 ) {
-  --alabaster-bg: #edeade;
-  --alabaster-text: #000;
-  color: var(--alabaster-text) !important;
+  --alabaster-bg: var(--alabaster, #edeade);
+  --alabaster-text: #1a1a1a;
+  color: var(--alabaster-text);
+}
+
+/* ============================================
+   PAGE-LEVEL CSS VARIABLE OVERRIDES
+   Ensure proper contrast on Alabaster background
+   ============================================ */
+
+html:not(.dark) .feed-page,
+html:not(.dark) .map-page,
+html:not(.dark) .calendar-page,
+html:not(.dark) .home-page {
+  --c-content: #1a1a1a;
+  --c-content-secondary: #2b2b2b;
+  --c-content-tertiary: #4a4a44;
 }
 
 /* ============================================
    CARD BACKGROUNDS ON ALABASTER PAGES
+   Use Alabaster for all card surfaces
    ============================================ */
 
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .calendar-page .mq-magic-card-content,
 html:not(.dark) .home-page .mq-magic-card-content {
-  background-color: #edeade !important; /* Alabaster 2 */
+  background-color: var(--alabaster, #edeade) !important;
 }
 
 html:not(.dark) .feed-page .btn-premium,
 html:not(.dark) .map-page .btn-premium,
 html:not(.dark) .calendar-page .btn-premium,
 html:not(.dark) .home-page .btn-premium {
-  background-color: #edeade !important;
+  background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
 }
 
@@ -71,60 +88,62 @@ html:not(.dark) .feed-page .bg-mq-success\/10,
 html:not(.dark) .map-page .bg-mq-success\/10,
 html:not(.dark) .calendar-page .bg-mq-success\/10,
 html:not(.dark) .home-page .bg-mq-success\/10 {
-  background-color: #edeade !important;
+  background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
 }
 
 /* Stay connected banner styling */
 html:not(.dark) .feed-page .stay-connected-banner {
-  background-color: #edeade !important;
+  background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
 }
 
 /* ============================================
-   PAGE-LEVEL CSS VARIABLE OVERRIDES
+   TEXT COLOR ENFORCEMENT
+   Force proper contrast text on Alabaster pages
    ============================================ */
 
+/* Primary text enforcement */
 html:not(.dark) .feed-page,
 html:not(.dark) .map-page,
 html:not(.dark) .calendar-page,
 html:not(.dark) .home-page {
-  --c-content: #1a1a1a;
-  --c-content-secondary: #2b2b2b; /* darker secondary for Alabaster */
-  --c-content-tertiary: #4a4a44;
+  color: #1a1a1a;
 }
 
-/* ============================================
-   TEXT COLOR ENFORCEMENT
-   Aggressive enforcement: force all text within Alabaster page roots to black
-   ============================================ */
-
-html:not(.dark) .feed-page *,
-html:not(.dark) .map-page *,
-html:not(.dark) .calendar-page *,
-html:not(.dark) .home-page * {
-  color: #000 !important;
-}
-
-/* Final enforcement: ensure every text node inside Alabaster page roots renders pure black */
-html:not(.dark) .feed-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .feed-page .mq-magic-card .mq-magic-card-content *,
-html:not(.dark) .map-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .map-page .mq-magic-card .mq-magic-card-content *,
-html:not(.dark) .calendar-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .calendar-page .mq-magic-card .mq-magic-card-content *,
-html:not(.dark) .home-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .home-page .mq-magic-card .mq-magic-card-content *,
-/* Aggressive page-root text enforcement (avoid SVGs and interactive controls) */
-html:not(.dark) .feed-page :where(*:not(svg):not(path):not(circle):not(line):not([role="img"]):not(button):not(a):not(input):not(textarea):not(select)),
-html:not(.dark) .map-page :where(*:not(svg):not(path):not(circle):not(line):not([role="img"]):not(button):not(a):not(input):not(textarea):not(select)),
-html:not(.dark) .home-page :where(*:not(svg):not(path):not(circle):not(line):not([role="img"]):not(button):not(a):not(input):not(textarea):not(select)),
-html:not(.dark) .calendar-page :where(*:not(svg):not(path):not(circle):not(line):not([role="img"]):not(button):not(a):not(input):not(textarea):not(select)) {
-  color: #000 !important;
-  -webkit-text-fill-color: #000 !important;
-  opacity: 1 !important;
-  mix-blend-mode: normal !important;
-  filter: none !important;
+/* Force text content (excluding SVGs and interactive elements) */
+html:not(.dark)
+  .feed-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .map-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .home-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .calendar-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ) {
+  color: #1a1a1a;
+  -webkit-text-fill-color: #1a1a1a;
+  opacity: 1;
+  mix-blend-mode: normal;
 }
 
 /* ============================================
@@ -137,17 +156,7 @@ html:not(.dark) .text-mq-content-secondary,
 html:not(.dark) .text-mq-sm.text-mq-content-secondary,
 html:not(.dark) .text-mq-lg,
 html:not(.dark) .text-mq-3xl {
-  color: #000 !important;
-}
-
-/* Also force large/sized text utility classes and the main app wrapper text to black on Alabaster pages */
-html:not(.dark) [class*='text-mq-3xl'],
-html:not(.dark) [class*='text-mq-2xl'],
-html:not(.dark) [class*='text-mq-xl'],
-html:not(.dark) [class*='text-mq-lg'],
-html:not(.dark) [class*='text-mq-sm'],
-html:not(.dark) .min-h-screen.bg-mq-background * {
-  color: #000 !important;
+  color: var(--c-content) !important;
 }
 
 /* Broad enforcement for common content tokens on Alabaster pages */
@@ -173,8 +182,8 @@ html:not(.dark) .feed-page .animate-pulse *,
 html:not(.dark) .map-page .animate-pulse *,
 html:not(.dark) .calendar-page .animate-pulse *,
 html:not(.dark) .home-page .animate-pulse * {
-  color: #000 !important;
-  background-color: #edeade !important;
+  color: var(--c-content) !important;
+  background-color: var(--alabaster, #edeade) !important;
 }
 
 /* ============================================
@@ -211,7 +220,7 @@ html:not(.dark) .feed-page .bg-mq-info\/10,
 html:not(.dark) .map-page .bg-mq-info\/10,
 html:not(.dark) .calendar-page .bg-mq-info\/10,
 html:not(.dark) .home-page .bg-mq-info\/10 {
-  background-color: #ffffff !important;
+  background-color: var(--alabaster-light, #f5f4ed) !important;
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
 }
@@ -229,15 +238,6 @@ html:not(.dark) .calendar-page .btn-premium:not([class*='bg-mq-primary']) {
   -webkit-text-fill-color: var(--mq-content) !important;
 }
 
-/* Ensure small sub-card text uses the unified token */
-html:not(.dark) .feed-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .map-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .home-page .mq-magic-card .mq-magic-card-content,
-html:not(.dark) .calendar-page .mq-magic-card .mq-magic-card-content {
-  color: var(--mq-content) !important;
-  -webkit-text-fill-color: var(--mq-content) !important;
-}
-
 /* ============================================
    BACKGROUND-SECONDARY SECTIONS
    ============================================ */
@@ -247,11 +247,10 @@ html:not(.dark) .bg-mq-background-secondary,
 html:not(.dark) .bg-mq-background-secondary *,
 html:not(.dark) .mq-magic-card .mq-magic-card-content,
 html:not(.dark) .mq-magic-card .mq-magic-card-content * {
-  color: #000 !important;
-  -webkit-text-fill-color: #000 !important;
+  color: #1a1a1a !important;
+  -webkit-text-fill-color: #1a1a1a !important;
   opacity: 1 !important;
   mix-blend-mode: normal !important;
-  filter: none !important;
 }
 
 /* Force headings and small text in bg-mq-background-secondary to use the unified content token */
@@ -262,27 +261,23 @@ html:not(.dark) .home-page .bg-mq-background-secondary h4,
 html:not(.dark) .feed-page .bg-mq-background-secondary p,
 html:not(.dark) .map-page .bg-mq-background-secondary p,
 html:not(.dark) .calendar-page .bg-mq-background-secondary p,
-html:not(.dark) .home-page .bg-mq-background-secondary p,
+html:not(.dark) .home-page .bg-mq-background-secondary p {
+  color: #1a1a1a !important;
+}
+
+/* Secondary text styling */
 html:not(.dark) .feed-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
 html:not(.dark) .map-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
 html:not(.dark) .calendar-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
 html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary {
-  color: #000 !important;
+  color: #4a4a44 !important; /* Darker secondary for contrast */
 }
 
 /* Global wrapper fallback */
 html:not(.dark) .min-h-screen.bg-mq-background,
 html:not(.dark) .min-h-screen.bg-mq-background * {
-  color: var(--mq-content) !important;
-  -webkit-text-fill-color: var(--mq-content) !important;
-}
-
-/* Also ensure small secondary text inside bg-mq-background-secondary is readable */
-html:not(.dark) .feed-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .map-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .calendar-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary {
-  color: #5a5a54 !important; /* darker secondary */
+  color: var(--mq-content);
+  -webkit-text-fill-color: var(--mq-content);
 }
 
 /* ============================================

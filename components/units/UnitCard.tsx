@@ -35,7 +35,7 @@ const UnitCard = React.memo(({ unit, onEdit, onDelete, showActions = true }: Uni
   };
 
   return (
-    <div className="mq-magic-card h-full">
+    <div className="mq-magic-card mq-liquid-enhanced h-full">
       <div className="mq-magic-card-content h-full">
         <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
           {/* Color indicator bar */}

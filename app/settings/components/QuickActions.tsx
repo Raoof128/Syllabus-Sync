@@ -21,7 +21,7 @@ const quickActionLinks: { href: string; labelKey: TranslationKey; icon: typeof H
 
 const QuickActions = memo(({ t }: QuickActionsProps) => {
   return (
-    <div className="mq-magic-card" data-testid="quick-actions">
+    <div className="mq-magic-card mq-liquid-enhanced" data-testid="quick-actions">
       <Card className="mq-magic-card-content">
         <CardHeader>
           <CardTitle id="quick-actions-heading">{t('quickActions')}</CardTitle>
@@ -41,7 +41,7 @@ const QuickActions = memo(({ t }: QuickActionsProps) => {
               <Button
                 key={href}
                 variant="ghost"
-                className="w-full justify-start rounded-mq-lg bg-mq-card-background hover:bg-mq-hover-background text-mq-content border border-mq-border"
+                className="w-full justify-start rounded-mq-lg bg-mq-card-background text-mq-content border border-mq-border hover:border-mq-border-secondary transition-colors"
                 asChild
               >
                 <Link href={href} data-testid={`quick-action-${href.replace('/', '')}`}>

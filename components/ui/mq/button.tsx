@@ -18,6 +18,10 @@ const buttonVariants = cva(
           'border border-mq-border bg-transparent text-mq-content hover:bg-mq-red hover:border-mq-red hover:text-white hover:shadow-mq-sm hover:-translate-y-0.5 active:scale-[0.98]',
         ghost:
           'text-mq-content-secondary hover:bg-mq-red hover:text-white hover:shadow-mq-sm active:scale-[0.98]',
+        // Liquid glass button variants
+        glass: 'mq-liquid-btn',
+        'glass-primary': 'mq-liquid-btn mq-liquid-btn-primary',
+        'glass-navy': 'mq-liquid-btn mq-liquid-btn-navy',
       },
       size: {
         // Touch target sizes: 44px minimum on mobile for WCAG compliance, smaller on desktop
@@ -42,10 +46,14 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, premium = false, ...props }, ref) => {
+  (
+    { className, variant, size, asChild = false, premium = false, type = 'button', ...props },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
+        type={asChild ? undefined : type}
         className={cn(buttonVariants({ variant, size, className }), premium && 'btn-premium')}
         ref={ref}
         {...props}

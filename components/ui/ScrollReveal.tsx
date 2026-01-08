@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -22,29 +22,41 @@ export function ScrollReveal({
   className = '',
   staggerChildren = 0,
 }: ScrollRevealProps) {
+  // Respect user's reduced motion preference
+  const prefersReducedMotion = useReducedMotion();
+
   // Using the easing curve from mq-tokens.css (--t-ease-slow)
   // cubic-bezier(0.5, 0.5, 0, 1)
   const ease = [0.5, 0.5, 0, 1] as const;
 
-  const variants = {
-    hidden: {
-      opacity: 0,
-      y: yOffset,
-      scale: 0.98,
-      // Removed filter: 'blur(2px)' to prevent repaints and improve performance
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration,
-        ease,
-        delay,
-        staggerChildren,
-      },
-    },
-  };
+  // If user prefers reduced motion, use instant transitions
+  const variants = prefersReducedMotion
+    ? {
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { duration: 0.01, delay: 0 },
+        },
+      }
+    : {
+        hidden: {
+          opacity: 0,
+          y: yOffset,
+          scale: 0.98,
+          // Removed filter: 'blur(2px)' to prevent repaints and improve performance
+        },
+        visible: {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          transition: {
+            duration,
+            ease,
+            delay,
+            staggerChildren,
+          },
+        },
+      };
 
   return (
     <motion.div

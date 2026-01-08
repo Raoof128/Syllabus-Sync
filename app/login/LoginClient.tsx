@@ -115,7 +115,7 @@ export default function LoginClient() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md mq-liquid-glass-elevated">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-6">
             <div className="relative w-65 h-65 flex items-center justify-center">

@@ -24,7 +24,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
   }, [t]);
 
   return (
-    <div className="mq-magic-card" data-testid="help-support">
+    <div className="mq-magic-card mq-liquid-enhanced" data-testid="help-support">
       <Card className="mq-magic-card-content">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -42,7 +42,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
           </div>
 
           {/* Need Help */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
             <h3 className="font-semibold text-mq-content mb-1">{t('needHelp')}</h3>
             <p className="text-mq-sm text-mq-content-secondary mb-2">{t('helpDesc')}</p>
             <Button
@@ -58,7 +58,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
           </div>
 
           {/* Feedback */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
+          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
             <h3 className="font-semibold text-mq-content mb-1">{t('feedback')}</h3>
             <p className="text-mq-sm text-mq-content-secondary mb-2">{t('feedbackDesc')}</p>
             <Button

@@ -105,8 +105,8 @@ describe('CalendarPage', () => {
   it('opens edit dialog with keyboard interaction on edit button', async () => {
     render(<CalendarPage />);
 
-    // Find the edit button by its aria-label which now includes the deadline title
-    const editButton = screen.getByRole('button', { name: /Open edit dialog Assignment 1/i });
+    // Find the edit button by its aria-label which includes the deadline title
+    const editButton = screen.getByRole('button', { name: /Edit Assignment 1/i });
     const user = userEvent.setup();
     editButton.focus();
     await user.keyboard('{Enter}');
@@ -116,11 +116,12 @@ describe('CalendarPage', () => {
     });
   });
 
-  it('opens edit dialog from calendar grid button click', async () => {
+  it('opens edit dialog from edit button click', async () => {
     render(<CalendarPage />);
 
-    const gridButton = screen.getByTitle(/Assignment 1 \(2:30 PM\)/i);
-    fireEvent.click(gridButton);
+    // Find the edit button by its aria-label
+    const editButton = screen.getByRole('button', { name: /Edit Assignment 1/i });
+    fireEvent.click(editButton);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();

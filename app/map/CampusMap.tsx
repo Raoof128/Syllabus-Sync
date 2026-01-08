@@ -571,7 +571,7 @@ export default function CampusMap({
       {/* Hybrid Navigation Panel - Responsive */}
       {selectedBuilding && (preview || routeError || isLoadingRoute) && (
         <div
-          className="route-panel absolute bottom-4 left-4 right-4 md:right-auto z-[1000] p-4 md:p-5 rounded-2xl shadow-xl md:w-80 max-h-[60vh] overflow-y-auto border backdrop-blur-md transition-all duration-300 bg-mq-card-background border-mq-border text-mq-content"
+          className="route-panel absolute bottom-4 left-4 right-4 md:right-auto z-[1000] p-4 md:p-5 rounded-2xl shadow-xl md:w-80 max-h-[60vh] overflow-y-auto border backdrop-blur-md transition-all duration-300 bg-mq-card-background border-mq-border text-mq-content mq-liquid-glass-elevated"
           role="region"
           aria-label={t('turnByTurn')}
         >

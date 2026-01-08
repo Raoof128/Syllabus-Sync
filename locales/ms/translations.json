@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "Lihat dasar privasi kami",
   "exportWarning": "Fail yang dieksport akan mengandungi semua data peribadi anda termasuk unit, tarikh akhir dan pilihan. Simpan fail ini dengan selamat dan jangan kongsi dengan orang lain.",
   "outsideCampus": "Di Luar Kampus",
-  "outsideCampusDistance": "Anda berada kira-kira {{distance}}m dari pusat kampus"
+  "outsideCampusDistance": "Anda berada kira-kira {{distance}}m dari pusat kampus",
+  "pending": "tertangguh",
+  "addYourFirstDeadline": "Tambah tarikh akhir pertama anda",
+  "overdue": "lewat",
+  "at": "pada"
 }

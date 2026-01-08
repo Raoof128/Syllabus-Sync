@@ -60,6 +60,10 @@ const config: Config = {
           'red-deep': 'var(--c-deep-red)',
           magenta: 'var(--c-magenta)',
           purple: 'var(--c-purple)',
+          // Alabaster - Primary background
+          alabaster: 'var(--alabaster)',
+          'alabaster-dark': 'var(--alabaster-dark)',
+          'alabaster-light': 'var(--alabaster-light)',
           background: 'var(--c-background)',
           'background-secondary': 'var(--c-background-secondary)',
           'background-tertiary': 'var(--c-background-tertiary)',

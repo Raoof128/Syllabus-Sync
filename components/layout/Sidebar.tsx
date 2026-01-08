@@ -3,12 +3,13 @@
 // SIDEBAR COMPONENT - LIQUID GLASS EDITION
 // ============================================================================
 // Premium expandable sidebar with "Liquid Glass" effect. Features organic
-// refraction, backdrop blur, and fluid animations powered by CSS.
+// refraction, backdrop blur, fluid animations, and permanent shadows.
 //
 // FEATURES:
 // - Desktop: Hover to expand with heavy, fluid slide animation
 // - Mobile: Hamburger button toggles slide-out drawer with overlay
 // - Liquid Glass: Backdrop blur, refraction filter, layered shadows
+// - Permanent Shadow: Always-visible depth shadow on trigger and panel
 // - Accessibility: Focus trap, keyboard navigation, ARIA attributes
 // - Performance: GPU-accelerated animations, respects prefers-reduced-motion
 //
@@ -62,10 +63,13 @@ const Sidebar = memo(() => {
 
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Keyboard navigation state for desktop sidebar
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   // Refs for focus management
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const sidebarShellRef = useRef<HTMLElement>(null);
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
   // ============================================================================
@@ -125,6 +129,39 @@ const Sidebar = memo(() => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
+  // ============================================================================
+  // KEYBOARD NAVIGATION FOR DESKTOP SIDEBAR
+  // ============================================================================
+  // Opens sidebar when user tabs into it, closes when focus leaves.
+  // Uses data-keyboard-open attribute instead of :focus-within CSS pseudo-class
+  // to prevent the sidebar from staying open permanently after clicking links.
+  useEffect(() => {
+    const shell = sidebarShellRef.current;
+    if (!shell) return;
+
+    const handleFocusIn = () => {
+      // Only open on keyboard navigation (desktop)
+      if (window.innerWidth >= 768) {
+        setKeyboardOpen(true);
+      }
+    };
+
+    const handleFocusOut = (e: FocusEvent) => {
+      // Check if focus is moving outside the sidebar shell
+      if (!shell.contains(e.relatedTarget as Node)) {
+        setKeyboardOpen(false);
+      }
+    };
+
+    shell.addEventListener('focusin', handleFocusIn);
+    shell.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      shell.removeEventListener('focusin', handleFocusIn);
+      shell.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+
   // Close menu when clicking the overlay backdrop
   const handleOverlayClick = useCallback(() => {
     setMobileMenuOpen(false);
@@ -169,15 +206,16 @@ const Sidebar = memo(() => {
           SIDEBAR CONTAINER
           ========================================================================
           The main sidebar wrapper. On desktop, hovering this container triggers
-          all child animations via CSS :hover selectors in globals.css.
+          all child animations via CSS :hover selectors in sidebar.css.
+          The sidebar uses CSS-only hover detection for smooth, lag-free animations.
           ======================================================================== */}
       <aside
+        ref={sidebarShellRef}
         className="relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell"
+        data-keyboard-open={keyboardOpen ? 'true' : undefined}
         onMouseLeave={() => {
-          // Blur any focused element to prevent sidebar staying open via :focus-within
-          if (document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur();
-          }
+          // Close keyboard-open state when mouse leaves (user switched to mouse navigation)
+          setKeyboardOpen(false);
         }}
       >
         {/* ----------------------------------------------------------------------
@@ -185,11 +223,11 @@ const Sidebar = memo(() => {
             ----------------------------------------------------------------------
             Always-visible 48px strip on the left edge with animated hamburger bars.
             Hovering this area triggers the sidebar to expand.
-            Uses .mq-liquid-glass-subtle for a lighter glass effect.
+            Uses Alabaster background in light mode, charcoal in dark mode.
             ---------------------------------------------------------------------- */}
         <div
           aria-hidden="true"
-          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-card-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger mq-liquid-glass-subtle"
+          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger mq-liquid-glass-subtle"
         >
           {/* Hamburger bars - animate on hover (expand outward) */}
           <span className="flex flex-col items-center gap-2 sidebar-bars">
@@ -204,7 +242,8 @@ const Sidebar = memo(() => {
             ----------------------------------------------------------------------
             The main sidebar content that slides in from the left on hover (desktop)
             or when mobileMenuOpen is true (mobile).
-            Uses .mq-liquid-glass for premium backdrop blur and refraction.
+            Uses .mq-liquid-glass for premium backdrop blur, refraction, and
+            permanent shadow for depth.
             ---------------------------------------------------------------------- */}
         <div
           ref={sidebarRef}
@@ -213,7 +252,7 @@ const Sidebar = memo(() => {
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(
-            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col md:transition-none motion-reduce:transition-none motion-reduce:transform-none sidebar-panel mq-liquid-glass',
+            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel mq-liquid-glass',
             mobileMenuOpen && 'sidebar-panel-open',
           )}
         >

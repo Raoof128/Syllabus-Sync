@@ -106,7 +106,7 @@ const AppearanceSettings = memo(
     );
 
     return (
-      <div className="mq-magic-card" data-testid="appearance-settings">
+      <div className="mq-magic-card mq-liquid-enhanced" data-testid="appearance-settings">
         <Card className="mq-magic-card-content">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -116,8 +116,8 @@ const AppearanceSettings = memo(
           </CardHeader>
           <CardContent className="space-y-3" role="region" aria-labelledby="appearance-heading">
             {/* Theme Selection */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-              <div className="flex items-center justify-between">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('darkMode')}</h3>
                   <p className="text-mq-sm text-mq-content-secondary">
@@ -150,16 +150,18 @@ const AppearanceSettings = memo(
             </div>
 
             {/* Language Selection */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-mq-content">{t('language')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('current')}: {languageNames[language] || language}
-                  </p>
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-mq-content">{t('language')}</h3>
+                    <p className="text-mq-sm text-mq-content-secondary">
+                      {t('current')}: {languageNames[language] || language}
+                    </p>
+                  </div>
                 </div>
                 <div
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"
+                  className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1 -m-1"
                   role="radiogroup"
                   aria-label={t('language')}
                 >
@@ -171,8 +173,8 @@ const AppearanceSettings = memo(
                       onClick={() => handleLanguageChange(lang)}
                       className={`px-2 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${
                         language === lang
-                          ? 'bg-mq-primary text-white'
-                          : 'text-mq-content-secondary hover:bg-mq-primary/10'
+                          ? 'bg-mq-primary text-white ring-2 ring-mq-primary/30'
+                          : 'text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content'
                       }`}
                       role="radio"
                       aria-checked={language === lang}

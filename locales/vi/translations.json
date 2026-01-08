@@ -675,5 +675,9 @@
   "privacyPolicyDesc": "Xem chính sách bảo mật của chúng tôi",
   "exportWarning": "Tệp xuất sẽ chứa tất cả dữ liệu cá nhân của bạn bao gồm môn học, hạn nộp và tùy chọn. Giữ tệp này an toàn và không chia sẻ với người khác.",
   "outsideCampus": "Ngoài khuôn viên",
-  "outsideCampusDistance": "Bạn đang ở cách trung tâm khuôn viên khoảng {{distance}}m"
+  "outsideCampusDistance": "Bạn đang ở cách trung tâm khuôn viên khoảng {{distance}}m",
+  "pending": "đang chờ",
+  "addYourFirstDeadline": "Thêm hạn nộp đầu tiên của bạn",
+  "overdue": "quá hạn",
+  "at": "lúc"
 }

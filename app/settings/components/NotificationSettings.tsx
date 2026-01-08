@@ -196,7 +196,7 @@ const NotificationSettings = memo(
       isClient && typeof window !== 'undefined' && 'Notification' in window;
 
     return (
-      <div className="mq-magic-card" data-testid="notification-settings">
+      <div className="mq-magic-card mq-liquid-enhanced" data-testid="notification-settings">
         <Card className="mq-magic-card-content">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -288,7 +288,7 @@ const NotificationSettings = memo(
             {notificationItems.map(({ key, icon: Icon, label, desc, timing, setTiming }) => (
               <div
                 key={key}
-                className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:bg-mq-card-background transition-colors"
+                className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-border-secondary transition-colors"
                 data-testid={`notification-item-${key}`}
               >
                 <div className="flex items-center justify-between">

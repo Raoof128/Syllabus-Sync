@@ -685,5 +685,9 @@
   "privacyPolicyDesc": "Ver nuestra política de privacidad",
   "exportWarning": "El archivo exportado contendrá todos sus datos personales, incluyendo unidades, fechas límite y preferencias. Mantenga este archivo seguro y no lo comparta con otros.",
   "outsideCampus": "Fuera del Campus",
-  "outsideCampusDistance": "Estás aproximadamente a {{distance}}m del centro del campus"
+  "outsideCampusDistance": "Estás aproximadamente a {{distance}}m del centro del campus",
+  "pending": "pendiente",
+  "addYourFirstDeadline": "Añade tu primera fecha límite",
+  "overdue": "atrasado",
+  "at": "a las"
 }
