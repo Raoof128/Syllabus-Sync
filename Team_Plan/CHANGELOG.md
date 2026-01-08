@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.82] - 2026-01-08
+
+### Security
+
+#### Critical Security Audit & IDOR Vulnerability Fix (Raouf)
+
+Conducted comprehensive security audit identifying and fixing critical vulnerabilities across the application:
+
+**Critical Fixes:**
+
+- **IDOR Vulnerability (CRITICAL)**: API routes were returning ALL users' data without filtering by `user_id`
+  - Fixed `/api/units/route.ts`: Added `.eq('user_id', userId)` to GET, added `user_id` to POST payload
+  - Fixed `/api/deadlines/route.ts`: Added `.eq('user_id', userId)` to GET, added `user_id` to POST payload
+  - Fixed `/api/events/route.ts`: Added `.or('user_id.is.null,user_id.eq.${userId}')` filter, added `user_id` to POST
+  - Fixed `app/api/_lib/mappers.ts`: Updated serializers to include `user_id`
+
+- **Row Level Security (HIGH)**: Created database migration with:
+  - Added `user_id` columns to units, deadlines, events tables
+  - Enabled RLS on all 6 user-scoped tables
+  - Created 20+ RLS policies enforcing `auth.uid() = user_id`
+
+- **Service Worker Caching (MEDIUM)**: Excluded `/api/` and `/auth/` routes from caching in `public/sw.js` to prevent authenticated data from persisting after logout
+
+- **Open Redirect (MEDIUM)**: Improved redirect URL validation in `app/login/LoginClient.tsx` using proper URL parsing instead of string checks
+
+**Database Migrations Applied:**
+- `20260108131028`: Added user_id columns and RLS policies
+- `20260108140000`: Fixed event columns and added seed data triggers
+- `20260108150000`: Fixed RLS policies with TO authenticated, added class_times RLS
+
+**Seed Data:**
+- 16 public events visible to all authenticated users
+- New users automatically receive sample data on signup (4 units, 6 deadlines, 4 notifications, preferences, profile)
+
+**Files Changed:**
+- app/api/units/route.ts
+- app/api/deadlines/route.ts
+- app/api/events/route.ts
+- app/api/_lib/mappers.ts
+- app/login/LoginClient.tsx
+- database-schema.sql
+- public/sw.js
+- supabase/migrations/*.sql (3 new)
+
+**Verification:**
+- `npm run build` (pass)
+- `npm run lint` (pass)
+- RLS test confirms anonymous access blocked to user-scoped tables
+
+---
+
 ## [0.5.81] - 2026-01-08
 
 ### Refactored

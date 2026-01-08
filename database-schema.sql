@@ -1,6 +1,15 @@
--- Corrected Database Schema for Syllabus Sync
--- Matches website TypeScript types and API expectations
--- This is a reference schema - use supabase/migrations for actual deployment
+-- Database Schema for Syllabus Sync
+-- Last Updated: 2026-01-08
+-- This is a reference schema - actual database uses supabase/migrations
+--
+-- IMPORTANT: The API mappers (app/api/_lib/mappers.ts) handle both:
+--   - JSONB location field (preferred)
+--   - Flat building/room columns (legacy/current remote)
+--
+-- Migrations Applied:
+--   - 20260108131028: Added user_id columns and RLS policies
+--   - 20260108140000: Event column fixes and seed data triggers
+--   - 20260108150000: Fixed RLS policies with TO authenticated, added class_times RLS
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -17,6 +26,8 @@ CREATE TABLE public.profiles (
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
 
+-- Note: Remote database uses flat building/room columns instead of location JSONB
+-- The API mappers handle both formats for backwards compatibility
 CREATE TABLE public.units (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL, -- Owner of this unit (security: user-scoped data)
@@ -24,13 +35,13 @@ CREATE TABLE public.units (
   name text NOT NULL,
   color text NOT NULL DEFAULT '#3B82F6',
   description text,
-  location jsonb, -- Stores {"building": "C5C", "room": "204"}
+  -- Remote uses: building text, room text (flat columns)
+  -- Preferred: location jsonb storing {"building": "C5C", "room": "204"}
+  building text,
+  room text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT units_pkey PRIMARY KEY (id),
   CONSTRAINT units_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
-  CONSTRAINT units_code_format CHECK (code ~ '^[A-Z]{3,4}\d{3,4}$'),
-  CONSTRAINT units_color_format CHECK (color ~ '^#[0-9A-Fa-f]{6}$'),
   CONSTRAINT units_user_code_unique UNIQUE (user_id, code) -- Each user can have unique unit codes
 );
 
@@ -128,103 +139,164 @@ CREATE INDEX IF NOT EXISTS idx_events_user_id ON public.events(user_id);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
--- CRITICAL: These must be enabled in production to prevent IDOR attacks
+-- CRITICAL: All policies use TO authenticated to block anonymous access
 -- ============================================================================
 
 -- Enable RLS on all user-scoped tables
 ALTER TABLE public.units ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.class_times ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deadlines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- Revoke anonymous access from all user-scoped tables
+REVOKE ALL ON public.units FROM anon;
+REVOKE ALL ON public.class_times FROM anon;
+REVOKE ALL ON public.deadlines FROM anon;
+REVOKE ALL ON public.events FROM anon;
+REVOKE ALL ON public.notifications FROM anon;
+REVOKE ALL ON public.user_preferences FROM anon;
+REVOKE ALL ON public.profiles FROM anon;
+
+-- Grant to authenticated users
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.units TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.class_times TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.deadlines TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.events TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.user_preferences TO authenticated;
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+
 -- Units: Users can only access their own units
 CREATE POLICY "Users can view their own units"
   ON public.units FOR SELECT
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own units"
   ON public.units FOR INSERT
+  TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own units"
   ON public.units FOR UPDATE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own units"
   ON public.units FOR DELETE
+  TO authenticated
   USING (auth.uid() = user_id);
+
+-- Class Times: Users can only access class_times for their own units
+CREATE POLICY "Users can view class_times for their units"
+  ON public.class_times FOR SELECT
+  TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid()));
+
+CREATE POLICY "Users can insert class_times for their units"
+  ON public.class_times FOR INSERT
+  TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid()));
+
+CREATE POLICY "Users can update class_times for their units"
+  ON public.class_times FOR UPDATE
+  TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid()));
+
+CREATE POLICY "Users can delete class_times for their units"
+  ON public.class_times FOR DELETE
+  TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid()));
 
 -- Deadlines: Users can only access their own deadlines
 CREATE POLICY "Users can view their own deadlines"
   ON public.deadlines FOR SELECT
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own deadlines"
   ON public.deadlines FOR INSERT
+  TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own deadlines"
   ON public.deadlines FOR UPDATE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own deadlines"
   ON public.deadlines FOR DELETE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 -- Events: Users can view public events (user_id IS NULL) or their own events
 CREATE POLICY "Users can view public or their own events"
   ON public.events FOR SELECT
+  TO authenticated
   USING (user_id IS NULL OR auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own events"
   ON public.events FOR INSERT
+  TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own events"
   ON public.events FOR UPDATE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own events"
   ON public.events FOR DELETE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 -- Notifications: Users can only access their own notifications
 CREATE POLICY "Users can view their own notifications"
   ON public.notifications FOR SELECT
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own notifications"
   ON public.notifications FOR INSERT
+  TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own notifications"
   ON public.notifications FOR UPDATE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete their own notifications"
   ON public.notifications FOR DELETE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 -- User Preferences: Users can only access their own preferences
 CREATE POLICY "Users can view their own preferences"
   ON public.user_preferences FOR SELECT
+  TO authenticated
   USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert their own preferences"
   ON public.user_preferences FOR INSERT
+  TO authenticated
   WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own preferences"
   ON public.user_preferences FOR UPDATE
+  TO authenticated
   USING (auth.uid() = user_id);
 
 -- Profiles: Users can only access their own profile
 CREATE POLICY "Users can view their own profile"
   ON public.profiles FOR SELECT
+  TO authenticated
   USING (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile"
   ON public.profiles FOR UPDATE
+  TO authenticated
   USING (auth.uid() = id);

@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.5.80 | Last Updated: January 08, 2026
+Version: 0.5.82 | Last Updated: January 08, 2026
 
 ---
 
@@ -2521,3 +2521,25 @@ Files: components/layout/Sidebar.tsx; components/layout/animated-sidebar.module.
 Verification: npm run lint (0 errors); npm run build (success, 27 routes).
 Follow-ups: None.
 
+
+### Raouf: 2026-01-08 (Australia/Sydney)
+Scope: Comprehensive Security Audit & IDOR Vulnerability Fix (v0.5.82).
+Summary:
+  - Conducted comprehensive security audit identifying critical IDOR vulnerability across all API endpoints.
+  - **CRITICAL FIX #1 (IDOR)**: API routes were returning ALL users' data without filtering by user_id.
+    - Fixed `/api/units/route.ts`: Added `.eq('user_id', userId)` to GET, added `user_id` to POST payload.
+    - Fixed `/api/deadlines/route.ts`: Added `.eq('user_id', userId)` to GET, added `user_id` to POST payload.
+    - Fixed `/api/events/route.ts`: Added `.or('user_id.is.null,user_id.eq.${userId}')` for public + own events, added `user_id` to POST.
+    - Fixed `/app/api/_lib/mappers.ts`: Updated `serializeUnit` and `serializeDeadline` to include `user_id`.
+  - **CRITICAL FIX #2 (RLS)**: Created database migration that added user_id columns and 20+ RLS policies enforcing `auth.uid() = user_id` for all user-scoped tables.
+  - **CRITICAL FIX #3 (Service Worker)**: Excluded `/api/` and `/auth/` routes from caching to prevent data leakage.
+  - **CRITICAL FIX #4 (Open Redirect)**: Improved redirect URL validation using proper URL parsing.
+  - **SEED DATA**: Created seed migration with 16 public events and auto-seed triggers for new users (4 units, 6 deadlines, 4 notifications).
+  - **RLS FIX**: Fixed RLS policies with `TO authenticated` clause and added class_times RLS (ownership via units).
+Files: app/api/units/route.ts; app/api/deadlines/route.ts; app/api/events/route.ts; app/api/_lib/mappers.ts; app/login/LoginClient.tsx; database-schema.sql; public/sw.js; supabase/migrations/*.sql (3 migrations).
+Verification: npm run build (pass); npm run lint (pass); RLS test confirms anonymous access blocked to user-scoped tables.
+Follow-ups: New users automatically receive sample data on signup.
+
+**Questions?** Contact the team leads:
+- Frontend: Pouya
+- Backend: Raouf
