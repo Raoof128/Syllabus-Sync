@@ -1,0 +1,137 @@
+/**
+ * dark-mode.css
+ * Clean dark mode implementation using MQ design tokens
+ * 
+ * CONTENTS:
+ * 1. Color scheme declaration
+ * 2. Body and layout overrides
+ * 3. Cards and surfaces
+ * 4. Form elements
+ * 5. State color overrides (success, error, warning, info)
+ * 6. Shadow overrides
+ */
+
+/* ============================================
+   CLEAN DARK MODE IMPLEMENTATION
+   ============================================ */
+
+.dark {
+  color-scheme: dark;
+}
+
+/* MQ Token-based Dark Mode Overrides - Complete replacement of Tailwind fallbacks */
+.dark body {
+  background-color: var(--c-background);
+  color: var(--c-content);
+}
+
+.dark #__next {
+  background-color: var(--c-background);
+}
+
+/* Layout Containers - MQ token backgrounds */
+.dark .flex.h-screen {
+  background-color: var(--c-background);
+}
+
+/* Header - MQ token styling */
+.dark header {
+  background-color: var(--c-background);
+  border-color: var(--c-border);
+}
+
+/* Cards & Surfaces - MQ backgrounds */
+.dark .bg-white {
+  background-color: var(--c-card-background);
+}
+
+/* Buttons - MQ primary colors */
+.dark .bg-blue-600 {
+  background-color: var(--c-primary);
+}
+
+/* Form Elements - MQ consistent styling */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--c-input-background);
+  border-color: var(--c-border);
+  color: var(--c-content);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder,
+.dark select {
+  color: var(--c-content-tertiary);
+}
+
+/* Focus states for form elements */
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--mq-focus);
+  --tw-ring-color: var(--mq-focus);
+}
+
+/* State color overrides - using MQ semantic colors */
+.dark .bg-green-100 {
+  background-color: var(--mq-success);
+  opacity: 0.1;
+}
+
+.dark .text-green-800 {
+  color: var(--mq-success);
+}
+
+.dark .bg-red-100 {
+  background-color: var(--mq-error);
+  opacity: 0.1;
+}
+
+.dark .text-red-800 {
+  color: var(--mq-error);
+}
+
+.dark .bg-yellow-100 {
+  background-color: var(--mq-warning);
+  opacity: 0.1;
+}
+
+.dark .text-yellow-800 {
+  color: var(--mq-warning);
+}
+
+.dark .bg-blue-100 {
+  background-color: var(--mq-info);
+  opacity: 0.1;
+}
+
+.dark .text-blue-800 {
+  color: var(--mq-info);
+}
+
+/* Component Specific */
+.dark .shadow-sm {
+  box-shadow: var(--mq-shadow-sm);
+}
+
+.dark .shadow {
+  box-shadow: var(--mq-shadow);
+}
+
+.dark .shadow-md {
+  box-shadow: var(--mq-shadow-md);
+}
+
+/* Unified dark-mode text enforcement: make textual content use the unified MQ content token in dark mode */
+html.dark
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ) {
+  color: var(--mq-content) !important;
+  -webkit-text-fill-color: var(--mq-content) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}

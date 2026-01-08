@@ -1,0 +1,87 @@
+/**
+ * btn-premium.css
+ * Premium button animations with gradient glow effects
+ * 
+ * CONTENTS:
+ * 1. Base button styling
+ * 2. Gradient overlay (::before)
+ * 3. Glow effect (::after)
+ * 4. Hover states
+ * 5. Icon animations
+ */
+
+/* ============================================
+   PREMIUM BUTTON ANIMATIONS
+   ============================================ */
+
+.btn-premium {
+  position: relative;
+  z-index: 10;
+  transition: 0.5s;
+  overflow: visible !important;
+  isolation: isolate;
+  /* Create new stacking context */
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    45deg,
+    var(--mq-anim-primary, #a6192e),
+    var(--mq-anim-secondary, #d6001c)
+  );
+  opacity: 0;
+  transition: 0.5s;
+  z-index: -1;
+}
+
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    45deg,
+    var(--mq-anim-primary, #a6192e),
+    var(--mq-anim-secondary, #d6001c)
+  );
+  transition: 0.5s;
+  filter: blur(15px);
+  z-index: -2;
+  opacity: 0;
+}
+
+.btn-premium:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0);
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.btn-premium:hover::before {
+  opacity: 1;
+}
+
+.btn-premium:hover::after {
+  opacity: 0.5;
+}
+
+/* Ensure Icons and Text are always visible above the glow */
+.btn-premium * {
+  position: relative;
+  z-index: 5;
+  transition: 0.5s;
+  pointer-events: none;
+  /* Let the button handle clicks */
+}
+
+.btn-premium:hover svg {
+  transform: scale(1.1);
+  color: white !important;
+}

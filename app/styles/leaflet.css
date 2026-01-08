@@ -1,0 +1,103 @@
+/**
+ * leaflet.css
+ * Custom Leaflet map styling for light and dark modes
+ * 
+ * CONTENTS:
+ * 1. Map container background gradients
+ * 2. Zoom control styling
+ * 3. User location "blue dot" with pulse animation
+ */
+
+/* ============================================
+   LEAFLET MAP CUSTOM STYLING
+   ============================================ */
+
+/* Premium gradient background for map empty areas - matches UI theme */
+
+/* Light theme version */
+.leaflet-container {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.03), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(0, 0, 0, 0.02), transparent 45%),
+    var(--mq-background-secondary) !important;
+  /* MQ background */
+}
+
+/* Dark theme override */
+.dark .leaflet-container {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(148, 163, 184, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(100, 116, 139, 0.06), transparent 45%),
+    var(--mq-background) !important;
+  /* MQ background */
+}
+
+/* ============================================
+   LEAFLET ZOOM CONTROLS DARK MODE STYLING
+   ============================================ */
+
+/* Light theme zoom controls (default) */
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: var(--mq-content) !important;
+  border: 1px solid var(--mq-border) !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dark theme zoom controls */
+.dark .leaflet-control-zoom-in,
+.dark .leaflet-control-zoom-out {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--mq-content) !important;
+  border: 1px solid var(--mq-border) !important;
+}
+
+/* ============================================
+   USER LOCATION DOT - "BLUE DOT"
+   ============================================ */
+
+.user-location-dot {
+  background: transparent;
+  border: none;
+}
+
+.user-location-dot .pulse {
+  width: 16px;
+  height: 16px;
+  background: #1a73e8;
+  /* Google Blue */
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(26, 115, 232, 0.4);
+  animation: pulse 2s infinite;
+  position: relative;
+  left: -2px;
+  /* Center adjustment because of border */
+  top: -2px;
+}
+
+/* Dark mode adjustment for the dot border */
+.dark .user-location-dot .pulse {
+  border-color: #2c2c2c;
+  /* Match dark map bg */
+  box-shadow: 0 0 10px rgba(26, 115, 232, 0.6);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(26, 115, 232, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0);
+  }
+}

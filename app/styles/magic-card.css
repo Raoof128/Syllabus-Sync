@@ -1,0 +1,155 @@
+/**
+ * magic-card.css
+ * Magic card animation with rotating gradient border
+ * 
+ * CONTENTS:
+ * 1. Base magic card styling
+ * 2. Card content wrapper
+ * 3. Hover animations
+ * 4. Active states
+ */
+
+/* ============================================
+   MAGIC CARD ANIMATION
+   Rotating gradient border with MQ branding
+   ============================================ */
+
+.mq-magic-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 3px;
+  border-radius: var(--c-radius-lg);
+  background: transparent;
+  isolation: isolate;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+/* Magic Card Animation ENABLED - Complete Red Hover Effect for Event Cards */
+
+.mq-magic-card:hover {
+  background: linear-gradient(135deg, #a6192e, #d6001c);
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.mq-magic-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  border-radius: calc(var(--c-radius-lg) - 3px);
+  overflow: hidden;
+  background-color: var(--c-card-background) !important;
+  background-clip: padding-box;
+  border: 1px solid var(--c-border);
+  z-index: 2;
+  box-shadow: none !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mq-magic-card:hover .mq-magic-card-content {
+  transform: none !important;
+  border-radius: calc(var(--c-radius-lg) - 3px);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Active state - subtle press effect */
+.mq-magic-card:active {
+  transform: translateY(0);
+  box-shadow:
+    0 4px 12px rgba(166, 25, 46, 0.2),
+    0 2px 4px rgba(166, 25, 46, 0.1);
+}
+
+/* Ensure all content inside cards is visible */
+.mq-magic-card-content > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Force dark text on Alabaster card surfaces in light mode to satisfy WCAG */
+html:not(.dark) .mq-magic-card .mq-magic-card-content {
+  color: var(--mq-content) !important;
+  -webkit-text-fill-color: var(--mq-content) !important;
+}
+
+/* Light-mode styling for cards and buttons on Alabaster */
+html:not(.dark) .mq-magic-card,
+html:not(.dark) .mq-magic-card .mq-magic-card-content,
+html:not(.dark) .card,
+html:not(.dark) .btn-premium {
+  border-radius: var(--c-radius-lg) !important; /* keep card corners rounded */
+}
+
+/* Make buttons pill-shaped (round) in light mode for a cohesive look */
+html:not(.dark) .btn-premium {
+  border-radius: 9999px !important; /* pill */
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* Prevent Card component's default shadow from showing */
+.mq-magic-card .mq-magic-card-content.shadow-sm {
+  box-shadow: none !important;
+}
+
+/* Ensure headers, paragraphs and small utility text inside card content are the unified content token */
+html:not(.dark) .mq-magic-card .mq-magic-card-content h1,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h2,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h3,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h4,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h5,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h6,
+html:not(.dark) .mq-magic-card .mq-magic-card-content p,
+html:not(.dark) .mq-magic-card .mq-magic-card-content span,
+html:not(.dark) .mq-magic-card .mq-magic-card-content a,
+html:not(.dark) .mq-magic-card .mq-magic-card-content li {
+  color: var(--mq-content) !important;
+  -webkit-text-fill-color: var(--mq-content) !important;
+}
+
+/* Very high-specificity catch for card surfaces */
+html:not(.dark) .mq-magic-card .mq-magic-card-content .text-mq-content,
+html:not(.dark) .mq-magic-card .mq-magic-card-content .text-mq-content-secondary,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h3,
+html:not(.dark) .mq-magic-card .mq-magic-card-content h4,
+html:not(.dark) .mq-magic-card .mq-magic-card-content p {
+  color: #000 !important;
+}
+
+/* Broader rules to cover various nesting patterns and utility classes inside bg-mq-background-secondary */
+html:not(.dark) .mq-magic-card .bg-mq-background-secondary h4,
+html:not(.dark) .mq-magic-card .bg-mq-background-secondary p,
+html:not(.dark) .mq-magic-card .bg-mq-background-secondary span,
+html:not(.dark) .mq-magic-card .bg-mq-background-secondary .text-mq-content-secondary,
+html:not(.dark) .bg-mq-background-secondary .text-mq-content-secondary {
+  color: var(--mq-content) !important; /* broader enforcement for any nesting */
+}
+
+/* Force small secondary utility text inside bg-mq-background-secondary to best-contrast color */
+html:not(.dark) .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
+html:not(.dark) .mq-magic-card .text-mq-sm.text-mq-content-secondary {
+  color: #1a1a1a !important;
+  -webkit-text-fill-color: #1a1a1a !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Additional aggressive fallback to cover variations in DOM */
+html:not(.dark) .mq-magic-card .p-3.rounded-mq-lg.bg-mq-background-secondary,
+html:not(.dark) .mq-magic-card .p-3.rounded-mq-lg.bg-mq-background-secondary *,
+html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary,
+html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
+  background-color: #ffffff !important;
+  color: var(--mq-content) !important;
+  -webkit-text-fill-color: var(--mq-content) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  -webkit-font-smoothing: antialiased !important;
+}

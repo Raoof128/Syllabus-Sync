@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.81] - 2026-01-08
+
+### Refactored
+
+#### CSS Modularization - globals.css Split into Modular Files (Raouf)
+
+Refactored the monolithic 2,061-line `app/globals.css` into 10 modular CSS files for improved maintainability and developer experience.
+
+**Architecture:**
+
+```
+app/styles/
+├── tokens.css          - CSS custom properties (colors, spacing, radius)
+├── animations.css      - Keyframes and animation utility classes
+├── dark-mode.css       - Dark mode overrides using MQ tokens
+├── btn-premium.css     - Premium button gradient glow effects
+├── fingerprint.css     - Fingerprint login animation (6s sequence)
+├── magic-card.css      - Magic card hover effects (gradient border)
+├── leaflet.css         - Map container and zoom control styling
+├── social-buttons.css  - Social button expand-on-hover animations
+├── sidebar.css         - Sidebar navigation animations
+├── settings-page.css   - Settings page specific styles
+└── alabaster-contrast.css - WCAG contrast enforcement rules
+```
+
+**Key Improvements:**
+
+1. **File Reduction**: 2,061 lines → 68 lines (globals.css) + 1,993 lines (modular files)
+2. **Better Organization**: Styles grouped by concern (animations, components, pages)
+3. **Improved Maintainability**: Changes to specific features only affect one file
+4. **DRY Consolidation**: Created `:where()` selector for repeated Alabaster page rules
+5. **Standardized Tokens**: Renamed `--anim-*` → `--mq-anim-*` for consistency
+6. **Optimized will-change**: Moved to only animated elements (removed from static)
+7. **Documentation**: Each file includes header with contents and purpose
+
+**Files Changed:**
+- `app/globals.css` - Refactored to use CSS imports
+- `app/styles/` - **CREATED** directory with 10 new CSS files
+
+**Verification:**
+- `npm run lint` (0 errors, 0 warnings)
+- `npm run build` (success, 27 routes)
+- `npm run test` (143/143 tests passing)
+- `npm run typecheck` (pass)
+
+---
+
 ## [0.5.80] - 2026-01-08
 
 ### Fixed

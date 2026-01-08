@@ -1,0 +1,281 @@
+/**
+ * social-buttons.css
+ * Social media buttons with expand-on-hover animation
+ * 
+ * CONTENTS:
+ * 1. Container layout
+ * 2. Button base styles
+ * 3. Hover/focus expansion animation
+ * 4. Gradient overlays and glow effects
+ * 5. Icon and text animations
+ * 6. Dark mode adjustments
+ * 7. Mobile responsive layout
+ * 8. Reduced motion preferences
+ */
+
+/* ============================================
+   SOCIAL BUTTONS CONTAINER
+   ============================================ */
+
+.social-buttons {
+  display: flex;
+  position: relative;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* Add padding to account for expansion overlap */
+  padding: 0 10px;
+}
+
+.social-buttons li {
+  position: relative;
+  list-style: none;
+  width: 48px;
+  height: 48px;
+  /* Placeholder only - no visual styles here */
+  z-index: 1;
+}
+
+/* Bring hovered item to front so expansion overlays neighbors */
+.social-buttons li:hover {
+  z-index: 50;
+}
+
+/* ============================================
+   BUTTON BASE STYLES
+   ============================================ */
+
+/* The actual visual button - absolutely positioned to center of placeholder */
+.social-buttons li a {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  padding: 0 8px;
+  background: var(--c-card-background);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 48px;
+  border: 1px solid var(--c-border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  transform-origin: center;
+  transition:
+    width 240ms cubic-bezier(0.22, 0.9, 0.36, 1),
+    padding 180ms ease,
+    background 240ms ease,
+    box-shadow 240ms ease;
+}
+
+/* Focus outline for keyboard users */
+.social-buttons li a:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(166, 25, 46, 0.12),
+    0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 80;
+}
+
+/* ============================================
+   HOVER/FOCUS EXPANSION ANIMATION
+   ============================================ */
+
+/* Expansion state - grows outwards from center */
+.social-buttons li:hover a,
+.social-buttons li:focus-within a {
+  width: 160px; /* subtler expansion */
+  padding: 0 12px;
+  box-shadow: 0 8px 20px rgba(166, 25, 46, 0.28);
+  background: linear-gradient(90deg, rgba(166, 25, 46, 1) 0%, rgba(214, 0, 28, 1) 100%);
+  z-index: 60; /* ensure it sits on top */
+}
+
+.social-buttons li:hover a::before,
+.social-buttons li:focus-within a::before {
+  opacity: 1;
+}
+
+.social-buttons li:hover a::after,
+.social-buttons li:focus-within a::after {
+  opacity: 0.45;
+}
+
+/* Also expand on keyboard focus for accessibility */
+.social-buttons li:focus-within a {
+  width: 160px;
+  padding: 0 12px;
+  box-shadow: 0 8px 20px rgba(166, 25, 46, 0.28);
+  background: transparent;
+  z-index: 60;
+}
+
+.social-buttons li:focus-within .social-title {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0) scale(1);
+  transition-delay: 0s;
+}
+
+/* ============================================
+   GRADIENT OVERLAYS AND GLOW EFFECTS
+   ============================================ */
+
+/* Gradient background (moved to anchor tag) */
+.social-buttons li a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 48px;
+  background: linear-gradient(45deg, #a6192e, #d6001c);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+/* Glow effect (moved to anchor tag) */
+.social-buttons li a::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 48px;
+  background: linear-gradient(45deg, #a6192e, #d6001c);
+  transition: opacity 0.3s ease;
+  filter: blur(15px);
+  z-index: -1;
+  opacity: 0;
+}
+
+.social-buttons li:hover a::before {
+  opacity: 1;
+}
+
+.social-buttons li:hover a::after {
+  opacity: 0.5;
+}
+
+/* ============================================
+   ICON AND TEXT ANIMATIONS
+   ============================================ */
+
+/* Icon Animation */
+.social-buttons li .social-icon {
+  color: var(--c-content-secondary);
+  font-size: 1.4em;
+  transition:
+    transform 200ms cubic-bezier(0.22, 0.9, 0.36, 1),
+    opacity 180ms ease;
+  transition-delay: 0.04s;
+  z-index: 10;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.social-buttons li:hover .social-icon,
+.social-buttons li:focus-within .social-icon {
+  transform: translateX(-8px) scale(0.72);
+  opacity: 0.12;
+  transition-delay: 0s;
+  color: #fff;
+}
+
+/* Text Animation */
+.social-buttons li .social-title {
+  position: absolute;
+  left: 56px; /* position to the right of the 48px circle so it's hidden when collapsed */
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px) scale(0.98);
+  color: #fff;
+  font-size: clamp(0.82rem, 1.1vw, 0.96rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none; /* preserve natural casing to shorten long labels */
+  opacity: 0;
+  transition:
+    transform 200ms cubic-bezier(0.22, 0.9, 0.36, 1),
+    opacity 200ms ease;
+  transition-delay: 0s;
+  z-index: 10;
+  white-space: nowrap;
+  pointer-events: none;
+  max-width: calc(100% - 72px); /* match reduced pill size */
+  overflow: hidden;
+  text-overflow: clip;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.social-buttons li:hover .social-title,
+.social-buttons li:focus-within .social-title {
+  opacity: 1;
+  left: 50%; /* centre horizontally inside the expanded pill */
+  /* small fixed nudge left to account for the icon */
+  transform: translate(calc(-50% - 4px), -50%) scale(1);
+  transition-delay: 0.04s;
+  overflow: visible;
+  max-width: 72%;
+  text-align: center;
+}
+
+/* ============================================
+   DARK MODE ADJUSTMENTS
+   ============================================ */
+
+.dark .social-buttons li a {
+  background: var(--c-card-background);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  border-color: var(--mq-border);
+}
+
+.dark .social-buttons li .social-icon {
+  color: var(--c-content);
+}
+
+.dark .social-buttons li:hover a {
+  box-shadow: 0 10px 25px rgba(166, 25, 46, 0.4);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE LAYOUT
+   ============================================ */
+
+/* Mobile: expand to full width to avoid overlap and truncation */
+@media (max-width: 640px) {
+  .social-buttons {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .social-buttons li a {
+    position: relative;
+    left: 0;
+    transform: none;
+    width: 48px;
+  }
+  .social-buttons li:hover a,
+  .social-buttons li:focus-within a {
+    width: calc(100% - 32px);
+    left: 16px;
+    transform: none;
+    padding: 0 16px;
+  }
+  .social-buttons li .social-title {
+    left: 72px;
+    max-width: calc(100% - 104px);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION PREFERENCES
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .social-buttons li a,
+  .social-buttons li .social-title,
+  .social-buttons li .social-icon {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}

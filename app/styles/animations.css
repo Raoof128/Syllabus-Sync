@@ -1,0 +1,92 @@
+/**
+ * animations.css
+ * Performance-optimized animation utilities and keyframes
+ * 
+ * CONTENTS:
+ * 1. will-change hints for commonly animated elements
+ * 2. Core keyframe definitions (fade-in, slide-up, scale-in)
+ * 3. Animation utility classes
+ * 4. Animation delay utilities
+ */
+
+/* ============================================
+   PERFORMANCE OPTIMIZATION: will-change hints
+   Applied to commonly animated elements
+   ============================================ */
+.animate-fade-in,
+.animate-slide-up,
+.animate-scale-in,
+.btn-premium,
+.mq-magic-card {
+  will-change: transform, opacity;
+}
+
+/* ============================================
+   KEYFRAME DEFINITIONS
+   ============================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   ANIMATION UTILITY CLASSES
+   ============================================ */
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* ============================================
+   ANIMATION DELAY UTILITIES
+   ============================================ */
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
