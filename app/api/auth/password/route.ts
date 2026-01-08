@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { passwordResetLimiter } from '@/lib/services/rateLimitService';
 import { z } from 'zod';
 
 // SECURITY: Stronger password policy - min 12 chars
@@ -8,28 +9,6 @@ const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
   newPassword: z.string().min(12, 'New password must be at least 12 characters'),
 });
-
-// Rate limiting map (in production, use Redis or similar)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_MAX = 5; // Max 5 attempts
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-
-function checkRateLimit(userId: string): { allowed: boolean; remainingAttempts: number } {
-  const now = Date.now();
-  const record = rateLimitMap.get(userId);
-
-  if (!record || now > record.resetTime) {
-    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return { allowed: true, remainingAttempts: RATE_LIMIT_MAX - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT_MAX) {
-    return { allowed: false, remainingAttempts: 0 };
-  }
-
-  record.count++;
-  return { allowed: true, remainingAttempts: RATE_LIMIT_MAX - record.count };
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,13 +24,14 @@ export async function POST(request: NextRequest) {
       return jsonError('Not authenticated', 401, ERROR_CODES.UNAUTHORIZED);
     }
 
-    // Check rate limit
-    const { allowed, remainingAttempts } = checkRateLimit(user.id);
+    // SECURITY: Rate limit by user ID using distributed store (works in serverless)
+    const { allowed, remaining, resetIn } = await passwordResetLimiter(user.id);
     if (!allowed) {
       return jsonError(
-        'Too many password change attempts. Please try again in 15 minutes.',
+        `Too many password change attempts. Please try again in ${Math.ceil(resetIn / 60)} minutes.`,
         429,
         ERROR_CODES.RATE_LIMITED,
+        { retryAfter: resetIn },
       );
     }
 
@@ -79,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (verifyError) {
       return jsonError('Current password is incorrect', 400, ERROR_CODES.BAD_REQUEST, {
-        remainingAttempts,
+        remainingAttempts: remaining,
       });
     }
 
@@ -89,11 +69,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      return jsonError(updateError.message, 400, ERROR_CODES.BAD_REQUEST);
+      // SECURITY: Don't expose internal Supabase error messages to client
+      console.error('Password update failed:', updateError.message);
+      return jsonError(
+        'Failed to update password. Please try again.',
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
-
-    // Clear rate limit on success
-    rateLimitMap.delete(user.id);
 
     return jsonSuccess({
       message: 'Password changed successfully',

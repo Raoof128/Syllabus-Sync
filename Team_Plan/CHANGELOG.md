@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.5] - 2026-01-09
+
+### Security
+
+#### Critical Security Hardening - Comprehensive STRIDE Audit & Fixes (Raouf)
+
+**Comprehensive Security Assessment:**
+- Conducted full STRIDE-style security audit identifying 8 critical/high-priority vulnerabilities
+- Prioritized fixes based on risk level: authentication bypass, data leakage, and DoS vulnerabilities
+
+**Distributed Rate Limiting Migration:**
+- Replaced in-memory `Map()` rate limiting with distributed `rateLimitService.ts` (works in serverless environments)
+- Fixed rate limiting bypass where each serverless function instance had its own isolated Map
+- Updated routes: `signin/route.ts` (loginLimiter: 10 attempts/15min), `password/route.ts` (passwordResetLimiter: 3 attempts/hour), `navigate/route.ts` (apiLimiter: 100 requests/minute)
+
+**Fail-Closed Rate Limiting for Auth Endpoints:**
+- Added `failClosed` option to `RateLimitConfig` interface for security-critical endpoints
+- Auth limiters (`signupLimiter`, `loginLimiter`, `passwordResetLimiter`) now deny requests when Redis unavailable
+- General API limiter (`apiLimiter`) remains fail-open to prioritize availability over strict security
+
+**Hardened IP Extraction (Anti-Spoofing Protection):**
+- Production now only trusts verified proxy headers that cannot be spoofed:
+  - `x-vercel-forwarded-for` (Vercel's edge network - cryptographically verified)
+  - `cf-connecting-ip` (Cloudflare - cryptographically verified)
+- Added `isValidIP()` validation function to prevent header injection attacks
+- Falls back to `x-forwarded-for` only in development or as last resort
+
+**Developer Email Bypass Externalization:**
+- Removed hardcoded developer emails from source code in `signup/route.ts` and `signin/route.ts`
+- Moved to `DEV_BYPASS_EMAILS` environment variable (comma-separated list)
+- Only functions when `NODE_ENV=development` for security
+
+**Error Message Sanitization:**
+- Fixed `password/route.ts` line 92 leaking internal Supabase error messages to client
+- Now logs actual errors server-side and returns generic "Failed to update password" message
+- Prevents information disclosure attacks
+
+**Next.js 16 Compatibility Fix:**
+- Renamed `middleware.ts` to `proxy.ts` to match Next.js 16 middleware API
+- Updated export from `export const middleware` to `export const proxy`
+- Build now shows "ƒ Proxy (Middleware)" instead of deprecated message
+
+**ESLint Warning Resolution:**
+- Fixed `jsx-a11y/no-static-element-interactions` warning in `MagicCard.tsx`
+- Added ESLint disable comment with justification (decorative mouse-following effect, not interactive)
+
+**Files Changed:**
+- `app/api/auth/signin/route.ts` - Distributed rate limiting, hardened IP extraction, env-based dev emails
+- `app/api/auth/signup/route.ts` - Hardened IP extraction, env-based dev emails
+- `app/api/auth/password/route.ts` - Distributed rate limiting, error sanitization
+- `app/api/navigate/route.ts` - Distributed rate limiting
+- `lib/services/rateLimitService.ts` - Added `failClosed` config option
+- `proxy.ts` - Renamed from `middleware.ts`, updated export for Next.js 16
+- `components/ui/MagicCard.tsx` - Added ESLint disable comment
+- `.env.example` - Added `DEV_BYPASS_EMAILS` documentation
+
+**Verification:**
+- `npm run lint`: Passed (ESLint OK)
+- `npm run build`: Success (28/28 pages, ƒ Proxy (Middleware))
+
+---
+
 ## [0.8.4] - 2026-01-08
 
 ### Fixed

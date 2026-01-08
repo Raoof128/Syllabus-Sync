@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.7.0 | Last Updated: January 08, 2026
+Version: 0.8.5 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,28 @@ Version: 0.7.0 | Last Updated: January 08, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Critical Security Hardening v0.8.5 (Raouf)
+- **Comprehensive Security Audit**: Conducted full STRIDE-style security assessment identifying 8 critical/high-priority issues
+- **Distributed Rate Limiting Migration**: Replaced in-memory `Map()` rate limiting with distributed `rateLimitService.ts` in all auth routes:
+  - `signin/route.ts` → `loginLimiter` (10 attempts/15min)
+  - `password/route.ts` → `passwordResetLimiter` (3 attempts/hour)
+  - `navigate/route.ts` → `apiLimiter` (100 requests/minute)
+- **Fail-Closed Rate Limiting**: Added `failClosed` config option; auth endpoints now deny requests when Redis unavailable (fail-closed security)
+- **IP Spoofing Prevention**: Hardened IP extraction to only trust verified proxy headers in production:
+  - `x-vercel-forwarded-for` (Vercel's edge network - cannot be spoofed)
+  - `cf-connecting-ip` (Cloudflare - cannot be spoofed)
+  - Added `isValidIP()` validation to prevent header injection
+- **Developer Email Externalization**: Moved hardcoded developer emails from source code to `DEV_BYPASS_EMAILS` environment variable (comma-separated)
+- **Error Message Sanitization**: Fixed password route leaking Supabase error messages to client; now logs server-side and returns generic messages
+- **Next.js 16 Compatibility**: Renamed `middleware.ts` to `proxy.ts` and updated export to match Next.js 16 middleware API
+- **ESLint Warning Fix**: Added ESLint disable comment with justification for `MagicCard.tsx` decorative mouse interaction effect
+
+**Files Modified:**
+- `app/api/auth/signin/route.ts`, `app/api/auth/signup/route.ts`, `app/api/auth/password/route.ts`, `app/api/navigate/route.ts`
+- `lib/services/rateLimitService.ts`, `proxy.ts` (renamed from `middleware.ts`)
+- `components/ui/MagicCard.tsx`, `.env.example`
+- **Verification**: `npm run lint` (pass), `npm run build` (28/28 pages success)
 
 #### ✅ Liquid Glass UI System (v0.6.0)
 - **LiquidFilter component (Raouf)**: Created SVG filter definitions (`components/ui/LiquidFilter.tsx`) for organic refraction effects with 4 filter variants:

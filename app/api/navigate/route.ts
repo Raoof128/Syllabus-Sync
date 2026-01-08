@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth } from '@/app/api/_lib/middleware';
+import { apiLimiter } from '@/lib/services/rateLimitService';
 import { createHash } from 'crypto';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
@@ -31,37 +32,6 @@ const EXTENDED_BOUNDS = {
   minLng: CAMPUS_BOUNDS.minLng - GEOFENCE_BUFFER_KM / KM_PER_DEGREE_LNG,
   maxLng: CAMPUS_BOUNDS.maxLng + GEOFENCE_BUFFER_KM / KM_PER_DEGREE_LNG,
 };
-
-// ============================================================================
-// RATE LIMITING - Per-user limits to prevent API key abuse
-// ============================================================================
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_MAX = 30; // Max requests per user per window
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute window
-
-function checkUserRateLimit(userId: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const record = rateLimitStore.get(userId);
-
-  // Clean up expired entries periodically
-  if (Math.random() < 0.1) {
-    for (const [key, val] of rateLimitStore.entries()) {
-      if (val.resetTime < now) rateLimitStore.delete(key);
-    }
-  }
-
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return { allowed: true, remaining: RATE_LIMIT_MAX - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT_MAX) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  record.count++;
-  return { allowed: true, remaining: RATE_LIMIT_MAX - record.count };
-}
 
 // ============================================================================
 // ROUTE CACHING - Prevent duplicate ORS API calls
@@ -150,14 +120,14 @@ function isWithinGeofence(coord: { lat: number; lng: number }): boolean {
 export async function POST(request: NextRequest) {
   // SECURITY: Require authentication to prevent anonymous abuse
   return requireAuth(request, async (userId: string) => {
-    // SECURITY: Rate limit per user
-    const { allowed, remaining } = checkUserRateLimit(userId);
+    // SECURITY: Rate limit per user using distributed store (works in serverless)
+    const { allowed, remaining, resetIn } = await apiLimiter(userId);
     if (!allowed) {
       return jsonError(
         'Rate limit exceeded. Please wait before making more navigation requests.',
         429,
         ERROR_CODES.RATE_LIMITED,
-        { retryAfter: Math.ceil(RATE_LIMIT_WINDOW / 1000) },
+        { retryAfter: resetIn },
       );
     }
 

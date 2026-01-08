@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,28 +27,43 @@ export const MagicCard = ({
   children,
   className,
   isLiquidEnhanced = true,
+  onMouseMove,
+  onMouseLeave,
   ...props
 }: MagicCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!cardRef.current) return;
 
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const rect = cardRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    setPosition({ x, y });
-    setOpacity(1);
-  };
+      setPosition({ x, y });
+      setOpacity(1);
 
-  const handleMouseLeave = () => {
-    setOpacity(0);
-  };
+      // Call parent handler if provided
+      onMouseMove?.(e);
+    },
+    [onMouseMove],
+  );
+
+  const handleMouseLeave = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      setOpacity(0);
+
+      // Call parent handler if provided
+      onMouseLeave?.(e);
+    },
+    [onMouseLeave],
+  );
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- This div tracks mouse for visual effects only, not interactive
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}

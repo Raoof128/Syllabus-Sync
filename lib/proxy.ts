@@ -1,49 +1,19 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-
-// ============================================================================
-// SECURITY: Content Security Policy
-// ============================================================================
-function buildCSPHeader(): string {
-  // Note: We use 'unsafe-inline' for scripts instead of nonce because:
-  // 1. Next.js App Router generates different nonces between SSR and hydration
-  // 2. This causes hydration mismatches that break the app
-  // 3. The inline scripts (theme/RTL) are static and safe
-  // 4. For production, consider using hashes instead of unsafe-inline
-  return [
-    "default-src 'self'",
-    // Scripts: Allow self and unsafe-inline (nonce causes hydration mismatch in Next.js App Router)
-    "script-src 'self' 'unsafe-inline'",
-    // Styles: Allow self and unsafe-inline (required for Tailwind/CSS-in-JS)
-    "style-src 'self' 'unsafe-inline'",
-    // Images
-    "img-src 'self' data: blob: https:",
-    // Fonts
-    "font-src 'self' data:",
-    // Connect (API, WebSocket)
-    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org wss://*.supabase.co",
-    // Frame ancestors (clickjacking protection)
-    "frame-ancestors 'self'",
-    // Base URI
-    "base-uri 'self'",
-    // Form actions
-    "form-action 'self'",
-    // Object sources
-    "object-src 'none'",
-    // Upgrade insecure requests in production
-    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
-  ].join('; ');
-}
+import { getCSP } from '@/lib/security/csp';
 
 export async function proxy(request: NextRequest) {
+  // Get appropriate CSP based on environment
+  const cspHeader = getCSP();
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // SECURITY: Add CSP header
-  response.headers.set('Content-Security-Policy', buildCSPHeader());
+  // SECURITY: Add CSP header (now using hash-based script validation)
+  response.headers.set('Content-Security-Policy', cspHeader);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -86,7 +56,7 @@ export async function proxy(request: NextRequest) {
           },
         });
         // Re-add security headers after response recreation
-        response.headers.set('Content-Security-Policy', buildCSPHeader());
+        response.headers.set('Content-Security-Policy', cspHeader);
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -100,12 +70,34 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   // Protect routes that require authentication
+  // SECURITY: Include /api routes to prevent accidental exposure of future endpoints
   const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
+
+  // API routes that require authentication (all except public endpoints)
+  const publicApiRoutes = ['/api/auth', '/api/health'];
+
   const isProtectedRoute = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route),
   );
 
-  if (isProtectedRoute && !session) {
+  // SECURITY: API routes are protected by default, except explicitly public ones
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
+  const isPublicApiRoute = publicApiRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route),
+  );
+  const isProtectedApiRoute = isApiRoute && !isPublicApiRoute;
+
+  if ((isProtectedRoute || isProtectedApiRoute) && !session) {
+    // For API routes, return 401 instead of redirect
+    if (isApiRoute) {
+      return new NextResponse(JSON.stringify({ error: 'Unauthorized', code: 'UNAUTHORIZED' }), {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Security-Policy': cspHeader,
+        },
+      });
+    }
     // Redirect to login if accessing protected route without session
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
