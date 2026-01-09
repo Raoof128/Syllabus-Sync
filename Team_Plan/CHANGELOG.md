@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.4] - 2026-01-09
+
+### Fixed
+
+#### Fix ImageOverlay DOM Errors with Native Leaflet API (Raouf)
+
+**Summary:** Replaced react-leaflet's `ImageOverlay` component with native Leaflet API to eliminate persistent DOM errors during Hot Module Replacement (HMR).
+
+**Problem:**
+- Previous fix (v0.14.3) reduced but didn't eliminate HMR errors
+- react-leaflet's `ImageOverlay` component uses Leaflet's internal DOM manipulation
+- This conflicts with React's virtual DOM during Turbopack's fast refresh
+- Errors: "Cannot read properties of undefined (reading 'tagName')" and "(reading 'parentNode')"
+
+**Solution - Native Leaflet API for Overlays:**
+- Removed `ImageOverlay` from `reactLeafletModule` state (no longer needed)
+- Added `campusOverlayRef` and `activeOverlayRefs` refs to track overlay instances
+- Created dedicated `useEffect` hooks that use native `L.imageOverlay()` API:
+  - Campus base image overlay managed in separate effect
+  - Active overlays (parking, water, etc.) managed with Map tracking
+- Wrapped all cleanup code in try-catch to silently suppress HMR-related errors
+- Check `mapInstance.hasLayer()` before removing to avoid double-removal errors
+
+**Why This Works:**
+- Native Leaflet API gives us full control over overlay lifecycle
+- We can check if map/layer still exists before operations
+- try-catch in cleanup prevents crashes when React has already removed DOM
+- No longer relying on react-leaflet's lifecycle which conflicts with HMR
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Replaced ImageOverlay JSX with native Leaflet useEffect
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful
+
+---
+
 ## [0.14.3] - 2026-01-09
 
 ### Fixed

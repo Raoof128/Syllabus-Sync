@@ -66,7 +66,6 @@ export default function CampusMap({
   const [leafletModule, setLeafletModule] = useState<typeof import('leaflet') | null>(null);
   const [reactLeafletModule, setReactLeafletModule] = useState<{
     MapContainer: typeof import('react-leaflet').MapContainer;
-    ImageOverlay: typeof import('react-leaflet').ImageOverlay;
     Marker: typeof import('react-leaflet').Marker;
     Popup: typeof import('react-leaflet').Popup;
     Polyline: typeof import('react-leaflet').Polyline;
@@ -135,7 +134,6 @@ export default function CampusMap({
         setLeafletModule(L.default as unknown as typeof import('leaflet'));
         setReactLeafletModule({
           MapContainer: RL.MapContainer,
-          ImageOverlay: RL.ImageOverlay,
           Marker: RL.Marker,
           Popup: RL.Popup,
           Polyline: RL.Polyline,
@@ -273,6 +271,94 @@ export default function CampusMap({
       setOverlaysReady(false);
     };
   }, [mapInstance, isMapReady]);
+
+  // ============================================
+  // NATIVE LEAFLET OVERLAYS - Use native API to avoid react-leaflet HMR issues
+  // ============================================
+  const campusOverlayRef = useRef<import('leaflet').ImageOverlay | null>(null);
+  const activeOverlayRefs = useRef<Map<MapOverlayId, import('leaflet').ImageOverlay>>(new Map());
+
+  // Campus base image overlay
+  useEffect(() => {
+    if (!mapInstance || !leafletModule || !overlaysReady) return;
+
+    try {
+      // Create campus overlay using native Leaflet
+      const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, CAMPUS_BOUNDS);
+      campusOverlay.addTo(mapInstance);
+      campusOverlayRef.current = campusOverlay;
+      mapLog.log('Campus overlay added via native Leaflet');
+    } catch (error) {
+      mapLog.log('Error adding campus overlay:', error);
+    }
+
+    return () => {
+      try {
+        if (campusOverlayRef.current && mapInstance) {
+          // Check if map still has the layer before removing
+          if (mapInstance.hasLayer(campusOverlayRef.current)) {
+            mapInstance.removeLayer(campusOverlayRef.current);
+          }
+        }
+      } catch {
+        // Silently ignore cleanup errors during HMR - this is expected
+        mapLog.log('Campus overlay cleanup skipped (HMR or unmount)');
+      }
+      campusOverlayRef.current = null;
+    };
+  }, [mapInstance, leafletModule, overlaysReady]);
+
+  // Active overlay layers (parking, water, etc.)
+  useEffect(() => {
+    if (!mapInstance || !leafletModule || !overlaysReady) return;
+
+    const currentOverlays = activeOverlayRefs.current;
+
+    try {
+      // Remove overlays that are no longer active
+      currentOverlays.forEach((overlay, id) => {
+        if (!activeOverlays.includes(id)) {
+          try {
+            if (mapInstance.hasLayer(overlay)) {
+              mapInstance.removeLayer(overlay);
+            }
+          } catch {
+            // Ignore removal errors
+          }
+          currentOverlays.delete(id);
+        }
+      });
+
+      // Add new overlays
+      activeOverlays.forEach((overlayId) => {
+        if (!currentOverlays.has(overlayId)) {
+          const overlay = leafletModule.imageOverlay(OVERLAY_PATHS[overlayId], CAMPUS_BOUNDS, {
+            opacity: 0.85,
+            className: 'map-overlay-layer',
+          });
+          overlay.addTo(mapInstance);
+          currentOverlays.set(overlayId, overlay);
+          mapLog.log(`Overlay ${overlayId} added via native Leaflet`);
+        }
+      });
+    } catch (error) {
+      mapLog.log('Error managing active overlays:', error);
+    }
+
+    return () => {
+      // Cleanup all active overlays
+      currentOverlays.forEach((overlay) => {
+        try {
+          if (mapInstance && mapInstance.hasLayer(overlay)) {
+            mapInstance.removeLayer(overlay);
+          }
+        } catch {
+          // Silently ignore cleanup errors during HMR
+        }
+      });
+      currentOverlays.clear();
+    };
+  }, [mapInstance, leafletModule, overlaysReady, activeOverlays]);
 
   // ============================================
   // GEOLOCATION EFFECT
@@ -657,22 +743,8 @@ export default function CampusMap({
           zoomControl={false}
           style={{ height: '100%', width: '100%' }}
         >
-          {/* Base campus image - only render when overlays are ready */}
-          {overlaysReady && (
-            <reactLeafletModule.ImageOverlay url={CAMPUS_IMAGE_URL} bounds={CAMPUS_BOUNDS} />
-          )}
-
-          {/* Map Overlay Layers - only render when overlays are ready */}
-          {overlaysReady &&
-            activeOverlays.map((overlayId) => (
-              <reactLeafletModule.ImageOverlay
-                key={overlayId}
-                url={OVERLAY_PATHS[overlayId]}
-                bounds={CAMPUS_BOUNDS}
-                opacity={0.85}
-                className="map-overlay-layer"
-              />
-            ))}
+          {/* Base campus image and overlay layers are managed via native Leaflet API in useEffect */}
+          {/* This avoids react-leaflet ImageOverlay HMR/DOM conflicts */}
 
           <MapController
             selectedBuildingProp={selectedBuilding}
