@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { signupLimiter } from '@/lib/services/rateLimitService';
 import { z } from 'zod';
@@ -119,31 +120,43 @@ export async function POST(request: NextRequest) {
     });
 
     // Auto-confirm ONLY in development AND only for developer emails
+    // Requires SUPABASE_SERVICE_ROLE_KEY to be configured
     if (data.user && !data.session && !error && isDevelopment && isDevEmail(email)) {
-      console.warn(`Development mode: auto-confirming developer email`);
+      const adminClient = createAdminClient();
 
-      const { error: confirmError } = await supabase.auth.admin.updateUserById(data.user.id, {
-        email_confirm: true,
-      });
+      if (adminClient) {
+        console.warn(`Development mode: auto-confirming developer email`);
 
-      if (confirmError) {
-        console.warn('Auto-confirmation failed');
-      } else {
-        // Try to create a session
-        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+        const { error: confirmError } = await adminClient.auth.admin.updateUserById(data.user.id, {
+          email_confirm: true,
         });
 
-        if (!sessionError && sessionData.session) {
-          const response = jsonSuccess({
-            user: sessionData.user,
-            session: sessionData.session,
-            message: 'Signup successful (auto-confirmed for development)',
-          });
-          response.headers.set('X-RateLimit-Remaining', remaining.toString());
-          return response;
+        if (confirmError) {
+          console.warn('Auto-confirmation failed:', confirmError.message);
+        } else {
+          // Try to create a session using the regular client
+          const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword(
+            {
+              email,
+              password,
+            },
+          );
+
+          if (!sessionError && sessionData.session) {
+            const response = jsonSuccess({
+              user: sessionData.user,
+              session: sessionData.session,
+              message: 'Signup successful (auto-confirmed for development)',
+            });
+            response.headers.set('X-RateLimit-Remaining', remaining.toString());
+            return response;
+          }
         }
+      } else {
+        console.warn(
+          'Dev email auto-confirm skipped: SUPABASE_SERVICE_ROLE_KEY not configured.\n' +
+            'Add the service role key to .env.local for auto-confirmation to work.',
+        );
       }
     }
 
@@ -151,19 +164,26 @@ export async function POST(request: NextRequest) {
     // Log actual errors server-side for debugging (sanitized)
     if (error) {
       console.warn('Signup error:', { email: `${email.substring(0, 3)}***`, code: error.status });
+      // Return generic message to prevent enumeration
+      const response = jsonSuccess({
+        message: GENERIC_SIGNUP_SUCCESS,
+      });
+      response.headers.set('X-RateLimit-Remaining', remaining.toString());
+      return response;
     }
 
-    // Create profile record if user was created (only store studentId in protected profiles table)
+    // Profile is created automatically by database trigger on auth.users
+    // If studentId was provided, update the profile to add it
     if (data.user && studentId) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        email: data.user.email!,
-        full_name: fullName,
-        student_id: studentId,
-      });
+      // Use service role or direct update since profile should exist from trigger
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ student_id: studentId })
+        .eq('id', data.user.id);
 
-      if (profileError) {
-        console.warn('Profile creation failed:', profileError.code);
+      if (updateError) {
+        console.warn('Profile student_id update failed:', updateError.message);
+        // Don't fail signup - profile was created, just missing student_id
       }
     }
 

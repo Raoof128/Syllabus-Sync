@@ -111,6 +111,13 @@
       "command": "npx",
       "args": ["@playwright/mcp@latest"],
     },
+
+    // Repomix - Codebase Packing for LLM Context
+    // Packs entire repositories into AI-friendly single-file contexts
+    "repomix": {
+      "command": "npx",
+      "args": ["-y", "repomix", "--mcp"],
+    },
   },
 
   // Project-Specific Verification Commands

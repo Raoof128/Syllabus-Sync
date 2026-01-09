@@ -7,6 +7,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.1] - 2026-01-09
+
+### Fixed
+
+#### Supabase Admin Client for Dev Email Auto-Confirmation (Raouf)
+
+**Issue:** Dev email auto-confirmation wasn't working because the signup route tried to use `supabase.auth.admin.updateUserById()` which requires a service role key, but the server client only had the anon key.
+
+**Solution:**
+- Created new `lib/supabase/admin.ts` with a dedicated admin client using the service role key
+- Updated `app/api/auth/signup/route.ts` to use the admin client for auto-confirmation
+- Admin client is only used for specific admin operations (email confirmation)
+- Gracefully falls back if service role key is not configured (logs warning, continues normally)
+
+**Security Considerations:**
+- Service role key is server-side only (not exposed to client)
+- Admin client bypasses RLS - used carefully only for admin operations
+- Clear documentation in .env.example about security implications
+
+**Files Created:**
+- `lib/supabase/admin.ts` - Admin client with service role key, includes helper functions
+
+**Files Changed:**
+- `app/api/auth/signup/route.ts` - Import and use admin client for dev email auto-confirm
+- `.env.example` - Added `SUPABASE_SERVICE_ROLE_KEY` with security documentation
+- `Team_Plan/AGENT.md` - Updated version and work log
+
+**Verification:**
+- `npm run lint`: 0 errors, 0 warnings
+- `npm run typecheck`: Pass
+- `npm run build`: Success (29/29 pages)
+
+---
+
+## [0.9.0] - 2026-01-09
+
+### Fixed & Improved
+
+#### Database Error Fix: "Database error saving new user" (Raouf)
+
+**Issue:** Users encountered "Database error saving new user" during signup process due to RLS policy conflicts with Supabase auth hooks.
+
+**Root Cause:** Supabase auth hooks attempt to create profile records during user registration, but RLS policies blocked the insertion since authentication wasn't fully established yet.
+
+**Solution:**
+- Created `create_user_profile()` SECURITY DEFINER function to bypass RLS safely during signup
+- Updated signup API route to use the function instead of direct table insertion
+- Function validates user permissions before allowing profile creation
+- Maintains security by ensuring users can only create their own profiles
+
+**Files Changed:**
+- `database-schema.sql` - Added `create_user_profile()` function
+- `app/api/auth/signup/route.ts` - Updated to use RPC function
+
+#### Login Page Debug & Polish (Raouf)
+
+**Scope:** Fixed critical UX issues with the login page, improved authentication flow, and removed dead UI elements.
+
+**Login Page Fixes:**
+- **Reduced forced wait time** from 6.3 seconds to 1.5 seconds for smoother login UX
+- **Fixed FingerprintButton type** - Now properly accepts `type` prop (default: "button", form: "submit")
+- **Removed dead OAuth section** - Commented out the "Or sign with" divider and Google OAuth info box since OAuth is disabled
+
+**Developer Email Bypass:**
+- Updated `.env.example` with team developer emails: raouf@mq.edu.au, pouya@mq.edu.au, kit@mq.edu.au
+- Dev email bypass allows auto-confirmation in development mode for faster testing
+
+**Gamification System Bug Fix:**
+- Fixed `getStreakEmojiForDays()` function in gamificationStore.ts - was returning empty strings
+- Now properly displays streak emojis based on streak length:
+  - 1-2 days: 🔥
+  - 3-6 days: 🔥🔥
+  - 7-13 days: 🔥🔥🔥
+  - 14-29 days: ⚡🔥
+  - 30-59 days: 💎🔥
+  - 60+ days: 👑🔥
+
+**OpenCode Configuration:**
+- Added Repomix MCP server to team OpenCode config for codebase packing
+
+**Files Changed:**
+- `app/login/LoginClient.tsx` - Fixed wait time, commented OAuth section
+- `components/auth/FingerprintButton.tsx` - Fixed type prop handling
+- `.env.example` - Added team dev emails
+- `lib/store/gamificationStore.ts` - Fixed streak emoji function
+- `team-opencode-config/opencode.jsonc` - Added repomix MCP server
+
+**Verification:**
+- `npm run lint`: 0 errors, 0 warnings
+- `npm run build`: Success (29/29 pages)
+- `npm run test`: 143/143 tests passing
+
+---
+
 ## [0.8.9] - 2026-01-09
 
 ### Added

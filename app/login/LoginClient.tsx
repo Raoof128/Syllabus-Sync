@@ -81,8 +81,8 @@ export default function LoginClient() {
     setError(null);
 
     try {
-      // Enforce minimum 60s wait (1 minute) per user request
-      const minWait = new Promise((resolve) => setTimeout(resolve, 6300));
+      // Minimum wait to allow the fingerprint animation to complete smoothly
+      const minWait = new Promise((resolve) => setTimeout(resolve, 1500));
 
       const [authResult] = await Promise.all([
         supabase.auth
@@ -175,23 +175,26 @@ export default function LoginClient() {
                 className="mx-auto" /* Center the fixed-width button */
               />
             </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-mq-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-mq-card-background px-2 text-mq-content-secondary">
-                  {t('orSignWith')}
-                </span>
-              </div>
-            </div>
           </form>
+
+          {/* Google OAuth section - disabled until Supabase is configured */}
+          {/* 
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-mq-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white dark:bg-mq-card-background px-2 text-mq-content-secondary">
+                {t('orSignWith')}
+              </span>
+            </div>
+          </div>
 
           <div className="text-center text-sm text-mq-content-secondary mt-6 p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
             <div className="font-medium text-mq-info mb-1">{t('oauthRequired')}</div>
             <div className="text-xs">{t('googleOAuthDesc')}</div>
           </div>
+          */}
 
           <div className="text-center text-sm text-mq-content-secondary">
             <p>

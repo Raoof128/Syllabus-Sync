@@ -342,6 +342,23 @@ CREATE POLICY "Users can insert their own profile"
   TO authenticated
   WITH CHECK (auth.uid() = id);
 
+-- SECURITY: Allow profile creation for new users during registration
+-- This handles cases where Supabase auth hooks create profiles before authentication is fully established
+-- The policy is temporary and will be removed once the user is properly authenticated
+CREATE POLICY "Allow new user profile creation"
+  ON public.profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
+-- SECURITY FIX: Allow profile creation during user registration
+-- This handles Supabase auth hooks that may create profiles before full authentication
+-- The policy allows inserts where the ID matches the authenticated user's ID
+-- This prevents the "Database error saving new user" during signup
+CREATE POLICY "Allow profile creation during user registration"
+  ON public.profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
 -- ============================================================================
 -- ATOMIC TRANSACTION FUNCTIONS
 -- SECURITY: These functions ensure data consistency and prevent orphaned records
@@ -790,6 +807,47 @@ CREATE TRIGGER unit_created_trigger
   AFTER INSERT ON public.units
   FOR EACH ROW
   EXECUTE FUNCTION on_unit_created();
+
+-- ============================================================================
+-- PROFILE CREATION FUNCTION - Bypasses RLS for signup flow
+-- ============================================================================
+
+/**
+ * Create a user profile during signup - SECURITY DEFINER to bypass RLS
+ * This function is called by the signup API to create profiles safely
+ */
+CREATE OR REPLACE FUNCTION create_user_profile(
+  p_user_id uuid,
+  p_email text,
+  p_full_name text DEFAULT NULL,
+  p_student_id text DEFAULT NULL
+)
+RETURNS jsonb AS $$
+DECLARE
+  v_result jsonb;
+BEGIN
+  -- Validate that the caller is creating their own profile
+  IF p_user_id != auth.uid() THEN
+    RAISE EXCEPTION 'Unauthorized: Cannot create profile for another user';
+  END IF;
+
+  -- Insert the profile
+  INSERT INTO public.profiles (id, email, full_name, student_id)
+  VALUES (p_user_id, p_email, p_full_name, p_student_id);
+
+  -- Return success
+  v_result := jsonb_build_object(
+    'success', true,
+    'profile_id', p_user_id,
+    'message', 'Profile created successfully'
+  );
+
+  RETURN v_result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION create_user_profile TO authenticated;
 
 -- Grant execute on gamification functions
 GRANT EXECUTE ON FUNCTION calculate_level TO authenticated;

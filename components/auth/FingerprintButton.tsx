@@ -18,6 +18,7 @@ export function FingerprintButton({
   className,
   disabled,
   text,
+  type = 'button',
   ...props
 }: FingerprintButtonProps) {
   const [isActive, setIsActive] = useState(false);
@@ -57,7 +58,7 @@ export function FingerprintButton({
   return (
     <button
       ref={containerRef}
-      type="button"
+      type={type}
       onClick={handleClick}
       disabled={disabled || isLoading}
       className={cn('fp-login-container', isActive && 'active', disabled && 'disabled', className)}

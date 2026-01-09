@@ -79,12 +79,12 @@ function getLevelTitleForLevel(level: number): string {
 
 function getStreakEmojiForDays(days: number): string {
   if (days === 0) return '';
-  if (days < 3) return '';
-  if (days < 7) return '';
-  if (days < 14) return '';
-  if (days < 30) return '';
-  if (days < 60) return '';
-  return '';
+  if (days < 3) return '🔥';
+  if (days < 7) return '🔥🔥';
+  if (days < 14) return '🔥🔥🔥';
+  if (days < 30) return '⚡🔥';
+  if (days < 60) return '💎🔥';
+  return '👑🔥';
 }
 
 // ============================================================================

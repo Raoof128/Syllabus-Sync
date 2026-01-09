@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.8.9 | Last Updated: January 09, 2026
+Version: 0.9.1 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,25 @@ Version: 0.8.9 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Supabase Admin Client for Dev Email Bypass v0.9.1 (Raouf)
+- **Created admin client** (`lib/supabase/admin.ts`) with service role key for admin operations
+- **Fixed dev email auto-confirmation** - Signup route now uses admin client for `auth.admin.updateUserById()`
+- **Updated .env.example** - Added `SUPABASE_SERVICE_ROLE_KEY` with security documentation
+- **Graceful fallback** - If service role key not configured, logs warning and continues normally
+
+**Files Created/Modified:**
+- `lib/supabase/admin.ts` - NEW: Admin client with service role key
+- `app/api/auth/signup/route.ts` - Uses admin client for dev email auto-confirm
+- `.env.example` - Added SUPABASE_SERVICE_ROLE_KEY documentation
+
+#### ✅ Login Page Debug & Polish v0.9.0 (Raouf)
+- **Fixed login wait time** from 6.3 seconds to 1.5 seconds for smoother UX
+- **Fixed FingerprintButton type** - Now properly passes `type` prop (default: "button", form: "submit")
+- **Removed dead OAuth section** - Commented out disabled Google OAuth UI elements
+- **Added team dev emails** to .env.example for email bypass in development
+- **Fixed gamification streak emojis** - `getStreakEmojiForDays()` now returns proper emojis
+- **Added Repomix MCP** to team OpenCode config for codebase packing
 
 #### ✅ Critical Security Hardening v0.8.5 (Raouf)
 - **Comprehensive Security Audit**: Conducted full STRIDE-style security assessment identifying 8 critical/high-priority issues

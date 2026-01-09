@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createBrowserClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/mq/input';
@@ -22,8 +21,6 @@ export default function SignupClient() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const supabase = createBrowserClient();
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -42,18 +39,34 @@ export default function SignupClient() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
+      // Call the API route instead of Supabase directly
+      // This allows server-side handling including dev email bypass
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
-      if (error) {
-        setError(error.message);
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || t('unexpectedError'));
         return;
       }
 
-      toastUtils.success(t('accountCreated'), t('verifyEmail'));
-      router.push('/login');
+      // Check if we got a session back (dev email auto-confirmed)
+      if (result.data?.session) {
+        toastUtils.success(t('accountCreated'), 'You are now signed in!');
+        router.push('/home');
+      } else {
+        toastUtils.success(t('accountCreated'), t('verifyEmail'));
+        router.push('/login');
+      }
     } catch {
       setError(t('unexpectedError'));
     } finally {
