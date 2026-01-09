@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.0 | Last Updated: January 09, 2026
+Version: 0.14.2 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,25 @@ Version: 0.14.0 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Fix Leaflet Map DOM Errors v0.14.1 (Raouf)
+- **Fixed "Cannot read properties of undefined" errors** - Added defensive checks for Leaflet map initialization
+- **Added `isMapReady()` helper** - Validates map container and internal state before operations
+- **Updated MapController effects** - All effects now check map readiness before DOM manipulation
+- **Added auto-retry for transient errors** - MapErrorBoundary now automatically retries on known Leaflet errors (up to 2 times)
+- **Enhanced cleanup** - Proper marker/circle removal on component unmount to prevent memory leaks
+- **Error categories** - Added list of known transient Leaflet errors for intelligent handling
+- **Deferred MapContainer render** - Added `isMounted` state to defer Leaflet rendering until DOM is ready, preventing hydration/SSR issues
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Added isMapReady helper, isMounted state, defensive checks in MapController and geolocation effects
+- `app/map/MapErrorBoundary.tsx` - Added auto-retry logic for transient Leaflet DOM errors
+
+**Verification:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
 
 #### ✅ Enhanced Buildings Sidebar - Search, Filter & Views v0.12.0 (Raouf)
 - **Complete Buildings sidebar redesign** with advanced search, category filtering, and dual view modes (grid/list)

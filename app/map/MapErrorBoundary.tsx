@@ -14,19 +14,70 @@ interface MapErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
   errorInfo: string | null;
+  retryCount: number;
 }
+
+/**
+ * Known Leaflet errors that are transient and can be automatically retried.
+ * These typically occur during rapid mount/unmount cycles, hot reload, or
+ * when Next.js Turbopack performs fast refresh.
+ */
+const TRANSIENT_LEAFLET_ERRORS = [
+  // DOM element not ready errors
+  "Cannot read properties of undefined (reading 'tagName')",
+  "Cannot read properties of undefined (reading 'parentNode')",
+  "Cannot read properties of undefined (reading 'style')",
+  "Cannot read properties of undefined (reading 'className')",
+  "Cannot read properties of undefined (reading 'classList')",
+  "Cannot read properties of undefined (reading 'appendChild')",
+  "Cannot read properties of undefined (reading 'removeChild')",
+  "Cannot read properties of undefined (reading 'insertBefore')",
+  // Leaflet internal state errors
+  "Cannot set properties of undefined (setting '_leaflet_pos')",
+  "Cannot set properties of undefined (setting '_leaflet_id')",
+  // Null reference errors during unmount
+  "Cannot read properties of null (reading 'appendChild')",
+  "Cannot read properties of null (reading 'removeChild')",
+  "Cannot read properties of null (reading 'parentNode')",
+  "Cannot read properties of null (reading 'tagName')",
+  "Cannot read properties of null (reading 'style')",
+  "Cannot read properties of null (reading '_leaflet_pos')",
+  // Map container errors
+  'Map container is already initialized',
+  'Map container not found',
+  // Layer errors during rapid state changes
+  "Cannot read properties of undefined (reading '_map')",
+  "Cannot read properties of null (reading '_map')",
+];
+
+/**
+ * Check if an error is a transient Leaflet error that can be retried
+ */
+function isTransientLeafletError(error: Error | null): boolean {
+  if (!error) return false;
+  const message = error.message || '';
+  return TRANSIENT_LEAFLET_ERRORS.some(
+    (pattern) => message.includes(pattern) || message.toLowerCase().includes(pattern.toLowerCase()),
+  );
+}
+
+const MAX_AUTO_RETRIES = 3; // Increased from 2 to handle Turbopack fast refresh
 
 /**
  * MapErrorBoundary - Error boundary specifically for map components
  * Catches rendering errors and provides a graceful fallback UI
+ * Automatically retries transient Leaflet DOM errors
  */
 export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorBoundaryState> {
+  private retryTimeout: ReturnType<typeof setTimeout> | null = null;
+
   constructor(props: MapErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
+      retryCount: 0,
     };
   }
 
@@ -38,7 +89,30 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log error to our error handling system
+    // Check if this is a transient Leaflet error that can be auto-retried
+    if (isTransientLeafletError(error) && this.state.retryCount < MAX_AUTO_RETRIES) {
+      // Don't log transient errors to error handler - they're expected during HMR
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          `MapErrorBoundary: Transient Leaflet error detected, auto-retrying (${this.state.retryCount + 1}/${MAX_AUTO_RETRIES})...`,
+          error.message,
+        );
+      }
+
+      // Auto-retry after a short delay to allow React to settle
+      this.retryTimeout = setTimeout(() => {
+        this.setState((prev) => ({
+          hasError: false,
+          error: null,
+          errorInfo: null,
+          retryCount: prev.retryCount + 1,
+        }));
+      }, 150); // Increased from 100ms to 150ms for better stability
+
+      return;
+    }
+
+    // Log non-transient errors to our error handling system
     errorHandler.logError(error, 'Map Component', 'medium');
 
     this.setState({
@@ -52,11 +126,18 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
     }
   }
 
+  componentWillUnmount(): void {
+    if (this.retryTimeout) {
+      clearTimeout(this.retryTimeout);
+    }
+  }
+
   handleRetry = (): void => {
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
+      retryCount: 0,
     });
   };
 

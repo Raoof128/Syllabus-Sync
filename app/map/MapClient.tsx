@@ -317,24 +317,23 @@ export default function MapClient() {
   }, []);
 
   // Handle coordinate picker click
-  const handleMapClick = async (e: L.LeafletMouseEvent) => {
+  const handleMapClick = (e: { latlng: { lat: number; lng: number } }) => {
     if (coordPickerMode) {
       const coords = `[${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`;
-      try {
-        if (!navigator.clipboard?.writeText) {
-          throw new Error('Clipboard API unavailable');
-        }
-        await navigator.clipboard.writeText(coords);
-        setCopiedCoords(coords);
-        setTimeout(() => setCopiedCoords(''), 2000);
-      } catch (error) {
-        errorHandler.logError(
-          error instanceof Error ? error : new Error('Failed to copy coordinates'),
-          'Map Clipboard',
-          'low',
-        );
-        setCopiedCoords('');
-      }
+      navigator.clipboard
+        ?.writeText(coords)
+        .then(() => {
+          setCopiedCoords(coords);
+          setTimeout(() => setCopiedCoords(''), 2000);
+        })
+        .catch((error) => {
+          errorHandler.logError(
+            error instanceof Error ? error : new Error('Failed to copy coordinates'),
+            'Map Clipboard',
+            'low',
+          );
+          setCopiedCoords('');
+        });
     }
   };
 

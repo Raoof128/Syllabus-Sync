@@ -7,6 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.2] - 2026-01-09
+
+### Fixed
+
+#### Fix Leaflet Map DOM Errors with Dynamic Module Loading (Raouf)
+
+**Summary:** Fixed critical Leaflet map initialization errors in Next.js 16.1.1 + Turbopack by implementing fully dynamic client-side module loading.
+
+**Problem:**
+- Map page crashed with "Cannot read properties of undefined (reading 'tagName')" errors
+- Errors occurred during Turbopack fast refresh and initial page load
+- Root cause: Leaflet modules imported at module level caused SSR/hydration conflicts
+
+**Solution - Dynamic Module Loading:**
+- Leaflet and react-leaflet now loaded via `useEffect` with async dynamic imports
+- `leafletModule` and `reactLeafletModule` states hold loaded modules
+- `isClientReady` state guards rendering until modules AND DOM are ready
+- CSS imports handled with `@ts-expect-error` comments for type safety
+
+**Solution - State-Based Architecture:**
+- All Leaflet-dependent helpers (`pixelToLatLng`, `isMapReady`, `getMarkerIcon`) converted to `useCallback` with module dependencies
+- `MapController` component created via `useMemo` to properly access react-leaflet hooks
+- `userIcon` and `selectedIcon` created via `useMemo` after module loads
+
+**MapErrorBoundary Improvements:**
+- Extended transient error list to 20+ patterns for comprehensive coverage
+- Increased `MAX_AUTO_RETRIES` from 2 to 3 for Turbopack stability
+- Increased retry delay from 100ms to 150ms
+- Added case-insensitive error pattern matching
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Complete rewrite with dynamic loading
+- `app/map/MapClient.tsx` - Simplified handleMapClick signature
+- `app/map/MapErrorBoundary.tsx` - Extended error handling
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
+
+---
+
+## [0.14.1] - 2026-01-09
+
+### Fixed
+
+#### Fix Leaflet Map DOM Errors (Raouf)
+
+**Summary:** Fixed critical Leaflet map initialization errors that caused "Cannot read properties of undefined" crashes during rapid navigation, hot module reload, or component unmounting.
+
+**Root Cause:**
+- Leaflet map operations (setView, getContainer, etc.) were being called on unmounted or not-yet-initialized map instances
+- This commonly occurs in React with HMR, fast navigation, or when the map container is removed from DOM before effects clean up
+
+**Solution - Deferred MapContainer Rendering:**
+- Added `isMounted` state that starts as `false`
+- Only renders `MapContainer` after component mounts and DOM container exists
+- Uses `mapContainerRef` to verify DOM element is ready
+- 50ms delay ensures DOM is fully painted before Leaflet initialization
+- Shows "Loading map..." placeholder while waiting
+
+**Solution - isMapReady Helper:**
+- Created `isMapReady()` helper function that validates:
+  - Map instance exists and is not null
+  - Container element exists and has a parent node
+  - Required methods (getCenter, getZoom) are available
+- All map operations now wrapped with this check
+
+**MapController Improvements:**
+- Added `isReady` state to track when map is fully initialized
+- Map setup effect only runs after map is confirmed ready
+- Building navigation effect checks both map readiness and instance
+- Cursor style changes wrapped in try-catch for safety
+
+**Geolocation Effect Fixes:**
+- Added map readiness check before starting watch
+- Position update callback validates map before updating markers
+- Marker/circle creation wrapped in try-catch
+- Proper cleanup on unmount (removes markers and circles)
+
+**MapErrorBoundary Auto-Retry:**
+- Added list of known transient Leaflet errors that can be auto-retried
+- Automatic retry (up to 2 times) with 100ms delay for transient errors
+- Prevents error boundary from showing for recoverable DOM errors
+- Only logs non-transient errors to error handler
+
+**Known Transient Errors Handled:**
+- `Cannot read properties of undefined (reading 'tagName')`
+- `Cannot read properties of undefined (reading 'parentNode')`
+- `Cannot read properties of undefined (reading 'style')`
+- `Cannot set properties of undefined (setting '_leaflet_pos')`
+- `Cannot read properties of null (reading 'appendChild')`
+- `Cannot read properties of null (reading 'removeChild')`
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Added isMapReady helper, defensive checks in all effects
+- `app/map/MapErrorBoundary.tsx` - Added auto-retry logic for transient errors
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
+
+---
+
 ## [0.14.0] - 2026-01-09
 
 ### Changed
