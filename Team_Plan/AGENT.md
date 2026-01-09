@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.8 | Last Updated: January 09, 2026
+Version: 0.14.10 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,11 @@ Version: 0.14.8 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Map Data Refinement v0.14.9 (Raouf)
+- **Added 13A Research Park Drive** - Distinct building from 13RPD found in OSM scan on second pass
+- **Updated Translations** - Added English keys for new building
+- **Scan Complete** - Verified no other major buildings missing from OSM data
 
 #### ✅ GeoJSON Building Import v0.14.8 (Raouf)
 - **Imported remaining buildings from MQ_Full.geojson** - Added 7 new buildings not already in buildings.ts

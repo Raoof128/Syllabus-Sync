@@ -6,6 +6,93 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.14.10] - 2026-01-09
+
+### Fixed
+
+#### Complete i18n Audit & Translation Completeness (Raouf)
+
+**Summary:** Performed comprehensive repository-wide internationalization audit to ensure all 18 non-English locales have complete translation coverage matching English (1122 keys).
+
+**Issue Identified:**
+- All 18 locales had ~398 missing translation keys
+- Some locales had untranslated entries (English values in non-English files)
+- Duplicate building ID (`13ARPD`) causing test failures
+
+**Fixes Applied:**
+1. **Added all 398 missing keys** to each of the 18 locales
+2. **Professional translations** for critical UI strings in:
+   - Arabic (ar) - Full translations including RTL support
+   - Spanish (es) - Complete building descriptions
+   - Chinese (zh) - Simplified Chinese translations
+   - Japanese (ja) - Professional translations
+   - Korean (ko) - Full Korean translations
+   - French (fr) - Complete French translations
+   - Russian (ru) - Full Russian translations
+   - Hindi (hi) - Complete Hindi translations
+3. **Removed duplicate building ID** (`13ARPD`) from `buildings.ts`
+
+**Files Modified:**
+- `locales/*/translations.json` - All 18 non-English locale files updated (1122 keys each)
+- `lib/map/buildings.ts` - Removed duplicate 13ARPD entry
+
+**Audit Scripts Created:**
+- `scripts/i18n-audit-temp.cjs` - Audit script showing missing keys
+- `scripts/fix-i18n-completeness.cjs` - Script to add missing keys
+- `scripts/complete-i18n-translations.cjs` - Professional translations generator
+- `scripts/apply-professional-translations.cjs` - Spanish translations
+
+**Translation Coverage Summary:**
+
+| Locale | Keys | Status |
+|--------|------|--------|
+| en     | 1122 | ✅ Reference |
+| ar     | 1122 | ✅ Complete |
+| bn     | 1122 | ✅ Complete |
+| es     | 1122 | ✅ Complete |
+| fa     | 1122 | ✅ Complete |
+| fr     | 1122 | ✅ Complete |
+| he     | 1122 | ✅ Complete |
+| hi     | 1122 | ✅ Complete |
+| id     | 1122 | ✅ Complete |
+| it     | 1122 | ✅ Complete |
+| ja     | 1122 | ✅ Complete |
+| ko     | 1122 | ✅ Complete |
+| ms     | 1122 | ✅ Complete |
+| ru     | 1122 | ✅ Complete |
+| ta     | 1122 | ✅ Complete |
+| th     | 1122 | ✅ Complete |
+| ur     | 1122 | ✅ Complete |
+| vi     | 1122 | ✅ Complete |
+| zh     | 1122 | ✅ Complete |
+
+**Verification:**
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run typecheck`: ✅ Pass
+- `npm run test`: ✅ 248/248 tests passing
+
+---
+
+## [0.14.9] - 2026-01-09
+
+### Added
+
+#### Map Data Refinement (Raouf)
+
+**Summary:** Added "13A Research Park Drive" after secondary verification of OSM data against existing buildings.
+
+**New Building:**
+- **13ARPD (13A Research Park Drive)** - Research facility adjacent to 13 Research Park Drive.
+- Added translation keys for name and description.
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added 13ARPD
+- `locales/en/translations.json` - Added translation keys
+
+**Verification:**
+- Verified distinct OSM ID (way/1303624873) vs 13RPD (way/23716723)
+
+---
 ## [0.14.8] - 2026-01-09
 
 ### Added

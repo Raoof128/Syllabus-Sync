@@ -791,6 +791,19 @@ export const buildings: Building[] = [
     location: { lat: -33.772395, lng: 151.11687, osmId: 459015422 },
   },
   {
+    id: '13ARPD',
+    name: '13A Research Park Drive',
+    position: gridToPixel('M26'),
+    description: 'Research facility on Research Park Drive.',
+    tags: ['research', 'academic'],
+    translationKey: 'building_13ARPD_name',
+    descriptionKey: 'building_13ARPD_desc',
+    gridRef: 'M26',
+    address: '13 Research Park Drive',
+    category: 'research',
+    location: { lat: -33.773151, lng: 151.116676, osmId: 1303624873 },
+  },
+  {
     id: 'COCHLEAR',
     name: 'Cochlear Limited',
     position: gridToPixel('U16'),
@@ -1956,19 +1969,7 @@ export const buildings: Building[] = [
     location: { lat: -33.774195, lng: 151.118145, osmId: 1303624871 },
     levels: 1
   },
-  {
-    id: '13ARPD',
-    name: "13ARPD",
-    position: [1863, 2437],
-    description: "13ARPD building.",
-    tags: ["academic"],
-    translationKey: 'building_13ARPD_name',
-    descriptionKey: 'building_13ARPD_desc',
-    category: 'academic',
-    location: { lat: -33.773151, lng: 151.116676, osmId: 1303624873 },
-    levels: 1
-  }
-  ,
+
   // --- FINAL SCAN ADDITIONS ---
   {
     id: '17WWMICHAE',
