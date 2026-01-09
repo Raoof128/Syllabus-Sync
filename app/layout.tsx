@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
   description: APP_CONFIG.fullDescription,
   metadataBase: new URL(UNIVERSITY_CONFIG.website),
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
     description: APP_CONFIG.fullDescription,

@@ -1,57 +1,72 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 
+type AnimationState = 'idle' | 'scanning' | 'success' | 'error';
+
 interface FingerprintButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
-  onSuccess?: () => void;
+  isSuccess?: boolean;
+  isError?: boolean;
+  onAnimationComplete?: () => void;
   className?: string;
   text?: string;
 }
 
 export function FingerprintButton({
   isLoading,
+  isSuccess,
+  isError,
   onClick,
-  onSuccess,
+  onAnimationComplete,
   className,
   disabled,
   text,
   type = 'button',
   ...props
 }: FingerprintButtonProps) {
-  const [isActive, setIsActive] = useState(false);
   const containerRef = useRef<HTMLButtonElement>(null);
-  const prevLoadingRef = useRef(isLoading);
   const { t } = useTranslation();
 
-  // Sync isActive when isLoading transitions from false to true
-  // This is a legitimate use case for setState in effect: syncing with external prop
+  // Compute animation state directly from props (no internal state needed)
+  const animationState: AnimationState = useMemo(() => {
+    if (isSuccess) return 'success';
+    if (isError) return 'error';
+    if (isLoading) return 'scanning';
+    return 'idle';
+  }, [isLoading, isSuccess, isError]);
+
+  // Call onAnimationComplete after success/error state ends
+  // This is a side effect (calling external callback), which is valid in useEffect
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    if (isLoading && !prevLoadingRef.current && !isActive) {
-      setIsActive(true);
+    if (animationState === 'success' || animationState === 'error') {
+      const timer = setTimeout(() => {
+        onAnimationComplete?.();
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-    prevLoadingRef.current = isLoading;
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [isLoading, isActive]);
+  }, [animationState, onAnimationComplete]);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (disabled || isLoading || isActive) return;
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled || animationState !== 'idle') return;
+      onClick?.(e);
+    },
+    [disabled, animationState, onClick],
+  );
 
-    setIsActive(true);
-
-    // Trigger the actual click handler
-    if (onClick) {
-      onClick(e);
-    }
-  };
-
-  const handleAnimationEnd = (e: React.AnimationEvent) => {
-    if (e.animationName === 'fpContainer') {
-      setIsActive(false);
-      if (onSuccess) onSuccess();
+  const getStateClass = () => {
+    switch (animationState) {
+      case 'scanning':
+        return 'scanning';
+      case 'success':
+        return 'success';
+      case 'error':
+        return 'error';
+      default:
+        return '';
     }
   };
 
@@ -60,20 +75,22 @@ export function FingerprintButton({
       ref={containerRef}
       type={type}
       onClick={handleClick}
-      disabled={disabled || isLoading}
-      className={cn('fp-login-container', isActive && 'active', disabled && 'disabled', className)}
-      onAnimationEnd={handleAnimationEnd}
+      disabled={disabled || animationState !== 'idle'}
+      className={cn('fp-login-container', getStateClass(), disabled && 'disabled', className)}
       aria-label={text || t('signIn')}
+      aria-busy={animationState === 'scanning'}
       {...props}
     >
       <span className="fp-text">{text || t('signIn')}</span>
 
+      {/* Base fingerprint SVG (semi-transparent) */}
       <svg
         className="fp-svg fp-base"
         xmlns="http://www.w3.org/2000/svg"
         width="100"
         height="100"
         viewBox="0 0 100 100"
+        aria-hidden="true"
       >
         <g className="fp-out" fill="none" strokeWidth="2" strokeLinecap="round">
           <path
@@ -148,12 +165,14 @@ export function FingerprintButton({
         </g>
       </svg>
 
+      {/* Active fingerprint SVG (bright white during scan) */}
       <svg
         className="fp-svg fp-svg-active"
         xmlns="http://www.w3.org/2000/svg"
         width="100"
         height="100"
         viewBox="0 0 100 100"
+        aria-hidden="true"
       >
         <g className="fp-out" fill="none" strokeWidth="2" strokeLinecap="round">
           <path
@@ -228,14 +247,34 @@ export function FingerprintButton({
         </g>
       </svg>
 
+      {/* Success checkmark */}
       <svg
         className="fp-ok"
         xmlns="http://www.w3.org/2000/svg"
         width="100"
         height="100"
         viewBox="0 0 100 100"
+        aria-hidden="true"
       >
         <path d="M34.912 50.75l10.89 10.125L67 36.75" fill="none" stroke="#fff" strokeWidth="6" />
+      </svg>
+
+      {/* Error X mark */}
+      <svg
+        className="fp-error"
+        xmlns="http://www.w3.org/2000/svg"
+        width="100"
+        height="100"
+        viewBox="0 0 100 100"
+        aria-hidden="true"
+      >
+        <path
+          d="M35 35L65 65M65 35L35 65"
+          fill="none"
+          stroke="#fff"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
       </svg>
     </button>
   );
