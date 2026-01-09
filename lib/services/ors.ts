@@ -1,24 +1,36 @@
 import { RoutePreview } from '@/lib/map/navigationHelpers';
 
-interface ORSResponse {
-  features: {
-    geometry: {
-      coordinates: [number, number][]; // [lon, lat]
+interface ORSFeature {
+  geometry: {
+    coordinates: [number, number][]; // [lon, lat]
+  };
+  properties: {
+    summary: {
+      distance: number;
+      duration: number;
     };
-    properties: {
-      summary: {
+    segments: {
+      steps: {
         distance: number;
         duration: number;
-      };
-      segments: {
-        steps: {
-          distance: number;
-          duration: number;
-          instruction: string;
-        }[];
+        instruction: string;
       }[];
-    };
-  }[];
+    }[];
+  };
+}
+
+interface ORSResponse {
+  features: ORSFeature[];
+}
+
+// API response wrapper from our backend
+interface ApiResponse {
+  success: boolean;
+  data?: ORSResponse;
+  error?: {
+    code: string;
+    message: string;
+  };
 }
 
 export async function fetchORSRoute(
@@ -38,28 +50,19 @@ export async function fetchORSRoute(
       body: JSON.stringify({ start, end }),
     });
 
-    if (!response.ok) {
-      // Read error details from our proxy
-      let errorMessage = `Route Failed: ${response.status}`;
-      try {
-        const errorJson = await response.json();
-        // API returns { error: { code, message } } structure
-        if (errorJson.error?.message) {
-          errorMessage = errorJson.error.message;
-        } else if (typeof errorJson.error === 'string') {
-          errorMessage = errorJson.error;
-        }
-      } catch {
-        /* ignore parse error */
-      }
+    const json: ApiResponse = await response.json();
 
+    if (!response.ok || !json.success) {
+      // Extract error message from our API response format
+      const errorMessage = json.error?.message || `Route Failed: ${response.status}`;
       console.error('Navigation Proxy Failed:', errorMessage);
       return { coordinates: [], preview: null, error: errorMessage };
     }
 
-    const data: ORSResponse = await response.json();
+    // Extract the ORS data from our API wrapper
+    const data = json.data;
 
-    if (!data.features || data.features.length === 0) {
+    if (!data?.features || data.features.length === 0) {
       return { coordinates: [], preview: null, error: 'No route found' };
     }
 
@@ -68,11 +71,12 @@ export async function fetchORSRoute(
 
     // Parse preview data
     const summary = feature.properties.summary;
-    const steps = feature.properties.segments[0].steps.map((s) => ({
-      text: s.instruction,
-      distance: s.distance,
-      time: s.duration,
-    }));
+    const steps =
+      feature.properties.segments[0]?.steps.map((s) => ({
+        text: s.instruction,
+        distance: s.distance,
+        time: s.duration,
+      })) || [];
 
     const preview: RoutePreview = {
       distanceMeters: summary.distance,

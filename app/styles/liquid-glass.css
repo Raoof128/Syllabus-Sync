@@ -113,7 +113,7 @@
 
   /* Edge definition */
   border: 1px solid var(--liquid-glass-border);
-  border-radius: var(--c-radius-lg);
+  border-radius: var(--c-radius-lg, 0.5rem);
 
   /* Layered shadows for depth */
   box-shadow: var(--liquid-glass-shadow-inset), var(--liquid-glass-shadow-outer);
@@ -131,12 +131,15 @@
 }
 
 /* Refraction pseudo-element - applies liquid distortion to backdrop */
+/* Fixed: Using radial gradient overlay instead of background: inherit for proper refraction effect */
 .mq-liquid-glass::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: inherit;
+  /* Sheen/refraction overlay - creates organic highlight instead of distorting inherited bg */
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+  mix-blend-mode: overlay;
   filter: url(#mq-liquid-distortion);
   opacity: 0.5;
   z-index: -1;
@@ -260,8 +263,8 @@
 
   /* Typography */
   font-weight: 600;
-  font-size: var(--mq-text-sm);
-  color: var(--c-content);
+  font-size: var(--mq-text-sm, 0.875rem);
+  color: var(--c-content, inherit);
 
   /* Shadows */
   box-shadow:
@@ -313,13 +316,13 @@
 
 /* Primary variant - solid MQ Red */
 .mq-liquid-btn-primary {
-  background: linear-gradient(135deg, var(--c-red), var(--c-bright-red));
+  background: linear-gradient(135deg, var(--c-red, #a6192e), var(--c-bright-red, #d6001c));
   color: white;
   border-color: transparent;
 }
 
 .mq-liquid-btn-primary:hover {
-  background: linear-gradient(135deg, var(--c-bright-red), var(--c-red));
+  background: linear-gradient(135deg, var(--c-bright-red, #d6001c), var(--c-red, #a6192e));
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.3),
     0 8px 25px -5px rgba(166, 25, 46, 0.5),
@@ -356,7 +359,7 @@
   z-index: -10;
   overflow: hidden;
   pointer-events: none;
-  background: var(--c-background);
+  background: var(--c-background, #edeade);
 }
 
 /* Gradient blob base styles */
@@ -461,13 +464,13 @@
   .mq-liquid-glass {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: var(--c-background) !important;
-    border-color: var(--c-border) !important;
+    background: var(--c-background, #edeade) !important;
+    border-color: var(--c-border, #a0a29c) !important;
   }
 
   /* Dark mode solid fallback */
   .dark .mq-liquid-glass {
-    background: var(--c-charcoal-800) !important;
+    background: var(--c-charcoal-800, #373a36) !important;
   }
 
   .mq-liquid-btn {

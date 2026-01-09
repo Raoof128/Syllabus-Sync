@@ -14,12 +14,14 @@
 //    demos, lectures, and judge evaluations while still feeling human.
 // 4. Campus-specific messaging (walking distances, building codes) adds
 //    authentic Macquarie flavour without referencing specific staff or units.
+// 5. Gamification stats (Level, XP, Streak) provide motivation and progression.
 // ============================================
 
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { GamificationStats } from '@/components/gamification';
 
 // ============================================
 // TYPES
@@ -32,6 +34,8 @@ interface WelcomeHeaderProps {
   fallbackName?: string;
   /** Optional CSS class for the container */
   className?: string;
+  /** Show gamification stats (level, streak) */
+  showGamification?: boolean;
 }
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
@@ -98,7 +102,12 @@ function formatDisplayName(name: string | null | undefined): string | null {
  * <WelcomeHeader name={currentProfile?.name} />
  * ```
  */
-export function WelcomeHeader({ name, fallbackName, className = '' }: WelcomeHeaderProps) {
+export function WelcomeHeader({
+  name,
+  fallbackName,
+  className = '',
+  showGamification = true,
+}: WelcomeHeaderProps) {
   const { t } = useTranslation();
 
   // Format the display name, with fallback chain: name -> fallbackName -> null
@@ -157,7 +166,10 @@ export function WelcomeHeader({ name, fallbackName, className = '' }: WelcomeHea
 
   return (
     <div className={`flex-1 min-w-0 ${className}`}>
-      <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{greeting}</h1>
+      <div className="flex items-center gap-3 mb-2">
+        <h1 className="text-mq-3xl font-bold text-mq-content">{greeting}</h1>
+        {showGamification && <GamificationStats variant="compact" />}
+      </div>
       <p className="text-mq-content-secondary">{message}</p>
     </div>
   );

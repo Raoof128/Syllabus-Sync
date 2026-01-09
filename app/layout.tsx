@@ -83,6 +83,43 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <ClientLayout>{children}</ClientLayout>
+
+        {/* SVG Filters for Liquid Glass Effects */}
+        {/* These filters are required by liquid-glass.css for the organic distortion effects */}
+        <svg
+          width="0"
+          height="0"
+          style={{ position: 'absolute' }}
+          aria-hidden="true"
+          className="liquid-glass-filters"
+        >
+          {/* Main liquid distortion - organic wobble effect */}
+          <filter id="mq-liquid-distortion">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="2" />
+            <feDisplacementMap in="SourceGraphic" scale="12" />
+          </filter>
+
+          {/* Subtle distortion for smaller elements */}
+          <filter id="mq-liquid-subtle">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed="3" />
+            <feDisplacementMap in="SourceGraphic" scale="6" />
+          </filter>
+
+          {/* Glow effect for buttons and interactive elements */}
+          <filter id="mq-glow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          {/* Security shield effect - used for settings/security contexts */}
+          <filter id="mq-security-shield">
+            <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="2" seed="7" />
+            <feDisplacementMap in="SourceGraphic" scale="8" />
+          </filter>
+        </svg>
       </body>
     </html>
   );

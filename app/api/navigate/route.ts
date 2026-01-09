@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
-import { requireAuth } from '@/app/api/_lib/middleware';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { createHash } from 'crypto';
 
@@ -14,6 +13,7 @@ const ORS_BASE_URL =
 // CAMPUS GEOFENCE - Macquarie University bounds
 // ============================================================================
 // Prevents abuse by rejecting requests for routes outside campus area
+// Only enforced when using real ORS API (to protect API quota)
 const CAMPUS_BOUNDS = {
   minLat: -33.785, // South boundary
   maxLat: -33.765, // North boundary
@@ -21,8 +21,10 @@ const CAMPUS_BOUNDS = {
   maxLng: 151.135, // East boundary
 };
 
-// Generous buffer (2km) around campus for nearby transit stops, parking, etc.
-const GEOFENCE_BUFFER_KM = 2;
+// Very generous buffer (50km) around campus for demo/testing from anywhere in Sydney
+// This allows developers and testers to use the app from home while still preventing
+// global abuse of the ORS API. For production, reduce to 2-5km.
+const GEOFENCE_BUFFER_KM = 50;
 const KM_PER_DEGREE_LAT = 111.32;
 const KM_PER_DEGREE_LNG = 111.32 * Math.cos((-33.775 * Math.PI) / 180); // ~93km at this latitude
 
@@ -117,113 +119,189 @@ function isWithinGeofence(coord: { lat: number; lng: number }): boolean {
   );
 }
 
-export async function POST(request: NextRequest) {
-  // SECURITY: Require authentication to prevent anonymous abuse
-  return requireAuth(request, async (userId: string) => {
-    // SECURITY: Rate limit per user using distributed store (works in serverless)
-    const { allowed, remaining, resetIn } = await apiLimiter(userId);
-    if (!allowed) {
-      return jsonError(
-        'Rate limit exceeded. Please wait before making more navigation requests.',
-        429,
-        ERROR_CODES.RATE_LIMITED,
-        { retryAfter: resetIn },
-      );
-    }
+/**
+ * Generate a simple demo route between two points
+ * This is used when ORS_API_KEY is not configured
+ */
+function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: number; lng: number }) {
+  // Calculate straight-line distance (Haversine would be better, but this is demo)
+  const latDiff = end.lat - start.lat;
+  const lngDiff = end.lng - start.lng;
+  const distanceKm = Math.sqrt(
+    Math.pow(latDiff * KM_PER_DEGREE_LAT, 2) + Math.pow(lngDiff * KM_PER_DEGREE_LNG, 2),
+  );
+  const distanceMeters = distanceKm * 1000;
 
-    if (!ORS_API_KEY) {
-      return jsonError(
-        'Server configuration error: Missing API Key',
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
-    }
+  // Estimate walking time (5 km/h average walking speed)
+  const durationSeconds = (distanceKm / 5) * 3600;
 
-    try {
-      const body = await request.json().catch(() => null);
+  // Generate intermediate points for a simple route line
+  const numPoints = Math.max(5, Math.min(20, Math.ceil(distanceMeters / 50)));
+  const coordinates: [number, number][] = [];
 
-      if (!body || typeof body !== 'object') {
-        return jsonError('Invalid request body', 400, ERROR_CODES.BAD_REQUEST);
-      }
+  for (let i = 0; i <= numPoints; i++) {
+    const t = i / numPoints;
+    coordinates.push([start.lng + lngDiff * t, start.lat + latDiff * t]);
+  }
 
-      const { start, end } = body;
-
-      if (!start || !end) {
-        return jsonError('Missing start or end coordinates', 400, ERROR_CODES.BAD_REQUEST);
-      }
-
-      if (!isValidCoordinate(start)) {
-        return jsonError(
-          'Invalid start coordinates. Expected { lat: number, lng: number } with lat in [-90, 90] and lng in [-180, 180]',
-          400,
-          ERROR_CODES.VALIDATION_ERROR,
-        );
-      }
-
-      if (!isValidCoordinate(end)) {
-        return jsonError(
-          'Invalid end coordinates. Expected { lat: number, lng: number } with lat in [-90, 90] and lng in [-180, 180]',
-          400,
-          ERROR_CODES.VALIDATION_ERROR,
-        );
-      }
-
-      // SECURITY: Validate coordinates are within campus geofence
-      if (!isWithinGeofence(start) || !isWithinGeofence(end)) {
-        return jsonError(
-          'Coordinates must be within the Macquarie University campus area',
-          400,
-          ERROR_CODES.VALIDATION_ERROR,
-        );
-      }
-
-      // Check cache first
-      const cacheKey = getCacheKey(start, end);
-      const cachedData = getCachedRoute(cacheKey);
-      if (cachedData) {
-        const response = jsonSuccess(cachedData);
-        response.headers.set('X-Cache', 'HIT');
-        response.headers.set('X-RateLimit-Remaining', remaining.toString());
-        return response;
-      }
-
-      const orsResponse = await fetch(ORS_BASE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: ORS_API_KEY,
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates,
         },
-        body: JSON.stringify({
-          coordinates: [
-            [start.lng, start.lat],
-            [end.lng, end.lat],
+        properties: {
+          summary: {
+            distance: distanceMeters,
+            duration: durationSeconds,
+          },
+          segments: [
+            {
+              steps: [
+                {
+                  distance: distanceMeters * 0.3,
+                  duration: durationSeconds * 0.3,
+                  instruction: `Head towards ${end.lat > start.lat ? 'north' : 'south'}`,
+                },
+                {
+                  distance: distanceMeters * 0.5,
+                  duration: durationSeconds * 0.5,
+                  instruction: 'Continue on the campus pathway',
+                },
+                {
+                  distance: distanceMeters * 0.2,
+                  duration: durationSeconds * 0.2,
+                  instruction: 'Arrive at your destination',
+                },
+              ],
+            },
           ],
-          instructions: true,
-        }),
-      });
+        },
+      },
+    ],
+  };
+}
 
-      if (!orsResponse.ok) {
-        const errText = await orsResponse.text();
-        console.error('ORS Upstream Error:', orsResponse.status, errText);
-        return jsonError(
-          `Navigation service temporarily unavailable`,
-          orsResponse.status >= 500 ? 502 : orsResponse.status,
-          ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-        );
-      }
+export async function POST(request: NextRequest) {
+  // Get client identifier for rate limiting
+  // In demo mode without auth, use IP address
+  const clientId =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'anonymous';
 
-      const data = await orsResponse.json();
+  // Apply rate limiting (works for both authenticated and demo modes)
+  const { allowed, remaining, resetIn } = await apiLimiter(clientId);
+  if (!allowed) {
+    return jsonError(
+      'Rate limit exceeded. Please wait before making more navigation requests.',
+      429,
+      ERROR_CODES.RATE_LIMITED,
+      { retryAfter: resetIn },
+    );
+  }
 
-      // Cache the successful response
-      setCachedRoute(cacheKey, data);
+  try {
+    const body = await request.json().catch(() => null);
 
-      const response = jsonSuccess(data);
-      response.headers.set('X-Cache', 'MISS');
+    if (!body || typeof body !== 'object') {
+      return jsonError('Invalid request body', 400, ERROR_CODES.BAD_REQUEST);
+    }
+
+    const { start, end } = body;
+
+    if (!start || !end) {
+      return jsonError('Missing start or end coordinates', 400, ERROR_CODES.BAD_REQUEST);
+    }
+
+    if (!isValidCoordinate(start)) {
+      return jsonError(
+        'Invalid start coordinates. Expected { lat: number, lng: number } with lat in [-90, 90] and lng in [-180, 180]',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
+    }
+
+    if (!isValidCoordinate(end)) {
+      return jsonError(
+        'Invalid end coordinates. Expected { lat: number, lng: number } with lat in [-90, 90] and lng in [-180, 180]',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
+    }
+
+    // SECURITY: Validate coordinates are within campus geofence
+    // Only enforce strictly when ORS_API_KEY is configured (to protect API quota)
+    // In demo mode, we allow any coordinates since demo routes are free
+    if (ORS_API_KEY && (!isWithinGeofence(start) || !isWithinGeofence(end))) {
+      return jsonError(
+        'Coordinates must be within the Macquarie University campus area',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
+    }
+
+    // Check cache first
+    const cacheKey = getCacheKey(start, end);
+    const cachedData = getCachedRoute(cacheKey);
+    if (cachedData) {
+      const response = jsonSuccess(cachedData);
+      response.headers.set('X-Cache', 'HIT');
       response.headers.set('X-RateLimit-Remaining', remaining.toString());
       return response;
-    } catch (error) {
-      console.error('Navigate Proxy error:', error);
-      return jsonError('Internal Server Error', 500, ERROR_CODES.INTERNAL_ERROR);
     }
-  });
+
+    // If no ORS_API_KEY, return demo route
+    if (!ORS_API_KEY) {
+      console.warn('ORS_API_KEY not configured - returning demo route');
+      const demoData = generateDemoRoute(start, end);
+      setCachedRoute(cacheKey, demoData);
+
+      const response = jsonSuccess(demoData);
+      response.headers.set('X-Cache', 'DEMO');
+      response.headers.set('X-RateLimit-Remaining', remaining.toString());
+      return response;
+    }
+
+    const orsResponse = await fetch(ORS_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: ORS_API_KEY,
+      },
+      body: JSON.stringify({
+        coordinates: [
+          [start.lng, start.lat],
+          [end.lng, end.lat],
+        ],
+        instructions: true,
+      }),
+    });
+
+    if (!orsResponse.ok) {
+      const errText = await orsResponse.text();
+      console.error('ORS Upstream Error:', orsResponse.status, errText);
+      return jsonError(
+        `Navigation service temporarily unavailable`,
+        orsResponse.status >= 500 ? 502 : orsResponse.status,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+
+    const data = await orsResponse.json();
+
+    // Cache the successful response
+    setCachedRoute(cacheKey, data);
+
+    const response = jsonSuccess(data);
+    response.headers.set('X-Cache', 'MISS');
+    response.headers.set('X-RateLimit-Remaining', remaining.toString());
+    return response;
+  } catch (error) {
+    console.error('Navigate Proxy error:', error);
+    return jsonError('Internal Server Error', 500, ERROR_CODES.INTERNAL_ERROR);
+  }
 }

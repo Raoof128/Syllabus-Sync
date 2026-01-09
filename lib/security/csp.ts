@@ -115,13 +115,36 @@ export function buildCSP(options: CSPOptions = {}): string {
 
 /**
  * Build CSP header for development (more permissive)
+ * NOTE: Next.js injects many inline scripts for hydration and routing that
+ * cannot be pre-hashed. In development, we use unsafe-inline WITHOUT hashes
+ * because browsers ignore unsafe-inline when hashes are present.
  */
 export function buildDevCSP(): string {
-  return buildCSP({
-    upgradeInsecure: false,
-    // In development, we might need unsafe-eval for hot reload
-    additionalScriptSrc: ["'unsafe-eval'"],
-  });
+  // In development, skip hash-based validation entirely
+  // because unsafe-inline is ignored when hashes are present
+  const directives = [
+    "default-src 'self'",
+    // Scripts: Allow inline and eval for HMR, hydration, Turbopack
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+    // Styles: Allow inline for Tailwind/CSS-in-JS
+    "style-src 'self' 'unsafe-inline'",
+    // Images
+    "img-src 'self' data: blob: https:",
+    // Fonts
+    "font-src 'self' data:",
+    // Connect: API endpoints, Supabase, HMR websockets
+    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
+    // Frame ancestors
+    "frame-ancestors 'self'",
+    // Base URI
+    "base-uri 'self'",
+    // Form actions
+    "form-action 'self'",
+    // Object sources
+    "object-src 'none'",
+  ];
+
+  return directives.join('; ');
 }
 
 /**
