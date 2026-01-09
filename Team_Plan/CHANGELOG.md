@@ -6,6 +6,91 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.14.8] - 2026-01-09
+
+### Added
+
+#### GeoJSON Building Import - Final Buildings from MQ_Full.geojson (Raouf)
+
+**Summary:** Imported remaining buildings from `data/MQ_Full.geojson` that were not already present in `buildings.ts`, avoiding duplicates by checking OSM IDs.
+
+**New Buildings Added (7):**
+| ID | Name | OSM ID | Category |
+|----|------|--------|----------|
+| DLCNEW | Dunmore Lang College - New Wing | 488128859 | residential |
+| DLCOFFICE | Dunmore Lang College - Office | 488128860 | residential |
+| VILLAS2 | Villas (Building 2) | 967533745 | residential |
+| BLOCKCWAT | Block C (Waterloo Road) | 982138149 | residential |
+| BLOCKDWAT | Block D (Waterloo Road) | 982138150 | residential |
+| BLOCKAWAT | Block A (Waterloo Road) | 982138151 | residential |
+| BLOCKBWAT | Block B (Waterloo Road) | 982138152 | residential |
+
+**Duplicate Detection:**
+- Cross-referenced 113 existing OSM IDs in buildings.ts
+- Identified 3 duplicates in GeoJSON with different OSM IDs (8SCO, 12WW, 12MW) - skipped
+- Added only 7 truly new buildings not already present
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added 7 new building entries with GPS coordinates
+- `locales/en/translations.json` - Added 14 new translation keys (name + desc for each)
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+
+---
+## [0.14.7] - 2026-01-09
+
+### Added
+
+#### Full Campus Building Scan (Raouf)
+
+**Summary:** Completed a "zero missing buildings" initiative by performing a comprehensive scan of the entire campus area using OpenStreetMap data.
+
+**New Additions:**
+- **51 Additional Buildings:** Added all remaining identifiable campus structures including:
+  - **Student Housing:** Hobart, Melbourne, Sydney, Brisbane apartments, Saunders Close apartments (1-8), Herring Road apartments (120, 155, 157), Peach Tree Road apartments (1-9), Cottonwood Crescent.
+  - **Commercial:** Macquarie Centre, Lakeside Hotel, Fujitsu, Siemens, 82/93 Waterloo Road.
+  - **Academic/Research:** 10HA, 16MW (Library alias), 8LR, 11GR, 13ARPD.
+  - **Retail:** The Ranch, Dan Murphy's.
+
+**Technical Details:**
+- **Duplicate Detection:** Implemented proximity-based filtering (50px threshold) to prevent duplicate markers for existing buildings.
+- **Data Enrichment:** All new entries include GPS coordinates (lat/lng), OSM IDs, categories, and descriptions.
+- **Total Coverage:** Campus map now contains over 100+ distinct points of interest.
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added 51 new building entries
+- `locales/en/translations.json` - Added 102 new translation keys
+
+**Quality Assurance:**
+- All 248 tests passing
+
+---
+
+## [0.14.6] - 2026-01-09
+
+### Added
+
+#### Map Building Data Enrichment (Raouf)
+
+**Summary:** Enriched campus map with 40+ new buildings, car parks, and facilities sourced from OpenStreetMap GeoJSON data.
+
+**Data Updates:**
+- **New Buildings:** Added 40+ new entries including East 2/3 Car Parks, residential colleges (Dunmore Lang, Robert Menzies, MQ Village), new academic buildings (1MD, 3MD, 5MD, 1EXR), and more.
+- **Data Source:** Processed from OpenStreetMap export (`MQ_Full.geojson`) using affine transformation for accurate pixel positioning.
+- **Translations:** Added 80+ new translation keys for building names and descriptions.
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added new building entries
+- `locales/en/translations.json` - Added translation keys
+
+**Quality Assurance:**
+- All 248 tests passing
+
+---
+
 
 ## [0.14.5] - 2026-01-09
 

@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.5 | Last Updated: January 09, 2026
+Version: 0.14.8 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,21 @@ Version: 0.14.5 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ GeoJSON Building Import v0.14.8 (Raouf)
+- **Imported remaining buildings from MQ_Full.geojson** - Added 7 new buildings not already in buildings.ts
+- **Duplicate detection** - Cross-referenced 113 existing OSM IDs, identified 3 duplicates to skip
+- **New buildings:** Dunmore Lang College New Wing, Office, Villas (Building 2), 4 Waterloo Road Blocks (A-D)
+- **Translations added** - 14 new keys in English translations (name + desc for each building)
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added 7 new building entries with GPS coordinates
+- `locales/en/translations.json` - Added 14 new translation keys
+
+**Verification:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
 
 #### ✅ Fix Leaflet Map DOM Errors v0.14.1 (Raouf)
 - **Fixed "Cannot read properties of undefined" errors** - Added defensive checks for Leaflet map initialization
@@ -3593,3 +3608,17 @@ Summary: Fixed 3 ESLint prefer-arrow-callback warnings in XPHistory.tsx by conve
 Files changed: components/gamification/XPHistory.tsx
 Verification: npm run lint (0 errors, 0 warnings)
 Follow-ups: None.
+
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Map Building Data Enrichment
+Summary: Enriched campus map with 40+ new buildings and parking locations sourced from OpenStreetMap GeoJSON data, and added corresponding translation keys.
+Files changed: lib/map/buildings.ts, locales/en/translations.json, scripts/process_buildings.cjs (new), scripts/apply_changes.cjs (new)
+Verification: npm test (248/248 passed), verification of buildings.ts content.
+
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Full Campus Building Scan & Enrichment
+Summary: Performed a comprehensive scan of OpenStreetMap data to identify and add 51 additional campus buildings, ensuring zero missing buildings while filtering duplicates. Updated translations and type definitions.
+Files changed: lib/map/buildings.ts, locales/en/translations.json, scripts/scan_all_buildings.cjs (new), scripts/filter_and_apply_scan.cjs (new)
+Verification: npm test (248/248 passed), manual verification of building counts.
