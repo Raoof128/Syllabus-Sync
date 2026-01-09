@@ -193,6 +193,33 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 - **Mobile App**: React Native companion app for iOS/Android
 - **Offline Sync**: Advanced offline functionality with conflict resolution
 
+#### 🔐 Biometric Login (Passkeys / FaceID / TouchID)
+**Objective:** Upgrade perceived security and modernity with enterprise-grade authentication.
+
+**Backend Implementation (Raouf):**
+- Enable Supabase Passkeys (WebAuthn) for passwordless authentication
+- Maintain email/password fallback for compatibility
+- No biometric data stored by application (handled by device secure enclave)
+- Implement secure credential registration and verification endpoints
+
+**Frontend Implementation (Pouya):**
+- Settings → Security → "Enable FaceID / TouchID" toggle
+- Clear security messaging and user education
+- Simple success/failure feedback with toast notifications
+- Graceful fallback for unsupported browsers/devices
+
+**MVP Scope:**
+- Opt-in only (no forced migration from password auth)
+- Simple enable/disable toggle in Security settings
+- No advanced recovery flows in initial release
+- Browser compatibility detection with user guidance
+
+**Expected Outcome:**
+✅ Strong enterprise/security perception signal
+✅ Zero UX friction once enabled
+✅ Modern authentication aligned with industry standards
+✅ Reduced password fatigue for users
+
 #### Major Milestones Achieved:
 - **Database Migration & Schema Alignment**: Complete resolution of schema drift with safe migration scripts
 - **Authentication System Implementation**: Full user lifecycle with protected routes and middleware
@@ -459,9 +486,9 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 
 ---
 
-**Last Updated:** January 05, 2026
-**Version:** 0.5.41
-**Status:** Production Ready - 12-Language Support & Dynamic i18n
+**Last Updated:** January 09, 2026
+**Version:** 0.9.4
+**Status:** Production Ready - Gamification Settings & Biometric Roadmap
 
 ---
 

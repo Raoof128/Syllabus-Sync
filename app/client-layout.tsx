@@ -19,6 +19,8 @@ import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
 
 // Silence known Next.js 16 internal warnings that we cannot fix
 // These are framework issues, not application bugs
@@ -42,6 +44,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const language = useLanguageStore((state) => state.language);
 
   // Memoize Supabase client to prevent recreation on every render
   const supabase = useMemo(() => createBrowserClient(), []);
@@ -191,39 +194,42 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // Render full layout for authenticated routes
   return (
     <ThemeProvider>
-      {/* Global SVG filters for liquid glass effects */}
-      <LiquidFilter />
+      {/* Level-up notifications for gamification */}
+      <LevelUpNotificationProvider locale={language}>
+        {/* Global SVG filters for liquid glass effects */}
+        <LiquidFilter />
 
-      {/* Animated mesh gradient background */}
-      <MeshGradient />
+        {/* Animated mesh gradient background */}
+        <MeshGradient />
 
-      {/* Skip to main content link for accessibility */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-mq focus:shadow-mq-lg focus:outline-none"
-      >
-        {t('skipToContent')}
-      </a>
-      <div className="layout-shell flex min-h-screen flex-col">
-        <div className="flex flex-1">
-          {/* Sidebar */}
-          <Sidebar />
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-mq focus:shadow-mq-lg focus:outline-none"
+        >
+          {t('skipToContent')}
+        </a>
+        <div className="layout-shell flex min-h-screen flex-col">
+          <div className="flex flex-1">
+            {/* Sidebar */}
+            <Sidebar />
 
-          {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
-          <div className="layout-main flex-1 flex flex-col overflow-hidden md:ml-12">
-            <Header />
-            <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
-              <ErrorBoundary>{children}</ErrorBoundary>
-            </main>
+            {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
+            <div className="layout-main flex-1 flex flex-col overflow-hidden md:ml-12">
+              <Header />
+              <main id="main-content" className="flex-1 overflow-y-auto pt-16 md:pt-0" role="main">
+                <ErrorBoundary>{children}</ErrorBoundary>
+              </main>
+            </div>
           </div>
+          {/* Footer landmark for accessibility - screen reader only */}
+          <footer role="contentinfo" className="sr-only" aria-label="Footer">
+            <p>&copy; {new Date().getFullYear()} Syllabus Sync - Macquarie University</p>
+          </footer>
         </div>
-        {/* Footer landmark for accessibility - screen reader only */}
-        <footer role="contentinfo" className="sr-only" aria-label="Footer">
-          <p>&copy; {new Date().getFullYear()} Syllabus Sync - Macquarie University</p>
-        </footer>
-      </div>
-      <Toaster />
-      <OfflineIndicator />
+        <Toaster />
+        <OfflineIndicator />
+      </LevelUpNotificationProvider>
     </ThemeProvider>
   );
 }

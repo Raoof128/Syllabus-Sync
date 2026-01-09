@@ -110,3 +110,85 @@ export type PasswordStrengthResult = {
   score: number; // 0-4
   feedback: string[];
 };
+
+// ============================================================================
+// GAMIFICATION TYPES
+// ============================================================================
+
+/**
+ * User's gamification profile with XP, level, and streak tracking
+ */
+export interface GamificationProfile {
+  xp: number;
+  level: number;
+  streakDays: number;
+  longestStreak: number;
+  lastActivityDate: string | null;
+  xpToNextLevel: number;
+  xpForCurrentLevel: number;
+  levelProgress: number; // 0-100 percentage
+}
+
+/**
+ * XP event types that can trigger XP awards
+ */
+export type XPEventType =
+  | 'deadline_completed'
+  | 'deadline_early'
+  | 'daily_login'
+  | 'streak_bonus'
+  | 'unit_added'
+  | 'event_attended'
+  | 'profile_completed'
+  | 'first_deadline'
+  | 'weekly_goal'
+  | 'level_up_bonus';
+
+/**
+ * XP event record for audit logging
+ */
+export interface XPEvent {
+  id: string;
+  eventType: XPEventType | string;
+  xpAmount: number;
+  referenceId: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+/**
+ * Level tier for badge coloring
+ */
+export type LevelTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'master';
+
+/**
+ * Get the tier for a given level
+ */
+export function getLevelTier(level: number): LevelTier {
+  if (level <= 5) return 'bronze';
+  if (level <= 10) return 'silver';
+  if (level <= 20) return 'gold';
+  if (level <= 35) return 'platinum';
+  if (level <= 50) return 'diamond';
+  return 'master';
+}
+
+/**
+ * Gamification settings preferences
+ */
+export interface GamificationSettings {
+  showXPNotifications: boolean;
+  showLevelUpNotifications: boolean;
+  showStreakReminders: boolean;
+  displayOnProfile: boolean;
+}
+
+/**
+ * Default gamification settings
+ */
+export const DEFAULT_GAMIFICATION_SETTINGS: GamificationSettings = {
+  showXPNotifications: true,
+  showLevelUpNotifications: true,
+  showStreakReminders: true,
+  displayOnProfile: true,
+};

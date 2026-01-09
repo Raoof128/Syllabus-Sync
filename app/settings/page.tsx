@@ -25,6 +25,7 @@ import {
   QuickActions,
   HelpSupport,
   SettingsSkeleton,
+  GamificationSettings,
 } from './components';
 
 // Helper to get device label
@@ -145,6 +146,9 @@ function SettingsContent() {
 
         {/* Quick Actions */}
         <QuickActions t={t} />
+
+        {/* Gamification Settings */}
+        <GamificationSettings t={t} />
       </div>
 
       {/* Help & Support Section */}

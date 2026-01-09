@@ -1,5 +1,5 @@
 {
-  "$schema": "https://opencode.ai/schema/opencode.json",
+  "$schema": "https://opencode.ai/config.json",
 
   // ============================================================
   // TEAM OPENCODE CONFIGURATION
@@ -21,108 +21,80 @@
   // MCP Server Declarations
   // Each server extends OpenCode with specialized capabilities
   "mcp": {
+    // Context7 - Documentation Retrieval (remote)
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
+    },
+
+    // Sosumi - Apple Developer Documentation (remote)
+    "sosumi": {
+      "type": "remote",
+      "url": "https://sosumi.ai/mcp",
+      "enabled": true,
+    },
+
+    // Git Operations (local)
+    "git": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-git"],
+      "enabled": true,
+    },
+
+    // Sequential Thinking for Complex Problem Solving (local)
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enabled": true,
+    },
+
+    // Memory/Knowledge Graph (local)
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "enabled": true,
+    },
+
+    // File System Operations (local)
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "/Users/raoof.r12"],
+      "enabled": true,
+    },
+
     // SAST: Static Application Security Testing
     "semgrep": {
-      "command": "uvx",
-      "args": ["--from", "semgrep", "semgrep", "mcp"],
-      "env": {
+      "type": "local",
+      "command": ["uvx", "--from", "semgrep", "semgrep", "mcp"],
+      "enabled": false,
+      "environment": {
         "SEMGREP_RULES": "p/typescript,p/react,p/nextjs,p/security-audit,p/secrets",
       },
     },
 
-    // Dependency Vulnerability Scanner (OSV)
-    "osv-scanner": {
-      "command": "osv-scanner",
-      "args": ["--format", "json", "--recursive", "."],
-    },
-
-    // File System Operations (built-in but configured)
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-filesystem"],
-      "env": {
-        "ALLOWED_PATHS": ".",
-      },
-    },
-
-    // Git Operations
-    "git": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-git"],
-    },
-
-    // Sequential Thinking for Complex Problem Solving
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-sequential-thinking"],
-    },
-
-    // Memory/Knowledge Graph
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/mcp-memory"],
-    },
-
-    // Context7 - Documentation Retrieval
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-    },
-
-    // Sosumi - Apple Developer Documentation
-    "sosumi": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://sosumi.ai/mcp"],
-    },
-
-    // Bright Data - Web Scraping and Browser Automation
-    "brightdata": {
-      "command": "npx",
-      "args": ["@brightdata/mcp"],
-      "env": {
-        "API_TOKEN": "YOUR_BRIGHTDATA_API_TOKEN",
-        "PRO_MODE": "true",
-      },
-    },
-
-    // Chrome DevTools - Browser Debugging and Inspection
-    "chrome-devtools": {
-      "command": "npx",
-      "args": ["chrome-devtools-mcp@latest"],
-    },
-
-    // MarkItDown - Universal Document-to-Markdown Converter
-    "markitdown": {
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "markitdown-mcp:latest"],
-    },
-
     // Supabase - Database and Backend Operations
     "supabase": {
-      "command": "npx",
-      "args": ["-y", "@supabase/mcp-server-supabase"],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "YOUR_SUPABASE_ACCESS_TOKEN",
+      "type": "local",
+      "command": ["npx", "-y", "@supabase/mcp-server-supabase"],
+      "enabled": false,
+      "environment": {
+        "SUPABASE_ACCESS_TOKEN": "{env:SUPABASE_ACCESS_TOKEN}",
       },
-    },
-
-    // Shadcn UI - Professional Component Generation
-    "shadcn": {
-      "command": "npx",
-      "args": ["@jpisnice/shadcn-ui-mcp-server", "--github-api-key", "YOUR_GITHUB_TOKEN"],
     },
 
     // Playwright - Automated Browser Testing
     "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"],
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": false,
     },
 
     // Repomix - Codebase Packing for LLM Context
-    // Packs entire repositories into AI-friendly single-file contexts
     "repomix": {
-      "command": "npx",
-      "args": ["-y", "repomix", "--mcp"],
+      "type": "local",
+      "command": ["npx", "-y", "repomix", "--mcp"],
+      "enabled": false,
     },
   },
 

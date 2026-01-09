@@ -1,7 +1,7 @@
 // app/feed/FeedClient.tsx
 'use client';
 
-import { useState, memo, useMemo } from 'react';
+import { useState, memo, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -16,6 +16,8 @@ import {
   Info,
   Navigation,
   Rss,
+  Bell,
+  Check,
 } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -23,6 +25,9 @@ import Link from 'next/link';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { toastUtils } from '@/lib/utils/toast';
+import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
+import { apiRequest } from '@/lib/utils/api';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info',
@@ -36,6 +41,73 @@ type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
 const FeedClient = memo(() => {
   const { t, language } = useTranslation();
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
+  const [remindedEvents, setRemindedEvents] = useState<Set<string>>(new Set());
+  const [loadingEvents, setLoadingEvents] = useState<Set<string>>(new Set());
+
+  // Gamification store
+  const { isDemo, refreshProfile, settings } = useGamificationStore();
+
+  // Handle "Remind Me" button click - awards XP for event attendance
+  const handleRemindMe = useCallback(
+    async (eventId: string, eventTitle: string) => {
+      // Already reminded for this event
+      if (remindedEvents.has(eventId)) {
+        toastUtils.info('Already Reminded', 'You already set a reminder for this event');
+        return;
+      }
+
+      // Mark as loading
+      setLoadingEvents((prev) => new Set(prev).add(eventId));
+
+      try {
+        // If user is authenticated (not demo mode), award XP
+        if (!isDemo) {
+          const response = await apiRequest<{
+            message: string;
+            result: { xpAwarded: number; leveledUp: boolean; newLevel: number };
+          }>('/api/gamification/award-xp', {
+            method: 'POST',
+            body: JSON.stringify({
+              eventType: 'event_attended',
+              referenceId: eventId,
+              metadata: { title: eventTitle },
+            }),
+          });
+
+          // Show XP notification if enabled
+          if (settings.showXPNotifications) {
+            showXPEarnedNotification(response.result.xpAwarded, 'Event Reminder Set', language);
+          }
+
+          // Refresh profile to update XP display
+          await refreshProfile();
+        }
+
+        // Mark event as reminded (works for both demo and authenticated users)
+        setRemindedEvents((prev) => new Set(prev).add(eventId));
+        toastUtils.success(
+          t('reminderTimingUpdated'),
+          `You will be reminded about "${eventTitle}"`,
+        );
+      } catch (error) {
+        // Check if it's a "already awarded" error (409 conflict)
+        if (error instanceof Error && error.message.includes('already awarded')) {
+          setRemindedEvents((prev) => new Set(prev).add(eventId));
+          toastUtils.info('Already Reminded', 'You already set a reminder for this event');
+        } else {
+          console.error('Failed to set reminder:', error);
+          toastUtils.error('Failed', 'Could not set reminder. Please try again.');
+        }
+      } finally {
+        setLoadingEvents((prev) => {
+          const next = new Set(prev);
+          next.delete(eventId);
+          return next;
+        });
+      }
+    },
+    [isDemo, remindedEvents, refreshProfile, settings.showXPNotifications, language, t],
+  );
 
   // Get locale string for date formatting
   const getLocaleString = useMemo(() => {
@@ -192,81 +264,112 @@ const FeedClient = memo(() => {
                       aria-busy="false"
                     >
                       {filteredEvents.length > 0 ? (
-                        filteredEvents.map((event, index) => (
-                          <article
-                            key={event.id}
-                            className="p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm transition-all duration-mq-fast"
-                            aria-posinset={index + 1}
-                            aria-setsize={filteredEvents.length}
-                          >
-                            {/* Event Header */}
-                            <div className="flex items-start justify-between gap-3 mb-3">
-                              <h3 className="font-semibold text-mq-content text-mq-lg">
+                        filteredEvents.map((event, index) => {
+                          const isReminded = remindedEvents.has(event.id);
+                          const isLoading = loadingEvents.has(event.id);
+
+                          return (
+                            <article
+                              key={event.id}
+                              className="p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm transition-all duration-mq-fast"
+                              aria-posinset={index + 1}
+                              aria-setsize={filteredEvents.length}
+                            >
+                              {/* Event Header */}
+                              <div className="flex items-start justify-between gap-3 mb-3">
+                                <h3 className="font-semibold text-mq-content text-mq-lg">
+                                  {t(
+                                    (event.translationKey || event.title) as Parameters<
+                                      typeof t
+                                    >[0],
+                                  )}
+                                </h3>
+                                <Badge
+                                  className={`${categoryColors[event.category as keyof typeof categoryColors]} flex-shrink-0`}
+                                >
+                                  {t(
+                                    `category_${event.category.replace(/ /g, '')}` as Parameters<
+                                      typeof t
+                                    >[0],
+                                  )}
+                                </Badge>
+                              </div>
+
+                              {/* Event Description */}
+                              <p className="text-mq-sm text-mq-content-secondary mb-3">
                                 {t(
-                                  (event.translationKey || event.title) as Parameters<typeof t>[0],
-                                )}
-                              </h3>
-                              <Badge
-                                className={`${categoryColors[event.category as keyof typeof categoryColors]} flex-shrink-0`}
-                              >
-                                {t(
-                                  `category_${event.category.replace(/ /g, '')}` as Parameters<
+                                  (event.descriptionKey || event.description) as Parameters<
                                     typeof t
                                   >[0],
                                 )}
-                              </Badge>
-                            </div>
+                              </p>
 
-                            {/* Event Description */}
-                            <p className="text-mq-sm text-mq-content-secondary mb-3">
-                              {t(
-                                (event.descriptionKey || event.description) as Parameters<
-                                  typeof t
-                                >[0],
-                              )}
-                            </p>
+                              {/* Event Details */}
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-mq-sm text-mq-content-secondary">
+                                <div className="flex items-center gap-1.5">
+                                  <Calendar className="h-4 w-4" aria-hidden="true" />
+                                  <time dateTime={new Date(event.date).toISOString()}>
+                                    {new Date(event.date).toLocaleDateString(getLocaleString, {
+                                      weekday: 'short',
+                                      month: 'short',
+                                      day: 'numeric',
+                                    })}
+                                  </time>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="h-4 w-4" aria-hidden="true" />
+                                  <span>{event.time}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                                  <span>{event.location}</span>
+                                </div>
+                              </div>
 
-                            {/* Event Details */}
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-mq-sm text-mq-content-secondary">
-                              <div className="flex items-center gap-1.5">
-                                <Calendar className="h-4 w-4" aria-hidden="true" />
-                                <time dateTime={new Date(event.date).toISOString()}>
-                                  {new Date(event.date).toLocaleDateString(getLocaleString, {
-                                    weekday: 'short',
-                                    month: 'short',
-                                    day: 'numeric',
-                                  })}
-                                </time>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Clock className="h-4 w-4" aria-hidden="true" />
-                                <span>{event.time}</span>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <MapPin className="h-4 w-4" aria-hidden="true" />
-                                <span>{event.location}</span>
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="mt-4 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
-                              <Button variant="secondary" size="sm">
-                                {t('remindMe')}
-                              </Button>
-                              <Button asChild variant="secondary" size="sm">
-                                <Link
-                                  href={`/map?building=${event.building}`}
-                                  aria-label={t('navigateToBuildingAria', {
-                                    building: event.location,
-                                  })}
+                              {/* Action Buttons */}
+                              <div className="mt-4 pt-3 border-t border-mq-border flex gap-2 flex-wrap">
+                                <Button
+                                  variant={isReminded ? 'primary' : 'secondary'}
+                                  size="sm"
+                                  onClick={() =>
+                                    handleRemindMe(
+                                      event.id,
+                                      t(
+                                        (event.translationKey || event.title) as Parameters<
+                                          typeof t
+                                        >[0],
+                                      ),
+                                    )
+                                  }
+                                  disabled={isLoading}
+                                  aria-label={
+                                    isReminded ? t('reminderTimingUpdated') : t('remindMe')
+                                  }
                                 >
-                                  <Navigation className="h-4 w-4 mr-1.5" aria-hidden="true" />
-                                  {t('navigate')}
-                                </Link>
-                              </Button>
-                            </div>
-                          </article>
-                        ))
+                                  {isLoading ? (
+                                    <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-1.5" />
+                                  ) : isReminded ? (
+                                    <Check className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                  ) : (
+                                    <Bell className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                  )}
+                                  {isReminded ? t('reminderTimingUpdated') : t('remindMe')}
+                                </Button>
+                                <Button asChild variant="secondary" size="sm">
+                                  <Link
+                                    href={`/map?building=${event.building}`}
+                                    aria-label={t('navigateToBuildingAria', {
+                                      building: event.location,
+                                    })}
+                                  >
+                                    <Navigation className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                    {t('navigate')}
+                                  </Link>
+                                </Button>
+                              </div>
+                            </article>
+                          );
+                        })
                       ) : (
                         <div className="text-center py-12">
                           <Rss

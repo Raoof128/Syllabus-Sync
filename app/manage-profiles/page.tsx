@@ -22,9 +22,11 @@ import { UserProfile } from '@/lib/store/profilesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
+import { apiRequest } from '@/lib/utils/api';
 
 export default function ManageProfilesPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({
@@ -44,8 +46,50 @@ export default function ManageProfilesPage() {
     setCurrentProfile,
   } = useProfilesStore();
 
-  const handleAddProfile = () => {
+  // Gamification store
+  const { isDemo, refreshProfile, settings } = useGamificationStore();
+
+  // Check if profile is complete (all required fields filled)
+  const isProfileComplete = (data: typeof formData) => {
+    return data.name && data.email && data.studentId && data.course && data.year;
+  };
+
+  // Award XP for completing profile (one-time bonus)
+  const awardProfileCompletionXP = async () => {
+    if (isDemo) return; // Skip for demo users
+
+    try {
+      const response = await apiRequest<{
+        message: string;
+        result: { xpAwarded: number; leveledUp: boolean; newLevel: number };
+      }>('/api/gamification/award-xp', {
+        method: 'POST',
+        body: JSON.stringify({
+          eventType: 'profile_completed',
+          metadata: { source: 'manage-profiles' },
+        }),
+      });
+
+      // Show XP notification if enabled
+      if (settings.showXPNotifications) {
+        showXPEarnedNotification(response.result.xpAwarded, 'Profile Completed', language);
+      }
+
+      // Refresh profile to update XP display
+      await refreshProfile();
+    } catch (error) {
+      // Silently ignore if already awarded (409 conflict)
+      if (error instanceof Error && !error.message.includes('already awarded')) {
+        console.error('Failed to award profile completion XP:', error);
+      }
+    }
+  };
+
+  const handleAddProfile = async () => {
     if (formData.name && formData.email && formData.studentId) {
+      // Check if this is the first complete profile
+      const isFirstCompleteProfile = profiles.length === 0 && isProfileComplete(formData);
+
       addProfile({
         ...formData,
         preferences: {
@@ -64,6 +108,11 @@ export default function ManageProfilesPage() {
       });
       setShowAddDialog(false);
       toastUtils.success(t('profileCreated'), t('profileCreatedMsg'));
+
+      // Award XP for first complete profile
+      if (isFirstCompleteProfile) {
+        await awardProfileCompletionXP();
+      }
     }
   };
 
@@ -79,8 +128,13 @@ export default function ManageProfilesPage() {
     setShowAddDialog(true);
   };
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if (editingProfile && formData.name && formData.email) {
+      // Check if we're completing a previously incomplete profile
+      const wasIncomplete = !editingProfile.course || !editingProfile.year;
+      const isNowComplete = isProfileComplete(formData);
+      const shouldAwardXP = wasIncomplete && isNowComplete;
+
       updateProfile(editingProfile.id, {
         ...formData,
         preferences: editingProfile.preferences,
@@ -96,6 +150,11 @@ export default function ManageProfilesPage() {
       });
       setShowAddDialog(false);
       toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
+
+      // Award XP if profile is now complete
+      if (shouldAwardXP) {
+        await awardProfileCompletionXP();
+      }
     }
   };
 

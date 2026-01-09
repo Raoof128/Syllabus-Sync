@@ -1462,7 +1462,7 @@ MIT License - See LICENSE file for details.
 ---
 
 **Last Updated:** January 09, 2026
-**Version:** 0.9.2
+**Version:** 0.9.6
 
 ---
 
@@ -3368,3 +3368,28 @@ Summary:
 **Questions?** Contact the team leads:
 - Frontend: Pouya
 - Backend: Raouf
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix
+Summary: Fixed invalid OpenCode configuration by adding missing "type": "stdio" field to all MCP server definitions in opencode.jsonc to resolve schema validation errors.
+Files changed: opencode.jsonc
+Verification: Visual verification of JSON structure and schema compliance.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix (Correction)
+Summary: Corrected invalid OpenCode configuration by updating MCP server definitions to use 'type': 'local' and merging 'command'/'args' into a single 'command' array, based on search results for the correct schema.
+Files changed: opencode.jsonc, team-opencode-config/opencode.jsonc
+Verification: Updated to valid local MCP schema structure.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix (Environment Variables)
+Summary: Renamed 'env' to 'environment' in all MCP server configurations in opencode.jsonc and team-opencode-config/opencode.jsonc to resolve 'Unrecognized key' validation errors, based on official schema documentation.
+Files changed: opencode.jsonc, team-opencode-config/opencode.jsonc
+Verification: Updated to valid 'environment' key for local MCPs.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: ESLint Warnings Fix & Documentation Update (v0.9.6)
+Summary: Fixed 3 ESLint prefer-arrow-callback warnings in XPHistory.tsx by converting named function expressions to arrow functions in memo() calls. Added displayName properties for React DevTools debugging.
+Files changed: components/gamification/XPHistory.tsx
+Verification: npm run lint (0 errors, 0 warnings)
+Follow-ups: None.

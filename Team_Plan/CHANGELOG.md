@@ -7,6 +7,209 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.6] - 2026-01-09
+
+### Fixed
+
+#### ESLint Warnings in XPHistory Component (Raouf)
+
+**Summary:** Fixed 3 ESLint `prefer-arrow-callback` warnings in the XP history component.
+
+**Changes:**
+- Converted named function expressions in `memo()` to arrow functions
+- Added `displayName` properties for React DevTools debugging
+- Components affected: `XPEventItem`, `XPHistory`, `XPHistoryCompact`
+
+**Files Changed:**
+- `components/gamification/XPHistory.tsx`
+
+**Verification:**
+- `npm run lint`: ✅ 0 errors, 0 warnings
+
+---
+
+## [0.9.5] - 2026-01-09
+
+### Added
+
+#### Complete XP Triggers & Security Settings UI (Raouf)
+
+**Summary:** Implemented all remaining XP event triggers for the gamification system, added XP history timeline component, and created SecuritySettings component with biometric authentication UI (WebAuthn ready).
+
+**🎯 XP Event Triggers:**
+
+**New API Endpoint: `/api/gamification/award-xp`**
+- POST endpoint for awarding XP from client-triggered events
+- Supports `event_attended` and `profile_completed` event types
+- Duplicate prevention (409 Conflict if already awarded)
+- Validates user authentication via middleware
+- Returns updated profile with XP, level, and progress info
+
+**Event Attended Trigger (Feed Page):**
+- Modified `FeedClient.tsx` - "Remind Me" button now awards 10 XP
+- Shows XP earned notification if enabled in settings
+- Loading state with spinner while processing
+- Checkmark and "Reminder Timing Updated" state when reminded
+- Gracefully handles duplicate clicks (shows "Already Reminded" toast)
+
+**Profile Completed Trigger (Manage Profiles):**
+- Modified `app/manage-profiles/page.tsx` - Awards 50 XP (one-time)
+- Triggers when first complete profile is created (all fields filled)
+- Also triggers when updating incomplete profile to complete
+- Works only for authenticated users (not demo mode)
+
+**📊 XP History Component:**
+
+**New Components in `components/gamification/XPHistory.tsx`:**
+- `XPHistory` - Full card with header, event list, total XP badge
+- `XPHistoryCompact` - Minimal version for sidebars/widgets
+- Event type icons and colors for all 10 XP event types
+- Relative time formatting (localized: "2 hours ago", "3 days ago")
+- Loading skeleton state
+- Empty state with helpful messaging
+
+**Files Created:**
+- `app/api/gamification/award-xp/route.ts` - XP award endpoint
+- `components/gamification/XPHistory.tsx` - History components
+
+**Files Changed:**
+- `app/feed/FeedClient.tsx` - Added XP trigger on Remind Me button
+- `app/manage-profiles/page.tsx` - Added profile completion XP trigger
+- `components/gamification/index.ts` - Export XPHistory components
+
+**🔐 Security Settings Component:**
+
+**New Component: `SecuritySettings.tsx`**
+- Biometric authentication toggle (WebAuthn/Passkeys ready)
+- Detects platform authenticator availability (Face ID, Touch ID, Windows Hello)
+- Enable/disable confirmation dialogs
+- Device status indicator with checkmark
+- Privacy note about biometric data handling
+- "Coming Soon" section for future features (2FA, security keys)
+- Full accessibility support
+
+**Files Created:**
+- `app/settings/components/SecuritySettings.tsx` - Security settings UI
+
+**🌐 New Translation Keys (English):**
+
+Added 28 new keys for XP history and security features:
+- `recentActivity`, `noRecentActivity`, `startEarningXP`, `recently`, `recentXPEvents`
+- `security`, `biometricLogin`, `biometricLoginDesc`
+- `biometricEnabled`, `biometricEnabledMsg`, `biometricDisabled`, `biometricDisabledMsg`
+- `biometricSetupFailed`, `biometricSetupFailedMsg`, `biometricDeviceReady`
+- `biometricNotConfigured`, `biometricPrivacyNote`
+- `enableBiometric`, `enableBiometricDesc`, `disableBiometric`, `disableBiometricDesc`
+- `moreSecurityFeatures`, `moreSecurityFeaturesDesc`
+- `notSupported`, `noDeviceFound`, `settingUp`, `tryAgainLater`, `processing`
+
+**✅ Verification:**
+- `npx tsc --noEmit`: ✅ Pass
+- All XP triggers working correctly
+- Duplicate award prevention working
+
+---
+
+## [0.9.4] - 2026-01-09
+
+### Added
+
+#### Gamification Settings UI & Biometric Roadmap (Raouf)
+
+**Summary:** Complete gamification settings component with user preferences, progress display, and comprehensive i18n support across all 19 languages. Added biometric login feature documentation to Phase 5 roadmap.
+
+**🎮 Gamification Settings Component:**
+
+**New Component: `GamificationSettings.tsx`**
+- **Progress Display:** Level, XP, current streak, and longest streak with tier-colored icons
+- **Toggle Settings:** 
+  - XP Notifications - Enable/disable XP earned notifications
+  - Level Up Notifications - Celebrate reaching new levels
+  - Streak Reminders - Daily reminders to maintain streak
+  - Display on Profile - Show/hide gamification stats on profile
+- **Reset Progress:** Confirmation dialog to reset all XP, level, and streak data
+- **Accessibility:** Full ARIA support, proper region labeling, keyboard navigation
+- **Styling:** Consistent with MQ design system, MagicCard wrapper, smooth transitions
+
+**Files Created:**
+- `app/settings/components/GamificationSettings.tsx` - Complete settings component
+- `tests/settings/GamificationSettings.test.tsx` - 10 comprehensive tests
+
+**Files Changed:**
+- `app/settings/components/index.ts` - Added GamificationSettings export
+- `app/settings/page.tsx` - Integrated GamificationSettings into settings grid
+
+**🌐 Internationalization (19 Languages):**
+
+Added 20 new translation keys across all 19 locale files:
+- `gamification`, `gamificationDesc`
+- `showXPNotifications`, `showXPNotificationsDesc`
+- `showLevelUpNotifications`, `showLevelUpNotificationsDesc`
+- `showStreakReminders`, `showStreakRemindersDesc`
+- `displayOnProfile`, `displayOnProfileDesc`
+- `yourProgress`, `level`, `totalXP`, `currentStreak`, `longestStreak`
+- `resetProgress`, `resetProgressDesc`, `resetProgressConfirm`
+- `progressReset`, `progressResetMsg`
+
+**Languages Updated:**
+- en, es, ar, zh, fa, hi, ja, ko, ur, th, vi, ru, ta, bn, id, ms, it, fr, he
+
+**📋 Biometric Login Roadmap (Phase 5):**
+
+Added comprehensive biometric authentication feature plan to `TEAM_ROADMAP.md`:
+
+**Backend (Raouf):**
+- Enable Supabase Passkeys (WebAuthn)
+- Keep email/password fallback
+- No biometric data stored by app
+
+**Frontend (Pouya):**
+- Settings → Security → "Enable FaceID / TouchID" toggle
+- Clear security messaging
+- Simple success/failure feedback
+
+**MVP Scope:**
+- Opt-in only, no forced migration
+- Simple enable/disable toggle
+- No advanced recovery flows initially
+
+**✅ Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run test`: ✅ 153/153 tests passing (10 new gamification tests)
+- `npm run build`: ✅ All pages successful
+
+---
+
+## [0.9.3] - 2026-01-09
+
+### Fixed
+
+#### MCP Server Configuration Fixes (Raouf)
+
+**Issue:** MCP servers in local and team configs were using non-existent package names (`@anthropic/mcp-*` packages don't exist).
+
+**Solution:** Updated both configuration files with correct package names from the official Model Context Protocol servers repository.
+
+**Package Name Corrections:**
+| Server | Incorrect Package | Correct Package |
+|--------|-------------------|-----------------|
+| filesystem | `@anthropic/mcp-filesystem` | `@modelcontextprotocol/server-filesystem` |
+| git | `@anthropic/mcp-git` | `mcp-git` |
+| memory | `@anthropic/mcp-memory` | `@modelcontextprotocol/server-memory` |
+| sequential-thinking | `@anthropic/mcp-sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` |
+| sosumi | `npx mcp-remote https://sosumi.ai/mcp` | `type: "remote", url: "https://sosumi.ai/mcp"` |
+
+**Files Changed:**
+- `opencode.jsonc` - Fixed all MCP package names, changed sosumi to remote type
+- `team-opencode-config/opencode.jsonc` - Fixed core MCP package names, changed sosumi to remote type
+
+**Verification:**
+- Context7 MCP: ✅ Working (tested with Next.js library lookup)
+- Sosumi MCP: ✅ Working (tested with SwiftUI documentation search)
+
+---
+
 ## [0.9.2] - 2026-01-09
 
 ### Added & Fixed
@@ -4362,3 +4565,21 @@ Summary:
 Files: lib/i18n/translations.ts; locales/*/translations.json (19 files created); locales/fr/translations.json; locales/he/translations.json.
 Verification: npm run build (pass); npx tsc --noEmit (pass); npm run lint (pass); npm test (39 passed, 2 skipped).
 Follow-ups: Consider automated i18n coverage checks in CI.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix
+Summary: Fixed invalid OpenCode configuration by adding missing "type": "stdio" field to all MCP server definitions in opencode.jsonc to resolve schema validation errors.
+Files changed: opencode.jsonc
+Verification: Visual verification of JSON structure and schema compliance.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix (Correction)
+Summary: Corrected invalid OpenCode configuration by updating MCP server definitions to use 'type': 'local' and merging 'command'/'args' into a single 'command' array, based on search results for the correct schema.
+Files changed: opencode.jsonc, team-opencode-config/opencode.jsonc
+Verification: Updated to valid local MCP schema structure.
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Configuration Fix (Environment Variables)
+Summary: Renamed 'env' to 'environment' in all MCP server configurations in opencode.jsonc and team-opencode-config/opencode.jsonc to resolve 'Unrecognized key' validation errors, based on official schema documentation.
+Files changed: opencode.jsonc, team-opencode-config/opencode.jsonc
+Verification: Updated to valid 'environment' key for local MCPs.

@@ -1,30 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { apiRequest } from '@/lib/utils/api';
+import type { GamificationProfile, XPEvent, GamificationSettings } from '@/lib/types';
+import { DEFAULT_GAMIFICATION_SETTINGS } from '@/lib/types';
 
 // ============================================================================
-// TYPES
+// TYPES (Re-export from centralized types)
 // ============================================================================
 
-export interface GamificationProfile {
-  xp: number;
-  level: number;
-  streakDays: number;
-  longestStreak: number;
-  lastActivityDate: string | null;
-  xpToNextLevel: number;
-  xpForCurrentLevel: number;
-  levelProgress: number; // 0-100 percentage
-}
-
-export interface XPEvent {
-  id: string;
-  eventType: string;
-  xpAmount: number;
-  referenceId: string | null;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-}
+export type { GamificationProfile, XPEvent } from '@/lib/types';
 
 interface GamificationState {
   profile: GamificationProfile | null;
@@ -33,11 +17,14 @@ interface GamificationState {
   hasLoaded: boolean;
   isDemo: boolean;
   error: string | null;
+  settings: GamificationSettings;
 
   // Actions
   loadProfile: (includeEvents?: boolean) => Promise<void>;
   recordActivity: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateSettings: (settings: Partial<GamificationSettings>) => void;
+  resetSettings: () => void;
 
   // Computed helpers
   getLevelTitle: () => string;
@@ -115,6 +102,7 @@ export const useGamificationStore = create<GamificationState>()(
       hasLoaded: false,
       isDemo: false,
       error: null,
+      settings: DEFAULT_GAMIFICATION_SETTINGS,
 
       loadProfile: async (includeEvents = true) => {
         // Don't reload if already loaded (unless forced via refreshProfile)
@@ -183,6 +171,16 @@ export const useGamificationStore = create<GamificationState>()(
         await get().loadProfile(true);
       },
 
+      updateSettings: (newSettings: Partial<GamificationSettings>) => {
+        set((state) => ({
+          settings: { ...state.settings, ...newSettings },
+        }));
+      },
+
+      resetSettings: () => {
+        set({ settings: DEFAULT_GAMIFICATION_SETTINGS });
+      },
+
       getLevelTitle: () => {
         const profile = get().profile;
         if (!profile) return 'Student';
@@ -204,6 +202,7 @@ export const useGamificationStore = create<GamificationState>()(
         recentEvents: state.recentEvents,
         isDemo: state.isDemo,
         hasLoaded: state.hasLoaded,
+        settings: state.settings,
       }),
     },
   ),
