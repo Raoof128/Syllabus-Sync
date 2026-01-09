@@ -985,14 +985,404 @@ npm start
 
 ---
 
+## OpenCode Team Workflow & MCP Power-Tools Roadmap
+
+This section documents the upgrade path for OpenCode from a helpful assistant to a **team-grade operating system** with consistent workflows, security tooling, and automated verification.
+
+### 1) Team-Grade Workflow: Plan → Patch → Verify
+
+#### Shared Config Directory Structure
+
+Create a shared `team-opencode-config/` directory (tracked in repo or separate config repo):
+
+```
+team-opencode-config/
+├── opencode.jsonc          # Shared OpenCode settings
+├── agent/
+│   └── repo-first.md       # Behavioral script for consistent agent behavior
+├── command/
+│   ├── rfp.md              # Repo First Pipeline command
+│   ├── secverify.md        # Security verification command
+│   ├── fastcheck.md        # Fast minimal test command
+│   └── docfind.md          # Documentation finder command
+└── prompts/
+    └── system.md           # Team-wide system prompt additions
+```
+
+#### Environment Configuration
+
+Point OpenCode to the shared config:
+
+```bash
+# Add to shell profile (.bashrc, .zshrc)
+export OPENCODE_CONFIG_DIR=/path/to/team-opencode-config
+```
+
+#### Repo-First Agent (`agent/repo-first.md`)
+
+The repo-first agent follows a strict behavioral script for every task:
+
+```markdown
+# Repo-First Agent
+
+## Behavioral Script
+
+1. **MAP REPO** - Before any changes, scan project structure:
+   - Read AGENT.md, CHANGELOG.md, README.md
+   - Identify key directories (src/, lib/, components/, tests/)
+   - Note existing patterns and conventions
+
+2. **PROPOSE PLAN** - Present approach to user:
+   - List files to be modified/created
+   - Explain reasoning for each change
+   - Estimate complexity (small/medium/large)
+
+3. **LIST FILES** - Explicitly enumerate:
+   - Files to read (for context)
+   - Files to modify (edits)
+   - Files to create (if absolutely necessary)
+
+4. **MAKE TINY PATCHES** - Implement incrementally:
+   - One logical change per edit
+   - Preserve existing patterns
+   - Add comments for non-obvious code
+
+5. **RUN CHECKS** - Verify after each change:
+   - Linting (npm run lint)
+   - Type checking (npm run typecheck)
+   - Tests (npm run test)
+   - Build (npm run build)
+
+6. **SUMMARIZE DIFFS** - Report changes:
+   - What changed and why
+   - Test results
+   - Any warnings or concerns
+```
+
+#### Reusable Commands
+
+**`command/rfp.md` - Repo First Pipeline:**
+
+```markdown
+# /rfp - Repo First Pipeline
+
+Execute the full Plan → Patch → Verify workflow:
+
+1. Read AGENT.md and CHANGELOG.md for context
+2. Map repository structure
+3. Propose changes with file list
+4. Implement changes incrementally
+5. Run verification suite
+6. Update AGENT.md and CHANGELOG.md with Raouf: template
+7. Report summary with diffs
+```
+
+**`command/secverify.md` - Security Verification:**
+
+```markdown
+# /secverify - Security Verification
+
+Run comprehensive security checks:
+
+1. Run Semgrep SAST scan (if MCP available)
+2. Run dependency vulnerability scan (npm audit / OSV)
+3. Check for hardcoded secrets (grep patterns)
+4. Verify CSP headers configured
+5. Check rate limiting on auth endpoints
+6. Summarize findings with severity levels
+```
+
+#### Verify Output Contract
+
+Every task completion must include:
+
+```markdown
+## Verification Report
+
+**Checks Executed:**
+- [ ] npm run lint: [PASS/FAIL]
+- [ ] npm run typecheck: [PASS/FAIL]
+- [ ] npm run test: [PASS/FAIL] (X/Y tests)
+- [ ] npm run build: [PASS/FAIL] (X/Y pages)
+
+**Failures:** [None / List with details]
+
+**Next Action:** [Ready to commit / Needs fix for X]
+
+**Git Diff Summary:**
+- Files modified: X
+- Lines added: +Y
+- Lines removed: -Z
+```
+
+---
+
+### 2) MCP Power-Tools
+
+Model Context Protocol (MCP) servers extend OpenCode with specialized capabilities:
+
+#### SAST: Semgrep MCP
+
+**Purpose:** Static Application Security Testing with structured results
+
+**Integration:**
+```jsonc
+// opencode.jsonc
+{
+  "mcp": {
+    "semgrep": {
+      "command": "npx",
+      "args": ["@semgrep/mcp-server"],
+      "config": {
+        "rules": ["p/typescript", "p/react", "p/nextjs", "p/security-audit"]
+      }
+    }
+  }
+}
+```
+
+**Usage:** Scan for security vulnerabilities, code quality issues, and anti-patterns.
+
+#### Dependency + License Audit MCP (OSV/Trivy)
+
+**Purpose:** Supply chain vulnerability detection and license compliance
+
+**Integration:**
+```jsonc
+{
+  "mcp": {
+    "dependency-audit": {
+      "command": "npx",
+      "args": ["osv-scanner-mcp"],
+      "config": {
+        "checkLicenses": true,
+        "failOnHigh": true
+      }
+    }
+  }
+}
+```
+
+**Usage:** Detect vulnerable dependencies, check license compatibility, suggest updates.
+
+#### Repo Graph MCP
+
+**Purpose:** Architecture visibility, blast radius analysis, cycle detection
+
+**Integration:**
+```jsonc
+{
+  "mcp": {
+    "repo-graph": {
+      "command": "npx",
+      "args": ["repo-graph-mcp"],
+      "config": {
+        "includePatterns": ["src/**", "lib/**", "components/**"],
+        "excludePatterns": ["node_modules/**", "*.test.*"]
+      }
+    }
+  }
+}
+```
+
+**Usage:** Visualize dependencies, identify high-impact files, detect circular imports.
+
+#### Test Orchestrator MCP
+
+**Purpose:** Run minimal relevant test subset based on changed files
+
+**Integration:**
+```jsonc
+{
+  "mcp": {
+    "test-orchestrator": {
+      "command": "npx",
+      "args": ["test-orchestrator-mcp"],
+      "config": {
+        "testRunner": "vitest",
+        "coverageThreshold": 80
+      }
+    }
+  }
+}
+```
+
+**Usage:** Smart test selection, coverage gaps, flaky test detection.
+
+#### Docs Indexer MCP
+
+**Purpose:** Local RAG for repository documentation retrieval
+
+**Integration:**
+```jsonc
+{
+  "mcp": {
+    "docs-indexer": {
+      "command": "npx",
+      "args": ["docs-indexer-mcp"],
+      "config": {
+        "indexPaths": ["docs/", "Team_Plan/", "README.md"],
+        "embedModel": "local"
+      }
+    }
+  }
+}
+```
+
+**Usage:** Query internal docs, retrieve conventions, find related documentation.
+
+---
+
+### 3) Tool-First Commands
+
+Quick-access commands that leverage MCP tools:
+
+| Command | Description | Tools Used |
+|---------|-------------|------------|
+| `/secverify` | Run security scans and summarize findings | Semgrep, OSV, grep |
+| `/repomap` | Show repository structure and key modules | Repo Graph, glob |
+| `/fastcheck` | Run minimal tests based on changed files | Test Orchestrator |
+| `/docfind <topic>` | Retrieve relevant internal documentation | Docs Indexer |
+| `/rfp` | Execute full Repo First Pipeline | All tools |
+
+---
+
+### 4) Syllabus Sync Verify Commands
+
+Project-specific verification suite:
+
+```bash
+# Full verification (run before every commit)
+npm run lint        # ESLint - code quality
+npm run typecheck   # TypeScript - type safety (if configured)
+npm run test        # Vitest - 143+ unit tests
+npm run build       # Next.js - 28 pages
+
+# Quick verification (during development)
+npm run lint -- --fix  # Auto-fix linting issues
+npm run test -- --watch  # Watch mode for TDD
+```
+
+**Expected Results:**
+- Lint: 0 errors, 0 warnings
+- Tests: 143/143 passing
+- Build: 28/28 pages compiled
+
+---
+
+### 5) GitHub Automation (Optional)
+
+#### OpenCode GitHub Actions Bot
+
+```yaml
+# .github/workflows/opencode-bot.yml
+name: OpenCode Bot
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  opencode:
+    if: contains(github.event.comment.body, '@opencode')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run OpenCode
+        uses: opencode/action@v1
+        with:
+          command: ${{ github.event.comment.body }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Use Cases:**
+- PR comments: `@opencode /secverify` - Run security scan
+- Issue comments: `@opencode fix this` - Auto-patch issues
+- CI failures: Auto-analyze and suggest fixes
+
+#### Automated Dependency Updates
+
+```yaml
+# .github/workflows/dep-update.yml
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Monday
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update dependencies
+        run: npx npm-check-updates -u
+      - name: Run verification
+        run: npm run lint && npm run test && npm run build
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: 'chore(deps): weekly dependency updates'
+          branch: 'deps/weekly-update'
+```
+
+---
+
+### 6) Rollout Plan
+
+#### Phase 1: Foundation (1 day)
+
+- [ ] Create `team-opencode-config/` directory
+- [ ] Add `agent/repo-first.md` behavioral script
+- [ ] Add `command/rfp.md` for Repo First Pipeline
+- [ ] Configure `OPENCODE_CONFIG_DIR` environment variable
+- [ ] Test workflow on small feature branch
+
+#### Phase 2: MCP Core (1-2 days)
+
+- [ ] Install and configure Semgrep MCP
+- [ ] Install and configure dependency audit MCP (OSV)
+- [ ] Create `/secverify` command
+- [ ] Run baseline security scan and document findings
+- [ ] Integrate into pre-commit hooks (optional)
+
+#### Phase 3: Speed (1-2 days)
+
+- [ ] Install and configure Test Orchestrator MCP
+- [ ] Install and configure Repo Graph MCP
+- [ ] Create `/fastcheck` command
+- [ ] Create `/repomap` command
+- [ ] Benchmark test time reduction
+
+#### Phase 4: Scale (Optional)
+
+- [ ] Set up GitHub Actions OpenCode bot
+- [ ] Configure automated dependency updates
+- [ ] Install Docs Indexer MCP for large repos
+- [ ] Create team onboarding documentation
+
+---
+
+### 7) Success Metrics
+
+| Metric | Baseline | Target |
+|--------|----------|--------|
+| Time to first patch | ~10 min | <5 min |
+| Security issues caught pre-commit | Manual | Automated |
+| Test feedback time | Full suite | Relevant subset |
+| Cross-machine consistency | Variable | 100% identical |
+| Documentation retrieval | Manual search | Instant `/docfind` |
+
+---
+
 ## License
 
 MIT License - See LICENSE file for details.
 
 ---
 
-**Last Updated:** January 08, 2026
-**Version:** 0.7.0
+**Last Updated:** January 09, 2026
+**Version:** 0.8.6
 
 ---
 

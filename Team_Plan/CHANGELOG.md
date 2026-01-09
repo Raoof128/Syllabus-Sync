@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.6] - 2026-01-09
+
+### Added
+
+#### OpenCode Team Workflow & MCP Power-Tools Roadmap (Raouf)
+
+**Scope:** Documentation - Added comprehensive roadmap for upgrading OpenCode from helpful assistant to team-grade operating system with consistent workflows, security tooling, and automated verification.
+
+**Team-Grade Workflow (Plan → Patch → Verify):**
+- Documented shared `team-opencode-config/` directory structure (opencode.jsonc, agent/, command/, prompts/)
+- Created Repo-First Agent behavioral script (map repo → propose plan → list files → make tiny patches → run checks → summarize diffs)
+- Defined reusable commands: `/rfp` (Repo First Pipeline), `/secverify` (Security Verification)
+- Specified environment configuration (`OPENCODE_CONFIG_DIR`)
+- Established Verify Output Contract (what checks ran, results, failures, next action, git diff summary)
+
+**MCP Power-Tools Documentation:**
+- **Semgrep MCP** - Static Application Security Testing with structured results
+- **Dependency + License Audit MCP (OSV/Trivy)** - Supply chain vulnerability detection
+- **Repo Graph MCP** - Architecture visibility, blast radius analysis, cycle detection
+- **Test Orchestrator MCP** - Smart test selection based on changed files
+- **Docs Indexer MCP** - Local RAG for repository documentation retrieval
+
+**Tool-First Commands:**
+- `/secverify` - Run Semgrep + dependency scan + summarize findings
+- `/repomap` - Show repository structure and key modules
+- `/fastcheck` - Run minimal tests based on changed files
+- `/docfind <topic>` - Retrieve relevant internal documentation
+
+**Syllabus Sync Verify Commands:**
+- Documented project-specific verification suite (lint, typecheck, test, build)
+- Expected results: 0 lint errors, 143/143 tests passing, 28/28 pages compiled
+
+**GitHub Automation (Optional):**
+- OpenCode GitHub Actions bot for PR/issue comment commands
+- Automated weekly dependency update workflow
+
+**Rollout Plan (4 Phases):**
+- Phase 1: Foundation (config repo, repo-first agent, /rfp command)
+- Phase 2: MCP Core (Semgrep, OSV, /secverify)
+- Phase 3: Speed (test orchestrator, repo graph, /fastcheck, /repomap)
+- Phase 4: Scale (GitHub Actions, docs indexer)
+
+**Success Metrics:**
+- Time to first patch: <5 min target
+- Security issues caught pre-commit: Automated
+- Cross-machine consistency: 100% identical
+
+**Files Changed:**
+- `Team_Plan/AGENT.md` - Added OpenCode Team Workflow & MCP Roadmap section (~300 lines)
+- `Team_Plan/CHANGELOG.md` - Added this changelog entry
+
+**Verification:**
+- `npm run lint`: Pass
+- `npm run build`: Success (28/28 pages)
+
+---
+
 ## [0.8.5] - 2026-01-09
 
 ### Security
