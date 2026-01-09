@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.3] - 2026-01-09
+
+### Fixed
+
+#### Fix ImageOverlay DOM Errors During HMR (Raouf)
+
+**Summary:** Fixed persistent ImageOverlay DOM errors that occurred during Hot Module Replacement (HMR) and fast refresh cycles in Turbopack dev mode.
+
+**Problem:**
+- ImageOverlay components threw "Cannot read properties of undefined (reading 'tagName')" on mount
+- ImageOverlay components threw "Cannot read properties of undefined (reading 'parentNode')" on unmount
+- Errors occurred in Leaflet's internal `_initImage` and `onRemove` methods
+- Issue was caused by React/Leaflet lifecycle conflicts during HMR transitions
+
+**Solution - Two-Phase Rendering:**
+- **Phase 1 (isClientReady):** Map container renders empty, MapController initializes map instance
+- **Phase 2 (overlaysReady):** After 200ms delay once map instance is stable, overlays are rendered
+- This ensures DOM container is fully stable before adding ImageOverlay layers
+
+**Solution - Clean Remount on HMR:**
+- Added `mapKey` state that increments when modules load
+- MapContainer uses `key={map-${mapKey}}` to force full clean remount instead of patching
+- Prevents Leaflet from trying to patch DOM elements that may be in transitional state
+
+**Solution - Mount Ref Tracking:**
+- Added `isMountedRef` to track component mount state
+- Cleanup function now properly resets `overlaysReady` and `isClientReady` on unmount
+- Prevents state updates on unmounted components
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Added overlaysReady, mapKey, isMountedRef states
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
+
+---
+
 ## [0.14.2] - 2026-01-09
 
 ### Fixed

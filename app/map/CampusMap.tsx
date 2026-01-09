@@ -80,7 +80,10 @@ export default function CampusMap({
   const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
   const [pickedLocation, setPickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isClientReady, setIsClientReady] = useState(false);
+  const [overlaysReady, setOverlaysReady] = useState(false);
+  const [mapKey, setMapKey] = useState(0); // Key to force remount on HMR
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
 
   // Hybrid Navigation State
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
@@ -102,7 +105,7 @@ export default function CampusMap({
   // LOAD LEAFLET MODULES ON CLIENT SIDE ONLY
   // ============================================
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
 
     const loadLeaflet = async () => {
       try {
@@ -118,7 +121,7 @@ export default function CampusMap({
         // Import react-leaflet components
         const RL = await import('react-leaflet');
 
-        if (!isMounted) return;
+        if (!isMountedRef.current) return;
 
         // Fix default marker icons
         delete (L.default.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })
@@ -140,9 +143,12 @@ export default function CampusMap({
           useMapEvents: RL.useMapEvents,
         });
 
+        // Generate new key to force clean mount
+        setMapKey((prev) => prev + 1);
+
         // Small delay to ensure everything is ready
         setTimeout(() => {
-          if (isMounted && mapContainerRef.current) {
+          if (isMountedRef.current && mapContainerRef.current) {
             setIsClientReady(true);
           }
         }, 100);
@@ -159,7 +165,9 @@ export default function CampusMap({
     loadLeaflet();
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
+      setOverlaysReady(false);
+      setIsClientReady(false);
     };
   }, []);
 
@@ -242,6 +250,29 @@ export default function CampusMap({
   }, [leafletModule]);
 
   const selectedIcon = useMemo(() => getMarkerIcon(true), [getMarkerIcon]);
+
+  // ============================================
+  // OVERLAYS READY EFFECT - Delay overlay rendering until map is stable
+  // ============================================
+  useEffect(() => {
+    if (!mapInstance || !isMapReady(mapInstance)) {
+      setOverlaysReady(false);
+      return;
+    }
+
+    // Delay overlay rendering to ensure map container DOM is fully stable
+    const timer = setTimeout(() => {
+      if (isMountedRef.current && isMapReady(mapInstance)) {
+        mapLog.log('Map stable, enabling overlays');
+        setOverlaysReady(true);
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(timer);
+      setOverlaysReady(false);
+    };
+  }, [mapInstance, isMapReady]);
 
   // ============================================
   // GEOLOCATION EFFECT
@@ -620,23 +651,28 @@ export default function CampusMap({
       {/* Only render MapContainer after client-side modules are loaded */}
       {isClientReady && reactLeafletModule && MapController ? (
         <reactLeafletModule.MapContainer
+          key={`map-${mapKey}`} // Force clean remount on HMR
           center={[-33.77, 151.115]}
           zoom={16}
           zoomControl={false}
           style={{ height: '100%', width: '100%' }}
         >
-          <reactLeafletModule.ImageOverlay url={CAMPUS_IMAGE_URL} bounds={CAMPUS_BOUNDS} />
+          {/* Base campus image - only render when overlays are ready */}
+          {overlaysReady && (
+            <reactLeafletModule.ImageOverlay url={CAMPUS_IMAGE_URL} bounds={CAMPUS_BOUNDS} />
+          )}
 
-          {/* Map Overlay Layers */}
-          {activeOverlays.map((overlayId) => (
-            <reactLeafletModule.ImageOverlay
-              key={overlayId}
-              url={OVERLAY_PATHS[overlayId]}
-              bounds={CAMPUS_BOUNDS}
-              opacity={0.85}
-              className="map-overlay-layer"
-            />
-          ))}
+          {/* Map Overlay Layers - only render when overlays are ready */}
+          {overlaysReady &&
+            activeOverlays.map((overlayId) => (
+              <reactLeafletModule.ImageOverlay
+                key={overlayId}
+                url={OVERLAY_PATHS[overlayId]}
+                bounds={CAMPUS_BOUNDS}
+                opacity={0.85}
+                className="map-overlay-layer"
+              />
+            ))}
 
           <MapController
             selectedBuildingProp={selectedBuilding}
@@ -646,8 +682,8 @@ export default function CampusMap({
             setPickedLocationProp={setPickedLocation}
           />
 
-          {/* Route Polyline */}
-          {routeCoords.length > 0 && (
+          {/* Route Polyline - only render when overlays are ready */}
+          {overlaysReady && routeCoords.length > 0 && (
             <reactLeafletModule.Polyline
               positions={routeCoords}
               color="var(--mq-primary, blue)"
@@ -656,8 +692,8 @@ export default function CampusMap({
             />
           )}
 
-          {/* Picked Location Marker */}
-          {pickedLocation && selectedIcon && (
+          {/* Picked Location Marker - only render when overlays are ready */}
+          {overlaysReady && pickedLocation && selectedIcon && (
             <reactLeafletModule.Marker
               position={[pickedLocation.lat, pickedLocation.lng]}
               icon={selectedIcon}
@@ -674,8 +710,8 @@ export default function CampusMap({
             </reactLeafletModule.Marker>
           )}
 
-          {/* Building markers - only show when a building is selected */}
-          {selectedBuilding && selectedIcon && (
+          {/* Building markers - only show when a building is selected and overlays are ready */}
+          {overlaysReady && selectedBuilding && selectedIcon && (
             <reactLeafletModule.Marker
               key={selectedBuilding.id}
               position={[
