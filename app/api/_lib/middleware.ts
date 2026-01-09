@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonUnauthorized, jsonError, ERROR_CODES } from './response';
+import { checkRateLimit, type RateLimitConfig } from '@/lib/services/rateLimitService';
 
 // ============================================================================
 // AUTHENTICATION MIDDLEWARE
@@ -26,7 +27,10 @@ export const requireAuth = async (
 
     return await handler(user.id);
   } catch (error) {
-    console.error('Authentication middleware error:', error);
+    console.error(
+      'Authentication middleware error:',
+      error instanceof Error ? error.message : 'Unknown error',
+    );
     return jsonError('Authentication failed', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 };
@@ -46,7 +50,10 @@ export const optionalAuth = async (
 
     return await handler(user?.id);
   } catch (error) {
-    console.error('Optional auth middleware error:', error);
+    console.error(
+      'Optional auth middleware error:',
+      error instanceof Error ? error.message : 'Unknown error',
+    );
     // Continue without authentication
     return await handler(undefined);
   }
@@ -56,21 +63,29 @@ export const optionalAuth = async (
 // RATE LIMITING MIDDLEWARE
 // ============================================================================
 
-// Simple in-memory rate limiting (for production, use Redis or similar)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
 /**
- * Rate limiting configuration
+ * Extract client IP from request headers
  */
-interface RateLimitConfig {
-  windowMs: number; // Time window in milliseconds
-  maxRequests: number; // Maximum requests per window
-  skipSuccessfulRequests?: boolean; // Don't count 2xx responses
-  skipFailedRequests?: boolean; // Don't count 4xx/5xx responses
+function getClientIP(request: NextRequest): string {
+  // Check standard proxy headers in order of preference
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const firstIp = forwarded.split(',')[0].trim();
+    if (firstIp) return firstIp;
+  }
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  const clientIp = request.headers.get('x-client-ip');
+  if (clientIp) return clientIp;
+
+  return 'unknown';
 }
 
 /**
  * Apply rate limiting to API routes
+ * SECURITY: Uses distributed store (Redis/KV) in production for serverless compatibility
  */
 export const rateLimit = (
   config: RateLimitConfig = { windowMs: 15 * 60 * 1000, maxRequests: 100 },
@@ -79,63 +94,35 @@ export const rateLimit = (
     request: NextRequest,
     handler: () => Promise<NextResponse>,
   ): Promise<NextResponse> => {
-    const ip =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      request.headers.get('x-client-ip') ||
-      'unknown';
+    const ip = getClientIP(request);
     const key = `${ip}:${request.nextUrl.pathname}`;
 
-    const now = Date.now();
+    // Check rate limit using distributed store
+    const { allowed, remaining, resetIn, limit } = await checkRateLimit(key, {
+      ...config,
+      prefix: config.prefix || 'api',
+    });
 
-    // Clean up old entries
-    for (const [k, v] of rateLimitStore.entries()) {
-      if (v.resetTime < now) {
-        rateLimitStore.delete(k);
-      }
-    }
-
-    const current = rateLimitStore.get(key) || { count: 0, resetTime: now + config.windowMs };
-
-    if (current.count >= config.maxRequests) {
-      const resetIn = Math.ceil((current.resetTime - now) / 1000);
+    if (!allowed) {
       return jsonError(
         `Rate limit exceeded. Try again in ${resetIn} seconds.`,
         429,
         ERROR_CODES.RATE_LIMITED,
-        { resetIn, limit: config.maxRequests, windowMs: config.windowMs },
+        { resetIn, limit, windowMs: config.windowMs },
       );
     }
 
     try {
       const response = await handler();
 
-      // Update rate limit counter based on config
-      const shouldCount =
-        (!config.skipSuccessfulRequests || response.status >= 400) &&
-        (!config.skipFailedRequests || response.status < 400);
-
-      if (shouldCount) {
-        current.count++;
-        rateLimitStore.set(key, current);
-      }
-
       // Add rate limit headers to response
       const newResponse = new NextResponse(response.body, response);
-      newResponse.headers.set('X-RateLimit-Limit', config.maxRequests.toString());
-      newResponse.headers.set(
-        'X-RateLimit-Remaining',
-        Math.max(0, config.maxRequests - current.count).toString(),
-      );
-      newResponse.headers.set('X-RateLimit-Reset', Math.ceil(current.resetTime / 1000).toString());
+      newResponse.headers.set('X-RateLimit-Limit', limit.toString());
+      newResponse.headers.set('X-RateLimit-Remaining', remaining.toString());
+      newResponse.headers.set('X-RateLimit-Reset', resetIn.toString());
 
       return newResponse;
     } catch (error) {
-      // Count failed requests if configured
-      if (!config.skipFailedRequests) {
-        current.count++;
-        rateLimitStore.set(key, current);
-      }
       throw error;
     }
   };

@@ -5,6 +5,7 @@ import './globals.css';
 import './mq-tokens.css';
 import ClientLayout from './client-layout';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { THEME_SCRIPT, RTL_SCRIPT } from '@/lib/security/csp';
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -63,52 +64,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     logo: new URL('/MQ_Logo_Final.png', UNIVERSITY_CONFIG.website).toString(),
   };
 
-  // Inline script to prevent theme flash on page load
-  // This runs before React hydration to set the correct theme immediately
-  const themeScript = `
-    (function() {
-      try {
-        var stored = localStorage.getItem('theme-storage');
-        var theme = 'system';
-        if (stored) {
-          var parsed = JSON.parse(stored);
-          theme = parsed.state?.theme || 'system';
-        }
-        var resolved = theme;
-        if (theme === 'system') {
-          resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.classList.add(resolved);
-        document.documentElement.style.colorScheme = resolved;
-      } catch (e) {
-        // Ignore localStorage/parsing errors - will fall back to system default
-      }
-    })();
-  `;
-
-  // Inline script to handle RTL direction based on stored language
-  const rtlScript = `
-    (function() {
-      try {
-        var stored = localStorage.getItem('language-storage');
-        if (stored) {
-          var parsed = JSON.parse(stored);
-          var lang = parsed.state?.language || 'en';
-          var rtlLanguages = ['fa', 'ar', 'ur', 'he'];
-          if (rtlLanguages.includes(lang)) {
-            document.documentElement.dir = 'rtl';
-            document.documentElement.lang = lang;
-          } else {
-            document.documentElement.dir = 'ltr';
-            document.documentElement.lang = lang;
-          }
-        }
-      } catch (e) {
-        // Ignore localStorage/parsing errors - will fall back to LTR English
-      }
-    })();
-  `;
-
   return (
     <html
       lang="en"
@@ -116,10 +71,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
-        {/* Theme and RTL scripts run before body to prevent flash */}
-        {/* Note: Using unsafe-inline in CSP instead of nonce to avoid hydration mismatch */}
-        <script key="theme-script" dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: rtlScript }} />
+        {/* Theme and RTL scripts - minified and hash-validated by CSP */}
+        {/* SECURITY: These scripts are validated via SHA-256 hashes in the CSP header */}
+        {/* If you modify these scripts, update lib/security/csp.ts with new hashes */}
+        <script key="theme-script" dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }} />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <script

@@ -8,7 +8,7 @@ import {
   handleDatabaseError,
   ERROR_CODES,
 } from '@/app/api/_lib/response';
-import { mapUnitRow, serializeUnit } from '@/app/api/_lib/mappers';
+import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
 
 // ============================================================================
@@ -43,6 +43,7 @@ const unitSchema = z.object({
     .regex(/^[A-Z]{3,4}\d{3,4}$/, 'Unit code must be in format AAA123 or AAAA1234'),
   name: z.string().min(1).max(200),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
+  description: z.string().max(500).optional(),
   location: z.object({
     building: z.string().min(1).max(100),
     room: z.string().min(1).max(50),
@@ -202,7 +203,10 @@ export async function GET(request: Request) {
       if (error instanceof z.ZodError) {
         return handleValidationError(error);
       }
-      console.error('GET /api/units error:', error);
+      console.error(
+        'GET /api/units error:',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
       return jsonError('Failed to fetch units', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -239,85 +243,35 @@ export async function POST(request: Request) {
     return validateRequest(unitSchema)(request, async (validatedData) => {
       try {
         const supabase = await createServerClient();
-        const { schedule, ...unitData } = validatedData;
-        const payload = {
-          ...unitData,
-          id: unitData.id ?? crypto.randomUUID(),
-          user_id: userId, // Security: Associate unit with current user
-          createdAt: unitData.createdAt ?? new Date(),
-        };
+        const { schedule, location, ...unitData } = validatedData;
 
-        // Start transaction-like approach for unit and class times
-        const { error: unitError } = await supabase
-          .from('units')
-          .insert(serializeUnit(payload))
-          .select('*')
-          .single();
+        // SECURITY: Use atomic database function to prevent orphaned records
+        // This creates the unit and all class times in a single transaction
+        const { data, error } = await supabase.rpc('create_unit_with_schedule', {
+          p_user_id: userId,
+          p_code: unitData.code,
+          p_name: unitData.name,
+          p_color: unitData.color,
+          p_building: location.building,
+          p_room: location.room,
+          p_description: unitData.description || null,
+          p_schedule: schedule || [],
+        });
 
-        if (unitError) {
-          if (unitError.code === '23505') {
+        if (error) {
+          if (error.code === '23505') {
             // Unique constraint violation
             return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
           }
-          return handleDatabaseError(unitError);
+          return handleDatabaseError(error);
         }
 
-        let createdClassTimes: Array<{
-          id: string;
-          day: string;
-          startTime: string;
-          endTime: string;
-          unit_id?: string;
-        }> = [];
-
-        // Insert class times if any
-        if (schedule && schedule.length > 0) {
-          const classTimesToInsert = schedule.map((ct) => ({
-            unit_id: payload.id,
-            day: ct.day,
-            start_time: ct.startTime,
-            end_time: ct.endTime,
-          }));
-
-          const { data: classTimesData, error: classTimesError } = await supabase
-            .from('class_times')
-            .insert(classTimesToInsert)
-            .select('*');
-
-          if (classTimesError) {
-            // Rollback by deleting the unit (best effort)
-            await supabase.from('units').delete().eq('id', unitData.id);
-            return handleDatabaseError(classTimesError);
-          }
-
-          createdClassTimes =
-            classTimesData?.map((ct: unknown) => {
-              const c = ct as Record<string, unknown>;
-              return {
-                id: String(c.id),
-                day: String(c.day) as
-                  | 'Monday'
-                  | 'Tuesday'
-                  | 'Wednesday'
-                  | 'Thursday'
-                  | 'Friday'
-                  | 'Saturday'
-                  | 'Sunday',
-                startTime: String(c.start_time),
-                endTime: String(c.end_time),
-              };
-            }) ?? [];
-        }
-
-        return jsonSuccess(
-          {
-            ...mapUnitRow(unitData),
-            schedule: createdClassTimes,
-          },
-          201,
-        );
+        return jsonSuccess(data, 201);
       } catch (error) {
-        console.error('POST /api/units error:', error);
+        console.error(
+          'POST /api/units error:',
+          error instanceof Error ? error.message : 'Unknown error',
+        );
         return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
       }
     });

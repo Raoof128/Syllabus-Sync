@@ -1,0 +1,170 @@
+{
+  "$schema": "https://opencode.ai/schema/opencode.json",
+
+  // ============================================================
+  // TEAM OPENCODE CONFIGURATION
+  // Syllabus Sync - Macquarie University Campus Management
+  // ============================================================
+  //
+  // Usage: export OPENCODE_CONFIG_DIR=/path/to/team-opencode-config
+  // This ensures consistent behavior across all team machines.
+  //
+  // ============================================================
+
+  // Agent Configuration
+  // Default agent for all tasks - enforces Plan -> Patch -> Verify
+  "agent": {
+    "default": "repo-first",
+    "model": "claude-sonnet-4-20250514",
+  },
+
+  // MCP Server Declarations
+  // Each server extends OpenCode with specialized capabilities
+  "mcp": {
+    // SAST: Static Application Security Testing
+    "semgrep": {
+      "command": "uvx",
+      "args": ["--from", "semgrep", "semgrep", "mcp"],
+      "env": {
+        "SEMGREP_RULES": "p/typescript,p/react,p/nextjs,p/security-audit,p/secrets",
+      },
+    },
+
+    // Dependency Vulnerability Scanner (OSV)
+    "osv-scanner": {
+      "command": "osv-scanner",
+      "args": ["--format", "json", "--recursive", "."],
+    },
+
+    // File System Operations (built-in but configured)
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-filesystem"],
+      "env": {
+        "ALLOWED_PATHS": ".",
+      },
+    },
+
+    // Git Operations
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-git"],
+    },
+
+    // Sequential Thinking for Complex Problem Solving
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-sequential-thinking"],
+    },
+
+    // Memory/Knowledge Graph
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-memory"],
+    },
+
+    // Context7 - Documentation Retrieval
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-context7"],
+    },
+
+    // Bright Data - Web Scraping and Browser Automation
+    "brightdata": {
+      "command": "npx",
+      "args": ["@brightdata/mcp"],
+      "env": {
+        "API_TOKEN": "YOUR_BRIGHTDATA_API_TOKEN",
+        "PRO_MODE": "true",
+      },
+    },
+
+    // Chrome DevTools - Browser Debugging and Inspection
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"],
+    },
+
+    // MarkItDown - Universal Document-to-Markdown Converter
+    "markitdown": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "markitdown-mcp:latest"],
+    },
+
+    // Supabase - Database and Backend Operations
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "YOUR_SUPABASE_ACCESS_TOKEN",
+      },
+    },
+
+    // Shadcn UI - Professional Component Generation
+    "shadcn": {
+      "command": "npx",
+      "args": ["@jpisnice/shadcn-ui-mcp-server", "--github-api-key", "YOUR_GITHUB_TOKEN"],
+    },
+
+    // Playwright - Automated Browser Testing
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+    },
+  },
+
+  // Project-Specific Verification Commands
+  // Used by repo-first agent during VERIFY phase
+  "verify": {
+    "lint": "npm run lint",
+    "typecheck": "npm run typecheck",
+    "test": "npm run test",
+    "build": "npm run build",
+    "secrets": "npm run check:secrets",
+  },
+
+  // Expected Verification Results (for pass/fail detection)
+  "verify_expectations": {
+    "lint": {
+      "success_pattern": "Lint OK",
+      "fail_pattern": "error",
+    },
+    "test": {
+      "success_pattern": "passing",
+      "fail_pattern": "failed",
+    },
+    "build": {
+      "success_pattern": "Generating static pages",
+      "fail_pattern": "Build failed",
+    },
+  },
+
+  // File Patterns for Smart Test Selection
+  "file_patterns": {
+    "source": ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"],
+    "tests": ["tests/**/*.{test,spec}.{ts,tsx}"],
+    "config": ["*.config.{ts,js,mjs}", "tsconfig.json", "package.json"],
+    "docs": ["*.md", "Team_Plan/*.md", "docs/*.md"],
+  },
+
+  // Security Scan Configuration
+  "security": {
+    "scan_paths": ["app/", "components/", "lib/"],
+    "exclude_paths": ["node_modules/", ".next/", "coverage/"],
+    "severity_threshold": "medium",
+  },
+
+  // Output Formatting
+  "output": {
+    "diff_context_lines": 3,
+    "max_file_preview_lines": 50,
+    "truncate_large_outputs": true,
+    "max_output_tokens": 4000,
+  },
+
+  // Session Defaults
+  "session": {
+    "auto_save": true,
+    "history_limit": 100,
+  },
+}

@@ -167,7 +167,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON public.deadlines TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.events TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.user_preferences TO authenticated;
-GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.profiles TO authenticated;
 
 -- Units: Users can only access their own units
 CREATE POLICY "Users can view their own units"
@@ -296,7 +296,126 @@ CREATE POLICY "Users can view their own profile"
   TO authenticated
   USING (auth.uid() = id);
 
+-- SECURITY: Restrict profile updates to safe columns only
+-- student_id and email are protected - can only be set by admin/trigger
+-- Users can only update: full_name, avatar_url
 CREATE POLICY "Users can update their own profile"
   ON public.profiles FOR UPDATE
   TO authenticated
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id
+    -- Ensure student_id cannot be changed by comparing old vs new
+    -- This is enforced via a trigger below for complete protection
+  );
+
+-- Trigger function to prevent modification of sensitive profile fields
+CREATE OR REPLACE FUNCTION protect_profile_fields()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Prevent changing student_id after initial set (only admin can change via separate process)
+  IF OLD.student_id IS NOT NULL AND NEW.student_id IS DISTINCT FROM OLD.student_id THEN
+    RAISE EXCEPTION 'Cannot modify student_id after it has been set';
+  END IF;
+  
+  -- Prevent changing email (should only change via auth flow)
+  IF NEW.email IS DISTINCT FROM OLD.email THEN
+    RAISE EXCEPTION 'Cannot modify email directly. Use the authentication flow.';
+  END IF;
+  
+  -- Auto-update the updated_at timestamp
+  NEW.updated_at = NOW();
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER protect_profile_fields_trigger
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION protect_profile_fields();
+
+-- Policy for profile insertion (needed for signup flow)
+-- This allows users to insert their own profile row during signup
+CREATE POLICY "Users can insert their own profile"
+  ON public.profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = id);
+
+-- ============================================================================
+-- ATOMIC TRANSACTION FUNCTIONS
+-- SECURITY: These functions ensure data consistency and prevent orphaned records
+-- ============================================================================
+
+/**
+ * Create a unit with its class times in a single atomic transaction
+ * This prevents orphaned units if class_times insertion fails
+ */
+CREATE OR REPLACE FUNCTION create_unit_with_schedule(
+  p_user_id UUID,
+  p_code TEXT,
+  p_name TEXT,
+  p_color TEXT,
+  p_building TEXT,
+  p_room TEXT,
+  p_description TEXT DEFAULT NULL,
+  p_schedule JSONB DEFAULT '[]'::JSONB
+)
+RETURNS JSONB AS $$
+DECLARE
+  v_unit_id UUID;
+  v_schedule_item JSONB;
+  v_result JSONB;
+BEGIN
+  -- Validate user owns this request
+  IF p_user_id != auth.uid() THEN
+    RAISE EXCEPTION 'Unauthorized: Cannot create unit for another user';
+  END IF;
+
+  -- Generate unit ID
+  v_unit_id := uuid_generate_v4();
+
+  -- Insert the unit
+  INSERT INTO public.units (id, user_id, code, name, color, building, room, description)
+  VALUES (v_unit_id, p_user_id, p_code, p_name, p_color, p_building, p_room, p_description);
+
+  -- Insert class times if provided
+  FOR v_schedule_item IN SELECT * FROM jsonb_array_elements(p_schedule)
+  LOOP
+    INSERT INTO public.class_times (unit_id, day, start_time, end_time)
+    VALUES (
+      v_unit_id,
+      v_schedule_item->>'day',
+      v_schedule_item->>'startTime',
+      v_schedule_item->>'endTime'
+    );
+  END LOOP;
+
+  -- Return the created unit with schedule
+  SELECT jsonb_build_object(
+    'id', u.id,
+    'code', u.code,
+    'name', u.name,
+    'color', u.color,
+    'building', u.building,
+    'room', u.room,
+    'description', u.description,
+    'schedule', COALESCE(
+      (SELECT jsonb_agg(jsonb_build_object(
+        'id', ct.id,
+        'day', ct.day,
+        'startTime', ct.start_time,
+        'endTime', ct.end_time
+      )) FROM public.class_times ct WHERE ct.unit_id = u.id),
+      '[]'::JSONB
+    )
+  ) INTO v_result
+  FROM public.units u
+  WHERE u.id = v_unit_id;
+
+  RETURN v_result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION create_unit_with_schedule TO authenticated;

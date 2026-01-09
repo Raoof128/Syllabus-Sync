@@ -30,12 +30,17 @@ export async function GET(request: Request) {
         .order('event_date', { ascending: true });
 
       if (error) {
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Don't expose internal database error messages to clients
+        console.error('Database error:', error.code);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(data?.map(mapEventRow) ?? []);
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error(
+        'Error fetching events:',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
       return jsonError('Failed to fetch events', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -79,12 +84,17 @@ export async function POST(request: Request) {
         .single();
 
       if (error) {
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Don't expose internal database error messages to clients
+        console.error('Database error:', error.code);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(mapEventRow(data), 201);
     } catch (error) {
-      console.error('Error creating event:', error);
+      console.error(
+        'Error creating event:',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
       return jsonError('Failed to create event', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
