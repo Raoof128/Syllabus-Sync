@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.4 | Last Updated: January 09, 2026
+Version: 0.14.5 | Last Updated: January 09, 2026
 
 ---
 
@@ -1582,7 +1582,40 @@ MIT License - See LICENSE file for details.
 ---
 
 **Last Updated:** January 09, 2026
-**Version:** 0.9.6
+**Version:** 0.14.5
+
+---
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Map Navigation Popup Readability & Building Data Enrichment
+
+**Summary:** Improved map navigation popup readability by removing transparency and enriched 15+ buildings with data from OpenStreetMap GeoJSON including building levels, addresses, and OSM IDs.
+
+**Navigation Popup Fix:**
+- Changed `bg-mq-card-background/95 backdrop-blur-lg` to `bg-mq-card-background` (fully opaque) in CampusMap.tsx line 979
+- Improves text readability and contrast for route information display
+
+**Building Data Enrichment from GeoJSON:**
+- Data sourced from `/Users/raoof.r12/Desktop/Raouf/MQ_Project/MQ_Full.geojson` (OpenStreetMap export)
+- Updated 15+ buildings with:
+  - `levels` - Building floor counts (e.g., 4ER: 4→8, LIB: 8, 14SCO: 7)
+  - `addresses` - Added suburb/state (Macquarie Park, NSW 2113)
+  - `location.osmId` - OpenStreetMap attribution IDs
+  - Enhanced descriptions (e.g., 6WW: "Biological Sciences", 14ER: "Faculty of Science")
+
+**Buildings Updated:**
+17WW, 4ER, 6WW, 18WW, LIB, 8SCO, 6ER, CHAP, 14SCO, 75TAL, 13RPD, BANK, 14FW, 14ER, 6SR
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Fixed navigation popup opacity
+- `lib/map/buildings.ts` - Enriched building data from GeoJSON
+
+**Verification:**
+- `npm run prepush`: ✅ All checks pass
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
 
 ---
 

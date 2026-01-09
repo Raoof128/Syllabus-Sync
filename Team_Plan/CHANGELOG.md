@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.5] - 2026-01-09
+
+### Fixed
+
+#### Map Navigation Popup Readability & Building Data Enrichment (Raouf)
+
+**Summary:** Improved map navigation popup readability by removing transparency and enriched 15+ buildings with data from OpenStreetMap GeoJSON including building levels, addresses, and OSM IDs.
+
+**Navigation Popup Fix:**
+- Changed navigation panel background from `bg-mq-card-background/95 backdrop-blur-lg` to `bg-mq-card-background` (fully opaque)
+- Improves text readability and contrast when displaying route information
+
+**Building Data Enrichment from GeoJSON:**
+Data sourced from `/Users/raoof.r12/Desktop/Raouf/MQ_Project/MQ_Full.geojson` (OpenStreetMap export)
+
+| Building ID | Updates Applied |
+|-------------|-----------------|
+| 17WW | Added `levels: 3`, updated address with suburb/state |
+| 4ER | Updated `levels: 4` → `levels: 8` (from OSM data) |
+| 6WW | Added `levels: 3`, enhanced description with "Biological Sciences" |
+| 18WW | Added `levels: 4` |
+| LIB | Added `levels: 8` |
+| 8SCO | Updated address with suburb/state |
+| 6ER | Added `levels: 4`, updated address |
+| CHAP | Added `levels: 3` |
+| 14SCO | Added `levels: 7`, added location with OSM ID, enhanced description |
+| 75TAL | Updated address with suburb/state |
+| 13RPD | Updated address with suburb/state |
+| BANK | Updated address with suburb/state |
+| 14FW | Added location with OSM ID, updated address |
+| 14ER | Enhanced description with "Faculty of Science" |
+| 6SR | Updated address with suburb/state |
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Fixed navigation popup opacity (line 979)
+- `lib/map/buildings.ts` - Enriched 15+ buildings with GeoJSON data
+
+**Quality Assurance:**
+- All 248 tests passing
+- TypeScript: No errors
+- ESLint: 0 errors, 0 warnings
+- Build: Successful (30 routes)
+
+---
+
 ## [0.14.4] - 2026-01-09
 
 ### Fixed
