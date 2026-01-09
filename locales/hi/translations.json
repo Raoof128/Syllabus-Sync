@@ -699,5 +699,22 @@
   "resetProgressDesc": "सभी XP साफ करें और नए सिरे से शुरू करें",
   "resetProgressConfirm": "क्या आप सुनिश्चित हैं? यह आपके सभी XP, लेवल और स्ट्रीक डेटा को रीसेट कर देगा। इसे पूर्ववत नहीं किया जा सकता।",
   "progressReset": "प्रगति रीसेट",
-  "progressResetMsg": "आपकी गेमिफिकेशन प्रगति रीसेट कर दी गई है।"
+  "progressResetMsg": "आपकी गेमिफिकेशन प्रगति रीसेट कर दी गई है।",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }

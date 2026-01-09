@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.9.1 | Last Updated: January 09, 2026
+Version: 0.9.7 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,25 @@ Version: 0.9.1 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Campus Map Overlay Layers v0.9.7 (Raouf)
+- **Imported campus data from CSV files** - 108 locations, 11 exam sites, 15 walking track POIs
+- **Extracted PNG map overlays** - Parking, drinking water, accessibility, permits, exam, walking track
+- **Created overlay layer system** - Toggleable map layers with UI panel in MapClient
+- **Added i18n translations** - 17 new keys across all 19 supported languages
+- **Fixed JSON syntax errors** - Added missing commas in all translation files
+
+**Files Created:**
+- `lib/map/locations.ts` - 108 campus locations from CSV
+- `lib/map/examSites.ts` - 11 exam sites with room lists  
+- `lib/map/budyariNgurraPOIs.ts` - 15 POIs for walking track
+- `lib/map/mapOverlays.ts` - Overlay layer configuration
+- `public/maps/overlays/*.png` - 6 PNG overlay images
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Added activeOverlays prop and ImageOverlay rendering
+- `app/map/MapClient.tsx` - Added overlay controls UI panel with icons
+- `locales/*/translations.json` - Added map layer translations (all 19 languages)
 
 #### ✅ Supabase Admin Client for Dev Email Bypass v0.9.1 (Raouf)
 - **Created admin client** (`lib/supabase/admin.ts`) with service role key for admin operations

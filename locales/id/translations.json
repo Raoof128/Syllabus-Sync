@@ -699,5 +699,22 @@
   "resetProgressDesc": "Hapus semua XP dan mulai dari awal",
   "resetProgressConfirm": "Apakah Anda yakin? Ini akan mereset semua data XP, level, dan streak Anda. Ini tidak dapat dibatalkan.",
   "progressReset": "Kemajuan Direset",
-  "progressResetMsg": "Kemajuan gamifikasi Anda telah direset."
+  "progressResetMsg": "Kemajuan gamifikasi Anda telah direset.",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }

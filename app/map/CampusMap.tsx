@@ -23,6 +23,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { devLog } from '@/lib/utils/devLog';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import type { MapOverlayId } from '@/lib/map/mapOverlays';
 
 // Import Leaflet CSS
 import 'leaflet/dist/leaflet.css';
@@ -194,16 +195,28 @@ function MapController({
   return null;
 }
 
+// Overlay image paths
+const OVERLAY_PATHS: Record<MapOverlayId, string> = {
+  parking: '/maps/overlays/Campus-Map_parking.png',
+  water: '/maps/overlays/Drinking-water.png',
+  accessibility: '/maps/overlays/map_accessibility.png',
+  permits: '/maps/overlays/map_special_permits_service_vehicles.png',
+  exam: '/maps/overlays/Exam-Map-S22024.png',
+  walking_track: '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
+};
+
 interface CampusMapProps {
   selectedBuilding?: Building;
   coordPickerMode: boolean;
   onMapClick: (e: L.LeafletMouseEvent) => void;
+  activeOverlays?: MapOverlayId[];
 }
 
 export default function CampusMap({
   selectedBuilding,
   coordPickerMode,
   onMapClick,
+  activeOverlays = [],
 }: CampusMapProps) {
   const { t } = useTranslation();
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
@@ -452,6 +465,17 @@ export default function CampusMap({
         style={{ height: '100%', width: '100%' }}
       >
         <ImageOverlay url={CAMPUS_IMAGE_URL} bounds={CAMPUS_BOUNDS} />
+
+        {/* Map Overlay Layers */}
+        {activeOverlays.map((overlayId) => (
+          <ImageOverlay
+            key={overlayId}
+            url={OVERLAY_PATHS[overlayId]}
+            bounds={CAMPUS_BOUNDS}
+            opacity={0.85}
+            className="map-overlay-layer"
+          />
+        ))}
 
         <MapController
           selectedBuilding={selectedBuilding}

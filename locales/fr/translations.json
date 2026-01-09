@@ -699,5 +699,22 @@
   "resetProgressDesc": "Effacer tous les XP et recommencer",
   "resetProgressConfirm": "Êtes-vous sûr? Cela réinitialisera toutes vos données XP, niveau et série. Cette action est irréversible.",
   "progressReset": "Progression Réinitialisée",
-  "progressResetMsg": "Votre progression de gamification a été réinitialisée."
+  "progressResetMsg": "Votre progression de gamification a été réinitialisée.",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }

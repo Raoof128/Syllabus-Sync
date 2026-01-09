@@ -709,5 +709,22 @@
   "resetProgressDesc": "Borrar todo el XP y empezar de nuevo",
   "resetProgressConfirm": "¿Estás seguro? Esto reiniciará todos tus datos de XP, nivel y racha. Esta acción no se puede deshacer.",
   "progressReset": "Progreso Reiniciado",
-  "progressResetMsg": "Tu progreso de gamificación ha sido reiniciado."
+  "progressResetMsg": "Tu progreso de gamificación ha sido reiniciado.",
+  "mapLayers": "Capas del Mapa",
+  "mapLayersDesc": "Activa capas de aparcamiento, agua, accesibilidad y más",
+  "showLayers": "Mostrar Capas",
+  "hideLayers": "Ocultar Capas",
+  "overlayParking": "Aparcamiento",
+  "overlayParkingDesc": "Zonas de aparcamiento, carga EV, máquinas de tickets",
+  "overlayWater": "Agua Potable",
+  "overlayWaterDesc": "Ubicaciones de fuentes de agua",
+  "overlayAccessibility": "Accesibilidad",
+  "overlayAccessibilityDesc": "Rutas accesibles, baños, ascensores",
+  "overlayPermits": "Permisos Especiales",
+  "overlayPermitsDesc": "Zonas de vehículos de servicio",
+  "overlayExam": "Ubicaciones de Examen",
+  "overlayExamDesc": "Edificios y salas de examen",
+  "overlayWalkingTrack": "Ruta a Pie",
+  "overlayWalkingTrackDesc": "Ruta Budyari Ngurra de 3km",
+  "layersActive": "capas activas"
 }

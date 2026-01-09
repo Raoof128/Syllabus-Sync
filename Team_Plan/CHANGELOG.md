@@ -7,6 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.7] - 2026-01-09
+
+### Added
+
+#### Campus Map Overlay Layers (Raouf)
+
+**Summary:** Added toggleable map overlay layers for parking, drinking water, accessibility, special permits, exam locations, and Budyari Ngurra walking track. Imported campus location data from official MQ CSV exports.
+
+**📍 Campus Data Import:**
+
+**New Data Files from CSV:**
+- `lib/map/locations.ts` - 108 campus locations (buildings, services, facilities)
+- `lib/map/examSites.ts` - 11 exam sites with room lists for S2 2024
+- `lib/map/budyariNgurraPOIs.ts` - 15 POIs for the 3km walking track
+
+**🗺️ Map Overlay System:**
+
+**New Overlay Configuration: `lib/map/mapOverlays.ts`**
+- 6 overlay types: parking, water, accessibility, permits, exam, walking_track
+- Each overlay has: id, name, description, imagePath, icon, color, category
+- Helper functions and TypeScript type exports
+
+**PNG Overlay Images: `public/maps/overlays/`**
+- `Campus-Map_parking.png` - Parking zones, EV charging, ticket machines
+- `Drinking-water.png` - Water fountain locations
+- `map_accessibility.png` - Accessible pathways, toilets, lifts, stairs
+- `map_special_permits_service_vehicles.png` - Service vehicle zones
+- `Exam-Map-S22024.png` - Exam building locations
+- `MU87371-MQ-Loop-Walk-Map-digital-June-2024.png` - Walking track route
+
+**🎨 UI Components:**
+
+**CampusMap.tsx Updates:**
+- Added `activeOverlays` prop to component interface
+- Added `OVERLAY_PATHS` constant mapping overlay IDs to image paths
+- Renders ImageOverlay components for each active overlay
+- Overlays render at 85% opacity on top of base campus map
+
+**MapClient.tsx Updates:**
+- New state: `activeOverlays`, `showOverlayPanel`
+- New functions: `toggleOverlay()`, `clearOverlays()`
+- "Map Layers" UI panel with:
+  - Toggle button to show/hide layer selection
+  - Grid of 6 overlay buttons (2x3 mobile, 3x2 desktop)
+  - Icon, name, description for each overlay
+  - Visual active state with ring highlight
+  - Badge showing count of active layers
+  - "Clear All" button when overlays are active
+
+**🌐 Translations:**
+
+Added 17 new keys across all 19 supported languages:
+- `mapLayers`, `mapLayersDesc`, `showLayers`, `hideLayers`
+- `overlayParking`, `overlayParkingDesc`
+- `overlayWater`, `overlayWaterDesc`
+- `overlayAccessibility`, `overlayAccessibilityDesc`
+- `overlayPermits`, `overlayPermitsDesc`
+- `overlayExam`, `overlayExamDesc`
+- `overlayWalkingTrack`, `overlayWalkingTrackDesc`
+- `layersActive`
+
+### Fixed
+
+- Fixed missing commas in all 19 translation JSON files causing build errors
+
+**Files Created:**
+- `lib/map/locations.ts`
+- `lib/map/examSites.ts`
+- `lib/map/budyariNgurraPOIs.ts`
+- `lib/map/mapOverlays.ts`
+- `public/maps/overlays/*.png` (6 files)
+
+**Files Changed:**
+- `app/map/CampusMap.tsx`
+- `app/map/MapClient.tsx`
+- `locales/*/translations.json` (19 files)
+
+**Verification:**
+- `npm run build`: ✅ 30/30 pages success
+
+---
+
 ## [0.9.6] - 2026-01-09
 
 ### Fixed

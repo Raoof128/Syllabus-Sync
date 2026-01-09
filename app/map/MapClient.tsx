@@ -21,6 +21,12 @@ import {
   BookOpen,
   Dumbbell,
   Briefcase,
+  Layers,
+  Car,
+  Droplets,
+  BadgeCheck,
+  GraduationCap,
+  Footprints,
 } from 'lucide-react';
 import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -29,6 +35,7 @@ import { Button } from '@/components/ui/mq/button';
 import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { Building, buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings';
+import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import Link from 'next/link';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -44,6 +51,16 @@ const FILTER_CATEGORIES = [
   { id: 'labs', icon: FilterIcon, label: 'labs' as TranslationKey },
   { id: 'accessibility', icon: Accessibility, label: 'accessibility' as TranslationKey },
 ] as const;
+
+// Map overlay icons
+const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
+  parking: Car,
+  water: Droplets,
+  accessibility: Accessibility,
+  permits: BadgeCheck,
+  exam: GraduationCap,
+  walking_track: Footprints,
+};
 
 // Custom hook for debounced search with proper state management
 function useDebouncedSearch(searchFunction: (query: string) => Building[], delay: number = 300) {
@@ -124,6 +141,8 @@ export default function MapClient() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [activeOverlays, setActiveOverlays] = useState<MapOverlayId[]>([]);
+  const [showOverlayPanel, setShowOverlayPanel] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   const selectedBuildingId = searchParams.get('building');
@@ -166,6 +185,18 @@ export default function MapClient() {
   // Clear all filters
   const clearFilters = useCallback(() => {
     setActiveFilters([]);
+  }, []);
+
+  // Toggle a map overlay layer
+  const toggleOverlay = useCallback((overlayId: MapOverlayId) => {
+    setActiveOverlays((prev) =>
+      prev.includes(overlayId) ? prev.filter((id) => id !== overlayId) : [...prev, overlayId],
+    );
+  }, []);
+
+  // Clear all overlays
+  const clearOverlays = useCallback(() => {
+    setActiveOverlays([]);
   }, []);
 
   // Handle coordinate picker click
@@ -444,6 +475,80 @@ export default function MapClient() {
             </div>
           </div>
         </MagicCard>
+
+        {/* Map Overlay Layers */}
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <Layers className="h-5 w-5 text-mq-primary" />
+                <div>
+                  <p className="text-mq-sm font-medium text-mq-content">{t('mapLayers')}</p>
+                  <p className="text-mq-xs text-mq-content-secondary">{t('mapLayersDesc')}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {activeOverlays.length > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {activeOverlays.length} {t('active')}
+                  </Badge>
+                )}
+                <Button
+                  variant={showOverlayPanel ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => setShowOverlayPanel(!showOverlayPanel)}
+                  className="gap-2"
+                >
+                  <Layers className="h-4 w-4" />
+                  {showOverlayPanel ? t('hideLayers') : t('showLayers')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Overlay Toggle Buttons */}
+            {showOverlayPanel && (
+              <div className="space-y-3 pt-3 border-t border-mq-border">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {mapOverlays.map((overlay) => {
+                    const Icon = OVERLAY_ICONS[overlay.id];
+                    const isActive = activeOverlays.includes(overlay.id);
+                    return (
+                      <button
+                        key={overlay.id}
+                        onClick={() => toggleOverlay(overlay.id)}
+                        aria-pressed={isActive}
+                        className={`flex items-center gap-2 p-3 rounded-mq-lg border transition-all duration-200 text-left ${
+                          isActive
+                            ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
+                            : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
+                        }`}
+                      >
+                        <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
+                        <div className="min-w-0">
+                          <p className="text-mq-sm font-medium truncate">{overlay.name}</p>
+                          <p className="text-mq-xs text-mq-content-secondary truncate">
+                            {overlay.description}
+                          </p>
+                        </div>
+                        {isActive && (
+                          <CheckCircle2 className="h-4 w-4 ml-auto flex-shrink-0 text-mq-success" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {activeOverlays.length > 0 && (
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={clearOverlays} className="gap-1">
+                      <X className="h-4 w-4" />
+                      {t('clearAll')}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </MagicCard>
       </div>
 
       {/* Map */}
@@ -463,6 +568,7 @@ export default function MapClient() {
                     selectedBuilding={selectedBuilding}
                     coordPickerMode={coordPickerMode}
                     onMapClick={handleMapClick}
+                    activeOverlays={activeOverlays}
                   />
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">

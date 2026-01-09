@@ -699,5 +699,22 @@
   "resetProgressDesc": "அனைத்து XP-ஐ அழித்து புதிதாக தொடங்கு",
   "resetProgressConfirm": "நீங்கள் உறுதியாக இருக்கிறீர்களா? இது உங்கள் அனைத்து XP, நிலை மற்றும் ஸ்ட்ரீக் தரவையும் மீட்டமைக்கும். இதை மீட்க முடியாது.",
   "progressReset": "முன்னேற்றம் மீட்டமைக்கப்பட்டது",
-  "progressResetMsg": "உங்கள் கேமிஃபிகேஷன் முன்னேற்றம் மீட்டமைக்கப்பட்டது."
+  "progressResetMsg": "உங்கள் கேமிஃபிகேஷன் முன்னேற்றம் மீட்டமைக்கப்பட்டது.",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }

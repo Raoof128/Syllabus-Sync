@@ -699,5 +699,22 @@
   "resetProgressDesc": "すべてのXPをクリアして最初から始める",
   "resetProgressConfirm": "本当によろしいですか？すべてのXP、レベル、連続記録データがリセットされます。この操作は取り消せません。",
   "progressReset": "進捗がリセットされました",
-  "progressResetMsg": "ゲーミフィケーションの進捗がリセットされました。"
+  "progressResetMsg": "ゲーミフィケーションの進捗がリセットされました。",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }

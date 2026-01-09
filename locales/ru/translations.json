@@ -699,5 +699,22 @@
   "resetProgressDesc": "Очистить все XP и начать заново",
   "resetProgressConfirm": "Вы уверены? Это сбросит все данные XP, уровня и серии. Это действие нельзя отменить.",
   "progressReset": "Прогресс сброшен",
-  "progressResetMsg": "Ваш прогресс геймификации был сброшен."
+  "progressResetMsg": "Ваш прогресс геймификации был сброшен.",
+  "mapLayers": "Map Layers",
+  "mapLayersDesc": "Toggle map overlay layers for parking, water, accessibility and more",
+  "showLayers": "Show Layers",
+  "hideLayers": "Hide Layers",
+  "overlayParking": "Parking",
+  "overlayParkingDesc": "Parking zones, EV charging, ticket machines",
+  "overlayWater": "Drinking Water",
+  "overlayWaterDesc": "Water fountain locations across campus",
+  "overlayAccessibility": "Accessibility",
+  "overlayAccessibilityDesc": "Accessible pathways, toilets, lifts, stairs",
+  "overlayPermits": "Special Permits",
+  "overlayPermitsDesc": "Service vehicle and permit parking zones",
+  "overlayExam": "Exam Locations",
+  "overlayExamDesc": "Exam buildings and room locations",
+  "overlayWalkingTrack": "Walking Track",
+  "overlayWalkingTrackDesc": "Budyari Ngurra 3km walking track",
+  "layersActive": "layers active"
 }
