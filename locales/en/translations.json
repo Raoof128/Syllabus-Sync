@@ -905,5 +905,14 @@
   "layersActive": "layers active",
   "source": "Source",
   "lastUpdated": "Last Updated",
-  "legend": "Legend"
+  "legend": "Legend",
+  "showMore": "Show More",
+  "showLess": "Show Less",
+  "gridView": "Grid View",
+  "listView": "List View",
+  "allCategories": "All Categories",
+  "filterByCategory": "Filter by category",
+  "buildingsFound": "{{count}} buildings found",
+  "quickSearch": "Quick Search",
+  "filterBuildings": "Filter buildings by name, code, or category"
 }

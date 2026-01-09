@@ -29,6 +29,15 @@ import {
   Footprints,
   Link as LinkIcon,
   HelpCircle,
+  Stethoscope,
+  Home,
+  Utensils,
+  Theater,
+  FlaskConical,
+  ChevronDown,
+  ChevronUp,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -36,7 +45,14 @@ import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
-import { Building, buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings';
+import {
+  Building,
+  buildings,
+  getBuildingById,
+  searchBuildings,
+  BuildingCategory,
+  BUILDING_CATEGORY_LABELS,
+} from '@/lib/map/buildings';
 import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import Link from 'next/link';
@@ -52,9 +68,27 @@ const FILTER_CATEGORIES = [
   { id: 'services', icon: Briefcase, label: 'services' as TranslationKey },
   { id: 'sports', icon: Dumbbell, label: 'sports' as TranslationKey },
   { id: 'study', icon: Coffee, label: 'study' as TranslationKey },
-  { id: 'labs', icon: FilterIcon, label: 'labs' as TranslationKey },
+  { id: 'labs', icon: FlaskConical, label: 'labs' as TranslationKey },
   { id: 'accessibility', icon: Accessibility, label: 'accessibility' as TranslationKey },
 ] as const;
+
+// Category filter buttons for buildings sidebar
+const CATEGORY_FILTERS: {
+  id: BuildingCategory | 'all';
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  color: string;
+}[] = [
+  { id: 'all', icon: LayoutGrid, label: 'All', color: 'text-mq-content' },
+  { id: 'academic', icon: BookOpen, label: 'Teaching', color: 'text-blue-500' },
+  { id: 'food', icon: Utensils, label: 'Food', color: 'text-orange-500' },
+  { id: 'services', icon: Briefcase, label: 'Services', color: 'text-purple-500' },
+  { id: 'health', icon: Stethoscope, label: 'Health', color: 'text-red-500' },
+  { id: 'sports', icon: Dumbbell, label: 'Sports', color: 'text-green-500' },
+  { id: 'venue', icon: Theater, label: 'Venues', color: 'text-pink-500' },
+  { id: 'research', icon: FlaskConical, label: 'Research', color: 'text-cyan-500' },
+  { id: 'residential', icon: Home, label: 'Housing', color: 'text-amber-500' },
+];
 
 // Map overlay icons
 const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
@@ -147,6 +181,13 @@ export default function MapClient() {
   const [showFilters, setShowFilters] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // Buildings sidebar state
+  const [buildingSearch, setBuildingSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<BuildingCategory | 'all'>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showAllBuildings, setShowAllBuildings] = useState(false);
+  const buildingSearchRef = useRef<HTMLInputElement>(null);
+
   // Use map store for overlay persistence
   const {
     activeOverlays,
@@ -226,13 +267,41 @@ export default function MapClient() {
     );
   }, [searchResults, activeFilters, searchQuery]);
 
-  // Get buildings filtered by active tags (for the grid display)
-  const filteredBuildingsForGrid = useMemo(() => {
-    if (activeFilters.length === 0) return buildings;
-    return buildings.filter((building) =>
-      activeFilters.some((filter) => building.tags?.includes(filter)),
-    );
-  }, [activeFilters]);
+  // Buildings sidebar - filtered and searched
+  const sidebarBuildings = useMemo(() => {
+    let result = [...buildings];
+
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter((b) => b.category === categoryFilter);
+    }
+
+    // Apply search filter
+    if (buildingSearch.trim()) {
+      const query = buildingSearch.toLowerCase();
+      result = result.filter(
+        (b) =>
+          b.name.toLowerCase().includes(query) ||
+          b.id.toLowerCase().includes(query) ||
+          b.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
+          b.description?.toLowerCase().includes(query) ||
+          b.address?.toLowerCase().includes(query),
+      );
+    }
+
+    return result;
+  }, [categoryFilter, buildingSearch]);
+
+  // Calculate category counts for badge display
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: buildings.length };
+    buildings.forEach((b) => {
+      if (b.category) {
+        counts[b.category] = (counts[b.category] || 0) + 1;
+      }
+    });
+    return counts;
+  }, []);
 
   // Toggle a filter
   const toggleFilter = useCallback((filterId: string) => {
@@ -676,67 +745,259 @@ export default function MapClient() {
         </div>
       </MagicCard>
 
-      {/* Campus Buildings Quick Reference */}
+      {/* Campus Buildings Quick Reference - Enhanced with Search & Filter */}
       <MagicCard isLiquidEnhanced className="mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                {t('campusBuildings')}
-                {activeFilters.length > 0 && (
+            <CardHeader className="pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  {t('campusBuildings')}
                   <Badge className="ml-2 bg-mq-primary/10 text-mq-primary">
-                    {filteredBuildingsForGrid.length} {t('results')}
+                    {sidebarBuildings.length} / {buildings.length}
                   </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {filteredBuildingsForGrid.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {filteredBuildingsForGrid.map((building) => {
-                    const isSelected = selectedBuildingId === building.id;
-                    return (
-                      <Link
-                        key={building.id}
-                        href={`/map?building=${building.id}`}
-                        aria-current={isSelected ? 'page' : undefined}
-                        className={`p-3 rounded-mq-lg transition-all duration-300 text-mq-content border ${
-                          isSelected
-                            ? 'bg-mq-success/10 border-2 border-mq-success'
-                            : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="font-semibold text-mq-content">{building.id}</div>
-                          {isSelected && (
-                            <Badge className="bg-mq-success text-white text-mq-xs">
-                              {t('selected')}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-mq-sm text-mq-content-secondary">
-                          {t(building.translationKey)}
-                        </div>
-                        {building.tags && building.tags.length > 0 && (
-                          <div className="mt-1">
-                            <Badge variant="neutral" className="text-xs">
-                              {t(building.tags[0] as TranslationKey)}
-                            </Badge>
-                          </div>
-                        )}
-                      </Link>
-                    );
-                  })}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {/* View Toggle */}
+                  <div className="flex items-center bg-mq-background-secondary rounded-mq p-0.5">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'grid'
+                          ? 'bg-mq-card-background text-mq-primary shadow-sm'
+                          : 'text-mq-content-tertiary hover:text-mq-content'
+                      }`}
+                      aria-label="Grid view"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'list'
+                          ? 'bg-mq-card-background text-mq-primary shadow-sm'
+                          : 'text-mq-content-tertiary hover:text-mq-content'
+                      }`}
+                      aria-label="List view"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
+                <input
+                  ref={buildingSearchRef}
+                  type="text"
+                  placeholder={t('searchBuildings')}
+                  value={buildingSearch}
+                  onChange={(e) => setBuildingSearch(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2.5 bg-mq-background-secondary/50 border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
+                />
+                {buildingSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setBuildingSearch('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-mq-content-tertiary hover:text-mq-content"
+                    aria-label={t('clearSearch')}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="flex flex-wrap gap-2">
+                {CATEGORY_FILTERS.map((cat) => {
+                  const Icon = cat.icon;
+                  const isActive = categoryFilter === cat.id;
+                  const count = categoryCounts[cat.id] || 0;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setCategoryFilter(cat.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-mq-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-mq-primary text-white shadow-sm'
+                          : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content'
+                      }`}
+                      aria-pressed={isActive}
+                    >
+                      <Icon className={`h-3.5 w-3.5 ${isActive ? '' : cat.color}`} />
+                      <span>{cat.label}</span>
+                      {count > 0 && (
+                        <span
+                          className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            isActive ? 'bg-white/20' : 'bg-mq-background text-mq-content-tertiary'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Buildings Grid/List */}
+              {sidebarBuildings.length > 0 ? (
+                <>
+                  <div
+                    className={
+                      viewMode === 'grid'
+                        ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
+                        : 'space-y-2'
+                    }
+                  >
+                    {(showAllBuildings ? sidebarBuildings : sidebarBuildings.slice(0, 12)).map(
+                      (building) => {
+                        const isSelected = selectedBuildingId === building.id;
+                        const categoryInfo = CATEGORY_FILTERS.find(
+                          (c) => c.id === building.category,
+                        );
+                        const CategoryIcon = categoryInfo?.icon || Building2;
+
+                        if (viewMode === 'list') {
+                          return (
+                            <Link
+                              key={building.id}
+                              href={`/map?building=${building.id}`}
+                              aria-current={isSelected ? 'page' : undefined}
+                              className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border ${
+                                isSelected
+                                  ? 'bg-mq-success/10 border-mq-success'
+                                  : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                              }`}
+                            >
+                              <div
+                                className={`p-2 rounded-mq ${
+                                  isSelected ? 'bg-mq-success/20' : 'bg-mq-background'
+                                }`}
+                              >
+                                <CategoryIcon
+                                  className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-mq-sm text-mq-content">
+                                    {building.id}
+                                  </span>
+                                  {building.wheelchair && (
+                                    <Accessibility className="h-3 w-3 text-mq-success" />
+                                  )}
+                                  {isSelected && (
+                                    <Badge className="bg-mq-success text-white text-[10px] px-1.5">
+                                      {t('selected')}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-mq-xs text-mq-content-secondary truncate">
+                                  {t(building.translationKey)}
+                                </p>
+                              </div>
+                              {building.category && (
+                                <Badge variant="secondary" className="text-[10px] shrink-0">
+                                  {BUILDING_CATEGORY_LABELS[building.category]}
+                                </Badge>
+                              )}
+                            </Link>
+                          );
+                        }
+
+                        // Grid view
+                        return (
+                          <Link
+                            key={building.id}
+                            href={`/map?building=${building.id}`}
+                            aria-current={isSelected ? 'page' : undefined}
+                            className={`group p-3 rounded-mq-lg transition-all duration-200 border ${
+                              isSelected
+                                ? 'bg-mq-success/10 border-2 border-mq-success'
+                                : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1.5">
+                                <CategoryIcon
+                                  className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
+                                />
+                                <span className="font-semibold text-mq-content">{building.id}</span>
+                              </div>
+                              {isSelected && (
+                                <Badge className="bg-mq-success text-white text-[10px] px-1">
+                                  {t('selected')}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-mq-sm text-mq-content-secondary line-clamp-2">
+                              {t(building.translationKey)}
+                            </p>
+                            <div className="flex items-center gap-1 mt-2">
+                              {building.category && (
+                                <Badge
+                                  variant="secondary"
+                                  className="text-[10px] bg-mq-background/50"
+                                >
+                                  {BUILDING_CATEGORY_LABELS[building.category]}
+                                </Badge>
+                              )}
+                              {building.wheelchair && (
+                                <span className="inline-flex items-center text-[10px] text-mq-success">
+                                  <Accessibility className="h-3 w-3" />
+                                </span>
+                              )}
+                            </div>
+                          </Link>
+                        );
+                      },
+                    )}
+                  </div>
+
+                  {/* Show More/Less Button */}
+                  {sidebarBuildings.length > 12 && (
+                    <div className="flex justify-center pt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAllBuildings(!showAllBuildings)}
+                        className="gap-2 text-mq-content-secondary hover:text-mq-content"
+                      >
+                        {showAllBuildings ? (
+                          <>
+                            <ChevronUp className="h-4 w-4" />
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-4 w-4" />
+                            Show All ({sidebarBuildings.length - 12} more)
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-8 text-mq-content-secondary">
-                  <FilterIcon className="h-8 w-8 mx-auto mb-3 opacity-50" />
-                  <p className="text-mq-sm">{t('noMatchingBuildings')}</p>
+                  <Search className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                  <p className="text-mq-sm">
+                    {buildingSearch
+                      ? t('noBuildingsFound', { query: buildingSearch })
+                      : t('noMatchingBuildings')}
+                  </p>
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={clearFilters}
+                    onClick={() => {
+                      setBuildingSearch('');
+                      setCategoryFilter('all');
+                    }}
                     className="mt-3 gap-2"
                   >
                     <X className="h-4 w-4" />

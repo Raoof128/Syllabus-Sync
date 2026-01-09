@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.12.0] - 2026-01-09
+
+### Added
+
+#### Enhanced Buildings Sidebar - Search, Filter & Views (Raouf)
+
+**Summary:** Complete redesign of the Campus Buildings sidebar with advanced search functionality, category filtering, and dual view modes for improved campus navigation user experience.
+
+**Advanced Search Features:**
+- **Real-time fuzzy search** - Searches across building names, IDs, tags, descriptions, and addresses
+- **Instant results** - No debounce delay for responsive user experience
+- **Clear functionality** - Easy reset with clear button and keyboard shortcuts
+
+**Category Filtering System:**
+- **9 filter categories** - All, Teaching, Food, Services, Health, Sports, Venues, Research, Housing
+- **Count badges** - Shows number of buildings in each category
+- **Visual states** - Active filter highlighting with color-coded icons
+- **Accessibility icons** - Wheelchair accessibility indicators
+
+**Dual View Modes:**
+- **Grid view** - Card-based layout with category icons and compact information
+- **List view** - Detailed list with full building information and metadata
+- **View toggle** - Smooth transition between grid and list layouts
+- **Responsive design** - Adapts to different screen sizes
+
+**User Experience Enhancements:**
+- **Smart pagination** - Shows 12 buildings initially, expandable to full list
+- **Empty states** - Helpful messaging when no results match filters
+- **Keyboard navigation** - Full keyboard accessibility support
+- **Loading states** - Visual feedback during interactions
+
+**Technical Implementation:**
+- **Memoized filtering** - Optimized performance with useMemo hooks
+- **State management** - Clean state for search, filters, and view preferences
+- **i18n support** - Full internationalization with 10 new translation keys
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Complete Buildings sidebar implementation
+- `locales/en/translations.json` - Added new translation keys
+
+---
+
 ## [0.11.0] - 2026-01-09
 
 ### Added

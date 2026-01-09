@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.11.0 | Last Updated: January 09, 2026
+Version: 0.12.0 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,27 @@ Version: 0.11.0 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Enhanced Buildings Sidebar - Search, Filter & Views v0.12.0 (Raouf)
+- **Complete Buildings sidebar redesign** with advanced search, category filtering, and dual view modes (grid/list)
+- **Real-time search** - Fuzzy search across building names, IDs, tags, descriptions, and addresses with instant results
+- **Category filters** - 9 filter buttons (All, Teaching, Food, Services, Health, Sports, Venues, Research, Housing) with count badges
+- **Dual view modes** - Toggle between grid and list views with category icons and accessibility indicators
+- **Smart show more/less** - Displays 12 buildings initially, with "Show All" for full results
+- **Enhanced UI** - Search input with clear button, filter pills with active states, view mode toggle buttons
+- **Accessibility** - Proper ARIA labels, keyboard navigation, screen reader support
+- **Performance** - Memoized filtering logic, optimized re-renders
+
+**Files Created:**
+- None (enhanced existing component)
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Complete Buildings sidebar overhaul with search/filter/view functionality
+- `locales/en/translations.json` - Added 10 new translation keys for UI elements
+
+**New Translation Keys:**
+- `gridView`, `listView`, `allCategories`, `filterByCategory`, `buildingsFound`, `quickSearch`, `filterBuildings`
+- `showMore`, `showLess`
 
 #### ✅ OSM Building Data Pipeline & Enhanced Map Popups v0.11.0 (Raouf)
 - **Created OSM data pipeline script** (`scripts/osm_mq_buildings.py`) - Fetches 543 buildings (150 named) from OpenStreetMap
