@@ -1,0 +1,6 @@
+1a3e242850b3a33a53eef8848204e657ae7d84c6bc005079ad2d79d49a76cdcd  data/mq-pdfs/Drinking-water.pdf
+3efd9b7396134fa2e776aa0fd8be76a601cae948d11c55b0507cd4a912c1e55c  data/mq-pdfs/map_accessibility.pdf
+b8d51364706cdad47a146aee5cae548bc8b9df80401de6fb7d75155dbbc6f64e  data/mq-pdfs/map_special_permits_service_vehicles.pdf
+9acd01461048f63d2557c004c3bcdd849525dd801e704e688fb19c0fd50979ed  data/mq-pdfs/MQ-Campus_map_2022-10.pdf
+c0da2043b69ed8e6f14080af1160b28596480398e873d49a894d3d6d06a99f12  data/mq-pdfs/MQ-Location-Guide_2022-10.pdf
+6cc4599fe480dc3e7783ac5cbea8c752f452d25a0702192b1b34b73260304ccf  data/mq-pdfs/MU87371-MQ-Loop-Walk-Map-digital-June-2024.pdf

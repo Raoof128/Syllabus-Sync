@@ -7,6 +7,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.9] - 2026-01-09
+
+### Added
+
+#### MQ Maps PDF Scraper Automation Workflow (Raouf)
+
+**Summary:** Implemented legitimate automated workflow to sync with Macquarie University's published map PDFs. Includes discovery script, download script with caching, and change detection via SHA256 checksums.
+
+**🗺️ MQ Maps Scraper Scripts:**
+
+**New Script: `scripts/mq_maps_discover.py`**
+- Scrapes https://www.mq.edu.au/about/locations/maps for PDF links
+- Outputs JSON with URL, title, filename for each PDF
+- Includes timestamp and count metadata
+- Uses polite User-Agent header for respectful crawling
+
+**New Script: `scripts/mq_maps_download.py`**
+- Downloads all PDFs from the index file
+- Skips already-downloaded files (caching)
+- 1.2-second delay between requests (polite behavior)
+- Reports download/skip/fail counts
+
+**📂 Data Files Created:**
+
+**Index: `data/mq-exports/mq_pdfs_index.json`**
+- Contains metadata for 7 discovered PDFs:
+  - Campus-Map_parking.pdf - Car Parking
+  - Drinking-water.pdf - Drinking water fountain map
+  - map_accessibility.pdf - Accessibility map
+  - map_special_permits_service_vehicles.pdf - Special permits map
+  - MQ-Campus_map_2022-10.pdf - Campus map
+  - MQ-Location-Guide_2022-10.pdf - Location guide
+  - MU87371-MQ-Loop-Walk-Map-digital-June-2024.pdf - Budyari Ngurra Walking Track
+
+**Checksums: `data/mq-exports/mq_pdfs_sha256.txt`**
+- SHA256 checksums for change detection on future runs
+- Enables automated detection of MQ map updates
+
+**Downloaded PDFs: `data/mq-pdfs/`**
+- 6 PDFs downloaded successfully (1 failed with 403)
+- Verified: `MQ-Campus_map_2022-10.pdf` matches existing `maps/source/` file (up to date)
+
+**🔍 Comparison with Existing Assets:**
+
+| Downloaded PDF | Existing Overlay PNG | Status |
+|----------------|---------------------|--------|
+| Drinking-water.pdf | Drinking-water.png | ✅ Have overlay |
+| map_accessibility.pdf | map_accessibility.png | ✅ Have overlay |
+| map_special_permits_service_vehicles.pdf | map_special_permits_service_vehicles.png | ✅ Have overlay |
+| MU87371-MQ-Loop-Walk-Map-digital-June-2024.pdf | MU87371-MQ-Loop-Walk-Map-digital-June-2024.png | ✅ Have overlay |
+| Campus-Map_parking.pdf (403) | Campus-Map_parking.png | ✅ Have overlay |
+| MQ-Location-Guide_2022-10.pdf | N/A | 📝 Useful for building data |
+
+**📋 Weekly Sync Workflow:**
+
+```bash
+# Discover current PDFs on MQ website
+python scripts/mq_maps_discover.py > data/mq-exports/mq_pdfs_index.json
+
+# Download any new/updated PDFs
+python scripts/mq_maps_download.py
+
+# Generate checksums for change detection
+shasum -a 256 data/mq-pdfs/*.pdf > data/mq-exports/mq_pdfs_sha256.txt
+
+# Compare with previous checksums to detect changes
+```
+
+**Files Created:**
+- `scripts/mq_maps_discover.py` - PDF discovery script
+- `scripts/mq_maps_download.py` - PDF download script
+- `data/mq-exports/mq_pdfs_index.json` - Index of 7 PDFs
+- `data/mq-exports/mq_pdfs_sha256.txt` - SHA256 checksums
+- `data/mq-pdfs/*.pdf` - 6 downloaded PDFs
+
+**Files Changed:**
+- `Team_Plan/AGENT.md` - Added v0.9.9 work log, version bump
+
+**Verification:**
+- Discovery script: ✅ Found 7 PDFs
+- Download script: ✅ 6/7 downloaded (1 x 403 Forbidden)
+- Checksum verification: ✅ MQ-Campus_map_2022-10.pdf identical to existing source
+
+---
+
 ## [0.9.8] - 2026-01-09
 
 ### Added

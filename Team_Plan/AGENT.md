@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.9.8 | Last Updated: January 09, 2026
+Version: 0.9.9 | Last Updated: January 09, 2026
 
 ---
 
@@ -57,6 +57,25 @@ Version: 0.9.8 | Last Updated: January 09, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ MQ Maps Scraper Workflow v0.9.9 (Raouf)
+- **Created automation scripts** for weekly sync with MQ's published map PDFs
+- **mq_maps_discover.py** - Discovers all PDF links from MQ Maps page (https://www.mq.edu.au/about/locations/maps)
+- **mq_maps_download.py** - Downloads PDFs with caching and polite 1.2s delay between requests
+- **SHA256 checksums** - Change detection for PDF updates
+- **Downloaded 6/7 PDFs** - Parking PDF returned 403 Forbidden (already have PNG overlay)
+
+**Files Created:**
+- `scripts/mq_maps_discover.py` - PDF discovery script
+- `scripts/mq_maps_download.py` - PDF download script with caching
+- `data/mq-exports/mq_pdfs_index.json` - Index of discovered PDFs
+- `data/mq-exports/mq_pdfs_sha256.txt` - SHA256 checksums for change detection
+- `data/mq-pdfs/*.pdf` - 6 downloaded PDFs (Drinking-water, accessibility, permits, campus map, location guide, walking track)
+
+**Comparison with Existing Data:**
+- `maps/source/MQ-Campus_map_2022-10.pdf` - ✅ Identical checksum (up to date)
+- `public/maps/overlays/*.png` - 6 overlays already extracted from PDFs
+- New `MQ-Location-Guide_2022-10.pdf` - Useful for building data reference
 
 #### ✅ Campus Map Overlay Layers v0.9.7 (Raouf)
 - **Imported campus data from CSV files** - 108 locations, 11 exam sites, 15 walking track POIs
