@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/schema/opencode.json",
+
+  // Local OpenCode Configuration
+  // MCP Servers for Apple docs, code docs, git, memory, etc.
+
+  "mcp": {
+    // Sosumi - Apple Developer Documentation
+    "sosumi": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://sosumi.ai/mcp"],
+    },
+
+    // Context7 - Code Documentation Retrieval
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+    },
+
+    // Git Operations
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-git"],
+    },
+
+    // Memory/Knowledge Graph
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-memory"],
+    },
+
+    // Sequential Thinking
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-sequential-thinking"],
+    },
+
+    // File System
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-filesystem"],
+      "env": {
+        "ALLOWED_PATHS": ".",
+      },
+    },
+  },
+}
