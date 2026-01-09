@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.9.7 | Last Updated: January 09, 2026
+Version: 0.9.8 | Last Updated: January 09, 2026
 
 ---
 
@@ -1482,6 +1482,53 @@ MIT License - See LICENSE file for details.
 
 **Last Updated:** January 09, 2026
 **Version:** 0.9.6
+
+---
+
+### Raouf: 2026-01-09 (Australia/Sydney)
+Scope: Map Enhancement & Polish - Layer Persistence, URL Sharing, Expanded Buildings, Hover Tooltips
+
+**Summary:** Comprehensive map enhancements including layer state persistence with URL sharing, expanded building data (40+ locations from MQ Location Guide), and hover tooltips for map overlays with source attribution and legends.
+
+**🗺️ Layer State Persistence:**
+- Created `lib/store/mapStore.ts` with Zustand + localStorage persistence
+- URL sync for shareable map state (`?layers=parking,water,accessibility`)
+- "Copy Link" button generates shareable URLs with current layer state
+- `setLayersFromURL()` parses URL params on page load
+
+**📍 Expanded Building Data:**
+- Updated `lib/map/buildings.ts` from 10 to 40+ campus buildings
+- Data sourced from official MQ Location Guide (2024)
+- New categories: academic, services, health, food, sports, venue, research, residential
+- `gridToPixel()` function converts MQ grid references to pixel coordinates
+
+**🔍 Hover Tooltips for Map Layers:**
+- Added metadata fields to `MapOverlay` interface: `source`, `lastUpdated`, `legend`
+- Updated `app/map/MapClient.tsx` with hover tooltip UI showing:
+  - Data source attribution
+  - Last updated date
+  - Legend explaining icons/colors
+- Uses CSS `group-hover` pattern for clean visibility transitions
+
+**🌐 Translations:**
+- Added 3 new keys: `source`, `lastUpdated`, `legend`
+
+**🧪 Test Updates:**
+- Fixed `tests/map/buildings.test.ts` for new building data
+- Changed test building ID from 'C5C' to 'LIB'
+- Updated search tests to use 'security' instead of 'computer science'
+
+**Files Created:**
+- `lib/store/mapStore.ts`
+
+**Files Changed:**
+- `lib/map/buildings.ts`, `lib/map/mapOverlays.ts`, `app/map/MapClient.tsx`
+- `locales/en/translations.json`, `tests/map/buildings.test.ts`
+
+**Verification:**
+- `npm run test`: ✅ 24/24 map tests passing
+- `npm run lint`: ✅ 0 errors
+- `npm run build`: ✅ All pages successful
 
 ---
 

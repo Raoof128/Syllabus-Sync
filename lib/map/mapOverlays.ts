@@ -18,6 +18,10 @@ export interface MapOverlay {
   color: string; // Tailwind color class
   category: 'transport' | 'facilities' | 'accessibility' | 'academic' | 'recreation';
   enabled: boolean; // Default enabled state
+  // Metadata for hover tooltips
+  source: string; // Data source attribution
+  lastUpdated: string; // When the data was last updated
+  legend?: string[]; // What the overlay shows (icons/colors meaning)
 }
 
 export const mapOverlays: MapOverlay[] = [
@@ -30,6 +34,14 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-blue-500',
     category: 'transport',
     enabled: false,
+    source: 'MQ Property Division',
+    lastUpdated: 'August 2024',
+    legend: [
+      'Blue zones: Staff parking',
+      'Green zones: Student parking',
+      'Yellow: EV charging stations',
+      'Purple: Accessible bays',
+    ],
   },
   {
     id: 'water',
@@ -40,6 +52,9 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-cyan-500',
     category: 'facilities',
     enabled: false,
+    source: 'MQ Sustainability Office',
+    lastUpdated: 'June 2024',
+    legend: ['Blue drops: Water fountains', 'Refill stations marked'],
   },
   {
     id: 'accessibility',
@@ -50,6 +65,13 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-purple-500',
     category: 'accessibility',
     enabled: false,
+    source: 'MQ Campus Services',
+    lastUpdated: 'July 2024',
+    legend: [
+      'Purple lines: Accessible paths',
+      'Wheelchair icons: Accessible toilets',
+      'Lift icons: Elevator locations',
+    ],
   },
   {
     id: 'permits',
@@ -60,6 +82,9 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-orange-500',
     category: 'transport',
     enabled: false,
+    source: 'MQ Security & Transport',
+    lastUpdated: 'August 2024',
+    legend: ['Orange zones: Service vehicles only', 'Special permit areas marked'],
   },
   {
     id: 'exam',
@@ -70,6 +95,9 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-red-500',
     category: 'academic',
     enabled: false,
+    source: 'MQ Examinations Office',
+    lastUpdated: 'Semester 2, 2024',
+    legend: ['Red markers: Exam venues', 'Numbers: Building codes', 'Check iLearn for your venue'],
   },
   {
     id: 'walking_track',
@@ -80,6 +108,13 @@ export const mapOverlays: MapOverlay[] = [
     color: 'text-green-500',
     category: 'recreation',
     enabled: false,
+    source: 'MQ Office of Indigenous Strategy',
+    lastUpdated: 'June 2024',
+    legend: [
+      'Green line: Walking track route',
+      'Numbered markers: Points of interest',
+      '15 POIs featuring local flora & culture',
+    ],
   },
 ];
 

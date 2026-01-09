@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.8] - 2026-01-09
+
+### Added
+
+#### Map Enhancement & Polish - Layer Persistence, URL Sharing, Expanded Buildings, Hover Tooltips (Raouf)
+
+**Summary:** Comprehensive map enhancements including layer state persistence, shareable URLs, expanded building data (40+ locations), and hover tooltips for map overlays with source attribution and legends.
+
+**🗺️ Layer State Persistence:**
+
+**New Store: `lib/store/mapStore.ts`**
+- Zustand store with `persist` middleware for localStorage persistence
+- Stores active overlay layers across sessions
+- URL sync for shareable map state (`?layers=parking,water,accessibility`)
+- "Copy Link" button generates shareable URLs with current layer state
+- `setLayersFromURL()` function parses URL params on page load
+
+**📍 Expanded Building Data:**
+
+**Updated: `lib/map/buildings.ts`**
+- Expanded from 10 to 40+ campus buildings with accurate grid references
+- Data sourced from official MQ Location Guide (2024)
+- New building categories: academic, services, health, food, sports, venue, research, residential
+- `gridToPixel()` function converts MQ grid references (e.g., "E4") to pixel coordinates
+- Buildings include: Library, all Wally's Walk buildings, MQ Business School, sporting facilities, student services, health services, research centers
+
+**🔍 Hover Tooltips for Map Layers:**
+
+**Updated: `lib/map/mapOverlays.ts`**
+- Added metadata fields to `MapOverlay` interface:
+  - `source`: Data source attribution (e.g., "MQ Property Division", "MQ Sport & Aquatic Centre")
+  - `lastUpdated`: When data was last updated (e.g., "August 2024", "June 2024")
+  - `legend`: Array of strings explaining what icons/colors mean
+- All 6 overlay types now have complete metadata
+
+**Updated: `app/map/MapClient.tsx`**
+- Added hover tooltip UI for layer toggle buttons
+- Tooltips show: overlay name with HelpCircle icon, source, last updated date, and legend items
+- Uses CSS `group-hover` pattern for clean visibility transitions
+- Accessible design with proper z-index stacking
+
+**🌐 Translations:**
+
+Added 3 new keys to English locale:
+- `source` - "Source"
+- `lastUpdated` - "Last Updated"
+- `legend` - "Legend"
+
+**🧪 Test Updates:**
+
+**Fixed: `tests/map/buildings.test.ts`**
+- Updated test building ID from 'C5C' to 'LIB' (Library exists in expanded data)
+- Fixed duplicate position test to expect buildings at same location (grid-based data)
+- Updated search tests to use 'security' instead of 'computer science'
+- All 24 map tests now pass
+
+**Files Created:**
+- `lib/store/mapStore.ts` - Map state persistence store
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Expanded to 40+ buildings
+- `lib/map/mapOverlays.ts` - Added source, lastUpdated, legend metadata
+- `app/map/MapClient.tsx` - Added hover tooltips, URL sharing
+- `locales/en/translations.json` - Added 3 new keys
+- `tests/map/buildings.test.ts` - Fixed tests for new data
+
+**Verification:**
+- `npm run test`: ✅ 24/24 map tests passing
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ All pages successful
+
+---
+
 ## [0.9.7] - 2026-01-09
 
 ### Added
