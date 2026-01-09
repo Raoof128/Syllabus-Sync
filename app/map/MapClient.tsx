@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   MapPin,
@@ -37,8 +38,10 @@ import {
   ChevronDown,
   ChevronUp,
   LayoutGrid,
-  List,
+  List as ListIcon,
 } from 'lucide-react';
+import { MapErrorBoundary } from './MapErrorBoundary';
+import { MapLoadingSkeleton } from './MapSkeleton';
 import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -727,17 +730,16 @@ export default function MapClient() {
                 className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
               >
                 {shouldRenderMap ? (
-                  <CampusMap
-                    selectedBuilding={selectedBuilding}
-                    coordPickerMode={coordPickerMode}
-                    onMapClick={handleMapClick}
-                    activeOverlays={activeOverlays}
-                  />
+                  <MapErrorBoundary>
+                    <CampusMap
+                      selectedBuilding={selectedBuilding}
+                      coordPickerMode={coordPickerMode}
+                      onMapClick={handleMapClick}
+                      activeOverlays={activeOverlays}
+                    />
+                  </MapErrorBoundary>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center gap-3 bg-mq-background-secondary text-mq-content-secondary">
-                    <MapPin className="h-6 w-6" />
-                    <p className="text-mq-sm">{t('mapLoadsWhenVisible')}</p>
-                  </div>
+                  <MapLoadingSkeleton />
                 )}
               </div>
             </CardContent>
@@ -781,7 +783,7 @@ export default function MapClient() {
                       }`}
                       aria-label="List view"
                     >
-                      <List className="h-4 w-4" />
+                      <ListIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -844,124 +846,168 @@ export default function MapClient() {
                 })}
               </div>
 
-              {/* Buildings Grid/List */}
+              {/* Buildings Grid/List with Animations */}
               {sidebarBuildings.length > 0 ? (
                 <>
-                  <div
+                  <motion.div
+                    layout
                     className={
                       viewMode === 'grid'
                         ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
                         : 'space-y-2'
                     }
                   >
-                    {(showAllBuildings ? sidebarBuildings : sidebarBuildings.slice(0, 12)).map(
-                      (building) => {
-                        const isSelected = selectedBuildingId === building.id;
-                        const categoryInfo = CATEGORY_FILTERS.find(
-                          (c) => c.id === building.category,
-                        );
-                        const CategoryIcon = categoryInfo?.icon || Building2;
+                    <AnimatePresence mode="popLayout">
+                      {(showAllBuildings ? sidebarBuildings : sidebarBuildings.slice(0, 12)).map(
+                        (building, index) => {
+                          const isSelected = selectedBuildingId === building.id;
+                          const categoryInfo = CATEGORY_FILTERS.find(
+                            (c) => c.id === building.category,
+                          );
+                          const CategoryIcon = categoryInfo?.icon || Building2;
 
-                        if (viewMode === 'list') {
+                          if (viewMode === 'list') {
+                            return (
+                              <motion.div
+                                key={building.id}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{
+                                  duration: 0.2,
+                                  delay: Math.min(index * 0.02, 0.15),
+                                }}
+                              >
+                                <Link
+                                  href={`/map?building=${building.id}`}
+                                  aria-current={isSelected ? 'page' : undefined}
+                                  role="button"
+                                  tabIndex={0}
+                                  className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
+                                    isSelected
+                                      ? 'bg-mq-success/10 border-mq-success'
+                                      : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                                  }`}
+                                >
+                                  <div
+                                    className={`p-2 rounded-mq ${
+                                      isSelected ? 'bg-mq-success/20' : 'bg-mq-background'
+                                    }`}
+                                  >
+                                    <CategoryIcon
+                                      className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
+                                      aria-hidden="true"
+                                    />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-semibold text-mq-sm text-mq-content">
+                                        {building.id}
+                                      </span>
+                                      {building.wheelchair && (
+                                        <Accessibility
+                                          className="h-3 w-3 text-mq-success"
+                                          aria-label="Wheelchair accessible"
+                                        />
+                                      )}
+                                      {isSelected && (
+                                        <Badge className="bg-mq-success text-white text-[10px] px-1.5">
+                                          {t('selected')}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <p className="text-mq-xs text-mq-content-secondary truncate">
+                                      {t(building.translationKey)}
+                                    </p>
+                                  </div>
+                                  {building.category && (
+                                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                                      {BUILDING_CATEGORY_LABELS[building.category]}
+                                    </Badge>
+                                  )}
+                                </Link>
+                              </motion.div>
+                            );
+                          }
+
+                          // Grid view with animations
                           return (
-                            <Link
+                            <motion.div
                               key={building.id}
-                              href={`/map?building=${building.id}`}
-                              aria-current={isSelected ? 'page' : undefined}
-                              className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border ${
-                                isSelected
-                                  ? 'bg-mq-success/10 border-mq-success'
-                                  : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
-                              }`}
+                              layout
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              transition={{
+                                duration: 0.2,
+                                delay: Math.min(index * 0.02, 0.15),
+                              }}
                             >
-                              <div
-                                className={`p-2 rounded-mq ${
-                                  isSelected ? 'bg-mq-success/20' : 'bg-mq-background'
+                              <Link
+                                href={`/map?building=${building.id}`}
+                                aria-current={isSelected ? 'page' : undefined}
+                                role="button"
+                                tabIndex={0}
+                                className={`group block p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
+                                  isSelected
+                                    ? 'bg-mq-success/10 border-2 border-mq-success'
+                                    : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
                                 }`}
                               >
-                                <CategoryIcon
-                                  className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-mq-sm text-mq-content">
-                                    {building.id}
-                                  </span>
-                                  {building.wheelchair && (
-                                    <Accessibility className="h-3 w-3 text-mq-success" />
-                                  )}
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <CategoryIcon
+                                      className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
+                                      aria-hidden="true"
+                                    />
+                                    <span className="font-semibold text-mq-content">
+                                      {building.id}
+                                    </span>
+                                  </div>
                                   {isSelected && (
-                                    <Badge className="bg-mq-success text-white text-[10px] px-1.5">
+                                    <Badge className="bg-mq-success text-white text-[10px] px-1">
                                       {t('selected')}
                                     </Badge>
                                   )}
                                 </div>
-                                <p className="text-mq-xs text-mq-content-secondary truncate">
+                                <p className="text-mq-sm text-mq-content-secondary line-clamp-2">
                                   {t(building.translationKey)}
                                 </p>
-                              </div>
-                              {building.category && (
-                                <Badge variant="secondary" className="text-[10px] shrink-0">
-                                  {BUILDING_CATEGORY_LABELS[building.category]}
-                                </Badge>
-                              )}
-                            </Link>
+                                <div className="flex items-center gap-1 mt-2">
+                                  {building.category && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-[10px] bg-mq-background/50"
+                                    >
+                                      {BUILDING_CATEGORY_LABELS[building.category]}
+                                    </Badge>
+                                  )}
+                                  {building.wheelchair && (
+                                    <span
+                                      className="inline-flex items-center text-[10px] text-mq-success"
+                                      aria-label="Wheelchair accessible"
+                                    >
+                                      <Accessibility className="h-3 w-3" aria-hidden="true" />
+                                    </span>
+                                  )}
+                                </div>
+                              </Link>
+                            </motion.div>
                           );
-                        }
-
-                        // Grid view
-                        return (
-                          <Link
-                            key={building.id}
-                            href={`/map?building=${building.id}`}
-                            aria-current={isSelected ? 'page' : undefined}
-                            className={`group p-3 rounded-mq-lg transition-all duration-200 border ${
-                              isSelected
-                                ? 'bg-mq-success/10 border-2 border-mq-success'
-                                : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-1.5">
-                                <CategoryIcon
-                                  className={`h-4 w-4 ${isSelected ? 'text-mq-success' : categoryInfo?.color || 'text-mq-content-secondary'}`}
-                                />
-                                <span className="font-semibold text-mq-content">{building.id}</span>
-                              </div>
-                              {isSelected && (
-                                <Badge className="bg-mq-success text-white text-[10px] px-1">
-                                  {t('selected')}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-mq-sm text-mq-content-secondary line-clamp-2">
-                              {t(building.translationKey)}
-                            </p>
-                            <div className="flex items-center gap-1 mt-2">
-                              {building.category && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-[10px] bg-mq-background/50"
-                                >
-                                  {BUILDING_CATEGORY_LABELS[building.category]}
-                                </Badge>
-                              )}
-                              {building.wheelchair && (
-                                <span className="inline-flex items-center text-[10px] text-mq-success">
-                                  <Accessibility className="h-3 w-3" />
-                                </span>
-                              )}
-                            </div>
-                          </Link>
-                        );
-                      },
-                    )}
-                  </div>
+                        },
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
 
                   {/* Show More/Less Button */}
                   {sidebarBuildings.length > 12 && (
-                    <div className="flex justify-center pt-2">
+                    <motion.div
+                      className="flex justify-center pt-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
                       <Button
                         variant="ghost"
                         size="sm"
@@ -980,7 +1026,7 @@ export default function MapClient() {
                           </>
                         )}
                       </Button>
-                    </div>
+                    </motion.div>
                   )}
                 </>
               ) : (

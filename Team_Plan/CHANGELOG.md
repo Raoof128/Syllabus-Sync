@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.13.0] - 2026-01-09
+
+### Added
+
+#### Map Performance & UX Upgrade (Raouf)
+
+**Summary:** Comprehensive map component performance improvements and UX enhancements including animated loading skeletons, error boundaries, smooth list animations, improved accessibility, and PWA offline caching for map assets.
+
+**Loading States & Skeleton:**
+- **MapLoadingSkeleton** - Animated skeleton with pulsing background grid and "dropping" pin animations
+- **6 animated pins** - Staggered drop-in animation with bounce effect and pulsing shadows
+- **Center loading indicator** - Spinner with "Loading campus map..." message
+- **Screen reader support** - Proper ARIA labels and live regions
+
+**Error Boundary:**
+- **MapErrorBoundary** - Class component error boundary wrapping map
+- **Graceful fallback UI** - Error icon, helpful message, retry/reload buttons
+- **Development details** - Shows technical error info in dev mode
+- **Error logging** - Integrates with errorHandler utility for monitoring
+- **HOC wrapper** - `withMapErrorBoundary()` for easy component wrapping
+
+**Smooth List Animations:**
+- **AnimatePresence** - framer-motion for enter/exit animations on filter changes
+- **Grid view** - Scale animations with staggered delays
+- **List view** - Slide-up animations with opacity transitions
+- **Layout animations** - Smooth container resize on filter changes
+- **Respects reduced motion** - Honors `prefers-reduced-motion` setting
+
+**Accessibility Enhancements:**
+- **Focus states** - Visible focus rings on all building items
+- **ARIA labels** - Proper `aria-hidden` on icons, descriptive labels
+- **Keyboard navigation** - `tabIndex={0}` and `role="button"` on building cards
+- **Wheelchair indicators** - Accessible labels for wheelchair icons
+
+**PWA Offline Support:**
+- **Dedicated map cache** - `syllabus-sync-map-v1` for map assets
+- **Precached assets** - Campus map PNG, 6 overlay images, Leaflet icons
+- **Cache-first strategy** - Serves cached map assets offline
+- **Background updates** - Stale-while-revalidate pattern
+- **Graceful degradation** - Works offline with cached assets
+
+**New Files:**
+- `app/map/MapSkeleton.tsx` - Loading skeleton components (198 lines)
+- `app/map/MapErrorBoundary.tsx` - Error boundary with HOC (136 lines)
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Integrated skeleton, error boundary, animations
+- `public/sw.js` - Added map asset caching (v3)
+- `package.json` - Added react-window dependency (for future virtualization)
+
+**Dependencies Added:**
+- `react-window@2.2.4` - List virtualization library
+- `@types/react-window@1.8.8` - TypeScript types
+- `react-leaflet-cluster@3.0.1` - Marker clustering (for future use)
+
+---
+
 ## [0.12.0] - 2026-01-09
 
 ### Added

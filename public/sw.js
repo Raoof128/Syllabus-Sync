@@ -5,15 +5,30 @@
 // SECURITY: This service worker implements a strict caching policy to prevent
 // sensitive data from being cached and exposed after logout or on shared devices.
 
-const CACHE_NAME = 'syllabus-sync-v2'; // Bump version for cache invalidation
-const STATIC_CACHE = 'syllabus-sync-static-v2';
-const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v2';
+const CACHE_NAME = 'syllabus-sync-v3'; // Bump version for cache invalidation
+const STATIC_CACHE = 'syllabus-sync-static-v3';
+const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v3';
+const MAP_CACHE = 'syllabus-sync-map-v1'; // Dedicated cache for map assets
 
 // SECURITY: Only cache truly static assets - NO HTML pages that may contain user data
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
   '/favicon.ico',
   '/MQ_Logo_Final.png',
+];
+
+// Map assets to precache for offline support (non-sensitive public data)
+const MAP_ASSETS = [
+  '/maps/raster/mq-campus.png',
+  '/maps/overlays/Campus-Map_parking.png',
+  '/maps/overlays/Drinking-water.png',
+  '/maps/overlays/map_accessibility.png',
+  '/maps/overlays/map_special_permits_service_vehicles.png',
+  '/maps/overlays/Exam-Map-S22024.png',
+  '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
+  '/images/leaflet/marker-icon.png',
+  '/images/leaflet/marker-icon-2x.png',
+  '/images/leaflet/marker-shadow.png',
 ];
 
 // SECURITY: Paths that should NEVER be cached (authenticated/sensitive data)
@@ -51,24 +66,43 @@ const SAFE_TO_CACHE_EXTENSIONS = [
   '.json', // Only for non-API JSON files like manifest
 ];
 
-// Install event - cache only essential static assets
+// Install event - cache essential static assets and map assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
+    Promise.all([
+      caches.open(STATIC_CACHE).then((cache) => {
+        return cache.addAll(STATIC_ASSETS);
+      }),
+      caches.open(MAP_CACHE).then((cache) => {
+        // Map assets are optional - don't fail install if they're missing
+        return Promise.allSettled(
+          MAP_ASSETS.map((asset) =>
+            fetch(asset)
+              .then((response) => {
+                if (response.ok) {
+                  return cache.put(asset, response);
+                }
+              })
+              .catch(() => {
+                /* ignore failures - map will still work with network */
+              })
+          )
+        );
+      }),
+    ])
   );
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  const validCaches = [STATIC_CACHE, DYNAMIC_CACHE, MAP_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           // Delete old cache versions
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+          if (!validCaches.includes(cacheName)) {
             return caches.delete(cacheName);
           }
         })
@@ -121,6 +155,16 @@ function isCacheable(url) {
   return false;
 }
 
+/**
+ * Check if URL is a map asset (for dedicated map cache)
+ */
+function isMapAsset(url) {
+  const pathname = url.pathname;
+  return pathname.startsWith('/maps/') || 
+         pathname.startsWith('/images/leaflet/') ||
+         MAP_ASSETS.some(asset => pathname === asset);
+}
+
 // Fetch event - network-first for most content, cache only static assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -134,6 +178,37 @@ self.addEventListener('fetch', (event) => {
   // SECURITY: NEVER cache API, auth routes, or HTML pages - always go to network
   if (!isCacheable(url)) {
     event.respondWith(fetch(request));
+    return;
+  }
+
+  // Special handling for map assets - cache-first with map cache
+  if (isMapAsset(url)) {
+    event.respondWith(
+      caches.open(MAP_CACHE).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          if (cachedResponse) {
+            // Return from cache, update in background
+            fetch(request).then((response) => {
+              if (response.ok) {
+                cache.put(request, response);
+              }
+            }).catch(() => {/* ignore */});
+            return cachedResponse;
+          }
+          
+          // Not in cache, fetch and cache
+          return fetch(request).then((response) => {
+            if (response.ok) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          }).catch(() => {
+            // Return offline placeholder if map fails to load
+            return new Response('', { status: 503, statusText: 'Map unavailable offline' });
+          });
+        });
+      })
+    );
     return;
   }
 
