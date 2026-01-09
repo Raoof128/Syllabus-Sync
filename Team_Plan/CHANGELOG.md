@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.0] - 2026-01-09
+
+### Changed
+
+#### Map UI Refinements & Data Updates (Raouf)
+
+**Summary:** Map interface improvements focusing on usability, data accuracy, and visual clarity including selective marker display, overlay removal, transparency fixes, and building data synchronization.
+
+**Marker Display Optimization:**
+- **Selective markers** - Map pins now only appear when a building is selected from the sidebar, reducing visual clutter
+- **Focused navigation** - Users can select buildings to see their location without overwhelming the map with all building markers
+- **Improved performance** - Fewer DOM elements rendered, better scrolling and interaction performance
+
+**Overlay Streamlining:**
+- **Removed walking track overlay** - Eliminated the "Walking Track" layer to simplify the map interface
+- **Cleaner overlay panel** - Reduced from 6 to 5 available overlays for better focus on essential map features
+- **Updated icon imports** - Removed unused Footprints icon from component imports
+
+**Navigation Panel Enhancement:**
+- **Improved readability** - Increased background opacity from transparent to 95% for better text contrast
+- **Enhanced blur effect** - Upgraded from backdrop-blur-md to backdrop-blur-lg for stronger visual separation
+- **Stronger shadows** - Upgraded from shadow-xl to shadow-2xl and added border-2 for better depth perception
+
+**Building Data Synchronization:**
+- **Added 3 new buildings** from MAP_Data cross-check:
+  - `14 First Walk (MUSEC)` - Macquarie University Special Education Centre
+  - `14 Sir Christopher Ondaatje Ave` - Academic building with exam halls
+  - `4 Western Road` - Academic building with examination rooms
+- **Translation support** - Added building names and descriptions in all 19 supported languages
+- **Grid reference mapping** - All new buildings include proper campus grid coordinates
+
+**Quality Assurance:**
+- **Full test suite** - All 248 tests passing
+- **Type safety** - No TypeScript errors across the codebase
+- **Code quality** - Zero ESLint warnings or errors
+- **Build verification** - Successful production build with 30 routes compiled
+
 ## [0.13.0] - 2026-01-09
 
 ### Added

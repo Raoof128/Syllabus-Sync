@@ -914,5 +914,11 @@
   "filterByCategory": "Filter by category",
   "buildingsFound": "{{count}} buildings found",
   "quickSearch": "Quick Search",
-  "filterBuildings": "Filter buildings by name, code, or category"
+  "filterBuildings": "Filter buildings by name, code, or category",
+  "building_14FW_name": "14 First Walk (MUSEC)",
+  "building_14FW_desc": "Macquarie University Special Education Centre - education programs for children.",
+  "building_14SCO_name": "14 Sir Christopher Ondaatje Ave",
+  "building_14SCO_desc": "Academic building with teaching spaces and exam halls.",
+  "building_4WR_name": "4 Western Road",
+  "building_4WR_desc": "Academic building with teaching and examination rooms."
 }

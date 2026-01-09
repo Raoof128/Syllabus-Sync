@@ -1,13 +1,7 @@
 // lib/map/mapOverlays.ts
 // Map Overlay Layers Configuration
 
-export type MapOverlayId =
-  | 'parking'
-  | 'water'
-  | 'accessibility'
-  | 'permits'
-  | 'exam'
-  | 'walking_track';
+export type MapOverlayId = 'parking' | 'water' | 'accessibility' | 'permits' | 'exam';
 
 export interface MapOverlay {
   id: MapOverlayId;
@@ -99,23 +93,6 @@ export const mapOverlays: MapOverlay[] = [
     lastUpdated: 'Semester 2, 2024',
     legend: ['Red markers: Exam venues', 'Numbers: Building codes', 'Check iLearn for your venue'],
   },
-  {
-    id: 'walking_track',
-    name: 'Walking Track',
-    description: 'Budyari Ngurra (Good Country) 3km walking track with 15 POIs',
-    imagePath: '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
-    icon: 'Footprints',
-    color: 'text-green-500',
-    category: 'recreation',
-    enabled: false,
-    source: 'MQ Office of Indigenous Strategy',
-    lastUpdated: 'June 2024',
-    legend: [
-      'Green line: Walking track route',
-      'Numbered markers: Points of interest',
-      '15 POIs featuring local flora & culture',
-    ],
-  },
 ];
 
 // Helper functions
@@ -144,5 +121,4 @@ export const DEFAULT_OVERLAY_PREFERENCES: MapOverlayPreferences = {
   accessibility: false,
   permits: false,
   exam: false,
-  walking_track: false,
 };

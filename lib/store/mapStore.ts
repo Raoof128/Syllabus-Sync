@@ -88,14 +88,7 @@ export const parseOverlaysFromURL = (searchParams: URLSearchParams): MapOverlayI
   const layersParam = searchParams.get('layers');
   if (!layersParam) return [];
 
-  const validOverlays: MapOverlayId[] = [
-    'parking',
-    'water',
-    'accessibility',
-    'permits',
-    'exam',
-    'walking_track',
-  ];
+  const validOverlays: MapOverlayId[] = ['parking', 'water', 'accessibility', 'permits', 'exam'];
 
   return layersParam
     .split(',')

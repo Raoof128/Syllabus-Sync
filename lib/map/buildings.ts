@@ -836,6 +836,43 @@ export const buildings: Building[] = [
     category: 'academic',
     location: { lat: -33.773641, lng: 151.116131, osmId: 157975717 },
   },
+  // Additional buildings from MQ Location Guide
+  {
+    id: '14FW',
+    name: '14 First Walk (MUSEC)',
+    position: gridToPixel('O10'),
+    description: 'Macquarie University Special Education Centre - education programs for children.',
+    tags: ['academic', 'education', 'services'],
+    translationKey: 'building_14FW_name',
+    descriptionKey: 'building_14FW_desc',
+    gridRef: 'O10',
+    address: '14 First Walk',
+    category: 'academic',
+  },
+  {
+    id: '14SCO',
+    name: '14 Sir Christopher Ondaatje Ave',
+    position: gridToPixel('N20'),
+    description: 'Academic building with teaching spaces and exam halls.',
+    tags: ['academic', 'teaching', 'exams'],
+    translationKey: 'building_14SCO_name',
+    descriptionKey: 'building_14SCO_desc',
+    gridRef: 'N20',
+    address: '14 Sir Christopher Ondaatje Ave',
+    category: 'academic',
+  },
+  {
+    id: '4WR',
+    name: '4 Western Road',
+    position: gridToPixel('P14'),
+    description: 'Academic building with teaching and examination rooms.',
+    tags: ['academic', 'teaching', 'exams'],
+    translationKey: 'building_4WR_name',
+    descriptionKey: 'building_4WR_desc',
+    gridRef: 'P14',
+    address: '4 Western Road',
+    category: 'academic',
+  },
 ];
 
 export const getBuildingById = (id: string): Building | undefined => {

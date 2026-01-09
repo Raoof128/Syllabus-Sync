@@ -27,7 +27,6 @@ import {
   Droplets,
   BadgeCheck,
   GraduationCap,
-  Footprints,
   Link as LinkIcon,
   HelpCircle,
   Stethoscope,
@@ -100,7 +99,6 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
   accessibility: Accessibility,
   permits: BadgeCheck,
   exam: GraduationCap,
-  walking_track: Footprints,
 };
 
 // Custom hook for debounced search with proper state management
