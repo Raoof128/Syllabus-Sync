@@ -1,0 +1,151 @@
+name,building_type,lat,lng,amenity,addr_street,osm_id
+8SCO,college,-33.77557,151.114936,,Sir Christopher Ondaatje Avenue,23716703
+11WW,university,-33.774641,151.115085,,Wally's Walk,23716716
+75TR,yes,-33.774163,151.118636,,Talavera Road,23716719
+13RPD,university,-33.77325,151.117162,,Research Park Drive,23716723
+3SR,university,-33.773313,151.116659,,Science Road,23716725
+Avaya House,office,-33.784199,151.118281,,,23716732
+Memjet Australia,yes,-33.783035,151.119379,,Lyonpark Road,23716736
+8SCO,yes,-33.775235,151.114671,,Sir Christopher Ondaatje Avenue,51549358
+4ER,university,-33.775808,151.115985,,Eastern Road,51673946
+6ER,university,-33.775576,151.115895,,Eastern Road,51673951
+6FW,yes,-33.775392,151.112051,,First Walk,62060227
+The Ranch,retail,-33.781539,151.112592,restaurant,Herring Road,75739210
+10HA,university,-33.776044,151.108066,,Hadenfeld Avenue,100955278
+17MW,yes,-33.77624,151.113187,,Macquarie Walk,141281548
+16MW (Macquarie University Library),university,-33.775705,151.113082,,Macquarie Walk,141281549
+1MD,university,-33.771648,151.116079,,Management Drive,148387966
+Lakeside Hotel & Conference Centre,yes,-33.771289,151.11605,,Executive Road,148387967
+3MD,university,-33.771879,151.115742,,Management Drive,148387968
+5MD,yes,-33.772028,151.116656,,Management Drive,148387969
+1EXR,yes,-33.771119,151.115865,,Executive Road,148387970
+2FW,yes,-33.775333,151.113363,,First Walk,148389591
+14FW,university,-33.774838,151.109776,,First Walk,148389592
+4FW,university,-33.775382,151.112805,,First Walk,148389593
+8LR (Banksia Cottage),yes,-33.775158,151.108997,,Link Road,148389594
+2LR,university,-33.774985,151.105925,,Link Road,148390207
+6LR,university,-33.77503,151.106431,,Link Road,148390210
+4LR,university,-33.775275,151.106134,,Link Road,148390211
+14ER,university,-33.77386,151.115721,,Eastern Road,157975715
+14SCO,university,-33.77395,151.114924,,Sir Christopher Ondaatje Avenue,157975716
+6SR,university,-33.773641,151.116131,,Science Road,157975717
+6WW,university,-33.774152,151.116117,,Wally's Walk,157975718
+Macquarie Centre,retail,-33.777108,151.121294,,Herring Road,201725087
+18WW (Service Connect),university,-33.774021,151.11261,,Wally's Walk,205588336
+11GR (Lighthouse Theatre),yes,-33.772283,151.111919,theatre,,205588350
+16WW (Lincoln Building),university,-33.774231,151.113649,,Wally's Walk,205588359
+19ER (The Chancellery),yes,-33.77242,151.114854,,Eastern Road,205588364
+10GR (Macquarie University Sport and Aquatic Centre),yes,-33.772661,151.110771,,Gymnasium Road,205588367
+Dunmore Lang College - Postgraduate Apartments,apartments,-33.779625,151.116166,,Herring Road,205588642
+Cochlear,commercial,-33.777452,151.113603,,University Avenue,260224790
+Acre Woods Childcare,retail,-33.776187,151.099175,childcare,Vimiera Road,270755080
+16UA (Australian Hearing Hub),yes,-33.776499,151.111815,,University Avenue,271661421
+Destination Orana,apartments,-33.773586,151.119754,,Talavera Road,286832282
+Optus Campus Sydney (OCS) Building G,office,-33.783179,151.122385,,Giffnock Avenue,317876366
+3IR,yes,-33.775249,151.118583,,Innovation Road,324612872
+4RPD,university,-33.774839,151.117814,,Research Park Drive,324612875
+1IR,yes,-33.775657,151.119183,,Innovation Road,324612876
+Curzon Hall,yes,-33.780332,151.103764,,,329250116
+Ryde Panthers Soccer Club,yes,-33.787579,151.112858,,,409890696
+ELS Hall,sports_centre,-33.787356,151.112703,,,409890738
+Fujitsu Australia Limited,office,-33.773188,151.119056,,Talavera Road,412583875
+29WW,yes,-33.774513,151.110334,,Wally's Walk,455246541
+27WW (Lotus Theatre),yes,-33.774631,151.110656,,Wally's Walk,455246542
+25WW,university,-33.774873,151.110937,,Wally's Walk,458998300
+23WW,yes,-33.774655,151.11174,,Wally's Walk,458998303
+21WW (Macquarie Theatre),yes,-33.77466,151.11228,,Wally's Walk,458998304
+14SW,yes,-33.774877,151.1127,,Second Way,458998305
+12SW,university,-33.775059,151.113014,,Second Way,458998306
+10SCO,university,-33.774901,151.114706,,Sir Christopher Ondaatje Avenue,458998307
+Mercure Sydney Macquarie,yes,-33.772395,151.11687,,Research Park Drive,459015422
+15RPD,yes,-33.772882,151.116948,,Research Park Drive,459015425
+2TP,university,-33.773038,151.117681,,Technology Place,459015453
+Macquarie University Hospital,hospital,-33.773819,151.118075,,Technology Place,459015460
+4WW,university,-33.774109,151.116726,,Wally's Walk,459015462
+Dunmore Lang College - Old Wing,dormitory,-33.77817,151.11606,,Herring Road,488128858
+Dunmore Lang College - New Wing,dormitory,-33.777892,151.116772,,Herring Road,488128859
+Dunmore Lang College - Office,university,-33.778327,151.116545,,Herring Road,488128860
+E-Block,yes,-33.770387,151.098474,,,511603050
+12WW,university,-33.774291,151.114765,,Wallys Walk,613401543
+Ron Reilly Pavilion,grandstand,-33.766292,151.114925,,,791253931
+Blue Barclay Pavilion,grandstand,-33.765866,151.11488,,,791253932
+M2 Operations Centre,industrial,-33.768918,151.116381,security,,791276982
+EBHS Library,yes,-33.769751,151.09835,,,814034937
+I-Block,yes,-33.770014,151.098697,,,814034939
+D-Block,yes,-33.770725,151.098833,,,814034941
+B-Block,yes,-33.770577,151.099293,,,814034943
+Pizza oven,yes,-33.769783,151.099525,restaurant,,814034948
+Trade Training Centre,yes,-33.7686,151.099259,,,814034952
+TTC2,yes,-33.768775,151.099508,,,814034953
+Millamurra,yes,-33.76889,151.099604,,,814034957
+Batch ZKK,yes,-33.784153,151.122676,cafe,,830184535
+Optus Satellite Loading Dock,yes,-33.783701,151.122169,,,830184539
+C7,yes,-33.770892,151.099037,,,910333979
+C8,yes,-33.770967,151.099114,,,910333980
+K8,yes,-33.770377,151.098169,,,911120613
+TPG,office,-33.782134,151.12596,,,912977283
+1CC,university,-33.773263,151.113652,,Central Courtyard,914350786
+Student Accommodation,university,-33.773092,151.112678,,Wally's Walk,914350787
+DXC Technology,commercial,-33.779348,151.128668,,Talavera Road,916056285
+Adelaide,apartments,-33.779769,151.112499,,,967523408
+Darwin,apartments,-33.780106,151.112938,,,967523409
+Hobart,apartments,-33.780483,151.113436,,,967523410
+Melbourne,apartments,-33.780809,151.113836,,Mooltan Avenue,967523411
+Sydney,apartments,-33.7809,151.113301,,Mooltan Avenue,967523412
+Brisbane,apartments,-33.780546,151.112783,,,967523413
+Perth,apartments,-33.780122,151.112207,,,967523414
+Block A,apartments,-33.78047,151.114304,,Herring Road,967530686
+Block B,apartments,-33.78029,151.114167,,Herring Road,967533739
+Block C,apartments,-33.780111,151.114028,,Herring Road,967533740
+Block D,apartments,-33.779984,151.113839,,Herring Road,967533741
+Block E,apartments,-33.779847,151.113664,,Herring Road,967533742
+Block F,apartments,-33.780079,151.11358,,Herring Road,967533743
+Villas,apartments,-33.779589,151.112956,,Herring Road,967533744
+Villas,apartments,-33.779404,151.113173,,Herring Road,967533745
+Block C,apartments,-33.779049,151.12164,,Waterloo Road,982138149
+Block D,apartments,-33.778993,151.121027,,Waterloo Road,982138150
+Block A,apartments,-33.778487,151.121497,,Waterloo Road,982138151
+Block B,apartments,-33.778516,151.122144,,Waterloo Road,982138152
+Dan Murphy's,yes,-33.781039,151.111848,,,991365824
+D3,yes,-33.770461,151.098221,,,1032500062
+D2,yes,-33.770517,151.09828,,,1032500063
+D1,yes,-33.770573,151.098339,,,1032500064
+GA Shed,shed,-33.77039,151.099824,,,1032500107
+Caretaker's Cottage,house,-33.771091,151.099474,,,1032500110
+205A CR,yes,-33.769182,151.111823,,,1065030401
+205B CR,yes,-33.769606,151.111678,,,1065030402
+8HA (Incubator),university,-33.776162,151.109078,,Hadenfeld Avenue,1107882877
+Holiday Inn Express Sydney Macquarie Park,hotel,-33.780923,151.120042,,,1108110442
+Mac Residences,apartments,-33.780675,151.115334,,,1161574505
+6MD,university,-33.772141,151.116046,,Management Drive,1192234862
+7MD,university,-33.772279,151.115701,,Management Drive,1192234863
+12MW,university,-33.775174,151.114141,,Macquarie Walk,1192234871
+12MW,university,-33.775486,151.11417,,Macquarie Walk,1192236229
+5GR (Macquarie Observatory),university,-33.770357,151.111125,,Gymnasium Road,1192242193
+18ER,yes,-33.77289,151.115757,,Eastern Road,1192257351
+AWS Asia Pacific (Sydney) Region Data Centre,construction,-33.779954,151.12605,,Talavera Road,1298979786
+Intellicentre 2,yes,-33.780741,151.12767,,Talavera Road,1298979787
+Intellicentre 3 East,yes,-33.781296,151.127271,,Talavera Road,1298979789
+1WW (Ainsworth Building),university,-33.774218,151.118133,,Wally's Walk,1303624871
+2WW,university,-33.774207,151.117217,,Wally's Walk,1303624872
+13ARPD,university,-33.773161,151.116709,,Research Park Drive,1303624873
+G-Block,yes,-33.769915,151.099622,,,1305955574
+F-Block,yes,-33.769929,151.099392,,,1305955575
+J-Block,yes,-33.770141,151.098524,,,1305955581
+Canteen,yes,-33.770137,151.099173,fast_food,,1305955582
+Hall,yes,-33.769845,151.098915,,,1305955583
+M1,yes,-33.769559,151.099144,,,1305955584
+M2,yes,-33.769485,151.099221,,,1305955585
+M3,yes,-33.769411,151.099298,,,1305955586
+M4,yes,-33.769339,151.099374,,,1305955587
+K7,yes,-33.76981,151.09815,,,1305955595
+H-Block,yes,-33.769603,151.098533,,,1305955596
+K-Block,yes,-33.770128,151.098059,,,1305955604
+Sydney FC Centre of Excellence,yes,-33.764547,151.116823,,,1362439339
+Reddy Express,yes,-33.775138,151.105401,,,1444070791
+23WW,yes,-33.775037,151.11182,,Wally's Walk,6784791
+Siemens,yes,-33.774785,151.119673,,Innovation Road,6784971
+17WW (Michael Kirby Building),yes,-33.774709,151.11334,,Wally's Walk,7867502
+Edmund Barton Centre,school,-33.768745,151.099053,,,11185058
+East 3,yes,-33.775567,151.11674,parking,,14744550
+East 2,yes,-33.774832,151.11681,parking,,14744551

@@ -1,5 +1,12 @@
 import type { TranslationKey } from '@/lib/i18n/translations';
 
+// Geographic coordinates from OpenStreetMap
+export type GeoLocation = {
+  lat: number;
+  lng: number;
+  osmId?: number; // OpenStreetMap ID for attribution
+};
+
 export type Building = {
   id: string;
   name: string;
@@ -11,6 +18,9 @@ export type Building = {
   gridRef?: string; // Campus map grid reference (e.g., 'N16', 'O22')
   address?: string; // Physical address on campus
   category?: BuildingCategory;
+  location?: GeoLocation; // Real-world GPS coordinates from OSM
+  levels?: number; // Number of floors
+  wheelchair?: boolean; // Wheelchair accessible
 };
 
 export type BuildingCategory =
@@ -69,6 +79,7 @@ export const buildings: Building[] = [
     gridRef: 'N16',
     address: "18 Wally's Walk",
     category: 'services',
+    location: { lat: -33.774021, lng: 151.11261, osmId: 205588336 },
   },
   {
     id: 'LIB',
@@ -82,6 +93,7 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'academic',
+    location: { lat: -33.775705, lng: 151.113082, osmId: 141281549 },
   },
   {
     id: 'SEC',
@@ -109,6 +121,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25B Wally's Walk",
     category: 'academic',
+    location: { lat: -33.774873, lng: 151.110937, osmId: 458998300 },
   },
   {
     id: '17WW',
@@ -121,6 +134,7 @@ export const buildings: Building[] = [
     gridRef: 'O19',
     address: "17 Wally's Walk",
     category: 'academic',
+    location: { lat: -33.774709, lng: 151.11334, osmId: 7867502 },
   },
 
   // MACQUARIE BUSINESS SCHOOL
@@ -136,6 +150,8 @@ export const buildings: Building[] = [
     gridRef: 'Q22',
     address: '4 Eastern Road',
     category: 'academic',
+    location: { lat: -33.775808, lng: 151.115985, osmId: 51673946 },
+    levels: 4,
   },
 
   // FACULTY OF MEDICINE, HEALTH & HUMAN SCIENCES
@@ -151,6 +167,7 @@ export const buildings: Building[] = [
     gridRef: 'M28',
     address: '75 Talavera Road',
     category: 'academic',
+    location: { lat: -33.774163, lng: 151.118636, osmId: 23716719 },
   },
   {
     id: '16UA',
@@ -164,6 +181,7 @@ export const buildings: Building[] = [
     gridRef: 'T14',
     address: '16 University Avenue',
     category: 'academic',
+    location: { lat: -33.776499, lng: 151.111815, osmId: 271661421 },
   },
 
   // FACULTY OF SCIENCE & ENGINEERING
@@ -190,6 +208,7 @@ export const buildings: Building[] = [
     gridRef: 'O26',
     address: '4 Research Park Drive',
     category: 'academic',
+    location: { lat: -33.774839, lng: 151.117814, osmId: 324612875 },
   },
   {
     id: '12WW',
@@ -202,6 +221,7 @@ export const buildings: Building[] = [
     gridRef: 'N20',
     address: "12 Wally's Walk",
     category: 'academic',
+    location: { lat: -33.775174, lng: 151.114141, osmId: 1192234871 },
   },
   {
     id: '6WW',
@@ -214,6 +234,7 @@ export const buildings: Building[] = [
     gridRef: 'M23',
     address: "6 Wally's Walk",
     category: 'academic',
+    location: { lat: -33.774152, lng: 151.116117, osmId: 157975718 },
   },
   {
     id: '4WW',
@@ -226,6 +247,7 @@ export const buildings: Building[] = [
     gridRef: 'M24',
     address: "4 Wally's Walk",
     category: 'research',
+    location: { lat: -33.774109, lng: 151.116726, osmId: 459015462 },
   },
 
   // VENUES & THEATRES
@@ -240,6 +262,7 @@ export const buildings: Building[] = [
     gridRef: 'O11',
     address: "27 Wally's Walk",
     category: 'venue',
+    location: { lat: -33.774631, lng: 151.110656, osmId: 455246542 },
   },
   {
     id: 'MQTH',
@@ -252,6 +275,7 @@ export const buildings: Building[] = [
     gridRef: 'O15',
     address: "21 Wally's Walk",
     category: 'venue',
+    location: { lat: -33.77466, lng: 151.11228, osmId: 458998304 },
   },
   {
     id: 'PRICE',
@@ -264,6 +288,7 @@ export const buildings: Building[] = [
     gridRef: 'O14',
     address: "23 Wally's Walk",
     category: 'venue',
+    location: { lat: -33.774655, lng: 151.11174, osmId: 458998303 },
   },
   {
     id: 'LIGHT',
@@ -276,6 +301,7 @@ export const buildings: Building[] = [
     gridRef: 'H14',
     address: '11 Gymnasium Road',
     category: 'venue',
+    location: { lat: -33.772283, lng: 151.111919, osmId: 205588350 },
   },
   {
     id: 'AINS',
@@ -288,6 +314,7 @@ export const buildings: Building[] = [
     gridRef: 'N27',
     address: "1 Wally's Walk",
     category: 'academic',
+    location: { lat: -33.774218, lng: 151.118133, osmId: 1303624871 },
   },
 
   // MQ HEALTH
@@ -302,6 +329,8 @@ export const buildings: Building[] = [
     gridRef: 'L27',
     address: '3 Technology Place',
     category: 'health',
+    location: { lat: -33.773819, lng: 151.118075, osmId: 459015460 },
+    wheelchair: true,
   },
   {
     id: 'CLINIC',
@@ -314,6 +343,8 @@ export const buildings: Building[] = [
     gridRef: 'K26',
     address: '2 Technology Place',
     category: 'health',
+    location: { lat: -33.773038, lng: 151.117681, osmId: 459015453 },
+    wheelchair: true,
   },
   {
     id: 'WOOL',
@@ -341,6 +372,8 @@ export const buildings: Building[] = [
     gridRef: 'J12',
     address: '10 Gymnasium Road',
     category: 'sports',
+    location: { lat: -33.772661, lng: 151.110771, osmId: 205588367 },
+    wheelchair: true,
   },
   {
     id: 'FIELDS',
@@ -367,6 +400,7 @@ export const buildings: Building[] = [
     gridRef: 'K18',
     address: '1 Central Courtyard',
     category: 'food',
+    location: { lat: -33.773263, lng: 151.113652, osmId: 914350786 },
   },
   {
     id: 'CULT',
@@ -391,6 +425,7 @@ export const buildings: Building[] = [
     gridRef: 'E23',
     address: '1 Executive Road',
     category: 'food',
+    location: { lat: -33.771289, lng: 151.11605, osmId: 148387967 },
   },
 
   // OTHER SERVICES
@@ -406,6 +441,8 @@ export const buildings: Building[] = [
     gridRef: 'P20',
     address: '8 Sir Christopher Ondaatje Ave',
     category: 'services',
+    location: { lat: -33.77557, lng: 151.114936, osmId: 23716703 },
+    levels: 4,
   },
   {
     id: '16WW',
@@ -418,6 +455,7 @@ export const buildings: Building[] = [
     gridRef: 'N18',
     address: "16 Wally's Walk",
     category: 'research',
+    location: { lat: -33.774231, lng: 151.113649, osmId: 205588359 },
   },
   {
     id: '12SW',
@@ -430,6 +468,7 @@ export const buildings: Building[] = [
     gridRef: 'P16',
     address: '12 Second Way',
     category: 'services',
+    location: { lat: -33.775059, lng: 151.113014, osmId: 458998306 },
   },
   {
     id: '19ER',
@@ -442,6 +481,7 @@ export const buildings: Building[] = [
     gridRef: 'H20',
     address: '19 Eastern Road',
     category: 'services',
+    location: { lat: -33.77242, lng: 151.114854, osmId: 205588364 },
   },
   {
     id: 'OBS',
@@ -454,6 +494,7 @@ export const buildings: Building[] = [
     gridRef: 'C12',
     address: '5 Gymnasium Road',
     category: 'research',
+    location: { lat: -33.770357, lng: 151.111125, osmId: 1192242193 },
   },
   {
     id: 'INCUB',
@@ -466,6 +507,7 @@ export const buildings: Building[] = [
     gridRef: 'S8',
     address: '8 Hadenfeld Avenue',
     category: 'services',
+    location: { lat: -33.776162, lng: 151.109078, osmId: 1107882877 },
   },
   {
     id: 'CHAP',
@@ -478,6 +520,7 @@ export const buildings: Building[] = [
     gridRef: 'R6',
     address: '10 Hadenfeld Avenue',
     category: 'services',
+    location: { lat: -33.776044, lng: 151.108066, osmId: 100955278 },
   },
   {
     id: 'WALU',
@@ -490,6 +533,7 @@ export const buildings: Building[] = [
     gridRef: 'N11',
     address: "29 Wally's Walk",
     category: 'services',
+    location: { lat: -33.774513, lng: 151.110334, osmId: 455246541 },
   },
 
   // CHILDCARE
@@ -504,6 +548,7 @@ export const buildings: Building[] = [
     gridRef: 'P8',
     address: '8 Link Road',
     category: 'services',
+    location: { lat: -33.775158, lng: 151.108997, osmId: 148389594 },
   },
   {
     id: 'GUMNUT',
@@ -578,6 +623,7 @@ export const buildings: Building[] = [
     gridRef: 'K24',
     address: '3 Science Road',
     category: 'services',
+    location: { lat: -33.773313, lng: 151.116659, osmId: 23716725 },
   },
 
   // ADDITIONAL CAFES
@@ -618,6 +664,7 @@ export const buildings: Building[] = [
     gridRef: 'W25',
     address: '130 Herring Road',
     category: 'residential',
+    location: { lat: -33.77817, lng: 151.11606, osmId: 488128858 },
   },
   {
     id: 'RMC',
@@ -668,6 +715,126 @@ export const buildings: Building[] = [
     gridRef: 'L23',
     address: '6 Science Road',
     category: 'venue',
+  },
+
+  // ADDITIONAL BUILDINGS FROM OSM DATA
+  {
+    id: '11WW',
+    name: "11 Wally's Walk",
+    position: gridToPixel('N22'),
+    description: 'Academic building on Wallys Walk.',
+    tags: ['academic', 'teaching'],
+    translationKey: 'building_11WW_name',
+    descriptionKey: 'building_11WW_desc',
+    gridRef: 'N22',
+    address: "11 Wally's Walk",
+    category: 'academic',
+    location: { lat: -33.774641, lng: 151.115085, osmId: 23716716 },
+    levels: 4,
+  },
+  {
+    id: '13RPD',
+    name: '13 Research Park Drive',
+    position: gridToPixel('M26'),
+    description: 'Research facility on Research Park Drive.',
+    tags: ['research', 'academic'],
+    translationKey: 'building_13RPD_name',
+    descriptionKey: 'building_13RPD_desc',
+    gridRef: 'M26',
+    address: '13 Research Park Drive',
+    category: 'research',
+    location: { lat: -33.77325, lng: 151.117162, osmId: 23716723 },
+  },
+  {
+    id: '6ER',
+    name: '6 Eastern Road',
+    position: gridToPixel('Q21'),
+    description: 'Academic building on Eastern Road.',
+    tags: ['academic', 'teaching'],
+    translationKey: 'building_6ER_name',
+    descriptionKey: 'building_6ER_desc',
+    gridRef: 'Q21',
+    address: '6 Eastern Road',
+    category: 'academic',
+    location: { lat: -33.775576, lng: 151.115895, osmId: 51673951 },
+  },
+  {
+    id: '1CC',
+    name: '1 Central Courtyard',
+    position: gridToPixel('K19'),
+    description: 'Central Courtyard building and student hub.',
+    tags: ['services', 'student'],
+    translationKey: 'building_1CC_name',
+    descriptionKey: 'building_1CC_desc',
+    gridRef: 'K19',
+    address: '1 Central Courtyard',
+    category: 'services',
+    location: { lat: -33.773263, lng: 151.113652, osmId: 914350786 },
+  },
+  {
+    id: 'MERCURE',
+    name: 'Mercure Sydney Macquarie Park',
+    position: gridToPixel('L25'),
+    description: 'Hotel adjacent to campus.',
+    tags: ['accommodation', 'hotel'],
+    translationKey: 'building_MERCURE_name',
+    descriptionKey: 'building_MERCURE_desc',
+    gridRef: 'L25',
+    address: 'Research Park Drive',
+    category: 'other',
+    location: { lat: -33.772395, lng: 151.11687, osmId: 459015422 },
+  },
+  {
+    id: 'COCHLEAR',
+    name: 'Cochlear Limited',
+    position: gridToPixel('U16'),
+    description: 'Cochlear headquarters and research facility.',
+    tags: ['research', 'commercial', 'health'],
+    translationKey: 'building_COCHLEAR_name',
+    descriptionKey: 'building_COCHLEAR_desc',
+    gridRef: 'U16',
+    address: 'University Avenue',
+    category: 'research',
+    location: { lat: -33.777452, lng: 151.113603, osmId: 260224790 },
+  },
+  {
+    id: '10SCO',
+    name: '10 Sir Christopher Ondaatje Ave',
+    position: gridToPixel('P21'),
+    description: 'Academic building.',
+    tags: ['academic', 'teaching'],
+    translationKey: 'building_10SCO_name',
+    descriptionKey: 'building_10SCO_desc',
+    gridRef: 'P21',
+    address: '10 Sir Christopher Ondaatje Ave',
+    category: 'academic',
+    location: { lat: -33.774901, lng: 151.114706, osmId: 458998307 },
+  },
+  {
+    id: '14ER',
+    name: '14 Eastern Road',
+    position: gridToPixel('P22'),
+    description: 'Academic building on Eastern Road.',
+    tags: ['academic', 'teaching'],
+    translationKey: 'building_14ER_name',
+    descriptionKey: 'building_14ER_desc',
+    gridRef: 'P22',
+    address: '14 Eastern Road',
+    category: 'academic',
+    location: { lat: -33.77386, lng: 151.115721, osmId: 157975715 },
+  },
+  {
+    id: '6SR',
+    name: '6 Science Road',
+    position: gridToPixel('M23'),
+    description: 'Science building on Science Road.',
+    tags: ['academic', 'science', 'labs'],
+    translationKey: 'building_6SR_name',
+    descriptionKey: 'building_6SR_desc',
+    gridRef: 'M23',
+    address: '6 Science Road',
+    category: 'academic',
+    location: { lat: -33.773641, lng: 151.116131, osmId: 157975717 },
   },
 ];
 

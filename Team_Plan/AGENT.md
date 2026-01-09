@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.10.0 | Last Updated: January 09, 2026
+Version: 0.11.0 | Last Updated: January 09, 2026
 
 ---
 
@@ -58,7 +58,49 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
-#### ✅ MQ Maps Scraper Workflow v0.9.9 (Raouf)
+#### ✅ OSM Building Data Pipeline & Enhanced Map Popups v0.11.0 (Raouf)
+- **Created OSM data pipeline script** (`scripts/osm_mq_buildings.py`) - Fetches 543 buildings (150 named) from OpenStreetMap
+- **Added GeoLocation type** - Real GPS coordinates (lat/lng) from OSM with attribution IDs
+- **Enhanced Building type** - Added `location`, `levels`, `wheelchair` fields
+- **Updated 35+ buildings** with OSM coordinates for accurate GPS navigation
+- **Redesigned map popups** - Modern card design with category badges, grid refs, address, accessibility info
+- **Added 10 new buildings** from OSM data (11WW, 13RPD, 6ER, 1CC, Mercure, Cochlear, 10SCO, 14ER, 6SR)
+- **Added 22 new translation keys** for new buildings, "levels", "accessible"
+
+**Files Created:**
+- `scripts/osm_mq_buildings.py` - OSM Overpass API data fetcher
+- `data/mq-exports/osm_buildings.json` - 543 buildings with metadata
+- `data/mq-exports/osm_buildings.csv` - 150 named buildings for reference
+
+**Files Modified:**
+- `lib/map/buildings.ts` - Added GeoLocation type, location/levels/wheelchair fields, 10 new buildings
+- `app/map/CampusMap.tsx` - Enhanced popup design with category badges, address, grid ref, accessibility
+- `locales/en/translations.json` - Added 22 new translation keys
+
+**Building Type Enhanced:**
+```typescript
+type Building = {
+  // ... existing fields
+  location?: GeoLocation; // { lat, lng, osmId }
+  levels?: number;        // Building floors
+  wheelchair?: boolean;   // Accessibility
+}
+```
+
+**New Buildings Added:**
+| ID | Name | OSM ID | Category |
+|----|------|--------|----------|
+| 11WW | 11 Wally's Walk | 23716716 | academic |
+| 13RPD | 13 Research Park Drive | 23716723 | research |
+| 6ER | 6 Eastern Road | 51673951 | academic |
+| 1CC | 1 Central Courtyard | 914350786 | services |
+| MERCURE | Mercure Sydney Macquarie Park | 459015422 | other |
+| COCHLEAR | Cochlear Limited | 260224790 | research |
+| 10SCO | 10 Sir Christopher Ondaatje Ave | 458998307 | academic |
+| 14ER | 14 Eastern Road | 157975715 | academic |
+| 6SR | 6 Science Road | 157975717 | academic |
+
+#### ✅ Expanded Building Data v0.10.0 (Raouf)
 - **Created automation scripts** for weekly sync with MQ's published map PDFs
 - **mq_maps_discover.py** - Discovers all PDF links from MQ Maps page (https://www.mq.edu.au/about/locations/maps)
 - **mq_maps_download.py** - Downloads PDFs with caching and polite 1.2s delay between requests

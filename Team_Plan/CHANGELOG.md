@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.11.0] - 2026-01-09
+
+### Added
+
+#### OSM Building Data Pipeline & Enhanced Map Popups (Raouf)
+
+**Summary:** Implemented OpenStreetMap data pipeline for real GPS coordinates, added 10 new buildings from OSM, enhanced Building type with location/levels/wheelchair fields, and redesigned map popups with modern card design. Total buildings increased from 53 to 62.
+
+**OSM Data Pipeline:**
+- Created `scripts/osm_mq_buildings.py` - Fetches building data from OpenStreetMap Overpass API
+- Outputs 543 total buildings, 150 with names around MQ campus (1.5km radius)
+- Saves JSON and CSV formats for reference and import
+
+**Enhanced Building Type:**
+```typescript
+type GeoLocation = {
+  lat: number;
+  lng: number;
+  osmId?: number; // OpenStreetMap attribution
+};
+
+type Building = {
+  // ... existing fields
+  location?: GeoLocation; // Real GPS coordinates
+  levels?: number;        // Number of floors
+  wheelchair?: boolean;   // Accessibility status
+};
+```
+
+**New Buildings from OSM:**
+
+| ID | Name | OSM ID | Category |
+|----|------|--------|----------|
+| 11WW | 11 Wally's Walk | 23716716 | academic |
+| 13RPD | 13 Research Park Drive | 23716723 | research |
+| 6ER | 6 Eastern Road | 51673951 | academic |
+| 1CC | 1 Central Courtyard | 914350786 | services |
+| MERCURE | Mercure Sydney Macquarie Park | 459015422 | other |
+| COCHLEAR | Cochlear Limited | 260224790 | research |
+| 10SCO | 10 Sir Christopher Ondaatje Ave | 458998307 | academic |
+| 14ER | 14 Eastern Road | 157975715 | academic |
+| 6SR | 6 Science Road | 157975717 | academic |
+
+**Enhanced Map Popups:**
+- Modern card design with category badges
+- Building ID + Grid reference display
+- Address with location icon
+- Building levels indicator
+- Wheelchair accessibility badge
+- Tag pills with limit (max 4 shown)
+- OSM attribution for GPS-sourced data
+
+**Files Created:**
+- `scripts/osm_mq_buildings.py` - OSM Overpass API data fetcher
+- `data/mq-exports/osm_buildings.json` - 543 buildings with full metadata
+- `data/mq-exports/osm_buildings.csv` - 150 named buildings
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Added GeoLocation type, location/levels/wheelchair fields, 10 new buildings (53 → 62)
+- `app/map/CampusMap.tsx` - Redesigned popup with category, address, grid ref, levels, wheelchair, OSM attribution
+- `locales/en/translations.json` - Added 22 new translation keys
+
+**Verification:**
+- `npm run test`: ✅ 248/248 tests passing
+- `npm run lint`: ✅ 0 errors
+- `npm run typecheck`: ✅ Pass
+
+---
+
 ## [0.10.0] - 2026-01-09
 
 ### Added
