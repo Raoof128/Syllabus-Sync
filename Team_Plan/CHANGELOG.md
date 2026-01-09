@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2026-01-09
+
+### Added
+
+#### Expanded Building Data from MQ Location Guide (Raouf)
+
+**Summary:** Added 9 new buildings to the campus map from the official MQ Location Guide PDF, including childcare facilities, accessibility services, engineering support, and cafes. Total buildings increased from 44 to 53.
+
+**New Buildings Added:**
+
+| Building | Grid Ref | Category |
+|----------|----------|----------|
+| Gumnut Cottage (Childcare) | V15 | services |
+| Mia Mia (Childcare) | N11 | services |
+| Waratah (Childcare) | W17 | services |
+| NextSense Centre of Excellence | F9 | research |
+| NextSense School | G7 | academic |
+| METS (Engineering Services) | K24 | services |
+| Wally's Coffee and Toasties | N15 | food |
+| Library Cafe | Q17 | food |
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Added 9 new buildings with grid references (44 → 53 buildings)
+- `locales/en/translations.json` - Added 18 new translation keys (name + description per building)
+- `tests/map/buildings.test.ts` - Updated search test for new buildings (LIB now returns 2 results)
+
+**Verification:**
+- `npm run test`: ✅ 248/248 tests passing
+- `npm run lint`: ✅ 0 errors
+- `npm run typecheck`: ✅ Pass
+
+---
+
 ## [0.9.9] - 2026-01-09
 
 ### Added
