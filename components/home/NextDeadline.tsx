@@ -6,7 +6,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Clock, AlertCircle, Plus } from 'lucide-react';
+import { Clock, AlertCircle, ExternalLink } from 'lucide-react';
 import { formatDistanceToNow, format, isValid } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
@@ -73,9 +73,9 @@ const NextDeadline = memo(() => {
               className="gap-1"
               asChild
             >
-              <Link href="/calendar" aria-label={t('addDeadline')}>
-                <Plus className="h-4 w-4" />
-                {t('addDeadline')}
+              <Link href="/calendar" aria-label={t('viewAll')}>
+                <ExternalLink className="h-4 w-4" />
+                {t('viewAll')}
               </Link>
             </Button>
           </CardHeader>

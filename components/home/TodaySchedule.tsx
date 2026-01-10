@@ -4,21 +4,25 @@
 import React, { useMemo, memo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Clock, MapPin, BookOpen, Plus } from 'lucide-react';
+import { Clock, MapPin, ExternalLink } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MagicCard } from '@/components/ui/MagicCard';
 
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const { t } = useTranslation();
+  const router = useRouter();
+
   const todayLabel = useMemo(() => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[new Date().getDay()];
   }, []);
+
   const todayClasses = useMemo(() => {
     const classes = units.flatMap((unit) =>
       unit.schedule
@@ -32,6 +36,10 @@ const TodaySchedule = memo(() => {
     return classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
   }, [todayLabel, units]);
 
+  const handleViewAll = () => {
+    router.push('/calendar');
+  };
+
   return (
     <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
@@ -42,17 +50,11 @@ const TodaySchedule = memo(() => {
               size="sm"
               variant="outline"
               className="gap-1"
-              onClick={() => {
-                try {
-                  window.dispatchEvent(new CustomEvent('add-unit'));
-                } catch (error) {
-                  console.warn('Failed to trigger add unit event:', error);
-                }
-              }}
-              aria-label={t('addUnit')}
+              onClick={handleViewAll}
+              aria-label={t('viewAll')}
             >
-              <Plus className="h-4 w-4" />
-              {t('addUnit')}
+              <ExternalLink className="h-4 w-4" />
+              {t('viewAll')}
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -76,37 +78,7 @@ const TodaySchedule = memo(() => {
             ) : todayClasses.length === 0 ? (
               <div className="text-center py-8">
                 <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-mq-content mb-2">
-                  {t('noClassesToday')}
-                </h3>
-                <p className="text-mq-content-secondary mb-4">{t('noClassesDesc')}</p>
-                <Button
-                  onClick={() => {
-                    try {
-                      window.dispatchEvent(new CustomEvent('add-unit'));
-                    } catch (error) {
-                      console.warn('Failed to trigger add unit event:', error);
-                      // Fallback to direct navigation
-                      window.location.href = '/home';
-                    }
-                  }}
-                  className="gap-2 focus:ring-2 focus:ring-mq-primary/50"
-                  aria-label={t('addUnitAria')}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      try {
-                        window.dispatchEvent(new CustomEvent('add-unit'));
-                      } catch (error) {
-                        console.warn('Failed to trigger add unit event:', error);
-                        window.location.href = '/home';
-                      }
-                    }
-                  }}
-                >
-                  <BookOpen className="h-4 w-4" />
-                  {t('addUnit')}
-                </Button>
+                <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -152,5 +124,6 @@ const TodaySchedule = memo(() => {
 });
 
 TodaySchedule.displayName = 'TodaySchedule';
+
 
 export default TodaySchedule;

@@ -27,13 +27,14 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, TrendingUp } from 'lucide-react'; // Clock removed
+import { Info, Plus, BookOpen, TrendingUp, ExternalLink } from 'lucide-react'; // Clock removed
 import { Button } from '@/components/ui/mq/button';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -533,11 +534,12 @@ export default function HomeClient() {
                     size="sm"
                     variant="outline"
                     className="gap-1"
-                    onClick={handleAddUnit}
-                    aria-label={t('addUnit')}
+                    asChild
                   >
-                    <Plus className="h-4 w-4" />
-                    {t('addUnit')}
+                    <Link href="/calendar" aria-label={t('viewAll')}>
+                      <ExternalLink className="h-4 w-4" />
+                      {t('viewAll')}
+                    </Link>
                   </Button>
                 </CardHeader>
                 <CardContent>
