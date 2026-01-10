@@ -58,6 +58,26 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Performance Optimization - Server-Side Data & Liquid Filter Fix v0.14.33 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Optimize initial load performance and reduce bundle size
+- **Summary:** Moved Home Page user fetching to server-side to eliminate waterfall loading and removed redundant LiquidFilter calculation.
+
+**Changes:**
+1. **Home Page Waterfall Fix:** Moved user session fetching from client-side `useEffect` to server-side `page.tsx`. Passed user data as initial prop to `HomeClient`.
+2. **Liquid Filter Removal:** Removed `LiquidFilter` component from `client-layout.tsx`. Confirmed CSS uses static `#mq-liquid-refraction` from `layout.tsx`, making the dynamic canvas calculation redundant.
+
+**Files Changed:**
+- `app/home/page.tsx`
+- `app/home/HomeClient.tsx`
+- `app/client-layout.tsx`
+
+**Verification:**
+- `npm run build`: ✅ Success
+- `npm run lint`: ✅ Pass
+
+---
+
 #### ✅ Performance Audit & Fixes V3.1 Part 9 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)
 - **Scope:** Comprehensive performance audit and optimization across CSS, components, and pages

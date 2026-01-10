@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import HomeClient from './HomeClient';
+import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Home`,
@@ -64,7 +65,12 @@ function HomeSkeleton() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <Suspense fallback={<HomeSkeleton />}>
       <main
@@ -73,7 +79,7 @@ export default function HomePage() {
         role="main"
         aria-label="Dashboard overview"
       >
-        <HomeClient />
+        <HomeClient initialUser={user} />
       </main>
     </Suspense>
   );

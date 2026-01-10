@@ -64,10 +64,29 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // Refresh session if expired - required for Server Components
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+
+
+  // Safe session refresh
+  let session = null;
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      // If the refresh token is invalid (e.g. revoked, expired, or missing from db),
+      // we should clear the local cookies to prevent constant retry loops and error logging.
+      if (
+        error.message?.includes('Refresh Token Not Found') ||
+        error.code === 'refresh_token_not_found'
+      ) {
+        // Clear invalid session data
+        await supabase.auth.signOut();
+      }
+    } else {
+      session = data.session;
+    }
+  } catch (err) {
+    // Suppress unhandled auth errors during refresh to prevent noisy logs
+    console.error('Middleware auth error (handled):', err);
+  }
 
   // Protect routes that require authentication
   // SECURITY: Include /api routes to prevent accidental exposure of future endpoints

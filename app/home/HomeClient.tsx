@@ -46,8 +46,13 @@ import {
 import { MagicCard } from '@/components/ui/MagicCard';
 import { Unit } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
-export default function HomeClient() {
+interface HomeClientProps {
+  initialUser: User | null;
+}
+
+export default function HomeClient({ initialUser }: HomeClientProps) {
   const { t } = useTranslation();
 
   // -- HOOKS MUST BE DECLARED BEFORE ANY RETURNS --
@@ -55,11 +60,8 @@ export default function HomeClient() {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // User state from Supabase
-  const [user, setUser] = useState<{
-    email?: string;
-    user_metadata?: { full_name?: string; name?: string };
-  } | null>(null);
+  // User state from Supabase - initialized from server prop
+  const [user, setUser] = useState<User | null>(initialUser);
   const supabase = useMemo(() => createBrowserClient(), []);
 
   const units = useUnitsStore((state) => state.units);
@@ -75,38 +77,13 @@ export default function HomeClient() {
   const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
 
-  // Load user authentication state
+  // Listen for auth changes (sign out, etc)
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setUser(user);
-      } catch (error) {
-        console.error('Failed to get user:', error);
-      }
-    };
-
-    getUser();
-
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (
-        _event: string,
-        session: {
-          user: {
-            id: string;
-            email?: string;
-            user_metadata?: { full_name?: string; name?: string };
-          };
-        } | null,
-      ) => {
-        setUser(session?.user ?? null);
-      },
-    );
+    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => subscription.unsubscribe();
   }, [supabase.auth]);

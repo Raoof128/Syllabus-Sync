@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.33] - 2026-01-11
+
+### Performance
+
+#### Home Page Waterfall & Liquid Filter Optimization (Raouf)
+
+**Summary:** Significantly improved Initial Page Load and Time to Interactive (TTI) by moving critical data fetching to the server and removing heavy, unused canvas calculations.
+
+**Home Page Waterfall Fix:**
+- **Problem:** User data was being fetched client-side inside `useEffect` *after* the component mounted, causing a layout shift and loading spinner delay.
+- **Solution:** Moved `supabase.auth.getUser()` to `app/home/page.tsx` (Server Component).
+- **Result:** User data is now available immediately during hydration. Zero waiting time for dashboard personalization.
+- **Files:** `app/home/page.tsx`, `app/home/HomeClient.tsx`
+
+**Liquid Filter Redundancy Removal:**
+- **Problem:** `LiquidFilter.tsx` was running expensive canvas calculations to generate displacement maps for `#mq-liquid-glass`.
+- **Finding:** The CSS (`liquid-glass.css`) was actually using the *static* SVG filter `#mq-liquid-refraction` defined in `layout.tsx`.
+- **Solution:** Removed the `LiquidFilter` component usage from `client-layout.tsx`.
+- **Benefit:** Saved bundle size and main thread CPU time during critical startup phase without changing any visuals.
+- **File:** `app/client-layout.tsx`
+
+**Verification:**
+- `npm run build`: ✅ Success
+- `npm run lint`: ✅ Pass
+
+---
+
 ## [0.14.32] - 2026-01-11
 
 ### Added

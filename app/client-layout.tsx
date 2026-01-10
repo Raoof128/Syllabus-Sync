@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, memo } from 'react';
-import dynamic from 'next/dynamic';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -20,12 +19,6 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
-
-// V3.1: Lazy load LiquidFilter - heavy canvas operations deferred
-const LiquidFilter = dynamic(() => import('@/components/ui/LiquidFilter'), {
-  ssr: false,
-  loading: () => null,
-});
 
 // V3.1: Performance optimization - move constant arrays outside component
 // Prevents recreation on every render
@@ -215,9 +208,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     <ThemeProvider>
       {/* Level-up notifications for gamification */}
       <LevelUpNotificationProvider locale={language}>
-        {/* Global SVG filters for liquid glass effects */}
-        <LiquidFilter />
-
+        {/* Global SVG filters for liquid glass effects - REMOVED (Redundant: using static filters from layout.tsx) */}
         {/* Mesh background now rendered in layout.tsx as CSS-only for performance */}
 
         {/* Skip to main content link for accessibility */}
