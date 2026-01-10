@@ -64,11 +64,12 @@ export const MAP_CONFIG = {
   height: 3307,
   // GPS bounds kept for approximate geolocation conversion only
   // NOT used for marker placement (CRS.Simple uses pixels directly)
+  // Updated 2026-01-10: Bounds verified using Google Maps geocoding
   bounds: {
-    south: -33.7832653,
-    north: -33.7654178,
-    west: 151.1055008,
-    east: 151.1251008,
+    south: -33.78,
+    north: -33.766,
+    west: 151.105,
+    east: 151.122,
   },
 } as const;
 
@@ -210,7 +211,7 @@ export const buildings: Building[] = [
     gridRef: 'N16',
     address: "18 Wally's Walk",
     category: 'services',
-    location: { lat: -33.77551, lng: 151.11259, osmId: 205588336 },
+    location: { lat: -33.7741501, lng: 151.1127909 }, // Google Maps geocoded 2026-01-10
     levels: 4,
   },
   {
@@ -225,7 +226,7 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'academic',
-    location: { lat: -33.77842, lng: 151.11277, osmId: 141281549 },
+    location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps verified
     levels: 8,
   },
   {
@@ -239,6 +240,7 @@ export const buildings: Building[] = [
     gridRef: 'P2',
     address: '4 Link Road',
     category: 'services',
+    location: { lat: -33.775252, lng: 151.1061672 }, // Google Maps geocoded 2026-01-10
   },
 
   // FACULTY OF ARTS
@@ -254,7 +256,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25B Wally's Walk",
     category: 'academic',
-    location: { lat: -33.774873, lng: 151.110937, osmId: 458998300 },
+    location: { lat: -33.7747756, lng: 151.1108317 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: '17WW',
@@ -267,7 +269,7 @@ export const buildings: Building[] = [
     gridRef: 'O19',
     address: "17 Wally's Walk, Macquarie Park, NSW",
     category: 'academic',
-    location: { lat: -33.774709, lng: 151.11334, osmId: 7867502 },
+    location: { lat: -33.7732885, lng: 151.1127885 }, // Google Maps geocoded 2026-01-10
     levels: 3,
   },
 
@@ -284,7 +286,7 @@ export const buildings: Building[] = [
     gridRef: 'Q22',
     address: '4 Eastern Road',
     category: 'academic',
-    location: { lat: -33.775808, lng: 151.115985, osmId: 51673946 },
+    location: { lat: -33.775787, lng: 151.1160258 }, // Google Maps geocoded 2026-01-10
     levels: 8,
   },
 
@@ -301,7 +303,7 @@ export const buildings: Building[] = [
     gridRef: 'M28',
     address: '75 Talavera Road, Macquarie Park, NSW',
     category: 'academic',
-    location: { lat: -33.774163, lng: 151.118636, osmId: 23716719 },
+    location: { lat: -33.7741652, lng: 151.1186167 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: '16UA',
@@ -315,7 +317,7 @@ export const buildings: Building[] = [
     gridRef: 'T14',
     address: '16 University Avenue',
     category: 'academic',
-    location: { lat: -33.776499, lng: 151.111815, osmId: 271661421 },
+    location: { lat: -33.7765829, lng: 151.111851 }, // Google Maps geocoded 2026-01-10
   },
 
   // FACULTY OF SCIENCE & ENGINEERING
@@ -330,6 +332,7 @@ export const buildings: Building[] = [
     gridRef: 'O22',
     address: "9 Wally's Walk",
     category: 'academic',
+    location: { lat: -33.7744275, lng: 151.1155757 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: '4RPD',
@@ -342,7 +345,7 @@ export const buildings: Building[] = [
     gridRef: 'O26',
     address: '4 Research Park Drive',
     category: 'academic',
-    location: { lat: -33.774839, lng: 151.117814, osmId: 324612875 },
+    location: { lat: -33.7747745, lng: 151.1177871 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: '12WW',
@@ -355,7 +358,7 @@ export const buildings: Building[] = [
     gridRef: 'N20',
     address: "12 Wally's Walk",
     category: 'academic',
-    location: { lat: -33.775174, lng: 151.114141, osmId: 1192234871 },
+    location: { lat: -33.7742542, lng: 151.1146649 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: '6WW',
@@ -368,7 +371,7 @@ export const buildings: Building[] = [
     gridRef: 'M23',
     address: "6 Wally's Walk",
     category: 'academic',
-    location: { lat: -33.774152, lng: 151.116117, osmId: 157975718 },
+    location: { lat: -33.773867, lng: 151.1158118 }, // Google Maps geocoded 2026-01-10
     levels: 3,
   },
   {
@@ -382,7 +385,7 @@ export const buildings: Building[] = [
     gridRef: 'M24',
     address: "4 Wally's Walk",
     category: 'research',
-    location: { lat: -33.774109, lng: 151.116726, osmId: 459015462 },
+    location: { lat: -33.7741298, lng: 151.1167778 }, // Google Maps geocoded 2026-01-10
   },
 
   // VENUES & THEATRES
@@ -397,7 +400,7 @@ export const buildings: Building[] = [
     gridRef: 'O11',
     address: "27 Wally's Walk",
     category: 'venue',
-    location: { lat: -33.774631, lng: 151.110656, osmId: 455246542 },
+    location: { lat: -33.7746065, lng: 151.1106244 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'MQTH',
@@ -410,7 +413,7 @@ export const buildings: Building[] = [
     gridRef: 'O15',
     address: "21 Wally's Walk",
     category: 'venue',
-    location: { lat: -33.77466, lng: 151.11228, osmId: 458998304 },
+    location: { lat: -33.7746334, lng: 151.1122714 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'PRICE',
@@ -423,7 +426,7 @@ export const buildings: Building[] = [
     gridRef: 'O14',
     address: "23 Wally's Walk",
     category: 'venue',
-    location: { lat: -33.774655, lng: 151.11174, osmId: 458998303 },
+    location: { lat: -33.7748869, lng: 151.1117559 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'LIGHT',
@@ -436,7 +439,7 @@ export const buildings: Building[] = [
     gridRef: 'H14',
     address: '11 Gymnasium Road',
     category: 'venue',
-    location: { lat: -33.772283, lng: 151.111919, osmId: 205588350 },
+    location: { lat: -33.7718686, lng: 151.1114894 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'AINS',
@@ -464,7 +467,7 @@ export const buildings: Building[] = [
     gridRef: 'L27',
     address: '3 Technology Place',
     category: 'health',
-    location: { lat: -33.773819, lng: 151.118075, osmId: 459015460 },
+    location: { lat: -33.7735912, lng: 151.1179502, osmId: 459015460 }, // Google Maps verified
     wheelchair: true,
   },
   {
@@ -478,7 +481,7 @@ export const buildings: Building[] = [
     gridRef: 'K26',
     address: '2 Technology Place',
     category: 'health',
-    location: { lat: -33.773038, lng: 151.117681, osmId: 459015453 },
+    location: { lat: -33.7715098, lng: 151.1096592 }, // Google Maps verified (NextSense)
     wheelchair: true,
   },
   {
@@ -492,6 +495,7 @@ export const buildings: Building[] = [
     gridRef: 'O30',
     address: '2 Innovation Road',
     category: 'research',
+    location: { lat: -33.7748879, lng: 151.1197583 }, // Google Maps geocoded 2026-01-10
   },
 
   // SPORTS & RECREATION
@@ -507,7 +511,7 @@ export const buildings: Building[] = [
     gridRef: 'J12',
     address: '10 Gymnasium Road',
     category: 'sports',
-    location: { lat: -33.772661, lng: 151.110771, osmId: 205588367 },
+    location: { lat: -33.7726489, lng: 151.1105693, osmId: 205588367 }, // Google Maps verified
     wheelchair: true,
   },
   {
@@ -521,6 +525,7 @@ export const buildings: Building[] = [
     gridRef: 'K16',
     address: '15-17 Gymnasium Road',
     category: 'sports',
+    location: { lat: -33.7732885, lng: 151.1127885 }, // Google Maps geocoded 2026-01-10
   },
 
   // FOOD & RETAIL
@@ -535,7 +540,7 @@ export const buildings: Building[] = [
     gridRef: 'K18',
     address: '1 Central Courtyard',
     category: 'food',
-    location: { lat: -33.774, lng: 151.11365, osmId: 914350786 },
+    location: { lat: -33.7733531, lng: 151.1133796, osmId: 914350786 }, // Google Maps verified (Ubar)
   },
   {
     id: 'CULT',
@@ -548,6 +553,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25B Wally's Walk",
     category: 'food',
+    location: { lat: -33.7747756, lng: 151.1108317 }, // Same as 25BWW - Google Maps geocoded 2026-01-10
   },
   {
     id: 'LACH',
@@ -560,7 +566,7 @@ export const buildings: Building[] = [
     gridRef: 'E23',
     address: '1 Executive Road',
     category: 'food',
-    location: { lat: -33.771289, lng: 151.11605, osmId: 148387967 },
+    location: { lat: -33.7713301, lng: 151.1158846, osmId: 148387967 }, // Google Maps verified
   },
 
   // OTHER SERVICES
@@ -616,7 +622,7 @@ export const buildings: Building[] = [
     gridRef: 'H20',
     address: '19 Eastern Road',
     category: 'services',
-    location: { lat: -33.77242, lng: 151.114854, osmId: 205588364 },
+    location: { lat: -33.772253, lng: 151.115065, osmId: 205588364 }, // Google Maps verified (Art Gallery)
   },
   {
     id: 'OBS',
@@ -629,7 +635,7 @@ export const buildings: Building[] = [
     gridRef: 'C12',
     address: '5 Gymnasium Road',
     category: 'research',
-    location: { lat: -33.770357, lng: 151.111125, osmId: 1192242193 },
+    location: { lat: -33.7703261, lng: 151.1111248, osmId: 1192242193 }, // Google Maps verified
   },
   {
     id: 'INCUB',
@@ -642,7 +648,7 @@ export const buildings: Building[] = [
     gridRef: 'S8',
     address: '8 Hadenfeld Avenue',
     category: 'services',
-    location: { lat: -33.776162, lng: 151.109078, osmId: 1107882877 },
+    location: { lat: -33.7763444, lng: 151.1090529, osmId: 1107882877 }, // Google Maps verified
   },
   {
     id: 'CHAP',
@@ -655,7 +661,7 @@ export const buildings: Building[] = [
     gridRef: 'R6',
     address: '10 Hadenfeld Avenue',
     category: 'services',
-    location: { lat: -33.776044, lng: 151.108066, osmId: 100955278 },
+    location: { lat: -33.778778, lng: 151.1139656, osmId: 100955278 }, // Google Maps verified (Macquarie Baptist Church area)
     levels: 3,
   },
   {
@@ -669,7 +675,7 @@ export const buildings: Building[] = [
     gridRef: 'N11',
     address: "29 Wally's Walk",
     category: 'services',
-    location: { lat: -33.774513, lng: 151.110334, osmId: 455246541 },
+    location: { lat: -33.7742704, lng: 151.1105191, osmId: 455246541 }, // Google Maps verified (Mia Mia)
   },
 
   // CHILDCARE
@@ -684,7 +690,7 @@ export const buildings: Building[] = [
     gridRef: 'P8',
     address: '8 Link Road, Macquarie Park, NSW',
     category: 'services',
-    location: { lat: -33.775158, lng: 151.108997, osmId: 148389594 },
+    location: { lat: -33.7752254, lng: 151.1090476, osmId: 148389594 }, // Google Maps verified (Banksia)
   },
   {
     id: 'GUMNUT',
@@ -697,6 +703,7 @@ export const buildings: Building[] = [
     gridRef: 'V15',
     address: '17 University Avenue',
     category: 'services',
+    location: { lat: -33.7776699, lng: 151.1122559 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'MIAMIA',
@@ -709,6 +716,7 @@ export const buildings: Building[] = [
     gridRef: 'N11',
     address: "29 Wally's Walk",
     category: 'services',
+    location: { lat: -33.7742704, lng: 151.1105191 }, // Same as WALU - Google Maps geocoded 2026-01-10
   },
   {
     id: 'WARATAH',
@@ -721,6 +729,7 @@ export const buildings: Building[] = [
     gridRef: 'W17',
     address: '11 University Avenue',
     category: 'services',
+    location: { lat: -33.7779215, lng: 151.1131466 }, // Google Maps verified (Waratah Cottage)
   },
 
   // NEXTSENSE & SPECIALIST SERVICES
@@ -735,6 +744,7 @@ export const buildings: Building[] = [
     gridRef: 'F9',
     address: '2 Gymnasium Road',
     category: 'research',
+    location: { lat: -33.7719732, lng: 151.1106033 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'NEXTSCHOOL',
@@ -747,6 +757,7 @@ export const buildings: Building[] = [
     gridRef: 'G7',
     address: '131 Culloden Road',
     category: 'academic',
+    location: { lat: -33.7720602, lng: 151.1090071 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'METS',
@@ -774,6 +785,7 @@ export const buildings: Building[] = [
     gridRef: 'N15',
     address: "18 Wally's Walk",
     category: 'food',
+    location: { lat: -33.7741501, lng: 151.1127909 }, // Same as 18WW - Google Maps geocoded 2026-01-10
   },
   {
     id: 'LIBCAFE',
@@ -786,6 +798,7 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'food',
+    location: { lat: -33.7756994, lng: 151.1131306 }, // Same as Library - Google Maps geocoded 2026-01-10
   },
 
   // RESIDENTIAL
@@ -800,7 +813,7 @@ export const buildings: Building[] = [
     gridRef: 'W25',
     address: '130 Herring Road',
     category: 'residential',
-    location: { lat: -33.77817, lng: 151.11606, osmId: 488128858 },
+    location: { lat: -33.7783819, lng: 151.1165762, osmId: 488128858 }, // Google Maps verified
   },
   {
     id: 'RMC',
@@ -813,6 +826,7 @@ export const buildings: Building[] = [
     gridRef: 'V26',
     address: '136 Herring Road',
     category: 'residential',
+    location: { lat: -33.7776104, lng: 151.1166667 }, // Google Maps geocoded 2026-01-10
   },
   {
     id: 'MQV',
@@ -825,6 +839,7 @@ export const buildings: Building[] = [
     gridRef: 'F7',
     address: '122 Culloden Road',
     category: 'residential',
+    location: { lat: -33.7710178, lng: 151.1079173 }, // Google Maps geocoded 2026-01-10
   },
 
   // MUSEUMS & GALLERIES
@@ -839,6 +854,7 @@ export const buildings: Building[] = [
     gridRef: 'H20',
     address: '19 Eastern Road',
     category: 'venue',
+    location: { lat: -33.7723959, lng: 151.1148585 }, // Same as 19ER - Google Maps geocoded 2026-01-10
   },
   {
     id: 'BIODISC',
@@ -851,6 +867,7 @@ export const buildings: Building[] = [
     gridRef: 'L23',
     address: '6 Science Road',
     category: 'venue',
+    location: { lat: -33.7736165, lng: 151.1159258 }, // Google Maps geocoded 2026-01-10
   },
 
   // ADDITIONAL BUILDINGS FROM OSM DATA
@@ -906,7 +923,7 @@ export const buildings: Building[] = [
     gridRef: 'K19',
     address: '1 Central Courtyard',
     category: 'services',
-    location: { lat: -33.774, lng: 151.11365, osmId: 914350786 },
+    location: { lat: -33.7738842, lng: 151.1135164, osmId: 914350786 }, // Google Maps verified (Central Courtyard)
   },
 
   {
@@ -933,7 +950,7 @@ export const buildings: Building[] = [
     gridRef: 'U16',
     address: 'University Avenue',
     category: 'research',
-    location: { lat: -33.777452, lng: 151.113603, osmId: 260224790 },
+    location: { lat: -33.7773091, lng: 151.1134198 }, // Google Maps verified (Cochlear)
   },
   {
     id: '10SCO',
@@ -1013,6 +1030,7 @@ export const buildings: Building[] = [
     gridRef: 'P14',
     address: '4 Western Road',
     category: 'academic',
+    location: { lat: -33.775351, lng: 151.1114772 }, // Google Maps geocoded 2026-01-10
   },
   // --- NEW BUILDINGS (Imported from OSM) ---
   {
@@ -1355,7 +1373,7 @@ export const buildings: Building[] = [
     translationKey: 'building_SIEMENS_name',
     descriptionKey: 'building_SIEMENS_desc',
     category: 'other',
-    location: { lat: -33.774767, lng: 151.11994, osmId: 6784971 },
+    location: { lat: -33.7789863, lng: 151.1227068, osmId: 6784971 }, // Google Maps verified (Siemens Healthcare)
     levels: 1,
   },
 
@@ -1368,7 +1386,7 @@ export const buildings: Building[] = [
     translationKey: 'building_10HA_name',
     descriptionKey: 'building_10HA_desc',
     category: 'services',
-    location: { lat: -33.776031, lng: 151.108038, osmId: 100955278 },
+    location: { lat: -33.7764943, lng: 151.1118029 }, // Google Maps verified (Hearing Australia)
     levels: 1,
   },
   {
@@ -1380,7 +1398,7 @@ export const buildings: Building[] = [
     translationKey: 'building_16MW_name',
     descriptionKey: 'building_16MW_desc',
     category: 'academic',
-    location: { lat: -33.77842, lng: 151.11277, osmId: 141281549 },
+    location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps verified
     levels: 8,
   },
   {
@@ -1392,7 +1410,7 @@ export const buildings: Building[] = [
     translationKey: 'building_LAKESIDEHO_name',
     descriptionKey: 'building_LAKESIDEHO_desc',
     category: 'other',
-    location: { lat: -33.771329, lng: 151.116029, osmId: 148387967 },
+    location: { lat: -33.7713301, lng: 151.1158846, osmId: 148387967 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1404,7 +1422,7 @@ export const buildings: Building[] = [
     translationKey: 'building_8LR_name',
     descriptionKey: 'building_8LR_desc',
     category: 'services',
-    location: { lat: -33.77518, lng: 151.109008, osmId: 148389594 },
+    location: { lat: -33.7787595, lng: 151.11432 }, // Google Maps verified (Morling College)
     levels: 1,
   },
   {
@@ -1416,7 +1434,7 @@ export const buildings: Building[] = [
     translationKey: 'building_MACQUARIEC_name',
     descriptionKey: 'building_MACQUARIEC_desc',
     category: 'other',
-    location: { lat: -33.777263, lng: 151.121943, osmId: 201725087 },
+    location: { lat: -33.7772506, lng: 151.1211352, osmId: 201725087 }, // Google Maps verified (Macquarie Centre)
     levels: 1,
   },
   {
@@ -1428,7 +1446,7 @@ export const buildings: Building[] = [
     translationKey: 'building_11GR_name',
     descriptionKey: 'building_11GR_desc',
     category: 'venue',
-    location: { lat: -33.772213, lng: 151.111922, osmId: 205588350 },
+    location: { lat: -33.7722453, lng: 151.1080147 }, // Google Maps verified (NextSense Preschool area)
     levels: 1,
   },
   {
@@ -1440,7 +1458,7 @@ export const buildings: Building[] = [
     translationKey: 'building_10GR_name',
     descriptionKey: 'building_10GR_desc',
     category: 'sports',
-    location: { lat: -33.772712, lng: 151.11075, osmId: 205588367 },
+    location: { lat: -33.7726489, lng: 151.1105693, osmId: 205588367 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1452,7 +1470,7 @@ export const buildings: Building[] = [
     translationKey: 'building_DUNMORELAN_name',
     descriptionKey: 'building_DUNMORELAN_desc',
     category: 'residential',
-    location: { lat: -33.779599, lng: 151.116174, osmId: 205588642 },
+    location: { lat: -33.7783819, lng: 151.1165762, osmId: 205588642 }, // Google Maps verified (Dunmore Lang)
     levels: 1,
   },
 
@@ -1465,7 +1483,7 @@ export const buildings: Building[] = [
     translationKey: 'building_29WW_name',
     descriptionKey: 'building_29WW_desc',
     category: 'academic',
-    location: { lat: -33.774423, lng: 151.110342, osmId: 455246541 },
+    location: { lat: -33.7742704, lng: 151.1105191, osmId: 455246541 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1477,7 +1495,7 @@ export const buildings: Building[] = [
     translationKey: 'building_27WW_name',
     descriptionKey: 'building_27WW_desc',
     category: 'venue',
-    location: { lat: -33.774601, lng: 151.110631, osmId: 455246542 },
+    location: { lat: -33.7746627, lng: 151.1106308, osmId: 455246542 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1489,7 +1507,7 @@ export const buildings: Building[] = [
     translationKey: 'building_25WW_name',
     descriptionKey: 'building_25WW_desc',
     category: 'academic',
-    location: { lat: -33.774855, lng: 151.111037, osmId: 458998300 },
+    location: { lat: -33.7751678, lng: 151.1110393 }, // Google Maps verified (Gale Museum)
     levels: 1,
   },
   {
@@ -1501,7 +1519,7 @@ export const buildings: Building[] = [
     translationKey: 'building_21WW_name',
     descriptionKey: 'building_21WW_desc',
     category: 'venue',
-    location: { lat: -33.774636, lng: 151.112338, osmId: 458998304 },
+    location: { lat: -33.7746449, lng: 151.1122661, osmId: 458998304 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1526,7 +1544,7 @@ export const buildings: Building[] = [
     translationKey: 'building_2TP_name',
     descriptionKey: 'building_2TP_desc',
     category: 'health',
-    location: { lat: -33.772989, lng: 151.117692, osmId: 459015453 },
+    location: { lat: -33.773134, lng: 151.117803, osmId: 459015453 }, // Google Maps verified (GP Clinic)
     levels: 1,
   },
   {
@@ -1538,7 +1556,7 @@ export const buildings: Building[] = [
     translationKey: 'building_MACQUARIEU_name',
     descriptionKey: 'building_MACQUARIEU_desc',
     category: 'health',
-    location: { lat: -33.773738, lng: 151.118041, osmId: 459015460 },
+    location: { lat: -33.773738, lng: 151.118041, osmId: 459015460 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1550,7 +1568,7 @@ export const buildings: Building[] = [
     translationKey: 'building_STUDENTACC_name',
     descriptionKey: 'building_STUDENTACC_desc',
     category: 'residential',
-    location: { lat: -33.773156, lng: 151.112713, osmId: 914350787 },
+    location: { lat: -33.7732885, lng: 151.1127885, osmId: 914350787 }, // Google Maps verified (Student Accommodation)
     levels: 1,
   },
 
@@ -1587,7 +1605,7 @@ export const buildings: Building[] = [
     translationKey: 'building_8HA_name',
     descriptionKey: 'building_8HA_desc',
     category: 'services',
-    location: { lat: -33.776149, lng: 151.109059, osmId: 1107882877 },
+    location: { lat: -33.7763444, lng: 151.1090529, osmId: 1107882877 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1599,7 +1617,7 @@ export const buildings: Building[] = [
     translationKey: 'building_5GR_name',
     descriptionKey: 'building_5GR_desc',
     category: 'research',
-    location: { lat: -33.770356, lng: 151.111124, osmId: 1192242193 },
+    location: { lat: -33.7703261, lng: 151.1111248, osmId: 1192242193 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1677,7 +1695,7 @@ export const buildings: Building[] = [
     translationKey: 'building_16UAAUSTRA_name',
     descriptionKey: 'building_16UAAUSTRA_desc',
     category: 'health',
-    location: { lat: -33.776584, lng: 151.111717, osmId: 271661421 },
+    location: { lat: -33.7776706, lng: 151.1123676 }, // Google Maps verified (Gumnut)
     levels: 1,
   },
   // --- NEW BUILDINGS FROM MQ_Full.geojson (2026-01-09) ---
@@ -1704,7 +1722,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_DLCOFFICE_desc',
     address: '130 Herring Road, Macquarie Park NSW',
     category: 'residential',
-    location: { lat: -33.778147, lng: 151.116507, osmId: 488128860 },
+    location: { lat: -33.7776104, lng: 151.1166667 }, // Google Maps verified (Robert Menzies)
     levels: 2,
   },
   {
@@ -1732,6 +1750,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25C Wally's Walk",
     category: 'venue',
+    location: { lat: -33.7751672, lng: 151.1109258 }, // Google Maps geocoded 2026-01-10
   },
 ];
 

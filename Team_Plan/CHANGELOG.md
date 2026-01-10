@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.26] - 2026-01-10
+
+### Added
+
+#### Complete GPS Location Data for All Buildings (Raouf)
+
+**Summary:** Added Google Maps geocoded GPS coordinates to 17 buildings that were missing location data, ensuring all buildings now have proper GPS for external navigation.
+
+**Buildings Updated:**
+- SEC (Security & Emergency) - 4 Link Road
+- 9WW (Engineering) - 9 Wally's Walk
+- WOOL (Woolcock Institute) - 2 Innovation Road
+- FIELDS (Sports Fields & Tennis) - 15-17 Gymnasium Road
+- CULT (Cult Eatery) - 25B Wally's Walk
+- GUMNUT (Childcare) - 17 University Avenue
+- MIAMIA (Childcare) - 29 Wally's Walk
+- NEXTSENSE - 2 Gymnasium Road
+- NEXTSCHOOL - 131 Culloden Road
+- WALLYS (Cafe) - 18 Wally's Walk
+- LIBCAFE - 16 Macquarie Walk
+- RMC (Robert Menzies College) - 136 Herring Road
+- MQV (MQ Village) - 122 Culloden Road
+- GALLERY (Art Gallery) - 19 Eastern Road
+- BIODISC (Biology Discovery Centre) - 6 Science Road
+- 4WR (Western Road) - 4 Western Road
+- 25CWW (Gale History Museum) - 25C Wally's Walk
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Added location data to 17 buildings
+
+**Verification:**
+- `npm run lint`: Pass (0 errors)
+
+---
+
 ## [0.14.25] - 2026-01-10
 
 ### Fixed
