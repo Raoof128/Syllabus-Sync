@@ -1,7 +1,8 @@
 // app/feed/FeedClient.tsx
 'use client';
 
-import { useState, memo, useMemo, useCallback } from 'react';
+import { useState, memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -40,12 +41,41 @@ type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
 
 const FeedClient = memo(() => {
   const { t, language } = useTranslation();
+  const searchParams = useSearchParams();
+  const highlightEventId = searchParams.get('highlight');
+
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [remindedEvents, setRemindedEvents] = useState<Set<string>>(new Set());
   const [loadingEvents, setLoadingEvents] = useState<Set<string>>(new Set());
+  const [highlightedEvent, setHighlightedEvent] = useState<string | null>(highlightEventId);
+
+  // Ref for scrolling to highlighted event
+  const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Gamification store
   const { isDemo, refreshProfile, settings } = useGamificationStore();
+
+  // Scroll to and highlight the event when component mounts or highlight changes
+  useEffect(() => {
+    if (highlightEventId) {
+      setHighlightedEvent(highlightEventId);
+
+      // Wait for render, then scroll to the event
+      const timer = setTimeout(() => {
+        const eventElement = eventRefs.current.get(highlightEventId);
+        if (eventElement) {
+          eventElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Remove highlight after animation
+          setTimeout(() => {
+            setHighlightedEvent(null);
+          }, 3000);
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightEventId]);
 
   // Handle "Remind Me" button click - awards XP for event attendance
   const handleRemindMe = useCallback(
@@ -267,11 +297,19 @@ const FeedClient = memo(() => {
                         filteredEvents.map((event, index) => {
                           const isReminded = remindedEvents.has(event.id);
                           const isLoading = loadingEvents.has(event.id);
+                          const isHighlighted = highlightedEvent === event.id;
 
                           return (
                             <article
                               key={event.id}
-                              className="p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm transition-all duration-mq-fast"
+                              ref={(el) => {
+                                if (el) eventRefs.current.set(event.id, el);
+                              }}
+                              className={`p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border transition-all duration-mq-fast ${
+                                isHighlighted
+                                  ? 'border-mq-primary ring-2 ring-mq-primary/50 shadow-lg shadow-mq-primary/20 animate-pulse'
+                                  : 'border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm'
+                              }`}
                               aria-posinset={index + 1}
                               aria-setsize={filteredEvents.length}
                             >

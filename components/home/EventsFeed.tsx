@@ -8,6 +8,7 @@ import { MapPin, Clock, Plus } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { isToday } from 'date-fns';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -29,6 +30,7 @@ const categoryColors: Record<string, string> = {
 
 const EventsFeed = memo(() => {
   const { t } = useTranslation();
+  const router = useRouter();
   const userEvents = useEventsStore((state) => state.events);
   const [eventFormOpen, setEventFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -43,10 +45,15 @@ const EventsFeed = memo(() => {
   };
 
   const handleEventClick = (event: Event) => {
-    // Only allow editing user-created events (not sample events)
-    if (userEvents.find((e) => e.id === event.id)) {
+    const isUserEvent = userEvents.find((e) => e.id === event.id);
+
+    if (isUserEvent) {
+      // For user events, open edit dialog
       setEditingEvent(event);
       setEventFormOpen(true);
+    } else {
+      // For sample events, navigate to feed page with highlight
+      router.push(`/feed?highlight=${event.id}`);
     }
   };
 
@@ -80,8 +87,6 @@ const EventsFeed = memo(() => {
               ) : (
                 <div className="space-y-3">
                   {todayEvents.map((event) => {
-                    const isUserEvent = userEvents.find((e) => e.id === event.id);
-
                     const eventContent = (
                       <>
                         <div className="flex items-start justify-between gap-2">
@@ -107,26 +112,17 @@ const EventsFeed = memo(() => {
 
                     const baseClassName = "group block p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]";
 
-                    // For user events, render as a button for proper accessibility
-                    if (isUserEvent) {
-                      return (
-                        <button
-                          key={event.id}
-                          type="button"
-                          onClick={() => handleEventClick(event)}
-                          className={`${baseClassName} cursor-pointer text-left w-full`}
-                          aria-label={`Edit event: ${event.title}`}
-                        >
-                          {eventContent}
-                        </button>
-                      );
-                    }
-
-                    // For sample events, render as a non-interactive div
+                    // All events are clickable - user events open edit, sample events navigate
                     return (
-                      <div key={event.id} className={baseClassName}>
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={() => handleEventClick(event)}
+                        className={`${baseClassName} cursor-pointer text-left w-full`}
+                        aria-label={`View event: ${event.title}`}
+                      >
                         {eventContent}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
