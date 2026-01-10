@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow } from '@/app/api/_lib/mappers';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
 const eventSchema = z.object({
   id: z.string().min(1).optional(),
@@ -47,10 +47,15 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Use rate-limited auth for mutation endpoint
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
-      const body = await request.json().catch(() => null);
-      const parsed = eventSchema.safeParse(body);
+      // SECURITY: Parse with size limit protection
+      const bodyResult = await parseJsonBody(request);
+      if (!bodyResult.success) {
+        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+      }
+      const parsed = eventSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
         return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR);

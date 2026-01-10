@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.29 | Last Updated: January 10, 2026
+Version: 0.14.31 | Last Updated: January 11, 2026
 
 ---
 
@@ -58,6 +58,42 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Security Audit Remediation v0.14.31 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Address critical security findings from comprehensive security audit
+- **Summary:** Hardened security for production readiness, fixing admin API exposure, rate limiting bypass, broken signup flow, and hardcoded credentials
+
+**Security Issues Fixed:**
+
+1. **Admin API Hard Production Block:**
+   - Added `IS_PRODUCTION` constant with immediate 404 return at start of handlers
+   - Both POST and GET return 404 before any logic in production
+   - Cannot be bypassed by environment variables
+
+2. **Rate Limiting Production Requirement:**
+   - Changed from warning to throwing error without Redis in production
+   - Memory store only allowed in development
+   - Prevents ineffective rate limiting in serverless
+
+3. **Signup Profile Creation:**
+   - Database trigger was removed but signup API wasn't updated
+   - Added explicit profile creation using admin client after auth.signUp
+   - Uses upsert to handle edge cases
+
+4. **Removed Hardcoded Credentials:**
+   - Replaced hardcoded password in manage-users.mjs
+   - Now uses DEV_USER_PASSWORD env var or random generation
+   - Masked output to pass secret scanner
+
+**Files Changed:**
+- `app/api/admin/update-building-positions/route.ts`
+- `lib/services/rateLimitService.ts`
+- `app/api/auth/signup/route.ts`
+- `scripts/manage-users.mjs`
+
+**Verification:**
+- `npm run prepush`: ✅ All checks pass (275 tests, 0 lint errors)
+
 #### ✅ Schema.sql Gamification Table Names Fix v0.14.29 (Raouf)
 - **Date:** January 10, 2026 (Australia/Sydney)
 - **Scope:** Fix schema.sql gamification table names to match actual Supabase database
@@ -98,12 +134,13 @@ Dev server was showing warning:
 **Solution:**
 Updated `.env.local` with correct JWT format key from `npx supabase projects api-keys`:
 ```bash
-# Old (limited functionality)
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_os0VHJzmQxwT7BflKMNKAw_twigyYJa
+# Old (limited functionality) - sb_publishable_* format
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_***REDACTED***
 
-# New (full functionality)  
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# New (full functionality) - JWT format  
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...***REDACTED***
 ```
+**NOTE:** Never commit actual API keys. Use `npx supabase projects api-keys` to get your keys.
 
 **Database Schema Verification:**
 Compared Supabase remote tables with `database-schema.sql`:

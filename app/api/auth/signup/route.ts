@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // SECURITY: Don't reveal if email already exists - return same message regardless
+    // SECURITY: Always return success-like message to prevent account enumeration
     // Log actual errors server-side for debugging (sanitized)
     if (error) {
       console.warn('Signup error:', { email: `${email.substring(0, 3)}***`, code: error.status });
@@ -134,18 +134,40 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Profile is created automatically by database trigger on auth.users
-    // If studentId was provided, update the profile to add it
-    if (data.user && studentId) {
-      // Use service role or direct update since profile should exist from trigger
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ student_id: studentId })
-        .eq('id', data.user.id);
+    // CRITICAL: Create profile using admin client since auth trigger was removed
+    // The database migration dropped the auth.users trigger, so we must create profile manually
+    if (data.user) {
+      const adminClient = createAdminClient();
+      if (adminClient) {
+        const { error: profileError } = await adminClient.from('profiles').upsert(
+          {
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName || null,
+            student_id: studentId || null,
+          },
+          { onConflict: 'id' },
+        );
 
-      if (updateError) {
-        console.warn('Profile student_id update failed:', updateError.message);
-        // Don't fail signup - profile was created, just missing student_id
+        if (profileError) {
+          console.warn('Profile creation failed:', profileError.message);
+          // Don't fail signup - user can still use the app, profile will be created on first access
+        }
+      } else {
+        // Fallback: Try to create profile with regular client (relies on RLS INSERT policy)
+        const { error: profileError } = await supabase.from('profiles').upsert(
+          {
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName || null,
+            student_id: studentId || null,
+          },
+          { onConflict: 'id' },
+        );
+
+        if (profileError) {
+          console.warn('Profile creation (non-admin) failed:', profileError.message);
+        }
       }
     }
 

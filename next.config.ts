@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -74,4 +75,30 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default bundleAnalyzer(nextConfig);
+export default withSentryConfig(bundleAnalyzer(nextConfig), {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only upload source maps in CI or production builds
+  silent: !process.env.CI,
+
+  // Upload source maps to Sentry for better debugging
+  widenClientFileUpload: true,
+
+  // Automatically annotate React components to show their names in Sentry
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+
+  // Route handlers and server components are automatically instrumented
+  automaticVercelMonitors: true,
+
+  // Source map configuration
+  sourcemaps: {
+    // Disable source map upload if no auth token is configured
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+});

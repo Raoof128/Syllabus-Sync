@@ -4,12 +4,15 @@
  *
  * Deletes all users and creates a new dev account.
  * Run with: node scripts/manage-users.mjs
+ *
+ * SECURITY: Password is read from DEV_USER_PASSWORD env var or generated randomly
  */
 
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { randomBytes } from 'crypto';
 
 // Load environment variables from .env.local
 const __filename = fileURLToPath(import.meta.url);
@@ -184,7 +187,11 @@ async function main() {
   }
 
   // Step 2: Create/update the dev user
-  const newUser = await createDevUser('raouf@mq.edu.au', '111111111111');
+  // SECURITY: Use environment variable or generate a random password
+  const devPassword = process.env.DEV_USER_PASSWORD || randomBytes(16).toString('hex');
+  const devEmail = process.env.DEV_USER_EMAIL || 'raouf@mq.edu.au';
+
+  const newUser = await createDevUser(devEmail, devPassword);
 
   if (!newUser) {
     console.error('\n❌ Failed to create/update user.');
@@ -195,8 +202,18 @@ async function main() {
   console.log('                  DONE!                     ');
   console.log('═══════════════════════════════════════════');
   console.log('\n📝 Login credentials:');
-  console.log('   Email:    raouf@mq.edu.au');
-  console.log('   Credentials: (as specified in script)');
+  console.log(`   Email:    ${devEmail}`);
+  if (process.env.DEV_USER_PASSWORD) {
+    // eslint-disable-next-line no-console
+    console.log('   Credential: Set via DEV_USER_PASSWORD env var');
+  } else {
+    // Show first 4 chars of random token for verification, mask the rest
+    // eslint-disable-next-line no-console
+    console.log(`   Token: ${devPassword.substring(0, 4)}${'*'.repeat(12)} (random - save this!)`);
+    console.log(
+      '\n⚠️  Random token generated. Set DEV_USER_PASSWORD in .env.local for consistency.',
+    );
+  }
   console.log('\n✨ You can now login at http://localhost:3000/login');
 }
 

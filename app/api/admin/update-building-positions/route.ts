@@ -5,19 +5,28 @@
  * DEVELOPMENT ONLY - completely disabled in production.
  *
  * Multiple layers of protection:
- * 1. NODE_ENV check (must be 'development')
- * 2. ADMIN_API_ENABLED env var must be explicitly set to 'true'
- * 3. Building ID allowlist validation (prevents arbitrary regex injection)
- * 4. Position value bounds checking
+ * 1. HARD PRODUCTION BLOCK - returns 404 immediately in production (cannot be bypassed)
+ * 2. NODE_ENV check (must be 'development')
+ * 3. ADMIN_API_ENABLED env var must be explicitly set to 'true'
+ * 4. Building ID allowlist validation (prevents arbitrary regex injection)
+ * 5. Position value bounds checking
  *
  * POST /api/admin/update-building-positions
  * Body: { changes: [{ id: string, position: [number, number] }] }
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { parseJsonBody } from '@/app/api/_lib/middleware';
+
+// ============================================================================
+// CRITICAL SECURITY: HARD PRODUCTION BLOCK
+// ============================================================================
+// This block CANNOT be bypassed by any environment variable.
+// The endpoint will simply not exist in production.
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // ============================================================================
 // SECURITY CONFIGURATION
@@ -26,7 +35,22 @@ import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 // SECURITY: Multiple checks required for this dangerous endpoint
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isAdminEnabled = process.env.ADMIN_API_ENABLED === 'true';
+const adminSecretToken = process.env.ADMIN_SECRET_TOKEN;
 const isEndpointAllowed = isDevelopment && isAdminEnabled;
+
+// SECURITY: Validate admin token header (additional layer of protection)
+function validateAdminToken(request: NextRequest): boolean {
+  // In development without token configured, allow access (for local dev)
+  if (!adminSecretToken && isDevelopment) {
+    return true;
+  }
+  // If token is configured, it must match
+  if (adminSecretToken) {
+    const providedToken = request.headers.get('x-admin-token');
+    return providedToken === adminSecretToken;
+  }
+  return false;
+}
 
 // SECURITY: Allowlist of valid building IDs (prevents regex injection)
 // This list should match the building IDs in lib/map/buildings.ts
@@ -102,6 +126,11 @@ interface RequestBody {
 // ============================================================================
 
 export async function POST(request: NextRequest) {
+  // CRITICAL: Hard block in production - cannot be bypassed by any env var
+  if (IS_PRODUCTION) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // SECURITY: Multi-layer check - must pass ALL conditions
   if (!isDevelopment) {
     console.warn('Admin API blocked: Not in development mode');
@@ -121,8 +150,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // SECURITY: Validate admin token if configured
+  if (!validateAdminToken(request)) {
+    console.warn('Admin API blocked: Invalid or missing admin token');
+    return jsonError(
+      'Invalid admin token. Provide X-Admin-Token header.',
+      403,
+      ERROR_CODES.FORBIDDEN,
+    );
+  }
+
   try {
-    const body: RequestBody = await request.json();
+    // SECURITY: Parse JSON with size limit (50KB for building position updates)
+    const parseResult = await parseJsonBody<RequestBody>(request, 50 * 1024);
+    if (!parseResult.success) {
+      return jsonError(parseResult.error, 400, ERROR_CODES.VALIDATION_ERROR);
+    }
+    const body = parseResult.data;
 
     // Validate request body structure
     if (!body.changes || !Array.isArray(body.changes) || body.changes.length === 0) {
@@ -263,6 +307,11 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to check if the service is available
 export async function GET() {
+  // CRITICAL: Hard block in production - cannot be bypassed by any env var
+  if (IS_PRODUCTION) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (!isEndpointAllowed) {
     return jsonError(
       'This endpoint is only available in development mode with ADMIN_API_ENABLED=true',

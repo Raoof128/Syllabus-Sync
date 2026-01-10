@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -38,7 +38,8 @@ const unitUpdateSchema = z.object({
 });
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Use rate-limited auth for mutation endpoint
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const { id } = await params;
 
@@ -47,8 +48,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         return jsonError('Invalid unit ID format', 400, ERROR_CODES.BAD_REQUEST);
       }
 
-      const body = await request.json().catch(() => null);
-      const parsed = unitUpdateSchema.safeParse(body);
+      // SECURITY: Parse with size limit protection
+      const bodyResult = await parseJsonBody(request);
+      if (!bodyResult.success) {
+        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+      }
+      const parsed = unitUpdateSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
         return jsonError('Invalid unit payload.', 400, ERROR_CODES.VALIDATION_ERROR);
@@ -90,7 +95,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Use rate-limited auth for mutation endpoint
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const { id } = await params;
 

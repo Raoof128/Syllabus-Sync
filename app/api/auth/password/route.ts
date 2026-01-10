@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { passwordResetLimiter } from '@/lib/services/rateLimitService';
+import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { z } from 'zod';
 
 // SECURITY: Stronger password policy - min 12 chars
@@ -35,9 +36,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse and validate body
-    const body = await request.json().catch(() => null);
-    const parsed = passwordChangeSchema.safeParse(body);
+    // Parse and validate body - SECURITY: Parse with size limit protection
+    const bodyResult = await parseJsonBody(request);
+    if (!bodyResult.success) {
+      return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+    }
+    const parsed = passwordChangeSchema.safeParse(bodyResult.data);
 
     if (!parsed.success) {
       const firstError = parsed.error.issues[0];

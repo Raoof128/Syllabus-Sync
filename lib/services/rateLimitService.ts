@@ -182,15 +182,18 @@ function getStore(): RateLimitStore {
     return new UpstashRedisStore(kvUrl, kvToken);
   }
 
-  // Fall back to memory store with warning
+  // SECURITY: In production, require Redis - don't fall back to memory store
+  // Memory store is useless in serverless environments (each instance has its own memory)
   if (process.env.NODE_ENV === 'production') {
-    console.warn(
-      '⚠️ SECURITY WARNING: Using in-memory rate limiting in production!\n' +
-        'This does NOT work across serverless instances.\n' +
-        'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for proper rate limiting.',
+    throw new Error(
+      'SECURITY ERROR: Rate limiting requires Redis in production. ' +
+        'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, ' +
+        'or KV_REST_API_URL and KV_REST_API_TOKEN for Vercel KV.',
     );
   }
 
+  // Fall back to memory store only in development (with warning)
+  console.warn('⚠️ DEV MODE: Using in-memory rate limiting. This is fine for local development.');
   return new MemoryStore();
 }
 
@@ -300,4 +303,20 @@ export const passwordResetLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 3, // Max 3 reset requests per hour
   failClosed: true, // SECURITY: Deny on store failure
+});
+
+/** Rate limiter for mutation endpoints (POST, PUT, DELETE) - moderate limits */
+export const mutationLimiter = createRateLimiter({
+  prefix: 'mutation',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30, // Max 30 mutations per minute per user/IP
+  failClosed: false, // Prioritize availability
+});
+
+/** Rate limiter for bulk operations - stricter limits */
+export const bulkOperationLimiter = createRateLimiter({
+  prefix: 'bulk',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 5, // Max 5 bulk operations per minute
+  failClosed: false,
 });

@@ -1,6 +1,15 @@
 -- Database Schema for Syllabus Sync
--- Last Updated: 2026-01-08
--- This is a reference schema - actual database uses supabase/migrations
+-- Last Updated: 2026-01-11
+--
+-- REFERENCE DOCUMENT ONLY
+-- =======================
+-- This file shows the complete database schema for reference.
+-- The actual schema is managed by migration files in: supabase/migrations/
+--
+-- To apply changes to the database, create new migration files using:
+--   supabase migration new migration_name
+--
+-- See supabase/README.md for more information.
 --
 -- IMPORTANT: The API mappers (app/api/_lib/mappers.ts) handle both:
 --   - JSONB location field (preferred)
@@ -10,6 +19,13 @@
 --   - 20260108131028: Added user_id columns and RLS policies
 --   - 20260108140000: Event column fixes and seed data triggers
 --   - 20260108150000: Fixed RLS policies with TO authenticated, added class_times RLS
+--   - 20260109012136: Create user profile function
+--   - 20260109012243: Add gamification system tables
+--   - 20260109012548: Fix permissions and schema alignment
+--   - 20260109012721: Add missing deadline columns
+--   - 20260109012944: Fix auth trigger for new users
+--   - 20260109013033: Check and fix existing triggers
+--   - 20260109013302: Disable all auth triggers
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -337,24 +353,8 @@ CREATE TRIGGER protect_profile_fields_trigger
 
 -- Policy for profile insertion (needed for signup flow)
 -- This allows users to insert their own profile row during signup
+-- Handles both normal registration and Supabase auth hooks that may create profiles
 CREATE POLICY "Users can insert their own profile"
-  ON public.profiles FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = id);
-
--- SECURITY: Allow profile creation for new users during registration
--- This handles cases where Supabase auth hooks create profiles before authentication is fully established
--- The policy is temporary and will be removed once the user is properly authenticated
-CREATE POLICY "Allow new user profile creation"
-  ON public.profiles FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = id);
-
--- SECURITY FIX: Allow profile creation during user registration
--- This handles Supabase auth hooks that may create profiles before full authentication
--- The policy allows inserts where the ID matches the authenticated user's ID
--- This prevents the "Database error saving new user" during signup
-CREATE POLICY "Allow profile creation during user registration"
   ON public.profiles FOR INSERT
   TO authenticated
   WITH CHECK (auth.uid() = id);

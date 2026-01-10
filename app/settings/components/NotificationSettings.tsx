@@ -44,7 +44,6 @@ const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps)
     role="switch"
     aria-checked={checked}
     aria-label={label}
-    aria-pressed={checked}
     onClick={onToggle}
     className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
     data-testid={testId}

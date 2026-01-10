@@ -6,7 +6,7 @@ import {
   ERROR_CODES,
   handleValidationError,
 } from '@/app/api/_lib/response';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuth, parseJsonBody } from '@/app/api/_lib/middleware';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
@@ -33,8 +33,6 @@ const awardXPSchema = z.object({
   referenceId: z.string().uuid().optional().nullable(),
   metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
-
-type AwardXPRequest = z.infer<typeof awardXPSchema>;
 
 // ============================================================================
 // LEVEL CALCULATION (mirrors database function)
@@ -84,20 +82,18 @@ export async function POST(request: NextRequest) {
   }
 
   return requireAuth(request, async (userId) => {
-    // Parse and validate request body
-    let body: AwardXPRequest;
-    try {
-      const rawBody = await request.json();
-      const parseResult = awardXPSchema.safeParse(rawBody);
-
-      if (!parseResult.success) {
-        return handleValidationError(parseResult.error);
-      }
-
-      body = parseResult.data;
-    } catch {
-      return jsonError('Invalid JSON body', 400, ERROR_CODES.BAD_REQUEST);
+    // Parse and validate request body - SECURITY: Parse with size limit protection
+    const bodyResult = await parseJsonBody(request);
+    if (!bodyResult.success) {
+      return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
     }
+    const parseResult = awardXPSchema.safeParse(bodyResult.data);
+
+    if (!parseResult.success) {
+      return handleValidationError(parseResult.error);
+    }
+
+    const body = parseResult.data;
 
     const { eventType, referenceId, metadata } = body;
 

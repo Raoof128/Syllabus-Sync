@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.31] - 2026-01-11
+
+### Security
+
+#### Security Audit Remediation (Raouf)
+
+**Summary:** Addressed critical security findings from comprehensive security audit, improving security score from 7.5/10 to production-ready status.
+
+**Changes Made:**
+
+1. **Admin API Hard Production Block:**
+   - Added `IS_PRODUCTION` constant check with immediate 404 return
+   - Both POST and GET handlers now return 404 in production before any other logic
+   - Cannot be bypassed by any environment variable
+   - File: `app/api/admin/update-building-positions/route.ts`
+
+2. **Rate Limiting Redis Requirement:**
+   - Changed from warning-only to throwing error in production without Redis
+   - Memory store now only allowed in development (with warning)
+   - Prevents ineffective rate limiting in serverless environments
+   - File: `lib/services/rateLimitService.ts`
+
+3. **Signup Profile Creation Fix:**
+   - Database trigger for profile creation was removed in migration
+   - Added explicit profile creation using admin client after successful signup
+   - Falls back to regular client with RLS INSERT policy if admin client unavailable
+   - Uses upsert with onConflict to handle edge cases
+   - File: `app/api/auth/signup/route.ts`
+
+4. **Removed Hardcoded Credentials:**
+   - Replaced hardcoded password `111111111111` with environment variable
+   - Now uses `DEV_USER_PASSWORD` env var or generates random 32-char hex
+   - Email configurable via `DEV_USER_EMAIL` env var
+   - Masked password output to pass secret scanner
+   - File: `scripts/manage-users.mjs`
+
+**Note:** Geofence default was already correctly set to 5km in production via environment variable check at `app/api/navigate/route.ts:30-31`.
+
+**Files Changed:**
+- `app/api/admin/update-building-positions/route.ts` - Hard production block
+- `lib/services/rateLimitService.ts` - Production Redis requirement
+- `app/api/auth/signup/route.ts` - Profile creation fix
+- `scripts/manage-users.mjs` - Removed hardcoded password
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing
+- Tests: ✅ 275 tests pass
+- Build: ✅ Success
+
+---
+
 ## [0.14.30] - 2026-01-11
 
 ### Fixed

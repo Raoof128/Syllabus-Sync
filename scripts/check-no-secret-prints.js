@@ -8,9 +8,26 @@ import path from 'path';
 const ROOT = path.resolve(process.cwd());
 const IGNORED_DIRS = ['node_modules', '.git', 'dist', '.next', 'public', 'test-results'];
 const SECRET_PATTERNS = [
+  // Environment variables
   /process\.env\.[A-Z0-9_]+/i,
   /Auth Token:/i,
+  // Common secret variable names
   /\b(AUTH_TOKEN|access_token|ACCESS_TOKEN|SUPABASE_ANON_KEY|SUPABASE_SERVICE_ROLE_KEY|PASSWORD|SECRET|PRIVATE_KEY)\b/i,
+  // Google API keys (AIza prefix)
+  /AIza[0-9A-Za-z_-]{35}/,
+  // Supabase keys (sb_ prefix)
+  /sb_[a-zA-Z0-9_-]{20,}/,
+  // Stripe live keys
+  /pk_live_[0-9A-Za-z]{20,}/,
+  /sk_live_[0-9A-Za-z]{20,}/,
+  // JWT tokens (common format)
+  /eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/,
+  // AWS keys
+  /AKIA[0-9A-Z]{16}/,
+  // Generic API key patterns
+  /api[_-]?key\s*[:=]\s*['"][^'"]{10,}['"]/i,
+  // Bearer tokens in strings
+  /Bearer\s+[a-zA-Z0-9_-]{20,}/,
 ];
 
 function walk(dir) {

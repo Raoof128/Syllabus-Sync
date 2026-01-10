@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
+import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { createHash } from 'crypto';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
@@ -220,7 +221,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
+    // SECURITY: Parse with size limit protection (small limit for coordinates)
+    const bodyResult = await parseJsonBody(request, 10 * 1024); // 10KB limit for navigation requests
+    if (!bodyResult.success) {
+      return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+    }
+    const body = bodyResult.data as Record<string, unknown>;
 
     if (!body || typeof body !== 'object') {
       return jsonError('Invalid request body', 400, ERROR_CODES.BAD_REQUEST);

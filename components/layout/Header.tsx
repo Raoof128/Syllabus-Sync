@@ -24,6 +24,7 @@ import { useProfilesStore } from '@/lib/store/profilesStore';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocaleString } from '@/lib/utils/locale';
+import { clearAllClientStorage } from '@/lib/utils/clientStorage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -426,6 +427,9 @@ const Header = memo(() => {
               <DropdownMenuItem
                 onClick={async () => {
                   try {
+                    // SECURITY: Clear client storage before signing out
+                    // This prevents sensitive data from persisting after logout
+                    clearAllClientStorage();
                     await supabase.auth.signOut();
                     router.push('/login');
                   } catch (error) {

@@ -138,8 +138,8 @@ describe('NotificationSettings', () => {
     const deadlinesToggle = screen.getByTestId('toggle-deadlines-notifications');
     const eventsToggle = screen.getByTestId('toggle-events-notifications');
 
-    expect(deadlinesToggle).toHaveAttribute('aria-pressed', 'true');
-    expect(eventsToggle).toHaveAttribute('aria-pressed', 'false');
+    expect(deadlinesToggle).toHaveAttribute('aria-checked', 'true');
+    expect(eventsToggle).toHaveAttribute('aria-checked', 'false');
   });
 
   it('calls setDeadlinesEnabled when deadline toggle is clicked', () => {

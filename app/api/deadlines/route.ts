@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapDeadlineRow, serializeDeadline } from '@/app/api/_lib/mappers';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
@@ -42,11 +42,16 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Use rate-limited auth for mutation endpoint
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
-      const body = await request.json().catch(() => null);
-      const parsed = deadlineSchema.safeParse(body);
+      // SECURITY: Parse with size limit protection
+      const bodyResult = await parseJsonBody(request);
+      if (!bodyResult.success) {
+        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+      }
+      const parsed = deadlineSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
         return jsonError('Invalid deadline payload.', 400, ERROR_CODES.VALIDATION_ERROR);

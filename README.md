@@ -1,248 +1,31 @@
-# 🎓 The Syllabus Sync
+# The Syllabus Sync
 
 **Campus Navigation and Schedule Management for Macquarie University**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![Version](https://img.shields.io/badge/version-0.5.69-blue)]()
-[![Tests](https://img.shields.io/badge/tests-46%2F46-brightgreen)]()
-[![Lint](https://img.shields.io/badge/eslint-0%20errors-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-0.14.25-blue)]()
+[![Node.js](https://img.shields.io/badge/Node.js-22+-brightgreen)]()
 
 ---
 
-## 📋 Overview
+## Overview
 
 **The Syllabus Sync** is a comprehensive campus management web application designed to help Macquarie University students seamlessly manage their academic and campus life. Built with enterprise-grade code quality and modern web technologies, it provides an all-in-one platform for schedule management, deadline tracking, event discovery, and campus navigation.
 
-**Current Version:** 0.5.69  
-**Current Status:** Production-ready application with comprehensive error handling, offline support, enterprise-level code quality, and 19-language internationalization support.
-
-**Demo Target:** Macquarie University Administration - February 2026
+**Current Version:** 0.14.25  
+**Current Status:** Production-ready with Supabase backend, comprehensive security measures, and 19-language internationalization support.
 
 ---
 
-## 🏗️ Complete Architecture Overview
-
-This diagram illustrates the modern, scalable architecture of Syllabus Sync, featuring clean separation of concerns, comprehensive state management, and enterprise-grade error handling. The application follows React best practices with TypeScript for type safety and Zustand for predictable state management.
-
-```mermaid
-flowchart TB
-  %% User Interface Layer
-  subgraph "🎨 User Interface Layer"
-    direction LR
-    Home["🏠 Home Dashboard<br/>Units & Schedule<br/>WelcomeHeader"]
-    Calendar["📅 Calendar<br/>Deadlines Management"]
-    Map["🗺️ Campus Map<br/>Building Navigation<br/>MapClient"]
-    Feed["📡 Events Feed<br/>Campus Activities<br/>FeedClient"]
-    ManageProfiles["👤 Manage Profiles<br/>Profile CRUD"]
-    Settings["⚙️ Settings<br/>App Preferences<br/>Data Management"]
-    Login["🔐 Login/Signup<br/>Authentication<br/>Fingerprint Auth"]
-    Header["📱 Header<br/>Clock & Notifications"]
-    Sidebar["🧭 Sidebar<br/>Navigation<br/>SocialButtons"]
-  end
-
-  %% State Management Layer
-  subgraph "🔄 State Management Layer"
-    direction TB
-    UnitsStore["📚 unitsStore<br/>Unit CRUD operations"]
-    DeadlinesStore["⏰ deadlinesStore<br/>Deadline management<br/>Stress calculations"]
-    ProfilesStore["👥 profilesStore<br/>User profiles<br/>Authentication"]
-    NotificationsStore["🔔 notificationsStore<br/>System notifications"]
-    ThemeStore["🌙 themeStore<br/>Dark mode & theming"]
-    LanguageStore["🌍 languageStore<br/>i18n (12 languages)<br/>RTL support"]
-  end
-
-  %% API & Services Layer
-  subgraph "🛠️ API & Services Layer"
-    direction LR
-    API["⚡ Next.js API Routes<br/>/api/units<br/>/api/deadlines<br/>/api/events<br/>/api/notifications<br/>/api/auth"]
-    ErrorBoundary["🚨 Error Boundary<br/>React error handling"]
-    ToastSystem["🍞 Toast Notifications<br/>User feedback"]
-    RetrySystem["🔄 Retry System<br/>Automatic retries"]
-    ServiceWorker["📱 Service Worker<br/>Offline support<br/>Caching"]
-    i18n["🌍 i18n System<br/>Translations<br/>520+ keys"]
-  end
-
-  %% Data Layer
-  subgraph "💾 Data Layer"
-    direction LR
-    SampleUnits["📄 sampleUnits.ts<br/>Demo unit data"]
-    SampleEvents["📅 sampleEvents.ts<br/>Campus events"]
-    SampleNotifications["🔔 sampleNotifications.ts<br/>Demo notifications"]
-    LocalStorage[("💽 localStorage<br/>Persistent storage")]
-    Supabase[("☁️ Supabase<br/>Future cloud storage<br/>Auth & Database")]
-  end
-
-  %% Navigation & Layout
-  Header --> Clock["🕒 Live Clock"]
-  Header --> Sidebar
-  Sidebar --> Home
-  Sidebar --> Calendar
-  Sidebar --> Map
-  Sidebar --> Feed
-  Sidebar --> Settings
-  Sidebar --> SocialButtons["🔗 Social Links"]
-
-  Header -.-> Login
-  Header -.-> ManageProfiles
-
-  %% UI to State connections
-  Home --> UnitsStore
-  Home --> DeadlinesStore
-  Calendar --> DeadlinesStore
-  Feed --> NotificationsStore
-  ManageProfiles --> ProfilesStore
-  Settings --> ThemeStore
-  Settings --> LanguageStore
-  Header --> NotificationsStore
-  Login --> ProfilesStore
-
-  %% State to Data connections
-  UnitsStore --> LocalStorage
-  DeadlinesStore --> LocalStorage
-  ProfilesStore --> LocalStorage
-  NotificationsStore --> LocalStorage
-  ThemeStore --> LocalStorage
-  LanguageStore --> LocalStorage
-
-  %% API connections
-  Home --> API
-  Calendar --> API
-  Feed --> API
-  Login --> API
-
-  %% Services connections
-  ErrorBoundary --> ToastSystem
-  ToastSystem --> Header
-  RetrySystem --> API
-  ServiceWorker --> LocalStorage
-  i18n --> LanguageStore
-
-  %% Data sources
-  API --> SampleUnits
-  API --> SampleEvents
-  API --> SampleNotifications
-
-  %% Future connections
-  LocalStorage -.-> Supabase
-  API -.-> Supabase
-
-  %% Styling
-  classDef uiLayer fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-  classDef stateLayer fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-  classDef servicesLayer fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-  classDef dataLayer fill:#fff3e0,stroke:#e65100,stroke-width:2px
-
-  class UI uiLayer
-  class State stateLayer
-  class Services servicesLayer
-  class Data dataLayer
-```
-
-### 🏛️ Architecture Layers Explained
-
-- **🎨 User Interface Layer**: React Server/Client Components with TypeScript, responsive design, accessibility features, and premium MQ gradient hover effects
-- **🔄 State Management Layer**: Zustand stores providing centralized, type-safe state management with localStorage persistence and 12-language internationalization
-- **🛠️ API & Services Layer**: Enterprise-grade RESTful API routes, error handling, offline support, toast notifications, and comprehensive i18n system
-- **💾 Data Layer**: Current localStorage implementation with planned Supabase cloud migration for authentication and real-time database synchronization
-
-### 🔄 Data Flow
-
-1. **User Interaction** → UI Components (Server/Client split)
-2. **State Updates** → Zustand Stores with language & theme support
-3. **API Requests** → Next.js API Routes with error handling & retry logic
-4. **Persistence** → localStorage (current) / Supabase (planned)
-5. **Error Handling** → Toast Notifications + Error Boundaries with auto-retry
-6. **Offline Support** → Service Worker + Cache Management
-7. **Internationalization** → Language Store → i18n System (12 languages, RTL support)
-
----
-
-## ✨ Core Features
-
-### 🏠 **Home Dashboard** (Complete)
-
-- **Today's Schedule:** View your classes for the day with room locations
-- **Next Deadline:** Track upcoming assignments with priority levels and countdown
-- **My Units:** Full unit management with add/edit/delete functionality
-- **Unit Statistics:** Total units, classes per week, and study hours
-- **Events Feed:** Discover campus events across categories
-- **Stress Indicator:** Visual workload indicator based on deadlines
-- **Quick Actions:** Fast navigation to Calendar and Map
-- **Premium Hover Effects:** MQ red gradient border animations on all cards
-
-### 📅 **Calendar & Deadlines** (Complete)
-
-- **Full Deadline Management:** Add, edit, complete, delete deadlines
-- **Statistics Overview:** Upcoming, completed, overdue counts
-- **Completion Toggle:** Mark deadlines as complete/incomplete
-- **Smart Navigation:** Click deadlines to view in calendar
-- **Priority & Type System:** Color-coded priority and deadline types
-- **Overdue Detection:** Automatic highlighting of overdue deadlines
-- **Stress Level Algorithm:** Dynamic workload assessment
-- **Interactive Cards:** Premium hover animations matching brand design
-
-### 🔔 **Notifications System** (Complete)
-
-- **Real-time Notifications:** Bell icon with unread count badge
-- **Smart Categorization:** Deadlines, events, classes, system notifications
-- **Interactive Navigation:** Click notifications to jump to relevant pages
-- **Read Status Tracking:** Mark individual or all notifications as read
-- **Persistent Storage:** Notifications survive browser sessions
-
-### 🗺️ **Campus Map** (Complete)
-
-- **Google Maps Integration:** Interactive campus map with Macquarie University
-- **Building Navigation:** Quick reference for all campus buildings
-- **Smart Query Parameters:** Direct navigation via `?building=XXX`
-- **Interactive Features:** Building highlights and selection states
-- **Premium Card Design:** Consistent hover effects across all map components
-
-### 📱 **Events Feed** (Complete)
-
-- **Advanced Filtering:** Filter events by category (Career, Social, Academic, Free Food)
-- **Location Integration:** Navigate to event buildings directly from feed
-- **Time & Location Details:** Complete event information display
-- **Cross-Page Navigation:** Seamless integration with map and calendar
-- **Interactive Cards:** Premium gradient hover effects on all feed components
-- **Event Categories Legend:** Visual guide to event types and priorities
-
-### ⚙️ **Settings & Profile** (Complete)
-
-- **Data Management:** Clear all data with confirmation dialogs
-- **Storage Status:** Real-time data storage information
-- **App Information:** Version, build status, and system info
-- **Profile Management:** User profile settings (framework ready)
-- **Theme-Aware Borders:** Consistent design tokens across light/dark modes
-- **Polished Social Buttons:** Premium animated social media links
-
-### 🌍 **Internationalization System** (Complete)
-
-- **12 Languages Fully Supported:** English, Spanish, Persian/Farsi, Chinese, Arabic, Hindi, Korean, Japanese, Urdu, Thai, Vietnamese, Russian
-- **520+ Translation Keys:** Complete coverage of all user-facing strings
-- **RTL Language Support:** Full right-to-left support for Arabic, Persian, and Urdu
-- **Professional Translations:** Native speaker-quality translations with academic terminology
-- **Zero Fallback Strings:** All languages have complete translations
-- **Instant Language Switching:** Real-time UI updates with localStorage persistence
-
-### 🎯 **Quality Assurance Features**
-
-- **Error Recovery:** Automatic retry mechanisms for failed operations
-- **Offline Support:** Service worker with caching strategies
-- **Toast Notifications:** Comprehensive user feedback system
-- **Performance Monitoring:** Bundle analysis and optimization tracking
-- **Accessibility:** WCAG compliant with keyboard navigation and screen reader support
-- **Live Clock Display:** Real-time clock and date in header with locale support
-- **Suspense Boundaries:** Progressive streaming with skeleton loaders
-
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- **Node.js 22+** (required)
+- **npm** (comes with Node.js)
+- **Supabase account** (for database and authentication)
 
 ### Installation
 
@@ -267,21 +50,34 @@ flowchart TB
 
    Edit `.env.local` and add your credentials:
 
-   | Variable                        | Description          | Where to get it                                                             |
-   | ------------------------------- | -------------------- | --------------------------------------------------------------------------- |
-   | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL | [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public key  | Same as above                                                               |
-   | `NEXT_PUBLIC_ORS_API_KEY`       | OpenRouteService key | [ORS Sign Up](https://openrouteservice.org/dev/#/signup)                    |
+   | Variable                        | Description                    | Required | Where to get it                                                             |
+   | ------------------------------- | ------------------------------ | -------- | --------------------------------------------------------------------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL           | Yes      | [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public (anon) key     | Yes      | Same as above                                                               |
+   | `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key      | Yes\*    | Same as above (Settings > API > service_role)                               |
+   | `UPSTASH_REDIS_REST_URL`        | Upstash Redis URL              | Prod     | [Upstash Console](https://console.upstash.com/)                             |
+   | `UPSTASH_REDIS_REST_TOKEN`      | Upstash Redis token            | Prod     | Same as above                                                               |
+   | `ADMIN_SECRET_TOKEN`            | Admin API authentication token | Dev      | Generate a secure random string                                             |
+   | `ADMIN_API_ENABLED`             | Enable admin endpoints         | Dev      | Set to `true` in development only                                           |
 
-   > **Note:** Supabase keys support both legacy JWT format (`eyJ...`) and new publishable format (`sb_...`).
+   > **Note:** `*` Service role key is needed for server-side operations. Never expose this in client code.
 
-4. **Run development server**
+4. **Set up the database**
+
+   Run the database schema in your Supabase SQL Editor:
+
+   ```bash
+   # The schema is in database-schema.sql
+   # Copy the contents and run in Supabase Dashboard > SQL Editor
+   ```
+
+5. **Run development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open in browser**
+6. **Open in browser**
    ```
    http://localhost:3000
    ```
@@ -290,7 +86,8 @@ flowchart TB
 
 ```bash
 # Development
-npm run dev          # Start development server
+npm run dev          # Start development server (Turbopack)
+npm run dev:safe     # Start without Turbopack
 npm run build        # Build for production
 npm run start        # Start production server
 
@@ -303,244 +100,194 @@ npm run test:accessibility # Run accessibility tests
 npm run test:ci      # Run all tests (unit + e2e)
 
 # Quality Assurance
-npm run lint         # Run ESLint (0 errors, 0 warnings)
+npm run lint         # Run ESLint
+npm run typecheck    # TypeScript type checking
 npm run format       # Format code with Prettier
 npm run format:check # Check code formatting
-npm run analyze      # Bundle analysis (Webpack)
-npm run lighthouse   # Performance audit (Lighthouse CI)
+npm run check:secrets # Check for exposed secrets
+npm run prepush      # Run all checks before pushing
 
-# Deployment
-npm run build        # Production build
+# Analysis
+npm run analyze      # Bundle analysis
+npm run lighthouse   # Performance audit
 ```
 
 ---
 
-## 📁 Project Structure
+## Security Configuration
+
+### Rate Limiting (Production)
+
+For production deployments, configure distributed rate limiting:
+
+```env
+# Upstash Redis (Recommended)
+UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-token
+
+# OR Vercel KV
+KV_REST_API_URL=https://your-kv.vercel-storage.com
+KV_REST_API_TOKEN=your-token
+```
+
+Without these, rate limiting falls back to in-memory storage (not suitable for serverless).
+
+### Admin Endpoints (Development Only)
+
+Admin endpoints are disabled by default. To enable in development:
+
+```env
+ADMIN_API_ENABLED=true
+ADMIN_SECRET_TOKEN=your-secure-random-token
+```
+
+**Warning:** Never enable admin endpoints in production without proper authentication.
+
+### CORS Configuration
+
+Configure allowed origins for API access:
+
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:3000,https://your-domain.com
+```
+
+---
+
+## Database Setup
+
+### Supabase Configuration
+
+1. Create a new Supabase project
+2. Go to SQL Editor and run `database-schema.sql`
+3. Configure Row Level Security (RLS) policies (included in schema)
+4. Enable email authentication in Authentication > Providers
+
+### Database Schema
+
+The application uses the following tables:
+
+- `profiles` - User profiles and settings
+- `units` - Academic units/courses
+- `class_times` - Class schedules
+- `deadlines` - Assignment deadlines
+- `events` - Campus events
+- `notifications` - User notifications
+- `gamification_profiles` - Gamification/XP tracking
+- `xp_events` - XP earning events
+
+### Migrations
+
+Database migrations are managed via SQL files:
+
+```
+database-schema.sql           # Full schema
+supabase/migrations/          # Incremental migrations
+```
+
+---
+
+## Project Structure
 
 ```
 syllabus-sync/
-├── app/                      # Next.js pages
-│   ├── home/                # Home dashboard (Units + Schedule)
-│   ├── calendar/            # Calendar view (Deadlines)
+├── app/                      # Next.js App Router
+│   ├── api/                  # API routes
+│   │   ├── _lib/            # Shared API utilities
+│   │   ├── units/           # Unit endpoints
+│   │   ├── deadlines/       # Deadline endpoints
+│   │   ├── events/          # Event endpoints
+│   │   └── auth/            # Authentication endpoints
+│   ├── home/                # Home dashboard
+│   ├── calendar/            # Calendar view
 │   ├── map/                 # Campus map
 │   ├── feed/                # Events feed
 │   └── settings/            # Settings page
-├── components/
-│   ├── home/                # Dashboard components
-│   ├── layout/              # Sidebar & Header
-│   ├── ui/                  # Reusable UI components
-│   ├── units/               # Unit management
-│   └── deadlines/           # Deadline management
+├── components/              # React components
+│   ├── layout/             # Layout components
+│   ├── ui/                 # UI primitives
+│   └── ...                 # Feature components
 ├── lib/
-│   ├── store/               # State management (Zustand)
-│   ├── types/               # TypeScript definitions
-│   └── hooks/               # Custom React hooks
-├── data/                    # Sample data for demo
-└── tests/                   # Unit tests
+│   ├── store/              # Zustand stores
+│   ├── supabase/           # Supabase client
+│   ├── security/           # Security utilities
+│   ├── services/           # Business logic
+│   └── utils/              # Utility functions
+├── data/                   # Sample data
+└── tests/                  # Test files
 ```
 
 ---
 
-## 🚀 CI/CD Pipeline
+## API Documentation
 
-This project uses GitHub Actions for comprehensive continuous integration and deployment:
+### Authentication
 
-### **Automated Checks**
+All mutation endpoints require authentication via Supabase session cookies.
 
-- ✅ **Multi-Node Testing**: Tests across Node.js 18.x, 20.x, and 22.x
-- ✅ **Type Safety**: TypeScript compilation verification
-- ✅ **Code Quality**: ESLint with 0 errors, 0 warnings
-- ✅ **Unit Testing**: 36/36 tests passing with Vitest
-- ✅ **End-to-End Testing**: Playwright E2E tests
-- ✅ **Accessibility Testing**: axe-core automated accessibility checks
-- ✅ **Performance Monitoring**: Lighthouse CI performance audits
-- ✅ **Security Scanning**: npm audit for vulnerabilities
-- ✅ **Bundle Analysis**: Webpack bundle size monitoring
+### Endpoints
 
-### **Quality Gates**
+| Method | Endpoint              | Description           | Auth Required |
+| ------ | --------------------- | --------------------- | ------------- |
+| GET    | `/api/units`          | List user's units     | Yes           |
+| POST   | `/api/units`          | Create a unit         | Yes           |
+| PUT    | `/api/units/[id]`     | Update a unit         | Yes           |
+| DELETE | `/api/units/[id]`     | Delete a unit         | Yes           |
+| GET    | `/api/deadlines`      | List deadlines        | Yes           |
+| POST   | `/api/deadlines`      | Create a deadline     | Yes           |
+| PUT    | `/api/deadlines/[id]` | Update a deadline     | Yes           |
+| DELETE | `/api/deadlines/[id]` | Delete a deadline     | Yes           |
+| GET    | `/api/events`         | List events           | Yes           |
+| POST   | `/api/events`         | Create an event       | Yes           |
+| GET    | `/api/gamification`   | Get user's XP profile | Yes           |
+| POST   | `/api/gamification`   | Record activity       | Yes           |
 
-- **Test Coverage**: 100% success rate required
-- **Build Status**: Production build must succeed
-- **Performance**: Lighthouse scores must meet minimum thresholds
-- **Accessibility**: WCAG 2.1 AA compliance required
-- **Security**: No high/critical vulnerabilities allowed
+### Security Features
 
-### **Deployment**
-
-- **Preview Deployments**: Automatic Vercel previews for pull requests
-- **Production Builds**: Optimized production builds with bundle analysis
-- **Performance Reports**: Automated Lighthouse reports for each deployment
-
----
-
-## 👥 Team
-
-### Tab/Feature Ownership
-
-| Tab/Feature        | Owner                     | Status          |
-| ------------------ | ------------------------- | --------------- |
-| **Home Tab**       | Pouya                     | 🚧 In Progress  |
-| **Calendar Tab**   | Pouya                     | 🚧 In Progress  |
-| **Feed Tab**       | Pouya (50%) + Raouf (50%) | 🚧 Shared       |
-| **Map Tab**        | Raouf                     | 🚧 In Progress  |
-| **Settings Tab**   | Raouf                     | 🚧 In Progress  |
-| **AI Integration** | Kit                       | 🔜 Demo Feature |
-
-### Team Members
-
-- **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Infrastructure
-- **Pouya**: Home Tab, Calendar Tab, Feed Tab (Frontend), UI/UX, Components
-- **Kit**: AI Integration for Demo
-
-See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
+- **CSRF Protection**: Origin validation on all mutation endpoints
+- **Rate Limiting**: Distributed rate limiting (30 req/min for mutations)
+- **Body Size Limits**: JSON payloads limited to 100KB
+- **Input Validation**: Zod schemas for all inputs
+- **Row Level Security**: Database-level access control
 
 ---
 
-## 📝 Documentation
+## Tech Stack
+
+| Category             | Technology               | Purpose                               |
+| -------------------- | ------------------------ | ------------------------------------- |
+| **Framework**        | Next.js 16 (React 19)    | Full-stack React framework            |
+| **Language**         | TypeScript 5.x           | Type-safe JavaScript                  |
+| **Database**         | Supabase (PostgreSQL)    | Backend-as-a-Service                  |
+| **Styling**          | Tailwind CSS + Shadcn UI | Utility-first CSS                     |
+| **State Management** | Zustand                  | Client-side state with persistence    |
+| **Testing**          | Vitest + Playwright      | Unit and E2E testing                  |
+| **Security**         | Custom middleware        | Rate limiting, CSRF, input validation |
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Run quality checks (`npm run prepush`)
+4. Commit changes (`git commit -m 'Add amazing feature'`)
+5. Push to branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+---
+
+## Documentation
 
 - **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
 - **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
-- **[TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md)** - Team responsibilities
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributing guidelines
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community guidelines
 - **[SECURITY.md](SECURITY.md)** - Security policy
 
 ---
 
-## 🎯 Development Roadmap
-
-### ✅ Phase 1 (Weeks 1-2) - COMPLETE: Code Quality & Error Handling
-
-- [x] **Enterprise Code Quality**: 0 ESLint errors/warnings, full TypeScript strictness
-- [x] **Comprehensive Error Handling**: Error boundaries, retry logic, centralized logging
-- [x] **Performance Optimizations**: React.memo, proper display names, component optimizations
-- [x] **Build System**: Production-ready compilation with no errors
-- [x] **Type Safety**: Eliminated all `any` types, proper generic constraints
-
-### ✅ Phase 2 (Weeks 3-4) - COMPLETE: Advanced Features & Performance
-
-- [x] **Toast Notification System**: Complete user feedback with all variants
-- [x] **Error Recovery**: Automatic retry mechanisms with exponential backoff
-- [x] **Offline Support**: Service worker implementation with caching strategies
-- [x] **Bundle Optimization**: Code splitting, dynamic imports, bundle analysis
-- [x] **Enhanced UX**: Proper dialog replacements, loading states, accessibility
-
-### 🚧 Phase 3 (Week 5) - API Integration & User Management
-
-- [ ] **Supabase Setup**: Database schema design and configuration
-- [ ] **User Authentication**: Email/password, social login, session management
-- [ ] **Real-time Sync**: Replace localStorage with Supabase real-time subscriptions
-- [ ] **Data Migration**: Seamless transition from local to cloud storage
-- [ ] **User Profiles**: Profile management, preferences, and settings
-
-### ⏳ Phase 4 (Week 6) - Enhanced Features
-
-- [ ] **Advanced Calendar**: FullCalendar integration with drag-and-drop
-- [ ] **Interactive Map**: Leaflet integration with building markers
-- [ ] **Collaboration**: Share schedules and units with other users
-- [ ] **Push Notifications**: Browser notifications for deadlines and events
-
-### ⏳ Phase 5 (Weeks 7-8) - Production & Demo Preparation
-
-- [ ] **Performance Monitoring**: Analytics, error tracking, performance metrics
-- [ ] **Testing Suite**: E2E tests, visual regression, accessibility testing
-- [ ] **Documentation**: API docs, user guides, deployment instructions
-- [ ] **Demo Preparation**: Pitch deck, user testing, final refinements
-
----
-
-## 🛠 Tech Stack
-
-| Category             | Technology               | Purpose                                           |
-| -------------------- | ------------------------ | ------------------------------------------------- |
-| **Framework**        | Next.js 16 (React 19)    | Full-stack React framework with SSR               |
-| **Language**         | TypeScript 5.x           | Type-safe JavaScript with strict checking         |
-| **Styling**          | Tailwind CSS + Shadcn UI | Utility-first CSS with component library          |
-| **State Management** | Zustand (localStorage)   | Lightweight state management with persistence     |
-| **UI Components**    | Radix UI Primitives      | Accessible, unstyled component primitives         |
-| **Icons**            | Lucide React             | Consistent icon system                            |
-| **Date Handling**    | date-fns                 | Modern date utility library                       |
-| **Testing**          | Vitest + Testing Library | Fast unit testing framework                       |
-| **Notifications**    | Radix Toast              | Accessible toast notification system              |
-| **Error Handling**   | Custom retry system      | Automatic error recovery with exponential backoff |
-| **Offline Support**  | Service Worker API       | Progressive web app capabilities                  |
-
-### 📊 Quality Metrics
-
-- **Test Coverage**: 41/41 tests passing (100% success rate)
-- **Code Quality**: 0 ESLint errors, 0 warnings (perfect compliance)
-- **Type Safety**: Full TypeScript strictness, no `any` types
-- **Performance**: Optimized bundles with code splitting and caching
-- **Accessibility**: WCAG compliant with screen reader support
-- **Build Status**: Production-ready with zero compilation errors
-- **Internationalization**: 12 languages with 520+ translation keys per language
-
----
-
-## 🎨 Design System
-
-### Macquarie University Branding
-
-- **Primary Red:** `#A6192E`
-- **Primary Blue:** `#002A45`
-- **Accent Gold:** `#FFB81C`
-
----
-
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📊 Project Status
-
-**Current Version:** 0.5.45  
-**Last Updated:** January 06, 2026  
-**Status:** ✅ Production Ready with CI/CD
-
-### 🎯 **Quality Metrics Achieved**
-
-- **Code Quality**: 0 ESLint errors, 0 warnings (perfect compliance)
-- **Type Safety**: Full TypeScript strictness, no `any` types
-- **Test Coverage**: 41/41 unit tests passing (100% success rate)
-- **Performance**: Optimized bundles with code splitting and caching
-- **Accessibility**: WCAG 2.1 AA compliant with comprehensive support
-- **Build Status**: Production-ready with zero compilation errors
-- **CI/CD**: Comprehensive GitHub Actions pipeline with automated testing
-- **Internationalization**: 12 languages, 520+ translation keys, full RTL support
-
-### 🏆 **Technical Achievements**
-
-- **Phase 1 Complete**: Enterprise-grade error handling and retry systems
-- **Phase 2 Complete**: Advanced features with offline support and performance optimization
-- **Complete i18n System**: 12 languages with professional translations and RTL support
-- **Enterprise API System**: RESTful architecture with versioning and comprehensive documentation
-- **Premium UI/UX**: Macquarie red gradient hover effects across all interactive cards
-- **CI/CD Pipeline**: Automated testing across multiple Node.js versions
-- **Performance Monitoring**: Lighthouse CI integration with performance budgets
-- **Accessibility Testing**: Automated axe-core accessibility scanning
-- **Security**: npm audit integration with vulnerability detection
-- **Bundle Analysis**: Webpack bundle size monitoring and optimization
-
-### 🚀 **Recent Updates (v0.5.45)**
-
-- **Social Buttons Polish**: Improved bottom-left social widgets with better accessibility, centered labels, keyboard focus expansion, and mobile-friendly behavior
-- **Settings Card Border**: Added theme-aware borders using design tokens for consistent dark mode display
-- **Home Page Bug Fixes**: Removed duplicate headings, fixed skip links, simplified validation, and improved layout structure
-- **TypeScript & ESLint Fixes**: Resolved all implicit `any` types and typing issues across the codebase
-- **Accessibility Improvements**: Enhanced contrast remediation, dark mode enforcement, and automated instrumentation
-
-### 🚀 **Ready for Next Phase**
-
-The application is now enterprise-ready and prepared for:
-
-- Real API integration with Supabase
-- User authentication and cloud synchronization
-- Advanced calendar integration (FullCalendar)
-- Progressive Web App features
-- University administration demo presentation
-
----
-
-**Made with ❤️ for Macquarie University students**
+**Made with care for Macquarie University students**

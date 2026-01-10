@@ -9,7 +9,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
-import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -214,6 +214,7 @@ export async function GET(request: Request) {
 
 /**
  * POST /api/units - Create unit with schedule
+ * SECURITY: Rate limited to prevent abuse
  *
  * Request Body:
  * {
@@ -239,7 +240,8 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Use rate-limited auth for mutation endpoint
+  return requireAuthWithRateLimit(request, async (userId) => {
     return validateRequest(unitSchema)(request, async (validatedData) => {
       try {
         const supabase = await createServerClient();

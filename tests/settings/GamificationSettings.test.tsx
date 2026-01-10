@@ -134,8 +134,8 @@ describe('GamificationSettings', () => {
     const xpToggle = screen.getByTestId('toggle-xp-notifications');
     const streakToggle = screen.getByTestId('toggle-streak-reminders');
 
-    expect(xpToggle).toHaveAttribute('aria-pressed', 'true');
-    expect(streakToggle).toHaveAttribute('aria-pressed', 'false');
+    expect(xpToggle).toHaveAttribute('aria-checked', 'true');
+    expect(streakToggle).toHaveAttribute('aria-checked', 'false');
   });
 
   it('calls updateSettings when toggle is clicked', () => {
@@ -160,10 +160,10 @@ describe('GamificationSettings', () => {
     // Dialog should be open
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Are you sure? This will reset all your XP, level, and streak data. This cannot be undone.',
-      ),
-    ).toBeInTheDocument();
+      screen.getByRole('dialog').querySelector('[data-slot="dialog-description"]'),
+    ).toHaveTextContent(
+      'Are you sure? This will reset all your XP, level, and streak data. This cannot be undone.',
+    );
   });
 
   it('closes dialog when cancel is clicked', () => {
@@ -186,8 +186,8 @@ describe('GamificationSettings', () => {
     const region = screen.getByRole('region', { name: 'Gamification' });
     expect(region).toBeInTheDocument();
 
-    // Check aria-pressed attributes on toggles
+    // Check aria-checked attributes on toggles
     const xpToggle = screen.getByTestId('toggle-xp-notifications');
-    expect(xpToggle).toHaveAttribute('aria-pressed');
+    expect(xpToggle).toHaveAttribute('aria-checked');
   });
 });

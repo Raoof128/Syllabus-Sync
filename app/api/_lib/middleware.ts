@@ -1,20 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonUnauthorized, jsonError, ERROR_CODES } from './response';
-import { checkRateLimit, type RateLimitConfig } from '@/lib/services/rateLimitService';
+import {
+  checkRateLimit,
+  type RateLimitConfig,
+  mutationLimiter,
+} from '@/lib/services/rateLimitService';
+import { validateOrigin } from '@/lib/security/csrf';
 
 // ============================================================================
 // AUTHENTICATION MIDDLEWARE
 // ============================================================================
 
+// HTTP methods that modify state and require CSRF protection
+const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
 /**
  * Require authentication for API routes
+ * SECURITY: For mutation methods, also validates CSRF origin header
  */
 export const requireAuth = async (
   request: Request,
   handler: (userId: string) => Promise<NextResponse>,
 ): Promise<NextResponse> => {
   try {
+    // SECURITY: Validate origin for mutation methods (CSRF protection)
+    if (MUTATION_METHODS.includes(request.method)) {
+      const originResult = validateOrigin(request as unknown as NextRequest);
+      if (!originResult.valid) {
+        console.warn('CSRF origin validation failed:', originResult.reason);
+        return jsonError('Invalid request origin', 403, ERROR_CODES.FORBIDDEN);
+      }
+    }
+
     const supabase = await createServerClient();
     const {
       data: { user },
@@ -56,6 +74,79 @@ export const optionalAuth = async (
     );
     // Continue without authentication
     return await handler(undefined);
+  }
+};
+
+// ============================================================================
+// AUTHENTICATED + RATE LIMITED MIDDLEWARE
+// ============================================================================
+
+/**
+ * Require authentication AND apply rate limiting for mutation endpoints
+ * SECURITY: Combines auth check, CSRF validation, and rate limiting
+ *
+ * @param request - The request object
+ * @param handler - Handler function that receives userId
+ * @param rateLimitKey - Optional custom key for rate limiting (defaults to pathname)
+ */
+export const requireAuthWithRateLimit = async (
+  request: Request,
+  handler: (userId: string) => Promise<NextResponse>,
+  rateLimitKey?: string,
+): Promise<NextResponse> => {
+  // First authenticate
+  try {
+    // SECURITY: Validate origin for mutation methods (CSRF protection)
+    if (MUTATION_METHODS.includes(request.method)) {
+      const originResult = validateOrigin(request as unknown as NextRequest);
+      if (!originResult.valid) {
+        console.warn('CSRF origin validation failed:', originResult.reason);
+        return jsonError('Invalid request origin', 403, ERROR_CODES.FORBIDDEN);
+      }
+    }
+
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      return jsonUnauthorized('Valid authentication token required');
+    }
+
+    // Apply rate limiting using user ID for authenticated requests
+    const key = rateLimitKey || new URL(request.url).pathname;
+    const rateLimitResult = await mutationLimiter(`user:${user.id}:${key}`);
+
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+        {
+          resetIn: rateLimitResult.resetIn,
+          limit: rateLimitResult.limit,
+        },
+      );
+    }
+
+    // Execute handler and add rate limit headers
+    const response = await handler(user.id);
+
+    // Add rate limit headers to response
+    const newResponse = new NextResponse(response.body, response);
+    newResponse.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
+    newResponse.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+    newResponse.headers.set('X-RateLimit-Reset', rateLimitResult.resetIn.toString());
+
+    return newResponse;
+  } catch (error) {
+    console.error(
+      'Auth/RateLimit middleware error:',
+      error instanceof Error ? error.message : 'Unknown error',
+    );
+    return jsonError('Request processing failed', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 };
 
@@ -271,25 +362,73 @@ export const cors = (config: CorsConfig = {}) => {
 // VALIDATION MIDDLEWARE
 // ============================================================================
 
+// Default body size limit (100KB - reasonable for most API payloads)
+const DEFAULT_MAX_BODY_SIZE = 100 * 1024; // 100KB
+
+/**
+ * Parse JSON body with size limit protection
+ * SECURITY: Prevents unbounded JSON parsing DoS attacks
+ */
+export async function parseJsonBody<T = unknown>(
+  request: Request,
+  maxSize: number = DEFAULT_MAX_BODY_SIZE,
+): Promise<{ success: true; data: T } | { success: false; error: string }> {
+  try {
+    // Check Content-Length header first (fast rejection)
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > maxSize) {
+      return {
+        success: false,
+        error: `Request body too large. Maximum size is ${Math.round(maxSize / 1024)}KB`,
+      };
+    }
+
+    // Read body as text to check actual size
+    const body = await request.text();
+
+    if (body.length > maxSize) {
+      return {
+        success: false,
+        error: `Request body too large. Maximum size is ${Math.round(maxSize / 1024)}KB`,
+      };
+    }
+
+    // Parse JSON
+    if (!body || body.trim() === '') {
+      return { success: true, data: {} as T };
+    }
+
+    const data = JSON.parse(body) as T;
+    return { success: true, data };
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return { success: false, error: 'Invalid JSON in request body' };
+    }
+    return { success: false, error: 'Failed to parse request body' };
+  }
+}
+
 /**
  * Request validation middleware
  */
-export const validateRequest = <T>(schema: {
-  safeParse: (data: unknown) => { success: boolean; data?: T; error?: unknown };
-}) => {
+export const validateRequest = <T>(
+  schema: {
+    safeParse: (data: unknown) => { success: boolean; data?: T; error?: unknown };
+  },
+  maxBodySize: number = DEFAULT_MAX_BODY_SIZE,
+) => {
   return async (
     request: Request,
     handler: (validatedData: T) => Promise<NextResponse>,
   ): Promise<NextResponse> => {
     try {
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        body = {};
+      // SECURITY: Parse with size limit
+      const bodyResult = await parseJsonBody(request, maxBodySize);
+      if (!bodyResult.success) {
+        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
       }
 
-      const result = schema.safeParse(body);
+      const result = schema.safeParse(bodyResult.data);
 
       if (!result.success) {
         return jsonError(
