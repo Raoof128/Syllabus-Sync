@@ -34,43 +34,173 @@ export type BuildingCategory =
   | 'residential'
   | 'other';
 
-// Grid reference to approximate pixel position mapping
-// The campus map uses a grid system (columns A-X, rows 1-30 approx)
-// Map dimensions: 4678 x 3307 pixels
-// These are approximate conversions based on the campus layout
-const gridToPixel = (ref: string): [number, number] => {
-  // Extract column letter(s) and row number
-  const match = ref.match(/^([A-Z]+)(\d+)$/);
-  if (!match) return [2339, 1654]; // Center fallback
+// Map dimensions and coordinate system configuration
+// These MUST match the values in CampusMap.tsx
+//
+// === COORDINATE SYSTEM: L.CRS.Simple (v0.14.22+) ===
+// The campus map uses L.CRS.Simple (pixel-based) instead of GPS coordinates.
+// This eliminates edge drift by treating the map as a pure 2D pixel grid.
+//
+// COORDINATE SYSTEMS:
+// 1. Image pixels: building.position = [x, y] where:
+//    - x = horizontal pixel from LEFT edge (0 to 4678)
+//    - y = vertical pixel from TOP edge (0 to 3307)
+//
+// 2. CRS.Simple (Leaflet): [lat, lng] where:
+//    - lat = MAP_HEIGHT - y (Y-axis inverted, 0 at bottom)
+//    - lng = x (same as image X)
+//
+// 3. Real GPS: building.location = { lat, lng } (OSM coordinates)
+//    - Used ONLY for external navigation (Apple/Google Maps, ORS routing)
+//    - NOT used for marker placement on the map
+//
+// USAGE:
+// - Marker placement: Use pixelToCrsSimple() or getBuildingCrsCoords()
+// - External navigation: Use getBuildingGps()
+// - User geolocation: Convert GPS to approximate pixels via gpsToPixel()
+//
+export const MAP_CONFIG = {
+  width: 4678,
+  height: 3307,
+  // GPS bounds kept for approximate geolocation conversion only
+  // NOT used for marker placement (CRS.Simple uses pixels directly)
+  bounds: {
+    south: -33.7832653,
+    north: -33.7654178,
+    west: 151.1055008,
+    east: 151.1251008,
+  },
+} as const;
 
-  const colStr = match[1];
-  const row = parseInt(match[2], 10);
+// =============================================================================
+// CRS.Simple Coordinate Conversion Functions
+// =============================================================================
 
-  // Column mapping (A=1, B=2, ... X=24)
-  // Campus spans roughly columns C to W (3 to 23)
-  let col = 0;
-  for (let i = 0; i < colStr.length; i++) {
-    col = col * 26 + (colStr.charCodeAt(i) - 64);
+/**
+ * Convert image pixel coordinates to CRS.Simple coordinates for Leaflet.
+ * This is the PRIMARY function for marker placement on the map.
+ *
+ * @param x - Horizontal pixel from left edge (0 to 4678)
+ * @param y - Vertical pixel from top edge (0 to 3307)
+ * @returns CRS.Simple coordinates { lat, lng } where lat = height - y, lng = x
+ */
+export function pixelToCrsSimple(x: number, y: number): { lat: number; lng: number } {
+  return {
+    lat: MAP_CONFIG.height - y, // Invert Y axis (CRS.Simple has Y=0 at bottom)
+    lng: x,
+  };
+}
+
+/**
+ * Convert CRS.Simple coordinates back to image pixel coordinates.
+ *
+ * @param lat - CRS.Simple latitude (inverted Y)
+ * @param lng - CRS.Simple longitude (same as X)
+ * @returns Image pixel coordinates [x, y]
+ */
+export function crsSimpleToPixel(lat: number, lng: number): [number, number] {
+  return [lng, MAP_CONFIG.height - lat];
+}
+
+// =============================================================================
+// GPS Conversion Functions (for geolocation and external navigation)
+// =============================================================================
+
+/**
+ * Convert GPS coordinates to approximate pixel position.
+ * Used for displaying user's real-world location on the map.
+ * NOTE: This is approximate since the map is not georeferenced.
+ *
+ * @param lat - GPS latitude
+ * @param lng - GPS longitude
+ * @returns Approximate pixel coordinates [x, y]
+ */
+export function gpsToPixel(lat: number, lng: number): [number, number] {
+  const { width, height, bounds } = MAP_CONFIG;
+  const { south, north, west, east } = bounds;
+
+  // Calculate normalized position (0-1)
+  const xNorm = (lng - west) / (east - west);
+  const yNorm = (north - lat) / (north - south);
+
+  // Convert to pixel coordinates
+  const x = Math.round(xNorm * width);
+  const y = Math.round(yNorm * height);
+
+  return [x, y];
+}
+
+/**
+ * Convert pixel position to approximate GPS coordinates.
+ * Used as fallback for buildings without OSM GPS data.
+ * NOTE: Result is approximate, not real-world GPS.
+ *
+ * @deprecated Use getBuildingGps() instead which prefers OSM GPS coordinates.
+ * @param x - Horizontal pixel from left edge
+ * @param y - Vertical pixel from top edge
+ * @returns Approximate GPS coordinates { lat, lng }
+ */
+export function pixelToGps(x: number, y: number): { lat: number; lng: number } {
+  const { width, height, bounds } = MAP_CONFIG;
+  const { south, north, west, east } = bounds;
+
+  const xNorm = x / width;
+  const yNorm = y / height;
+
+  const lng = west + xNorm * (east - west);
+  const lat = north - yNorm * (north - south);
+
+  return { lat, lng };
+}
+
+// =============================================================================
+// Building Position Helper Functions
+// =============================================================================
+
+/**
+ * Get the image pixel position for a building.
+ * This is the stored position calibrated to the map image.
+ *
+ * @param building - The building object
+ * @returns Pixel coordinates [x, y] on the map image
+ */
+export function getBuildingPosition(building: Building): [number, number] {
+  return building.position;
+}
+
+/**
+ * Get CRS.Simple coordinates for a building (for Leaflet marker placement).
+ * This is the PRIMARY function for placing building markers on the map.
+ *
+ * @param building - The building object
+ * @returns CRS.Simple coordinates { lat, lng }
+ */
+export function getBuildingCrsCoords(building: Building): { lat: number; lng: number } {
+  return pixelToCrsSimple(building.position[0], building.position[1]);
+}
+
+/**
+ * Get real GPS coordinates for a building (for external navigation).
+ * Prefers OSM GPS coordinates when available, falls back to approximate conversion.
+ * Use this when opening directions in Apple/Google Maps or ORS routing.
+ *
+ * @param building - The building object
+ * @returns GPS coordinates { lat, lng }
+ */
+export function getBuildingGps(building: Building): { lat: number; lng: number } {
+  if (building.location?.lat && building.location?.lng) {
+    return { lat: building.location.lat, lng: building.location.lng };
   }
-
-  // Map grid to pixels
-  // Approximate: columns span ~200px each, rows span ~110px each
-  // Grid starts around column C (3) at x~200 and goes to W (23) at x~4400
-  // Grid starts around row 5 at y~300 and goes to row 30 at y~3100
-
-  const x = Math.round(((col - 3) / 20) * 4200 + 200);
-  const y = Math.round(((row - 5) / 25) * 2800 + 300);
-
-  // Clamp to map bounds
-  return [Math.max(100, Math.min(4578, x)), Math.max(100, Math.min(3207, y))];
-};
+  // Fallback: approximate GPS from pixel position (less accurate)
+  return pixelToGps(building.position[0], building.position[1]);
+}
 
 export const buildings: Building[] = [
   // KEY SERVICE LOCATIONS
   {
     id: '18WW',
     name: "18 Wally's Walk (Central Hub)",
-    position: gridToPixel('N16'),
+    position: [2282, 1881], // Calculated from GPS -33.77551, 151.11259
     description:
       'Main student services building housing Service Connect, IT, HR, Financial Services, and administration offices.',
     tags: ['services', 'administration', 'study'],
@@ -79,13 +209,13 @@ export const buildings: Building[] = [
     gridRef: 'N16',
     address: "18 Wally's Walk",
     category: 'services',
-    location: { lat: -33.774021, lng: 151.11261, osmId: 205588336 },
+    location: { lat: -33.77551, lng: 151.11259, osmId: 205588336 },
     levels: 4,
   },
   {
     id: 'LIB',
     name: 'Waranara Library',
-    position: gridToPixel('Q17'),
+    position: [2345, 2388], // Calculated from GPS -33.77842, 151.11277 (GCP anchor)
     description:
       'Main campus library with extensive collections, study spaces, Library Cafe, and the Lachlan Macquarie Room.',
     tags: ['academic', 'study', 'resources'],
@@ -94,13 +224,13 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'academic',
-    location: { lat: -33.775705, lng: 151.113082, osmId: 141281549 },
+    location: { lat: -33.77842, lng: 151.11277, osmId: 141281549 },
     levels: 8,
   },
   {
     id: 'SEC',
     name: 'Security & Emergency',
-    position: gridToPixel('P2'),
+    position: [315, 2220], // Calibrated: north end of campus near Link Road
     description: 'Campus security headquarters and emergency first aid services. Available 24/7.',
     tags: ['services', 'safety', 'emergency'],
     translationKey: 'building_SEC_name',
@@ -114,7 +244,7 @@ export const buildings: Building[] = [
   {
     id: '25BWW',
     name: "25B Wally's Walk (Arts Faculty)",
-    position: gridToPixel('O13'),
+    position: [1762, 2039], // Calibrated: GPS-derived + offset, near 25WW
     description:
       'Faculty of Arts administration, Education, Social Sciences, Indigenous Studies, History, and the Gale History Museum.',
     tags: ['academic', 'arts', 'teaching'],
@@ -128,7 +258,7 @@ export const buildings: Building[] = [
   {
     id: '17WW',
     name: "17 Wally's Walk (Law & Media)",
-    position: gridToPixel('O19'),
+    position: [2511, 1916], // Calibrated: GPS-derived + offset, near 18WW
     description: 'Macquarie Law School, Media & Communication, Michael Kirby Law Building.',
     tags: ['academic', 'law', 'media'],
     translationKey: 'building_17WW_name',
@@ -144,7 +274,7 @@ export const buildings: Building[] = [
   {
     id: '4ER',
     name: '4 Eastern Road (Business School)',
-    position: gridToPixel('Q22'),
+    position: [3066, 2352], // Calculated from GPS using calibrated bounds (2026-01-10)
     description:
       'Macquarie Business School - Accounting, Finance, Management, Marketing, Actuarial Studies.',
     tags: ['academic', 'business', 'teaching'],
@@ -161,7 +291,7 @@ export const buildings: Building[] = [
   {
     id: '75TAL',
     name: '75 Talavera Road (Health Sciences)',
-    position: gridToPixel('M28'),
+    position: [4078, 1604], // Calibrated: GPS-derived + offset, far east
     description:
       'Faculty of Medicine, Health Sciences, Medical School, Australian Institute of Health Innovation, Chiropractic.',
     tags: ['academic', 'health', 'research'],
@@ -175,7 +305,7 @@ export const buildings: Building[] = [
   {
     id: '16UA',
     name: '16 University Avenue (Psychology)',
-    position: gridToPixel('T14'),
+    position: [1803, 2695], // Calibrated: GPS-derived + offset, south of 21WW
     description:
       'Psychology, Linguistics, Speech & Hearing Clinic, Reading Clinic, Centre for Emotional Health.',
     tags: ['academic', 'psychology', 'health'],
@@ -191,7 +321,7 @@ export const buildings: Building[] = [
   {
     id: '9WW',
     name: "9 Wally's Walk (Engineering)",
-    position: gridToPixel('O22'),
+    position: [3162, 1894], // Calibrated: near 12WW
     description: 'School of Engineering, Australian Astronomical Optics.',
     tags: ['academic', 'engineering', 'labs'],
     translationKey: 'building_9WW_name',
@@ -203,7 +333,7 @@ export const buildings: Building[] = [
   {
     id: '4RPD',
     name: '4 Research Park Drive (Computing)',
-    position: gridToPixel('O26'),
+    position: [3685, 1985], // Calibrated: GPS-derived + offset, east of campus
     description: 'School of Computing, Esc Cafe.',
     tags: ['academic', 'technology', 'labs'],
     translationKey: 'building_4RPD_name',
@@ -216,7 +346,7 @@ export const buildings: Building[] = [
   {
     id: '12WW',
     name: "12 Wally's Walk (Maths & Physics)",
-    position: gridToPixel('N20'),
+    position: [2882, 1884], // Calibrated: GPS-derived + offset, near 12MW
     description: 'School of Mathematical & Physical Sciences.',
     tags: ['academic', 'science', 'research'],
     translationKey: 'building_12WW_name',
@@ -229,7 +359,7 @@ export const buildings: Building[] = [
   {
     id: '6WW',
     name: "6 Wally's Walk (Natural Sciences)",
-    position: gridToPixel('M23'),
+    position: [3158, 1829], // Calibrated: GPS-derived + offset
     description: 'School of Natural Sciences, Biological Sciences, Herbarium.',
     tags: ['academic', 'science', 'research'],
     translationKey: 'building_6WW_name',
@@ -243,7 +373,7 @@ export const buildings: Building[] = [
   {
     id: '4WW',
     name: "4 Wally's Walk (Proteome)",
-    position: gridToPixel('M24'),
+    position: [3482, 1854], // Calibrated: GPS-derived + offset
     description: 'Australian Proteome Analysis Facility.',
     tags: ['academic', 'research', 'labs'],
     translationKey: 'building_4WW_name',
@@ -258,7 +388,7 @@ export const buildings: Building[] = [
   {
     id: 'LOTUS',
     name: 'Lotus Theatre',
-    position: gridToPixel('O11'),
+    position: [1677, 1994], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Major teaching and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_LOTUS_name',
@@ -271,7 +401,7 @@ export const buildings: Building[] = [
   {
     id: 'MQTH',
     name: 'Macquarie Theatre',
-    position: gridToPixel('O15'),
+    position: [2124, 1969], // Calibrated: GPS-derived + offset, same row as 21WW
     description: 'Large lecture theatre and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_MQTH_name',
@@ -284,7 +414,7 @@ export const buildings: Building[] = [
   {
     id: 'PRICE',
     name: 'Price Theatre',
-    position: gridToPixel('O14'),
+    position: [1964, 2011], // Calibrated: GPS-derived + offset, between LOTUS and MQTH
     description: 'Teaching theatre.',
     tags: ['venue', 'teaching'],
     translationKey: 'building_PRICE_name',
@@ -297,7 +427,7 @@ export const buildings: Building[] = [
   {
     id: 'LIGHT',
     name: 'Lighthouse Theatre',
-    position: gridToPixel('H14'),
+    position: [2002, 1157], // Calibrated: GPS-derived + offset, north of theatres
     description: 'Performance venue.',
     tags: ['venue', 'performance', 'arts'],
     translationKey: 'building_LIGHT_name',
@@ -310,7 +440,7 @@ export const buildings: Building[] = [
   {
     id: 'AINS',
     name: 'Ainsworth Building',
-    position: gridToPixel('N27'),
+    position: [3779, 1885], // Calibrated: GPS-derived + offset, near hospital area
     description: 'Teaching facility.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_AINS_name',
@@ -325,7 +455,7 @@ export const buildings: Building[] = [
   {
     id: 'HOSP',
     name: 'MQ University Hospital',
-    position: gridToPixel('L27'),
+    position: [3799, 1568], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Teaching hospital with specialist clinics, medical imaging, and pharmacy.',
     tags: ['health', 'medical', 'services'],
     translationKey: 'building_HOSP_name',
@@ -339,7 +469,7 @@ export const buildings: Building[] = [
   {
     id: 'CLINIC',
     name: 'GP & Physio Clinics',
-    position: gridToPixel('K26'),
+    position: [3776, 1471], // Calibrated: GPS-derived + offset, near hospital
     description: 'General practice and physiotherapy clinics, specialist consultations.',
     tags: ['health', 'medical', 'services'],
     translationKey: 'building_CLINIC_name',
@@ -353,7 +483,7 @@ export const buildings: Building[] = [
   {
     id: 'WOOL',
     name: 'Woolcock Institute',
-    position: gridToPixel('O30'),
+    position: [4279, 2129], // Calibrated: far east, south of hospital area
     description: 'Woolcock Institute of Medical Research.',
     tags: ['health', 'research'],
     translationKey: 'building_WOOL_name',
@@ -367,7 +497,7 @@ export const buildings: Building[] = [
   {
     id: 'SPORT',
     name: 'Sport & Aquatic Centre',
-    position: gridToPixel('J12'),
+    position: [1671, 1162], // Calculated from GPS using calibrated bounds (2026-01-10)
     description:
       'Gym, swimming pool, sports facilities, Crunch Cafe, Sporting Hall of Fame Museum.',
     tags: ['sports', 'recreation', 'fitness'],
@@ -382,7 +512,7 @@ export const buildings: Building[] = [
   {
     id: 'FIELDS',
     name: 'Sports Fields & Tennis',
-    position: gridToPixel('K16'),
+    position: [1696, 65], // Calibrated: between sport centre and theatres
     description: 'Outdoor sports fields and tennis centre.',
     tags: ['sports', 'recreation', 'outdoor'],
     translationKey: 'building_FIELDS_name',
@@ -396,7 +526,7 @@ export const buildings: Building[] = [
   {
     id: 'UBAR',
     name: 'UBar & Central Courtyard',
-    position: gridToPixel('K18'),
+    position: [2551, 1617], // Calculated from GPS -33.774, 151.11365
     description: 'Campus bar, social venue, graduation ceremonies area.',
     tags: ['food', 'social', 'events'],
     translationKey: 'building_UBAR_name',
@@ -404,12 +534,12 @@ export const buildings: Building[] = [
     gridRef: 'K18',
     address: '1 Central Courtyard',
     category: 'food',
-    location: { lat: -33.773263, lng: 151.113652, osmId: 914350786 },
+    location: { lat: -33.774, lng: 151.11365, osmId: 914350786 },
   },
   {
     id: 'CULT',
     name: 'Cult Eatery',
-    position: gridToPixel('O13'),
+    position: [2462, 1803], // Calibrated: same as 25BWW (in Arts precinct)
     description: 'Campus eatery in Arts precinct.',
     tags: ['food', 'cafe'],
     translationKey: 'building_CULT_name',
@@ -421,7 +551,7 @@ export const buildings: Building[] = [
   {
     id: 'LACH',
     name: "Lachlan's Restaurant",
-    position: gridToPixel('E23'),
+    position: [3173, 735], // Calibrated: GPS-derived + offset, north-east area
     description: 'Fine dining restaurant.',
     tags: ['food', 'restaurant'],
     translationKey: 'building_LACH_name',
@@ -436,7 +566,7 @@ export const buildings: Building[] = [
   {
     id: '8SCO',
     name: '8 Sir Christopher Ondaatje Ave',
-    position: gridToPixel('P20'),
+    position: [2823, 2260], // Calibrated: GPS-derived + offset, near 12MW
     description:
       'Future Students, MQ College, MQ Academy, Prayer Room, IELTS/PTE Test Centre, Access & Widening Participation.',
     tags: ['services', 'student', 'administration'],
@@ -451,7 +581,7 @@ export const buildings: Building[] = [
   {
     id: '16WW',
     name: "16 Wally's Walk (Research)",
-    position: gridToPixel('N18'),
+    position: [2465, 1881], // Calibrated: GPS-derived + offset, near 18WW
     description: 'Graduate Research Academy, Research Services, Commercialisation & Innovation.',
     tags: ['research', 'services'],
     translationKey: 'building_16WW_name',
@@ -464,7 +594,7 @@ export const buildings: Building[] = [
   {
     id: '12SW',
     name: '12 Second Way (Student Services)',
-    position: gridToPixel('P16'),
+    position: [2177, 2120], // Calibrated: GPS-derived + offset, near 14SW
     description: 'Student Wellbeing, Student Engagement, Graduation Unit.',
     tags: ['services', 'student', 'wellbeing'],
     translationKey: 'building_12SW_name',
@@ -477,7 +607,7 @@ export const buildings: Building[] = [
   {
     id: '19ER',
     name: '19 Eastern Road (Chancellery)',
-    position: gridToPixel('H20'),
+    position: [2942, 1203], // Calibrated: GPS-derived + offset, north of central
     description: 'Chancellery, Archives & Records, Art Gallery.',
     tags: ['administration', 'gallery', 'arts'],
     translationKey: 'building_19ER_name',
@@ -490,7 +620,7 @@ export const buildings: Building[] = [
   {
     id: 'OBS',
     name: 'Observatory',
-    position: gridToPixel('C12'),
+    position: [1755, 492], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Astronomy observatory.',
     tags: ['research', 'science', 'astronomy'],
     translationKey: 'building_OBS_name',
@@ -503,7 +633,7 @@ export const buildings: Building[] = [
   {
     id: 'INCUB',
     name: 'MQ Incubator',
-    position: gridToPixel('S8'),
+    position: [1185, 2537], // Calibrated: GPS-derived + offset, south-west
     description: 'Macquarie University Incubator for startups.',
     tags: ['services', 'business', 'innovation'],
     translationKey: 'building_INCUB_name',
@@ -516,7 +646,7 @@ export const buildings: Building[] = [
   {
     id: 'CHAP',
     name: 'Chaplaincy',
-    position: gridToPixel('R6'),
+    position: [975, 2580], // Calibrated: GPS-derived + offset, west of campus
     description: 'Multi-faith chaplaincy services.',
     tags: ['services', 'spiritual'],
     translationKey: 'building_CHAP_name',
@@ -530,7 +660,7 @@ export const buildings: Building[] = [
   {
     id: 'WALU',
     name: 'Walanga Muru',
-    position: gridToPixel('N11'),
+    position: [1551, 1879], // Calibrated: GPS-derived + offset, near 29WW
     description: 'Indigenous student support and cultural services.',
     tags: ['services', 'indigenous', 'culture'],
     translationKey: 'building_WALU_name',
@@ -545,7 +675,7 @@ export const buildings: Building[] = [
   {
     id: 'BANK',
     name: 'Banksia Cottage (Childcare)',
-    position: gridToPixel('P8'),
+    position: [1195, 2175], // Calibrated: GPS-derived + offset, west area
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_BANK_name',
@@ -558,7 +688,7 @@ export const buildings: Building[] = [
   {
     id: 'GUMNUT',
     name: 'Gumnut Cottage (Childcare)',
-    position: gridToPixel('V15'),
+    position: [2130, 3078], // Calibrated: east, near 16UA
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_GUMNUT_name',
@@ -570,7 +700,7 @@ export const buildings: Building[] = [
   {
     id: 'MIAMIA',
     name: 'Mia Mia (Childcare)',
-    position: gridToPixel('N11'),
+    position: [1553, 1893], // Calibrated: same as WALU (near 29WW)
     description: 'Campus childcare facility near Walanga Muru.',
     tags: ['services', 'childcare'],
     translationKey: 'building_MIAMIA_name',
@@ -582,7 +712,7 @@ export const buildings: Building[] = [
   {
     id: 'WARATAH',
     name: 'Waratah (Childcare)',
-    position: gridToPixel('W17'),
+    position: [2420, 3144], // Calibrated: far east, near university avenue
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_WARATAH_name',
@@ -596,7 +726,7 @@ export const buildings: Building[] = [
   {
     id: 'NEXTSENSE',
     name: 'NextSense Centre of Excellence',
-    position: gridToPixel('F9'),
+    position: [1320, 944], // Calibrated: north-west campus
     description: 'NextSense Centre of Excellence for hearing, vision, and sensory research.',
     tags: ['services', 'health', 'research'],
     translationKey: 'building_NEXTSENSE_name',
@@ -608,7 +738,7 @@ export const buildings: Building[] = [
   {
     id: 'NEXTSCHOOL',
     name: 'NextSense School',
-    position: gridToPixel('G7'),
+    position: [969, 992], // Calibrated: north-west, near MQ Village
     description: 'NextSense School for deaf and vision impaired students.',
     tags: ['services', 'education', 'accessibility'],
     translationKey: 'building_NEXTSCHOOL_name',
@@ -620,7 +750,7 @@ export const buildings: Building[] = [
   {
     id: 'METS',
     name: 'METS (Engineering Services)',
-    position: gridToPixel('K24'),
+    position: [3411, 1484], // Calibrated: GPS-derived + offset
     description: 'Macquarie Engineering Technical Services - workshop and technical support.',
     tags: ['services', 'engineering', 'workshop'],
     translationKey: 'building_METS_name',
@@ -635,7 +765,7 @@ export const buildings: Building[] = [
   {
     id: 'WALLYS',
     name: "Wally's Coffee and Toasties",
-    position: gridToPixel('N15'),
+    position: [2261, 1879], // Calculated from GPS -33.77551, 151.11259 (same as 18WW)
     description: 'Campus cafe in the Central Hub building.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_WALLYS_name',
@@ -647,7 +777,7 @@ export const buildings: Building[] = [
   {
     id: 'LIBCAFE',
     name: 'Library Cafe',
-    position: gridToPixel('Q17'),
+    position: [2450, 2394], // Calculated from GPS -33.77842, 151.11277 (inside Library)
     description: 'Cafe located in Waranara Library.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_LIBCAFE_name',
@@ -661,7 +791,7 @@ export const buildings: Building[] = [
   {
     id: 'DLC',
     name: 'Dunmore Lang College',
-    position: gridToPixel('W25'),
+    position: [3159, 3041], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Student residential college.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_DLC_name',
@@ -674,7 +804,7 @@ export const buildings: Building[] = [
   {
     id: 'RMC',
     name: 'Robert Menzies College',
-    position: gridToPixel('V26'),
+    position: [3359, 3044], // Calibrated: south of DLC
     description: 'Student residential college.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_RMC_name',
@@ -686,7 +816,7 @@ export const buildings: Building[] = [
   {
     id: 'MQV',
     name: 'MQ Village',
-    position: gridToPixel('F7'),
+    position: [1022, 779], // Calibrated: north-west corner of campus
     description: 'Student accommodation village.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_MQV_name',
@@ -700,7 +830,7 @@ export const buildings: Building[] = [
   {
     id: 'GALLERY',
     name: 'Art Gallery',
-    position: gridToPixel('H20'),
+    position: [2981, 2060], // Calibrated: same as 19ER (inside Chancellery)
     description: 'University art gallery and exhibitions.',
     tags: ['arts', 'gallery', 'culture'],
     translationKey: 'building_GALLERY_name',
@@ -712,7 +842,7 @@ export const buildings: Building[] = [
   {
     id: 'BIODISC',
     name: 'Biology Discovery Centre',
-    position: gridToPixel('L23'),
+    position: [3175, 1597], // Calibrated: near 6WW and METS
     description: 'Biology museum and discovery centre.',
     tags: ['science', 'museum', 'education'],
     translationKey: 'building_BIODISC_name',
@@ -726,7 +856,7 @@ export const buildings: Building[] = [
   {
     id: '11WW',
     name: "11 Wally's Walk",
-    position: gridToPixel('N22'),
+    position: [2938, 1897], // Calibrated: GPS-derived + offset
     description: 'Academic building on Wallys Walk.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_11WW_name',
@@ -740,7 +870,7 @@ export const buildings: Building[] = [
   {
     id: '13RPD',
     name: '13 Research Park Drive',
-    position: gridToPixel('M26'),
+    position: [3620, 1418], // Calibrated: GPS-derived + offset
     description: 'Research facility on Research Park Drive.',
     tags: ['research', 'academic'],
     translationKey: 'building_13RPD_name',
@@ -753,7 +883,7 @@ export const buildings: Building[] = [
   {
     id: '6ER',
     name: '6 Eastern Road',
-    position: gridToPixel('Q21'),
+    position: [3056, 2281], // Calibrated: GPS-derived + offset
     description: 'Academic building on Eastern Road.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_6ER_name',
@@ -767,7 +897,7 @@ export const buildings: Building[] = [
   {
     id: '1CC',
     name: '1 Central Courtyard',
-    position: gridToPixel('K19'),
+    position: [2528, 1618], // Calculated from GPS -33.774, 151.11365 (same as UBAR)
     description: 'Central Courtyard building and student hub.',
     tags: ['services', 'student'],
     translationKey: 'building_1CC_name',
@@ -775,25 +905,13 @@ export const buildings: Building[] = [
     gridRef: 'K19',
     address: '1 Central Courtyard',
     category: 'services',
-    location: { lat: -33.773263, lng: 151.113652, osmId: 914350786 },
+    location: { lat: -33.774, lng: 151.11365, osmId: 914350786 },
   },
-  {
-    id: 'MERCURE',
-    name: 'Mercure Sydney Macquarie Park',
-    position: gridToPixel('L25'),
-    description: 'Hotel adjacent to campus.',
-    tags: ['accommodation', 'hotel'],
-    translationKey: 'building_MERCURE_name',
-    descriptionKey: 'building_MERCURE_desc',
-    gridRef: 'L25',
-    address: 'Research Park Drive',
-    category: 'other',
-    location: { lat: -33.772395, lng: 151.11687, osmId: 459015422 },
-  },
+
   {
     id: '13ARPD',
     name: '13A Research Park Drive',
-    position: gridToPixel('M26'),
+    position: [3456, 1388], // Calibrated: GPS-derived + offset, near 13RPD
     description: 'Research facility on Research Park Drive.',
     tags: ['research', 'academic'],
     translationKey: 'building_13ARPD_name',
@@ -806,7 +924,7 @@ export const buildings: Building[] = [
   {
     id: 'COCHLEAR',
     name: 'Cochlear Limited',
-    position: gridToPixel('U16'),
+    position: [2591, 2855], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Cochlear headquarters and research facility.',
     tags: ['research', 'commercial', 'health'],
     translationKey: 'building_COCHLEAR_name',
@@ -819,7 +937,7 @@ export const buildings: Building[] = [
   {
     id: '10SCO',
     name: '10 Sir Christopher Ondaatje Ave',
-    position: gridToPixel('P21'),
+    position: [2816, 2008], // Calibrated: GPS-derived + offset
     description: 'Academic building.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_10SCO_name',
@@ -832,7 +950,7 @@ export const buildings: Building[] = [
   {
     id: '14ER',
     name: '14 Eastern Road',
-    position: gridToPixel('P22'),
+    position: [3058, 1743], // Calibrated: GPS-derived + offset
     description: 'Academic building on Eastern Road. Faculty of Science.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_14ER_name',
@@ -845,7 +963,7 @@ export const buildings: Building[] = [
   {
     id: '6SR',
     name: '6 Science Road',
-    position: gridToPixel('M23'),
+    position: [3229, 1582], // Calibrated: GPS-derived + offset
     description: 'Science building on Science Road.',
     tags: ['academic', 'science', 'labs'],
     translationKey: 'building_6SR_name',
@@ -859,7 +977,7 @@ export const buildings: Building[] = [
   {
     id: '14FW',
     name: '14 First Walk (MUSEC)',
-    position: gridToPixel('O10'),
+    position: [1423, 2130], // Calibrated: GPS-derived + offset
     description: 'Macquarie University Special Education Centre - education programs for children.',
     tags: ['academic', 'education', 'services'],
     translationKey: 'building_14FW_name',
@@ -872,7 +990,7 @@ export const buildings: Building[] = [
   {
     id: '14SCO',
     name: '14 Sir Christopher Ondaatje Ave',
-    position: gridToPixel('N20'),
+    position: [2767, 1800], // Calibrated: GPS-derived + offset
     description: 'Academic building with teaching spaces and exam halls. Faculty of Sciences.',
     tags: ['academic', 'teaching', 'exams'],
     translationKey: 'building_14SCO_name',
@@ -886,7 +1004,7 @@ export const buildings: Building[] = [
   {
     id: '4WR',
     name: '4 Western Road',
-    position: gridToPixel('P14'),
+    position: [1894, 2103], // Calibrated: near theatres area
     description: 'Academic building with teaching and examination rooms.',
     tags: ['academic', 'teaching', 'exams'],
     translationKey: 'building_4WR_name',
@@ -899,7 +1017,7 @@ export const buildings: Building[] = [
   {
     id: 'EAST3',
     name: 'East 3 Car Park',
-    position: [2836, 2466],
+    position: [3526, 2249],
     description: 'Multi-storey car park.',
     tags: ['other', 'parking'],
     translationKey: 'building_EAST3_name',
@@ -911,7 +1029,7 @@ export const buildings: Building[] = [
   {
     id: 'EAST2',
     name: 'East 2 Car Park',
-    position: [2492, 2505],
+    position: [3518, 2035],
     description: 'Multi-storey car park.',
     tags: ['other', 'parking'],
     translationKey: 'building_EAST2_name',
@@ -923,7 +1041,7 @@ export const buildings: Building[] = [
   {
     id: '75TR',
     name: '75 Talavera Road',
-    position: [2119, 2870],
+    position: [4065, 1617],
     description: 'Commercial building in the Macquarie Park precinct.',
     tags: ['commercial', 'office'],
     translationKey: 'building_75TR_name',
@@ -935,7 +1053,7 @@ export const buildings: Building[] = [
   {
     id: '3SR',
     name: '3 Science Road',
-    position: [1925, 2423],
+    position: [3411, 1538],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3SR_name',
@@ -947,7 +1065,7 @@ export const buildings: Building[] = [
   {
     id: '6FW',
     name: '6 First Walk',
-    position: [3099, 1406],
+    position: [2148, 2260],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6FW_name',
@@ -960,7 +1078,7 @@ export const buildings: Building[] = [
   {
     id: '17MW',
     name: '17 Macquarie Walk',
-    position: [3335, 1667],
+    position: [2402, 2503],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_17MW_name',
@@ -972,7 +1090,7 @@ export const buildings: Building[] = [
   {
     id: '1MD',
     name: '1 Management Drive',
-    position: [1307, 2298],
+    position: [3177, 940],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1MD_name',
@@ -984,7 +1102,7 @@ export const buildings: Building[] = [
   {
     id: '3MD',
     name: '3 Management Drive',
-    position: [1450, 2214],
+    position: [3111, 983],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3MD_name',
@@ -996,7 +1114,7 @@ export const buildings: Building[] = [
   {
     id: '5MD',
     name: '5 Management Drive',
-    position: [1418, 2431],
+    position: [3349, 1057],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_5MD_name',
@@ -1008,7 +1126,7 @@ export const buildings: Building[] = [
   {
     id: '1EXR',
     name: '1 Executive Road',
-    position: [1108, 2259],
+    position: [3190, 772],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1EXR_name',
@@ -1020,7 +1138,7 @@ export const buildings: Building[] = [
   {
     id: '2FW',
     name: '2 First Walk',
-    position: [2969, 1709],
+    position: [2411, 2222],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2FW_name',
@@ -1033,7 +1151,7 @@ export const buildings: Building[] = [
   {
     id: '4FW',
     name: '4 First Walk',
-    position: [3025, 1590],
+    position: [2227, 2264],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_4FW_name',
@@ -1046,7 +1164,7 @@ export const buildings: Building[] = [
   {
     id: '2LR',
     name: '2 Link Road',
-    position: [3400, 42],
+    position: [241, 2064],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2LR_name',
@@ -1058,7 +1176,7 @@ export const buildings: Building[] = [
   {
     id: '6LR',
     name: '6 Link Road',
-    position: [3363, 151],
+    position: [377, 2131],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6LR_name',
@@ -1070,7 +1188,7 @@ export const buildings: Building[] = [
   {
     id: '4LR',
     name: '4 Link Road',
-    position: [3485, 83],
+    position: [333, 2201],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_4LR_name',
@@ -1082,7 +1200,7 @@ export const buildings: Building[] = [
   {
     id: 'DESTINATIO',
     name: 'Destination Orana',
-    position: [1810, 3099],
+    position: [4406, 1703],
     description: 'Student accommodation.',
     tags: ['residential'],
     translationKey: 'building_DESTINATIO_name',
@@ -1095,7 +1213,7 @@ export const buildings: Building[] = [
   {
     id: '3IR',
     name: '3 Innovation Road',
-    position: [2540, 2881],
+    position: [4137, 2106],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3IR_name',
@@ -1107,7 +1225,7 @@ export const buildings: Building[] = [
   {
     id: '1IR',
     name: '1 Innovation Road',
-    position: [2634, 2996],
+    position: [4240, 2182],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1IR_name',
@@ -1119,7 +1237,7 @@ export const buildings: Building[] = [
   {
     id: '15RPD',
     name: '15 Research Park Drive',
-    position: [1742, 2472],
+    position: [3569, 1343],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_15RPD_name',
@@ -1131,7 +1249,7 @@ export const buildings: Building[] = [
   {
     id: 'RONREILLYP',
     name: 'Ron Reilly Pavilion',
-    position: [1, 2016],
+    position: [1687, 76],
     description: 'Sports pavilion.',
     tags: ['sports'],
     translationKey: 'building_RONREILLYP_name',
@@ -1140,130 +1258,11 @@ export const buildings: Building[] = [
     category: 'sports',
     location: { lat: -33.766262, lng: 151.114914, osmId: 791253931 },
   },
-  {
-    id: 'M2OPERATIO',
-    name: 'M2 Operations Centre',
-    position: [199, 2350],
-    description: 'Operations Centre for M2 Motorway.',
-    tags: ['other'],
-    translationKey: 'building_M2OPERATIO_name',
-    descriptionKey: 'building_M2OPERATIO_desc',
 
-    category: 'other',
-    location: { lat: -33.768879, lng: 151.11636, osmId: 791276982 },
-  },
-  {
-    id: 'ADELAIDE',
-    name: 'Adelaide',
-    position: [4813, 1526],
-    description: 'Student accommodation.',
-    tags: ['residential'],
-    translationKey: 'building_ADELAIDE_name',
-    descriptionKey: 'building_ADELAIDE_desc',
-
-    category: 'residential',
-    location: { lat: -33.779828, lng: 151.112484, osmId: 967523408 },
-  },
-  {
-    id: 'DARWIN',
-    name: 'Darwin',
-    position: [4893, 1618],
-    description: 'Student accommodation.',
-    tags: ['residential'],
-    translationKey: 'building_DARWIN_name',
-    descriptionKey: 'building_DARWIN_desc',
-
-    category: 'residential',
-    location: { lat: -33.780107, lng: 151.112889, osmId: 967523409 },
-  },
-  {
-    id: 'PERTH',
-    name: 'Perth',
-    position: [4949, 1453],
-    description: 'Student accommodation.',
-    tags: ['residential'],
-    translationKey: 'building_PERTH_name',
-    descriptionKey: 'building_PERTH_desc',
-
-    category: 'residential',
-    location: { lat: -33.780108, lng: 151.112151, osmId: 967523414 },
-  },
-  {
-    id: 'BLOCKA',
-    name: 'Block A (Herring Road)',
-    position: [4931, 1937],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKA_name',
-    descriptionKey: 'building_BLOCKA_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.780472, lng: 151.114311, osmId: 967530686 },
-  },
-  {
-    id: 'BLOCKB',
-    name: 'Block B (Herring Road)',
-    position: [4873, 1904],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKB_name',
-    descriptionKey: 'building_BLOCKB_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.780298, lng: 151.114168, osmId: 967533739 },
-  },
-  {
-    id: 'BLOCKC',
-    name: 'Block C (Herring Road)',
-    position: [4814, 1873],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKC_name',
-    descriptionKey: 'building_BLOCKC_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.780121, lng: 151.114029, osmId: 967533740 },
-  },
-  {
-    id: 'BLOCKD',
-    name: 'Block D (Herring Road)',
-    position: [4774, 1832],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKD_name',
-    descriptionKey: 'building_BLOCKD_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.779986, lng: 151.113847, osmId: 967533741 },
-  },
-  {
-    id: 'BLOCKE',
-    name: 'Block E (Herring Road)',
-    position: [4737, 1790],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKE_name',
-    descriptionKey: 'building_BLOCKE_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.779857, lng: 151.113663, osmId: 967533742 },
-  },
-  {
-    id: 'BLOCKF',
-    name: 'Block F (Herring Road)',
-    position: [4824, 1769],
-    description: 'Residential block.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKF_name',
-    descriptionKey: 'building_BLOCKF_desc',
-    address: '116-118 Herring Road Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.780059, lng: 151.113567, osmId: 967533743 },
-  },
   {
     id: 'VILLAS',
     name: 'The Villas',
-    position: [4660, 1616],
+    position: [1014, 807],
     description: 'Residential villas.',
     tags: ['residential'],
     translationKey: 'building_VILLAS_name',
@@ -1272,34 +1271,11 @@ export const buildings: Building[] = [
     category: 'residential',
     location: { lat: -33.779518, lng: 151.11289, osmId: 967533744 },
   },
-  {
-    id: 'HOLIDAYINN',
-    name: 'Holiday Inn Express',
-    position: [4660, 3219],
-    description: 'Holiday Inn Express Sydney Macquarie Park.',
-    tags: ['other', 'hotel'],
-    translationKey: 'building_HOLIDAYINN_name',
-    descriptionKey: 'building_HOLIDAYINN_desc',
 
-    category: 'other',
-    location: { lat: -33.780869, lng: 151.120041, osmId: 1108110442 },
-  },
-  {
-    id: 'MACRESIDEN',
-    name: 'Mac Residences',
-    position: [4920, 2164],
-    description: 'Residential building.',
-    tags: ['residential'],
-    translationKey: 'building_MACRESIDEN_name',
-    descriptionKey: 'building_MACRESIDEN_desc',
-
-    category: 'residential',
-    location: { lat: -33.780634, lng: 151.115322, osmId: 1161574505 },
-  },
   {
     id: '6MD',
     name: '6 Management Drive',
-    position: [1503, 2297],
+    position: [3238, 1083],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6MD_name',
@@ -1311,7 +1287,7 @@ export const buildings: Building[] = [
   {
     id: '7MD',
     name: '7 Management Drive',
-    position: [1584, 2211],
+    position: [3128, 1083],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_7MD_name',
@@ -1323,7 +1299,7 @@ export const buildings: Building[] = [
   {
     id: '12MW',
     name: '12 Macquarie Walk',
-    position: [2846, 1875],
+    position: [2681, 2424],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_12MW_name',
@@ -1335,7 +1311,7 @@ export const buildings: Building[] = [
   {
     id: '18ER',
     name: '18 Eastern Road',
-    position: [1824, 2221],
+    position: [3080, 1345],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_18ER_name',
@@ -1347,7 +1323,7 @@ export const buildings: Building[] = [
   {
     id: '2WW',
     name: "2 Wally's Walk",
-    position: [2216, 2560],
+    position: [3582, 1847],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2WW_name',
@@ -1356,22 +1332,11 @@ export const buildings: Building[] = [
     category: 'academic',
     location: { lat: -33.774145, lng: 151.117209, osmId: 1303624872 },
   },
-  {
-    id: 'REDDYEXPRE',
-    name: 'Reddy Express',
-    position: [3483, 1],
-    description: 'Convenience store.',
-    tags: ['food', 'retail'],
-    translationKey: 'building_REDDYEXPRE_name',
-    descriptionKey: 'building_REDDYEXPRE_desc',
-
-    category: 'food',
-    location: { lat: -33.775123, lng: 151.105399, osmId: 1444070791 },
-  }, // --- ADDITIONAL BUILDINGS (Full Scan) ---
+  // --- ADDITIONAL BUILDINGS (Full Scan) ---
   {
     id: '23WW',
     name: '23WW',
-    position: [2982, 1358],
+    position: [1993, 1881],
     description: '23WW building.',
     tags: ['academic'],
     translationKey: 'building_23WW_name',
@@ -1383,7 +1348,7 @@ export const buildings: Building[] = [
   {
     id: 'SIEMENS',
     name: 'Siemens',
-    position: [2258, 3173],
+    position: [4303, 2013],
     description: 'Siemens building.',
     tags: ['commercial', 'office'],
     translationKey: 'building_SIEMENS_name',
@@ -1392,46 +1357,11 @@ export const buildings: Building[] = [
     location: { lat: -33.774767, lng: 151.11994, osmId: 6784971 },
     levels: 1,
   },
-  {
-    id: '82WATERLOO',
-    name: '82 Waterloo Road',
-    position: [4246, 3222],
-    description: '82 Waterloo Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_82WATERLOO_name',
-    descriptionKey: 'building_82WATERLOO_desc',
-    category: 'residential',
-    location: { lat: -33.779827, lng: 151.120073, osmId: 23716745 },
-    levels: 1,
-  },
-  {
-    id: '93WATERLOO',
-    name: '93 Waterloo Road',
-    position: [4001, 3663],
-    description: '93 Waterloo Road commercial office building.',
-    tags: ['commercial', 'office'],
-    translationKey: 'building_93WATERLOO_name',
-    descriptionKey: 'building_93WATERLOO_desc',
-    category: 'other',
-    location: { lat: -33.77958, lng: 151.122053, osmId: 23716748 },
-    levels: 1,
-  },
-  {
-    id: 'THERANCH',
-    name: 'The Ranch',
-    position: [5495, 1550],
-    description: 'The Ranch restaurant.',
-    tags: ['food'],
-    translationKey: 'building_THERANCH_name',
-    descriptionKey: 'building_THERANCH_desc',
-    category: 'food',
-    location: { lat: -33.781568, lng: 151.112559, osmId: 75739210 },
-    levels: 1,
-  },
+
   {
     id: '10HA',
     name: '10 Hadenfeld Avenue (Chaplaincy)',
-    position: [3645, 518],
+    position: [963, 2565],
     description: 'Multi-faith chaplaincy and spiritual services building.',
     tags: ['services', 'spiritual', 'chaplaincy'],
     translationKey: 'building_10HA_name',
@@ -1443,19 +1373,19 @@ export const buildings: Building[] = [
   {
     id: '16MW',
     name: '16 Macquarie Walk (Waranara Library)',
-    position: [3133, 1670],
+    position: [2397, 2389], // Calculated from GPS -33.77842, 151.11277 (same as LIB)
     description: 'Main campus library with study spaces, Library Cafe, and extensive collections.',
     tags: ['academic', 'study', 'library', 'resources'],
     translationKey: 'building_16MW_name',
     descriptionKey: 'building_16MW_desc',
     category: 'academic',
-    location: { lat: -33.77571, lng: 151.1132, osmId: 141281549 },
+    location: { lat: -33.77842, lng: 151.11277, osmId: 141281549 },
     levels: 8,
   },
   {
     id: 'LAKESIDEHO',
     name: 'Lakeside Hotel & Conference Centre',
-    position: [1191, 2285],
+    position: [3199, 719],
     description: 'Lakeside Hotel & Conference Centre.',
     tags: ['accommodation', 'hotel', 'venue'],
     translationKey: 'building_LAKESIDEHO_name',
@@ -1467,7 +1397,7 @@ export const buildings: Building[] = [
   {
     id: '8LR',
     name: '8LR (Banksia Cottage)',
-    position: [3237, 732],
+    position: [1261, 2193],
     description: 'Banksia Cottage campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_8LR_name',
@@ -1479,7 +1409,7 @@ export const buildings: Building[] = [
   {
     id: 'MACQUARIEC',
     name: 'Macquarie Centre',
-    position: [3094, 3630],
+    position: [4204, 2607],
     description: 'Macquarie Centre shopping mall with food court, retail stores, and cinema.',
     tags: ['food', 'retail', 'shopping'],
     translationKey: 'building_MACQUARIEC_name',
@@ -1491,7 +1421,7 @@ export const buildings: Building[] = [
   {
     id: '11GR',
     name: '11GR (Lighthouse Theatre)',
-    position: [1847, 1371],
+    position: [2026, 1149],
     description: 'Performance venue and theatre.',
     tags: ['venue', 'performance', 'arts'],
     translationKey: 'building_11GR_name',
@@ -1503,7 +1433,7 @@ export const buildings: Building[] = [
   {
     id: '10GR',
     name: '10GR (Macquarie University Sport and Aquatic Centre)',
-    position: [2132, 1111],
+    position: [1697, 1188],
     description: '10GR building.',
     tags: ['sports'],
     translationKey: 'building_10GR_name',
@@ -1515,7 +1445,7 @@ export const buildings: Building[] = [
   {
     id: 'DUNMORELAN',
     name: 'Dunmore Lang College - Postgraduate Apartments',
-    position: [4447, 2350],
+    position: [3395, 3045],
     description: 'Dunmore Lang College apartments.',
     tags: ['residential'],
     translationKey: 'building_DUNMORELAN_name',
@@ -1524,46 +1454,11 @@ export const buildings: Building[] = [
     location: { lat: -33.779599, lng: 151.116174, osmId: 205588642 },
     levels: 1,
   },
-  {
-    id: 'FUJITSUAUS',
-    name: 'Fujitsu Australia Limited',
-    position: [1707, 2981],
-    description: 'Fujitsu Australia Limited office.',
-    tags: ['commercial', 'office'],
-    translationKey: 'building_FUJITSUAUS_name',
-    descriptionKey: 'building_FUJITSUAUS_desc',
-    category: 'other',
-    location: { lat: -33.773217, lng: 151.11911, osmId: 412583875 },
-    levels: 1,
-  },
-  {
-    id: '8492TALAVE',
-    name: '84-92 Talavera Road',
-    position: [2360, 3624],
-    description: '84-92 Talavera Road commercial office building.',
-    tags: ['commercial', 'office'],
-    translationKey: 'building_8492TALAVE_name',
-    descriptionKey: 'building_8492TALAVE_desc',
-    category: 'other',
-    location: { lat: -33.775407, lng: 151.12195, osmId: 420147599 },
-    levels: 1,
-  },
-  {
-    id: '94110TALAV',
-    name: '94-110 Talavera Road',
-    position: [2293, 3559],
-    description: '94-110 Talavera Road commercial office building.',
-    tags: ['commercial', 'office'],
-    translationKey: 'building_94110TALAV_name',
-    descriptionKey: 'building_94110TALAV_desc',
-    category: 'other',
-    location: { lat: -33.775182, lng: 151.121663, osmId: 420147600 },
-    levels: 1,
-  },
+
   {
     id: '29WW',
     name: '29WW',
-    position: [2838, 1027],
+    position: [1576, 1880],
     description: '29WW building.',
     tags: ['academic'],
     translationKey: 'building_29WW_name',
@@ -1575,7 +1470,7 @@ export const buildings: Building[] = [
   {
     id: '27WW',
     name: '27WW (Lotus Theatre)',
-    position: [2887, 1092],
+    position: [1638, 1921],
     description: 'Major teaching and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_27WW_name',
@@ -1587,7 +1482,7 @@ export const buildings: Building[] = [
   {
     id: '25WW',
     name: '25WW',
-    position: [2957, 1184],
+    position: [1802, 1881],
     description: '25WW building.',
     tags: ['academic'],
     translationKey: 'building_25WW_name',
@@ -1599,7 +1494,7 @@ export const buildings: Building[] = [
   {
     id: '21WW',
     name: '21WW (Macquarie Theatre)',
-    position: [2773, 1474],
+    position: [2078, 1950],
     description: 'Large lecture theatre and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_21WW_name',
@@ -1611,7 +1506,7 @@ export const buildings: Building[] = [
   {
     id: '14SW',
     name: '14SW',
-    position: [2849, 1551],
+    position: [2212, 2069],
     description: '14SW building.',
     tags: ['academic'],
     translationKey: 'building_14SW_name',
@@ -1620,22 +1515,11 @@ export const buildings: Building[] = [
     location: { lat: -33.774892, lng: 151.112682, osmId: 458998305 },
     levels: 1,
   },
-  {
-    id: 'MERCURESYD',
-    name: 'Mercure Sydney Macquarie',
-    position: [1572, 2491],
-    description: 'Mercure Sydney Macquarie.',
-    tags: ['accommodation', 'hotel'],
-    translationKey: 'building_MERCURESYD_name',
-    descriptionKey: 'building_MERCURESYD_desc',
-    category: 'other',
-    location: { lat: -33.772462, lng: 151.116932, osmId: 459015422 },
-    levels: 1,
-  },
+
   {
     id: '2TP',
     name: '2 Technology Place',
-    position: [1723, 2663],
+    position: [3776, 1505],
     description: '2 Technology Place - health and medical facilities.',
     tags: ['health', 'medical'],
     translationKey: 'building_2TP_name',
@@ -1647,7 +1531,7 @@ export const buildings: Building[] = [
   {
     id: 'MACQUARIEU',
     name: 'Macquarie University Hospital',
-    position: [1993, 2744],
+    position: [3832, 1669],
     description: 'Macquarie University Hospital.',
     tags: ['health', 'medical', 'hospital'],
     translationKey: 'building_MACQUARIEU_name',
@@ -1659,7 +1543,7 @@ export const buildings: Building[] = [
   {
     id: 'STUDENTACC',
     name: 'Student Accommodation',
-    position: [2161, 1552],
+    position: [2274, 1585],
     description: 'Student Accommodation.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_STUDENTACC_name',
@@ -1668,250 +1552,11 @@ export const buildings: Building[] = [
     location: { lat: -33.773156, lng: 151.112713, osmId: 914350787 },
     levels: 1,
   },
-  {
-    id: 'HOBART',
-    name: 'Hobart',
-    position: [5009, 1733],
-    description: 'Hobart apartments.',
-    tags: ['residential'],
-    translationKey: 'building_HOBART_name',
-    descriptionKey: 'building_HOBART_desc',
-    category: 'residential',
-    location: { lat: -33.780496, lng: 151.113395, osmId: 967523410 },
-    levels: 1,
-  },
-  {
-    id: 'MELBOURNE',
-    name: 'Melbourne',
-    position: [5088, 1834],
-    description: 'Melbourne apartments.',
-    tags: ['residential'],
-    translationKey: 'building_MELBOURNE_name',
-    descriptionKey: 'building_MELBOURNE_desc',
-    category: 'residential',
-    location: { lat: -33.780779, lng: 151.113843, osmId: 967523411 },
-    levels: 1,
-  },
-  {
-    id: 'SYDNEY',
-    name: 'Sydney',
-    position: [5177, 1703],
-    description: 'Sydney apartments.',
-    tags: ['residential'],
-    translationKey: 'building_SYDNEY_name',
-    descriptionKey: 'building_SYDNEY_desc',
-    category: 'residential',
-    location: { lat: -33.780895, lng: 151.113255, osmId: 967523412 },
-    levels: 1,
-  },
-  {
-    id: 'BRISBANE',
-    name: 'Brisbane',
-    position: [5070, 1580],
-    description: 'Brisbane apartments.',
-    tags: ['residential'],
-    translationKey: 'building_BRISBANE_name',
-    descriptionKey: 'building_BRISBANE_desc',
-    category: 'residential',
-    location: { lat: -33.780522, lng: 151.112713, osmId: 967523413 },
-    levels: 1,
-  },
-  {
-    id: '1SAUNDERSC',
-    name: '1 Saunders Close',
-    position: [4417, 2133],
-    description: '1 Saunders Close apartments.',
-    tags: ['residential'],
-    translationKey: 'building_1SAUNDERSC_name',
-    descriptionKey: 'building_1SAUNDERSC_desc',
-    category: 'residential',
-    location: { lat: -33.779339, lng: 151.115209, osmId: 967530681 },
-    levels: 1,
-  },
-  {
-    id: '2SAUNDERSC',
-    name: '2 Saunders Close',
-    position: [4249, 2263],
-    description: '2 Saunders Close apartments.',
-    tags: ['residential'],
-    translationKey: 'building_2SAUNDERSC_name',
-    descriptionKey: 'building_2SAUNDERSC_desc',
-    category: 'residential',
-    location: { lat: -33.779025, lng: 151.115796, osmId: 967530682 },
-    levels: 1,
-  },
-  {
-    id: '4SAUNDERSC',
-    name: '4 Saunders Close',
-    position: [4191, 2165],
-    description: '4 Saunders Close apartments.',
-    tags: ['residential'],
-    translationKey: 'building_4SAUNDERSC_name',
-    descriptionKey: 'building_4SAUNDERSC_desc',
-    category: 'residential',
-    location: { lat: -33.778795, lng: 151.11536, osmId: 967530683 },
-    levels: 1,
-  },
-  {
-    id: '6SAUNDERSC',
-    name: '6 Saunders Close',
-    position: [4082, 2061],
-    description: '6 Saunders Close apartments.',
-    tags: ['residential'],
-    translationKey: 'building_6SAUNDERSC_name',
-    descriptionKey: 'building_6SAUNDERSC_desc',
-    category: 'residential',
-    location: { lat: -33.778433, lng: 151.1149, osmId: 967530684 },
-    levels: 1,
-  },
-  {
-    id: '8SAUNDERSC',
-    name: '8 Saunders Close',
-    position: [3995, 1959],
-    description: '8 Saunders Close apartments.',
-    tags: ['residential'],
-    translationKey: 'building_8SAUNDERSC_name',
-    descriptionKey: 'building_8SAUNDERSC_desc',
-    category: 'residential',
-    location: { lat: -33.778128, lng: 151.114451, osmId: 967530685 },
-    levels: 1,
-  },
-  {
-    id: '120HERRING',
-    name: '120 Herring Road',
-    position: [4702, 1971],
-    description: '120 Herring Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_120HERRING_name',
-    descriptionKey: 'building_120HERRING_desc',
-    category: 'residential',
-    location: { lat: -33.779922, lng: 151.11447, osmId: 968737345 },
-    levels: 1,
-  },
-  {
-    id: '155HERRING',
-    name: '155 Herring Road',
-    position: [4694, 2235],
-    description: '155 Herring Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_155HERRING_name',
-    descriptionKey: 'building_155HERRING_desc',
-    category: 'residential',
-    location: { lat: -33.780123, lng: 151.115651, osmId: 982138146 },
-    levels: 1,
-  },
-  {
-    id: '1PEACHTREE',
-    name: '1 Peach Tree Road',
-    position: [4894, 2405],
-    description: '1 Peach Tree Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_1PEACHTREE_name',
-    descriptionKey: 'building_1PEACHTREE_desc',
-    category: 'residential',
-    location: { lat: -33.780772, lng: 151.116402, osmId: 982138154 },
-    levels: 1,
-  },
-  {
-    id: '3PEACHTREE',
-    name: '3 Peach Tree Road',
-    position: [4949, 2469],
-    description: '3 Peach Tree Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_3PEACHTREE_name',
-    descriptionKey: 'building_3PEACHTREE_desc',
-    category: 'residential',
-    location: { lat: -33.780964, lng: 151.116685, osmId: 982138158 },
-    levels: 1,
-  },
-  {
-    id: '5PEACHTREE',
-    name: '5 Peach Tree Road',
-    position: [5013, 2537],
-    description: '5 Peach Tree Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_5PEACHTREE_name',
-    descriptionKey: 'building_5PEACHTREE_desc',
-    category: 'residential',
-    location: { lat: -33.781183, lng: 151.116982, osmId: 982138159 },
-    levels: 1,
-  },
-  {
-    id: '7PEACHTREE',
-    name: '7 Peach Tree Road',
-    position: [5079, 2602],
-    description: '7 Peach Tree Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_7PEACHTREE_name',
-    descriptionKey: 'building_7PEACHTREE_desc',
-    category: 'residential',
-    location: { lat: -33.781406, lng: 151.117272, osmId: 982138160 },
-    levels: 1,
-  },
-  {
-    id: '210COTTONW',
-    name: '2-10 Cottonwood Crescent',
-    position: [4435, 2867],
-    description: '2-10 Cottonwood Crescent apartments.',
-    tags: ['residential'],
-    translationKey: 'building_210COTTONW_name',
-    descriptionKey: 'building_210COTTONW_desc',
-    category: 'residential',
-    location: { lat: -33.780003, lng: 151.11848, osmId: 982143456 },
-    levels: 1,
-  },
-  {
-    id: '13LACHLANA',
-    name: '1-3 Lachlan Avenue',
-    position: [4778, 2302],
-    description: '1-3 Lachlan Avenue residential apartments.',
-    tags: ['residential'],
-    translationKey: 'building_13LACHLANA_name',
-    descriptionKey: 'building_13LACHLANA_desc',
-    category: 'residential',
-    location: { lat: -33.780393, lng: 151.115944, osmId: 982143458 },
-    levels: 1,
-  },
-  {
-    id: '9PEACHTREE',
-    name: '9 Peach Tree Road',
-    position: [5136, 2692],
-    description: '9 Peach Tree Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_9PEACHTREE_name',
-    descriptionKey: 'building_9PEACHTREE_desc',
-    category: 'residential',
-    location: { lat: -33.781624, lng: 151.117671, osmId: 982143459 },
-    levels: 1,
-  },
-  {
-    id: '157HERRING',
-    name: '157 Herring Road',
-    position: [4572, 2296],
-    description: '157 Herring Road apartments.',
-    tags: ['residential'],
-    translationKey: 'building_157HERRING_name',
-    descriptionKey: 'building_157HERRING_desc',
-    category: 'residential',
-    location: { lat: -33.779869, lng: 151.11593, osmId: 984576836 },
-    levels: 1,
-  },
-  {
-    id: 'DANMURPHYS',
-    name: "Dan Murphy's",
-    position: [5366, 1385],
-    description: "Dan Murphy's liquor store.",
-    tags: ['food'],
-    translationKey: 'building_DANMURPHYS_name',
-    descriptionKey: 'building_DANMURPHYS_desc',
-    category: 'food',
-    location: { lat: -33.781102, lng: 151.111828, osmId: 991365824 },
-    levels: 1,
-  },
+
   {
     id: '205A',
     name: '205A Culloden Road',
-    position: [667, 1324],
+    position: [1736, 79],
     description: '205A Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205A_name',
@@ -1923,7 +1568,7 @@ export const buildings: Building[] = [
   {
     id: '205B',
     name: '205B Culloden Road',
-    position: [814, 1294],
+    position: [1730, 99],
     description: '205B Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205B_name',
@@ -1935,7 +1580,7 @@ export const buildings: Building[] = [
   {
     id: '8HA',
     name: '8HA (Incubator)',
-    position: [3616, 747],
+    position: [1169, 2556],
     description: 'Macquarie University Incubator for startups and innovation.',
     tags: ['services', 'business', 'innovation'],
     translationKey: 'building_8HA_name',
@@ -1947,7 +1592,7 @@ export const buildings: Building[] = [
   {
     id: '5GR',
     name: '5GR (Macquarie Observatory)',
-    position: [1173, 1186],
+    position: [1731, 492],
     description: 'Astronomy observatory for research and education.',
     tags: ['research', 'science', 'astronomy'],
     translationKey: 'building_5GR_name',
@@ -1959,7 +1604,7 @@ export const buildings: Building[] = [
   {
     id: '1WW',
     name: '1WW (Ainsworth Building)',
-    position: [2166, 2769],
+    position: [3780, 1869],
     description: '1WW (Ainsworth Building).',
     tags: ['academic'],
     translationKey: 'building_1WW_name',
@@ -1973,7 +1618,7 @@ export const buildings: Building[] = [
   {
     id: '17WWMICHAE',
     name: '17WW (Michael Kirby Building)',
-    position: [2756, 1684],
+    position: [2523, 1935],
     description: '17WW (Michael Kirby Building).',
     tags: ['academic'],
     translationKey: 'building_17WWMICHAE_name',
@@ -1986,7 +1631,7 @@ export const buildings: Building[] = [
   {
     id: '18WWSERVIC',
     name: '18WW (Service Connect)',
-    position: [2517, 1522],
+    position: [2201, 1833],
     description: 'Service Connect - main student services hub with IT, HR, and Financial Services.',
     tags: ['services', 'administration', 'student'],
     translationKey: 'building_18WWSERVIC_name',
@@ -1999,7 +1644,7 @@ export const buildings: Building[] = [
   {
     id: '16WWLINCOL',
     name: '16WW (Lincoln Building)',
-    position: [2524, 1747],
+    position: [2486, 1880],
     description: '16WW (Lincoln Building).',
     tags: ['academic'],
     translationKey: 'building_16WWLINCOL_name',
@@ -2012,7 +1657,7 @@ export const buildings: Building[] = [
   {
     id: '19ERTHECHA',
     name: '19ER (The Chancellery)',
-    position: [1693, 2045],
+    position: [2914, 1202],
     description: 'The Chancellery - University administration headquarters.',
     tags: ['services', 'administration'],
     translationKey: 'building_19ERTHECHA_name',
@@ -2025,7 +1670,7 @@ export const buildings: Building[] = [
   {
     id: '16UAAUSTRA',
     name: '16UA (Australian Hearing Hub)',
-    position: [3589, 1342],
+    position: [1822, 2706],
     description: 'Australian Hearing Hub - hearing research and clinical services.',
     tags: ['health', 'research', 'clinic'],
     translationKey: 'building_16UAAUSTRA_name',
@@ -2038,7 +1683,7 @@ export const buildings: Building[] = [
   {
     id: 'DLCNEW',
     name: 'Dunmore Lang College - New Wing',
-    position: [4290, 2419],
+    position: [3127, 3003],
     description: 'Dunmore Lang College New Wing residential building.',
     tags: ['residential'],
     translationKey: 'building_DLCNEW_name',
@@ -2051,7 +1696,7 @@ export const buildings: Building[] = [
   {
     id: 'DLCOFFICE',
     name: 'Dunmore Lang College - Office',
-    position: [4276, 2487],
+    position: [3174, 3069],
     description: 'Dunmore Lang College administration office.',
     tags: ['residential', 'services'],
     translationKey: 'building_DLCOFFICE_name',
@@ -2064,7 +1709,7 @@ export const buildings: Building[] = [
   {
     id: 'VILLAS2',
     name: 'Villas (Building 2)',
-    position: [4675, 1627],
+    position: [997, 799],
     description: 'Residential villas - second building.',
     tags: ['residential'],
     translationKey: 'building_VILLAS2_name',
@@ -2073,53 +1718,19 @@ export const buildings: Building[] = [
     category: 'residential',
     location: { lat: -33.779176, lng: 151.12716, osmId: 967533745 },
   },
+
+  // --- BUILDINGS FROM MQ LOCATION GUIDE CSV (2026-01-10) ---
   {
-    id: 'BLOCKCWAT',
-    name: 'Block C (Waterloo Road)',
-    position: [4751, 3185],
-    description: 'Residential block on Waterloo Road.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKCWAT_name',
-    descriptionKey: 'building_BLOCKCWAT_desc',
-    address: '101 Waterloo Road, Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.779187, lng: 151.121267, osmId: 982138149 },
-  },
-  {
-    id: 'BLOCKDWAT',
-    name: 'Block D (Waterloo Road)',
-    position: [4751, 3170],
-    description: 'Residential block on Waterloo Road.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKDWAT_name',
-    descriptionKey: 'building_BLOCKDWAT_desc',
-    address: '101 Waterloo Road, Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.779153, lng: 151.121194, osmId: 982138150 },
-  },
-  {
-    id: 'BLOCKAWAT',
-    name: 'Block A (Waterloo Road)',
-    position: [4759, 3125],
-    description: 'Residential block on Waterloo Road.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKAWAT_name',
-    descriptionKey: 'building_BLOCKAWAT_desc',
-    address: '101 Waterloo Road, Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.778673, lng: 151.121302, osmId: 982138151 },
-  },
-  {
-    id: 'BLOCKBWAT',
-    name: 'Block B (Waterloo Road)',
-    position: [4830, 3125],
-    description: 'Residential block on Waterloo Road.',
-    tags: ['residential'],
-    translationKey: 'building_BLOCKBWAT_name',
-    descriptionKey: 'building_BLOCKBWAT_desc',
-    address: '101 Waterloo Road, Macquarie Park NSW',
-    category: 'residential',
-    location: { lat: -33.778659, lng: 151.121994, osmId: 982138152 },
+    id: '25CWW',
+    name: "25C Wally's Walk (Gale History Museum)",
+    position: [1780, 2050], // Near 25B Wally's Walk
+    description: 'The Gale History Museum - historical exhibits and collections.',
+    tags: ['venue', 'museum', 'arts', 'history'],
+    translationKey: 'building_25CWW_name',
+    descriptionKey: 'building_25CWW_desc',
+    gridRef: 'O13',
+    address: "25C Wally's Walk",
+    category: 'venue',
   },
 ];
 

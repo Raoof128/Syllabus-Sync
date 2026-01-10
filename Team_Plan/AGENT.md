@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.14 | Last Updated: January 10, 2026
+Version: 0.14.24 | Last Updated: January 10, 2026
 
 ---
 
@@ -58,11 +58,221 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
-#### ✅ Navigation Panel Rewrite & Map Overlay Coordinate Fix v0.14.14 (Raouf)
-- **Navigation Panel Complete Rewrite** - Changed from glassy/transparent to solid opaque backgrounds with hardcoded color values for guaranteed readability
-- **Separate Light/Dark Versions** - Used `dark:hidden` and `hidden dark:block` pattern with inline styles
-- **Map Overlay Coordinate Fix** - Updated `CAMPUS_BOUNDS` from `[[-33.783, 151.105], [-33.77, 151.125]]` to `[[-33.7825, 151.1045], [-33.7655, 151.1225]]` using OSM data
-- **Campus Center Update** - Changed from `{lat: -33.775, lng: 151.115}` to `{lat: -33.7742, lng: 151.1127}`
+#### ✅ Building Data Cleanup & Cross-Reference v0.14.24 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Clean up building data by removing off-campus locations and cross-reference with MQ Location Guide
+- **Summary:** Removed 46 off-campus/unwanted buildings and added 1 missing building (25C Wally's Walk - Gale History Museum)
+
+**What Was Done:**
+1. Removed 46 off-campus buildings (city names, residential blocks, external businesses)
+2. Cross-referenced with official MQ Location Guide CSV (111 entries)
+3. Added missing building: 25C Wally's Walk (Gale History Museum)
+4. Added translation keys to all 19 locale files
+5. Final building count: 118 (down from 163)
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Removed 46 entries, added 1 entry
+- `locales/*/translations.json` (19 files) - Added building_25CWW_name and building_25CWW_desc
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (0 errors)
+
+#### ✅ Interactive Position Editor with Direct File Save v0.14.23 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Create admin tool to visually correct building positions with direct file save
+- **Summary:** Built interactive editor at `/map/position-editor` to drag-and-drop fix building positions and save directly to `buildings.ts`
+
+**The Problem:**
+- Building pixel positions in `buildings.ts` are inaccurate for many buildings
+- Original positions were calculated using approximate grid references or GPS interpolation
+- Manual code editing is tedious and error-prone for 160+ buildings
+
+**What Was Done:**
+1. Created position editor page structure with dynamic Leaflet import
+2. Implemented draggable markers using same CRS.Simple as main map
+3. Added building selection with search, filter, and keyboard navigation
+4. Built position change tracking (original vs new positions)
+5. Added "Save to buildings.ts" button that writes directly to source file
+6. Created admin API endpoint (development only) for file updates
+7. Visual indicators: blue=unchanged, amber=changed, red=selected
+
+**Files Created:**
+- `app/map/position-editor/page.tsx` - Page wrapper
+- `app/map/position-editor/PositionEditorClient.tsx` - Main editor (~720 lines)
+- `app/api/admin/update-building-positions/route.ts` - Admin API (~130 lines)
+
+**API Security:**
+- Endpoint disabled in production (returns 403)
+- Only available when `NODE_ENV === 'development'`
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (0 errors)
+
+#### ✅ CRS.Simple Implementation - Zero Edge Drift v0.14.22 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Switch to pixel-based coordinate system for perfect marker alignment
+- **Summary:** Replaced GPS-based coordinates with L.CRS.Simple to eliminate all edge drift
+
+**Root Cause:**
+- Previous approaches (GCP calibration, affine transforms) couldn't fully fix edge drift
+- The map is a flat raster image, but Leaflet's default CRS applies spherical mercator math
+- This fundamental mismatch caused progressive distortion toward edges
+
+**What Was Done:**
+1. Switched MapContainer to `crs={L.CRS.Simple}`:
+   - Treats map as pure 2D pixel grid (1 unit = 1 pixel)
+   - No projection math = no distortion = no drift
+   - Zoom levels: -2 to 2 (pixel scale) instead of 15-20 (GPS)
+
+2. Simplified coordinate conversion:
+   - `pixelToLatLng(x, y)` now returns `{ lat: height - y, lng: x }`
+   - No affine transformation needed - direct pixel placement
+   - Y-axis inverted (image Y=0 at top, CRS.Simple Y=0 at bottom)
+
+3. Updated geolocation handling:
+   - User GPS stored for routing (ORS needs real GPS)
+   - GPS converted to approximate pixels for map display
+   - Off-campus users: marker hidden, routing still works
+
+4. Updated overlays and bounds to use pixel coordinates
+
+5. Updated `lib/map/buildings.ts` for CRS.Simple:
+   - Replaced GCP calibration docs with CRS.Simple coordinate system docs
+   - Added `pixelToCrsSimple()` - Primary function for marker placement
+   - Added `crsSimpleToPixel()` - Convert CRS.Simple back to pixels
+   - Added `getBuildingCrsCoords()` - Get CRS.Simple coords for any building
+   - Updated function docs to clarify when each is used
+
+**Files Changed:**
+- `app/map/CampusMap.tsx` - Major rewrite (~100 lines changed)
+- `lib/map/buildings.ts` - Updated docs, added CRS.Simple helpers (~50 lines changed)
+
+**Key Constants:**
+```typescript
+const MAP_DIMS = { width: 4678, height: 3307 };
+const PIXEL_BOUNDS = [[0, 0], [3307, 4678]];  // [minY, minX], [maxY, maxX]
+const CAMPUS_CENTER_PIXEL = [1653.5, 2339];   // height/2, width/2
+```
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (warnings only)
+- `npm run test`: ✅ 248/248 tests
+
+#### ✅ Affine Transformation for Map Edge Drift v0.14.21 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Fix building marker edge drift with affine transformation
+- **Summary:** Replaced simple linear interpolation with affine transformation to handle map rotation/tilt
+
+**What Was Done:**
+1. Added affine transformation module to `gcpCalibration.ts`:
+   - `AffineTransform` interface (6-coefficient matrix)
+   - `solveAffineTransform()` - Least-squares solver
+   - `pixelToGpsAffine()` / `gpsToPixelAffine()` - Transform functions
+   - `PRECOMPUTED_AFFINE_TRANSFORM` - Pre-calculated from PRIMARY_GCPS
+   - `pixelToGps()` / `gpsToPixel()` - Convenience wrappers
+
+2. Updated `CampusMap.tsx`:
+   - Uses affine-based `pixelToGps` for marker positioning
+   - Removed unused MAP_WIDTH/MAP_HEIGHT constants
+   - GCP debug mode now imports from gcpCalibration.ts
+
+**Files Changed:**
+- `lib/map/gcpCalibration.ts` - Added ~250 lines affine transformation code
+- `app/map/CampusMap.tsx` - Updated pixel-to-GPS conversion, fixed GCP debug imports
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (9 console warnings in dev helper - expected)
+- `npm run test`: ✅ 248/248 tests
+
+#### ✅ GCP Building Position Corrections v0.14.20 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Fix pixel positions for GCP buildings based on GPS coordinates
+- **Summary:** Corrected 10 key building positions to match their verified GPS using calibrated bounds
+
+**What Was Done:**
+1. Analysis revealed ~1130px systematic error for non-anchor GCP buildings
+2. Root cause: Original pixel positions were placed visually without GPS verification
+3. Corrected pixel positions in `gcpCalibration.ts` (PRIMARY + SECONDARY GCPs)
+4. Updated `buildings.ts` with GPS-calculated positions:
+   - HOSP: [4123, 1414] → [3001, 1557]
+   - SPORT: [2383, 1199] → [1258, 1342]
+   - DLC: [3643, 2220] → [2520, 2363]
+   - 4ER: [3625, 1782] → [2502, 1925]
+   - OBS: [2467, 772] → [1342, 915]
+   - COCHLEAR: [3058, 2087] → [1934, 2230]
+   - LOTUS: [2356, 1564] → [1230, 1707]
+   - LIB: [1735, 2408] → [1735, 2409]
+
+**Files Changed:**
+- `lib/map/gcpCalibration.ts`
+- `lib/map/buildings.ts`
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass
+- `npm run test`: ✅ 248/248 tests
+
+#### ✅ GCP-Based Map Calibration v0.14.19 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Map calibration system using Ground Control Points
+- **Summary:** Implemented industry-standard GCP calibration achieving sub-meter accuracy
+
+**What Was Done:**
+1. Created `lib/map/gcpCalibration.ts` - Full GCP solver module
+   - GCP types (pixel + GPS pairs)
+   - Least-squares bounds optimization
+   - Error metrics (RMSE, per-point residuals)
+   - Calibration report formatting
+
+2. Defined verified GCPs:
+   - 18WW: pixel [1692, 1870], GPS [-33.77551, 151.11259]
+   - LIB: pixel [1735, 2408], GPS [-33.77842, 151.11277]
+   - UBAR: pixel [1945, 1589], GPS [-33.774, 151.11365]
+
+3. Calibrated bounds (anchor-point method using 18WW):
+   - Old: west=151.1047, east=151.1243
+   - New: west=151.1055008, east=151.1251008
+   - Result: <1m error for verified GCPs
+
+4. Added GCP Debug Mode (Ctrl+Shift+G):
+   - Cyan markers = Primary GCPs
+   - Yellow markers = Secondary GCPs
+   - Click for pixel/GPS details
+
+**Files Changed:**
+- `lib/map/gcpCalibration.ts` (NEW)
+- `lib/map/buildings.ts`
+- `app/map/CampusMap.tsx`
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass
+- `npm run test`: ✅ 248/248 tests
+
+#### ✅ Map Marker Alignment Fix v0.14.16 (Raouf)
+- **Root Cause Identified** - Building markers were misaligned because `getBuildingLatLng()` preferred GPS coordinates over pixel positions
+- **Key Insight** - The campus map image is a raster illustration (NOT georeferenced), so pixel positions are the source of truth for marker placement
+- **Fix Applied** - `getBuildingLatLng()` now ALWAYS uses pixel positions converted via `pixelToLatLng()`
+- **Dual Coordinate System** - Pixel positions for map markers, GPS coordinates preserved for external navigation
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Fixed `getBuildingLatLng()` to use pixel positions only
+- `lib/map/buildings.ts` - Updated utility functions and documentation
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing
+- `npm run test`: ✅ 248/248 tests passing
+
+#### ✅ Map Coordinate System Overhaul v0.14.15 (Raouf)
+- **GPS-Based Building Positioning** - Complete overhaul of map coordinate system to use OSM GPS coordinates
+- **New Utility Functions** - Added `gpsToPixel()`, `pixelToGps()`, `getBuildingPosition()`, `getBuildingGps()` to buildings.ts
+- **MAP_CONFIG Export** - Centralized map dimensions and geographic bounds in buildings.ts
+- **Accurate Bounds** - Updated `CAMPUS_BOUNDS` to `[[-33.7832706, 151.1030022], [-33.7654231, 151.1226365]]` based on OSM data
+- **Priority System** - Buildings with GPS coords use those directly; others fall back to pixel conversion
 - **Lowered minZoom** - From 16 to 15 for better campus overview
 
 **Files Modified:**
