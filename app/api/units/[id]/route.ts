@@ -73,10 +73,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         .single();
 
       if (error) {
+        // SECURITY: Log actual error server-side, return generic message to client
+        console.error('Database error updating unit:', error.code, error.message);
         if (error.code === 'PGRST116') {
           return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
         }
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(mapUnitRow(data));
@@ -101,7 +103,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       const { error } = await supabase.from('units').delete().eq('id', id).eq('user_id', userId);
 
       if (error) {
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        console.error('Database error deleting unit:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({ id });

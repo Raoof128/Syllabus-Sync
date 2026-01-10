@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.28 | Last Updated: January 10, 2026
+Version: 0.14.29 | Last Updated: January 10, 2026
 
 ---
 
@@ -57,6 +57,29 @@ Version: 0.14.28 | Last Updated: January 10, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Schema.sql Gamification Table Names Fix v0.14.29 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Fix schema.sql gamification table names to match actual Supabase database
+- **Summary:** Updated `lib/supabase/schema.sql` to use correct table names (`gamification_profiles`, `xp_events`, `xp_config`) instead of incorrect names (`user_gamification`, `user_achievements`)
+
+**The Problem:**
+The schema.sql file had wrong gamification table names that didn't match the actual Supabase database:
+- Schema had: `user_gamification`, `user_achievements`
+- Actual DB: `gamification_profiles`, `xp_events`, `xp_config`
+
+**Changes Made:**
+1. Renamed `user_gamification` → `gamification_profiles` with updated columns
+2. Renamed `user_achievements` → `xp_events` with proper XP event audit structure
+3. Added `xp_config` table for configurable XP amounts
+4. Updated all indexes, RLS policies, permissions, and triggers
+
+**Files Changed:**
+- `lib/supabase/schema.sql` - Fixed gamification table names and structure
+
+**Verification:**
+- Schema now matches actual Supabase database structure
+- All migrations previously applied remain compatible
 
 #### ✅ Supabase Configuration & Schema Verification v0.14.28 (Raouf)
 - **Date:** January 10, 2026 (Australia/Sydney)

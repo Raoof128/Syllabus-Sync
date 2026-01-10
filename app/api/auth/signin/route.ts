@@ -1,8 +1,15 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import {
+  jsonSuccess,
+  jsonError,
+  ERROR_CODES,
+  parseJsonBody,
+  BODY_SIZE_LIMITS,
+} from '@/app/api/_lib/response';
 import { loginLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
 
 const signinSchema = z.object({
@@ -22,59 +29,11 @@ function isDevEmail(email: string): boolean {
   return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail);
 }
 
-// ============================================================================
-// SECURE IP EXTRACTION
-// ============================================================================
-// SECURITY: Only trust verified proxy headers in production
-// - x-vercel-forwarded-for: Set by Vercel's edge network (cannot be spoofed)
-// - cf-connecting-ip: Set by Cloudflare (cannot be spoofed)
-// - x-forwarded-for: Only trusted in development or as last resort
-// ============================================================================
-function getClientIP(request: NextRequest): string {
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  // In production, prefer verified proxy headers that cannot be spoofed
-  if (isProduction) {
-    // Vercel's verified header (highest trust)
-    const vercelIp = request.headers.get('x-vercel-forwarded-for');
-    if (vercelIp) {
-      const firstIp = vercelIp.split(',')[0].trim();
-      if (firstIp && isValidIP(firstIp)) return firstIp;
-    }
-
-    // Cloudflare's verified header
-    const cfIp = request.headers.get('cf-connecting-ip');
-    if (cfIp && isValidIP(cfIp)) return cfIp;
-  }
-
-  // In development or as fallback, use standard headers
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0].trim();
-    if (firstIp && isValidIP(firstIp)) return firstIp;
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp && isValidIP(realIp)) return realIp;
-
-  return 'unknown';
-}
-
-// Basic IP format validation to prevent injection
-function isValidIP(ip: string): boolean {
-  // IPv4 pattern
-  const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-  // IPv6 pattern (simplified)
-  const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
-
-  return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-}
-
 // Generic error message to prevent account enumeration
 const GENERIC_AUTH_ERROR = 'Invalid email or password';
 
 export async function POST(request: NextRequest) {
-  // SECURITY: Rate limit by IP using distributed store (works in serverless)
+  // SECURITY: Rate limit by IP using shared utility (works in serverless)
   const clientIP = getClientIP(request);
   const { allowed, remaining, resetIn } = await loginLimiter(clientIP);
 
@@ -88,7 +47,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
+    // SECURITY: Enforce body size limit for auth endpoints (10KB max)
+    const { data: body, error: bodyError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    if (bodyError) return bodyError;
+
     const parsed = signinSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -118,31 +80,58 @@ export async function POST(request: NextRequest) {
       if (adminClient) {
         console.warn(`🔧 Development mode: auto-confirming developer email...`);
 
-        // Get user by email to confirm
-        const { data: users, error: userError } = await adminClient.auth.admin.listUsers();
+        // SECURITY: Query auth.users directly using service role to get user by email
+        // This is more efficient than listUsers() which fetches ALL users
+        // The service role key bypasses RLS and can query auth.users
+        const { data: authUsers, error: queryError } = await adminClient
+          .from('auth.users')
+          .select('id')
+          .eq('email', email)
+          .limit(1)
+          .single();
 
-        if (!userError && users) {
-          const user = users.users.find((u: { email?: string }) => u.email === email);
-          if (user) {
-            // Confirm the email using admin client
-            const { error: confirmError } = await adminClient.auth.admin.updateUserById(user.id, {
-              email_confirm: true,
+        // Fallback: If direct query fails (some Supabase versions), use listUsers with filter
+        let userId: string | null = null;
+
+        if (!queryError && authUsers?.id) {
+          userId = authUsers.id;
+        } else {
+          // Fallback to listUsers but with pagination (perPage: 1) if email filter supported
+          // Note: listUsers() doesn't support email filter, so we need to search
+          // This is a known limitation - for development only, acceptable tradeoff
+          const { data: users, error: listError } = await adminClient.auth.admin.listUsers({
+            perPage: 100, // Limit to reduce memory usage
+          });
+
+          if (!listError && users) {
+            const user = users.users.find(
+              (u: { email?: string }) => u.email?.toLowerCase() === email.toLowerCase(),
+            );
+            if (user) {
+              userId = user.id;
+            }
+          }
+        }
+
+        if (userId) {
+          // Confirm the email using admin client
+          const { error: confirmError } = await adminClient.auth.admin.updateUserById(userId, {
+            email_confirm: true,
+          });
+
+          if (!confirmError) {
+            // Try signin again with regular client
+            const retryResult = await supabase.auth.signInWithPassword({
+              email,
+              password,
             });
 
-            if (!confirmError) {
-              // Try signin again with regular client
-              const retryResult = await supabase.auth.signInWithPassword({
-                email,
-                password,
-              });
-
-              if (!retryResult.error) {
-                data = retryResult.data;
-                error = null;
-              }
-            } else {
-              console.warn('Auto-confirmation failed:', confirmError.message);
+            if (!retryResult.error) {
+              data = retryResult.data;
+              error = null;
             }
+          } else {
+            console.warn('Auto-confirmation failed:', confirmError.message);
           }
         }
       } else {

@@ -1,6 +1,9 @@
+import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth, optionalAuth } from '@/app/api/_lib/middleware';
+import { apiLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
 
 // ============================================================================
 // TYPES
@@ -130,7 +133,19 @@ function generateDemoEvents(): XPEvent[] {
  * GET /api/gamification - Get user's gamification profile
  * Returns demo data if not authenticated
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // SECURITY: Apply rate limiting
+  const clientIP = getClientIP(request);
+  const { allowed, resetIn } = await apiLimiter(`gamification:${clientIP}`);
+  if (!allowed) {
+    return jsonError(
+      'Rate limit exceeded. Please try again later.',
+      429,
+      ERROR_CODES.RATE_LIMITED,
+      { retryAfter: resetIn },
+    );
+  }
+
   // Check for events query parameter
   const url = new URL(request.url);
   const includeEvents = url.searchParams.get('events') === 'true';
@@ -249,7 +264,19 @@ export async function GET(request: Request) {
  * POST /api/gamification/record-activity - Record user activity (for streak tracking)
  * This is called when the user performs certain actions to update their streak
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // SECURITY: Apply rate limiting (stricter for mutations)
+  const clientIP = getClientIP(request);
+  const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
+  if (!allowed) {
+    return jsonError(
+      'Rate limit exceeded. Please try again later.',
+      429,
+      ERROR_CODES.RATE_LIMITED,
+      { retryAfter: resetIn },
+    );
+  }
+
   return requireAuth(request, async (userId) => {
     const supabase = await createServerClient();
 

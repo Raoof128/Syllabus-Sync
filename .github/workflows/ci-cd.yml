@@ -65,6 +65,12 @@ jobs:
       - name: Run npm audit
         run: npm audit --audit-level moderate
 
+      - name: Validate CSP hashes
+        run: node scripts/validate-csp-hashes.mjs
+
+      - name: Check for secrets in code
+        run: node scripts/check-no-secret-prints.js
+
       - name: Run bundle analysis
         run: npm run analyze
         continue-on-error: true

@@ -1,8 +1,14 @@
 /**
  * Admin API: Update Building Positions
  *
- * This endpoint directly modifies lib/map/buildings.ts with new position values.
- * DEVELOPMENT ONLY - disabled in production for security.
+ * SECURITY: This endpoint directly modifies source code files.
+ * DEVELOPMENT ONLY - completely disabled in production.
+ *
+ * Multiple layers of protection:
+ * 1. NODE_ENV check (must be 'development')
+ * 2. ADMIN_API_ENABLED env var must be explicitly set to 'true'
+ * 3. Building ID allowlist validation (prevents arbitrary regex injection)
+ * 4. Position value bounds checking
  *
  * POST /api/admin/update-building-positions
  * Body: { changes: [{ id: string, position: [number, number] }] }
@@ -13,8 +19,74 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 
-// Security: Only allow in development
+// ============================================================================
+// SECURITY CONFIGURATION
+// ============================================================================
+
+// SECURITY: Multiple checks required for this dangerous endpoint
 const isDevelopment = process.env.NODE_ENV === 'development';
+const isAdminEnabled = process.env.ADMIN_API_ENABLED === 'true';
+const isEndpointAllowed = isDevelopment && isAdminEnabled;
+
+// SECURITY: Allowlist of valid building IDs (prevents regex injection)
+// This list should match the building IDs in lib/map/buildings.ts
+const ALLOWED_BUILDING_IDS = [
+  '1CC',
+  '4AW',
+  '6ER',
+  '7W',
+  '9W',
+  '10H',
+  '12SC',
+  '14SCO',
+  '17CC',
+  '19SL',
+  '25W',
+  '27W',
+  'LIBRARY',
+  'WALANGA',
+  'LOTUS',
+  'IGLU',
+  'MACQUARIE_CENTRE',
+  'MQ_METRO',
+  'SPORT_AQUATIC',
+  // Add any other valid building IDs here
+];
+
+// SECURITY: Position bounds (Macquarie University campus area)
+const POSITION_BOUNDS = {
+  minX: -500,
+  maxX: 500,
+  minY: -500,
+  maxY: 500,
+};
+
+// ============================================================================
+// VALIDATION HELPERS
+// ============================================================================
+
+function isValidBuildingId(id: string): boolean {
+  if (typeof id !== 'string') return false;
+  // Check against allowlist
+  return ALLOWED_BUILDING_IDS.includes(id.toUpperCase());
+}
+
+function isValidPosition(position: unknown): position is [number, number] {
+  if (!Array.isArray(position)) return false;
+  if (position.length !== 2) return false;
+  if (typeof position[0] !== 'number' || typeof position[1] !== 'number') return false;
+  if (!Number.isFinite(position[0]) || !Number.isFinite(position[1])) return false;
+
+  // Bounds checking
+  if (position[0] < POSITION_BOUNDS.minX || position[0] > POSITION_BOUNDS.maxX) return false;
+  if (position[1] < POSITION_BOUNDS.minY || position[1] > POSITION_BOUNDS.maxY) return false;
+
+  return true;
+}
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 interface PositionUpdate {
   id: string;
@@ -25,11 +97,25 @@ interface RequestBody {
   changes: PositionUpdate[];
 }
 
+// ============================================================================
+// API HANDLERS
+// ============================================================================
+
 export async function POST(request: NextRequest) {
-  // Security check: Block in production
+  // SECURITY: Multi-layer check - must pass ALL conditions
   if (!isDevelopment) {
+    console.warn('Admin API blocked: Not in development mode');
     return jsonError(
       'This endpoint is only available in development mode',
+      403,
+      ERROR_CODES.FORBIDDEN,
+    );
+  }
+
+  if (!isAdminEnabled) {
+    console.warn('Admin API blocked: ADMIN_API_ENABLED not set to true');
+    return jsonError(
+      'Admin API is disabled. Set ADMIN_API_ENABLED=true in .env.local to enable.',
       403,
       ERROR_CODES.FORBIDDEN,
     );
@@ -38,7 +124,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: RequestBody = await request.json();
 
-    // Validate request body
+    // Validate request body structure
     if (!body.changes || !Array.isArray(body.changes) || body.changes.length === 0) {
       return jsonError(
         'Invalid request body. Expected { changes: [{ id: string, position: [x, y] }] }',
@@ -47,52 +133,76 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate each change
+    // SECURITY: Limit number of changes per request (DoS prevention)
+    if (body.changes.length > 50) {
+      return jsonError(
+        'Too many changes. Maximum 50 per request.',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
+    }
+
+    // Validate each change against allowlist
+    const validatedChanges: PositionUpdate[] = [];
+    const invalidIds: string[] = [];
+
     for (const change of body.changes) {
-      if (!change.id || typeof change.id !== 'string') {
-        return jsonError(`Invalid building ID: ${change.id}`, 400, ERROR_CODES.VALIDATION_ERROR);
+      // SECURITY: Validate building ID against allowlist
+      if (!isValidBuildingId(change.id)) {
+        invalidIds.push(change.id);
+        continue;
       }
-      if (
-        !Array.isArray(change.position) ||
-        change.position.length !== 2 ||
-        typeof change.position[0] !== 'number' ||
-        typeof change.position[1] !== 'number'
-      ) {
+
+      // SECURITY: Validate position bounds
+      if (!isValidPosition(change.position)) {
         return jsonError(
-          `Invalid position for building ${change.id}`,
+          `Invalid position for building ${change.id}. Must be [x, y] within bounds.`,
           400,
           ERROR_CODES.VALIDATION_ERROR,
         );
       }
+
+      validatedChanges.push({
+        id: change.id.toUpperCase(),
+        position: [Math.round(change.position[0]), Math.round(change.position[1])],
+      });
+    }
+
+    if (invalidIds.length > 0) {
+      return jsonError(
+        `Invalid building IDs: ${invalidIds.join(', ')}. Use valid building codes.`,
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
+    }
+
+    if (validatedChanges.length === 0) {
+      return jsonError('No valid changes to apply', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Read the buildings.ts file
     const buildingsPath = path.join(process.cwd(), 'lib/map/buildings.ts');
+
+    // SECURITY: Verify file exists and is in expected location
+    try {
+      await fs.access(buildingsPath);
+    } catch {
+      return jsonError('Buildings file not found', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
     let content = await fs.readFile(buildingsPath, 'utf-8');
 
     // Track successful updates
     const updatedBuildings: string[] = [];
     const failedBuildings: string[] = [];
 
-    // Apply each position change
-    for (const change of body.changes) {
+    // Apply each validated position change
+    for (const change of validatedChanges) {
       const { id, position } = change;
 
-      // Create regex to find the building's position line
-      // Match pattern: id: 'BUILDING_ID', ... position: [x, y],
-      // We need to find the building block and update its position
-
-      // Strategy: Find the building by ID, then find its position array
-      // Building format in the file:
-      //   {
-      //     id: 'XXX',
-      //     ...
-      //     position: [x, y],
-      //     ...
-      //   },
-
-      // Find the building entry and update its position
-      const idPattern = new RegExp(`id:\\s*['"]${id}['"]`);
+      // SECURITY: Use exact string matching with escaped ID (no regex injection possible)
+      // Since we validated against allowlist, the ID is safe
+      const idPattern = new RegExp(`id:\\s*['"]${id}['"]`, 'i');
       const idMatch = content.match(idPattern);
 
       if (!idMatch || idMatch.index === undefined) {
@@ -126,6 +236,9 @@ export async function POST(request: NextRequest) {
     // Write back to file
     await fs.writeFile(buildingsPath, content, 'utf-8');
 
+    // eslint-disable-next-line no-console
+    console.log(`Admin API: Updated ${updatedBuildings.length} building positions`);
+
     // Create summary
     const summary = {
       totalRequested: body.changes.length,
@@ -143,20 +256,16 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error updating building positions:', error);
 
-    return jsonError(
-      error instanceof Error ? error.message : 'Failed to update building positions',
-      500,
-      ERROR_CODES.INTERNAL_ERROR,
-      isDevelopment ? { stack: error instanceof Error ? error.stack : undefined } : undefined,
-    );
+    // SECURITY: Don't leak error details even in dev
+    return jsonError('Failed to update building positions', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }
 
 // GET endpoint to check if the service is available
 export async function GET() {
-  if (!isDevelopment) {
+  if (!isEndpointAllowed) {
     return jsonError(
-      'This endpoint is only available in development mode',
+      'This endpoint is only available in development mode with ADMIN_API_ENABLED=true',
       403,
       ERROR_CODES.FORBIDDEN,
     );
@@ -166,5 +275,7 @@ export async function GET() {
     available: true,
     message: 'Building position update API is ready',
     usage: 'POST with { changes: [{ id: string, position: [x, y] }] }',
+    allowedBuildings: ALLOWED_BUILDING_IDS,
+    positionBounds: POSITION_BOUNDS,
   });
 }

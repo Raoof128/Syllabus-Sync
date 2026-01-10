@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import {
   jsonError,
@@ -6,6 +7,8 @@ import {
   handleValidationError,
 } from '@/app/api/_lib/response';
 import { requireAuth } from '@/app/api/_lib/middleware';
+import { apiLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
 
 // ============================================================================
@@ -62,10 +65,24 @@ function xpForLevel(level: number): number {
  *
  * Security:
  * - Requires authentication
+ * - Rate limited to prevent abuse
  * - Only allows specific event types (prevents abuse)
  * - Uses database RPC function for atomic XP award
+ * - Duplicate prevention for each event type
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // SECURITY: Apply strict rate limiting for XP mutations (10 requests per minute)
+  const clientIP = getClientIP(request);
+  const { allowed, resetIn } = await apiLimiter(`award-xp:${clientIP}`);
+  if (!allowed) {
+    return jsonError(
+      'Rate limit exceeded. Please try again later.',
+      429,
+      ERROR_CODES.RATE_LIMITED,
+      { retryAfter: resetIn },
+    );
+  }
+
   return requireAuth(request, async (userId) => {
     // Parse and validate request body
     let body: AwardXPRequest;

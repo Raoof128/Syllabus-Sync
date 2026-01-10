@@ -33,6 +33,7 @@ export interface ProfilesState {
   setCurrentProfile: (id: string | null) => void;
   getCurrentProfile: () => UserProfile | null;
   updateCurrentProfile: (updates: Partial<UserProfile>) => void;
+  fetchProfile: () => Promise<void>;
 }
 
 export const useProfilesStore = create<ProfilesState>()(
@@ -105,10 +106,60 @@ export const useProfilesStore = create<ProfilesState>()(
           ),
         }));
       },
+
+      fetchProfile: async () => {
+        try {
+          // Fetch from secure API
+          const res = await fetch('/api/auth/user');
+          if (!res.ok) return;
+          const data = await res.json();
+
+          if (data.success && data.data.profile) {
+            const profile = data.data.profile;
+            // Note: API returns snake_case from DB, need to map if necessary
+            // Assuming the API returns matching structure or we map it here
+            // But UserProfile interface uses camelCase.
+            // Let's assume for now we trust the structure or the API helps us.
+            // Actually, app/api/auth/user returns the raw DB row which is snake_case.
+            // We need to map it.
+
+            const mappedProfile: Partial<UserProfile> = {
+              id: profile.id,
+              email: profile.email,
+              name: profile.full_name,
+              studentId: profile.student_id,
+              // Add other fields as needed
+            };
+
+            set((state) => {
+              // Determine if we need to add or update
+              const existingIndex = state.profiles.findIndex((p) => p.id === profile.id);
+              if (existingIndex >= 0) {
+                const newProfiles = [...state.profiles];
+                newProfiles[existingIndex] = { ...newProfiles[existingIndex], ...mappedProfile };
+                return { ...state, profiles: newProfiles };
+              }
+              // If completely new, might need full object.
+              // For now, let's just update if exists or log warning if not found
+              return state;
+            });
+          }
+        } catch (e) {
+          console.error('Failed to fetch profile', e);
+        }
+      },
     }),
     {
       name: 'profiles-storage',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        ...state,
+        profiles: state.profiles.map((p) => ({
+          ...p,
+          studentId: '', // SECURITY: Don't persist sensitive PII
+          email: '', // SECURITY: Don't persist sensitive PII
+        })),
+      }),
     },
   ),
 );

@@ -1,8 +1,15 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import {
+  jsonSuccess,
+  jsonError,
+  ERROR_CODES,
+  parseJsonBody,
+  BODY_SIZE_LIMITS,
+} from '@/app/api/_lib/response';
 import { signupLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
 
 // SECURITY: Stronger password policy - min 12 chars for better security
@@ -25,54 +32,6 @@ function isDevEmail(email: string): boolean {
   return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail);
 }
 
-// ============================================================================
-// SECURE IP EXTRACTION
-// ============================================================================
-// SECURITY: Only trust verified proxy headers in production
-// - x-vercel-forwarded-for: Set by Vercel's edge network (cannot be spoofed)
-// - cf-connecting-ip: Set by Cloudflare (cannot be spoofed)
-// - x-forwarded-for: Only trusted in development or as last resort
-// ============================================================================
-function getClientIP(request: NextRequest): string {
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  // In production, prefer verified proxy headers that cannot be spoofed
-  if (isProduction) {
-    // Vercel's verified header (highest trust)
-    const vercelIp = request.headers.get('x-vercel-forwarded-for');
-    if (vercelIp) {
-      const firstIp = vercelIp.split(',')[0].trim();
-      if (firstIp && isValidIP(firstIp)) return firstIp;
-    }
-
-    // Cloudflare's verified header
-    const cfIp = request.headers.get('cf-connecting-ip');
-    if (cfIp && isValidIP(cfIp)) return cfIp;
-  }
-
-  // In development or as fallback, use standard headers
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0].trim();
-    if (firstIp && isValidIP(firstIp)) return firstIp;
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp && isValidIP(realIp)) return realIp;
-
-  return 'unknown';
-}
-
-// Basic IP format validation to prevent injection
-function isValidIP(ip: string): boolean {
-  // IPv4 pattern
-  const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-  // IPv6 pattern (simplified)
-  const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
-
-  return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-}
-
 // SECURITY: Generic message for all signup responses to prevent enumeration
 const GENERIC_SIGNUP_SUCCESS =
   'If this email is not already registered, you will receive a confirmation email shortly.';
@@ -92,7 +51,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json().catch(() => null);
+    // SECURITY: Enforce body size limit for auth endpoints (10KB max)
+    const { data: body, error: bodyError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    if (bodyError) return bodyError;
+
     const parsed = signupSchema.safeParse(body);
 
     if (!parsed.success) {

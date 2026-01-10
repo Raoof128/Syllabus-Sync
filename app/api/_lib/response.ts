@@ -209,3 +209,95 @@ function getErrorCodeFromStatus(status: number): ErrorCode {
 export const generateRequestId = (): string => {
   return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
+
+// ============================================================================
+// BODY SIZE LIMITS
+// ============================================================================
+
+/**
+ * Default body size limits (in bytes)
+ * SECURITY: Prevent DoS attacks via large request bodies
+ */
+export const BODY_SIZE_LIMITS = {
+  /** Default limit for JSON payloads (100KB) */
+  DEFAULT: 100 * 1024,
+  /** Smaller limit for auth endpoints (10KB) */
+  AUTH: 10 * 1024,
+  /** Larger limit for file uploads (5MB) */
+  UPLOAD: 5 * 1024 * 1024,
+  /** Admin endpoints (50KB) */
+  ADMIN: 50 * 1024,
+} as const;
+
+/**
+ * Check if request body exceeds size limit using Content-Length header
+ * SECURITY: This is a first-line defense; actual parsing may still fail for streams
+ *
+ * @param request - The incoming request
+ * @param maxBytes - Maximum allowed body size in bytes
+ * @returns Error response if exceeded, null if within limits
+ */
+export function checkBodySize(
+  request: Request,
+  maxBytes: number = BODY_SIZE_LIMITS.DEFAULT,
+): NextResponse<ApiResponse<never>> | null {
+  const contentLength = request.headers.get('content-length');
+
+  if (contentLength) {
+    const size = parseInt(contentLength, 10);
+    if (!isNaN(size) && size > maxBytes) {
+      return jsonError(
+        `Request body too large. Maximum size is ${Math.round(maxBytes / 1024)}KB`,
+        413,
+        ERROR_CODES.BAD_REQUEST,
+        { maxBytes, receivedBytes: size },
+      );
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Parse JSON body with size limit validation
+ * SECURITY: Safer than direct request.json() as it enforces size limits
+ *
+ * @param request - The incoming request
+ * @param maxBytes - Maximum allowed body size in bytes
+ * @returns Parsed JSON or error response
+ */
+export async function parseJsonBody<T = unknown>(
+  request: Request,
+  maxBytes: number = BODY_SIZE_LIMITS.DEFAULT,
+): Promise<{ data: T; error: null } | { data: null; error: NextResponse<ApiResponse<never>> }> {
+  // Check Content-Length header first
+  const sizeError = checkBodySize(request, maxBytes);
+  if (sizeError) {
+    return { data: null, error: sizeError };
+  }
+
+  try {
+    // For streams without Content-Length, we need to read and check size
+    const text = await request.text();
+
+    if (text.length > maxBytes) {
+      return {
+        data: null,
+        error: jsonError(
+          `Request body too large. Maximum size is ${Math.round(maxBytes / 1024)}KB`,
+          413,
+          ERROR_CODES.BAD_REQUEST,
+          { maxBytes, receivedBytes: text.length },
+        ),
+      };
+    }
+
+    const data = JSON.parse(text) as T;
+    return { data, error: null };
+  } catch {
+    return {
+      data: null,
+      error: jsonError('Invalid JSON body', 400, ERROR_CODES.BAD_REQUEST),
+    };
+  }
+}

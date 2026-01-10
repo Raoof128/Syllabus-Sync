@@ -15,7 +15,9 @@ export async function PUT(request: Request) {
         .select('id');
 
       if (error) {
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        console.error('Database error marking notifications read:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({

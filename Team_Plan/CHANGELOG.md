@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.29] - 2026-01-10
+
+### Fixed
+
+#### Schema.sql Gamification Table Names (Raouf)
+
+**Summary:** Fixed `lib/supabase/schema.sql` to use correct gamification table names that match the actual Supabase database structure.
+
+**The Problem:**
+- Schema.sql had incorrect table names: `user_gamification`, `user_achievements`
+- Actual database tables: `gamification_profiles`, `xp_events`, `xp_config`
+- This mismatch could cause confusion when referencing the schema documentation
+
+**Changes Made:**
+1. **Renamed `user_gamification` → `gamification_profiles`:**
+   - Updated columns to match: `xp`, `streak_days`, `longest_streak`, `last_activity_date`
+   - Added CHECK constraints for non-negative values
+   
+2. **Renamed `user_achievements` → `xp_events`:**
+   - Updated to proper XP event audit structure
+   - Added `event_type` CHECK constraint with valid event types
+   - Added `xp_amount`, `reference_id`, `metadata` columns
+
+3. **Added `xp_config` table:**
+   - Configuration table for XP amounts per action type
+   - Columns: `event_type` (PK), `base_xp`, `description`
+
+4. **Updated all references:**
+   - Indexes: `idx_gamification_profiles_user_id`, `idx_xp_events_*`
+   - RLS: `ALTER TABLE public.gamification_profiles/xp_events ENABLE ROW LEVEL SECURITY`
+   - Permissions: `REVOKE/GRANT` statements updated
+   - Policies: Updated to use new table names
+   - Triggers: `update_gamification_profiles_updated_at`
+
+**Files Changed:**
+- `lib/supabase/schema.sql` - 8 edits to fix table names and structure
+
+**Verification:**
+- Schema now matches actual Supabase database
+- All migrations remain compatible (no migration changes needed)
+
+---
+
 ## [0.14.28] - 2026-01-10
 
 ### Fixed

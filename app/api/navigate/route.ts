@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
 import { createHash } from 'crypto';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
@@ -23,8 +24,10 @@ const CAMPUS_BOUNDS = {
 
 // Very generous buffer (50km) around campus for demo/testing from anywhere in Sydney
 // This allows developers and testers to use the app from home while still preventing
-// global abuse of the ORS API. For production, reduce to 2-5km.
-const GEOFENCE_BUFFER_KM = 50;
+// global abuse of the ORS API.
+// SECURITY: In production, this is reduced to 5km via environment variable
+const GEOFENCE_BUFFER_KM =
+  process.env.NODE_ENV === 'production' ? Number(process.env.GEOFENCE_BUFFER_KM || 5) : 50;
 const KM_PER_DEGREE_LAT = 111.32;
 const KM_PER_DEGREE_LNG = 111.32 * Math.cos((-33.775 * Math.PI) / 180); // ~93km at this latitude
 
@@ -38,13 +41,18 @@ const EXTENDED_BOUNDS = {
 // ============================================================================
 // ROUTE CACHING - Prevent duplicate ORS API calls
 // ============================================================================
+// SECURITY: Increased cache size and added per-IP limits to prevent cache exhaustion
 interface CachedRoute {
   data: unknown;
   timestamp: number;
 }
 const routeCache = new Map<string, CachedRoute>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const MAX_CACHE_SIZE = 100;
+const MAX_CACHE_SIZE = 500; // Increased from 100 to prevent easy exhaustion
+
+// Track cache entries per IP to prevent cache flooding
+const ipCacheCount = new Map<string, number>();
+const MAX_CACHE_PER_IP = 20;
 
 function getCacheKey(
   start: { lat: number; lng: number },
@@ -65,7 +73,17 @@ function getCachedRoute(key: string): unknown | null {
   return cached.data;
 }
 
-function setCachedRoute(key: string, data: unknown): void {
+function setCachedRoute(key: string, data: unknown, clientIP?: string): void {
+  // Check per-IP cache limit to prevent cache flooding attacks
+  if (clientIP && clientIP !== 'unknown') {
+    const currentCount = ipCacheCount.get(clientIP) || 0;
+    if (currentCount >= MAX_CACHE_PER_IP) {
+      // Don't cache, but don't fail the request either
+      return;
+    }
+    ipCacheCount.set(clientIP, currentCount + 1);
+  }
+
   // Evict oldest entries if cache is full
   if (routeCache.size >= MAX_CACHE_SIZE) {
     const oldestKey = routeCache.keys().next().value;
@@ -186,12 +204,9 @@ function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: numb
 }
 
 export async function POST(request: NextRequest) {
-  // Get client identifier for rate limiting
-  // In demo mode without auth, use IP address
-  const clientId =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'anonymous';
+  // SECURITY: Use shared IP extraction utility for consistent, secure IP handling
+  const clientIP = getClientIP(request);
+  const clientId = `ip:${clientIP}`;
 
   // Apply rate limiting (works for both authenticated and demo modes)
   const { allowed, remaining, resetIn } = await apiLimiter(clientId);
@@ -258,7 +273,7 @@ export async function POST(request: NextRequest) {
     if (!ORS_API_KEY) {
       console.warn('ORS_API_KEY not configured - returning demo route');
       const demoData = generateDemoRoute(start, end);
-      setCachedRoute(cacheKey, demoData);
+      setCachedRoute(cacheKey, demoData, clientIP);
 
       const response = jsonSuccess(demoData);
       response.headers.set('X-Cache', 'DEMO');
@@ -294,7 +309,7 @@ export async function POST(request: NextRequest) {
     const data = await orsResponse.json();
 
     // Cache the successful response
-    setCachedRoute(cacheKey, data);
+    setCachedRoute(cacheKey, data, clientIP);
 
     const response = jsonSuccess(data);
     response.headers.set('X-Cache', 'MISS');
