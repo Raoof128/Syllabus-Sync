@@ -21,6 +21,18 @@ vi.mock('@/lib/store/unitsStore', () => ({
   },
 }));
 
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+    refresh: vi.fn(),
+  }),
+}));
+
 import TodaySchedule from '@/components/home/TodaySchedule';
 
 describe('TodaySchedule', () => {

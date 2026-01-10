@@ -173,7 +173,15 @@ const FeedClient = memo(() => {
         });
       }
     },
-    [isDemo, remindedEvents, refreshProfile, settings.showXPNotifications, language, t, addNotification],
+    [
+      isDemo,
+      remindedEvents,
+      refreshProfile,
+      settings.showXPNotifications,
+      language,
+      t,
+      addNotification,
+    ],
   );
 
   // Get locale string for date formatting
@@ -646,11 +654,7 @@ const FeedClient = memo(() => {
       </div>
 
       {/* Event Form Dialog */}
-      <EventForm
-        open={eventFormOpen}
-        onOpenChange={setEventFormOpen}
-        editEvent={editingEvent}
-      />
+      <EventForm open={eventFormOpen} onOpenChange={setEventFormOpen} editEvent={editingEvent} />
     </div>
   );
 });

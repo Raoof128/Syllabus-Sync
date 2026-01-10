@@ -162,9 +162,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md" key={formKey}>
         <DialogHeader>
-          <DialogTitle>
-            {editEvent ? t('editEvent') : t('addEvent')}
-          </DialogTitle>
+          <DialogTitle>{editEvent ? t('editEvent') : t('addEvent')}</DialogTitle>
           <DialogDescription>
             {editEvent ? t('editEventDesc') : t('addEventDesc')}
           </DialogDescription>
@@ -181,9 +179,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               placeholder={t('enterEventTitle')}
               className={errors.title ? 'border-mq-error' : ''}
             />
-            {errors.title && (
-              <p className="text-xs text-mq-error">{errors.title}</p>
-            )}
+            {errors.title && <p className="text-xs text-mq-error">{errors.title}</p>}
           </div>
 
           {/* Description */}
@@ -208,9 +204,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 onChange={(e) => setDate(e.target.value)}
                 className={errors.date ? 'border-mq-error' : ''}
               />
-              {errors.date && (
-                <p className="text-xs text-mq-error">{errors.date}</p>
-              )}
+              {errors.date && <p className="text-xs text-mq-error">{errors.date}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-time">{t('time' as 'title')}</Label>
@@ -222,9 +216,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 placeholder="e.g., 2:00 PM - 4:00 PM"
                 className={errors.time ? 'border-mq-error' : ''}
               />
-              {errors.time && (
-                <p className="text-xs text-mq-error">{errors.time}</p>
-              )}
+              {errors.time && <p className="text-xs text-mq-error">{errors.time}</p>}
             </div>
           </div>
 
@@ -239,9 +231,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 placeholder={t('enterLocation' as 'title')}
                 className={errors.location ? 'border-mq-error' : ''}
               />
-              {errors.location && (
-                <p className="text-xs text-mq-error">{errors.location}</p>
-              )}
+              {errors.location && <p className="text-xs text-mq-error">{errors.location}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-building">{t('buildingCode' as 'title')}</Label>
@@ -296,9 +286,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('cancel')}
           </Button>
-          <Button onClick={handleSave}>
-            {editEvent ? t('save') : t('addEvent')}
-          </Button>
+          <Button onClick={handleSave}>{editEvent ? t('save') : t('addEvent')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

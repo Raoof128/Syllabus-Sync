@@ -89,7 +89,8 @@ const EventsFeed = memo(() => {
                     </>
                   );
 
-                  const baseClassName = "group block p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]";
+                  const baseClassName =
+                    'group block p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]';
 
                   return (
                     <button

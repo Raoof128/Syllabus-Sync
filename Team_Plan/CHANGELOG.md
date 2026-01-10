@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.25] - 2026-01-10
+
+### Fixed
+
+#### ORS Routing Coordinate Mismatch Bug (Raouf)
+
+**Summary:** Fixed a critical bug where ORS (OpenRouteService) routing and external navigation (Google/Apple Maps) were receiving pixel-based CRS.Simple coordinates instead of real GPS coordinates, causing routing to fail or produce incorrect results.
+
+**The Problem:**
+- The map uses CRS.Simple (pixel-based) coordinates for marker placement
+- `getBuildingLatLng()` returns pixel coords like `{ lat: 2500, lng: 1800 }`
+- ORS API expects real GPS coords like `{ lat: -33.775, lng: 151.112 }`
+- This mismatch caused routing to fail or produce nonsensical routes
+
+**The Fix:**
+- Now using `getBuildingGps()` for all external navigation calls
+- `getBuildingGps()` returns real GPS from `building.location` when available (~101 buildings)
+- Falls back to approximate GPS calculation for buildings without OSM data (~17 buildings)
+- Pixel coordinates for map display remain completely unchanged
+
+**Files Changed:**
+- `app/map/CampusMap.tsx` - 4 code changes:
+  1. Added import for `getBuildingGps` from buildings.ts
+  2. Updated `retryRoute()` to use `getBuildingGps()` instead of `getBuildingLatLng()`
+  3. Updated routing useEffect to use `getBuildingGps()`
+  4. Updated both Navigate button handlers (light/dark mode) to use `getBuildingGps()`
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (0 errors)
+- `npm run test`: ✅ 248 tests pass
+- `npm run build`: ✅ Success
+
+---
+
 ## [0.14.24] - 2026-01-10
 
 ### Changed

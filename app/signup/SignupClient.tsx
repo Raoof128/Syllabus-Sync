@@ -123,9 +123,7 @@ export default function SignupClient() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            {step === 'auth'
-              ? t('joinApp', { appName: APP_CONFIG.name })
-              : t('completeProfile')}
+            {step === 'auth' ? t('joinApp', { appName: APP_CONFIG.name }) : t('completeProfile')}
           </CardTitle>
           <CardDescription className="text-center">
             {step === 'auth'
@@ -135,9 +133,13 @@ export default function SignupClient() {
 
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-2 pt-2">
-            <div className={`w-2 h-2 rounded-full ${step === 'auth' ? 'bg-mq-primary' : 'bg-mq-success'}`} />
+            <div
+              className={`w-2 h-2 rounded-full ${step === 'auth' ? 'bg-mq-primary' : 'bg-mq-success'}`}
+            />
             <div className={`w-8 h-0.5 ${step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border'}`} />
-            <div className={`w-2 h-2 rounded-full ${step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border'}`} />
+            <div
+              className={`w-2 h-2 rounded-full ${step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border'}`}
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

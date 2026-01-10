@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Badge } from '@/components/ui/mq/badge';
-import { Building, BUILDING_CATEGORY_LABELS } from '@/lib/map/buildings';
+import { Building, BUILDING_CATEGORY_LABELS, getBuildingGps } from '@/lib/map/buildings';
 import {
   RoutePreview,
   formatDistance,
@@ -20,24 +20,44 @@ import type { MapOverlayId } from '@/lib/map/mapOverlays';
 // Map-specific logger
 const mapLog = devLog.map;
 
-// Map dimensions (image size)
-const MAP_WIDTH = 4678;
-const MAP_HEIGHT = 3307;
-
 // Campus image path
 const CAMPUS_IMAGE_URL = '/maps/raster/mq-campus.png';
 
-// Macquarie University coordinates - aligned with OpenStreetMap data
-// OSM bounding box: S:-33.7812113, N:-33.7674824, W:151.1052677, E:151.1203710
-// Adjusted to match the campus map image overlay precisely
-// The map image covers a slightly larger area than the campus itself
-const CAMPUS_BOUNDS: [[number, number], [number, number]] = [
-  [-33.7825, 151.1045], // southwest (bottom-left) - slightly expanded
-  [-33.7655, 151.1225], // northeast (top-right) - slightly expanded
+// === CRS.Simple PIXEL-BASED COORDINATE SYSTEM (v0.14.22) ===
+// The map image is a raster illustration (4678x3307 pixels), NOT georeferenced.
+// Using L.CRS.Simple treats the map as a pure 2D pixel grid where 1 unit = 1 pixel.
+// This eliminates ALL projection distortion and edge drift issues.
+//
+// Coordinate system:
+//   - Origin [0, 0] is at bottom-left (Leaflet default for CRS.Simple)
+//   - X increases to the right (0 to 4678)
+//   - Y increases upward (0 to 3307)
+//   - Building positions are stored as [x, y] in IMAGE coords (Y from top)
+//   - For Leaflet, we convert: [x, height - y] to get [lng, lat] in CRS.Simple
+//
+// Map dimensions from VRT file
+const MAP_DIMS = { width: 4678, height: 3307 };
+
+// Pixel-based bounds for CRS.Simple: [[minY, minX], [maxY, maxX]]
+// In CRS.Simple with default transformation, bounds are [y, x] format
+const PIXEL_BOUNDS: [[number, number], [number, number]] = [
+  [0, 0], // Bottom-left corner (origin)
+  [MAP_DIMS.height, MAP_DIMS.width], // Top-right corner
 ];
 
-// Fallback origin (Central Courtyard/Campus Hub - from OSM)
-const CAMPUS_CENTRE = { lat: -33.7742, lng: 151.1127 };
+// Campus center in pixel coordinates (for initial view)
+const CAMPUS_CENTER_PIXEL: [number, number] = [MAP_DIMS.height / 2, MAP_DIMS.width / 2];
+
+// Real GPS coordinates for campus center (used ONLY for geolocation comparison)
+const CAMPUS_CENTRE_GPS = { lat: -33.7742, lng: 151.1127 };
+
+// GPS bounds for checking if user is on campus (approximate)
+const GPS_CAMPUS_BOUNDS = {
+  south: -33.7833,
+  north: -33.7654,
+  west: 151.1055,
+  east: 151.1251,
+};
 
 // Overlay image paths
 const OVERLAY_PATHS: Record<MapOverlayId, string> = {
@@ -175,27 +195,61 @@ export default function CampusMap({
   // ============================================
   // HELPER FUNCTIONS (use L from state)
   // ============================================
-  const pixelToLatLng = useCallback(
-    (x: number, y: number): { lat: number; lng: number } => {
-      if (!leafletModule) {
-        // Fallback calculation without Leaflet
-        const xNorm = x / MAP_WIDTH;
-        const yNorm = (MAP_HEIGHT - y) / MAP_HEIGHT;
-        const lat = CAMPUS_BOUNDS[0][0] + (CAMPUS_BOUNDS[1][0] - CAMPUS_BOUNDS[0][0]) * yNorm;
-        const lng = CAMPUS_BOUNDS[0][1] + (CAMPUS_BOUNDS[1][1] - CAMPUS_BOUNDS[0][1]) * xNorm;
-        return { lat, lng };
+
+  // Convert building pixel position [x, y] to CRS.Simple coordinates [lat, lng]
+  // In CRS.Simple:
+  //   - Leaflet expects [lat, lng] which maps to [y, x] in pixel space
+  //   - Image coordinates have Y=0 at TOP, but CRS.Simple has Y=0 at BOTTOM
+  //   - So we invert Y: leafletY = MAP_DIMS.height - imageY
+  const pixelToLatLng = useCallback((x: number, y: number): { lat: number; lng: number } => {
+    // Convert from image coordinates (Y from top) to CRS.Simple (Y from bottom)
+    // In CRS.Simple, lat=Y and lng=X
+    return {
+      lat: MAP_DIMS.height - y, // Invert Y axis
+      lng: x,
+    };
+  }, []);
+
+  // Get the map coordinates for a building marker in CRS.Simple
+  // Uses pixel position directly - no projection math needed!
+  // NOTE: For external navigation/routing, use building.location (real GPS) instead
+  const getBuildingLatLng = useCallback(
+    (building: Building): { lat: number; lng: number } => {
+      // Convert pixel position to CRS.Simple coordinates
+      return pixelToLatLng(building.position[0], building.position[1]);
+    },
+    [pixelToLatLng],
+  );
+
+  // Convert real GPS coordinates to approximate pixel position on map
+  // Used ONLY for showing user's geolocation on the map
+  // This is approximate since the map is not georeferenced
+  const gpsToPixelLatLng = useCallback(
+    (gpsLat: number, gpsLng: number): { lat: number; lng: number } | null => {
+      const { south, north, west, east } = GPS_CAMPUS_BOUNDS;
+
+      // Check if position is within campus bounds (with some margin)
+      const margin = 0.002; // ~200m margin
+      if (
+        gpsLat < south - margin ||
+        gpsLat > north + margin ||
+        gpsLng < west - margin ||
+        gpsLng > east + margin
+      ) {
+        return null; // Outside campus area
       }
 
-      const latLngBounds = leafletModule.latLngBounds(CAMPUS_BOUNDS);
-      const xNorm = x / MAP_WIDTH;
-      const yNorm = (MAP_HEIGHT - y) / MAP_HEIGHT;
-      const lat =
-        latLngBounds.getSouth() + (latLngBounds.getNorth() - latLngBounds.getSouth()) * yNorm;
-      const lng =
-        latLngBounds.getWest() + (latLngBounds.getEast() - latLngBounds.getWest()) * xNorm;
-      return { lat, lng };
+      // Linear interpolation from GPS to pixel coordinates
+      const xNorm = (gpsLng - west) / (east - west);
+      const yNorm = (north - gpsLat) / (north - south); // Note: lat decreases as image Y increases
+
+      const pixelX = xNorm * MAP_DIMS.width;
+      const pixelY = yNorm * MAP_DIMS.height;
+
+      // Convert to CRS.Simple coordinates
+      return pixelToLatLng(pixelX, pixelY);
     },
-    [leafletModule],
+    [pixelToLatLng],
   );
 
   const isMapReady = useCallback(
@@ -280,17 +334,42 @@ export default function CampusMap({
   // ============================================
   const campusOverlayRef = useRef<import('leaflet').ImageOverlay | null>(null);
   const activeOverlayRefs = useRef<Map<MapOverlayId, import('leaflet').ImageOverlay>>(new Map());
+  const debugRectRef = useRef<import('leaflet').Rectangle | null>(null);
+
+  // Debug mode for bounds calibration (Ctrl+Shift+D to toggle)
+  const [debugMode, setDebugMode] = useState(false);
+
+  // GCP debug mode for calibration visualization (Ctrl+Shift+G to toggle)
+  const [gcpDebugMode, setGcpDebugMode] = useState(false);
+
+  // Debug keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setDebugMode((prev) => !prev);
+        mapLog.log('Debug mode:', !debugMode);
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+        e.preventDefault();
+        setGcpDebugMode((prev) => !prev);
+        mapLog.log('GCP debug mode:', !gcpDebugMode);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [debugMode, gcpDebugMode]);
 
   // Campus base image overlay
   useEffect(() => {
     if (!mapInstance || !leafletModule || !overlaysReady) return;
 
     try {
-      // Create campus overlay using native Leaflet
-      const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, CAMPUS_BOUNDS);
+      // Create campus overlay using native Leaflet with PIXEL_BOUNDS for CRS.Simple
+      const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, PIXEL_BOUNDS);
       campusOverlay.addTo(mapInstance);
       campusOverlayRef.current = campusOverlay;
-      mapLog.log('Campus overlay added via native Leaflet');
+      mapLog.log('Campus overlay added via native Leaflet (CRS.Simple pixel bounds)');
     } catch (error) {
       mapLog.log('Error adding campus overlay:', error);
     }
@@ -310,6 +389,123 @@ export default function CampusMap({
       campusOverlayRef.current = null;
     };
   }, [mapInstance, leafletModule, overlaysReady]);
+
+  // Debug rectangle for bounds visualization
+  useEffect(() => {
+    if (!mapInstance || !leafletModule || !overlaysReady) return;
+
+    if (debugMode) {
+      // Add debug rectangle to visualize pixel bounds
+      const debugRect = leafletModule.rectangle(PIXEL_BOUNDS, {
+        color: '#ff0000',
+        weight: 3,
+        fillOpacity: 0.1,
+        dashArray: '10, 10',
+      });
+      debugRect.addTo(mapInstance);
+      debugRectRef.current = debugRect;
+      mapLog.log('Debug rectangle added - pixel bounds:', PIXEL_BOUNDS);
+    } else {
+      // Remove debug rectangle
+      if (debugRectRef.current && mapInstance.hasLayer(debugRectRef.current)) {
+        mapInstance.removeLayer(debugRectRef.current);
+        debugRectRef.current = null;
+      }
+    }
+
+    return () => {
+      if (debugRectRef.current && mapInstance) {
+        try {
+          if (mapInstance.hasLayer(debugRectRef.current)) {
+            mapInstance.removeLayer(debugRectRef.current);
+          }
+        } catch {
+          // Ignore cleanup errors
+        }
+        debugRectRef.current = null;
+      }
+    };
+  }, [mapInstance, leafletModule, overlaysReady, debugMode]);
+
+  // Corner markers debug visualization (replaces GCP markers for CRS.Simple)
+  // Shows pixel coordinate markers at map corners for verification
+  const cornerMarkersRef = useRef<import('leaflet').Marker[]>([]);
+
+  useEffect(() => {
+    if (!mapInstance || !leafletModule || !overlaysReady) return;
+
+    // Cleanup existing corner markers
+    cornerMarkersRef.current.forEach((marker) => {
+      try {
+        if (mapInstance.hasLayer(marker)) {
+          mapInstance.removeLayer(marker);
+        }
+      } catch {
+        // Ignore cleanup errors
+      }
+    });
+    cornerMarkersRef.current = [];
+
+    if (gcpDebugMode) {
+      // In CRS.Simple mode, show corner markers with pixel coordinates
+      const corners = [
+        { name: 'Bottom-Left (Origin)', pixel: [0, 0] },
+        { name: 'Bottom-Right', pixel: [MAP_DIMS.width, 0] },
+        { name: 'Top-Left', pixel: [0, MAP_DIMS.height] },
+        { name: 'Top-Right', pixel: [MAP_DIMS.width, MAP_DIMS.height] },
+        { name: 'Center', pixel: [MAP_DIMS.width / 2, MAP_DIMS.height / 2] },
+      ];
+
+      const createCornerIcon = (color: string) => {
+        return leafletModule.divIcon({
+          className: 'corner-marker',
+          html: `<div style="
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: ${color};
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+          "></div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        });
+      };
+
+      corners.forEach((corner, i) => {
+        // Convert image pixel coords to CRS.Simple coords
+        const pos = pixelToLatLng(corner.pixel[0], corner.pixel[1]);
+        const marker = leafletModule.marker([pos.lat, pos.lng], {
+          icon: createCornerIcon(i === 4 ? '#00ff00' : '#ff00ff'),
+          zIndexOffset: 2000,
+        });
+        marker.bindPopup(`
+          <div style="font-size: 12px;">
+            <strong>${corner.name}</strong><br/>
+            Image Pixel: [${corner.pixel[0]}, ${corner.pixel[1]}]<br/>
+            CRS.Simple: [${pos.lat.toFixed(0)}, ${pos.lng.toFixed(0)}]
+          </div>
+        `);
+        marker.addTo(mapInstance);
+        cornerMarkersRef.current.push(marker);
+      });
+
+      mapLog.log('Corner debug markers added for CRS.Simple verification');
+    }
+
+    return () => {
+      cornerMarkersRef.current.forEach((marker) => {
+        try {
+          if (mapInstance && mapInstance.hasLayer(marker)) {
+            mapInstance.removeLayer(marker);
+          }
+        } catch {
+          // Ignore cleanup errors
+        }
+      });
+      cornerMarkersRef.current = [];
+    };
+  }, [mapInstance, leafletModule, overlaysReady, gcpDebugMode, pixelToLatLng]);
 
   // Active overlay layers (parking, water, etc.)
   useEffect(() => {
@@ -335,13 +531,13 @@ export default function CampusMap({
       // Add new overlays
       activeOverlays.forEach((overlayId) => {
         if (!currentOverlays.has(overlayId)) {
-          const overlay = leafletModule.imageOverlay(OVERLAY_PATHS[overlayId], CAMPUS_BOUNDS, {
+          const overlay = leafletModule.imageOverlay(OVERLAY_PATHS[overlayId], PIXEL_BOUNDS, {
             opacity: 0.85,
             className: 'map-overlay-layer',
           });
           overlay.addTo(mapInstance);
           currentOverlays.set(overlayId, overlay);
-          mapLog.log(`Overlay ${overlayId} added via native Leaflet`);
+          mapLog.log(`Overlay ${overlayId} added via native Leaflet (CRS.Simple)`);
         }
       });
     } catch (error) {
@@ -364,7 +560,7 @@ export default function CampusMap({
   }, [mapInstance, leafletModule, overlaysReady, activeOverlays]);
 
   // ============================================
-  // GEOLOCATION EFFECT
+  // GEOLOCATION EFFECT - Convert real GPS to pixel coords for CRS.Simple
   // ============================================
   useEffect(() => {
     if (!mapInstance || !isMapReady(mapInstance) || !leafletModule || !navigator.geolocation) {
@@ -385,53 +581,80 @@ export default function CampusMap({
           return;
         }
 
-        mapLog.log('Position received:', {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
+        const gpsLat = pos.coords.latitude;
+        const gpsLng = pos.coords.longitude;
+
+        mapLog.log('GPS position received:', {
+          lat: gpsLat,
+          lng: gpsLng,
           accuracy: pos.coords.accuracy,
         });
 
         setLocationStatus('found');
-        const latlng = leafletModule.latLng(pos.coords.latitude, pos.coords.longitude);
-        setOrigin({ lat: latlng.lat, lng: latlng.lng });
+        // Store real GPS coords for routing (ORS needs real GPS)
+        setOrigin({ lat: gpsLat, lng: gpsLng });
 
-        const latLngBounds = leafletModule.latLngBounds(CAMPUS_BOUNDS);
-        const isInBounds = latLngBounds.contains(latlng);
-        const distance = latlng.distanceTo(
-          leafletModule.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng),
-        );
+        // Check if user is within campus bounds using GPS
+        const { south, north, west, east } = GPS_CAMPUS_BOUNDS;
+        const isInBounds = gpsLat >= south && gpsLat <= north && gpsLng >= west && gpsLng <= east;
+
+        // Calculate approximate distance from campus center
+        const latDiff = gpsLat - CAMPUS_CENTRE_GPS.lat;
+        const lngDiff = gpsLng - CAMPUS_CENTRE_GPS.lng;
+        const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111000; // rough meters
+
         mapLog.log('Position analysis:', {
           isInCampusBounds: isInBounds,
           distanceFromCampusCentre: `${Math.round(distance)}m`,
         });
 
         try {
-          if (!userMarkerRef.current && userIcon) {
-            mapLog.log('Creating user marker at:', latlng);
-            userMarkerRef.current = leafletModule
-              .marker(latlng, {
-                icon: userIcon,
-                zIndexOffset: 1000,
-              })
-              .addTo(mapInstance);
-          } else if (userMarkerRef.current) {
-            userMarkerRef.current.setLatLng(latlng);
-          }
+          // Convert GPS to pixel coordinates for CRS.Simple display
+          const pixelPos = gpsToPixelLatLng(gpsLat, gpsLng);
 
-          const accuracy = pos.coords.accuracy;
-          if (!accuracyCircleRef.current) {
-            accuracyCircleRef.current = leafletModule
-              .circle(latlng, {
-                radius: accuracy,
-                color: 'var(--mq-primary, #1a73e8)',
-                weight: 1,
-                opacity: 0.4,
-                fillOpacity: 0.1,
-              })
-              .addTo(mapInstance);
+          if (pixelPos) {
+            // User is on/near campus - show marker on map
+            if (!userMarkerRef.current && userIcon) {
+              mapLog.log('Creating user marker at pixel coords:', pixelPos);
+              userMarkerRef.current = leafletModule
+                .marker([pixelPos.lat, pixelPos.lng], {
+                  icon: userIcon,
+                  zIndexOffset: 1000,
+                })
+                .addTo(mapInstance);
+            } else if (userMarkerRef.current) {
+              userMarkerRef.current.setLatLng([pixelPos.lat, pixelPos.lng]);
+            }
+
+            // Accuracy circle - convert meters to pixels (approximate)
+            // At campus scale, roughly 1 pixel ≈ 0.42m (based on map dimensions)
+            const accuracy = pos.coords.accuracy;
+            const pixelAccuracy = accuracy / 0.42; // Convert meters to pixels
+            if (!accuracyCircleRef.current) {
+              accuracyCircleRef.current = leafletModule
+                .circle([pixelPos.lat, pixelPos.lng], {
+                  radius: pixelAccuracy,
+                  color: 'var(--mq-primary, #1a73e8)',
+                  weight: 1,
+                  opacity: 0.4,
+                  fillOpacity: 0.1,
+                })
+                .addTo(mapInstance);
+            } else {
+              accuracyCircleRef.current.setLatLng([pixelPos.lat, pixelPos.lng]);
+              accuracyCircleRef.current.setRadius(pixelAccuracy);
+            }
           } else {
-            accuracyCircleRef.current.setLatLng(latlng);
-            accuracyCircleRef.current.setRadius(accuracy);
+            // User is off campus - remove markers
+            mapLog.log('User is outside campus bounds, hiding marker');
+            if (userMarkerRef.current) {
+              mapInstance.removeLayer(userMarkerRef.current);
+              userMarkerRef.current = null;
+            }
+            if (accuracyCircleRef.current) {
+              mapInstance.removeLayer(accuracyCircleRef.current);
+              accuracyCircleRef.current = null;
+            }
           }
         } catch (error) {
           mapLog.log('Error updating location markers (likely unmounted):', error);
@@ -469,7 +692,7 @@ export default function CampusMap({
 
         if (!hasSetFallbackOrigin.current) {
           hasSetFallbackOrigin.current = true;
-          setOrigin(CAMPUS_CENTRE);
+          setOrigin(CAMPUS_CENTRE_GPS);
         }
       },
       {
@@ -496,7 +719,7 @@ export default function CampusMap({
         mapLog.log('Marker cleanup error (likely already removed):', error);
       }
     };
-  }, [mapInstance, leafletModule, userIcon, isMapReady]);
+  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng]);
 
   // ============================================
   // CENTER ON USER ACTION
@@ -519,26 +742,19 @@ export default function CampusMap({
       return;
     }
 
-    if (userMarkerRef.current && mapInstance && isMapReady(mapInstance) && leafletModule) {
+    if (userMarkerRef.current && mapInstance && isMapReady(mapInstance)) {
       try {
         const userLatLng = userMarkerRef.current.getLatLng();
-        mapLog.log('Centering on user at:', userLatLng);
-        mapInstance.setView(userLatLng, 18, { animate: true });
-
-        const latLngBounds = leafletModule.latLngBounds(CAMPUS_BOUNDS);
-        if (!latLngBounds.contains(userLatLng)) {
-          const distance = userLatLng.distanceTo(
-            leafletModule.latLng(CAMPUS_CENTRE.lat, CAMPUS_CENTRE.lng),
-          );
-          toastUtils.warning(
-            t('outsideCampus'),
-            t('outsideCampusDistance', { distance: Math.round(distance).toString() }),
-          );
-        }
+        mapLog.log('Centering on user at pixel coords:', userLatLng);
+        // In CRS.Simple, zoom level 0 shows the full map. Use 1 for closer view.
+        mapInstance.setView(userLatLng, 0, { animate: true });
       } catch (error) {
         mapLog.log('Error centering on user (likely unmounted):', error);
         toastUtils.warning(t('locationError'), t('positionUnavailableDesc'));
       }
+    } else if (!userMarkerRef.current && origin) {
+      // User is off campus but we have their GPS - show a message
+      toastUtils.warning(t('outsideCampus'), t('positionUnavailableDesc'));
     } else {
       mapLog.log('Cannot center - marker:', {
         hasMarker: !!userMarkerRef.current,
@@ -546,7 +762,7 @@ export default function CampusMap({
       });
       toastUtils.warning(t('locationError'), t('positionUnavailableDesc'));
     }
-  }, [locationStatus, mapInstance, origin, t, leafletModule, isMapReady]);
+  }, [locationStatus, mapInstance, origin, t, isMapReady]);
 
   // ============================================
   // RETRY ROUTE
@@ -557,10 +773,32 @@ export default function CampusMap({
     setIsLoadingRoute(true);
     setRouteError(null);
 
-    const destLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
-    const dest = { lat: destLatLng.lat, lng: destLatLng.lng };
+    // Use real GPS coordinates for ORS routing (not pixel-based CRS.Simple coords)
+    const destGps = getBuildingGps(selectedBuilding);
 
-    const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, dest);
+    // Validate coordinates
+    const isValidCoord = (c: { lat: number; lng: number } | null): boolean => {
+      if (!c) return false;
+      return (
+        typeof c.lat === 'number' &&
+        typeof c.lng === 'number' &&
+        Number.isFinite(c.lat) &&
+        Number.isFinite(c.lng) &&
+        c.lat >= -90 &&
+        c.lat <= 90 &&
+        c.lng >= -180 &&
+        c.lng <= 180
+      );
+    };
+
+    if (!isValidCoord(destGps) || !isValidCoord(origin)) {
+      mapLog.warn('Invalid coordinates for retry:', { destGps, origin });
+      setRouteError('Invalid coordinates');
+      setIsLoadingRoute(false);
+      return;
+    }
+
+    const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, destGps);
 
     if (routeData) {
       setRouteCoords(coordinates);
@@ -572,7 +810,7 @@ export default function CampusMap({
     }
 
     setIsLoadingRoute(false);
-  }, [selectedBuilding, origin, t, pixelToLatLng]);
+  }, [selectedBuilding, origin, t]);
 
   // ============================================
   // ROUTING LOGIC
@@ -586,11 +824,52 @@ export default function CampusMap({
       }
 
       setIsLoadingRoute(true);
-      const destLatLng = pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]);
-      const dest = { lat: destLatLng.lat, lng: destLatLng.lng };
+      // Use real GPS coordinates for ORS routing (not pixel-based CRS.Simple coords)
+      const destGps = getBuildingGps(selectedBuilding);
+
+      // Validate coordinates before sending to API
+      const isValidCoord = (c: { lat: number; lng: number } | null): boolean => {
+        if (!c) return false;
+        return (
+          typeof c.lat === 'number' &&
+          typeof c.lng === 'number' &&
+          Number.isFinite(c.lat) &&
+          Number.isFinite(c.lng) &&
+          c.lat >= -90 &&
+          c.lat <= 90 &&
+          c.lng >= -180 &&
+          c.lng <= 180
+        );
+      };
+
+      // Debug logging to diagnose coordinate issues
+      mapLog.log('ORS Route Request:', {
+        buildingId: selectedBuilding.id,
+        buildingName: selectedBuilding.name,
+        hasLocation: !!selectedBuilding.location,
+        pixelPosition: selectedBuilding.position,
+        destGps,
+        origin,
+        destValid: isValidCoord(destGps),
+        originValid: isValidCoord(origin),
+      });
+
+      if (!isValidCoord(destGps)) {
+        mapLog.warn('Invalid destination GPS coordinates:', destGps);
+        setRouteError('Invalid building coordinates');
+        setIsLoadingRoute(false);
+        return;
+      }
+
+      if (!isValidCoord(origin)) {
+        mapLog.warn('Invalid origin GPS coordinates:', origin);
+        setRouteError('Location not available');
+        setIsLoadingRoute(false);
+        return;
+      }
 
       setRouteError(null);
-      const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, dest);
+      const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, destGps);
 
       if (routeData) {
         setRouteCoords(coordinates);
@@ -605,7 +884,7 @@ export default function CampusMap({
 
     const timer = setTimeout(updateRoute, 100);
     return () => clearTimeout(timer);
-  }, [selectedBuilding, origin, t, pixelToLatLng]);
+  }, [selectedBuilding, origin, t]);
 
   // ============================================
   // MAP CONTROLLER COMPONENT (defined inside to access hooks)
@@ -670,12 +949,12 @@ export default function CampusMap({
         if (!isReady || !isMapReady(map)) return;
 
         try {
-          // Center on campus hub area using accurate coordinates
-          const center: [number, number] = [-33.7742, 151.1127];
-          map.setView(center, 16);
-          map.setMaxBounds(CAMPUS_BOUNDS);
-          map.setMinZoom(15);
-          map.setMaxZoom(20);
+          // CRS.Simple: Center on campus using pixel coordinates
+          // CAMPUS_CENTER_PIXEL is [height/2, width/2] = [1653.5, 2339]
+          map.setView(CAMPUS_CENTER_PIXEL, 0); // Zoom 0 shows full map in CRS.Simple
+          map.setMaxBounds(PIXEL_BOUNDS);
+          map.setMinZoom(-2); // Allow zooming out
+          map.setMaxZoom(2); // Allow zooming in
         } catch (error) {
           mapLog.log('Map setup error (likely unmounted):', error);
         }
@@ -685,11 +964,12 @@ export default function CampusMap({
         if (!isReady || !isMapReady(map) || !selectedBuildingProp) return;
 
         try {
+          // Use pixel-to-latLng conversion for CRS.Simple positioning
           const buildingLatLng = pixelToLatLng(
             selectedBuildingProp.position[0],
             selectedBuildingProp.position[1],
           );
-          map.setView([buildingLatLng.lat, buildingLatLng.lng], 17);
+          map.setView([buildingLatLng.lat, buildingLatLng.lng], 1); // Zoom 1 for building detail
 
           map.eachLayer((layer) => {
             if (layer instanceof leafletModule.Marker) {
@@ -739,11 +1019,12 @@ export default function CampusMap({
       aria-label={t('interactiveCampusMap')}
     >
       {/* Only render MapContainer after client-side modules are loaded */}
-      {isClientReady && reactLeafletModule && MapController ? (
+      {isClientReady && reactLeafletModule && leafletModule && MapController ? (
         <reactLeafletModule.MapContainer
           key={`map-${mapKey}`} // Force clean remount on HMR
-          center={[-33.7742, 151.1127]} // Campus hub coordinates
-          zoom={16}
+          crs={leafletModule.CRS.Simple} // Use pixel-based CRS for raster image
+          center={CAMPUS_CENTER_PIXEL} // Pixel center [height/2, width/2]
+          zoom={0} // Zoom 0 = 1:1 pixel scale in CRS.Simple
           zoomControl={false}
           style={{ height: '100%', width: '100%' }}
         >
@@ -791,8 +1072,8 @@ export default function CampusMap({
             <reactLeafletModule.Marker
               key={selectedBuilding.id}
               position={[
-                pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]).lat,
-                pixelToLatLng(selectedBuilding.position[0], selectedBuilding.position[1]).lng,
+                getBuildingLatLng(selectedBuilding).lat,
+                getBuildingLatLng(selectedBuilding).lng,
               ]}
               icon={selectedIcon}
             >
@@ -1121,11 +1402,17 @@ export default function CampusMap({
                         {/* Navigate Button */}
                         <button
                           onClick={() => {
-                            const destLatLng = pixelToLatLng(
-                              selectedBuilding.position[0],
-                              selectedBuilding.position[1],
-                            );
-                            openBestNavApp(origin, { lat: destLatLng.lat, lng: destLatLng.lng });
+                            // Use real GPS for external navigation (Google/Apple Maps)
+                            const destGps = getBuildingGps(selectedBuilding);
+                            mapLog.log('Navigate button clicked:', {
+                              buildingId: selectedBuilding.id,
+                              buildingName: selectedBuilding.name,
+                              hasStoredLocation: !!selectedBuilding.location,
+                              storedLocation: selectedBuilding.location,
+                              calculatedGps: destGps,
+                              origin,
+                            });
+                            openBestNavApp(origin, destGps);
                           }}
                           aria-label={`${t('navigate')} ${selectedBuilding.name}`}
                           className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2"
@@ -1325,11 +1612,9 @@ export default function CampusMap({
                         {/* Navigate Button */}
                         <button
                           onClick={() => {
-                            const destLatLng = pixelToLatLng(
-                              selectedBuilding.position[0],
-                              selectedBuilding.position[1],
-                            );
-                            openBestNavApp(origin, { lat: destLatLng.lat, lng: destLatLng.lng });
+                            // Use real GPS for external navigation (Google/Apple Maps)
+                            const destGps = getBuildingGps(selectedBuilding);
+                            openBestNavApp(origin, destGps);
                           }}
                           aria-label={`${t('navigate')} ${selectedBuilding.name}`}
                           className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2"

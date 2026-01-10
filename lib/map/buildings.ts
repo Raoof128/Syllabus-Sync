@@ -181,17 +181,18 @@ export function getBuildingCrsCoords(building: Building): { lat: number; lng: nu
 
 /**
  * Get real GPS coordinates for a building (for external navigation).
- * Prefers OSM GPS coordinates when available, falls back to approximate conversion.
- * Use this when opening directions in Apple/Google Maps or ORS routing.
+ * ALWAYS calculates GPS from the calibrated pixel position to ensure
+ * the navigation destination matches what's shown on the campus map.
+ *
+ * Note: The stored building.location (OSM GPS) is kept for reference/attribution
+ * but not used for navigation since it often doesn't match the calibrated pixel positions.
  *
  * @param building - The building object
  * @returns GPS coordinates { lat, lng }
  */
 export function getBuildingGps(building: Building): { lat: number; lng: number } {
-  if (building.location?.lat && building.location?.lng) {
-    return { lat: building.location.lat, lng: building.location.lng };
-  }
-  // Fallback: approximate GPS from pixel position (less accurate)
+  // Always calculate from pixel position (which has been manually calibrated)
+  // This ensures navigation matches what users see on the map
   return pixelToGps(building.position[0], building.position[1]);
 }
 

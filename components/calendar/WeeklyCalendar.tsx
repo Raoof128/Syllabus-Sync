@@ -46,9 +46,8 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const units = useUnitsStore((state) => state.units);
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
-
 
   // Get days of the current week
   const weekDays = useMemo(() => {
@@ -113,7 +112,6 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
     return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
   }, []);
 
-
   return (
     <div className="flex flex-col h-full">
       {/* Header with navigation */}
@@ -151,7 +149,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                 key={day.toISOString()}
                 className={cn(
                   'p-2 text-center border-r border-mq-border last:border-r-0',
-                  isToday(day) && 'bg-mq-primary/5'
+                  isToday(day) && 'bg-mq-primary/5',
                 )}
               >
                 <div className="text-xs text-mq-content-secondary uppercase">
@@ -162,7 +160,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                     'text-lg font-semibold mt-1',
                     isToday(day)
                       ? 'w-8 h-8 mx-auto rounded-full bg-mq-primary text-white flex items-center justify-center'
-                      : 'text-mq-content'
+                      : 'text-mq-content',
                   )}
                 >
                   {format(day, 'd')}
@@ -184,10 +182,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
             {/* Time labels */}
             <div className="relative">
               {HOURS.map((hour) => (
-                <div
-                  key={hour}
-                  className="h-[60px] border-b border-mq-border pr-2 text-right"
-                >
+                <div key={hour} className="h-[60px] border-b border-mq-border pr-2 text-right">
                   <span className="text-xs text-mq-content-secondary -mt-2 block">
                     {format(new Date().setHours(hour, 0), 'h a')}
                   </span>
@@ -209,15 +204,12 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                   key={day.toISOString()}
                   className={cn(
                     'relative border-r border-mq-border last:border-r-0',
-                    isToday(day) && 'bg-mq-primary/5'
+                    isToday(day) && 'bg-mq-primary/5',
                   )}
                 >
                   {/* Hour lines */}
                   {HOURS.map((hour) => (
-                    <div
-                      key={hour}
-                      className="h-[60px] border-b border-mq-border border-dashed"
-                    />
+                    <div key={hour} className="h-[60px] border-b border-mq-border border-dashed" />
                   ))}
 
                   {/* Current time indicator */}
@@ -277,8 +269,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                         const dueTime = new Date(deadline.dueDate);
                         const hours = dueTime.getHours();
                         const minutes = dueTime.getMinutes();
-                        const timePosition =
-                          hours >= 6 ? timeToPosition(`${hours}:${minutes}`) : 0;
+                        const timePosition = hours >= 6 ? timeToPosition(`${hours}:${minutes}`) : 0;
 
                         return (
                           <button
@@ -287,7 +278,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                             className={cn(
                               'absolute left-1 right-1 p-1 rounded text-xs font-medium truncate text-left hover:opacity-80 transition-opacity',
                               PRIORITY_COLORS[deadline.priority],
-                              deadline.completed && 'opacity-50 line-through'
+                              deadline.completed && 'opacity-50 line-through',
                             )}
                             style={{ top: timePosition || 0 }}
                           >
@@ -306,4 +297,3 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
     </div>
   );
 }
-

@@ -530,12 +530,7 @@ export default function HomeClient() {
                     <BookOpen className="h-5 w-5" aria-hidden="true" />
                     {t('myUnits')}
                   </CardTitle>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="gap-1"
-                    asChild
-                  >
+                  <Button size="sm" variant="outline" className="gap-1" asChild>
                     <Link href="/calendar" aria-label={t('viewAll')}>
                       <ExternalLink className="h-4 w-4" />
                       {t('viewAll')}
@@ -630,7 +625,6 @@ export default function HomeClient() {
 
       {/* Unit Form Dialog */}
       <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />
-
 
       {/* Delete Unit Confirmation Dialog */}
       <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>

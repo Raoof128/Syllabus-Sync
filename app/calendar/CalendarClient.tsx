@@ -31,7 +31,18 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { sampleEvents } from '@/data/sampleEvents';
 import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_LABELS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
-import { format, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, isToday, addWeeks, subWeeks, getHours, getMinutes } from 'date-fns';
+import {
+  format,
+  isSameDay,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isToday,
+  addWeeks,
+  subWeeks,
+  getHours,
+  getMinutes,
+} from 'date-fns';
 import { cn } from '@/lib/utils';
 
 // Dynamically import forms
@@ -58,11 +69,15 @@ const TYPE_COLORS = {
 };
 
 // Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" to start/end hours
-function parseTimeRange(timeStr: string): { startHour: number; startMin: number; endHour: number; endMin: number } | null {
+function parseTimeRange(
+  timeStr: string,
+): { startHour: number; startMin: number; endHour: number; endMin: number } | null {
   if (!timeStr) return null;
 
   // Try parsing range format "10:00 AM - 2:00 PM"
-  const rangeMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?\s*[-–]\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  const rangeMatch = timeStr.match(
+    /(\d{1,2}):(\d{2})\s*(AM|PM)?\s*[-–]\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i,
+  );
   if (rangeMatch) {
     let startHour = parseInt(rangeMatch[1], 10);
     const startMin = parseInt(rangeMatch[2], 10);
@@ -105,7 +120,12 @@ function parseTimeRange(timeStr: string): { startHour: number; startMin: number;
 }
 
 // Calculate position and height for a time-based item
-function getTimePositionAndHeight(startHour: number, startMin: number, endHour: number, endMin: number): { top: number; height: number } | null {
+function getTimePositionAndHeight(
+  startHour: number,
+  startMin: number,
+  endHour: number,
+  endMin: number,
+): { top: number; height: number } | null {
   // Clamp to visible range (7am to midnight)
   const effectiveStartHour = Math.max(START_HOUR, Math.min(24, startHour));
   const effectiveEndHour = Math.max(START_HOUR, Math.min(24, endHour));
@@ -113,7 +133,7 @@ function getTimePositionAndHeight(startHour: number, startMin: number, endHour: 
   if (effectiveStartHour >= 24) return null;
 
   const top = (effectiveStartHour - START_HOUR) * HOUR_HEIGHT + (startMin / 60) * HOUR_HEIGHT;
-  const durationHours = (effectiveEndHour - effectiveStartHour) + (endMin - startMin) / 60;
+  const durationHours = effectiveEndHour - effectiveStartHour + (endMin - startMin) / 60;
   const height = Math.max(20, durationHours * HOUR_HEIGHT);
 
   return { top, height };
@@ -141,7 +161,7 @@ export default function CalendarClient() {
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
   );
 
   // Get days of the current week
@@ -157,9 +177,7 @@ export default function CalendarClient() {
   const getUnitsForDay = (date: Date) => {
     const dayName = format(date, 'EEEE'); // Monday, Tuesday, etc.
     return units.flatMap((unit) =>
-      unit.schedule
-        .filter((s) => s.day === dayName)
-        .map((s) => ({ ...unit, schedule: s }))
+      unit.schedule.filter((s) => s.day === dayName).map((s) => ({ ...unit, schedule: s })),
     );
   };
 
@@ -260,7 +278,7 @@ export default function CalendarClient() {
                       key={day.toISOString()}
                       className={cn(
                         'p-3 text-center border-r border-mq-border last:border-r-0',
-                        isToday(day) && 'bg-mq-primary/5'
+                        isToday(day) && 'bg-mq-primary/5',
                       )}
                     >
                       <div className="text-xs text-mq-content-secondary uppercase font-medium">
@@ -271,7 +289,7 @@ export default function CalendarClient() {
                           'text-xl font-semibold mt-1 inline-flex items-center justify-center',
                           isToday(day)
                             ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
-                            : 'text-mq-content'
+                            : 'text-mq-content',
                         )}
                       >
                         {format(day, 'd')}
@@ -299,7 +317,7 @@ export default function CalendarClient() {
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
                             'border-t border-mq-border/50 border-r border-mq-border/30 last:border-r-0',
-                            isToday(day) && 'bg-mq-primary/[0.02]'
+                            isToday(day) && 'bg-mq-primary/[0.02]',
                           )}
                           style={{ height: HOUR_HEIGHT }}
                         />
@@ -323,10 +341,18 @@ export default function CalendarClient() {
                   {/* Events, Units and Deadlines Overlay */}
                   <div className="absolute left-[60px] right-0 top-0 bottom-0 grid grid-cols-7">
                     {weekDays.map((day) => {
-                      const { deadlines: dayDeadlines, events: dayEvents, mqDates: dayMQDates, units: dayUnits } = getItemsForDay(day);
+                      const {
+                        deadlines: dayDeadlines,
+                        events: dayEvents,
+                        mqDates: dayMQDates,
+                        units: dayUnits,
+                      } = getItemsForDay(day);
 
                       return (
-                        <div key={day.toISOString()} className="relative border-r border-mq-border/30 last:border-r-0">
+                        <div
+                          key={day.toISOString()}
+                          className="relative border-r border-mq-border/30 last:border-r-0"
+                        >
                           {/* MQ Key Dates - Full day background */}
                           {dayMQDates.map((mqDate, idx) => {
                             const colors = MQ_DATE_COLORS[mqDate.category];
@@ -336,16 +362,14 @@ export default function CalendarClient() {
                             return (
                               <div
                                 key={mqDate.id}
-                                className={cn(
-                                  'absolute left-0 right-0 z-5',
-                                  colors.bgLight
-                                )}
+                                className={cn('absolute left-0 right-0 z-5', colors.bgLight)}
                                 style={{ top: 0, height: '100%', opacity: 0.3 }}
                               >
                                 <div
                                   className={cn(
                                     'absolute top-0 left-1 right-1 text-[9px] px-1 py-0.5 rounded font-medium z-10 truncate',
-                                    colors.bg, colors.text
+                                    colors.bg,
+                                    colors.text,
                                   )}
                                   style={{ top: idx * 18 + 2 }}
                                   title={`${mqDate.event} - ${mqDate.term}${isSpecial ? ` (${programLabel})` : ''}`}
@@ -360,11 +384,18 @@ export default function CalendarClient() {
                           {/* Units - filled time block with unit color */}
                           {dayUnits.map((unitData) => {
                             const schedule = unitData.schedule;
-                            const timeInfo = parseTimeRange(`${schedule.startTime} - ${schedule.endTime}`);
+                            const timeInfo = parseTimeRange(
+                              `${schedule.startTime} - ${schedule.endTime}`,
+                            );
 
                             if (!timeInfo) return null;
 
-                            const posInfo = getTimePositionAndHeight(timeInfo.startHour, timeInfo.startMin, timeInfo.endHour, timeInfo.endMin);
+                            const posInfo = getTimePositionAndHeight(
+                              timeInfo.startHour,
+                              timeInfo.startMin,
+                              timeInfo.endHour,
+                              timeInfo.endMin,
+                            );
                             if (!posInfo) return null;
 
                             return (
@@ -380,8 +411,12 @@ export default function CalendarClient() {
                                 title={`${unitData.code} - ${unitData.name}\n${schedule.startTime} - ${schedule.endTime}\n${unitData.location.building} ${unitData.location.room}`}
                               >
                                 <div className="p-1 h-full" style={{ color: unitData.color }}>
-                                  <span className="block text-[10px] font-bold truncate">{unitData.code}</span>
-                                  <span className="text-[8px] opacity-80">{schedule.startTime}</span>
+                                  <span className="block text-[10px] font-bold truncate">
+                                    {unitData.code}
+                                  </span>
+                                  <span className="text-[8px] opacity-80">
+                                    {schedule.startTime}
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -395,7 +430,12 @@ export default function CalendarClient() {
                             const colors = TYPE_COLORS[deadline.type];
 
                             // Default 1 hour duration from due time
-                            const posInfo = getTimePositionAndHeight(hours, minutes, hours + 1, minutes);
+                            const posInfo = getTimePositionAndHeight(
+                              hours,
+                              minutes,
+                              hours + 1,
+                              minutes,
+                            );
 
                             if (!posInfo || hours < START_HOUR) {
                               // Show at top if outside visible hours
@@ -405,10 +445,11 @@ export default function CalendarClient() {
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
-                                    colors.bg, colors.text,
-                                    deadline.completed && 'opacity-50 line-through'
+                                    colors.bg,
+                                    colors.text,
+                                    deadline.completed && 'opacity-50 line-through',
                                   )}
-                                  style={{ top: (dayMQDates.length * 18) + 4 + (idx * 22) }}
+                                  style={{ top: dayMQDates.length * 18 + 4 + idx * 22 }}
                                   title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
                                 >
                                   {deadline.title}
@@ -422,14 +463,18 @@ export default function CalendarClient() {
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
                                   'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
-                                  colors.bg, colors.text, colors.border,
-                                  deadline.completed && 'opacity-50 line-through'
+                                  colors.bg,
+                                  colors.text,
+                                  colors.border,
+                                  deadline.completed && 'opacity-50 line-through',
                                 )}
                                 style={{ top: posInfo.top, height: posInfo.height }}
                                 title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
                               >
                                 <span className="block truncate">{deadline.title}</span>
-                                <span className="text-[8px] opacity-80">{format(dueDate, 'h:mm a')}</span>
+                                <span className="text-[8px] opacity-80">
+                                  {format(dueDate, 'h:mm a')}
+                                </span>
                               </button>
                             );
                           })}
@@ -441,14 +486,16 @@ export default function CalendarClient() {
 
                             if (!timeInfo) {
                               // Show at top if no valid time
-                              const offsetTop = (dayMQDates.length * 18) + 4 + (dayDeadlines.length * 22) + (idx * 22);
+                              const offsetTop =
+                                dayMQDates.length * 18 + 4 + dayDeadlines.length * 22 + idx * 22;
                               return (
                                 <button
                                   key={event.id}
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
-                                    colors.bg, colors.text
+                                    colors.bg,
+                                    colors.text,
                                   )}
                                   style={{ top: offsetTop }}
                                   title={`Event: ${event.title} @ ${event.time}`}
@@ -458,17 +505,24 @@ export default function CalendarClient() {
                               );
                             }
 
-                            const posInfo = getTimePositionAndHeight(timeInfo.startHour, timeInfo.startMin, timeInfo.endHour, timeInfo.endMin);
+                            const posInfo = getTimePositionAndHeight(
+                              timeInfo.startHour,
+                              timeInfo.startMin,
+                              timeInfo.endHour,
+                              timeInfo.endMin,
+                            );
 
                             if (!posInfo) {
-                              const offsetTop = (dayMQDates.length * 18) + 4 + (dayDeadlines.length * 22) + (idx * 22);
+                              const offsetTop =
+                                dayMQDates.length * 18 + 4 + dayDeadlines.length * 22 + idx * 22;
                               return (
                                 <button
                                   key={event.id}
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
-                                    colors.bg, colors.text
+                                    colors.bg,
+                                    colors.text,
                                   )}
                                   style={{ top: offsetTop }}
                                   title={`Event: ${event.title} @ ${event.time}`}
@@ -484,7 +538,9 @@ export default function CalendarClient() {
                                 onClick={() => handleEventClick(event)}
                                 className={cn(
                                   'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
-                                  colors.bg, colors.text, 'border-green-700'
+                                  colors.bg,
+                                  colors.text,
+                                  'border-green-700',
                                 )}
                                 style={{ top: posInfo.top, height: posInfo.height }}
                                 title={`Event: ${event.title} @ ${event.time}`}
@@ -556,12 +612,16 @@ export default function CalendarClient() {
                   {assignments.length === 0 ? (
                     <div className="text-center py-8">
                       <FileText className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">{t('noAssignmentsYet' as 'title')}</p>
+                      <p className="text-mq-content-secondary text-sm">
+                        {t('noAssignmentsYet' as 'title')}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                       {assignments
-                        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                        .sort(
+                          (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+                        )
                         .map((assignment) => {
                           const due = new Date(assignment.dueDate);
                           const isOverdue = !assignment.completed && due < new Date();
@@ -570,8 +630,11 @@ export default function CalendarClient() {
                               key={assignment.id}
                               className={cn(
                                 'flex items-center justify-between p-3 rounded-lg border transition-all',
-                                assignment.completed ? 'opacity-60 border-mq-border' :
-                                isOverdue ? 'border-red-300 bg-red-50 dark:bg-red-950/20' : 'border-mq-border hover:border-blue-300'
+                                assignment.completed
+                                  ? 'opacity-60 border-mq-border'
+                                  : isOverdue
+                                    ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
+                                    : 'border-mq-border hover:border-blue-300',
                               )}
                             >
                               <div className="flex items-center gap-3">
@@ -583,7 +646,12 @@ export default function CalendarClient() {
                                   )}
                                 </button>
                                 <div>
-                                  <h4 className={cn('font-medium text-sm', assignment.completed && 'line-through')}>
+                                  <h4
+                                    className={cn(
+                                      'font-medium text-sm',
+                                      assignment.completed && 'line-through',
+                                    )}
+                                  >
                                     {assignment.title}
                                   </h4>
                                   <p className="text-xs text-mq-content-secondary">
@@ -592,10 +660,16 @@ export default function CalendarClient() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Badge className={PRIORITY_COLORS[assignment.priority]} variant="neutral">
+                                <Badge
+                                  className={PRIORITY_COLORS[assignment.priority]}
+                                  variant="neutral"
+                                >
                                   {assignment.priority}
                                 </Badge>
-                                <button onClick={() => openEditDeadline(assignment)} className="p-1 hover:bg-mq-hover-background rounded">
+                                <button
+                                  onClick={() => openEditDeadline(assignment)}
+                                  className="p-1 hover:bg-mq-hover-background rounded"
+                                >
                                   <Edit2 className="h-4 w-4 text-mq-content-secondary" />
                                 </button>
                               </div>
@@ -635,12 +709,16 @@ export default function CalendarClient() {
                   {exams.length === 0 ? (
                     <div className="text-center py-8">
                       <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">{t('noExamsYet' as 'title')}</p>
+                      <p className="text-mq-content-secondary text-sm">
+                        {t('noExamsYet' as 'title')}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                       {exams
-                        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                        .sort(
+                          (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+                        )
                         .map((exam) => {
                           const due = new Date(exam.dueDate);
                           const isOverdue = !exam.completed && due < new Date();
@@ -649,8 +727,11 @@ export default function CalendarClient() {
                               key={exam.id}
                               className={cn(
                                 'flex items-center justify-between p-3 rounded-lg border transition-all',
-                                exam.completed ? 'opacity-60 border-mq-border' :
-                                isOverdue ? 'border-red-300 bg-red-50 dark:bg-red-950/20' : 'border-mq-border hover:border-red-300'
+                                exam.completed
+                                  ? 'opacity-60 border-mq-border'
+                                  : isOverdue
+                                    ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
+                                    : 'border-mq-border hover:border-red-300',
                               )}
                             >
                               <div className="flex items-center gap-3">
@@ -662,7 +743,12 @@ export default function CalendarClient() {
                                   )}
                                 </button>
                                 <div>
-                                  <h4 className={cn('font-medium text-sm', exam.completed && 'line-through')}>
+                                  <h4
+                                    className={cn(
+                                      'font-medium text-sm',
+                                      exam.completed && 'line-through',
+                                    )}
+                                  >
                                     {exam.title}
                                   </h4>
                                   <p className="text-xs text-mq-content-secondary">
@@ -674,7 +760,10 @@ export default function CalendarClient() {
                                 <Badge className={PRIORITY_COLORS[exam.priority]} variant="neutral">
                                   {exam.priority}
                                 </Badge>
-                                <button onClick={() => openEditDeadline(exam)} className="p-1 hover:bg-mq-hover-background rounded">
+                                <button
+                                  onClick={() => openEditDeadline(exam)}
+                                  className="p-1 hover:bg-mq-hover-background rounded"
+                                >
                                   <Edit2 className="h-4 w-4 text-mq-content-secondary" />
                                 </button>
                               </div>
@@ -732,7 +821,9 @@ export default function CalendarClient() {
                           />
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm truncate">{unit.code}</h4>
-                            <p className="text-xs text-mq-content-secondary truncate">{unit.name}</p>
+                            <p className="text-xs text-mq-content-secondary truncate">
+                              {unit.name}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -759,7 +850,14 @@ export default function CalendarClient() {
                       <Badge variant="neutral">
                         {allEvents.length} {t('total' as 'title')}
                       </Badge>
-                      <Button size="sm" variant="outline" onClick={() => { setEditEvent(null); setEventDialogOpen(true); }}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditEvent(null);
+                          setEventDialogOpen(true);
+                        }}
+                      >
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -769,7 +867,9 @@ export default function CalendarClient() {
                   {allEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <PartyPopper className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">{t('noEventsYet' as 'title')}</p>
+                      <p className="text-mq-content-secondary text-sm">
+                        {t('noEventsYet' as 'title')}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
@@ -782,7 +882,9 @@ export default function CalendarClient() {
                           <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500" />
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm truncate">{event.title}</h4>
-                            <p className="text-xs text-mq-content-secondary truncate">{event.time} • {event.location}</p>
+                            <p className="text-xs text-mq-content-secondary truncate">
+                              {event.time} • {event.location}
+                            </p>
                           </div>
                         </button>
                       ))}
@@ -845,7 +947,7 @@ export default function CalendarClient() {
                             className={cn(
                               'p-3 rounded-lg border-l-4 bg-mq-background-secondary/50',
                               colors.border,
-                              isOverdue && 'bg-red-50 dark:bg-red-950/20'
+                              isOverdue && 'bg-red-50 dark:bg-red-950/20',
                             )}
                           >
                             <div className="flex items-start justify-between">
@@ -854,11 +956,19 @@ export default function CalendarClient() {
                                 <p className="text-xs text-mq-content-secondary mt-1">
                                   {deadline.unitCode} • {deadline.type}
                                 </p>
-                                <p className={cn('text-xs mt-1', isOverdue ? 'text-red-600' : 'text-mq-content-secondary')}>
+                                <p
+                                  className={cn(
+                                    'text-xs mt-1',
+                                    isOverdue ? 'text-red-600' : 'text-mq-content-secondary',
+                                  )}
+                                >
                                   {format(due, 'EEE, MMM d @ h:mm a')}
                                 </p>
                               </div>
-                              <button onClick={() => openEditDeadline(deadline)} className="p-1 hover:bg-mq-hover-background rounded ml-2">
+                              <button
+                                onClick={() => openEditDeadline(deadline)}
+                                className="p-1 hover:bg-mq-hover-background rounded ml-2"
+                              >
                                 <Edit2 className="h-4 w-4 text-mq-content-secondary" />
                               </button>
                             </div>
@@ -881,18 +991,10 @@ export default function CalendarClient() {
       />
 
       {/* Event Form Dialog */}
-      <EventForm
-        open={eventDialogOpen}
-        onOpenChange={setEventDialogOpen}
-        editEvent={editEvent}
-      />
+      <EventForm open={eventDialogOpen} onOpenChange={setEventDialogOpen} editEvent={editEvent} />
 
       {/* Unit Form Dialog */}
-      <UnitForm
-        open={unitDialogOpen}
-        onOpenChange={setUnitDialogOpen}
-        editUnit={editingUnit}
-      />
+      <UnitForm open={unitDialogOpen} onOpenChange={setUnitDialogOpen} editUnit={editingUnit} />
     </div>
   );
 }

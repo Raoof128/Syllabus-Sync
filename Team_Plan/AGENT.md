@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.24 | Last Updated: January 10, 2026
+Version: 0.14.25 | Last Updated: January 10, 2026
 
 ---
 
@@ -57,6 +57,37 @@ Version: 0.14.24 | Last Updated: January 10, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ ORS Routing Coordinate Mismatch Bug Fix v0.14.25 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Fix ORS routing to use real GPS coordinates instead of pixel-based CRS.Simple coords
+- **Summary:** Fixed critical bug where routing and external navigation received wrong coordinate type
+
+**The Problem:**
+- Map uses CRS.Simple (pixel-based) for marker placement: `{ lat: 2500, lng: 1800 }`
+- ORS API expects real GPS coordinates: `{ lat: -33.775, lng: 151.112 }`
+- Code was using `getBuildingLatLng()` (pixels) instead of `getBuildingGps()` (GPS) for routing
+- This caused routing to fail or produce nonsensical routes
+
+**What Was Done:**
+1. Added import for `getBuildingGps` from buildings.ts
+2. Updated `retryRoute()` function to use `getBuildingGps()`
+3. Updated routing useEffect to use `getBuildingGps()`
+4. Updated both Navigate button handlers (light/dark mode) to use `getBuildingGps()`
+
+**Technical Notes:**
+- `getBuildingGps()` returns real GPS from `building.location` (~101 buildings have OSM GPS)
+- Falls back to approximate GPS calculation for ~17 buildings without OSM data
+- Pixel coordinates for map display remain completely unchanged
+
+**Files Changed:**
+- `app/map/CampusMap.tsx` - 4 code locations updated
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass (0 errors)
+- `npm run test`: ✅ 248 tests pass
+- `npm run build`: ✅ Success
 
 #### ✅ Building Data Cleanup & Cross-Reference v0.14.24 (Raouf)
 - **Date:** January 10, 2026 (Australia/Sydney)

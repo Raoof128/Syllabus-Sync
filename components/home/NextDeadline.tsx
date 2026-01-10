@@ -67,12 +67,7 @@ const NextDeadline = memo(() => {
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
           >
             <CardTitle>{t('nextDeadline')}</CardTitle>
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1"
-              asChild
-            >
+            <Button size="sm" variant="outline" className="gap-1" asChild>
               <Link href="/calendar" aria-label={t('viewAll')}>
                 <ExternalLink className="h-4 w-4" />
                 {t('viewAll')}

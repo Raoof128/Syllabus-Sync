@@ -27,9 +27,7 @@ export const useEventsStore = create<EventsState>()(
 
       updateEvent: (id, updates) => {
         set((state) => ({
-          events: state.events.map((e) =>
-            e.id === id ? { ...e, ...updates } : e
-          ),
+          events: state.events.map((e) => (e.id === id ? { ...e, ...updates } : e)),
         }));
       },
 
@@ -67,7 +65,6 @@ export const useEventsStore = create<EventsState>()(
     {
       name: 'events-storage',
       partialize: (state) => ({ events: state.events }),
-    }
-  )
+    },
+  ),
 );
-
