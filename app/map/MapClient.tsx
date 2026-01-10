@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,7 +14,6 @@ import {
   X,
   Eye,
   EyeOff,
-  Loader2,
   CheckCircle2,
   Filter as FilterIcon,
   Accessibility,
@@ -44,13 +43,10 @@ import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import {
-  Building,
   buildings,
   getBuildingById,
-  searchBuildings,
   BuildingCategory,
   BUILDING_CATEGORY_LABELS,
 } from '@/lib/map/buildings';
@@ -101,83 +97,15 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
   exam: GraduationCap,
 };
 
-// Custom hook for debounced search with proper state management
-function useDebouncedSearch(searchFunction: (query: string) => Building[], delay: number = 300) {
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Update query and manage searching state
-  const updateQuery = useCallback(
-    (newQuery: string) => {
-      setQuery(newQuery);
-      setIsSearching(true);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        setDebouncedQuery(newQuery);
-        setHasSearched(true);
-        setIsSearching(false);
-      }, delay);
-    },
-    [delay],
-  );
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Perform search when debounced query changes
-  const results = useMemo(() => {
-    if (debouncedQuery.trim()) {
-      return searchFunction(debouncedQuery);
-    } else {
-      return [];
-    }
-  }, [debouncedQuery, searchFunction]);
-
-  const clearSearch = useCallback(() => {
-    setQuery('');
-    setDebouncedQuery('');
-    setHasSearched(false);
-    setIsSearching(false);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  }, []);
-
-  return {
-    query,
-    results,
-    isSearching,
-    hasSearched,
-    updateQuery,
-    clearSearch,
-  };
-}
-
 // Dynamically import the entire map component
 const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 
 export default function MapClient() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [coordPickerMode, setCoordPickerMode] = useState(false);
   const [copiedCoords, setCopiedCoords] = useState<string>('');
-  const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -249,25 +177,6 @@ export default function MapClient() {
     }
   }, [activeOverlays, selectedBuildingId, t]);
 
-  // Use debounced search hook
-  const {
-    query: searchQuery,
-    results: searchResults,
-    isSearching,
-    hasSearched,
-    updateQuery,
-    clearSearch,
-  } = useDebouncedSearch(searchBuildings, 300);
-
-  // Apply tag filters to search results or all buildings
-  const filteredBuildings = useMemo(() => {
-    const baseResults = searchQuery.trim() ? searchResults : [];
-    if (activeFilters.length === 0) return baseResults;
-    return baseResults.filter((building) =>
-      activeFilters.some((filter) => building.tags?.includes(filter)),
-    );
-  }, [searchResults, activeFilters, searchQuery]);
-
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
     let result = [...buildings];
@@ -337,73 +246,6 @@ export default function MapClient() {
     }
   };
 
-  // Handle building selection from search results
-  const handleBuildingSelect = (building: Building) => {
-    router.push(`/map?building=${building.id}`);
-    clearSearch();
-    setSelectedResultIndex(-1);
-  };
-
-  // Handle keyboard navigation in search results
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (filteredBuildings.length === 0) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedResultIndex((prev) => (prev < filteredBuildings.length - 1 ? prev + 1 : prev));
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedResultIndex((prev) => (prev > 0 ? prev - 1 : -1));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (selectedResultIndex >= 0 && selectedResultIndex < filteredBuildings.length) {
-          handleBuildingSelect(filteredBuildings[selectedResultIndex]);
-        }
-        break;
-      case 'Escape':
-        clearSearch();
-        setSelectedResultIndex(-1);
-        break;
-    }
-  };
-
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateQuery(e.target.value);
-    setSelectedResultIndex(-1);
-  };
-
-  const highlightMatch = useCallback(
-    (text: string) => {
-      const query = searchQuery.trim();
-      if (!query) return text;
-      const lowerText = text.toLowerCase();
-      const lowerQuery = query.toLowerCase();
-      const matchIndex = lowerText.indexOf(lowerQuery);
-      if (matchIndex === -1) return text;
-      const endIndex = matchIndex + query.length;
-      return (
-        <>
-          {text.slice(0, matchIndex)}
-          <span className="text-mq-primary font-semibold">{text.slice(matchIndex, endIndex)}</span>
-          {text.slice(endIndex)}
-        </>
-      );
-    },
-    [searchQuery],
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const updateMotion = () => setPrefersReducedMotion(mediaQuery.matches);
-    updateMotion();
-    mediaQuery.addEventListener('change', updateMotion);
-    return () => mediaQuery.removeEventListener('change', updateMotion);
-  }, []);
-
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
     try {
@@ -469,48 +311,8 @@ export default function MapClient() {
         </MagicCard>
       )}
 
-      {/* Coordinate Picker and Map Overlays */}
-      <div className="mb-4 space-y-4">
-        {/* Coordinate Picker */}
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Info className="h-5 w-5 text-mq-info" />
-              <div>
-                <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
-                <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {copiedCoords && (
-                <div className="flex items-center gap-2 text-mq-sm text-mq-success">
-                  <Copy className="h-4 w-4" />
-                  {t('copied')} {copiedCoords}
-                </div>
-              )}
-              <Button
-                variant={coordPickerMode ? 'primary' : 'secondary'}
-                size="sm"
-                onClick={() => setCoordPickerMode(!coordPickerMode)}
-                className="gap-2"
-              >
-                {coordPickerMode ? (
-                  <>
-                    <Eye className="h-4 w-4" />
-                    {t('enabled')}
-                  </>
-                ) : (
-                  <>
-                    <EyeOff className="h-4 w-4" />
-                    {t('disabled')}
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </MagicCard>
-
-        {/* Map Overlay Layers */}
+      {/* Map Overlay Layers */}
+      <div className="mb-4">
         <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-4">
             <div className="flex items-center justify-between mb-3">
@@ -625,6 +427,45 @@ export default function MapClient() {
         </div>
       </MagicCard>
 
+      {/* Coordinate Picker - Developer Tool */}
+      <MagicCard isLiquidEnhanced className="mb-6">
+        <div className="mq-magic-card-content p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Info className="h-5 w-5 text-mq-info" />
+            <div>
+              <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
+              <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {copiedCoords && (
+              <div className="flex items-center gap-2 text-mq-sm text-mq-success">
+                <Copy className="h-4 w-4" />
+                {t('copied')} {copiedCoords}
+              </div>
+            )}
+            <Button
+              variant={coordPickerMode ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setCoordPickerMode(!coordPickerMode)}
+              className="gap-2"
+            >
+              {coordPickerMode ? (
+                <>
+                  <Eye className="h-4 w-4" />
+                  {t('enabled')}
+                </>
+              ) : (
+                <>
+                  <EyeOff className="h-4 w-4" />
+                  {t('disabled')}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </MagicCard>
+
       {/* Campus Buildings Quick Reference - Enhanced with Search & Filter */}
       <MagicCard isLiquidEnhanced className="mb-6">
         <div className="mq-magic-card-content p-0">
@@ -668,88 +509,6 @@ export default function MapClient() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Location Search Input - Main search bar moved here */}
-              <div className="relative">
-                {isSearching ? (
-                  <Loader2
-                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
-                      prefersReducedMotion ? '' : 'animate-spin'
-                    }`}
-                  />
-                ) : (
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
-                )}
-                <Input
-                  type="text"
-                  placeholder={t('searchBuildings')}
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  className="pl-10 pr-10 bg-mq-background-secondary/50"
-                  role="combobox"
-                  aria-expanded={hasSearched && searchQuery.length > 0}
-                  aria-controls="map-search-results"
-                  aria-activedescendant={
-                    selectedResultIndex >= 0
-                      ? `map-search-option-${filteredBuildings[selectedResultIndex]?.id}`
-                      : undefined
-                  }
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={clearSearch}
-                    aria-label={t('clearSearch')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-                {hasSearched && searchQuery && filteredBuildings.length > 0 && (
-                  <div
-                    id="map-search-results"
-                    role="listbox"
-                    aria-label={t('buildingResults')}
-                    aria-live="polite"
-                    className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
-                  >
-                    {filteredBuildings.map((building, index: number) => (
-                      <button
-                        key={building.id}
-                        id={`map-search-option-${building.id}`}
-                        role="option"
-                        aria-selected={index === selectedResultIndex}
-                        onClick={() => handleBuildingSelect(building)}
-                        className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-all duration-300 ${
-                          index === selectedResultIndex
-                            ? 'bg-mq-info/10'
-                            : 'hover:bg-mq-hover-background hover:shadow-[0_0_10px_rgba(166,25,46,0.08)]'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-mq-content truncate">
-                              {highlightMatch(t(building.translationKey))}
-                            </div>
-                            <div className="text-mq-sm text-mq-content-secondary">
-                              {highlightMatch(building.id)}
-                            </div>
-                          </div>
-                          <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
-                            {t((building.tags?.[0] || 'building') as TranslationKey)}
-                          </Badge>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
-                    {t('noBuildingsFound', { query: searchQuery })}
-                  </div>
-                )}
-              </div>
-
               {/* Building Filter Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />

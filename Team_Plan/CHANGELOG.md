@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.27] - 2026-01-10
+
+### Changed
+
+#### Map Page UI Restructure (Raouf)
+
+**Summary:** Improved the Map page layout by removing duplicate search functionality and reorganizing the Coordinate Picker placement for better UX.
+
+**Changes:**
+1. **Removed duplicate search bar** - The Buildings section had two search inputs; removed the complex debounced search with dropdown and kept only the simple filter search
+2. **Relocated Coordinate Picker** - Moved from top of page to between Map and Buildings sections for more logical placement
+
+**New Page Order:**
+1. Header
+2. Selected Building Banner (conditional)
+3. Map Overlay Layers
+4. Interactive Map
+5. Coordinate Picker (moved here)
+6. Campus Buildings
+7. Active Map Features
+
+**Files Changed:**
+- `app/map/MapClient.tsx` - UI restructure
+
+**Verification:**
+- `npm run lint`: Pass (0 errors, warnings only for unused code from removed search)
+
+---
+
 ## [0.14.26] - 2026-01-10
 
 ### Added
