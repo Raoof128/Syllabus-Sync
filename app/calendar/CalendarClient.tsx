@@ -43,9 +43,10 @@ const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
   loading: () => null,
 });
 
-// Hours to display (6 AM to 12 AM next day = 18 hours)
-const HOURS = Array.from({ length: 19 }, (_, i) => i + 6); // 6am to 12am (24)
+// Hours to display (7 AM to 12 AM midnight = 17 hours visible, but 6 AM exists logically)
+const HOURS = Array.from({ length: 18 }, (_, i) => i + 7); // 7am to 12am (24)
 const HOUR_HEIGHT = 48; // pixels per hour
+const START_HOUR = 7; // First visible hour (6 AM exists logically but not shown)
 
 // Type colors for the calendar
 const TYPE_COLORS = {
@@ -105,13 +106,13 @@ function parseTimeRange(timeStr: string): { startHour: number; startMin: number;
 
 // Calculate position and height for a time-based item
 function getTimePositionAndHeight(startHour: number, startMin: number, endHour: number, endMin: number): { top: number; height: number } | null {
-  // Clamp to visible range (6am to midnight)
-  const effectiveStartHour = Math.max(6, Math.min(24, startHour));
-  const effectiveEndHour = Math.max(6, Math.min(24, endHour));
+  // Clamp to visible range (7am to midnight)
+  const effectiveStartHour = Math.max(START_HOUR, Math.min(24, startHour));
+  const effectiveEndHour = Math.max(START_HOUR, Math.min(24, endHour));
 
   if (effectiveStartHour >= 24) return null;
 
-  const top = (effectiveStartHour - 6) * HOUR_HEIGHT + (startMin / 60) * HOUR_HEIGHT;
+  const top = (effectiveStartHour - START_HOUR) * HOUR_HEIGHT + (startMin / 60) * HOUR_HEIGHT;
   const durationHours = (effectiveEndHour - effectiveStartHour) + (endMin - startMin) / 60;
   const height = Math.max(20, durationHours * HOUR_HEIGHT);
 
@@ -176,8 +177,8 @@ export default function CalendarClient() {
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    if (hours < 6 || hours >= 24) return null;
-    return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
+    if (hours < START_HOUR || hours >= 24) return null;
+    return (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
   }, []);
 
   // Navigation handlers
@@ -396,7 +397,7 @@ export default function CalendarClient() {
                             // Default 1 hour duration from due time
                             const posInfo = getTimePositionAndHeight(hours, minutes, hours + 1, minutes);
 
-                            if (!posInfo || hours < 6) {
+                            if (!posInfo || hours < START_HOUR) {
                               // Show at top if outside visible hours
                               return (
                                 <button

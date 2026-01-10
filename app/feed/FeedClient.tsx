@@ -19,6 +19,7 @@ import {
   Rss,
   Bell,
   Check,
+  Plus,
 } from 'lucide-react';
 import { sampleEvents } from '@/data/sampleEvents';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -28,7 +29,16 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
 import { apiRequest } from '@/lib/utils/api';
+import { Event } from '@/lib/types';
+import dynamic from 'next/dynamic';
+
+// Dynamically import EventForm for code splitting
+const EventForm = dynamic(() => import('@/components/events/EventForm'), {
+  loading: () => null,
+});
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info',
@@ -49,11 +59,21 @@ const FeedClient = memo(() => {
   const [loadingEvents, setLoadingEvents] = useState<Set<string>>(new Set());
   const [highlightedEvent, setHighlightedEvent] = useState<string | null>(highlightEventId);
 
+  // Event form state
+  const [eventFormOpen, setEventFormOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+
   // Ref for scrolling to highlighted event
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   // Gamification store
   const { isDemo, refreshProfile, settings } = useGamificationStore();
+
+  // Notifications store
+  const addNotification = useNotificationsStore((state) => state.addNotification);
+
+  // User events store - used to check if event is user-created
+  useEventsStore((state) => state.events);
 
   // Scroll to and highlight the event when component mounts or highlight changes
   useEffect(() => {
@@ -77,9 +97,9 @@ const FeedClient = memo(() => {
     }
   }, [highlightEventId]);
 
-  // Handle "Remind Me" button click - awards XP for event attendance
+  // Handle "Remind Me" button click - awards XP for event attendance and creates notification
   const handleRemindMe = useCallback(
-    async (eventId: string, eventTitle: string) => {
+    async (eventId: string, eventTitle: string, eventTime: string) => {
       // Already reminded for this event
       if (remindedEvents.has(eventId)) {
         toastUtils.info('Already Reminded', 'You already set a reminder for this event');
@@ -90,27 +110,44 @@ const FeedClient = memo(() => {
       setLoadingEvents((prev) => new Set(prev).add(eventId));
 
       try {
+        // Create a notification for the reminder
+        await addNotification({
+          id: `reminder-${eventId}-${Date.now()}`,
+          title: `Reminder: ${eventTitle}`,
+          message: `Event starting at ${eventTime}`,
+          type: 'event',
+          read: false,
+          createdAt: new Date(),
+          link: `/feed?highlight=${eventId}`,
+          relatedId: eventId,
+        });
+
         // If user is authenticated (not demo mode), award XP
         if (!isDemo) {
-          const response = await apiRequest<{
-            message: string;
-            result: { xpAwarded: number; leveledUp: boolean; newLevel: number };
-          }>('/api/gamification/award-xp', {
-            method: 'POST',
-            body: JSON.stringify({
-              eventType: 'event_attended',
-              referenceId: null, // Use null since sample events don't have UUID IDs
-              metadata: { eventId, title: eventTitle },
-            }),
-          });
+          try {
+            const response = await apiRequest<{
+              message: string;
+              result: { xpAwarded: number; leveledUp: boolean; newLevel: number };
+            }>('/api/gamification/award-xp', {
+              method: 'POST',
+              body: JSON.stringify({
+                eventType: 'event_attended',
+                referenceId: null, // Use null since sample events don't have UUID IDs
+                metadata: { eventId, title: eventTitle },
+              }),
+            });
 
-          // Show XP notification if enabled
-          if (settings.showXPNotifications) {
-            showXPEarnedNotification(response.result.xpAwarded, 'Event Reminder Set', language);
+            // Show XP notification if enabled
+            if (settings.showXPNotifications) {
+              showXPEarnedNotification(response.result.xpAwarded, 'Event Reminder Set', language);
+            }
+
+            // Refresh profile to update XP display
+            await refreshProfile();
+          } catch (xpError) {
+            // XP error is not critical, continue with reminder
+            console.warn('Failed to award XP:', xpError);
           }
-
-          // Refresh profile to update XP display
-          await refreshProfile();
         }
 
         // Mark event as reminded (works for both demo and authenticated users)
@@ -136,7 +173,7 @@ const FeedClient = memo(() => {
         });
       }
     },
-    [isDemo, remindedEvents, refreshProfile, settings.showXPNotifications, language, t],
+    [isDemo, remindedEvents, refreshProfile, settings.showXPNotifications, language, t, addNotification],
   );
 
   // Get locale string for date formatting
@@ -194,6 +231,16 @@ const FeedClient = memo(() => {
               {t('campusFeedDesc', { uniName: UNIVERSITY_CONFIG.name })}
             </p>
           </div>
+          <Button
+            onClick={() => {
+              setEditingEvent(null);
+              setEventFormOpen(true);
+            }}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            {t('addEvent')}
+          </Button>
         </header>
       </ScrollReveal>
 
@@ -377,6 +424,7 @@ const FeedClient = memo(() => {
                                           typeof t
                                         >[0],
                                       ),
+                                      event.time,
                                     )
                                   }
                                   disabled={isLoading}
@@ -596,6 +644,13 @@ const FeedClient = memo(() => {
           </ScrollReveal>
         </aside>
       </div>
+
+      {/* Event Form Dialog */}
+      <EventForm
+        open={eventFormOpen}
+        onOpenChange={setEventFormOpen}
+        editEvent={editingEvent}
+      />
     </div>
   );
 });
