@@ -22,9 +22,6 @@ const FormLoadingSkeleton = () => (
 const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
   loading: FormLoadingSkeleton,
 });
-const DeadlineForm = dynamic(() => import('@/components/deadlines/DeadlineForm'), {
-  loading: FormLoadingSkeleton,
-});
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -46,7 +43,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { Unit, Deadline } from '@/lib/types';
+import { Unit } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
 
 export default function HomeClient() {
@@ -152,9 +149,7 @@ export default function HomeClient() {
   const hasSeededRef = useRef(false);
   const announcementTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const [unitFormOpen, setUnitFormOpen] = useState(false);
-  const [deadlineFormOpen, setDeadlineFormOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
-  const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
 
   // Live region for screen reader announcements
@@ -242,8 +237,8 @@ export default function HomeClient() {
     };
 
     const handleAddDeadlineEvent = () => {
-      setEditingDeadline(null);
-      setDeadlineFormOpen(true);
+      // Navigate to calendar page where deadline can be added
+      window.location.href = '/calendar';
     };
 
     // Keyboard shortcuts for power users
@@ -259,7 +254,7 @@ export default function HomeClient() {
         handleAddUnitEvent();
       }
 
-      // Ctrl/Cmd + D for Add Deadline
+      // Ctrl/Cmd + D for Add Deadline - navigate to calendar
       if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
         e.preventDefault();
         handleAddDeadlineEvent();
@@ -634,12 +629,6 @@ export default function HomeClient() {
       {/* Unit Form Dialog */}
       <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />
 
-      {/* Deadline Form Dialog */}
-      <DeadlineForm
-        open={deadlineFormOpen}
-        onOpenChange={setDeadlineFormOpen}
-        editDeadline={editingDeadline}
-      />
 
       {/* Delete Unit Confirmation Dialog */}
       <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>

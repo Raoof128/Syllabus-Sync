@@ -71,17 +71,12 @@ const NextDeadline = memo(() => {
               size="sm"
               variant="outline"
               className="gap-1"
-              onClick={() => {
-                try {
-                  window.dispatchEvent(new CustomEvent('add-deadline'));
-                } catch (error) {
-                  console.warn('Failed to trigger add deadline event:', error);
-                }
-              }}
-              aria-label={t('addDeadline')}
+              asChild
             >
-              <Plus className="h-4 w-4" />
-              {t('addDeadline')}
+              <Link href="/calendar" aria-label={t('addDeadline')}>
+                <Plus className="h-4 w-4" />
+                {t('addDeadline')}
+              </Link>
             </Button>
           </CardHeader>
           <CardContent>

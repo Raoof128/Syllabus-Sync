@@ -69,8 +69,8 @@ const FeedClient = memo(() => {
             method: 'POST',
             body: JSON.stringify({
               eventType: 'event_attended',
-              referenceId: eventId,
-              metadata: { title: eventTitle },
+              referenceId: null, // Use null since sample events don't have UUID IDs
+              metadata: { eventId, title: eventTitle },
             }),
           });
 
