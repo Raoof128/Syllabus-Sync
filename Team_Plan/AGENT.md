@@ -58,6 +58,60 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Supabase Configuration & Schema Verification v0.14.28 (Raouf)
+- **Date:** January 10, 2026 (Australia/Sydney)
+- **Scope:** Fix Supabase demo mode warning and verify database schema alignment
+- **Summary:** Resolved false "demo mode" warning by using correct JWT format anon key, verified all database tables match code schema
+
+**Problem Resolved:**
+Dev server was showing warning:
+```
+⚠️ Supabase not configured. Running in demo mode without authentication.
+```
+
+**Root Cause:**
+`.env.local` was using `sb_publishable_` format anon key, but Supabase SSR client requires JWT format anon key for full functionality.
+
+**Solution:**
+Updated `.env.local` with correct JWT format key from `npx supabase projects api-keys`:
+```bash
+# Old (limited functionality)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_os0VHJzmQxwT7BflKMNKAw_twigyYJa
+
+# New (full functionality)  
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Database Schema Verification:**
+Compared Supabase remote tables with `database-schema.sql`:
+
+| Table | Remote Status | Rows |
+|-------|---------------|------|
+| `units` | ✅ Exists | 0 |
+| `deadlines` | ✅ Exists | 0 |
+| `events` | ✅ Exists | 22 |
+| `profiles` | ✅ Exists | 0 |
+| `gamification_profiles` | ✅ Exists | 2 |
+| `xp_events` | ✅ Exists | 2 |
+| `xp_config` | ✅ Exists | 10 |
+| `class_times` | ✅ Exists | 0 |
+| `notifications` | ✅ Exists | 0 |
+| `user_preferences` | ✅ Exists | 0 |
+| `users` | ✅ Exists | 0 |
+
+**Result:** Schema matches code - no migration needed.
+
+**Note:** `.env.local` change is local-only (gitignored), not committed.
+
+**Important Note on Supabase API Keys:**
+- `anon` (JWT format): Use for `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Required for SSR/client auth
+- `service_role` (JWT format): Use for `SUPABASE_SERVICE_ROLE_KEY` - Admin operations
+- `default` (sb_publishable_): Limited functionality, avoid for SSR apps
+
+**Verification:**
+- `npm run prepush`: ✅ All checks pass (248/248 tests, 0 lint errors)
+- Dev server: No more demo mode warning
+
 #### ✅ Complete GPS Location Data for All Buildings v0.14.26 (Raouf)
 - **Date:** January 10, 2026 (Australia/Sydney)
 - **Scope:** Add missing GPS location data to remaining buildings in buildings.ts

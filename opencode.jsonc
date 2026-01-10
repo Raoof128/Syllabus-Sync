@@ -46,5 +46,16 @@
       "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "/Users/raoof.r12"],
       "enabled": true,
     },
+
+    // Google Maps API (HTTP transport)
+    // SETUP REQUIRED:
+    // 1. Get API key from https://console.cloud.google.com (enable Maps, Places, Geocoding APIs)
+    // 2. Run server: npx @cablate/mcp-google-map --port 3001 --apikey "YOUR_API_KEY"
+    // 3. Then enable this config
+    "google-map": {
+      "type": "remote",
+      "url": "http://localhost:3001/mcp",
+      "enabled": true,
+    },
   },
 }
