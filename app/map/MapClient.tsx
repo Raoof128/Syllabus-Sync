@@ -28,7 +28,6 @@ import {
   BadgeCheck,
   GraduationCap,
   Link as LinkIcon,
-  HelpCircle,
   Stethoscope,
   Home,
   Utensils,
@@ -90,6 +89,7 @@ const CATEGORY_FILTERS: {
   { id: 'venue', icon: Theater, label: 'Venues', color: 'text-pink-500' },
   { id: 'research', icon: FlaskConical, label: 'Research', color: 'text-cyan-500' },
   { id: 'residential', icon: Home, label: 'Housing', color: 'text-amber-500' },
+  { id: 'other', icon: Building2, label: 'Other', color: 'text-gray-500' },
 ];
 
 // Map overlay icons
@@ -469,90 +469,8 @@ export default function MapClient() {
         </MagicCard>
       )}
 
-      {/* Search and Coordinate Picker */}
+      {/* Coordinate Picker and Map Overlays */}
       <div className="mb-4 space-y-4">
-        {/* Search */}
-        <div className="relative">
-          {isSearching ? (
-            <Loader2
-              className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
-                prefersReducedMotion ? '' : 'animate-spin'
-              }`}
-            />
-          ) : (
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
-          )}
-          <Input
-            type="text"
-            placeholder={t('searchBuildings')}
-            value={searchQuery}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            className="pl-10 pr-10 bg-mq-background-secondary/50 backdrop-blur-sm"
-            role="combobox"
-            aria-expanded={hasSearched && searchQuery.length > 0}
-            aria-controls="map-search-results"
-            aria-activedescendant={
-              selectedResultIndex >= 0
-                ? `map-search-option-${filteredBuildings[selectedResultIndex]?.id}`
-                : undefined
-            }
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              aria-label={t('clearSearch')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-          {hasSearched && searchQuery && filteredBuildings.length > 0 && (
-            <div
-              id="map-search-results"
-              role="listbox"
-              aria-label={t('buildingResults')}
-              aria-live="polite"
-              className="absolute top-full left-0 right-0 mt-1 bg-mq-background/95 backdrop-blur-md border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
-            >
-              {filteredBuildings.map((building, index: number) => (
-                <button
-                  key={building.id}
-                  id={`map-search-option-${building.id}`}
-                  role="option"
-                  aria-selected={index === selectedResultIndex}
-                  onClick={() => handleBuildingSelect(building)}
-                  className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-all duration-300 ${
-                    index === selectedResultIndex
-                      ? 'bg-mq-info/10'
-                      : 'hover:bg-mq-hover-background hover:shadow-[0_0_10px_rgba(166,25,46,0.08)]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-mq-content truncate">
-                        {highlightMatch(t(building.translationKey))}
-                      </div>
-                      <div className="text-mq-sm text-mq-content-secondary">
-                        {highlightMatch(building.id)}
-                      </div>
-                    </div>
-                    <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
-                      {t((building.tags?.[0] || 'building') as TranslationKey)}
-                    </Badge>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-          {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background/95 backdrop-blur-md border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
-              {t('noBuildingsFound', { query: searchQuery })}
-            </div>
-          )}
-        </div>
-
         {/* Coordinate Picker */}
         <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-4 flex items-center justify-between">
@@ -629,64 +547,27 @@ export default function MapClient() {
                     const Icon = OVERLAY_ICONS[overlay.id];
                     const isActive = activeOverlays.includes(overlay.id);
                     return (
-                      <div key={overlay.id} className="relative group">
-                        <button
-                          onClick={() => toggleOverlay(overlay.id)}
-                          aria-pressed={isActive}
-                          className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-all duration-200 text-left ${
-                            isActive
-                              ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
-                              : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
-                          }`}
-                        >
-                          <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-mq-sm font-medium truncate">{overlay.name}</p>
-                            <p className="text-mq-xs text-mq-content-secondary truncate">
-                              {overlay.description}
-                            </p>
-                          </div>
-                          {isActive && (
-                            <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-mq-success" />
-                          )}
-                        </button>
-                        {/* Hover Tooltip with Legend */}
-                        <div className="absolute bottom-full left-0 right-0 mb-2 p-3 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-                          <div className="flex items-center gap-2 mb-2">
-                            <HelpCircle className="h-4 w-4 text-mq-info flex-shrink-0" />
-                            <span className="text-mq-sm font-semibold text-mq-content">
-                              {overlay.name}
-                            </span>
-                          </div>
-                          <div className="space-y-1.5 text-mq-xs">
-                            <p className="text-mq-content-secondary">
-                              <span className="font-medium text-mq-content">{t('source')}:</span>{' '}
-                              {overlay.source}
-                            </p>
-                            <p className="text-mq-content-secondary">
-                              <span className="font-medium text-mq-content">
-                                {t('lastUpdated')}:
-                              </span>{' '}
-                              {overlay.lastUpdated}
-                            </p>
-                            {overlay.legend && overlay.legend.length > 0 && (
-                              <div className="pt-1.5 border-t border-mq-border">
-                                <p className="font-medium text-mq-content mb-1">{t('legend')}:</p>
-                                <ul className="space-y-0.5 text-mq-content-secondary">
-                                  {overlay.legend.map((item, idx) => (
-                                    <li key={idx} className="flex items-start gap-1">
-                                      <span className="text-mq-primary">•</span>
-                                      <span>{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                          {/* Tooltip arrow */}
-                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-mq-background border-r border-b border-mq-border rotate-45" />
+                      <button
+                        key={overlay.id}
+                        onClick={() => toggleOverlay(overlay.id)}
+                        aria-pressed={isActive}
+                        className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-all duration-200 text-left ${
+                          isActive
+                            ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
+                            : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
+                        }`}
+                      >
+                        <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-mq-sm font-medium truncate">{overlay.name}</p>
+                          <p className="text-mq-xs text-mq-content-secondary truncate">
+                            {overlay.description}
+                          </p>
                         </div>
-                      </div>
+                        {isActive && (
+                          <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-mq-success" />
+                        )}
+                      </button>
                     );
                   })}
                 </div>
@@ -787,13 +668,95 @@ export default function MapClient() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Search Input */}
+              {/* Location Search Input - Main search bar moved here */}
+              <div className="relative">
+                {isSearching ? (
+                  <Loader2
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary ${
+                      prefersReducedMotion ? '' : 'animate-spin'
+                    }`}
+                  />
+                ) : (
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
+                )}
+                <Input
+                  type="text"
+                  placeholder={t('searchBuildings')}
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  className="pl-10 pr-10 bg-mq-background-secondary/50"
+                  role="combobox"
+                  aria-expanded={hasSearched && searchQuery.length > 0}
+                  aria-controls="map-search-results"
+                  aria-activedescendant={
+                    selectedResultIndex >= 0
+                      ? `map-search-option-${filteredBuildings[selectedResultIndex]?.id}`
+                      : undefined
+                  }
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    aria-label={t('clearSearch')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary hover:text-mq-content"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+                {hasSearched && searchQuery && filteredBuildings.length > 0 && (
+                  <div
+                    id="map-search-results"
+                    role="listbox"
+                    aria-label={t('buildingResults')}
+                    aria-live="polite"
+                    className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 max-h-60 overflow-y-auto"
+                  >
+                    {filteredBuildings.map((building, index: number) => (
+                      <button
+                        key={building.id}
+                        id={`map-search-option-${building.id}`}
+                        role="option"
+                        aria-selected={index === selectedResultIndex}
+                        onClick={() => handleBuildingSelect(building)}
+                        className={`w-full text-left px-4 py-3 border-b border-mq-border last:border-b-0 transition-all duration-300 ${
+                          index === selectedResultIndex
+                            ? 'bg-mq-info/10'
+                            : 'hover:bg-mq-hover-background hover:shadow-[0_0_10px_rgba(166,25,46,0.08)]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-mq-content truncate">
+                              {highlightMatch(t(building.translationKey))}
+                            </div>
+                            <div className="text-mq-sm text-mq-content-secondary">
+                              {highlightMatch(building.id)}
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs ml-2 flex-shrink-0">
+                            {t((building.tags?.[0] || 'building') as TranslationKey)}
+                          </Badge>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {hasSearched && searchQuery && filteredBuildings.length === 0 && !isSearching && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-mq-background border border-mq-border rounded-mq-lg shadow-mq-lg z-10 p-4 text-center text-mq-content-secondary">
+                    {t('noBuildingsFound', { query: searchQuery })}
+                  </div>
+                )}
+              </div>
+
+              {/* Building Filter Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
                 <input
                   ref={buildingSearchRef}
                   type="text"
-                  placeholder={t('searchBuildings')}
+                  placeholder={t('filterBuildings')}
                   value={buildingSearch}
                   onChange={(e) => setBuildingSearch(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 bg-mq-background-secondary/50 border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"

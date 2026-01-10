@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 
@@ -28,7 +27,9 @@ const getCentroid = (geometry) => {
   if (geometry.type === 'Polygon') {
     // Simple average of first ring
     const ring = geometry.coordinates[0];
-    let sumLat = 0, sumLng = 0, count = 0;
+    let sumLat = 0,
+      sumLng = 0,
+      count = 0;
     for (const [lng, lat] of ring) {
       sumLat += lat;
       sumLng += lng;
@@ -38,7 +39,9 @@ const getCentroid = (geometry) => {
   } else if (geometry.type === 'MultiPolygon') {
     // Average of first ring of first polygon (simplification)
     const ring = geometry.coordinates[0][0];
-    let sumLat = 0, sumLng = 0, count = 0;
+    let sumLat = 0,
+      sumLng = 0,
+      count = 0;
     for (const [lng, lat] of ring) {
       sumLat += lat;
       sumLng += lng;
@@ -53,14 +56,14 @@ const getCentroid = (geometry) => {
 // Extracted from buildings.ts
 const points = [
   { id: '18WW', grid: 'N16', lat: -33.774021, lng: 151.11261 },
-  { id: 'LIB',  grid: 'Q17', lat: -33.775705, lng: 151.113082 },
-  { id: '4ER',  grid: 'Q22', lat: -33.775808, lng: 151.115985 },
-  { id: '6WW',  grid: 'M23', lat: -33.774152, lng: 151.116117 },
-  { id: '75TAL', grid: 'M28', lat: -33.774163, lng: 151.118636 }
+  { id: 'LIB', grid: 'Q17', lat: -33.775705, lng: 151.113082 },
+  { id: '4ER', grid: 'Q22', lat: -33.775808, lng: 151.115985 },
+  { id: '6WW', grid: 'M23', lat: -33.774152, lng: 151.116117 },
+  { id: '75TAL', grid: 'M28', lat: -33.774163, lng: 151.118636 },
 ];
 
 // Calculate pixels for control points
-const controlPoints = points.map(p => {
+const controlPoints = points.map((p) => {
   const [px, py] = gridToPixel(p.grid);
   return { ...p, px, py };
 });
@@ -77,12 +80,16 @@ const p3 = controlPoints[3]; // 6WW
 function solveAffine(p1, p2, p3) {
   const det = p1.lng * (p2.lat - p3.lat) + p2.lng * (p3.lat - p1.lat) + p3.lng * (p1.lat - p2.lat);
 
-  const A = ((p1.px * (p2.lat - p3.lat)) + (p2.px * (p3.lat - p1.lat)) + (p3.px * (p1.lat - p2.lat))) / det;
-  const B = ((p1.px * (p3.lng - p2.lng)) + (p2.px * (p1.lng - p3.lng)) + (p3.px * (p2.lng - p1.lng))) / det;
+  const A =
+    (p1.px * (p2.lat - p3.lat) + p2.px * (p3.lat - p1.lat) + p3.px * (p1.lat - p2.lat)) / det;
+  const B =
+    (p1.px * (p3.lng - p2.lng) + p2.px * (p1.lng - p3.lng) + p3.px * (p2.lng - p1.lng)) / det;
   const C = p1.px - A * p1.lng - B * p1.lat;
 
-  const D = ((p1.py * (p2.lat - p3.lat)) + (p2.py * (p3.lat - p1.lat)) + (p3.py * (p1.lat - p2.lat))) / det;
-  const E = ((p1.py * (p3.lng - p2.lng)) + (p2.py * (p1.lng - p3.lng)) + (p3.py * (p2.lng - p1.lng))) / det;
+  const D =
+    (p1.py * (p2.lat - p3.lat) + p2.py * (p3.lat - p1.lat) + p3.py * (p1.lat - p2.lat)) / det;
+  const E =
+    (p1.py * (p3.lng - p2.lng) + p2.py * (p1.lng - p3.lng) + p3.py * (p2.lng - p1.lng)) / det;
   const F = p1.py - D * p1.lng - E * p1.lat;
 
   return { A, B, C, D, E, F };
@@ -99,13 +106,66 @@ const latLngToPixel = (lat, lng) => {
 // --- 3. Existing Buildings ---
 // IDs of buildings already in buildings.ts
 const existingIds = new Set([
-  '18WW', 'LIB', 'SEC', '25BWW', '17WW', '4ER', '75TAL', '16UA', '9WW', '4RPD', 
-  '12WW', '6WW', '4WW', 'LOTUS', 'MQTH', 'PRICE', 'LIGHT', 'AINS', 'HOSP', 
-  'CLINIC', 'WOOL', 'SPORT', 'FIELDS', 'UBAR', 'CULT', 'LACH', '8SCO', '16WW', 
-  '12SW', '19ER', 'OBS', 'INCUB', 'CHAP', 'WALU', 'BANK', 'GUMNUT', 'MIAMIA', 
-  'WARATAH', 'NEXTSENSE', 'NEXTSCHOOL', 'METS', 'WALLYS', 'LIBCAFE', 'DLC', 
-  'RMC', 'MQV', 'GALLERY', 'BIODISC', '11WW', '13RPD', '6ER', '1CC', 'MERCURE', 
-  'COCHLEAR', '10SCO', '14ER', '6SR', '14FW', '14SCO', '4WR'
+  '18WW',
+  'LIB',
+  'SEC',
+  '25BWW',
+  '17WW',
+  '4ER',
+  '75TAL',
+  '16UA',
+  '9WW',
+  '4RPD',
+  '12WW',
+  '6WW',
+  '4WW',
+  'LOTUS',
+  'MQTH',
+  'PRICE',
+  'LIGHT',
+  'AINS',
+  'HOSP',
+  'CLINIC',
+  'WOOL',
+  'SPORT',
+  'FIELDS',
+  'UBAR',
+  'CULT',
+  'LACH',
+  '8SCO',
+  '16WW',
+  '12SW',
+  '19ER',
+  'OBS',
+  'INCUB',
+  'CHAP',
+  'WALU',
+  'BANK',
+  'GUMNUT',
+  'MIAMIA',
+  'WARATAH',
+  'NEXTSENSE',
+  'NEXTSCHOOL',
+  'METS',
+  'WALLYS',
+  'LIBCAFE',
+  'DLC',
+  'RMC',
+  'MQV',
+  'GALLERY',
+  'BIODISC',
+  '11WW',
+  '13RPD',
+  '6ER',
+  '1CC',
+  'MERCURE',
+  'COCHLEAR',
+  '10SCO',
+  '14ER',
+  '6SR',
+  '14FW',
+  '14SCO',
+  '4WR',
 ]);
 
 // --- 4. Process GeoJSON ---
@@ -122,7 +182,7 @@ const extractId = (name) => {
   // Try to match pattern "12WW" or "12 Wally's Walk" -> "12WW"
   const match = name.match(/^(\d+[A-Z]+)/);
   if (match) return match[1];
-  
+
   // Try to match "Building C5C" -> "C5C"
   const match2 = name.match(/Building\s+([A-Z0-9]+)/i);
   if (match2) return match2[1];
@@ -136,17 +196,23 @@ const extractId = (name) => {
 
 // Helper to determine category
 const guessCategory = (props) => {
-    const name = props.name || '';
-    if (props.building === 'university' || props['department']) return 'academic';
-    if (props.amenity === 'parking') return 'other';
-    if (props.amenity === 'cafe' || props.amenity === 'restaurant' || props.amenity === 'fast_food') return 'food';
-    if (name.includes('Research') || name.includes('Lab')) return 'research';
-    if (name.includes('Sport') || name.includes('Gym')) return 'sports';
-    if (props.building === 'residential' || props.building === 'apartments' || props.building === 'college') return 'residential';
-    return 'academic'; // Default
+  const name = props.name || '';
+  if (props.building === 'university' || props['department']) return 'academic';
+  if (props.amenity === 'parking') return 'other';
+  if (props.amenity === 'cafe' || props.amenity === 'restaurant' || props.amenity === 'fast_food')
+    return 'food';
+  if (name.includes('Research') || name.includes('Lab')) return 'research';
+  if (name.includes('Sport') || name.includes('Gym')) return 'sports';
+  if (
+    props.building === 'residential' ||
+    props.building === 'apartments' ||
+    props.building === 'college'
+  )
+    return 'residential';
+  return 'academic'; // Default
 };
 
-geojson.features.forEach(feature => {
+geojson.features.forEach((feature) => {
   const props = feature.properties || {};
   if (!props.name) return;
 
@@ -158,17 +224,17 @@ geojson.features.forEach(feature => {
 
   // Check if exists
   if (existingIds.has(id)) {
-      // It's an update
-      // We don't need to output updates for this task unless explicitly asked, 
-      // but let's record them just in case. 
-      // The task says "add all these location to it ... avoid the duplicates"
-      // So we focus on adding NEW ones.
-      return;
+    // It's an update
+    // We don't need to output updates for this task unless explicitly asked,
+    // but let's record them just in case.
+    // The task says "add all these location to it ... avoid the duplicates"
+    // So we focus on adding NEW ones.
+    return;
   }
 
   // It's new
   const [px, py] = latLngToPixel(centroid.lat, centroid.lng);
-  
+
   // Filter out far away stuff (simple bbox check for campus map size)
   // Map size approx 4600 x 3300
   if (px < 0 || px > 5000 || py < 0 || py > 3500) return;
@@ -176,7 +242,7 @@ geojson.features.forEach(feature => {
   const levels = props['building:levels'] ? parseInt(props['building:levels']) : undefined;
   const wheelchair = props.wheelchair === 'yes';
   const osmId = feature.id ? feature.id.replace(/[^\d]/g, '') : undefined;
-  
+
   // Address
   const addressParts = [];
   if (props['addr:housenumber']) addressParts.push(props['addr:housenumber']);
@@ -196,12 +262,12 @@ geojson.features.forEach(feature => {
     address: address,
     category: guessCategory(props),
     location: {
-        lat: Number(centroid.lat.toFixed(6)),
-        lng: Number(centroid.lng.toFixed(6)),
-        osmId: osmId ? parseInt(osmId) : undefined
-    }
+      lat: Number(centroid.lat.toFixed(6)),
+      lng: Number(centroid.lng.toFixed(6)),
+      osmId: osmId ? parseInt(osmId) : undefined,
+    },
   };
-  
+
   if (levels) b.levels = levels;
   if (wheelchair) b.wheelchair = true;
 

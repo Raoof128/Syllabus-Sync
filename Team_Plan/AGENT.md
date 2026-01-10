@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.10 | Last Updated: January 09, 2026
+Version: 0.14.14 | Last Updated: January 10, 2026
 
 ---
 
@@ -58,20 +58,69 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Navigation Panel Rewrite & Map Overlay Coordinate Fix v0.14.14 (Raouf)
+- **Navigation Panel Complete Rewrite** - Changed from glassy/transparent to solid opaque backgrounds with hardcoded color values for guaranteed readability
+- **Separate Light/Dark Versions** - Used `dark:hidden` and `hidden dark:block` pattern with inline styles
+- **Map Overlay Coordinate Fix** - Updated `CAMPUS_BOUNDS` from `[[-33.783, 151.105], [-33.77, 151.125]]` to `[[-33.7825, 151.1045], [-33.7655, 151.1225]]` using OSM data
+- **Campus Center Update** - Changed from `{lat: -33.775, lng: 151.115}` to `{lat: -33.7742, lng: 151.1127}`
+- **Lowered minZoom** - From 16 to 15 for better campus overview
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Navigation panel rewrite, coordinate updates
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing
+- `npm run test`: ✅ 248/248 tests passing
+
+#### ✅ Map Navigation & Building Categorization Fixes v0.14.13 (Raouf)
+- **Navigation Popup Enhancement** - Changed from glassy/transparent to solid matte background (`bg-white dark:bg-gray-900`) for improved readability
+- **Building Category Accuracy** - Added missing 'other' category to CATEGORY_FILTERS array, fixing 148 vs 162 building count mismatch
+- **Animation Polish Verification** - Confirmed building section animations are properly implemented with staggered delays and smooth transitions
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Added 'other' category filter
+- `app/map/CampusMap.tsx` - Fixed navigation popup styling
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing
+- `npm run test`: ✅ 248/248 tests passing
+
+### ✅ Map UI Improvements & Building Categorization v0.14.12 (Raouf)
+- **Search Bar Relocation** - Moved main location search from top of page to the "Campus Buildings Quick Reference" section for better UX
+- **Navigation Popup Styling** - Changed from glassy/transparent to matte/opaque design, removed blur effect
+- **Building Categorization Fixes** - Corrected 12 miscategorized buildings (e.g., commercial buildings incorrectly marked as academic)
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Search bar relocation
+- `app/map/CampusMap.tsx` - Navigation popup styling
+- `lib/map/buildings.ts` - Building category corrections
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing
+- `npm run test`: ✅ 248/248 tests passing
+
+#### ✅ Map Runtime Error Fix & UI Polish v0.14.11 (Raouf)
+- **Fixed Runtime TypeError** - Resolved "Cannot read properties of undefined (reading 'style')" in CampusMap.tsx with defensive null checking
+- **Removed Hover Tooltips** - Cleaned up map layer controls by removing ugly hover explanations showing source/legend data
+- **Improved Error Handling** - Silenced cascading errors during component unmount
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Fixed TypeError with optional chaining in cursor style handling
+- `app/map/MapClient.tsx` - Removed hover tooltips from layer buttons and unused HelpCircle import
+
+**Verification:**
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ 30 routes successful
+- `npm run test`: ✅ 248/248 tests passing
+
 #### ✅ Map Data Refinement v0.14.9 (Raouf)
 - **Added 13A Research Park Drive** - Distinct building from 13RPD found in OSM scan on second pass
 - **Updated Translations** - Added English keys for new building
 - **Scan Complete** - Verified no other major buildings missing from OSM data
 
-#### ✅ GeoJSON Building Import v0.14.8 (Raouf)
-- **Imported remaining buildings from MQ_Full.geojson** - Added 7 new buildings not already in buildings.ts
-- **Duplicate detection** - Cross-referenced 113 existing OSM IDs, identified 3 duplicates to skip
-- **New buildings:** Dunmore Lang College New Wing, Office, Villas (Building 2), 4 Waterloo Road Blocks (A-D)
-- **Translations added** - 14 new keys in English translations (name + desc for each building)
-
 **Files Modified:**
-- `lib/map/buildings.ts` - Added 7 new building entries with GPS coordinates
-- `locales/en/translations.json` - Added 14 new translation keys
+- `lib/map/buildings.ts` - Added 13ARPD
+- `locales/en/translations.json` - Added translation keys
 
 **Verification:**
 - All 248 tests passing
@@ -3627,3 +3676,9 @@ Scope: Full Campus Building Scan & Enrichment
 Summary: Performed a comprehensive scan of OpenStreetMap data to identify and add 51 additional campus buildings, ensuring zero missing buildings while filtering duplicates. Updated translations and type definitions.
 Files changed: lib/map/buildings.ts, locales/en/translations.json, scripts/scan_all_buildings.cjs (new), scripts/filter_and_apply_scan.cjs (new)
 Verification: npm test (248/248 passed), manual verification of building counts.
+
+### Raouf: 2026-01-10 (Australia/Sydney)
+Scope: Map Runtime Error Fix & UI Polish
+Summary: Fixed critical runtime TypeError in map component causing "Cannot read properties of undefined (reading 'style')" errors and removed ugly hover tooltips from map layer controls. Added defensive null checking with optional chaining for cursor style handling and silenced cascading console errors during component unmount. Simplified layer controls to show only essential information without hover tooltips.
+Files: app/map/CampusMap.tsx, app/map/MapClient.tsx
+Verification: npm run lint (0 errors, 0 warnings), npm run build (30 routes successful), npm run test (248/248 tests passing)

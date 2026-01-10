@@ -1,22 +1,108 @@
-
 const fs = require('fs');
 const path = require('path');
 
 // --- 1. Current IDs (Updated from grep output) ---
 const existingIds = new Set([
-  '18WW', 'LIB', 'SEC', '25BWW', '17WW', '4ER', '75TAL', '16UA', '9WW', '4RPD', 
-  '12WW', '6WW', '4WW', 'LOTUS', 'MQTH', 'PRICE', 'LIGHT', 'AINS', 'HOSP', 
-  'CLINIC', 'WOOL', 'SPORT', 'FIELDS', 'UBAR', 'CULT', 'LACH', '8SCO', '16WW', 
-  '12SW', '19ER', 'OBS', 'INCUB', 'CHAP', 'WALU', 'BANK', 'GUMNUT', 'MIAMIA', 
-  'WARATAH', 'NEXTSENSE', 'NEXTSCHOOL', 'METS', 'WALLYS', 'LIBCAFE', 'DLC', 
-  'RMC', 'MQV', 'GALLERY', 'BIODISC', '11WW', '13RPD', '6ER', '1CC', 'MERCURE', 
-  'COCHLEAR', '10SCO', '14ER', '6SR', '14FW', '14SCO', '4WR', 
+  '18WW',
+  'LIB',
+  'SEC',
+  '25BWW',
+  '17WW',
+  '4ER',
+  '75TAL',
+  '16UA',
+  '9WW',
+  '4RPD',
+  '12WW',
+  '6WW',
+  '4WW',
+  'LOTUS',
+  'MQTH',
+  'PRICE',
+  'LIGHT',
+  'AINS',
+  'HOSP',
+  'CLINIC',
+  'WOOL',
+  'SPORT',
+  'FIELDS',
+  'UBAR',
+  'CULT',
+  'LACH',
+  '8SCO',
+  '16WW',
+  '12SW',
+  '19ER',
+  'OBS',
+  'INCUB',
+  'CHAP',
+  'WALU',
+  'BANK',
+  'GUMNUT',
+  'MIAMIA',
+  'WARATAH',
+  'NEXTSENSE',
+  'NEXTSCHOOL',
+  'METS',
+  'WALLYS',
+  'LIBCAFE',
+  'DLC',
+  'RMC',
+  'MQV',
+  'GALLERY',
+  'BIODISC',
+  '11WW',
+  '13RPD',
+  '6ER',
+  '1CC',
+  'MERCURE',
+  'COCHLEAR',
+  '10SCO',
+  '14ER',
+  '6SR',
+  '14FW',
+  '14SCO',
+  '4WR',
   // Newly added
-  'EAST3', 'EAST2', '75TR', '3SR', '6FW', '17MW', '1MD', '3MD', '5MD', '1EXR', 
-  '2FW', '4FW', '2LR', '6LR', '4LR', 'DESTINATIO', '3IR', '1IR', '15RPD', 
-  'RONREILLYP', 'M2OPERATIO', 'ADELAIDE', 'DARWIN', 'PERTH', 'BLOCKA', 'BLOCKB', 
-  'BLOCKC', 'BLOCKD', 'BLOCKE', 'BLOCKF', 'VILLAS', 'HOLIDAYINN', 'MACRESIDEN', 
-  '6MD', '7MD', '12MW', '18ER', '2WW', 'REDDYEXPRE'
+  'EAST3',
+  'EAST2',
+  '75TR',
+  '3SR',
+  '6FW',
+  '17MW',
+  '1MD',
+  '3MD',
+  '5MD',
+  '1EXR',
+  '2FW',
+  '4FW',
+  '2LR',
+  '6LR',
+  '4LR',
+  'DESTINATIO',
+  '3IR',
+  '1IR',
+  '15RPD',
+  'RONREILLYP',
+  'M2OPERATIO',
+  'ADELAIDE',
+  'DARWIN',
+  'PERTH',
+  'BLOCKA',
+  'BLOCKB',
+  'BLOCKC',
+  'BLOCKD',
+  'BLOCKE',
+  'BLOCKF',
+  'VILLAS',
+  'HOLIDAYINN',
+  'MACRESIDEN',
+  '6MD',
+  '7MD',
+  '12MW',
+  '18ER',
+  '2WW',
+  'REDDYEXPRE',
 ]);
 
 // --- 2. Coordinate Transforms ---
@@ -36,13 +122,13 @@ const gridToPixel = (ref) => {
 
 const points = [
   { id: '18WW', grid: 'N16', lat: -33.774021, lng: 151.11261 },
-  { id: 'LIB',  grid: 'Q17', lat: -33.775705, lng: 151.113082 },
-  { id: '4ER',  grid: 'Q22', lat: -33.775808, lng: 151.115985 },
-  { id: '6WW',  grid: 'M23', lat: -33.774152, lng: 151.116117 },
-  { id: '75TAL', grid: 'M28', lat: -33.774163, lng: 151.118636 }
+  { id: 'LIB', grid: 'Q17', lat: -33.775705, lng: 151.113082 },
+  { id: '4ER', grid: 'Q22', lat: -33.775808, lng: 151.115985 },
+  { id: '6WW', grid: 'M23', lat: -33.774152, lng: 151.116117 },
+  { id: '75TAL', grid: 'M28', lat: -33.774163, lng: 151.118636 },
 ];
 
-const controlPoints = points.map(p => {
+const controlPoints = points.map((p) => {
   const [px, py] = gridToPixel(p.grid);
   return { ...p, px, py };
 });
@@ -53,11 +139,15 @@ const p3 = controlPoints[3];
 
 function solveAffine(p1, p2, p3) {
   const det = p1.lng * (p2.lat - p3.lat) + p2.lng * (p3.lat - p1.lat) + p3.lng * (p1.lat - p2.lat);
-  const A = ((p1.px * (p2.lat - p3.lat)) + (p2.px * (p3.lat - p1.lat)) + (p3.px * (p1.lat - p2.lat))) / det;
-  const B = ((p1.px * (p3.lng - p2.lng)) + (p2.px * (p1.lng - p3.lng)) + (p3.px * (p2.lng - p1.lng))) / det;
+  const A =
+    (p1.px * (p2.lat - p3.lat) + p2.px * (p3.lat - p1.lat) + p3.px * (p1.lat - p2.lat)) / det;
+  const B =
+    (p1.px * (p3.lng - p2.lng) + p2.px * (p1.lng - p3.lng) + p3.px * (p2.lng - p1.lng)) / det;
   const C = p1.px - A * p1.lng - B * p1.lat;
-  const D = ((p1.py * (p2.lat - p3.lat)) + (p2.py * (p3.lat - p1.lat)) + (p3.py * (p1.lat - p2.lat))) / det;
-  const E = ((p1.py * (p3.lng - p2.lng)) + (p2.py * (p1.lng - p3.lng)) + (p3.py * (p2.lng - p1.lng))) / det;
+  const D =
+    (p1.py * (p2.lat - p3.lat) + p2.py * (p3.lat - p1.lat) + p3.py * (p1.lat - p2.lat)) / det;
+  const E =
+    (p1.py * (p3.lng - p2.lng) + p2.py * (p1.lng - p3.lng) + p3.py * (p2.lng - p1.lng)) / det;
   const F = p1.py - D * p1.lng - E * p1.lat;
   return { A, B, C, D, E, F };
 }
@@ -75,7 +165,9 @@ const getCentroid = (geometry) => {
   if (!geometry) return null;
   if (geometry.type === 'Polygon') {
     const ring = geometry.coordinates[0];
-    let sumLat = 0, sumLng = 0, count = 0;
+    let sumLat = 0,
+      sumLng = 0,
+      count = 0;
     for (const [lng, lat] of ring) {
       sumLat += lat;
       sumLng += lng;
@@ -84,7 +176,9 @@ const getCentroid = (geometry) => {
     return { lat: sumLat / count, lng: sumLng / count };
   } else if (geometry.type === 'MultiPolygon') {
     const ring = geometry.coordinates[0][0];
-    let sumLat = 0, sumLng = 0, count = 0;
+    let sumLat = 0,
+      sumLng = 0,
+      count = 0;
     for (const [lng, lat] of ring) {
       sumLat += lat;
       sumLng += lng;
@@ -121,21 +215,32 @@ const generateId = (name, props) => {
 };
 
 const guessCategory = (props) => {
-    const name = props.name || '';
-    if (props.building === 'university' || props['department']) return 'academic';
-    if (props.amenity === 'parking') return 'other';
-    if (props.amenity === 'cafe' || props.amenity === 'restaurant' || props.amenity === 'fast_food' || props.shop) return 'food';
-    if (name.includes('Research') || name.includes('Lab')) return 'research';
-    if (name.includes('Sport') || name.includes('Gym') || props.leisure) return 'sports';
-    if (props.building === 'residential' || props.building === 'apartments' || props.building === 'college') return 'residential';
-    if (props.amenity === 'toilets') return 'services';
-    return 'academic'; // Default
+  const name = props.name || '';
+  if (props.building === 'university' || props['department']) return 'academic';
+  if (props.amenity === 'parking') return 'other';
+  if (
+    props.amenity === 'cafe' ||
+    props.amenity === 'restaurant' ||
+    props.amenity === 'fast_food' ||
+    props.shop
+  )
+    return 'food';
+  if (name.includes('Research') || name.includes('Lab')) return 'research';
+  if (name.includes('Sport') || name.includes('Gym') || props.leisure) return 'sports';
+  if (
+    props.building === 'residential' ||
+    props.building === 'apartments' ||
+    props.building === 'college'
+  )
+    return 'residential';
+  if (props.amenity === 'toilets') return 'services';
+  return 'academic'; // Default
 };
 
-geojson.features.forEach(feature => {
+geojson.features.forEach((feature) => {
   const props = feature.properties || {};
   let name = props.name;
-  
+
   // If no name, check for address to make a descriptive name
   if (!name && props['addr:housenumber'] && props['addr:street']) {
     name = `${props['addr:housenumber']} ${props['addr:street']}`;
@@ -165,16 +270,16 @@ geojson.features.forEach(feature => {
     position: [px, py],
     category: guessCategory(props),
     osm_props: {
-        building: props.building,
-        amenity: props.amenity,
-        shop: props.shop,
-        leisure: props.leisure
+      building: props.building,
+      amenity: props.amenity,
+      shop: props.shop,
+      leisure: props.leisure,
     },
     location: {
-        lat: Number(centroid.lat.toFixed(6)),
-        lng: Number(centroid.lng.toFixed(6)),
-        osmId: feature.id ? feature.id.replace(/[^\d]/g, '') : undefined
-    }
+      lat: Number(centroid.lat.toFixed(6)),
+      lng: Number(centroid.lng.toFixed(6)),
+      osmId: feature.id ? feature.id.replace(/[^\d]/g, '') : undefined,
+    },
   };
 
   candidates.push(candidate);

@@ -6,6 +6,183 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
+## [0.14.14] - 2026-01-10
+
+### Fixed
+
+#### Navigation Panel Rewrite & Map Overlay Coordinate Fix (Raouf)
+
+**Summary:** Complete rewrite of the navigation panel with solid opaque backgrounds for readability, and fixed map overlay coordinate mismatch so building markers align correctly with the campus map image.
+
+**Navigation Panel Complete Rewrite:**
+- **Problem**: Navigation popup was glassy/transparent using CSS variables and backdrop blur, making text completely unreadable
+- **Solution**: Complete rewrite with solid opaque backgrounds using inline styles with hardcoded color values
+- **Light Mode**: Alabaster background (#edeade) with dark text (#1a1a1a)
+- **Dark Mode**: Charcoal background (#262826) with light text (#edeade)
+- **Separate Versions**: Used `dark:hidden` and `hidden dark:block` pattern for guaranteed theme rendering
+- **MQ Brand Colors**: Primary red (#a6192e light, #d6001c dark), success green (#10b981)
+- **Clean Design**: Matching settings page card style with proper shadows and borders
+
+**Map Overlay Coordinate Mismatch Fix:**
+- **Problem**: When selecting a building, the marker showed correct location but map overlay image didn't align
+- **Root Cause**: `CAMPUS_BOUNDS` coordinates were inaccurate
+- **Solution**: Updated coordinates using OpenStreetMap data:
+  - **Old bounds**: `[[-33.783, 151.105], [-33.77, 151.125]]`
+  - **New bounds**: `[[-33.7825, 151.1045], [-33.7655, 151.1225]]` (from OSM bounding box)
+  - **Campus center**: From `{lat: -33.775, lng: 151.115}` to `{lat: -33.7742, lng: 151.1127}`
+  - **MapContainer center**: Updated to match
+  - **minZoom**: Lowered from 16 to 15 for better overview capability
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Navigation panel rewrite, coordinate updates
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing (secrets, format, typecheck, lint, test, build)
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ 30 routes successful
+- `npm run test`: ✅ 248/248 tests passing
+
+---
+
+## [0.14.13] - 2026-01-10
+
+### Fixed
+
+#### Map Navigation & Building Categorization Fixes (Raouf)
+
+**Summary:** Comprehensive map fixes addressing navigation popup readability, building category accuracy, and animation polish with full verification.
+
+**Navigation Popup Enhancement:**
+- **Solid Matte Background**: Changed navigation panel from glassy/transparent to solid matte design using `bg-white dark:bg-gray-900` instead of `bg-mq-card-background/95`
+- **Removed Blur Effects**: Eliminated `backdropFilter: 'none'` and `WebkitBackdropFilter: 'none'` to ensure crisp, readable text
+- **Improved Contrast**: Enhanced readability for route information display in both light and dark modes
+
+**Building Categorization Corrections:**
+- **Added Missing Category**: Added 'other' category to `CATEGORY_FILTERS` array in `MapClient.tsx` (line ~92) with `{ id: 'other', icon: Building2, label: 'Other', color: 'text-gray-500' }`
+- **Category Distribution Now Accurate**: Fixed mismatch where filter counts showed 148 buildings but total was 162 (missing 'other' category with 14 buildings)
+
+**Building Section Animation Polish:**
+- **Verified Animations**: Confirmed building grid/list animations are properly implemented with:
+  - Staggered delays capped at `Math.min(index * 0.02, 0.15)` to prevent long waits
+  - Layout animations with `layout` prop on motion.div components
+  - `AnimatePresence mode="popLayout"` for smooth filter transitions
+  - Short 0.2s duration with proper exit animations
+  - Limited initial display to 12 buildings with "Show All" for performance
+
+**Updated Category Distribution:**
+| Category | Count |
+|----------|-------|
+| Academic | 48    |
+| Residential | 46   |
+| Services | 19    |
+| Other | 14      |
+| Venue | 9       |
+| Research | 9     |
+| Food | 8        |
+| Health | 5      |
+| Sports | 4      |
+| **Total** | **162**|
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Added 'other' category filter and verified animations
+- `app/map/CampusMap.tsx` - Fixed navigation popup with solid matte background
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing (secrets, format, typecheck, lint, test, build)
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ 30 routes successful
+- `npm run test`: ✅ 248/248 tests passing
+
+---
+
+## [0.14.12] - 2026-01-10
+
+### Changed
+
+#### Map UI Improvements & Building Categorization (Raouf)
+
+**Summary:** Improved map page UX by relocating the search bar, fixing navigation popup styling, and correcting building category assignments for better accuracy.
+
+**Search Bar Relocation:**
+- Moved main location search bar from the top of page to the "Campus Buildings Quick Reference" section
+- Search bar is now prominently placed at the top of the building list card
+- Added a secondary "filter buildings" input below for filtering the building list
+- Renamed "Search and Coordinate Picker" section to "Coordinate Picker and Map Overlays"
+
+**Navigation Popup Styling:**
+- Changed navigation panel from glassy/transparent to matte/opaque design
+- Removed blur effect with `backdropFilter: 'none'`
+- Changed `border-2` to `border` for cleaner appearance
+
+**Building Categorization Fixes:**
+Fixed 12 buildings that were incorrectly categorized:
+- **75TR** (75 Talavera Road): `academic` → `other` (commercial building)
+- **93WATERLOO** (93 Waterloo Road): `academic` → `other` (commercial office)
+- **8LR** (Banksia Cottage): `academic` → `services` (childcare facility)
+- **18WWSERVIC** (Service Connect): `academic` → `services` (student services hub)
+- **19ERTHECHA** (The Chancellery): `academic` → `services` (administration)
+- **16UAAUSTRA** (Australian Hearing Hub): `academic` → `health` (health/research)
+- **8492TALAVE** (84-92 Talavera Road): `academic` → `other` (commercial office)
+- **94110TALAV** (94-110 Talavera Road): `academic` → `other` (commercial office)
+- **13LACHLANA** (1-3 Lachlan Avenue): `academic` → `residential` (apartments)
+- **205A/205B** (Culloden Road): `academic` → `residential` (apartments)
+- **10HA** (Chaplaincy): `academic` → `services` (multi-faith services)
+- **16MW** (Library): Fixed description and levels to match main library entry
+
+**Updated Category Distribution:**
+| Category     | Count |
+|--------------|-------|
+| Academic     | 48    |
+| Residential  | 46    |
+| Services     | 19    |
+| Other        | 14    |
+| Venue        | 9     |
+| Research     | 9     |
+| Food         | 8     |
+| Health       | 5     |
+| Sports       | 4     |
+
+**Files Modified:**
+- `app/map/MapClient.tsx` - Search bar relocation
+- `app/map/CampusMap.tsx` - Navigation popup styling
+- `lib/map/buildings.ts` - Building category corrections
+
+**Verification:**
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ 30 routes successful
+- `npm run test`: ✅ 248/248 tests passing
+
+---
+
+## [0.14.11] - 2026-01-10
+
+### Fixed
+
+#### Map Runtime Error Fix & UI Polish (Raouf)
+
+**Summary:** Fixed critical runtime TypeError in map component causing "Cannot read properties of undefined (reading 'style')" errors and removed ugly hover tooltips from map layer controls.
+
+**Runtime Error Fix:**
+- **TypeError Resolution:** Fixed null reference error in `CampusMap.tsx` cursor style handling by adding proper null checking with optional chaining (`container?.style` instead of `container && container.style`)
+- **Error Silencing:** Updated error handling to avoid cascading console errors during component unmount
+
+**UI Polish:**
+- **Hover Tooltip Removal:** Removed hover tooltips from map overlay layer buttons that showed source attribution, last updated dates, and legend information
+- **Cleaner Interface:** Simplified layer controls to show only essential information (icon, name, description, active state)
+
+**Files Modified:**
+- `app/map/CampusMap.tsx` - Fixed TypeError with defensive null checking
+- `app/map/MapClient.tsx` - Removed hover tooltips from layer controls
+- `app/map/MapClient.tsx` - Removed unused `HelpCircle` import
+
+**Verification:**
+- `npm run lint`: ✅ 0 errors, 0 warnings
+- `npm run build`: ✅ 30 routes successful
+- `npm run test`: ✅ 248/248 tests passing
+
+---
+
 ## [0.14.10] - 2026-01-09
 
 ### Fixed
