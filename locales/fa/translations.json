@@ -412,7 +412,7 @@
   "noAccount": "حساب کاربری ندارید؟",
   "signUp": "ثبت‌نام",
   "passwordsDoNotMatch": "رمزهای عبور جدید مطابقت ندارند",
-  "passwordTooShort": "رمز عبور باید حداقل ۶ کاراکتر باشد",
+  "passwordTooShort": "رمز عبور باید حداقل ۸ کاراکتر باشد",
   "accountCreated": "حساب ایجاد شد!",
   "verifyEmail": "لطفاً ایمیل خود را برای تأیید حساب بررسی کنید.",
   "joinApp": "به {{appName}} بپیوندید",

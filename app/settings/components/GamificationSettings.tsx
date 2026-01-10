@@ -22,6 +22,31 @@ type GamificationSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
+type ToggleControlProps = {
+  checked: boolean;
+  onToggle: () => void;
+  label: string;
+  testId?: string;
+};
+
+const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    aria-label={label}
+    aria-pressed={checked}
+    onClick={onToggle}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
+    data-testid={testId}
+  >
+    <span
+      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
+      aria-hidden="true"
+    />
+  </button>
+);
+
 const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
   const { profile, settings, updateSettings, getLevelTitle, getStreakEmoji } =
     useGamificationStore();
@@ -135,20 +160,17 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                     {t('showXPNotificationsDesc')}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleToggleSetting('showXPNotifications')}
-                  className={`px-3 py-1 text-xs ${
-                    settings.showXPNotifications
-                      ? 'bg-mq-primary text-white'
-                      : 'text-mq-content-secondary'
-                  }`}
-                  aria-pressed={settings.showXPNotifications}
-                  data-testid="toggle-xp-notifications"
-                >
-                  {settings.showXPNotifications ? t('enabled') : t('disabled')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <ToggleControl
+                    checked={settings.showXPNotifications}
+                    onToggle={() => handleToggleSetting('showXPNotifications')}
+                    label={t('showXPNotifications')}
+                    testId="toggle-xp-notifications"
+                  />
+                  <span className="text-mq-xs text-mq-content-secondary">
+                    {settings.showXPNotifications ? t('enabled') : t('disabled')}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -161,20 +183,17 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                     {t('showLevelUpNotificationsDesc')}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleToggleSetting('showLevelUpNotifications')}
-                  className={`px-3 py-1 text-xs ${
-                    settings.showLevelUpNotifications
-                      ? 'bg-mq-primary text-white'
-                      : 'text-mq-content-secondary'
-                  }`}
-                  aria-pressed={settings.showLevelUpNotifications}
-                  data-testid="toggle-levelup-notifications"
-                >
-                  {settings.showLevelUpNotifications ? t('enabled') : t('disabled')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <ToggleControl
+                    checked={settings.showLevelUpNotifications}
+                    onToggle={() => handleToggleSetting('showLevelUpNotifications')}
+                    label={t('showLevelUpNotifications')}
+                    testId="toggle-levelup-notifications"
+                  />
+                  <span className="text-mq-xs text-mq-content-secondary">
+                    {settings.showLevelUpNotifications ? t('enabled') : t('disabled')}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -187,20 +206,17 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                     {t('showStreakRemindersDesc')}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleToggleSetting('showStreakReminders')}
-                  className={`px-3 py-1 text-xs ${
-                    settings.showStreakReminders
-                      ? 'bg-mq-primary text-white'
-                      : 'text-mq-content-secondary'
-                  }`}
-                  aria-pressed={settings.showStreakReminders}
-                  data-testid="toggle-streak-reminders"
-                >
-                  {settings.showStreakReminders ? t('enabled') : t('disabled')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <ToggleControl
+                    checked={settings.showStreakReminders}
+                    onToggle={() => handleToggleSetting('showStreakReminders')}
+                    label={t('showStreakReminders')}
+                    testId="toggle-streak-reminders"
+                  />
+                  <span className="text-mq-xs text-mq-content-secondary">
+                    {settings.showStreakReminders ? t('enabled') : t('disabled')}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -213,35 +229,35 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                     {t('displayOnProfileDesc')}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleToggleSetting('displayOnProfile')}
-                  className={`px-3 py-1 text-xs ${
-                    settings.displayOnProfile
-                      ? 'bg-mq-primary text-white'
-                      : 'text-mq-content-secondary'
-                  }`}
-                  aria-pressed={settings.displayOnProfile}
-                  data-testid="toggle-display-profile"
-                >
-                  {settings.displayOnProfile ? t('enabled') : t('disabled')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <ToggleControl
+                    checked={settings.displayOnProfile}
+                    onToggle={() => handleToggleSetting('displayOnProfile')}
+                    label={t('displayOnProfile')}
+                    testId="toggle-display-profile"
+                  />
+                  <span className="text-mq-xs text-mq-content-secondary">
+                    {settings.displayOnProfile ? t('enabled') : t('disabled')}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Reset Progress */}
             <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="space-y-1">
                   <h3 className="font-semibold text-mq-content">{t('resetProgress')}</h3>
                   <p className="text-mq-sm text-mq-content-secondary">{t('resetProgressDesc')}</p>
+                  <p className="text-mq-xs text-mq-warning" id="reset-progress-caution">
+                    {t('resetProgressConfirm')}
+                  </p>
                 </div>
                 <Button
-                  variant="ghost"
+                  variant="destructive"
                   size="sm"
                   onClick={() => setShowResetDialog(true)}
-                  className="px-3 py-1 text-xs text-red-500 hover:bg-red-500/10"
+                  aria-describedby="reset-progress-caution"
                   data-testid="reset-progress-button"
                 >
                   <RotateCcw className="h-3 w-3 mr-1" />

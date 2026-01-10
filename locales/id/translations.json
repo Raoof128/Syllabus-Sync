@@ -412,7 +412,7 @@
   "noAccount": "Belum punya akun?",
   "signUp": "Daftar",
   "passwordsDoNotMatch": "Kata sandi baru tidak cocok",
-  "passwordTooShort": "Kata sandi minimal 6 karakter",
+  "passwordTooShort": "Kata sandi minimal 8 karakter",
   "accountCreated": "Akun dibuat!",
   "verifyEmail": "Silakan periksa email Anda untuk memverifikasi akun.",
   "joinApp": "Bergabung dengan {{appName}}",

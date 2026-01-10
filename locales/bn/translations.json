@@ -412,7 +412,7 @@
   "noAccount": "অ্যাকাউন্ট নেই?",
   "signUp": "সাইন আপ",
   "passwordsDoNotMatch": "নতুন পাসওয়ার্ড মিলছে না",
-  "passwordTooShort": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে",
+  "passwordTooShort": "পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে",
   "accountCreated": "অ্যাকাউন্ট তৈরি হয়েছে!",
   "verifyEmail": "আপনার অ্যাকাউন্ট যাচাই করতে আপনার ইমেইল চেক করুন।",
   "joinApp": "{{appName}} এ যোগ দিন",

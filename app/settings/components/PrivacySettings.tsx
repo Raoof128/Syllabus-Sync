@@ -43,8 +43,6 @@ function calculatePasswordStrength(password: string): {
 
   if (password.length >= 8) {
     score += 1;
-  } else {
-    feedback.push('Use at least 8 characters');
   }
 
   if (password.length >= 12) {
@@ -53,26 +51,19 @@ function calculatePasswordStrength(password: string): {
 
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
     score += 1;
-  } else {
-    feedback.push('Include uppercase and lowercase letters');
   }
 
   if (/\d/.test(password)) {
     score += 1;
-  } else {
-    feedback.push('Include at least one number');
   }
 
   if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     score += 1;
-  } else {
-    feedback.push('Include a special character');
   }
 
   // Check for common patterns
   if (/(.)\1{2,}/.test(password)) {
     score = Math.max(0, score - 1);
-    feedback.push('Avoid repeated characters');
   }
 
   let strength: PasswordStrength;
@@ -150,7 +141,7 @@ const PrivacySettings = memo(
           return;
         }
 
-        if (newPassword.length < 6) {
+        if (newPassword.length < 8) {
           toastUtils.error(t('settingsError'), t('passwordTooShort'));
           return;
         }
@@ -535,7 +526,7 @@ const PrivacySettings = memo(
                     className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    minLength={6}
+                    minLength={8}
                     required
                     data-testid="new-password-input"
                   />
@@ -582,14 +573,6 @@ const PrivacySettings = memo(
                     >
                       {t(strengthLabels[passwordStrength.strength])}
                     </p>
-                    {passwordStrength.feedback.length > 0 &&
-                      passwordStrength.strength !== 'strong' && (
-                        <ul className="text-mq-xs text-mq-content-secondary list-disc list-inside">
-                          {passwordStrength.feedback.slice(0, 2).map((tip, idx) => (
-                            <li key={idx}>{tip}</li>
-                          ))}
-                        </ul>
-                      )}
                   </div>
                 )}
               </div>

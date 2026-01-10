@@ -412,7 +412,7 @@
   "noAccount": "اکاؤنٹ نہیں ہے؟",
   "signUp": "سائن اپ",
   "passwordsDoNotMatch": "نئے پاس ورڈ مماثل نہیں ہیں",
-  "passwordTooShort": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
+  "passwordTooShort": "پاس ورڈ کم از کم 8 حروف کا ہونا چاہیے",
   "accountCreated": "اکاؤنٹ بن گیا!",
   "verifyEmail": "براہ کرم اپنا اکاؤنٹ تصدیق کرنے کے لیے اپنا ای میل چیک کریں۔",
   "joinApp": "{{appName}} میں شامل ہوں",

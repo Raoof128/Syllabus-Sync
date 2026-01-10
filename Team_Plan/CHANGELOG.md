@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.30] - 2026-01-11
+
+### Fixed
+
+#### Settings Page UI Accessibility & Test Fixes (Raouf)
+
+**Summary:** Enhanced settings page accessibility by fixing test expectations and restoring proper ARIA attributes for language selection and toggle controls.
+
+**The Problem:**
+- Test failures occurred after UI changes: AppearanceSettings tests expected button-based language selection with data-testid, but code used select dropdown
+- Toggle controls lacked aria-pressed attribute needed for proper screen reader support
+
+**Changes Made:**
+1. **Restored language selection buttons:** Changed back from select dropdown to radiogroup buttons with proper data-testid attributes for test compatibility
+2. **Added aria-pressed to toggles:** Enhanced NotificationSettings and GamificationSettings toggle controls with aria-pressed for better accessibility
+3. **Maintained UI improvements:** Kept the 8-character password minimum, updated translations, and removed global button overrides
+
+**Files Changed:**
+- `app/settings/components/AppearanceSettings.tsx` - Restored button-based language picker with radiogroup
+- `app/settings/components/NotificationSettings.tsx` - Added aria-pressed to ToggleControl
+- `app/settings/components/GamificationSettings.tsx` - Added aria-pressed to ToggleControl
+
+**Verification:**
+- `npm run prepush`: ✅ All checks passing (format, typecheck, lint, test, build)
+- Tests: ✅ All 9 failing tests now pass
+
+---
+
 ## [0.14.29] - 2026-01-10
 
 ### Fixed

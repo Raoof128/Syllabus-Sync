@@ -412,7 +412,7 @@
   "noAccount": "Tiada akaun?",
   "signUp": "Daftar",
   "passwordsDoNotMatch": "Kata laluan baharu tidak sepadan",
-  "passwordTooShort": "Kata laluan mesti sekurang-kurangnya 6 aksara",
+  "passwordTooShort": "Kata laluan mesti sekurang-kurangnya 8 aksara",
   "accountCreated": "Akaun dicipta!",
   "verifyEmail": "Sila periksa e-mel anda untuk mengesahkan akaun.",
   "joinApp": "Sertai {{appName}}",

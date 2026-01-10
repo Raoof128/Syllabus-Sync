@@ -3,17 +3,7 @@
 import { memo, useCallback, useEffect, useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import {
-  Bell,
-  BellOff,
-  Mail,
-  Calendar,
-  Info,
-  CheckCircle,
-  XCircle,
-  Clock,
-  AlertTriangle,
-} from 'lucide-react';
+import { Bell, BellOff, Mail, Calendar, Info, Clock, AlertTriangle } from 'lucide-react';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -40,6 +30,31 @@ const REMINDER_TIMING_OPTIONS = [
 const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
+
+type ToggleControlProps = {
+  checked: boolean;
+  onToggle: () => void;
+  label: string;
+  testId?: string;
+};
+
+const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    aria-label={label}
+    aria-pressed={checked}
+    onClick={onToggle}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
+    data-testid={testId}
+  >
+    <span
+      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
+      aria-hidden="true"
+    />
+  </button>
+);
 
 const NotificationSettings = memo(
   ({ notifications, setNotifications, t }: NotificationSettingsProps) => {
@@ -245,31 +260,17 @@ const NotificationSettings = memo(
                     </div>
                   </div>
                   {permissionStatus === 'granted' ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleTogglePush}
-                      className={`px-3 py-1 text-xs flex items-center gap-1 border-2 rounded-md ${
-                        pushEnabled
-                          ? 'bg-mq-success text-white border-mq-success hover:bg-mq-success/80 hover:border-mq-success/80'
-                          : 'bg-mq-error text-white border-mq-error hover:bg-mq-error/80 hover:border-mq-error/80'
-                      }`}
-                      aria-pressed={pushEnabled}
-                      aria-label={`${t('pushNotifications')} ${pushEnabled ? t('enabled') : t('disabled')}`}
-                      data-testid="toggle-push-notifications"
-                    >
-                      {pushEnabled ? (
-                        <>
-                          <CheckCircle className="h-3 w-3" aria-hidden="true" />
-                          {t('on')}
-                        </>
-                      ) : (
-                        <>
-                          <XCircle className="h-3 w-3" aria-hidden="true" />
-                          {t('off')}
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <ToggleControl
+                        checked={pushEnabled}
+                        onToggle={handleTogglePush}
+                        label={`${t('pushNotifications')} ${pushEnabled ? t('enabled') : t('disabled')}`}
+                        testId="toggle-push-notifications"
+                      />
+                      <span className="text-mq-xs text-mq-content-secondary">
+                        {pushEnabled ? t('on') : t('off')}
+                      </span>
+                    </div>
                   ) : permissionStatus !== 'denied' && isNotificationSupported ? (
                     <Button
                       variant="ghost"
@@ -303,31 +304,17 @@ const NotificationSettings = memo(
                       <p className="text-mq-xs text-mq-content-secondary mt-0.5">{desc}</p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleNotificationPreference(key, !currentNotifications[key])}
-                    className={`px-3 py-1 text-xs flex items-center gap-1 transition-colors focus:ring-2 focus:ring-mq-primary/50 flex-shrink-0 border-2 rounded-md ${
-                      currentNotifications[key]
-                        ? 'bg-mq-success text-white border-mq-success hover:bg-mq-success/80 hover:border-mq-success/80'
-                        : 'bg-mq-error text-white border-mq-error hover:bg-mq-error/80 hover:border-mq-error/80'
-                    }`}
-                    aria-label={`${label} ${t('notifications').toLowerCase()} ${t('are')} ${currentNotifications[key] ? t('enabled') : t('disabled')}. ${t('clickTo')} ${currentNotifications[key] ? t('disable').toLowerCase() : t('enable').toLowerCase()}`}
-                    aria-pressed={currentNotifications[key]}
-                    data-testid={`toggle-${key}-notifications`}
-                  >
-                    {currentNotifications[key] ? (
-                      <>
-                        <CheckCircle className="h-3 w-3" aria-hidden="true" />
-                        {t('enabled')}
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-3 w-3" aria-hidden="true" />
-                        {t('disabled')}
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <ToggleControl
+                      checked={currentNotifications[key]}
+                      onToggle={() => handleNotificationPreference(key, !currentNotifications[key])}
+                      label={`${label} ${t('notifications')}`}
+                      testId={`toggle-${key}-notifications`}
+                    />
+                    <span className="text-mq-xs text-mq-content-secondary">
+                      {currentNotifications[key] ? t('enabled') : t('disabled')}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Reminder Timing Selector - only show when enabled */}

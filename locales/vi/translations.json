@@ -412,7 +412,7 @@
   "noAccount": "Chưa có tài khoản?",
   "signUp": "Đăng ký",
   "passwordsDoNotMatch": "Mật khẩu mới không khớp",
-  "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+  "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
   "accountCreated": "Đã tạo tài khoản!",
   "verifyEmail": "Vui lòng kiểm tra email để xác minh tài khoản.",
   "joinApp": "Tham gia {{appName}}",

@@ -162,29 +162,30 @@ const AppearanceSettings = memo(
                   </div>
                 </div>
                 <div
-                  className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1 -m-1"
+                  className="space-y-2"
                   role="radiogroup"
                   aria-label={t('language')}
+                  data-testid="language-group"
                 >
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <Button
-                      key={lang}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLanguageChange(lang)}
-                      className={`px-2 py-1 text-xs transition-colors focus:ring-2 focus:ring-mq-primary/50 ${
-                        language === lang
-                          ? 'bg-mq-primary text-white ring-2 ring-mq-primary/30'
-                          : 'text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content'
-                      }`}
-                      role="radio"
-                      aria-checked={language === lang}
-                      aria-label={`${t(languageAriaLabelKeys[lang])}${language === lang ? ` ${t('currentlySelected')}` : ''}`}
-                      data-testid={`language-${lang}`}
-                    >
-                      {lang.toUpperCase()}
-                    </Button>
-                  ))}
+                  <p className="text-mq-xs text-mq-content-secondary">{t('language')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {SUPPORTED_LANGUAGES.map((lang) => (
+                      <Button
+                        key={lang}
+                        variant="ghost"
+                        size="sm"
+                        role="radio"
+                        aria-checked={language === lang}
+                        aria-label={t(languageAriaLabelKeys[lang])}
+                        onClick={() => handleLanguageChange(lang)}
+                        data-testid={`language-${lang}`}
+                        className={`px-3 py-1 text-xs ${language === lang ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
+                      >
+                        {languageNames[lang] || lang}
+                        {language === lang ? ` ${t('currentlySelected') || ''}` : ''}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

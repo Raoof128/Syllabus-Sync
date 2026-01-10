@@ -412,7 +412,7 @@
   "noAccount": "Don't have an account?",
   "signUp": "Sign up",
   "passwordsDoNotMatch": "New passwords do not match",
-  "passwordTooShort": "Password must be at least 6 characters",
+  "passwordTooShort": "Password must be at least 8 characters",
   "accountCreated": "Account created!",
   "verifyEmail": "Please check your email to verify your account.",
   "joinApp": "Join {{appName}}",

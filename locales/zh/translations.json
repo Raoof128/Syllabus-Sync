@@ -412,7 +412,7 @@
   "noAccount": "没有账户？",
   "signUp": "注册",
   "passwordsDoNotMatch": "新密码不匹配",
-  "passwordTooShort": "密码必须至少6个字符",
+  "passwordTooShort": "密码必须至少8个字符",
   "accountCreated": "账户已创建！",
   "verifyEmail": "请检查您的邮箱以验证账户。",
   "joinApp": "加入 {{appName}}",

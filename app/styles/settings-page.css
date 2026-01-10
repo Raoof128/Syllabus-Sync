@@ -14,25 +14,14 @@
 
 .settings-page [data-slot='button'],
 .settings-page button {
-  background-color: #edeade !important;
-  color: var(--c-content) !important;
-  transition: background-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.settings-page [data-slot='button']:hover,
-.settings-page button:hover {
-  background-color: #e6e4d8 !important;
-}
-
-.settings-page [data-slot='button'][data-variant='primary'],
-.settings-page [data-slot='button'][data-variant='destructive'] {
-  background-color: #edeade !important;
-  color: var(--c-content) !important;
-}
-
-/* Dark mode settings page */
-.dark .settings-page [data-slot='button'],
-.dark .settings-page button {
-  background-color: var(--c-card-background) !important;
-  color: var(--c-content) !important;
+.settings-page [data-slot='button']:focus-visible,
+.settings-page button:focus-visible {
+  outline: 2px solid var(--c-primary, #a6192e);
+  outline-offset: 2px;
 }

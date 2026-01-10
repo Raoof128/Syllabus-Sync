@@ -412,7 +412,7 @@
   "noAccount": "אין לך חשבון?",
   "signUp": "הירשם",
   "passwordsDoNotMatch": "הסיסמאות החדשות אינן תואמות",
-  "passwordTooShort": "הסיסמה חייבת להכיל לפחות 6 תווים",
+  "passwordTooShort": "הסיסמה חייבת להכיל לפחות 8 תווים",
   "accountCreated": "Account created!",
   "verifyEmail": "Please check your email to verify your account.",
   "joinApp": "Join {{appName}}",

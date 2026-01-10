@@ -412,7 +412,7 @@
   "noAccount": "アカウントをお持ちでないですか？",
   "signUp": "サインアップ",
   "passwordsDoNotMatch": "新しいパスワードが一致しません",
-  "passwordTooShort": "パスワードは6文字以上必要です",
+  "passwordTooShort": "パスワードは8文字以上必要です",
   "accountCreated": "アカウントが作成されました！",
   "verifyEmail": "メールを確認してアカウントを認証してください。",
   "joinApp": "{{appName}}に参加",

@@ -412,7 +412,7 @@
   "noAccount": "Non hai un account?",
   "signUp": "Registrati",
   "passwordsDoNotMatch": "Le nuove password non corrispondono",
-  "passwordTooShort": "La password deve contenere almeno 6 caratteri",
+  "passwordTooShort": "La password deve contenere almeno 8 caratteri",
   "accountCreated": "Account creato!",
   "verifyEmail": "Controlla la tua email per verificare il tuo account.",
   "joinApp": "Unisciti a {{appName}}",
