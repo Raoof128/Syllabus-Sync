@@ -150,10 +150,9 @@
     pointer-events: auto; /* Enable clicks when visible */
     /* OPEN animation - slightly slower for fluid feel */
     transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
-    /* Enhanced shadow when open */
+    /* V3.1: Reduced shadow layers from 3 to 2 for better performance */
     box-shadow:
-      6px 0 30px rgba(0, 0, 0, 0.2),
-      12px 0 50px rgba(0, 0, 0, 0.15),
+      8px 0 35px rgba(0, 0, 0, 0.18),
       inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
 

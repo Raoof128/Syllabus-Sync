@@ -1,7 +1,8 @@
 // app/client-layout.tsx
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, memo } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -9,8 +10,6 @@ import ThemeProvider from '@/components/theme/ThemeProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
-import LiquidFilter from '@/components/ui/LiquidFilter';
-import MeshGradient from '@/components/ui/MeshGradient';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useUnitsStore } from '@/lib/store/unitsStore';
@@ -22,16 +21,38 @@ import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
 
-// Silence known Next.js 16 internal warnings that we cannot fix
-// These are framework issues, not application bugs
+// V3.1: Lazy load LiquidFilter - heavy canvas operations deferred
+const LiquidFilter = dynamic(() => import('@/components/ui/LiquidFilter'), {
+  ssr: false,
+  loading: () => null,
+});
+
+// V3.1: Performance optimization - move constant arrays outside component
+// Prevents recreation on every render
+const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
+const PROTECTED_ROUTES = [
+  '/home',
+  '/calendar',
+  '/feed',
+  '/map',
+  '/settings',
+  '/manage-profiles',
+] as const;
+
+// V3.1: Performance optimization - run console.error override once at module load
+// Instead of checking on every error call
 if (typeof window !== 'undefined') {
   const originalConsoleError = console.error;
+  const NEXT_KEY_WARNING = 'Each child in a list should have a unique "key" prop';
+  const OUTER_LAYOUT_ROUTER = 'OuterLayoutRouter';
+
   console.error = (...args: unknown[]) => {
     // Filter out the OuterLayoutRouter key warning - this is a Next.js 16 Turbopack internal issue
+    const firstArg = args[0];
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Each child in a list should have a unique "key" prop') &&
-      args.some((arg) => typeof arg === 'string' && arg.includes('OuterLayoutRouter'))
+      typeof firstArg === 'string' &&
+      firstArg.includes(NEXT_KEY_WARNING) &&
+      args.some((arg) => typeof arg === 'string' && arg.includes(OUTER_LAYOUT_ROUTER))
     ) {
       return; // Silently ignore this specific warning
     }
@@ -39,7 +60,9 @@ if (typeof window !== 'undefined') {
   };
 }
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+// V3.1: Wrapped with React.memo to prevent unnecessary re-renders
+// Using named function for better debugging in React DevTools
+function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
@@ -54,13 +77,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
 
-  // Auth routes that don't require authentication
-  const authRoutes = ['/login', '/signup', '/reset-password'];
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-
-  // Protected routes that require authentication
-  const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  // V3.1: Performance optimization - use pre-defined constant arrays
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
     // Check authentication status
@@ -199,8 +218,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {/* Global SVG filters for liquid glass effects */}
         <LiquidFilter />
 
-        {/* Animated mesh gradient background */}
-        <MeshGradient />
+        {/* Mesh background now rendered in layout.tsx as CSS-only for performance */}
 
         {/* Skip to main content link for accessibility */}
         <a
@@ -233,3 +251,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </ThemeProvider>
   );
 }
+
+// V3.1: Export the memoized component
+const ClientLayout = memo(ClientLayoutComponent);
+ClientLayout.displayName = 'ClientLayout';
+export default ClientLayout;

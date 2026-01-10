@@ -135,17 +135,21 @@
   box-shadow: var(--mq-shadow-md);
 }
 
-/* Unified dark-mode text enforcement: make textual content use the unified MQ content token in dark mode */
-html.dark
-  :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
-  ) {
-  color: var(--mq-content) !important;
-  -webkit-text-fill-color: var(--mq-content) !important;
-  opacity: 1 !important;
-  mix-blend-mode: normal !important;
+/* V3.1: Optimized dark-mode text enforcement - targeted selectors instead of universal */
+/* Previous implementation used :where(*:not(...)) which matches thousands of elements */
+/* Now targeting specific text containers for better performance */
+html.dark .text-mq-content,
+html.dark .text-mq-content-secondary,
+html.dark .text-mq-content-tertiary,
+html.dark main p,
+html.dark main span:not([class*='icon']),
+html.dark main div:not([class*='bg-']):not([class*='backdrop']),
+html.dark section p,
+html.dark section span:not([class*='icon']),
+html.dark article p,
+html.dark article span:not([class*='icon']) {
+  color: var(--mq-content);
+  -webkit-text-fill-color: var(--mq-content);
 }
 
 /* ============================================

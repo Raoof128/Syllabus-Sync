@@ -40,6 +40,39 @@
    1. CSS CUSTOM PROPERTIES - Liquid Glass Tokens
    ============================================================================ */
 :root {
+  /* =========================================================================
+     GLASS MODE SYSTEM - iOS 26 "Liquid Glass" Inspired
+     =========================================================================
+     Two modes: "clear" (more transparent) vs "tinted" (more opaque)
+     Controlled via [data-glass-mode="clear|tinted"] on <html>
+     Default: clear mode for that premium Apple look
+     ========================================================================= */
+
+  /* Glass Mode Toggle - default to clear */
+  --glass-mode: clear;
+
+  /* Glass Intensity Slider (0-100) - controls overall effect strength */
+  --glass-intensity: 75;
+  --glass-intensity-factor: calc(var(--glass-intensity) / 100);
+
+  /* Clear Mode Base Values */
+  --glass-clear-opacity: 0.55;
+  --glass-clear-blur: 32px;
+  --glass-clear-saturation: 220%;
+  --glass-clear-border-opacity: 0.35;
+
+  /* Tinted Mode Base Values */
+  --glass-tinted-opacity: 0.82;
+  --glass-tinted-blur: 20px;
+  --glass-tinted-saturation: 160%;
+  --glass-tinted-border-opacity: 0.18;
+
+  /* Active Glass Values (switches based on mode) - Light Mode Defaults */
+  --glass-opacity: 0.55;
+  --glass-blur: 32px;
+  --glass-saturation: 220%;
+  --glass-border-opacity: 0.35;
+
   /* Brand Colors for Liquid Glass */
   --mq-navy: #002a45;
   --mq-navy-light: #003d66;
@@ -53,12 +86,12 @@
   --alabaster-light: #f5f4ed;
 
   /* Glass Surface Properties - Light Mode (Alabaster-based) */
-  --liquid-glass-bg: rgba(237, 234, 222, 0.65); /* More translucent for 2025 look */
-  --liquid-glass-bg-hover: rgba(237, 234, 222, 0.75);
-  --liquid-glass-border: rgba(255, 255, 255, 0.4); /* Stronger edge definition */
-  --liquid-glass-border-hover: rgba(255, 255, 255, 0.6);
-  --liquid-glass-blur: 30px; /* Deeper blur */
-  --liquid-glass-saturation: 210%; /* Vibrant Apple-style saturation */
+  --liquid-glass-bg: rgba(237, 234, 222, 0.55);
+  --liquid-glass-bg-hover: rgba(237, 234, 222, 0.67);
+  --liquid-glass-border: rgba(255, 255, 255, 0.35);
+  --liquid-glass-border-hover: rgba(255, 255, 255, 0.55);
+  --liquid-glass-blur: 32px;
+  --liquid-glass-saturation: 220%;
 
   /* Shadow Layers - Light Mode */
   --liquid-glass-shadow-inset:
@@ -67,97 +100,199 @@
     0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
   --liquid-glass-shadow-glow: 0 0 30px rgba(166, 25, 46, 0.1);
 
+  /* Edge Glow & Rim Lighting - Light Mode */
+  --glass-edge-glow: 0 0 1px rgba(255, 255, 255, 0.8);
+  --glass-rim-light: inset 0 0.5px 0 rgba(255, 255, 255, 0.6);
+  --glass-rim-shadow: inset 0 -0.5px 0 rgba(0, 0, 0, 0.05);
+
   /* Security Shield (Navy tint) */
   --security-glass-bg: rgba(0, 42, 69, 0.08);
   --security-glass-border: rgba(0, 61, 102, 0.15);
   --security-glass-glow: 0 0 40px rgba(0, 42, 69, 0.1);
 
+  /* =========================================================================
+     SPRING ANIMATION SYSTEM - iOS 26 Bouncy Physics
+     =========================================================================
+     Apple's Liquid Glass uses spring physics for "jelly-like" motion.
+     These curves approximate spring animations in CSS.
+     ========================================================================= */
+
   /* Animation Timing */
   --liquid-transition-fast: 200ms;
   --liquid-transition-mid: 400ms;
   --liquid-transition-slow: 600ms;
+
+  /* Standard Easing */
   --liquid-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --liquid-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --liquid-ease-heavy: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Spring Easing - Bouncy Apple-style physics */
+  --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-soft: cubic-bezier(0.25, 1.25, 0.5, 1);
+  --spring-snappy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --spring-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Spring Animation Durations */
+  --spring-duration-fast: 350ms;
+  --spring-duration-mid: 500ms;
+  --spring-duration-slow: 700ms;
+
+  /* Legacy alias */
+  --liquid-ease-bounce: var(--spring-bounce);
+}
+
+/* =========================================================================
+   GLASS MODE: TINTED - Light Mode
+   =========================================================================
+   Activated via [data-glass-mode="tinted"] on <html>
+   More opaque, softer blur - better for readability
+   ========================================================================= */
+[data-glass-mode='tinted'] {
+  --glass-opacity: 0.82;
+  --glass-blur: 20px;
+  --glass-saturation: 160%;
+  --glass-border-opacity: 0.18;
+
+  /* Recalculate liquid glass values for tinted mode */
+  --liquid-glass-bg: rgba(237, 234, 222, 0.82);
+  --liquid-glass-bg-hover: rgba(237, 234, 222, 0.9);
+  --liquid-glass-border: rgba(255, 255, 255, 0.18);
+  --liquid-glass-blur: 20px;
+  --liquid-glass-saturation: 160%;
 }
 
 /* Dark mode adjustments */
 .dark {
-  --liquid-glass-bg: rgba(55, 58, 54, 0.85);
-  --liquid-glass-bg-hover: rgba(55, 58, 54, 0.92);
-  --liquid-glass-border: rgba(255, 255, 255, 0.08);
-  --liquid-glass-border-hover: rgba(255, 255, 255, 0.12);
+  /* Dark mode glass base values */
+  --glass-opacity: 0.45;
+  --glass-blur: 32px;
+  --glass-saturation: 200%;
+  --glass-border-opacity: 0.12;
+
+  --liquid-glass-bg: rgba(55, 58, 54, 0.45);
+  --liquid-glass-bg-hover: rgba(55, 58, 54, 0.57);
+  --liquid-glass-border: rgba(255, 255, 255, 0.12);
+  --liquid-glass-border-hover: rgba(255, 255, 255, 0.2);
+  --liquid-glass-blur: 32px;
+  --liquid-glass-saturation: 200%;
   --liquid-glass-shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.1);
   --liquid-glass-shadow-outer: 0 15px 35px -5px rgba(0, 0, 0, 0.4);
   --liquid-glass-shadow-glow: 0 0 30px rgba(166, 25, 46, 0.15);
+
+  /* Edge Glow & Rim Lighting - Dark Mode */
+  --glass-edge-glow: 0 0 1px rgba(255, 255, 255, 0.15);
+  --glass-rim-light: inset 0 0.5px 0 rgba(255, 255, 255, 0.2);
+  --glass-rim-shadow: inset 0 -0.5px 0 rgba(0, 0, 0, 0.3);
+
   --security-glass-bg: rgba(0, 42, 69, 0.25);
   --security-glass-border: rgba(0, 61, 102, 0.25);
   --security-glass-glow: 0 0 40px rgba(0, 42, 69, 0.2);
 }
 
+/* Dark mode + Tinted mode combination */
+.dark[data-glass-mode='tinted'] {
+  --glass-opacity: 0.85;
+  --liquid-glass-bg: rgba(55, 58, 54, 0.85);
+  --liquid-glass-bg-hover: rgba(55, 58, 54, 0.92);
+}
+
 /* ============================================================================
-   2. BASE LIQUID GLASS SURFACE
+   2. BASE LIQUID GLASS SURFACE - Apple Liquid Glass Style
    ============================================================================
-   The core glass effect with backdrop blur, saturation boost, and subtle
-   border for edge definition. The ::before pseudo-element applies the
-   liquid distortion filter to create organic refraction.
+   The core glass effect with optical refraction using:
+   - backdrop-filter: blur(25px) for frosted glass
+   - Specular highlight via inset box-shadow
+   - 1px variable-opacity border for edge definition
+   - Edge glow and rim lighting for depth
+   - Optional SVG filter for organic distortion
+   
+   Hardware acceleration enabled via will-change: backdrop-filter.
    ---------------------------------------------------------------------------- */
 .mq-liquid-glass {
   position: relative;
   isolation: isolate;
 
-  /* Glass surface */
+  /* Glass surface - Apple Liquid Glass style with dynamic opacity */
   background: var(--liquid-glass-bg);
+
+  /* V3.1: Optimized backdrop filter - removed brightness for performance */
+  /* Note: 3 filter operations (blur + saturate + brightness) is expensive */
+  /* Reduced to 2 operations for better GPU performance */
   backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
   -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
 
-  /* Edge definition */
+  /* Edge definition - 1px variable-opacity border */
   border: 1px solid var(--liquid-glass-border);
   border-radius: var(--c-radius-lg, 0.5rem);
 
-  /* Layered shadows for depth */
-  box-shadow: var(--liquid-glass-shadow-inset), var(--liquid-glass-shadow-outer);
+  /* Specular highlight + rim lighting + outer shadows */
+  box-shadow:
+    /* Edge glow for glass rim */
+    var(--glass-edge-glow),
+    /* Top rim light */ var(--glass-rim-light),
+    /* Bottom rim shadow */ var(--glass-rim-shadow),
+    /* Specular highlight - top edge */ inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    /* Inner glow for depth */ inset 0 0 20px rgba(255, 255, 255, 0.1),
+    /* Outer shadow layers */ var(--liquid-glass-shadow-outer);
 
-  /* GPU acceleration hints */
-  will-change: backdrop-filter, transform;
+  /* V3.1: Optimized will-change - removed backdrop-filter to reduce compositor overhead */
+  /* backdrop-filter in will-change creates permanent heavy layers */
+  will-change: transform;
   contain: layout style paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 
-  /* Smooth transitions */
+  /* Smooth transitions with spring physics */
   transition:
-    background var(--liquid-transition-mid) var(--liquid-ease),
-    border-color var(--liquid-transition-mid) var(--liquid-ease),
-    box-shadow var(--liquid-transition-mid) var(--liquid-ease),
-    transform var(--liquid-transition-mid) var(--liquid-ease);
+    background var(--spring-duration-fast) var(--spring-soft),
+    border-color var(--spring-duration-fast) var(--spring-soft),
+    box-shadow var(--spring-duration-fast) var(--spring-soft),
+    transform var(--spring-duration-fast) var(--spring-bounce);
 }
 
-/* Refraction pseudo-element - applies liquid distortion to backdrop */
-/* Fixed: Using radial gradient overlay instead of background: inherit for proper refraction effect */
+/* Refraction pseudo-element - applies liquid distortion via SVG filter */
+/* Uses #mq-liquid-refraction from LiquidRefractionMap.tsx */
 .mq-liquid-glass::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  /* Sheen/refraction overlay - creates organic highlight instead of distorting inherited bg */
-  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+
+  /* Sheen/refraction overlay - creates organic highlight */
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    transparent 70%
+  );
+
+  /* Apply liquid refraction filter from LiquidRefractionMap */
+  filter: url(#mq-liquid-refraction);
   mix-blend-mode: overlay;
-  filter: url(#mq-liquid-distortion);
-  opacity: 0.5;
+  opacity: 0.6;
   z-index: -1;
   pointer-events: none;
   transition: opacity var(--liquid-transition-mid) var(--liquid-ease);
 }
 
-/* Hover state - enhanced glow and slightly more visible */
+/* Hover state - enhanced glow and more visible refraction */
 .mq-liquid-glass:hover {
   background: var(--liquid-glass-bg-hover);
   border-color: var(--liquid-glass-border-hover);
+
   box-shadow:
-    var(--liquid-glass-shadow-inset), var(--liquid-glass-shadow-outer),
-    var(--liquid-glass-shadow-glow);
+    /* Enhanced edge glow on hover */
+    0 0 2px rgba(255, 255, 255, 0.9),
+    /* Enhanced rim lighting */ var(--glass-rim-light),
+    var(--glass-rim-shadow),
+    /* Enhanced specular highlight */ inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 0 25px rgba(255, 255, 255, 0.15),
+    /* Outer shadows */ var(--liquid-glass-shadow-outer),
+    /* MQ Red glow accent */ var(--liquid-glass-shadow-glow);
 }
 
 .mq-liquid-glass:hover::before {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 /* ============================================================================
@@ -347,11 +482,302 @@
 }
 
 /* ============================================================================
-   5. MESH GRADIENT BACKGROUND
+   5. MESH GRADIENT BACKGROUND - "Macquarie Fluid Mesh"
    ============================================================================
-   Animated mesh gradient that creates movement behind glass surfaces.
-   The gradient blobs drift slowly via Framer Motion, making the liquid
-   refraction visible and dynamic.
+   CSS-only animated mesh gradient that creates movement behind glass surfaces.
+   The gradient blobs drift slowly, making liquid refraction visible and dynamic.
+   
+   WHY CSS-ONLY:
+   - Lightweight: ~40 lines CSS vs heavy JS animation library
+   - Hardware accelerated: will-change + transform for 60fps
+   - Brand-integrated: Uses exact MQ Navy/Red design tokens
+   - Maximizes refraction: Moving colors make SVG displacement visible
+   ---------------------------------------------------------------------------- */
+
+/* Base Background - Alabaster for light mode */
+body {
+  background-color: var(--c-background, #edeade);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Dark mode base background */
+.dark body {
+  background-color: var(--c-background, #1a1a1a);
+}
+
+/* ============================================================================
+   5. AURORA BACKGROUND - "Macquarie Northern Lights"
+   ============================================================================
+   LIQUID GLASS V3.1 - Aurora Effect (Performance Optimized)
+   
+   Inspired by Aceternity UI Aurora Background with MQ brand colors.
+   Creates flowing ethereal bands of light like the Aurora Borealis.
+   
+   PERFORMANCE NOTES (V3.1):
+   - SVG refraction removed from background (was causing lag)
+   - SVG refraction belongs on .mq-liquid-glass panels only
+   - Reduced blur from 60px to 40px
+   - Simplified ::before layer (removed blur filter)
+   - Optimized will-change property
+   ---------------------------------------------------------------------------- */
+
+.mq-mesh-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* ================================================================
+     AURORA V3.1 - Performance Optimized
+     ================================================================
+     Key optimizations:
+     1. NO SVG refraction filter (too expensive for full viewport)
+     2. Reduced blur (40px vs 60px)
+     3. Simplified background-size
+     4. Removed will-change: filter
+     ================================================================ */
+
+  /* Aurora glow base */
+  background-color: var(--c-background, #edeade);
+
+  /* Aurora bands - the magic happens here */
+  background-image:
+    /* Layer 1: Primary aurora bands - MQ Red flowing through Navy */
+    repeating-linear-gradient(
+      100deg,
+      #002a45 0%,
+      #a6192e 7%,
+      transparent 10%,
+      transparent 12%,
+      #002a45 16%
+    ),
+    /* Layer 2: Secondary shimmer - subtle alabaster/white bands */
+    repeating-linear-gradient(
+        100deg,
+        #edeade 0%,
+        #edeade 3%,
+        transparent 5%,
+        transparent 7%,
+        #edeade 10%
+      ),
+    /* Layer 3: Radial glow centers for depth */
+    radial-gradient(ellipse at 20% 30%, rgba(166, 25, 46, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(0, 42, 69, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0, 64, 107, 0.3) 0%, transparent 60%);
+
+  /* V3.1: Reduced background-size for better performance */
+  background-size:
+    200% 100%,
+    /* Primary aurora - reduced from 300% */ 150% 100%,
+    /* Secondary shimmer - reduced from 200% */ 100% 100%,
+    /* Radial glow 1 */ 100% 100%,
+    /* Radial glow 2 */ 100% 100%; /* Radial glow 3 */
+
+  /* Aurora animation - slow 60s cycle */
+  animation: mq-aurora 60s linear infinite;
+
+  /* V3.1: REMOVED SVG refraction - only blur for performance */
+  /* SVG refraction should only be on .mq-liquid-glass panels */
+  filter: blur(40px);
+  opacity: 0.85;
+
+  /* V3.1: Optimized will-change - removed filter */
+  will-change: background-position;
+  transform: translateZ(0);
+  contain: strict;
+}
+
+/* Aurora ::before - simplified glow layer (no blur filter) */
+.mq-mesh-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* V3.1: Reduced from 200% size, removed blur filter */
+
+  /* Soft radial glows - no filter, just opacity animation */
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(166, 25, 46, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0, 42, 69, 0.35) 0%, transparent 55%);
+
+  opacity: 0.5;
+  animation: aurora-glow 30s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Grainy Texture Overlay - Premium film grain effect */
+.mq-mesh-background::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* SVG noise texture - fractal turbulence for organic grain */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================================
+   DARK MODE AURORA - Brighter, more vivid colors
+   ============================================================================ */
+.dark .mq-mesh-background {
+  background-color: var(--c-background, #1a1a1a);
+
+  /* Dark mode aurora - more saturated, vivid colors */
+  background-image:
+    /* Layer 1: Primary aurora - brighter red bands */
+    repeating-linear-gradient(
+      100deg,
+      #001f33 0%,
+      rgba(200, 50, 70, 0.8) 7%,
+      transparent 10%,
+      transparent 12%,
+      #002a45 16%
+    ),
+    /* Layer 2: Secondary shimmer - subtle gold/white bands */
+    repeating-linear-gradient(
+        100deg,
+        rgba(212, 175, 55, 0.15) 0%,
+        rgba(255, 255, 255, 0.1) 3%,
+        transparent 5%,
+        transparent 7%,
+        rgba(212, 175, 55, 0.1) 10%
+      ),
+    /* Layer 3: Radial glows - more vivid in dark mode */
+    radial-gradient(ellipse at 20% 30%, rgba(200, 50, 70, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(0, 61, 102, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0, 100, 150, 0.4) 0%, transparent 60%);
+
+  /* V3.1: Only blur, no SVG refraction */
+  filter: blur(35px);
+  opacity: 0.75;
+}
+
+/* Dark mode glow layer */
+.dark .mq-mesh-background::before {
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(200, 50, 70, 0.35) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 80%, rgba(0, 100, 150, 0.4) 0%, transparent 45%);
+  opacity: 0.6;
+}
+
+/* Dark mode grainy texture - slightly more visible */
+.dark .mq-mesh-background::after {
+  opacity: 0.04;
+  mix-blend-mode: soft-light;
+}
+
+/* ============================================================================
+   AURORA ANIMATIONS (V3.1 Performance Optimized)
+   ============================================================================ */
+
+/* Primary aurora animation - simplified background-position only */
+@keyframes mq-aurora {
+  from {
+    background-position:
+      50% 50%,
+      /* Primary aurora bands */ 50% 50%,
+      /* Secondary shimmer */ 0% 0%,
+      /* Radial glow 1 */ 100% 100%,
+      /* Radial glow 2 */ 50% 50%; /* Radial glow 3 */
+  }
+  to {
+    background-position:
+      250% 50%,
+      /* Primary aurora bands - sweep right (reduced from 350%) */ 150% 50%,
+      /* Secondary shimmer - sweep right (reduced from 200%) */ 10% 10%,
+      /* Radial glow 1 - subtle drift */ 90% 90%,
+      /* Radial glow 2 - subtle drift */ 60% 40%; /* Radial glow 3 - gentle movement */
+  }
+}
+
+/* Glow layer pulsing animation - simplified, no transform */
+@keyframes aurora-glow {
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+/* Legacy breathing animation for backward compatibility */
+@keyframes liquid-glass-breathe {
+  0% {
+    transform: translate(-10%, -10%) rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(5%, 5%) rotate(5deg) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-10%, -10%) rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+}
+
+/* Legacy animation alias for backward compatibility */
+@keyframes mesh-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-5%, 5%) scale(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(5%, -5%) scale(1);
+    opacity: 0.6;
+  }
+}
+
+/* Reduced motion: static aurora, no animation, no refraction */
+@media (prefers-reduced-motion: reduce) {
+  .mq-mesh-background {
+    animation: none;
+    transform: none;
+    opacity: 0.35;
+    /* Disable SVG filter for reduced motion - just use simple blur */
+    filter: blur(80px);
+    /* Simplified static background for reduced motion */
+    background-image:
+      radial-gradient(ellipse at 30% 40%, rgba(166, 25, 46, 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(0, 42, 69, 0.35) 0%, transparent 50%);
+    background-size: 100% 100%;
+  }
+  .mq-mesh-background::before {
+    animation: none;
+    opacity: 0.3;
+  }
+  /* Keep grain static but visible */
+  .mq-mesh-background::after {
+    opacity: 0.02;
+  }
+}
+
+/* High contrast: hide decorative aurora entirely */
+@media (prefers-contrast: more) {
+  .mq-mesh-background {
+    display: none;
+  }
+  .mq-mesh-background::before {
+    display: none;
+  }
+  .mq-mesh-background::after {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   5b. LEGACY MESH BLOB CLASSES (for React component compatibility)
+   ============================================================================
+   These classes are used by MovingMeshBackground.tsx if enabled.
+   The CSS-only .mq-mesh-background above is the preferred approach.
    ---------------------------------------------------------------------------- */
 .mq-mesh-gradient {
   position: fixed;
@@ -438,6 +864,184 @@
 }
 
 /* ============================================================================
+   6b. SPRING ANIMATION KEYFRAMES - iOS 26 Bouncy Physics
+   ============================================================================
+   These keyframes create the "jelly-like" bouncy motion characteristic
+   of Apple's Liquid Glass UI. Use for popups, menus, and modals.
+   ---------------------------------------------------------------------------- */
+
+/* Spring Scale In - bouncy entrance animation */
+@keyframes spring-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(10px);
+  }
+  50% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  75% {
+    transform: scale(0.99) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Spring Scale Out - bouncy exit animation */
+@keyframes spring-scale-out {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.85) translateY(10px);
+  }
+}
+
+/* Spring Slide Up - for bottom sheets and menus */
+@keyframes spring-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  60% {
+    transform: translateY(-8px);
+  }
+  80% {
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spring Slide Down - reverse of slide up */
+@keyframes spring-slide-down {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+/* Spring Pop - quick attention-grabbing bounce */
+@keyframes spring-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.08);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  75% {
+    transform: scale(1.02);
+  }
+}
+
+/* Liquid Wobble - organic jelly motion */
+@keyframes liquid-wobble {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.02, 0.98) rotate(0.5deg);
+  }
+  50% {
+    transform: scale(0.98, 1.02) rotate(-0.5deg);
+  }
+  75% {
+    transform: scale(1.01, 0.99) rotate(0.25deg);
+  }
+}
+
+/* Glass Shimmer - subtle highlight animation */
+@keyframes glass-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Pulse Glow - for focus and active states */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: var(--liquid-glass-shadow-outer);
+  }
+  50% {
+    box-shadow:
+      var(--liquid-glass-shadow-outer),
+      0 0 20px rgba(166, 25, 46, 0.2);
+  }
+}
+
+/* Utility classes for spring animations */
+.spring-enter {
+  animation: spring-scale-in var(--spring-duration-mid) var(--spring-bounce) forwards;
+}
+
+.spring-exit {
+  animation: spring-scale-out var(--spring-duration-fast) var(--liquid-ease) forwards;
+}
+
+.spring-slide-enter {
+  animation: spring-slide-up var(--spring-duration-mid) var(--spring-bounce) forwards;
+}
+
+.spring-slide-exit {
+  animation: spring-slide-down var(--spring-duration-fast) var(--liquid-ease) forwards;
+}
+
+.spring-pop {
+  animation: spring-pop var(--spring-duration-fast) var(--spring-snappy);
+}
+
+.liquid-wobble {
+  animation: liquid-wobble 2s var(--spring-soft) infinite;
+}
+
+/* Interactive spring on hover */
+.spring-hover:hover {
+  animation: spring-pop var(--spring-duration-fast) var(--spring-snappy);
+}
+
+/* Glass shimmer effect for loading states */
+.glass-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: glass-shimmer 2s linear infinite;
+  pointer-events: none;
+}
+
+/* ============================================================================
    7. REDUCED MOTION FALLBACKS
    ============================================================================
    For users who prefer reduced motion, we disable animations and
@@ -448,7 +1052,8 @@
   .mq-liquid-glass,
   .mq-liquid-glass::before,
   .mq-liquid-btn,
-  .mq-mesh-blob {
+  .mq-mesh-blob,
+  .moving-mesh-background * {
     transition: none !important;
     animation: none !important;
     will-change: auto !important;
@@ -462,8 +1067,8 @@
 
   /* Solid Alabaster fallback backgrounds for light mode */
   .mq-liquid-glass {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     background: var(--c-background, #edeade) !important;
     border-color: var(--c-border, #a0a29c) !important;
   }
@@ -488,6 +1093,69 @@
   .mq-liquid-glass-security .security-indicator {
     animation: none !important;
     filter: none !important;
+  }
+}
+
+/* ============================================================================
+   7b. HIGH CONTRAST MODE FALLBACKS
+   ============================================================================
+   For users who prefer high contrast, remove translucency and
+   ensure solid backgrounds with clear borders.
+   ---------------------------------------------------------------------------- */
+@media (prefers-contrast: more) {
+  /* Solid backgrounds - no translucency */
+  .mq-liquid-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--c-background, #edeade) !important;
+    border: 2px solid var(--c-content, #1a1a1a) !important;
+    box-shadow: none !important;
+  }
+
+  .mq-liquid-glass::before {
+    display: none !important;
+  }
+
+  .dark .mq-liquid-glass {
+    background: var(--c-charcoal-900, #2a2d29) !important;
+    border-color: var(--c-alabaster, #edeade) !important;
+  }
+
+  /* High contrast buttons */
+  .mq-liquid-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--c-red, #a6192e) !important;
+    color: white !important;
+    border: 2px solid currentColor !important;
+    box-shadow: none !important;
+  }
+
+  .mq-liquid-btn:hover {
+    filter: none !important;
+    outline: 3px solid var(--c-content, #1a1a1a) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Hide decorative mesh gradient */
+  .mq-mesh-gradient,
+  .moving-mesh-background {
+    display: none !important;
+  }
+
+  /* Ensure text contrast on glass surfaces */
+  .mq-liquid-glass,
+  .mq-liquid-glass-elevated,
+  .mq-liquid-glass-security,
+  .mq-liquid-glass-subtle {
+    color: var(--c-content, #1a1a1a) !important;
+  }
+
+  .dark .mq-liquid-glass,
+  .dark .mq-liquid-glass-elevated,
+  .dark .mq-liquid-glass-security,
+  .dark .mq-liquid-glass-subtle {
+    color: var(--c-alabaster, #edeade) !important;
   }
 }
 
@@ -635,4 +1303,140 @@
   .dark .sidebar-panel.mq-liquid-glass {
     background: rgba(55, 58, 54, 0.95) !important;
   }
+}
+
+/* ============================================================================
+   10. RUNTIME TOGGLE CLASSES
+   ============================================================================
+   Classes applied via themeStore to toggle glass features at runtime.
+   These are applied to <html> element via useThemeEffect.
+   ---------------------------------------------------------------------------- */
+
+/* Disable refraction filters when .glass-no-refraction is set */
+.glass-no-refraction .mq-liquid-glass::before {
+  filter: none !important;
+  opacity: 0 !important;
+}
+
+.glass-no-refraction .mq-liquid-glass-subtle::before,
+.glass-no-refraction .mq-liquid-glass-security::before,
+.glass-no-refraction .mq-liquid-glass-elevated::before {
+  filter: none !important;
+  opacity: 0 !important;
+}
+
+.glass-no-refraction .mq-liquid-btn:hover {
+  filter: none !important;
+}
+
+/* Disable spring animations when .glass-no-spring is set */
+.glass-no-spring .spring-enter,
+.glass-no-spring .spring-exit,
+.glass-no-spring .spring-slide-enter,
+.glass-no-spring .spring-slide-exit,
+.glass-no-spring .spring-pop,
+.glass-no-spring .liquid-wobble,
+.glass-no-spring .spring-hover:hover {
+  animation: none !important;
+}
+
+.glass-no-spring .mq-liquid-glass,
+.glass-no-spring .mq-liquid-btn {
+  transition-timing-function: var(--liquid-ease) !important;
+}
+
+/* ============================================================================
+   11. COMPONENT-SPECIFIC GLASS UTILITIES
+   ============================================================================
+   Helper classes for applying glass effects to specific component types.
+   ---------------------------------------------------------------------------- */
+
+/* Modal/Dialog glass */
+.mq-glass-modal {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+  -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--c-radius-lg, 0.75rem);
+  box-shadow:
+    var(--glass-edge-glow),
+    var(--glass-rim-light),
+    0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Dropdown/Popover glass */
+.mq-glass-dropdown {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--c-radius, 0.5rem);
+  box-shadow:
+    var(--glass-edge-glow),
+    var(--glass-rim-light),
+    0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* Toast/Notification glass */
+.mq-glass-toast {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--c-radius, 0.5rem);
+  box-shadow:
+    var(--glass-rim-light),
+    0 8px 20px -4px rgba(0, 0, 0, 0.12);
+}
+
+/* Input/Form field glass */
+.mq-glass-input {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--c-radius, 0.5rem);
+  transition:
+    border-color var(--spring-duration-fast) var(--spring-soft),
+    box-shadow var(--spring-duration-fast) var(--spring-soft);
+}
+
+.mq-glass-input:focus {
+  border-color: var(--c-red, #a6192e);
+  box-shadow: 0 0 0 3px rgba(166, 25, 46, 0.15);
+}
+
+/* Card glass */
+.mq-glass-card {
+  background: var(--liquid-glass-bg);
+  backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+  -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--c-radius-lg, 0.75rem);
+  box-shadow: var(--glass-rim-light), var(--liquid-glass-shadow-outer);
+  transition:
+    transform var(--spring-duration-fast) var(--spring-bounce),
+    box-shadow var(--spring-duration-fast) var(--spring-soft);
+}
+
+.mq-glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--glass-rim-light), var(--liquid-glass-shadow-outer), var(--liquid-glass-shadow-glow);
+}
+
+/* Pill/Badge glass */
+.mq-glass-pill {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--mq-text-sm, 0.875rem);
+}
+
+.dark .mq-glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.06);
 }

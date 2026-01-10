@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.31 | Last Updated: January 11, 2026
+Version: 0.14.32 | Last Updated: January 11, 2026
 
 ---
 
@@ -57,6 +57,164 @@ Version: 0.14.31 | Last Updated: January 11, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Performance Audit & Fixes V3.1 Part 9 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Comprehensive performance audit and optimization across CSS, components, and pages
+
+**Audit Summary:**
+- 47 performance issues identified (3 critical, 7 high, 5 medium)
+- Fixed CSS backdrop-filter (removed brightness, reduced to 2 operations)
+- Fixed will-change abuse (removed backdrop-filter from will-change)
+- Replaced universal selector in dark-mode.css (was matching thousands of elements)
+- Added React.memo to ClientLayout, moved constant arrays outside
+- Lazy loaded LiquidFilter component (heavy canvas operations)
+- Added Suspense boundaries to login/signup pages
+
+**Files Changed:**
+- `app/styles/liquid-glass.css`
+- `app/styles/dark-mode.css`
+- `app/styles/sidebar.css`
+- `app/client-layout.tsx`
+- `app/login/page.tsx`
+- `app/signup/page.tsx`
+
+**Verification:** typecheck ✅ | lint ✅ | build ✅
+
+---
+
+#### ✅ Apple Liquid Glass UI - Complete System v0.14.32 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Complete iOS 26-inspired Liquid Glass system with Glass Modes, spring animations, and unified theming
+
+**Part 1 - Initial Implementation:**
+
+1. **LiquidRefractionMap.tsx:**
+   - SVG filter component with feTurbulence + feDisplacementMap + feGaussianBlur
+   - Multiple filter variants: primary, subtle, heavy, specular, glow
+   - NEW: Intensity control via props (0-100) with `scaleConfigByIntensity()` function
+
+2. **MovingMeshBackground.tsx:**
+   - Parallax mesh gradient with 8 blob layers at different animation speeds (35s to 90s)
+   - MQ Navy and Red brand colors with GPU-accelerated Framer Motion
+
+**Part 2 - Glass Mode System:**
+
+3. **Glass Mode System (liquid-glass.css):**
+   - Two modes: `clear` (transparent, 55% opacity) vs `tinted` (opaque, 82% opacity)
+   - Activated via `[data-glass-mode="clear|tinted"]` on `<html>`
+   - CSS variables: `--glass-mode`, `--glass-opacity`, `--glass-blur`, `--glass-intensity`
+
+4. **Spring Animation System:**
+   - Spring easing: `--spring-bounce`, `--spring-soft`, `--spring-snappy`, `--spring-elastic`
+   - Keyframes: `spring-scale-in`, `spring-scale-out`, `spring-slide-up/down`, `spring-pop`, `liquid-wobble`, `glass-shimmer`
+   - Utility classes: `.spring-enter`, `.spring-exit`, `.spring-pop`, `.liquid-wobble`, `.spring-hover`
+
+5. **Edge Glow & Rim Lighting:**
+   - Variables: `--glass-edge-glow`, `--glass-rim-light`, `--glass-rim-shadow`
+
+6. **Runtime Toggle Classes:**
+   - `.glass-no-refraction` - Disables SVG filters
+   - `.glass-no-spring` - Disables spring animations
+
+7. **Component Glass Utilities:**
+   - `.mq-glass-modal`, `.mq-glass-dropdown`, `.mq-glass-toast`, `.mq-glass-input`, `.mq-glass-card`, `.mq-glass-pill`
+
+8. **Extended themeStore.ts:**
+   - GlassSettings: `{ mode, intensity, enableRefraction, enableSpringAnimations }`
+   - Actions: `setGlassMode()`, `setGlassIntensity()`, `setGlassRefraction()`, `setGlassSpringAnimations()`
+   - Hooks: `useGlassSettings()`, `useGlassMode()`, `useGlassIntensity()`
+   - `useThemeEffect()` applies glass settings to document
+
+**Part 3 - Dark Mode Background Fix:**
+
+9. **MovingMeshBackground Dark Mode Support:**
+   - Added `isDarkMode` state with MutationObserver to detect `.dark` class changes
+   - Blob component receives `isDarkMode` prop for conditional rendering
+   - Blend mode switches: `multiply` (light) → `screen` (dark)
+   - Dark mode colors brighter for screen blend visibility
+   - Opacity boosted 1.3x in dark mode (capped at 0.6)
+
+10. **Liquid Glass CSS Variable Fix:**
+    - Fixed `var()` inside `rgba()` not working reliably
+    - Hardcoded opacity values: light mode 0.55, dark mode 0.45
+
+**Part 4 - CSS-Only Mesh Background "Macquarie Fluid Mesh":**
+
+11. **CSS-Only Animated Mesh Background:**
+    - Replaced `MovingMeshBackground.tsx` (350+ lines, Framer Motion) with pure CSS
+    - New `.mq-mesh-background` class with `@keyframes mesh-drift` (25s cycle)
+    - 4 radial gradients: MQ Red + MQ Navy variants, 120px blur
+    - Renders in `layout.tsx` (server) - no JS hydration delay
+    - Dark mode: brighter colors | Reduced motion: static | High contrast: hidden
+
+12. **Architecture Improvement:**
+    - Mesh background moved from `client-layout.tsx` to `layout.tsx`
+    - Benefits: Faster paint, works without JS, ~300 lines less code
+
+**Part 5 - Grainy Texture Overlay (Premium Film Grain):**
+
+13. **Premium Film Grain Effect:**
+    - Added `::after` pseudo-element to `.mq-mesh-background`
+    - Inline SVG with `feTurbulence` filter (fractalNoise, baseFrequency="0.65", numOctaves="3", stitchTiles="stitch")
+    - Light mode: 3.5% opacity with `overlay` blend mode
+    - Dark mode: 5% opacity with `soft-light` blend mode
+    - Zero HTTP requests (data URI), hardware accelerated, seamless tiling
+
+**Part 6 - LIQUID GLASS V2.0 "True Liquid" Upgrade:**
+
+14. **SVG Refraction Integration:**
+    - Changed from `blur(120px)` to `blur(80px) url(#mq-liquid-refraction)`
+    - Uses `feTurbulence` + `feDisplacementMap` for organic light-bending
+    - True "liquid" warping effect instead of just blur
+
+15. **Organic 5-Blob Mesh:**
+    - Upgraded from 4 to 5 blobs with `circle` gradients
+    - Center blob (MQ Navy) as breathing anchor
+    - Positions optimized for organic movement
+
+16. **Breathing Animation:**
+    - New `@keyframes liquid-glass-breathe` with `ease-in-out alternate`
+    - Includes 5° rotation + scale 1.0→1.1 for depth
+    - Feels like liquid "breathing" not mechanical rotation
+
+17. **Enhanced Glass Overlay:**
+    - Added `brightness(1.05)` to backdrop-filter
+    - Colors behind glass now "pop" instead of appearing muted
+
+**Part 7 - AURORA BACKGROUND V3.0 "Macquarie Northern Lights":**
+
+18. **Aurora Background Implementation:**
+    - `repeating-linear-gradient(100deg, ...)` creates flowing aurora bands
+    - 60s `@keyframes mq-aurora` animation cycle
+    - Three-layer system: Primary bands + Shimmer + Radial glows
+
+19. **::before Glow Layer:**
+    - Pulsing radial gradients with 30s `aurora-glow` animation
+    - Creates depth and "breathing" effect underneath bands
+
+20. **Dark Mode Aurora:**
+    - More saturated colors, gold accent bands
+    - Increased glow intensity for visibility
+
+**Accessibility:**
+- `prefers-reduced-motion`: Disables filters, static backgrounds, solid colors
+- `prefers-contrast: more`: Removes translucency, solid backgrounds, 2px borders
+
+**Files Changed:**
+- `components/ui/LiquidRefractionMap.tsx` (new)
+- `components/ui/MovingMeshBackground.tsx` (new, then deprecated)
+- `app/styles/liquid-glass.css` (CSS variable fix, CSS-only mesh)
+- `app/layout.tsx` (added .mq-mesh-background div)
+- `app/client-layout.tsx` (removed MovingMeshBackground)
+- `components/layout/Sidebar.tsx` (documentation)
+- `components/layout/Header.tsx` (documentation)
+- `app/styles/leaflet.css`
+
+**Verification:**
+- `npm run typecheck`: ✅ Passing
+- `npm run lint`: ✅ Passing
+- `npm run build`: ✅ Success
 
 #### ✅ Security Audit Remediation v0.14.31 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)

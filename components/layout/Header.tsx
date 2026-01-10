@@ -1,3 +1,29 @@
+// components/layout/Header.tsx
+// ============================================================================
+// HEADER COMPONENT - APPLE LIQUID GLASS EDITION
+// ============================================================================
+// Premium top bar with "Apple Liquid Glass" effect featuring:
+// - Optical refraction via feTurbulence + feDisplacementMap filters
+// - 25px backdrop-filter blur with saturation boost
+// - Specular highlights via inset box-shadow
+// - LiveClock (date display) and NotificationSystem
+//
+// The header acts as a floating glass panel over the content, creating
+// visible distortion of the parallax mesh background beneath it.
+//
+// COMPONENTS:
+// - Logo and app title (left)
+// - Live date display (center-left)
+// - Notifications bell with badge
+// - Theme toggle (sun/moon)
+// - Profile dropdown menu
+//
+// ACCESSIBILITY:
+// - All interactive elements have min 44px touch targets
+// - Focus visible states for keyboard navigation
+// - ARIA labels and roles for screen readers
+// - Respects prefers-reduced-motion
+// ============================================================================
 'use client';
 
 import React, { useEffect, useState, useRef, memo, useMemo } from 'react';

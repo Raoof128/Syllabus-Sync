@@ -7,6 +7,389 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.32] - 2026-01-11
+
+### Added
+
+#### Apple Liquid Glass UI - Complete System with Glass Modes (Raouf)
+
+**Summary:** Extended the Liquid Glass system with iOS 26-inspired Glass Modes (Clear/Tinted), spring animations, intensity controls, and unified theming.
+
+**Part 1 - Initial Implementation (Session 1):**
+
+**New Components:**
+
+1. **LiquidRefractionMap.tsx** - SVG filter component for optical refraction
+   - Uses `feTurbulence` (fractalNoise, baseFrequency="0.012", numOctaves="3")
+   - Combined with `feDisplacementMap` (scale="35") + `feGaussianBlur` (stdDeviation="2")
+   - Multiple filter variants: primary, subtle, heavy, specular highlight, glow
+   - Filter IDs: `#mq-liquid-refraction`, `#mq-liquid-refraction-subtle`, `#mq-liquid-refraction-heavy`, `#mq-liquid-glow`, `#mq-specular-highlight`
+   - **NEW:** Intensity control via `intensity` prop (0-100) with `scaleConfigByIntensity()` function
+   - File: `components/ui/LiquidRefractionMap.tsx`
+
+2. **MovingMeshBackground.tsx** - Parallax mesh gradient background (DEPRECATED)
+   - 8 blob layers at different animation speeds (35s to 90s duration) for parallax depth
+   - MQ Navy (#002A45) and MQ Red (#a6192e) brand colors
+   - GPU-accelerated via Framer Motion with `will-change` optimization
+   - **REPLACED BY:** CSS-only `.mq-mesh-background` in Part 4 (Session 4)
+   - File: `components/ui/MovingMeshBackground.tsx`
+
+**Part 2 - Glass Mode System (Session 2):**
+
+**New CSS Features (liquid-glass.css):**
+
+3. **Glass Mode System (iOS 26-inspired):**
+   - Two modes: `clear` (more transparent, 55% opacity, 32px blur) vs `tinted` (more opaque, 82% opacity, 20px blur)
+   - Activated via `[data-glass-mode="clear|tinted"]` on `<html>` element
+   - CSS custom properties: `--glass-mode`, `--glass-opacity`, `--glass-blur`, `--glass-saturation`, `--glass-border-opacity`
+   - Intensity control: `--glass-intensity` (0-100) with `--glass-intensity-factor` calc
+
+4. **Spring Animation System:**
+   - Spring easing curves: `--spring-bounce`, `--spring-soft`, `--spring-snappy`, `--spring-elastic`
+   - Keyframe animations: `spring-scale-in`, `spring-scale-out`, `spring-slide-up`, `spring-slide-down`, `spring-pop`, `liquid-wobble`, `glass-shimmer`, `pulse-glow`
+   - Utility classes: `.spring-enter`, `.spring-exit`, `.spring-slide-enter`, `.spring-slide-exit`, `.spring-pop`, `.liquid-wobble`, `.spring-hover`, `.glass-shimmer`
+
+5. **Edge Glow & Rim Lighting:**
+   - New CSS variables: `--glass-edge-glow`, `--glass-rim-light`, `--glass-rim-shadow`
+   - Enhanced box-shadow composition on `.mq-liquid-glass` elements
+
+6. **Runtime Toggle Classes:**
+   - `.glass-no-refraction` - Disables SVG refraction filters
+   - `.glass-no-spring` - Disables spring animations
+
+7. **Component-Specific Glass Utilities:**
+   - `.mq-glass-modal` - For modals/dialogs
+   - `.mq-glass-dropdown` - For dropdowns/popovers
+   - `.mq-glass-toast` - For toast notifications
+   - `.mq-glass-input` - For form inputs
+   - `.mq-glass-card` - For card components
+   - `.mq-glass-pill` - For badges/pills
+
+**Extended themeStore (lib/store/themeStore.ts):**
+
+8. **GlassSettings Integration:**
+   - New types: `GlassMode`, `GlassSettings`
+   - New state: `glass: { mode, intensity, enableRefraction, enableSpringAnimations }`
+   - New actions: `setGlassMode()`, `setGlassIntensity()`, `setGlassRefraction()`, `setGlassSpringAnimations()`, `resetGlassSettings()`
+   - New hooks: `useGlassSettings()`, `useGlassMode()`, `useGlassIntensity()`
+   - `useThemeEffect()` now applies glass settings to document: `data-glass-mode`, `--glass-intensity`, `.glass-no-refraction`, `.glass-no-spring`
+   - Zustand persist migration from v1 to v2 for glass settings
+
+**Integration:**
+
+9. **client-layout.tsx:**
+   - Swapped `MeshGradient` import to `MovingMeshBackground`
+   - Updated component usage for parallax background
+
+10. **Component Documentation:**
+    - Updated header comments in `Sidebar.tsx` and `Header.tsx`
+    - Documents Apple Liquid Glass implementation approach
+
+**Accessibility & Protection:**
+
+11. **Map Marker Protection (leaflet.css):**
+    - `filter: none !important` on all Leaflet marker elements
+    - `isolation: isolate` on map container to prevent glass distortion
+    - Explicit popup styling without blur effects
+
+12. **Accessibility Fallbacks:**
+    - `prefers-reduced-motion`: Disables filters, uses static backgrounds, solid colors
+    - `prefers-contrast: more`: Removes all translucency, solid backgrounds, 2px borders, hides decorative mesh
+
+**Technical Details:**
+
+- SVG Filter Chain: feTurbulence → feDisplacementMap → feGaussianBlur → Specular overlay
+- CSS Material: blur(25-32px) + saturate(160-220%) + rgba borders + inset shadows + edge glow
+- Parallax: 8 layers from 35s (foreground) to 90s (background) animation cycles
+- Glass Modes: Clear (iOS default) vs Tinted (better readability)
+- Spring Physics: CSS cubic-bezier approximations of spring dynamics
+
+**Files Changed:**
+- `components/ui/LiquidRefractionMap.tsx` (new, then enhanced with intensity)
+- `components/ui/MovingMeshBackground.tsx` (new)
+- `app/styles/liquid-glass.css` (major enhancement: ~1100 lines)
+- `app/layout.tsx`
+- `app/client-layout.tsx`
+- `lib/store/themeStore.ts` (extended with GlassSettings)
+- `components/layout/Sidebar.tsx`
+- `components/layout/Header.tsx`
+- `app/styles/leaflet.css`
+
+**Part 3 - Dark Mode Background Fix (Session 3):**
+
+13. **MovingMeshBackground Dark Mode Support:**
+    - Added `isDarkMode` state with MutationObserver to detect theme changes
+    - Blob component now receives `isDarkMode` prop
+    - Blend mode switches: `multiply` (light mode) → `screen` (dark mode)
+    - Dark mode colors are brighter variants for visibility with screen blend:
+      - `MQ_NAVY_DARK_MODE`: rgba(0, 61, 102, 0.4)
+      - `MQ_RED_DARK_MODE`: rgba(200, 50, 70, 0.35)
+      - Opacity boosted by 1.3x in dark mode (capped at 0.6)
+    - File: `components/ui/MovingMeshBackground.tsx`
+
+14. **Liquid Glass CSS Variable Fix:**
+    - Fixed CSS variables that used `var()` inside `rgba()` (doesn't work reliably)
+    - Light mode: `--liquid-glass-bg: rgba(237, 234, 222, 0.55)` (hardcoded)
+    - Dark mode: `--liquid-glass-bg: rgba(55, 58, 54, 0.45)` (hardcoded)
+    - File: `app/styles/liquid-glass.css`
+
+**Part 4 - CSS-Only Mesh Background "Macquarie Fluid Mesh" (Session 4):**
+
+15. **CSS-Only Animated Mesh Background:**
+    - Replaced heavyweight `MovingMeshBackground.tsx` (350+ lines, Framer Motion) with pure CSS
+    - New `.mq-mesh-background` class with `@keyframes mesh-drift` (25s cycle)
+    - 4 radial gradients: MQ Red (top-left, bottom-right) + MQ Navy variants (top-right, bottom-left)
+    - 120px blur creates smooth "mesh" gradient effect
+    - Hardware accelerated via `will-change: transform, opacity`
+    - Renders in `layout.tsx` (server component) - no JS hydration delay
+    - Dark mode: brighter colors for visibility
+    - `prefers-reduced-motion`: static mesh, no animation
+    - `prefers-contrast: more`: mesh hidden entirely
+    - File: `app/styles/liquid-glass.css` (section 5)
+
+16. **Layout Architecture Change:**
+    - Moved mesh background from `client-layout.tsx` to `layout.tsx`
+    - Renders as simple `<div className="mq-mesh-background" aria-hidden="true" />`
+    - Benefits: Faster paint, works without JS, simpler architecture
+    - Removed `MovingMeshBackground` import from client-layout
+
+**Why CSS-Only is Better:**
+- ~40 lines CSS vs ~350 lines TypeScript
+- No Framer Motion dependency for background
+- Faster initial paint (no hydration needed)
+- Works with JS disabled
+- Lower memory/CPU usage
+
+**Part 5 - Grainy Texture Overlay (Session 5):**
+
+17. **Premium Film Grain Effect:**
+    - Added `::after` pseudo-element to `.mq-mesh-background`
+    - Uses inline SVG with `feTurbulence` filter (fractalNoise, baseFrequency="0.65", numOctaves="3")
+    - Light mode: 3.5% opacity with `overlay` blend mode
+    - Dark mode: 5% opacity with `soft-light` blend mode for visibility
+    - Creates subtle premium texture that complements liquid glass
+    - Zero additional HTTP requests (inline data URI)
+    - File: `app/styles/liquid-glass.css`
+
+18. **Accessibility Handling for Grain:**
+    - `prefers-reduced-motion`: Grain opacity reduced to 2.5%
+    - `prefers-contrast: more`: Grain hidden entirely along with mesh
+
+**Part 6 - LIQUID GLASS V2.0 "True Liquid" Upgrade (Session 6):**
+
+**Summary:** Upgraded from "Blurry Glass" to true "Liquid Glass" with SVG refraction integration.
+
+19. **SVG Refraction Integration:**
+    - Changed mesh filter from `blur(120px)` to `blur(80px) url(#mq-liquid-refraction)`
+    - Now uses `feTurbulence` + `feDisplacementMap` for organic light-bending
+    - Creates true "liquid" warping effect instead of just blur
+    - Dark mode: `blur(100px) url(#mq-liquid-refraction)` for softer effect
+
+20. **Organic 5-Blob Mesh Gradient:**
+    - Upgraded from 4 blobs to 5 for more organic movement
+    - Uses `circle` gradients instead of `at` for better radial falloff
+    - Center blob (MQ Navy) acts as "breathing" anchor
+    - Positions: 30%/30%, 70%/70%, 50%/50% (center), 20%/80%, 85%/20%
+
+21. **Breathing Animation:**
+    - New `@keyframes liquid-glass-breathe` replaces `mesh-drift`
+    - Uses `ease-in-out` with `alternate` for organic "breathing" feel
+    - Includes subtle 5° rotation during animation cycle
+    - Scale oscillates between 1.0 and 1.1 for depth
+
+22. **Enhanced Glass Overlay:**
+    - Added `brightness(1.05)` to backdrop-filter for vibrant color pop
+    - Combined with existing `saturate(220%)` for premium MQ Red appearance
+    - Colors behind glass now "pop" instead of appearing muted
+
+23. **Performance Optimizations:**
+    - `background-size: 200% 200%` for smoother animation
+    - `will-change: transform, filter` for GPU acceleration
+    - `transform: translateZ(0)` forces compositor layer
+    - Reduced motion: Falls back to `blur(100px)` without SVG filter
+
+**Why V2.0 is "Liquid" not "Blurry":**
+- V1.0: Just blur = colors blend together (frosted glass)
+- V2.0: Blur + Displacement = colors warp organically (liquid glass)
+
+**Technical Details:**
+- SVG filter `#mq-liquid-refraction` defined in `layout.tsx`
+- Uses `feDisplacementMap` with scale="35" for visible warping
+- `feTurbulence` (fractalNoise, freq=0.012, octaves=3) generates organic noise
+- Combined blur + displacement creates true Apple Liquid Glass effect
+
+**Verification:**
+- `npm run typecheck`: ✅ Passing
+- `npm run lint`: ✅ Passing
+- `npm run build`: ✅ Success
+
+**Part 7 - AURORA BACKGROUND V3.0 "Macquarie Northern Lights" (Session 7):**
+
+**Summary:** Upgraded from mesh gradients to Aurora effect with flowing ethereal light bands.
+
+24. **Aurora Background Implementation:**
+    - Inspired by Aceternity UI Aurora Background
+    - Uses `repeating-linear-gradient` at 100° angle for flowing aurora bands
+    - 60-second animation cycle via `@keyframes mq-aurora`
+    - Creates flowing ethereal bands like Aurora Borealis
+
+25. **Three-Layer Background System:**
+    - **Layer 1 (Primary Aurora):** `repeating-linear-gradient` with MQ Navy → MQ Red → transparent
+    - **Layer 2 (Secondary Shimmer):** Subtle Alabaster/white bands for depth
+    - **Layer 3 (Radial Glows):** Three radial gradients for soft color centers
+
+26. **::before Glow Layer:**
+    - Additional depth layer with pulsing radial gradients
+    - Separate 30s `aurora-glow` animation (ease-in-out alternate)
+    - Creates "breathing" effect underneath aurora bands
+
+27. **Dark Mode Aurora:**
+    - More saturated, vivid colors for dark backgrounds
+    - Gold accent bands (`rgba(212, 175, 55)`) replace white
+    - Increased radial glow intensity for visibility
+
+28. **Animation System:**
+    - `@keyframes mq-aurora`: 60s linear infinite background-position sweep
+    - `@keyframes aurora-glow`: 30s ease-in-out alternate pulsing
+    - Primary aurora sweeps from 50% to 350% (3x screen width)
+
+**Technical Details:**
+```css
+background-image:
+  repeating-linear-gradient(100deg, #002A45 0%, #a6192e 7%, transparent 10%, transparent 12%, #002A45 16%),
+  repeating-linear-gradient(100deg, #EDEADE 0%, #EDEADE 3%, transparent 5%, transparent 7%, #EDEADE 10%),
+  radial-gradient(ellipse at 20% 30%, rgba(166, 25, 46, 0.4) 0%, transparent 50%),
+  ...
+animation: mq-aurora 60s linear infinite;
+filter: blur(60px) url(#mq-liquid-refraction);
+```
+
+**Why Aurora is Better:**
+- V2.0 Mesh: Blobs drift around (organic but predictable)
+- V3.0 Aurora: Bands flow horizontally like northern lights (ethereal, premium)
+
+**Accessibility:**
+- `prefers-reduced-motion`: Static simplified gradients, no animation
+- `prefers-contrast: more`: Aurora hidden entirely
+
+**Part 8 - PERFORMANCE FIX V3.1 (Session 8):**
+
+**Summary:** Fixed critical performance issues causing site slowdown.
+
+**Problems Identified:**
+1. **SVG Refraction on Full Viewport** - `url(#mq-liquid-refraction)` was applying expensive feTurbulence + feDisplacementMap to entire screen (2M+ pixels)
+2. **::before with blur(80px) at 4x size** - 200% width/height element with blur filter
+3. **will-change: filter** - Caused browser overhead trying to optimize complex filter
+4. **300% background-size** - 6x pixel area being processed
+
+**Fixes Applied:**
+
+29. **Removed SVG Refraction from Background:**
+    - Changed: `filter: blur(60px) url(#mq-liquid-refraction)` → `filter: blur(40px)`
+    - SVG refraction now only applies to `.mq-liquid-glass` panels (smaller areas)
+    - This was the #1 performance killer
+
+30. **Simplified ::before Glow Layer:**
+    - Removed: `inset: -50%`, `width: 200%`, `height: 200%`
+    - Removed: `filter: blur(80px)`
+    - Now uses simple opacity animation only
+
+31. **Optimized Animation Keyframes:**
+    - `aurora-glow`: Removed transform, now opacity-only animation
+    - Reduced background-position sweep from 350% to 250%
+
+32. **Reduced Background Sizes:**
+    - Primary aurora: 300% → 200%
+    - Secondary shimmer: 200% → 150%
+
+33. **Fixed will-change:**
+    - Removed `filter` from will-change
+    - Added `contain: strict` for layout isolation
+
+**Performance Impact:**
+- Before: SVG filter recalculated every frame on 2M+ pixels
+- After: Simple blur on compositor layer, no per-frame recalculation
+
+**Verification:**
+- `npm run typecheck`: ✅ Passing
+- `npm run lint`: ✅ Passing
+- `npm run build`: ✅ Success
+
+**Part 9 - PERFORMANCE AUDIT FIXES V3.1 (Session 9):**
+
+**Summary:** Comprehensive performance audit and fixes across CSS, components, and pages.
+
+**Audit Findings (47 issues across CSS, components, and pages):**
+- CRITICAL (3): Heavy backdrop-filters, universal selectors, mesh blob blur
+- HIGH (7): will-change abuse, expensive shadows, missing React.memo
+- MEDIUM (5): Date recalculations, missing Suspense boundaries
+
+**CSS Performance Fixes:**
+
+34. **Optimized .mq-liquid-glass backdrop-filter:**
+    - Removed `brightness(1.05)` (3rd filter operation)
+    - Changed: `blur + saturate + brightness` → `blur + saturate` (2 operations)
+    - File: `app/styles/liquid-glass.css:218-222`
+
+35. **Fixed will-change in .mq-liquid-glass:**
+    - Removed: `will-change: backdrop-filter, transform`
+    - Changed to: `will-change: transform` only
+    - backdrop-filter in will-change creates permanent heavy compositor layers
+    - File: `app/styles/liquid-glass.css:238-240`
+
+36. **Replaced Universal Selector in dark-mode.css:**
+    - Removed: `html.dark :where(*:not(svg):not(path)...)`
+    - Added: Targeted selectors for specific text containers
+    - Previous selector matched thousands of elements per page
+    - File: `app/styles/dark-mode.css:138-149`
+
+37. **Reduced Sidebar Shadow Layers:**
+    - Changed: 3 shadow layers → 2 shadow layers on panel open
+    - File: `app/styles/sidebar.css:153-158`
+
+**Component Performance Fixes:**
+
+38. **client-layout.tsx Optimizations:**
+    - Added `React.memo()` wrapper to prevent unnecessary re-renders
+    - Moved `AUTH_ROUTES` and `PROTECTED_ROUTES` arrays outside component (prevents recreation)
+    - Optimized console.error override: cached warning strings as constants
+    - Lazy loaded `LiquidFilter` component via `next/dynamic` (heavy canvas operations deferred)
+    - Added `displayName` for React DevTools debugging
+    - File: `app/client-layout.tsx`
+
+39. **LiquidFilter Lazy Loading:**
+    - Changed: Direct import → `dynamic(() => import(...), { ssr: false })`
+    - LiquidFilter generates 5 canvas-based displacement maps on mount (65k pixel operations each)
+    - Now loads after initial paint, improving FCP/LCP
+    - File: `app/client-layout.tsx:24-28`
+
+**Page Performance Fixes:**
+
+40. **Login Page Suspense Boundary:**
+    - Added `<Suspense>` wrapper around `LoginClient`
+    - Added `LoginSkeleton` loading component
+    - File: `app/login/page.tsx`
+
+41. **Signup Page Suspense Boundary:**
+    - Added `<Suspense>` wrapper around `SignupClient`
+    - Added `SignupSkeleton` loading component
+    - File: `app/signup/page.tsx`
+
+**Files Changed:**
+- `app/styles/liquid-glass.css` (backdrop-filter, will-change optimizations)
+- `app/styles/dark-mode.css` (universal selector replacement)
+- `app/styles/sidebar.css` (shadow layer reduction)
+- `app/client-layout.tsx` (React.memo, lazy load, array hoisting)
+- `app/login/page.tsx` (Suspense boundary)
+- `app/signup/page.tsx` (Suspense boundary)
+
+**Verification:**
+- `npm run typecheck`: ✅ Passing
+- `npm run lint`: ✅ Passing
+- `npm run build`: ✅ Success
+
+---
+
 ## [0.14.31] - 2026-01-11
 
 ### Security

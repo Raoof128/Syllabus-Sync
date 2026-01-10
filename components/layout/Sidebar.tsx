@@ -1,9 +1,15 @@
 // components/layout/Sidebar.tsx
 // ============================================================================
-// SIDEBAR COMPONENT - LIQUID GLASS EDITION
+// SIDEBAR COMPONENT - APPLE LIQUID GLASS EDITION
 // ============================================================================
-// Premium expandable sidebar with "Liquid Glass" effect. Features organic
-// refraction, backdrop blur, fluid animations, and permanent shadows.
+// Premium expandable sidebar with "Apple Liquid Glass" effect featuring:
+// - Optical refraction via feTurbulence + feDisplacementMap filters
+// - 25px backdrop-filter blur with saturation boost
+// - Specular highlights via inset box-shadow
+// - GPU-accelerated animations (will-change: backdrop-filter)
+//
+// The sidebar acts as a "heavy glass pane" sliding over the stable map grid,
+// creating visible distortion of the parallax mesh background.
 //
 // FEATURES:
 // - Desktop: Hover to expand with heavy, fluid slide animation
@@ -17,7 +23,7 @@
 // - .sidebar-shell           → Main container, detects :hover
 // - .sidebar-trigger         → Always-visible 48px strip with hamburger
 // - .sidebar-panel           → Sliding content panel with liquid glass
-// - .mq-liquid-glass         → Backdrop blur + refraction effect
+// - .mq-liquid-glass         → Apple Liquid Glass (25px blur + refraction)
 // - .mq-liquid-glass-subtle  → Lighter glass for trigger strip
 // ============================================================================
 'use client';

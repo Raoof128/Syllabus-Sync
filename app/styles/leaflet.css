@@ -101,3 +101,48 @@
     box-shadow: 0 0 0 0 rgba(26, 115, 232, 0);
   }
 }
+
+/* ============================================
+   MAP MARKER SHARPNESS PROTECTION
+   ============================================
+   Ensures map markers remain crisp and are NOT
+   affected by liquid glass overlay filters.
+   The glass panels exist in the layout shell,
+   while the map content is isolated.
+   ============================================ */
+
+/* Protect Leaflet markers from any inherited filters */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-popup,
+.leaflet-popup-content-wrapper,
+.leaflet-tooltip,
+.leaflet-div-icon {
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate;
+  transform: translateZ(0); /* Force own compositing layer */
+}
+
+/* Ensure marker content stays sharp */
+.leaflet-marker-icon *,
+.leaflet-div-icon * {
+  filter: none !important;
+}
+
+/* Map container should not inherit glass effects */
+.leaflet-container {
+  isolation: isolate;
+}
+
+/* Popup styling - clean, no blur */
+.leaflet-popup-content-wrapper {
+  background: var(--c-background, #edeade) !important;
+  border-radius: var(--c-radius-lg, 0.5rem) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: var(--c-charcoal-800, #373a36) !important;
+}
