@@ -27,6 +27,50 @@ export type Language =
   | 'fr'
   | 'he';
 
+export const LANGUAGE_NAMES: Record<Language, string> = {
+  en: 'English',
+  es: 'Español',
+  fa: 'فارسی',
+  zh: '中文',
+  ar: 'العربية',
+  hi: 'हिन्दी',
+  ko: '한국어',
+  ja: '日本語',
+  ur: 'اردو',
+  th: 'ไทย',
+  vi: 'Tiếng Việt',
+  ru: 'Русский',
+  ta: 'தமிழ்',
+  bn: 'বাংলা',
+  id: 'Bahasa Indonesia',
+  ms: 'Bahasa Melayu',
+  it: 'Italiano',
+  fr: 'Français',
+  he: 'עברית',
+};
+
+export const SUPPORTED_LANGUAGES: Language[] = [
+  'en',
+  'es',
+  'fr',
+  'it',
+  'zh',
+  'ja',
+  'ko',
+  'vi',
+  'hi',
+  'ur',
+  'bn',
+  'ta',
+  'th',
+  'id',
+  'ms',
+  'fa',
+  'ru',
+  'ar',
+  'he',
+];
+
 // Partial translation type - non-English languages may have missing keys
 type TranslationData = Partial<typeof en>;
 

@@ -1,4 +1,7 @@
 {
+  "deviceUnknown": "Unknown device",
+  "deviceThis": "This device",
+  "deviceBrowser": "Browser",
   "home": "Home",
   "calendar": "Calendar",
   "feed": "Events Feed",
@@ -350,7 +353,8 @@
   "deleteDeadline": "Delete Deadline",
   "unitColor": "Unit Color",
   "start": "Start",
-  "day": "Day",
+  "day": "day",
+  "days": "days",
   "end": "End",
   "gettingStartedGuide": "Getting Started Guide",
   "noNotificationsYet": "No notifications yet",

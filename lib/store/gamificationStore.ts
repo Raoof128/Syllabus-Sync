@@ -25,6 +25,7 @@ interface GamificationState {
   refreshProfile: () => Promise<void>;
   updateSettings: (settings: Partial<GamificationSettings>) => void;
   resetSettings: () => void;
+  resetProgress: () => void;
 
   // Computed helpers
   getLevelTitle: () => string;
@@ -179,6 +180,22 @@ export const useGamificationStore = create<GamificationState>()(
 
       resetSettings: () => {
         set({ settings: DEFAULT_GAMIFICATION_SETTINGS });
+      },
+
+      resetProgress: () => {
+        set({
+          profile: {
+            xp: 0,
+            level: 1,
+            streakDays: 0,
+            longestStreak: 0,
+            lastActivityDate: null,
+            xpToNextLevel: 25,
+            xpForCurrentLevel: 0,
+            levelProgress: 0,
+          },
+          recentEvents: [],
+        });
       },
 
       getLevelTitle: () => {

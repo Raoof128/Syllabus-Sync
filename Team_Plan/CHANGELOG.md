@@ -7,6 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.34] - 2026-01-11
+
+### Fixed
+
+#### Settings Page NotificationSettings State Sync Race Condition (Raouf)
+
+**Summary:** Eliminated race conditions in the Settings page by removing dual state management for notification preferences. NotificationSettings and PrivacySettings now use `useNotificationPreferencesStore` as the single source of truth.
+
+**The Problem:**
+- `page.tsx` maintained local `notifications` state via `useState`
+- `NotificationSettings` had a `useEffect` that synced parent state with store values
+- This dual state (parent + store) created potential race conditions where updates could conflict
+- The sync effect was complex and had eslint-disable comments for exhaustive-deps
+
+**Architecture Before:**
+```
+page.tsx (useState) ←─useEffect sync─→ notificationPreferencesStore (Zustand)
+         ↓
+NotificationSettings (props: notifications, setNotifications)
+         ↓  
+PrivacySettings (props: notifications) → for data export
+```
+
+**Architecture After:**
+```
+notificationPreferencesStore (Zustand) ← Single Source of Truth
+         ↓
+NotificationSettings (reads directly from store)
+         ↓
+PrivacySettings (reads directly from store for export)
+```
+
+**Changes Made:**
+
+1. **`app/settings/page.tsx`:**
+   - Removed `NotificationPreferences` type import
+   - Removed `initializeNotifications()` helper function
+   - Removed `notifications` and `setNotifications` state
+   - Updated `<NotificationSettings>` to only pass `t` prop
+   - Removed `notifications` prop from `<PrivacySettings>`
+
+2. **`app/settings/components/NotificationSettings.tsx`:**
+   - Removed `notifications` and `setNotifications` from props type
+   - Removed `NotificationPreferences` type import  
+   - Removed the problematic sync `useEffect` (was lines 89-109)
+   - Component now reads directly from `useNotificationPreferencesStore`
+
+3. **`app/settings/components/PrivacySettings.tsx`:** (from previous session)
+   - Already updated to get notification data directly from store for export
+   - Uses `useNotificationPreferencesStore.getState()` in `handleExportData`
+
+**Files Changed:**
+- `app/settings/page.tsx` - Removed notifications state and props
+- `app/settings/components/NotificationSettings.tsx` - Removed props and sync effect
+- `app/settings/components/PrivacySettings.tsx` - Uses store directly (done earlier)
+
+**Benefits:**
+- No more race conditions between parent state and store
+- Simpler data flow (unidirectional)
+- Removed complex useEffect with eslint-disable
+- Consistent behavior across all components using notification preferences
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run build`: ✅ Success
+
+---
+
 ## [0.14.33] - 2026-01-11
 
 ### Performance

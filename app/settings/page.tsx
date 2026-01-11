@@ -16,12 +16,14 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import type { SessionInfo, NotificationPreferences } from '@/lib/types';
+import type { SessionInfo } from '@/lib/types';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 import {
   NotificationSettings,
   AppearanceSettings,
   PrivacySettings,
+  SecuritySettings,
   QuickActions,
   HelpSupport,
   SettingsSkeleton,
@@ -29,19 +31,19 @@ import {
 } from './components';
 
 // Helper to get device label
-const getDeviceLabel = () => {
-  if (typeof window === 'undefined') return 'Unknown device';
+const getDeviceLabel = (t: (key: TranslationKey) => string) => {
+  if (typeof window === 'undefined') return t('deviceUnknown');
   const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } })
     ?.userAgentData;
-  const platform = uaData?.platform || navigator.platform || 'This device';
+  const platform = uaData?.platform || navigator.platform || t('deviceThis');
   const ua = navigator.userAgent;
   const browserMatch = ua.match(/(Firefox|Edg|Chrome|Safari)/);
-  const browser = browserMatch ? browserMatch[0] : 'Browser';
+  const browser = browserMatch ? browserMatch[0] : t('deviceBrowser');
   return `${platform} · ${browser}`;
 };
 
 // Helper to initialize sessions from localStorage
-const initializeSessions = (): SessionInfo[] => {
+const initializeSessions = (t: (key: TranslationKey) => string): SessionInfo[] => {
   if (typeof window === 'undefined') return [];
 
   try {
@@ -51,7 +53,7 @@ const initializeSessions = (): SessionInfo[] => {
     const now = new Date().toISOString();
     const currentSession: SessionInfo = {
       id: currentId,
-      device: getDeviceLabel(),
+      device: getDeviceLabel(t),
       lastActive: now,
       current: true,
     };
@@ -70,24 +72,6 @@ const initializeSessions = (): SessionInfo[] => {
   }
 };
 
-// Helper to initialize notification preferences
-const initializeNotifications = (): NotificationPreferences => {
-  if (typeof window === 'undefined') {
-    return { deadlines: true, classes: true, events: true };
-  }
-
-  const getVal = (key: string) => {
-    const val = localStorage.getItem(key);
-    return val === null ? true : val === 'true';
-  };
-
-  return {
-    deadlines: getVal(STORAGE_KEYS.NOTIFICATION_DEADLINES),
-    classes: getVal(STORAGE_KEYS.NOTIFICATION_CLASSES),
-    events: getVal(STORAGE_KEYS.NOTIFICATION_EVENTS),
-  };
-};
-
 function SettingsContent() {
   const isClient = useIsClient();
 
@@ -98,9 +82,7 @@ function SettingsContent() {
   const { t, language, setLanguage } = useTranslation();
 
   // Local state - initialized lazily
-  const [sessions, setSessions] = useState<SessionInfo[]>(initializeSessions);
-  const [notifications, setNotifications] =
-    useState<NotificationPreferences>(initializeNotifications);
+  const [sessions, setSessions] = useState<SessionInfo[]>(() => initializeSessions(t));
 
   // Show skeleton on the server / before hydration
   if (!isClient) {
@@ -116,11 +98,7 @@ function SettingsContent() {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* Notification Settings */}
-        <NotificationSettings
-          notifications={notifications}
-          setNotifications={setNotifications}
-          t={t}
-        />
+        <NotificationSettings t={t} />
 
         {/* Appearance Settings */}
         <AppearanceSettings
@@ -141,8 +119,10 @@ function SettingsContent() {
           deadlines={deadlines}
           theme={theme}
           language={language}
-          notifications={notifications}
         />
+
+        {/* Security Settings (Biometric Auth) */}
+        <SecuritySettings t={t} />
 
         {/* Quick Actions */}
         <QuickActions t={t} />

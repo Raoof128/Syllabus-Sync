@@ -16,6 +16,8 @@ import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import type { Unit, Deadline, SessionInfo, PasswordStrength } from '@/lib/types';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -28,7 +30,6 @@ type PrivacySettingsProps = {
   deadlines: Deadline[];
   theme: string;
   language: string;
-  notifications: { deadlines: boolean; classes: boolean; events: boolean };
 };
 
 // Password strength calculation
@@ -81,16 +82,7 @@ function calculatePasswordStrength(password: string): {
 }
 
 const PrivacySettings = memo(
-  ({
-    t,
-    sessions,
-    setSessions,
-    units,
-    deadlines,
-    theme,
-    language,
-    notifications,
-  }: PrivacySettingsProps) => {
+  ({ t, sessions, setSessions, units, deadlines, theme, language }: PrivacySettingsProps) => {
     const [showSessionsDialog, setShowSessionsDialog] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -141,7 +133,7 @@ const PrivacySettings = memo(
           return;
         }
 
-        if (newPassword.length < 8) {
+        if (newPassword.length < 12) {
           toastUtils.error(t('settingsError'), t('passwordTooShort'));
           return;
         }
@@ -236,13 +228,34 @@ const PrivacySettings = memo(
 
     const handleExportData = useCallback(() => {
       try {
+        // Get gamification data from store
+        const gamificationState = useGamificationStore.getState();
+        const gamificationData = {
+          profile: gamificationState.profile,
+          recentEvents: gamificationState.recentEvents,
+          settings: gamificationState.settings,
+        };
+
+        // Get notification preferences from store
+        const notificationState = useNotificationPreferencesStore.getState();
+        const notificationPreferences = {
+          deadlines: notificationState.deadlinesEnabled,
+          classes: notificationState.classesEnabled,
+          events: notificationState.eventsEnabled,
+          deadlineReminderTiming: notificationState.deadlineReminderTiming,
+          classReminderTiming: notificationState.classReminderTiming,
+          eventReminderTiming: notificationState.eventReminderTiming,
+          pushEnabled: notificationState.pushEnabled,
+        };
+
         const data = {
           units,
           deadlines,
+          gamification: gamificationData,
           preferences: {
             theme,
             language,
-            notifications,
+            notifications: notificationPreferences,
           },
           exportedAt: new Date().toISOString(),
           version: '1.0',
@@ -268,7 +281,7 @@ const PrivacySettings = memo(
         );
         toastUtils.error(t('exportFailed'), t('exportFailedMsg'));
       }
-    }, [units, deadlines, theme, language, notifications, t]);
+    }, [units, deadlines, theme, language, t]);
 
     const openExportDialog = useCallback(() => {
       setShowExportDialog(true);
@@ -526,7 +539,7 @@ const PrivacySettings = memo(
                     className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    minLength={8}
+                    minLength={12}
                     required
                     data-testid="new-password-input"
                   />

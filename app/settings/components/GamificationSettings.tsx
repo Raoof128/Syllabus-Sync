@@ -47,7 +47,7 @@ const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps)
 );
 
 const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
-  const { profile, settings, updateSettings, getLevelTitle, getStreakEmoji } =
+  const { profile, settings, updateSettings, getLevelTitle, getStreakEmoji, resetProgress } =
     useGamificationStore();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
@@ -70,24 +70,12 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
   );
 
   const handleResetProgress = useCallback(() => {
-    // Reset the gamification store profile to defaults
+    // Reset the gamification store profile to defaults using the store action
     // Note: This only resets local state. Server-side reset would need API call
-    useGamificationStore.setState({
-      profile: {
-        xp: 0,
-        level: 1,
-        streakDays: 0,
-        longestStreak: 0,
-        lastActivityDate: null,
-        xpToNextLevel: 25,
-        xpForCurrentLevel: 0,
-        levelProgress: 0,
-      },
-      recentEvents: [],
-    });
+    resetProgress();
     setShowResetDialog(false);
     toastUtils.success(t('progressReset'), t('progressResetMsg'));
-  }, [t]);
+  }, [t, resetProgress]);
 
   const levelTier = profile ? getLevelTier(profile.level) : 'bronze';
   const tierColors: Record<string, string> = {
@@ -134,7 +122,8 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('currentStreak')}</p>
                     <p className="font-semibold text-mq-content">
-                      {profile?.streakDays ?? 0} {t('day')}s {getStreakEmoji()}
+                      {profile?.streakDays ?? 0}{' '}
+                      {(profile?.streakDays ?? 0) === 1 ? t('day') : t('days')} {getStreakEmoji()}
                     </p>
                   </div>
                 </div>
@@ -143,7 +132,8 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('longestStreak')}</p>
                     <p className="font-semibold text-mq-content">
-                      {profile?.longestStreak ?? 0} {t('day')}s
+                      {profile?.longestStreak ?? 0}{' '}
+                      {(profile?.longestStreak ?? 0) === 1 ? t('day') : t('days')}
                     </p>
                   </div>
                 </div>

@@ -5,54 +5,15 @@ import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Palette } from 'lucide-react';
 import { toastUtils } from '@/lib/utils/toast';
-import type { Language, TranslationKey } from '@/lib/i18n/translations';
+import {
+  LANGUAGE_NAMES,
+  SUPPORTED_LANGUAGES,
+  type Language,
+  type TranslationKey,
+} from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 
 type ThemeMode = 'light' | 'system' | 'dark';
-
-const languageNames: Record<Language, string> = {
-  en: 'English',
-  es: 'Español',
-  fa: 'فارسی',
-  zh: '中文',
-  ar: 'العربية',
-  hi: 'हिन्दी',
-  ko: '한국어',
-  ja: '日本語',
-  ur: 'اردو',
-  th: 'ไทย',
-  vi: 'Tiếng Việt',
-  ru: 'Русский',
-  ta: 'தமிழ்',
-  bn: 'বাংলা',
-  id: 'Bahasa Indonesia',
-  ms: 'Bahasa Melayu',
-  it: 'Italiano',
-  fr: 'Français',
-  he: 'עברית',
-};
-
-const SUPPORTED_LANGUAGES: Language[] = [
-  'en',
-  'es',
-  'fr',
-  'it',
-  'zh',
-  'ja',
-  'ko',
-  'vi',
-  'hi',
-  'ur',
-  'bn',
-  'ta',
-  'th',
-  'id',
-  'ms',
-  'fa',
-  'ru',
-  'ar',
-  'he',
-];
 
 // Map language codes to translation keys for aria-labels
 const languageAriaLabelKeys: Record<Language, TranslationKey> = {
@@ -93,7 +54,7 @@ const AppearanceSettings = memo(
         if (newLanguage === language) return;
         setLanguage(newLanguage);
 
-        const displayName = languageNames[newLanguage] || newLanguage;
+        const displayName = LANGUAGE_NAMES[newLanguage] || newLanguage;
         toastUtils.success(t('languageUpdated'), `${t('languageUpdatedMsg')} ${displayName}`);
       },
       [language, setLanguage, t],
@@ -157,7 +118,7 @@ const AppearanceSettings = memo(
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('language')}</h3>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {t('current')}: {languageNames[language] || language}
+                      {t('current')}: {LANGUAGE_NAMES[language] || language}
                     </p>
                   </div>
                 </div>
@@ -181,7 +142,7 @@ const AppearanceSettings = memo(
                         data-testid={`language-${lang}`}
                         className={`px-3 py-1 text-xs ${language === lang ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
                       >
-                        {languageNames[lang] || lang}
+                        {LANGUAGE_NAMES[lang] || lang}
                         {language === lang ? ` ${t('currentlySelected') || ''}` : ''}
                       </Button>
                     ))}

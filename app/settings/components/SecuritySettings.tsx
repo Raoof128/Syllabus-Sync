@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 import { Shield, Fingerprint, Smartphone, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { toastUtils } from '@/lib/utils/toast';
+import { errorHandler } from '@/lib/utils/errorHandling';
 import { MagicCard } from '@/components/ui/MagicCard';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
@@ -80,7 +81,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
       setShowEnableDialog(false);
       toastUtils.success(t('biometricEnabled'), t('biometricEnabledMsg'));
     } catch (error) {
-      console.error('Failed to enable biometric:', error);
+      errorHandler.logError(error as Error, 'Enable Biometric', 'medium');
       toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
     } finally {
       setIsLoading(false);
@@ -98,7 +99,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
       setShowDisableDialog(false);
       toastUtils.success(t('biometricDisabled'), t('biometricDisabledMsg'));
     } catch (error) {
-      console.error('Failed to disable biometric:', error);
+      errorHandler.logError(error as Error, 'Disable Biometric', 'medium');
       toastUtils.error(t('error'), t('tryAgainLater'));
     } finally {
       setIsLoading(false);

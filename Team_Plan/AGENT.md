@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.32 | Last Updated: January 11, 2026
+Version: 0.14.34 | Last Updated: January 11, 2026
 
 ---
 
@@ -57,6 +57,31 @@ Version: 0.14.32 | Last Updated: January 11, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Settings Page NotificationSettings State Sync Fix v0.14.34 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Eliminate race conditions in Settings page notification state management
+- **Summary:** Removed dual state management (parent useState + Zustand store) in NotificationSettings. Now uses `useNotificationPreferencesStore` as single source of truth.
+
+**Architecture Change:**
+- Before: `page.tsx (useState)` ↔ `useEffect sync` ↔ `notificationPreferencesStore`
+- After: All components read directly from `notificationPreferencesStore`
+
+**Changes:**
+1. **page.tsx:** Removed `notifications` state, `initializeNotifications()`, and props
+2. **NotificationSettings.tsx:** Removed props and sync `useEffect` (was lines 89-109)
+3. **PrivacySettings.tsx:** Reads from store directly for data export
+
+**Files Changed:**
+- `app/settings/page.tsx`
+- `app/settings/components/NotificationSettings.tsx`
+- `app/settings/components/PrivacySettings.tsx`
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run build`: ✅ Success
+
+---
 
 #### ✅ Performance Optimization - Server-Side Data & Liquid Filter Fix v0.14.33 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)
