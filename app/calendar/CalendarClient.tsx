@@ -55,6 +55,10 @@ const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
   loading: () => null,
 });
 
+const UnitDetailPanel = dynamic(() => import('@/components/units/UnitDetailPanel'), {
+  loading: () => null,
+});
+
 // Hours to display (6 AM to 11 PM = 18 hours)
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (23)
 const HOUR_HEIGHT = 48; // pixels per hour
@@ -259,6 +263,10 @@ export default function CalendarClient() {
   const [unitDialogOpen, setUnitDialogOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
 
+  // Unit detail panel state
+  const [unitDetailOpen, setUnitDetailOpen] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
@@ -288,6 +296,13 @@ export default function CalendarClient() {
     const dayMQDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
     const dayUnits = getUnitsForDay(date);
     return { deadlines: dayDeadlines, events: dayEvents, mqDates: dayMQDates, units: dayUnits };
+  };
+
+  // Get color for a deadline (custom color or unit color)
+  const getDeadlineColor = (deadline: Deadline): string => {
+    if (deadline.color) return deadline.color;
+    const unit = units.find((u) => u.code === deadline.unitCode);
+    return unit?.color || '#6366f1'; // fallback to indigo
   };
 
   // Current time position for the red line indicator
@@ -344,6 +359,19 @@ export default function CalendarClient() {
     ) {
       removeUnit(unit.id);
     }
+  };
+
+  // Open unit detail panel
+  const openUnitDetail = (unit: Unit) => {
+    setSelectedUnit(unit);
+    setUnitDetailOpen(true);
+  };
+
+  // Handle editing deadline from unit detail panel
+  const handleEditDeadlineFromPanel = (deadline: Deadline) => {
+    setUnitDetailOpen(false);
+    setEditDeadline(deadline);
+    setDeadlineDialogOpen(true);
   };
 
   // Filter deadlines by type
@@ -594,7 +622,7 @@ export default function CalendarClient() {
                             return (
                               <div
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all"
                                 style={{
                                   top: posInfo.top,
                                   height: posInfo.height,
@@ -603,7 +631,12 @@ export default function CalendarClient() {
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
-                                title={`${unitData.code} - ${unitData.name}\n${formatTime(schedule.startTime)} - ${formatTime(schedule.endTime)}\n${unitData.location.building} ${unitData.location.room}`}
+                                title={`Click to view ${unitData.code} details`}
+                                onClick={() => {
+                                  // Find the original unit with full schedule
+                                  const originalUnit = units.find((u) => u.id === unitData.id);
+                                  if (originalUnit) openUnitDetail(originalUnit);
+                                }}
                               >
                                 <div
                                   className="p-1 h-full overflow-hidden"
@@ -626,12 +659,12 @@ export default function CalendarClient() {
                             );
                           })}
 
-                          {/* Deadlines - filled time block */}
+                          {/* Deadlines - filled time block with unit color */}
                           {dayDeadlines.map((deadline, idx) => {
                             const dueDate = new Date(deadline.dueDate);
                             const hours = getHours(dueDate);
                             const minutes = getMinutes(dueDate);
-                            const colors = TYPE_COLORS[deadline.type];
+                            const deadlineColor = getDeadlineColor(deadline);
 
                             // Default 1 hour duration from due time
                             const posInfo = getTimePositionAndHeight(
@@ -641,6 +674,9 @@ export default function CalendarClient() {
                               minutes,
                             );
 
+                            // Display name: UNIT_CODE – Type or Title
+                            const displayName = `${deadline.unitCode} – ${deadline.title}`;
+
                             if (!posInfo || hours < START_HOUR) {
                               // Show at top if outside visible hours
                               return (
@@ -648,15 +684,16 @@ export default function CalendarClient() {
                                   key={deadline.id}
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
-                                    colors.bg,
-                                    colors.text,
+                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10 text-white',
                                     deadline.completed && 'opacity-50 line-through',
                                   )}
-                                  style={{ top: 4 + idx * 22 }}
-                                  title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
+                                  style={{
+                                    top: 4 + idx * 22,
+                                    backgroundColor: deadlineColor,
+                                  }}
+                                  title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                                 >
-                                  {deadline.title}
+                                  {displayName}
                                 </button>
                               );
                             }
@@ -675,16 +712,20 @@ export default function CalendarClient() {
                                 key={deadline.id}
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
-                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
-                                  colors.bg,
-                                  colors.text,
-                                  colors.border,
+                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4 text-white',
                                   deadline.completed && 'opacity-50 line-through',
                                 )}
-                                style={{ top: posInfo.top, height: posInfo.height, left, width }}
-                                title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
+                                style={{
+                                  top: posInfo.top,
+                                  height: posInfo.height,
+                                  left,
+                                  width,
+                                  backgroundColor: `${deadlineColor}dd`,
+                                  borderLeftColor: deadlineColor,
+                                }}
+                                title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                               >
-                                <span className="block truncate">{deadline.title}</span>
+                                <span className="block truncate">{displayName}</span>
                                 <span className="text-[8px] opacity-80">
                                   {format(dueDate, 'h:mm a')}
                                 </span>
@@ -1236,6 +1277,14 @@ export default function CalendarClient() {
 
       {/* Unit Form Dialog */}
       <UnitForm open={unitDialogOpen} onOpenChange={setUnitDialogOpen} editUnit={editingUnit} />
+
+      {/* Unit Detail Panel */}
+      <UnitDetailPanel
+        unit={selectedUnit}
+        open={unitDetailOpen}
+        onOpenChange={setUnitDetailOpen}
+        onEditDeadline={handleEditDeadlineFromPanel}
+      />
     </div>
   );
 }

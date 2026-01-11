@@ -1,7 +1,7 @@
 // components/deadlines/DeadlineForm.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Deadline } from '@/lib/types';
@@ -30,6 +30,7 @@ import {
 import { PRIORITY_LEVELS, DEADLINE_TYPES } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
+import { UNIT_COLORS } from '@/lib/config';
 
 interface DeadlineFormProps {
   open: boolean;
@@ -44,11 +45,26 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
+  const [color, setColor] = useState<string>(''); // Custom color override
+  const [useUnitColor, setUseUnitColor] = useState(true); // Toggle for unit color inheritance
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('23:59');
   const [priority, setPriority] = useState<Deadline['priority']>('Medium');
   const [type, setType] = useState<Deadline['type']>('Assignment');
   const [completed, setCompleted] = useState(false);
+
+  // Get selected unit for color inheritance
+  const selectedUnit = useMemo(() => {
+    return units.find((u) => u.code === unitCode);
+  }, [units, unitCode]);
+
+  // Effective color (either unit color or custom override)
+  const effectiveColor = useMemo(() => {
+    if (useUnitColor && selectedUnit) {
+      return selectedUnit.color;
+    }
+    return color || selectedUnit?.color || UNIT_COLORS[0].value;
+  }, [useUnitColor, selectedUnit, color]);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -74,6 +90,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const resetForm = () => {
     setTitle('');
     setUnitCode('');
+    setColor('');
+    setUseUnitColor(true);
     setDueDate('');
     setDueTime('23:59');
     setPriority('Medium');
@@ -86,6 +104,14 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     if (editDeadline) {
       setTitle(editDeadline.title);
       setUnitCode(editDeadline.unitCode);
+      // Check if deadline has custom color
+      if (editDeadline.color) {
+        setColor(editDeadline.color);
+        setUseUnitColor(false);
+      } else {
+        setColor('');
+        setUseUnitColor(true);
+      }
       const parsedDate = new Date(editDeadline.dueDate);
       if (isValid(parsedDate)) {
         setDueDate(format(parsedDate, 'yyyy-MM-dd'));
@@ -139,6 +165,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       id: editDeadline?.id || uuidv4(),
       title: title.trim(),
       unitCode,
+      unitId: selectedUnit?.id,
+      color: useUnitColor ? undefined : effectiveColor,
       dueDate: dueDateObj,
       priority,
       type,
@@ -334,6 +362,62 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Color Selection */}
+            <div className="space-y-3">
+              <Label>Color</Label>
+
+              {/* Unit color inheritance toggle */}
+              <div className="flex items-center gap-2">
+                <input
+                  id="useUnitColor"
+                  type="checkbox"
+                  checked={useUnitColor}
+                  onChange={(e) => setUseUnitColor(e.target.checked)}
+                  disabled={!selectedUnit}
+                  className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                />
+                <Label htmlFor="useUnitColor" className="text-sm font-normal">
+                  Use unit color
+                </Label>
+                {selectedUnit && (
+                  <div
+                    className="w-4 h-4 rounded-full border border-mq-border ml-1"
+                    style={{ backgroundColor: selectedUnit.color }}
+                    title={selectedUnit.code}
+                  />
+                )}
+              </div>
+
+              {/* Custom color picker (shown when not using unit color) */}
+              {!useUnitColor && (
+                <div className="grid grid-cols-8 gap-2">
+                  {UNIT_COLORS.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setColor(c.value)}
+                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                        color === c.value
+                          ? 'border-mq-primary scale-110 ring-2 ring-mq-primary/30'
+                          : 'border-transparent hover:border-mq-border'
+                      }`}
+                      style={{ backgroundColor: c.value }}
+                      title={c.name}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Color preview */}
+              <div className="flex items-center gap-2 text-xs text-mq-content-secondary">
+                <div
+                  className="w-4 h-4 rounded-full border border-mq-border"
+                  style={{ backgroundColor: effectiveColor }}
+                />
+                <span>Preview: {effectiveColor}</span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

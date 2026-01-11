@@ -33,6 +33,8 @@ export type Deadline = {
   id: string;
   title: string; // "Assignment 1"
   unitCode: string; // "COMP2310"
+  unitId?: string; // Reference to Unit.id for color inheritance
+  color?: string; // Custom color override (defaults to unit color)
   dueDate: Date;
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
