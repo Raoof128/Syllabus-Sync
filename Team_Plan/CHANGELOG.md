@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.36] - 2026-01-11
+
+### Fixed
+
+#### Navigation GPS Accuracy Fix (Raouf)
+
+**Problem:** When clicking "Navigate" to open Apple Maps or Google Maps, the destination was 50-140 meters away from the actual building location.
+
+**Root Cause:** The `getBuildingGps()` function was calculating GPS coordinates from pixel positions using linear interpolation, instead of using the accurate GPS coordinates already stored in `building.location` (verified from Google Maps geocoding).
+
+**Analysis (using Google Maps MCP):**
+- Library: Stored GPS matched Google Maps exactly (-33.7756994, 151.1131306), but calculated GPS was ~50m off
+- Hospital: Stored GPS matched Google Maps exactly (-33.7735912, 151.1179502), but calculated GPS was ~140m off
+
+**Fix:** Modified `getBuildingGps()` to:
+1. Prefer the stored `building.location` GPS coordinates (from Google Maps)
+2. Fall back to pixel-calculated GPS only when `building.location` is unavailable
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Updated `getBuildingGps()` function
+
+---
+
 ## [0.14.35] - 2026-01-11
 
 ### Changed

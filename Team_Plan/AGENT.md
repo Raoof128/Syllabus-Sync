@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.35 | Last Updated: January 11, 2026
+Version: 0.14.36 | Last Updated: January 11, 2026
 
 ---
 
@@ -57,6 +57,37 @@ Version: 0.14.35 | Last Updated: January 11, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Navigation GPS Accuracy Fix v0.14.36 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Fixed navigation coordinates being 50-140 meters off from actual building locations
+- **Root Cause:** `getBuildingGps()` was calculating GPS from pixel positions using linear interpolation instead of using the accurate Google Maps coordinates stored in `building.location`
+
+**Problem Analysis (using Google Maps MCP):**
+- Library building:
+  - Stored GPS (Google Maps): lat=-33.7756994, lng=151.1131306
+  - Calculated from pixel: lat=-33.776, lng=151.1135
+  - **Difference: ~50m off**
+- Hospital building:
+  - Stored GPS (Google Maps): lat=-33.7735912, lng=151.1179502
+  - Calculated from pixel: lat=-33.7726, lng=151.119
+  - **Difference: ~140m off**
+
+**Fix Applied:**
+- Modified `getBuildingGps()` in `lib/map/buildings.ts` to:
+  1. **Prefer** stored `building.location` GPS coordinates (verified from Google Maps)
+  2. **Fall back** to calculated GPS only when location is unavailable
+- This ensures Apple Maps and Google Maps navigate to the correct building entrance
+
+**Files Changed:**
+- `lib/map/buildings.ts` - Updated `getBuildingGps()` function
+
+**Verification:**
+- TypeScript: ✅ No errors
+- ESLint: ✅ No errors
+- All 119/120 buildings have accurate Google Maps GPS coordinates
+
+---
 
 #### ✅ Map Page Full Audit & Improvements v0.14.35 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)

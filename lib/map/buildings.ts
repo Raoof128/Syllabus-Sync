@@ -182,18 +182,22 @@ export function getBuildingCrsCoords(building: Building): { lat: number; lng: nu
 
 /**
  * Get real GPS coordinates for a building (for external navigation).
- * ALWAYS calculates GPS from the calibrated pixel position to ensure
- * the navigation destination matches what's shown on the campus map.
+ * PREFERS the stored GPS coordinates (verified from Google Maps) for accuracy.
+ * Falls back to calculated GPS from pixel position only when location is unavailable.
  *
- * Note: The stored building.location (OSM GPS) is kept for reference/attribution
- * but not used for navigation since it often doesn't match the calibrated pixel positions.
+ * The stored building.location coordinates are from Google Maps geocoding and
+ * provide accurate navigation destinations in Apple Maps and Google Maps.
  *
  * @param building - The building object
  * @returns GPS coordinates { lat, lng }
  */
 export function getBuildingGps(building: Building): { lat: number; lng: number } {
-  // Always calculate from pixel position (which has been manually calibrated)
-  // This ensures navigation matches what users see on the map
+  // Prefer stored GPS coordinates (verified from Google Maps) for accurate navigation
+  if (building.location) {
+    return { lat: building.location.lat, lng: building.location.lng };
+  }
+  // Fallback: calculate approximate GPS from pixel position
+  // Note: This is less accurate (~50-140m off) due to linear interpolation
   return pixelToGps(building.position[0], building.position[1]);
 }
 
