@@ -29,7 +29,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { sampleEvents } from '@/data/sampleEvents';
-import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_LABELS } from '@/data/mqKeyDates';
+import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import {
   format,
@@ -54,10 +54,10 @@ const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
   loading: () => null,
 });
 
-// Hours to display (7 AM to 12 AM midnight = 17 hours visible, but 6 AM exists logically)
-const HOURS = Array.from({ length: 18 }, (_, i) => i + 7); // 7am to 12am (24)
+// Hours to display (6 AM to 11 PM = 18 hours)
+const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (23)
 const HOUR_HEIGHT = 48; // pixels per hour
-const START_HOUR = 7; // First visible hour (6 AM exists logically but not shown)
+const START_HOUR = 6; // First visible hour
 
 // Type colors for the calendar
 const TYPE_COLORS = {
@@ -68,24 +68,36 @@ const TYPE_COLORS = {
   Event: { bg: 'bg-green-500', border: 'border-green-600', text: 'text-white' },
 };
 
-// Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" to start/end hours
+// Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" or "09:00 - 11:00" to start/end hours
 function parseTimeRange(
   timeStr: string,
 ): { startHour: number; startMin: number; endHour: number; endMin: number } | null {
   if (!timeStr) return null;
 
+  // Try parsing 24-hour range format "09:00 - 11:00" first (most common in our data)
+  const militaryRangeMatch = timeStr.match(
+    /(\d{1,2}):(\d{2})(?::\d{2})?\s*[-–]\s*(\d{1,2}):(\d{2})(?::\d{2})?/,
+  );
+  if (militaryRangeMatch) {
+    const startHour = parseInt(militaryRangeMatch[1], 10);
+    const startMin = parseInt(militaryRangeMatch[2], 10);
+    const endHour = parseInt(militaryRangeMatch[3], 10);
+    const endMin = parseInt(militaryRangeMatch[4], 10);
+    return { startHour, startMin, endHour, endMin };
+  }
+
   // Try parsing range format "10:00 AM - 2:00 PM"
   const rangeMatch = timeStr.match(
-    /(\d{1,2}):(\d{2})\s*(AM|PM)?\s*[-–]\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i,
+    /(\d{1,2}):(\d{2})\s*(AM|PM)\s*[-–]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i,
   );
   if (rangeMatch) {
     let startHour = parseInt(rangeMatch[1], 10);
     const startMin = parseInt(rangeMatch[2], 10);
-    const startPeriod = (rangeMatch[3] || rangeMatch[6] || 'AM').toUpperCase();
+    const startPeriod = rangeMatch[3].toUpperCase();
 
     let endHour = parseInt(rangeMatch[4], 10);
     const endMin = parseInt(rangeMatch[5], 10);
-    const endPeriod = (rangeMatch[6] || 'PM').toUpperCase();
+    const endPeriod = rangeMatch[6].toUpperCase();
 
     if (startPeriod === 'PM' && startHour !== 12) startHour += 12;
     if (startPeriod === 'AM' && startHour === 12) startHour = 0;
@@ -108,8 +120,8 @@ function parseTimeRange(
     return { startHour: hours, startMin: minutes, endHour: hours + 1, endMin: minutes };
   }
 
-  // Try parsing "14:00" format
-  const militaryMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
+  // Try parsing "14:00" format (single time, assume 1 hour duration)
+  const militaryMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
   if (militaryMatch) {
     const hours = parseInt(militaryMatch[1], 10);
     const minutes = parseInt(militaryMatch[2], 10);
@@ -126,15 +138,15 @@ function getTimePositionAndHeight(
   endHour: number,
   endMin: number,
 ): { top: number; height: number } | null {
-  // Clamp to visible range (7am to midnight)
-  const effectiveStartHour = Math.max(START_HOUR, Math.min(24, startHour));
+  // Clamp to visible range (6am to 11pm)
+  const effectiveStartHour = Math.max(START_HOUR, Math.min(23, startHour));
   const effectiveEndHour = Math.max(START_HOUR, Math.min(24, endHour));
 
   if (effectiveStartHour >= 24) return null;
 
   const top = (effectiveStartHour - START_HOUR) * HOUR_HEIGHT + (startMin / 60) * HOUR_HEIGHT;
   const durationHours = effectiveEndHour - effectiveStartHour + (endMin - startMin) / 60;
-  const height = Math.max(20, durationHours * HOUR_HEIGHT);
+  const height = Math.max(24, durationHours * HOUR_HEIGHT);
 
   return { top, height };
 }
@@ -270,46 +282,77 @@ export default function CalendarClient() {
             {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
             <div className="overflow-auto" style={{ maxHeight: '700px' }}>
               <div className="min-w-[800px]">
-                {/* Day Headers - Sticky */}
+                {/* Day Headers - Sticky with MQ Key Dates */}
                 <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-0 bg-mq-background z-20">
                   <div className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border" />
-                  {weekDays.map((day) => (
-                    <div
-                      key={day.toISOString()}
-                      className={cn(
-                        'p-3 text-center border-r border-mq-border last:border-r-0',
-                        isToday(day) && 'bg-mq-primary/5',
-                      )}
-                    >
-                      <div className="text-xs text-mq-content-secondary uppercase font-medium">
-                        {format(day, 'EEE')}
-                      </div>
+                  {weekDays.map((day) => {
+                    const dayMQDates = getMQKeyDatesForDay(day).filter(
+                      (d) => d.category !== 'classes',
+                    );
+                    return (
                       <div
+                        key={day.toISOString()}
                         className={cn(
-                          'text-xl font-semibold mt-1 inline-flex items-center justify-center',
-                          isToday(day)
-                            ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
-                            : 'text-mq-content',
+                          'p-2 text-center border-r border-mq-border last:border-r-0',
+                          isToday(day) && 'bg-mq-primary/5',
                         )}
                       >
-                        {format(day, 'd')}
+                        <div className="text-xs text-mq-content-secondary uppercase font-medium">
+                          {format(day, 'EEE')}
+                        </div>
+                        <div
+                          className={cn(
+                            'text-xl font-semibold mt-1 inline-flex items-center justify-center',
+                            isToday(day)
+                              ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
+                              : 'text-mq-content',
+                          )}
+                        >
+                          {format(day, 'd')}
+                        </div>
+                        {/* MQ Key Dates badges in header */}
+                        {dayMQDates.length > 0 && (
+                          <div className="mt-1 flex flex-col gap-0.5">
+                            {dayMQDates.slice(0, 2).map((mqDate) => {
+                              const colors = MQ_DATE_COLORS[mqDate.category];
+                              return (
+                                <div
+                                  key={mqDate.id}
+                                  className={cn(
+                                    'text-[8px] px-1 py-0.5 rounded font-medium truncate',
+                                    colors.bg,
+                                    colors.text,
+                                  )}
+                                  title={`${mqDate.event} - ${mqDate.term}`}
+                                >
+                                  {mqDate.event}
+                                </div>
+                              );
+                            })}
+                            {dayMQDates.length > 2 && (
+                              <div className="text-[8px] text-mq-content-secondary">
+                                +{dayMQDates.length - 2} more
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Time Grid */}
-                <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT }}>
+                <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT + 12 }}>
                   {/* Hour Lines */}
                   {HOURS.map((hour, index) => (
                     <div
                       key={hour}
                       className="absolute left-0 right-0 grid grid-cols-[60px_repeat(7,1fr)]"
-                      style={{ top: index * HOUR_HEIGHT }}
+                      style={{ top: index * HOUR_HEIGHT + 8 }}
                     >
                       {/* Time Label */}
                       <div className="text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border">
-                        {hour === 24 ? '12 AM' : format(new Date().setHours(hour, 0), 'h a')}
+                        {format(new Date().setHours(hour, 0), 'h a')}
                       </div>
                       {/* Hour Lines for each day */}
                       {weekDays.map((day) => (
@@ -329,7 +372,7 @@ export default function CalendarClient() {
                   {currentTimePosition !== null && (
                     <div
                       className="absolute left-[60px] right-0 z-30 pointer-events-none"
-                      style={{ top: currentTimePosition }}
+                      style={{ top: currentTimePosition + 8 }}
                     >
                       <div className="flex items-center">
                         <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
@@ -339,12 +382,11 @@ export default function CalendarClient() {
                   )}
 
                   {/* Events, Units and Deadlines Overlay */}
-                  <div className="absolute left-[60px] right-0 top-0 bottom-0 grid grid-cols-7">
+                  <div className="absolute left-[60px] right-0 top-[8px] bottom-0 grid grid-cols-7">
                     {weekDays.map((day) => {
                       const {
                         deadlines: dayDeadlines,
                         events: dayEvents,
-                        mqDates: dayMQDates,
                         units: dayUnits,
                       } = getItemsForDay(day);
 
@@ -353,34 +395,6 @@ export default function CalendarClient() {
                           key={day.toISOString()}
                           className="relative border-r border-mq-border/30 last:border-r-0"
                         >
-                          {/* MQ Key Dates - Full day background */}
-                          {dayMQDates.map((mqDate, idx) => {
-                            const colors = MQ_DATE_COLORS[mqDate.category];
-                            const programLabel = PROGRAM_LABELS[mqDate.program];
-                            const isSpecial = mqDate.program !== 'general';
-
-                            return (
-                              <div
-                                key={mqDate.id}
-                                className={cn('absolute left-0 right-0 z-5', colors.bgLight)}
-                                style={{ top: 0, height: '100%', opacity: 0.3 }}
-                              >
-                                <div
-                                  className={cn(
-                                    'absolute top-0 left-1 right-1 text-[9px] px-1 py-0.5 rounded font-medium z-10 truncate',
-                                    colors.bg,
-                                    colors.text,
-                                  )}
-                                  style={{ top: idx * 18 + 2 }}
-                                  title={`${mqDate.event} - ${mqDate.term}${isSpecial ? ` (${programLabel})` : ''}`}
-                                >
-                                  {isSpecial && <GraduationCap className="h-2 w-2 inline mr-0.5" />}
-                                  {mqDate.event}
-                                </div>
-                              </div>
-                            );
-                          })}
-
                           {/* Units - filled time block with unit color */}
                           {dayUnits.map((unitData) => {
                             const schedule = unitData.schedule;
@@ -398,25 +412,42 @@ export default function CalendarClient() {
                             );
                             if (!posInfo) return null;
 
+                            // Format time for display (e.g., "9:00 AM")
+                            const formatTime = (time: string) => {
+                              const [h, m] = time.split(':').map(Number);
+                              const hour = h % 12 || 12;
+                              const period = h >= 12 ? 'PM' : 'AM';
+                              return `${hour}:${m.toString().padStart(2, '0')} ${period}`;
+                            };
+
                             return (
                               <div
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                className="absolute left-1 right-1 rounded-md shadow-md z-10 border-l-4 overflow-hidden"
+                                className="absolute left-1 right-1 rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                                 style={{
                                   top: posInfo.top,
                                   height: posInfo.height,
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
-                                title={`${unitData.code} - ${unitData.name}\n${schedule.startTime} - ${schedule.endTime}\n${unitData.location.building} ${unitData.location.room}`}
+                                title={`${unitData.code} - ${unitData.name}\n${formatTime(schedule.startTime)} - ${formatTime(schedule.endTime)}\n${unitData.location.building} ${unitData.location.room}`}
                               >
-                                <div className="p-1 h-full" style={{ color: unitData.color }}>
+                                <div
+                                  className="p-1 h-full overflow-hidden"
+                                  style={{ color: unitData.color }}
+                                >
                                   <span className="block text-[10px] font-bold truncate">
                                     {unitData.code}
                                   </span>
-                                  <span className="text-[8px] opacity-80">
-                                    {schedule.startTime}
+                                  <span className="text-[8px] opacity-80 block truncate">
+                                    {formatTime(schedule.startTime)} -{' '}
+                                    {formatTime(schedule.endTime)}
                                   </span>
+                                  {posInfo.height > 50 && (
+                                    <span className="text-[8px] opacity-70 block truncate">
+                                      {unitData.location.building} {unitData.location.room}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             );
@@ -449,7 +480,7 @@ export default function CalendarClient() {
                                     colors.text,
                                     deadline.completed && 'opacity-50 line-through',
                                   )}
-                                  style={{ top: dayMQDates.length * 18 + 4 + idx * 22 }}
+                                  style={{ top: 4 + idx * 22 }}
                                   title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
                                 >
                                   {deadline.title}
@@ -486,8 +517,7 @@ export default function CalendarClient() {
 
                             if (!timeInfo) {
                               // Show at top if no valid time
-                              const offsetTop =
-                                dayMQDates.length * 18 + 4 + dayDeadlines.length * 22 + idx * 22;
+                              const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
                               return (
                                 <button
                                   key={event.id}
@@ -513,8 +543,7 @@ export default function CalendarClient() {
                             );
 
                             if (!posInfo) {
-                              const offsetTop =
-                                dayMQDates.length * 18 + 4 + dayDeadlines.length * 22 + idx * 22;
+                              const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
                               return (
                                 <button
                                   key={event.id}
