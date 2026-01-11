@@ -2,17 +2,42 @@
 // ============================================
 // PROFILES STORE
 // ============================================
-// Manages user profiles and authentication
+// Manages user profiles with Supabase integration
+
+'use client';
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { apiRequest } from '@/lib/utils/api';
+import { errorHandler } from '@/lib/utils/errorHandling';
 
+// ============================================================================
+// TYPES
+// ============================================================================
+
+/**
+ * Database profile schema (snake_case from Supabase)
+ */
+interface DbProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  student_id: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+/**
+ * Client-side profile with additional local preferences (camelCase)
+ */
 export interface UserProfile {
   id: string;
   name: string;
   email: string;
   studentId: string;
   avatar?: string;
+  // Local-only fields (not stored in Supabase)
   course: string;
   year: string;
   preferences: {
@@ -27,21 +52,78 @@ export interface UserProfile {
 export interface ProfilesState {
   profiles: UserProfile[];
   currentProfileId: string | null;
+  isLoading: boolean;
+  hasLoaded: boolean;
+  // Actions
   addProfile: (profile: Omit<UserProfile, 'id' | 'createdAt'>) => void;
-  updateProfile: (id: string, updates: Partial<UserProfile>) => void;
   deleteProfile: (id: string) => void;
+  fetchProfile: () => Promise<void>;
+  updateProfile: (id: string, updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   setCurrentProfile: (id: string | null) => void;
   getCurrentProfile: () => UserProfile | null;
-  updateCurrentProfile: (updates: Partial<UserProfile>) => void;
-  fetchProfile: () => Promise<void>;
+  updateCurrentProfile: (updates: Partial<UserProfile>) => Promise<UserProfile | null>;
+  clearProfiles: () => void;
 }
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Map database profile (snake_case) to client profile (camelCase)
+ */
+function mapDbToClient(db: DbProfile, existing?: Partial<UserProfile>): UserProfile {
+  return {
+    id: db.id,
+    name: db.full_name || '',
+    email: db.email,
+    studentId: db.student_id || '',
+    avatar: db.avatar_url || undefined,
+    // Preserve local-only fields from existing profile or use defaults
+    course: existing?.course || '',
+    year: existing?.year || '',
+    preferences: existing?.preferences || {
+      notifications: true,
+      emailReminders: false,
+      pushNotifications: true,
+    },
+    createdAt: new Date(db.created_at),
+    lastLogin: new Date(),
+  };
+}
+
+/**
+ * Map client updates to database format (only server-synced fields)
+ */
+function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
+  const dbUpdates: Partial<DbProfile> = {};
+
+  if (updates.name !== undefined) {
+    dbUpdates.full_name = updates.name;
+  }
+  if (updates.avatar !== undefined) {
+    dbUpdates.avatar_url = updates.avatar || null;
+  }
+
+  return dbUpdates;
+}
+
+// ============================================================================
+// STORE
+// ============================================================================
 
 export const useProfilesStore = create<ProfilesState>()(
   persist(
     (set, get) => ({
       profiles: [],
       currentProfileId: null,
+      isLoading: false,
+      hasLoaded: false,
 
+      /**
+       * Add a local profile (used for local profile management)
+       * Note: Auth profile is created via signup API, this is for local state only
+       */
       addProfile: (profileData) => {
         const newProfile: UserProfile = {
           ...profileData,
@@ -50,40 +132,131 @@ export const useProfilesStore = create<ProfilesState>()(
         };
 
         set((state) => ({
-          ...state,
           profiles: [...state.profiles, newProfile],
-          // Automatically set as current profile (always set new profile as current)
           currentProfileId: newProfile.id,
         }));
       },
 
-      updateProfile: (id, updates) => {
-        set((state) => ({
-          ...state,
-          profiles: state.profiles.map((profile) =>
-            profile.id === id ? { ...profile, ...updates } : profile,
-          ),
-        }));
-      },
-
+      /**
+       * Delete a local profile
+       * Note: This only removes from local state, not from Supabase
+       */
       deleteProfile: (id) => {
         set((state) => {
-          const newProfiles = state.profiles.filter((profile) => profile.id !== id);
+          const newProfiles = state.profiles.filter((p) => p.id !== id);
           const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
-
           return {
-            ...state,
             profiles: newProfiles,
             currentProfileId: newCurrentProfileId,
           };
         });
       },
 
-      setCurrentProfile: (id) => {
+      fetchProfile: async () => {
+        if (get().isLoading) return;
+
+        set({ isLoading: true });
+        try {
+          const dbProfile = await apiRequest<DbProfile | null>('/api/profiles');
+
+          if (dbProfile) {
+            const existingProfile = get().profiles.find((p) => p.id === dbProfile.id);
+            const clientProfile = mapDbToClient(dbProfile, existingProfile);
+
+            set((state) => {
+              const existingIndex = state.profiles.findIndex((p) => p.id === dbProfile.id);
+              const newProfiles = [...state.profiles];
+
+              if (existingIndex >= 0) {
+                // Update existing profile, preserving local-only fields
+                newProfiles[existingIndex] = {
+                  ...newProfiles[existingIndex],
+                  ...clientProfile,
+                };
+              } else {
+                // Add new profile
+                newProfiles.push(clientProfile);
+              }
+
+              return {
+                profiles: newProfiles,
+                currentProfileId: dbProfile.id,
+                hasLoaded: true,
+              };
+            });
+          } else {
+            set({ hasLoaded: true });
+          }
+        } catch (error) {
+          // Silently handle API errors - keep persisted data
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (
+            !errorMessage.includes('401') &&
+            !errorMessage.includes('authentication') &&
+            !errorMessage.includes('unauthorized')
+          ) {
+            errorHandler.logError(
+              error instanceof Error ? error : new Error('Failed to fetch profile'),
+              'ProfilesStore.fetchProfile',
+              'medium',
+            );
+          }
+          set({ hasLoaded: true });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updateProfile: async (id, updates) => {
+        const currentProfile = get().profiles.find((p) => p.id === id);
+        if (!currentProfile) return null;
+
+        // Optimistic update
+        const optimisticProfile = { ...currentProfile, ...updates, lastLogin: new Date() };
         set((state) => ({
-          ...state,
-          currentProfileId: id,
+          profiles: state.profiles.map((p) => (p.id === id ? optimisticProfile : p)),
         }));
+
+        // Determine which fields need server sync
+        const dbUpdates = mapClientToDb(updates);
+        const hasServerUpdates = Object.keys(dbUpdates).length > 0;
+
+        if (hasServerUpdates) {
+          try {
+            const dbProfile = await apiRequest<DbProfile>('/api/profiles', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(dbUpdates),
+            });
+
+            // Update with server response
+            const serverProfile = mapDbToClient(dbProfile, optimisticProfile);
+            set((state) => ({
+              profiles: state.profiles.map((p) => (p.id === id ? serverProfile : p)),
+            }));
+
+            return serverProfile;
+          } catch (error) {
+            // Revert on error
+            set((state) => ({
+              profiles: state.profiles.map((p) => (p.id === id ? currentProfile : p)),
+            }));
+
+            errorHandler.logError(
+              error instanceof Error ? error : new Error('Failed to update profile'),
+              'ProfilesStore.updateProfile',
+              'high',
+            );
+            return null;
+          }
+        }
+
+        // Local-only update succeeded
+        return optimisticProfile;
+      },
+
+      setCurrentProfile: (id) => {
+        set({ currentProfileId: id });
       },
 
       getCurrentProfile: () => {
@@ -93,72 +266,32 @@ export const useProfilesStore = create<ProfilesState>()(
           : null;
       },
 
-      updateCurrentProfile: (updates) => {
+      updateCurrentProfile: async (updates) => {
         const { currentProfileId } = get();
-        if (!currentProfileId) return;
+        if (!currentProfileId) return null;
 
-        set((state) => ({
-          ...state,
-          profiles: state.profiles.map((profile) =>
-            profile.id === currentProfileId
-              ? { ...profile, ...updates, lastLogin: new Date() }
-              : profile,
-          ),
-        }));
+        return get().updateProfile(currentProfileId, updates);
       },
 
-      fetchProfile: async () => {
-        try {
-          // Fetch from secure API
-          const res = await fetch('/api/auth/user');
-          if (!res.ok) return;
-          const data = await res.json();
-
-          if (data.success && data.data.profile) {
-            const profile = data.data.profile;
-            // Note: API returns snake_case from DB, need to map if necessary
-            // Assuming the API returns matching structure or we map it here
-            // But UserProfile interface uses camelCase.
-            // Let's assume for now we trust the structure or the API helps us.
-            // Actually, app/api/auth/user returns the raw DB row which is snake_case.
-            // We need to map it.
-
-            const mappedProfile: Partial<UserProfile> = {
-              id: profile.id,
-              email: profile.email,
-              name: profile.full_name,
-              studentId: profile.student_id,
-              // Add other fields as needed
-            };
-
-            set((state) => {
-              // Determine if we need to add or update
-              const existingIndex = state.profiles.findIndex((p) => p.id === profile.id);
-              if (existingIndex >= 0) {
-                const newProfiles = [...state.profiles];
-                newProfiles[existingIndex] = { ...newProfiles[existingIndex], ...mappedProfile };
-                return { ...state, profiles: newProfiles };
-              }
-              // If completely new, might need full object.
-              // For now, let's just update if exists or log warning if not found
-              return state;
-            });
-          }
-        } catch (e) {
-          console.error('Failed to fetch profile', e);
-        }
+      clearProfiles: () => {
+        set({
+          profiles: [],
+          currentProfileId: null,
+          hasLoaded: false,
+        });
       },
     }),
     {
       name: 'profiles-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        ...state,
         profiles: state.profiles.map((p) => ({
           ...p,
-          studentId: '', // SECURITY: Don't persist sensitive PII
-          email: '', // SECURITY: Don't persist sensitive PII
+          // SECURITY: Don't persist sensitive PII to localStorage
+          studentId: '',
+          email: '',
         })),
+        currentProfileId: state.currentProfileId,
       }),
     },
   ),

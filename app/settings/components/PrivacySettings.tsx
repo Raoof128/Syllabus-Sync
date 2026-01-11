@@ -11,11 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Shield, Download, Eye, EyeOff, Loader2, AlertTriangle } from 'lucide-react';
+import { Shield, Download, Eye, EyeOff, Loader2, AlertTriangle, Trash2 } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { toastUtils } from '@/lib/utils/toast';
+import { clearAllApplicationData } from '@/lib/utils/clientStorage';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import type { Unit, Deadline, SessionInfo, PasswordStrength } from '@/lib/types';
@@ -86,6 +87,9 @@ const PrivacySettings = memo(
     const [showSessionsDialog, setShowSessionsDialog] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
     const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+    const [showClearDataDialog, setShowClearDataDialog] = useState(false);
+    const [clearDataConfirmation, setClearDataConfirmation] = useState('');
+    const [isClearingData, setIsClearingData] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -287,6 +291,44 @@ const PrivacySettings = memo(
       setShowExportDialog(true);
     }, []);
 
+    const openClearDataDialog = useCallback(() => {
+      setClearDataConfirmation('');
+      setShowClearDataDialog(true);
+    }, []);
+
+    const handleClearAllData = useCallback(async () => {
+      if (clearDataConfirmation !== 'CLEAR') {
+        toastUtils.error(t('settingsError'), t('clearDataConfirmRequired'));
+        return;
+      }
+
+      setIsClearingData(true);
+
+      try {
+        // Clear all client-side storage
+        clearAllApplicationData();
+
+        // Close dialog and show success
+        setShowClearDataDialog(false);
+        setClearDataConfirmation('');
+        toastUtils.success(t('clearAllData'), t('preferenceUpdated'));
+
+        // Reload the page to reset all stores
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } catch (error) {
+        errorHandler.logError(
+          error instanceof Error ? error : new Error('Failed to clear data'),
+          'Settings Clear Data',
+          'high',
+        );
+        toastUtils.error(t('settingsError'), t('preferenceError'));
+      } finally {
+        setIsClearingData(false);
+      }
+    }, [clearDataConfirmation, t]);
+
     return (
       <>
         {/* Security Shield Liquid Glass Variant */}
@@ -382,6 +424,25 @@ const PrivacySettings = memo(
                   >
                     <Download className="h-4 w-4 mr-2" aria-hidden="true" />
                     {t('export')}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Clear All Data */}
+              <div className="p-3 bg-mq-error/5 backdrop-blur-sm rounded-mq-lg border border-mq-error/20 hover:border-mq-error/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-mq-content">{t('clearAllData')}</h3>
+                    <p className="text-mq-sm text-mq-content-secondary">{t('clearAllDataDesc')}</p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={openClearDataDialog}
+                    data-testid="clear-data-button"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                    {t('clearData')}
                   </Button>
                 </div>
               </div>
@@ -658,6 +719,81 @@ const PrivacySettings = memo(
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Clear All Data Confirmation Dialog */}
+        <Dialog open={showClearDataDialog} onOpenChange={setShowClearDataDialog}>
+          <DialogContent className="sm:max-w-md" data-testid="clear-data-dialog">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-mq-error">
+                <AlertTriangle className="h-5 w-5" aria-hidden="true" />
+                {t('clearAllDataTitle')}
+              </DialogTitle>
+              <DialogDescription>{t('clearAllDataDialogDesc')}</DialogDescription>
+            </DialogHeader>
+
+            {/* Warning about data loss */}
+            <div className="flex items-start gap-3 p-3 bg-mq-error/10 border border-mq-error/20 rounded-mq-lg">
+              <AlertTriangle
+                className="h-5 w-5 text-mq-error flex-shrink-0 mt-0.5"
+                aria-hidden="true"
+              />
+              <div className="space-y-1">
+                <p className="text-mq-sm font-medium text-mq-error">{t('warning')}</p>
+                <p className="text-mq-sm text-mq-content-secondary">
+                  {t('clearDataSummary', {
+                    units: units.length,
+                    deadlines: deadlines.length,
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Confirmation input */}
+            <div className="space-y-2">
+              <label htmlFor="clear-data-confirm" className="text-sm font-medium text-mq-content">
+                {t('clearDataConfirmPlaceholder')}
+              </label>
+              <input
+                id="clear-data-confirm"
+                type="text"
+                value={clearDataConfirmation}
+                onChange={(e) => setClearDataConfirmation(e.target.value.toUpperCase())}
+                className="w-full px-3 py-2 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-error"
+                placeholder="CLEAR"
+                autoComplete="off"
+                data-testid="clear-data-confirm-input"
+              />
+            </div>
+
+            <DialogFooter className="flex justify-end gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => setShowClearDataDialog(false)}
+                disabled={isClearingData}
+              >
+                {t('cancel')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleClearAllData}
+                disabled={isClearingData || clearDataConfirmation !== 'CLEAR'}
+                data-testid="confirm-clear-data-button"
+              >
+                {isClearingData ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+                    {t('loading')}
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
+                    {t('clearData')}
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </>

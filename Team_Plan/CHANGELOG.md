@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0-rc.1] - 2026-01-11
+
+### Release Candidate 1 - Production Ready Audit
+
+**Summary:** Comprehensive code audit and enterprise hardening for v1.0.0 release. All major features complete, Supabase integration verified, and production-ready utilities added.
+
+### Added
+
+#### API Retry Integration (Raouf)
+
+- Integrated `withRetry()` from `lib/utils/retry.ts` into `apiRequest()` in `lib/utils/api.ts`
+- Automatic retry on network errors and 5xx server errors (up to 3 attempts with exponential backoff)
+- NO retry on 4xx client errors (auth failures, validation errors)
+- Added `ApiRequestOptions` interface with `noRetry` and `maxRetries` options
+- Unwraps `RetryError` to return original error message
+
+**Files Changed:**
+- `lib/utils/api.ts` - Added retry integration
+
+#### Profiles API Endpoint (Raouf)
+
+- Created new **GET /api/profiles** endpoint to fetch current user's profile from Supabase
+- Created new **PUT /api/profiles** endpoint to update profile (only `full_name` and `avatar_url` allowed)
+- Protected fields (email, student_id) enforced by database trigger
+- Uses Zod validation for input sanitization
+
+**Files Created:**
+- `app/api/profiles/route.ts` - Profile CRUD API
+
+#### Clear Data Button in Settings (Raouf)
+
+- Added new "Clear All Data" section in PrivacySettings with destructive red styling
+- Confirmation dialog requiring user to type "CLEAR" to proceed
+- Uses `clearAllApplicationData()` from `lib/utils/clientStorage.ts`
+- Shows warning with count of units/deadlines to be deleted
+- Reloads page after clearing to reset all Zustand stores
+
+**Files Changed:**
+- `app/settings/components/PrivacySettings.tsx` - Added Clear Data UI
+
+### Changed
+
+#### ProfilesStore Supabase Integration (Raouf)
+
+- Complete rewrite with proper Supabase integration
+- `fetchProfile()` - Fetches from `/api/profiles`, maps snake_case DB to camelCase client
+- `updateProfile()` - Optimistic updates with API sync for server-synced fields
+- `addProfile()` / `deleteProfile()` - Kept as local-only operations (used by manage-profiles page)
+- Added `DbProfile` interface for database schema
+- Added `mapDbToClient()` and `mapClientToDb()` helper functions
+- Added `isLoading` and `hasLoaded` state for proper loading indicators
+
+**Files Changed:**
+- `lib/store/profilesStore.ts` - Supabase integration rewrite
+
+### Verification
+
+- **i18n Status:** English has 1166 translation keys (source of truth), all 18 other locales have 1124 keys (42 keys pending translation for newer features)
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass
+
+---
+
 ## [0.14.37] - 2026-01-11
 
 ### Fixed
