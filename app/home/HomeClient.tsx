@@ -6,45 +6,23 @@ import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
-import dynamic from 'next/dynamic';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
 import { motion } from 'framer-motion';
 
-// Loading skeleton component for dynamic imports (static, no hooks)
-const FormLoadingSkeleton = () => (
-  <div className="flex items-center justify-center p-8">
-    <p className="text-mq-content animate-pulse">Loading...</p>
-  </div>
-);
 
-// Dynamically import forms for better code splitting
-const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
-  loading: FormLoadingSkeleton,
-});
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, TrendingUp, ExternalLink } from 'lucide-react'; // Clock removed
+import { Info, Plus, BookOpen, TrendingUp, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
-import { toastUtils } from '@/lib/utils/toast';
-import { errorHandler } from '@/lib/utils/errorHandling';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { Unit } from '@/lib/types';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 
@@ -66,7 +44,6 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
 
   const units = useUnitsStore((state) => state.units);
   const addUnit = useUnitsStore((state) => state.addUnit);
-  const removeUnit = useUnitsStore((state) => state.removeUnit);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
@@ -125,22 +102,6 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   });
 
   const hasSeededRef = useRef(false);
-  const announcementTimersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
-  const [unitFormOpen, setUnitFormOpen] = useState(false);
-  const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
-  const [deleteUnitConfirm, setDeleteUnitConfirm] = useState<Unit | null>(null);
-
-  // Live region for screen reader announcements
-  const [announcements, setAnnouncements] = useState<string[]>([]);
-
-  // Cleanup announcement timers on unmount
-  useEffect(() => {
-    const timers = announcementTimersRef.current;
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer));
-      timers.clear();
-    };
-  }, []);
 
   // Load sample data on first visit with comprehensive validation
   useEffect(() => {
@@ -210,8 +171,8 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   // Listen for custom events from child components and keyboard shortcuts
   useEffect(() => {
     const handleAddUnitEvent = () => {
-      setEditingUnit(null);
-      setUnitFormOpen(true);
+      // Navigate to calendar page where units can be managed
+      window.location.href = '/calendar';
     };
 
     const handleAddDeadlineEvent = () => {
@@ -226,7 +187,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
         return;
       }
 
-      // Ctrl/Cmd + U for Add Unit
+      // Ctrl/Cmd + U for Add Unit - navigate to calendar
       if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
         e.preventDefault();
         handleAddUnitEvent();
@@ -361,17 +322,6 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
     );
   }
 
-  // Function to announce actions to screen readers
-  const announceToScreenReader = (message: string) => {
-    const timestamp = Date.now();
-    setAnnouncements((prev) => [...prev, `${timestamp}: ${message}`]);
-    // Clear old announcements after 5 seconds
-    const timer = setTimeout(() => {
-      setAnnouncements((prev) => prev.filter((ann) => !ann.startsWith(`${timestamp}:`)));
-      announcementTimersRef.current.delete(timer);
-    }, 5000);
-    announcementTimersRef.current.add(timer);
-  };
 
   const stressColors = {
     Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
@@ -385,49 +335,9 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
     High: '😰',
   };
 
-  const handleAddUnit = () => {
-    setEditingUnit(null);
-    setUnitFormOpen(true);
-  };
-
-  const handleEditUnit = (unit: Unit) => {
-    setEditingUnit(unit);
-    setUnitFormOpen(true);
-  };
-
-  const handleDeleteUnit = (unit: Unit) => {
-    setDeleteUnitConfirm(unit);
-  };
-
-  const confirmDeleteUnit = () => {
-    if (deleteUnitConfirm) {
-      try {
-        removeUnit(deleteUnitConfirm.id);
-        const successMessage = `${deleteUnitConfirm.code} - ${deleteUnitConfirm.name} ${t('unitDeletedMsg')}`;
-        toastUtils.success(t('unitDeleted'), successMessage);
-        announceToScreenReader(successMessage);
-      } catch (error) {
-        const errorMessage = t('deleteFailedMsg');
-        errorHandler.logError(
-          error instanceof Error ? error : new Error('Failed to delete unit'),
-          'Home Delete Unit',
-          'medium',
-        );
-        toastUtils.error(t('deleteFailed'), errorMessage);
-        announceToScreenReader(errorMessage);
-      }
-      setDeleteUnitConfirm(null);
-    }
-  };
 
   return (
     <div className="home-page">
-      {/* Screen reader announcements */}
-      <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {announcements.map((announcement, index) => (
-          <div key={index}>{announcement.split(': ').slice(1).join(': ')}</div>
-        ))}
-      </div>
 
       {/* Header */}
       <ScrollReveal>
@@ -496,7 +406,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
         </ScrollReveal>
       </section>
 
-      {/* My Units Section */}
+      {/* My Units Section - READ ONLY on Home page */}
       <ScrollReveal delay={0.3} staggerChildren={0.1}>
         <section aria-labelledby="units-section-heading" className="mb-6">
           <MagicCard isLiquidEnhanced>
@@ -531,9 +441,11 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                       <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
                         {t('addFirstUnitDesc')}
                       </p>
-                      <Button onClick={handleAddUnit} className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        {t('addYourFirstUnit')}
+                      <Button asChild className="gap-2">
+                        <Link href="/calendar">
+                          <Plus className="h-4 w-4" />
+                          {t('addYourFirstUnit')}
+                        </Link>
                       </Button>
                     </div>
                   ) : (
@@ -562,7 +474,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                         </div>
                       </div>
 
-                      {/* Units Grid */}
+                      {/* Units Grid - READ ONLY (no edit/delete) */}
                       <motion.div
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
                         variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
@@ -575,8 +487,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                           >
                             <UnitCard
                               unit={unit}
-                              onEdit={handleEditUnit}
-                              onDelete={handleDeleteUnit}
+                              showActions={false}
                             />
                           </motion.div>
                         ))}
@@ -599,33 +510,6 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
           <EventsFeed />
         </section>
       </ScrollReveal>
-
-      {/* Unit Form Dialog */}
-      <UnitForm open={unitFormOpen} onOpenChange={setUnitFormOpen} editUnit={editingUnit} />
-
-      {/* Delete Unit Confirmation Dialog */}
-      <Dialog open={!!deleteUnitConfirm} onOpenChange={() => setDeleteUnitConfirm(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('deleteUnit')}</DialogTitle>
-            <DialogDescription>
-              {t('deleteUnitConfirm')}{' '}
-              <strong>
-                {deleteUnitConfirm?.code} - {deleteUnitConfirm?.name}
-              </strong>
-              ? {t('deleteUnitConfirmEnd')}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2">
-            <Button variant="secondary" onClick={() => setDeleteUnitConfirm(null)}>
-              {t('cancel')}
-            </Button>
-            <Button variant="destructive" onClick={confirmDeleteUnit}>
-              {t('delete')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

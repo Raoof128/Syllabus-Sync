@@ -14,6 +14,7 @@ import {
   ChevronRight,
   GraduationCap,
   PartyPopper,
+  Trash2,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -151,12 +152,99 @@ function getTimePositionAndHeight(
   return { top, height };
 }
 
+// Interface for calendar items with time info
+interface CalendarItem {
+  id: string;
+  startHour: number;
+  startMin: number;
+  endHour: number;
+  endMin: number;
+  type: 'unit' | 'deadline' | 'event';
+  data: unknown;
+}
+
+// Calculate overlapping groups for collision detection
+function calculateOverlapGroups(
+  items: CalendarItem[],
+): Map<string, { column: number; totalColumns: number }> {
+  if (items.length === 0) return new Map();
+
+  // Sort items by start time
+  const sortedItems = [...items].sort((a, b) => {
+    const aStart = a.startHour * 60 + a.startMin;
+    const bStart = b.startHour * 60 + b.startMin;
+    return aStart - bStart;
+  });
+
+  const result = new Map<string, { column: number; totalColumns: number }>();
+  const groups: CalendarItem[][] = [];
+
+  // Group overlapping items
+  for (const item of sortedItems) {
+    const itemStart = item.startHour * 60 + item.startMin;
+
+    // Find a group that this item overlaps with
+    let foundGroup = false;
+    for (const group of groups) {
+      const groupEnd = Math.max(...group.map((g) => g.endHour * 60 + g.endMin));
+      if (itemStart < groupEnd) {
+        // Overlaps with this group
+        group.push(item);
+        foundGroup = true;
+        break;
+      }
+    }
+
+    if (!foundGroup) {
+      groups.push([item]);
+    }
+  }
+
+  // Assign columns within each group
+  for (const group of groups) {
+    const columns: CalendarItem[][] = [];
+
+    for (const item of group) {
+      const itemStart = item.startHour * 60 + item.startMin;
+
+      // Find the first column where this item doesn't overlap
+      let placed = false;
+      for (let col = 0; col < columns.length; col++) {
+        const colItems = columns[col];
+        const lastItem = colItems[colItems.length - 1];
+        const lastEnd = lastItem.endHour * 60 + lastItem.endMin;
+
+        if (itemStart >= lastEnd) {
+          colItems.push(item);
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        columns.push([item]);
+      }
+    }
+
+    // Assign column info to each item in the group
+    const totalColumns = columns.length;
+    for (let col = 0; col < columns.length; col++) {
+      for (const item of columns[col]) {
+        result.set(item.id, { column: col, totalColumns });
+      }
+    }
+  }
+
+  return result;
+}
+
 export default function CalendarClient() {
   const router = useRouter();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const userEvents = useEventsStore((state) => state.events);
   const units = useUnitsStore((state) => state.units);
+  const removeUnit = useUnitsStore((state) => state.removeUnit);
 
   const hasHydrated = useHydration();
   const { t } = useTranslation();
@@ -241,6 +329,21 @@ export default function CalendarClient() {
   const openAddUnit = () => {
     setEditingUnit(null);
     setUnitDialogOpen(true);
+  };
+
+  const openEditUnit = (unit: Unit) => {
+    setEditingUnit(unit);
+    setUnitDialogOpen(true);
+  };
+
+  const handleDeleteUnit = (unit: Unit) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${unit.code} - ${unit.name}? This cannot be undone.`,
+      )
+    ) {
+      removeUnit(unit.id);
+    }
   };
 
   // Filter deadlines by type
@@ -390,6 +493,65 @@ export default function CalendarClient() {
                         units: dayUnits,
                       } = getItemsForDay(day);
 
+                      // Build calendar items for collision detection
+                      const calendarItems: CalendarItem[] = [];
+
+                      // Add units
+                      dayUnits.forEach((unitData) => {
+                        const schedule = unitData.schedule;
+                        const timeInfo = parseTimeRange(
+                          `${schedule.startTime} - ${schedule.endTime}`,
+                        );
+                        if (timeInfo) {
+                          calendarItems.push({
+                            id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
+                            startHour: timeInfo.startHour,
+                            startMin: timeInfo.startMin,
+                            endHour: timeInfo.endHour,
+                            endMin: timeInfo.endMin,
+                            type: 'unit',
+                            data: unitData,
+                          });
+                        }
+                      });
+
+                      // Add deadlines
+                      dayDeadlines.forEach((deadline) => {
+                        const dueDate = new Date(deadline.dueDate);
+                        const hours = getHours(dueDate);
+                        const minutes = getMinutes(dueDate);
+                        if (hours >= START_HOUR) {
+                          calendarItems.push({
+                            id: `deadline-${deadline.id}`,
+                            startHour: hours,
+                            startMin: minutes,
+                            endHour: hours + 1,
+                            endMin: minutes,
+                            type: 'deadline',
+                            data: deadline,
+                          });
+                        }
+                      });
+
+                      // Add events
+                      dayEvents.forEach((event) => {
+                        const timeInfo = parseTimeRange(event.time);
+                        if (timeInfo) {
+                          calendarItems.push({
+                            id: `event-${event.id}`,
+                            startHour: timeInfo.startHour,
+                            startMin: timeInfo.startMin,
+                            endHour: timeInfo.endHour,
+                            endMin: timeInfo.endMin,
+                            type: 'event',
+                            data: event,
+                          });
+                        }
+                      });
+
+                      // Calculate overlap groups
+                      const overlapInfo = calculateOverlapGroups(calendarItems);
+
                       return (
                         <div
                           key={day.toISOString()}
@@ -412,6 +574,15 @@ export default function CalendarClient() {
                             );
                             if (!posInfo) return null;
 
+                            // Get overlap info for this item
+                            const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
+                            const overlap = overlapInfo.get(itemId) || {
+                              column: 0,
+                              totalColumns: 1,
+                            };
+                            const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                            const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
                             // Format time for display (e.g., "9:00 AM")
                             const formatTime = (time: string) => {
                               const [h, m] = time.split(':').map(Number);
@@ -423,10 +594,12 @@ export default function CalendarClient() {
                             return (
                               <div
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                className="absolute left-1 right-1 rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                                 style={{
                                   top: posInfo.top,
                                   height: posInfo.height,
+                                  left,
+                                  width,
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
@@ -488,18 +661,27 @@ export default function CalendarClient() {
                               );
                             }
 
+                            // Get overlap info for this item
+                            const itemId = `deadline-${deadline.id}`;
+                            const overlap = overlapInfo.get(itemId) || {
+                              column: 0,
+                              totalColumns: 1,
+                            };
+                            const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                            const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
                             return (
                               <button
                                 key={deadline.id}
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
-                                  'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
+                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
                                   colors.bg,
                                   colors.text,
                                   colors.border,
                                   deadline.completed && 'opacity-50 line-through',
                                 )}
-                                style={{ top: posInfo.top, height: posInfo.height }}
+                                style={{ top: posInfo.top, height: posInfo.height, left, width }}
                                 title={`${deadline.type}: ${deadline.title} @ ${format(dueDate, 'h:mm a')}`}
                               >
                                 <span className="block truncate">{deadline.title}</span>
@@ -561,17 +743,31 @@ export default function CalendarClient() {
                               );
                             }
 
+                            // Get overlap info for this item
+                            const itemId = `event-${event.id}`;
+                            const overlap = overlapInfo.get(itemId) || {
+                              column: 0,
+                              totalColumns: 1,
+                            };
+                            const evtWidth = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                            const evtLeft = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
                             return (
                               <button
                                 key={event.id}
                                 onClick={() => handleEventClick(event)}
                                 className={cn(
-                                  'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
+                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
                                   colors.bg,
                                   colors.text,
                                   'border-green-700',
                                 )}
-                                style={{ top: posInfo.top, height: posInfo.height }}
+                                style={{
+                                  top: posInfo.top,
+                                  height: posInfo.height,
+                                  left: evtLeft,
+                                  width: evtWidth,
+                                }}
                                 title={`Event: ${event.title} @ ${event.time}`}
                               >
                                 <span className="block truncate">{event.title}</span>
@@ -853,6 +1049,22 @@ export default function CalendarClient() {
                             <p className="text-xs text-mq-content-secondary truncate">
                               {unit.name}
                             </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => openEditUnit(unit)}
+                              className="p-1 hover:bg-mq-hover-background rounded"
+                              title={`Edit ${unit.code}`}
+                            >
+                              <Edit2 className="h-4 w-4 text-mq-content-secondary" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUnit(unit)}
+                              className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded"
+                              title={`Delete ${unit.code}`}
+                            >
+                              <Trash2 className="h-4 w-4 text-mq-content-secondary hover:text-red-500" />
+                            </button>
                           </div>
                         </div>
                       ))}
