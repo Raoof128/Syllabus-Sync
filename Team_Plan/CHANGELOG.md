@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.37] - 2026-01-11
+
+### Fixed
+
+#### OpenCode MCP File System Configuration (Pouya)
+
+**Summary:** Fixed OpenCode file system MCP server not working due to incorrect path configuration from remote/enterprise config.
+
+**Problem:**
+- The `filesystem` MCP server was failing with "MCP error -32000: Connection closed"
+- Remote config was using path `/Users/raoof.r12` which doesn't exist on this machine
+- Actual home directory is `/Users/pouya`
+
+**Solution:**
+- Created global OpenCode config at `~/.config/opencode/config.json`
+- Added new `fs` MCP server with correct path to bypass remote config conflict
+- Configuration uses `npx -y @modelcontextprotocol/server-filesystem /Users/pouya`
+
+**Note:** This is a local machine configuration change, not committed to the repository.
+
+---
+
 ## [0.14.36] - 2026-01-11
 
 ### Fixed

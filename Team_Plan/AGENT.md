@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.36 | Last Updated: January 11, 2026
+Version: 0.14.37 | Last Updated: January 11, 2026
 
 ---
 
@@ -57,6 +57,49 @@ Version: 0.14.36 | Last Updated: January 11, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ OpenCode MCP File System Configuration Fix v0.14.37 (Pouya)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Fixed OpenCode file system MCP server not working due to incorrect path configuration
+- **Summary:** Diagnosed and resolved MCP server connection failure caused by remote config overriding local settings with wrong home directory path
+
+**Problem:**
+- OpenCode `filesystem` MCP server was failing with error: "MCP error -32000: Connection closed"
+- Running `opencode mcp list` showed the server was configured with path `/Users/raoof.r12` which doesn't exist on this machine
+- The actual home directory is `/Users/pouya`
+- A remote/enterprise config was overriding local settings
+
+**Solution:**
+- Created/updated global OpenCode config at `~/.config/opencode/config.json`
+- Instead of trying to override the broken `filesystem` server from remote config, created a new MCP server named `fs` with the correct path
+- This workaround bypasses the remote config conflict
+
+**Final Configuration (`/Users/pouya/.config/opencode/config.json`):**
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "fs": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/pouya"
+      ],
+      "enabled": true
+    }
+  }
+}
+```
+
+**Verification:**
+- `fs` MCP server now working correctly
+- File system access to `/Users/pouya` confirmed operational
+
+**Note:** This is a local machine configuration change, not a project file change.
+
+---
 
 #### ✅ Navigation GPS Accuracy Fix v0.14.36 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)

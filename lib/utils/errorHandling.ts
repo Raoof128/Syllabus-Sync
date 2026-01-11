@@ -125,11 +125,49 @@ export class AppErrorHandler {
   }
 
   private reportToService(error: AppError, severity: ErrorSeverity): void {
-    // Placeholder for error reporting service integration
-    // In a real app, this would send to Sentry, LogRocket, etc.
+    // ==========================================================================
+    // ERROR REPORTING SERVICE INTEGRATION
+    // ==========================================================================
+    // To enable production error tracking:
+    //
+    // 1. SENTRY (Recommended):
+    //    npm install @sentry/nextjs
+    //    Then uncomment:
+    //    import * as Sentry from '@sentry/nextjs';
+    //    Sentry.captureException(new Error(error.message), {
+    //      level: severity === 'high' ? 'error' : severity === 'medium' ? 'warning' : 'info',
+    //      tags: { context: error.context },
+    //      extra: error.details,
+    //    });
+    //
+    // 2. LOGROCKET:
+    //    npm install logrocket
+    //    import LogRocket from 'logrocket';
+    //    LogRocket.captureException(new Error(error.message), { extra: error });
+    //
+    // 3. Custom endpoint:
+    //    fetch('/api/errors', { method: 'POST', body: JSON.stringify(error) });
+    // ==========================================================================
 
-    // For now, just store in localStorage in development
-    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isBrowser = typeof window !== 'undefined';
+
+    // In production, log high-severity errors to console (picked up by Vercel logs)
+    if (isProduction && severity === 'high') {
+      console.error(
+        '[ERROR_REPORT]',
+        JSON.stringify({
+          code: error.code,
+          message: error.message,
+          context: error.context,
+          timestamp: error.timestamp,
+          // Don't log stack traces to production logs for security
+        }),
+      );
+    }
+
+    // In development, store errors locally for debugging
+    if (!isProduction && isBrowser) {
       try {
         const existingErrors = JSON.parse(localStorage.getItem('appErrors') || '[]');
         existingErrors.unshift({

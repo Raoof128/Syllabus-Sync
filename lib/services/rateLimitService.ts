@@ -185,10 +185,11 @@ function getStore(): RateLimitStore {
   // SECURITY: In production, require Redis - don't fall back to memory store
   // Memory store is useless in serverless environments (each instance has its own memory)
   if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'SECURITY ERROR: Rate limiting requires Redis in production. ' +
-        'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN, ' +
-        'or KV_REST_API_URL and KV_REST_API_TOKEN for Vercel KV.',
+    console.error(
+      '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
+        'In-memory rate limiting does NOT work across serverless instances.\n' +
+        'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for proper rate limiting.\n' +
+        'Security-critical endpoints (login, signup, password reset) will fail-closed.',
     );
   }
 
@@ -223,6 +224,22 @@ export async function checkRateLimit(
     ? `ratelimit:${config.prefix}:${identifier}`
     : `ratelimit:${identifier}`;
   const now = Date.now();
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isMemoryStore = store instanceof MemoryStore;
+
+  // SECURITY: In production with memory store, fail-closed for security-critical endpoints
+  // This prevents bypass attacks when Redis is not configured
+  if (isProduction && isMemoryStore && config.failClosed) {
+    console.error(
+      `SECURITY: Blocking ${config.prefix} request - no distributed rate limiting in production`,
+    );
+    return {
+      allowed: false,
+      remaining: 0,
+      resetIn: 60,
+      limit: config.maxRequests,
+    };
+  }
 
   try {
     const data = await store.increment(key, config.windowMs);
