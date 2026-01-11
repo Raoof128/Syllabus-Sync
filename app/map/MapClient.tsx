@@ -47,6 +47,7 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import {
   buildings,
   getBuildingById,
+  searchBuildings,
   BuildingCategory,
   BUILDING_CATEGORY_LABELS,
 } from '@/lib/map/buildings';
@@ -179,24 +180,12 @@ export default function MapClient() {
 
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
-    let result = [...buildings];
+    // Use searchBuildings from buildings.ts to avoid duplicating filter logic
+    let result = buildingSearch.trim() ? searchBuildings(buildingSearch) : [...buildings];
 
     // Apply category filter
     if (categoryFilter !== 'all') {
       result = result.filter((b) => b.category === categoryFilter);
-    }
-
-    // Apply search filter
-    if (buildingSearch.trim()) {
-      const query = buildingSearch.toLowerCase();
-      result = result.filter(
-        (b) =>
-          b.name.toLowerCase().includes(query) ||
-          b.id.toLowerCase().includes(query) ||
-          b.tags?.some((tag) => tag.toLowerCase().includes(query)) ||
-          b.description?.toLowerCase().includes(query) ||
-          b.address?.toLowerCase().includes(query),
-      );
     }
 
     return result;

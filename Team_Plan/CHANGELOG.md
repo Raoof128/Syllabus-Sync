@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.14.35] - 2026-01-11
+
+### Changed
+
+#### Map Page Full Audit & Improvements (Raouf)
+
+**Summary:** Comprehensive code quality improvements to the map page, reducing duplication and improving maintainability.
+
+**Changes:**
+
+1. **Code Duplication Fix (MapClient.tsx):**
+   - Replaced duplicated filter logic with `searchBuildings()` from `lib/map/buildings.ts`
+   - Now also includes `gridRef` matching that was previously missing
+
+2. **Navigation Panel Refactor (CampusMap.tsx):**
+   - Eliminated ~200 lines of duplicate light/dark mode JSX
+   - Replaced ALL inline `style={{ }}` props with Tailwind utility classes (`bg-mq-*`, `text-mq-*`, `border-mq-*`)
+   - Single unified component using `dark:` prefixes
+
+3. **New Hook: `useLeafletLoader` (lib/hooks/useLeafletLoader.ts):**
+   - Extracted Leaflet loading boilerplate from CampusMap (~110 lines)
+   - Handles CSS imports, module loading, icon fixing
+   - Isolates all `as unknown as` type assertions
+   - Returns: `{ leafletModule, reactLeafletModule, isClientReady, mapKey, isMountedRef }`
+
+4. **New Utility: `mapUtils.ts` (lib/map/mapUtils.ts):**
+   - `generateMarkerSvgDataUrl()` - Creates SVG marker as data URL
+   - `createMarkerIcon()` - Creates Leaflet Icon instance
+   - `createUserLocationIcon()` - Creates pulsing user location marker
+   - Exports `MARKER_COLORS` and `MARKER_DIMENSIONS` constants
+
+5. **New Types: `leafletTypes.ts` (lib/map/leafletTypes.ts):**
+   - Type definitions for Leaflet module, map, marker, icons, coordinates
+
+**Files Created:**
+- `lib/hooks/useLeafletLoader.ts`
+- `lib/map/mapUtils.ts`
+- `lib/map/leafletTypes.ts`
+
+**Files Changed:**
+- `app/map/CampusMap.tsx`
+- `app/map/MapClient.tsx`
+
+**Verification:**
+- `npm run prepush`: All 275 tests pass, 0 lint errors, build success
+
+---
+
 ## [0.14.34] - 2026-01-11
 
 ### Fixed

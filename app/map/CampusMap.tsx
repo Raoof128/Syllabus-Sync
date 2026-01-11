@@ -9,9 +9,11 @@ import {
   formatDuration,
   openBestNavApp,
 } from '@/lib/map/navigationHelpers';
+import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
 import { fetchORSRoute } from '@/lib/services/ors';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useLeafletLoader } from '@/lib/hooks/useLeafletLoader';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { devLog } from '@/lib/utils/devLog';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -84,28 +86,18 @@ export default function CampusMap({
   const { t } = useTranslation();
 
   // ============================================
-  // LEAFLET MODULE STATE - Loaded dynamically on client only
+  // LEAFLET MODULE - Loaded dynamically via custom hook
   // ============================================
-  const [leafletModule, setLeafletModule] = useState<typeof import('leaflet') | null>(null);
-  const [reactLeafletModule, setReactLeafletModule] = useState<{
-    MapContainer: typeof import('react-leaflet').MapContainer;
-    Marker: typeof import('react-leaflet').Marker;
-    Popup: typeof import('react-leaflet').Popup;
-    Polyline: typeof import('react-leaflet').Polyline;
-    useMap: typeof import('react-leaflet').useMap;
-    useMapEvents: typeof import('react-leaflet').useMapEvents;
-  } | null>(null);
+  const { leafletModule, reactLeafletModule, isClientReady, mapKey, isMountedRef } =
+    useLeafletLoader();
 
   // ============================================
   // COMPONENT STATE
   // ============================================
   const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
   const [pickedLocation, setPickedLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [isClientReady, setIsClientReady] = useState(false);
   const [overlaysReady, setOverlaysReady] = useState(false);
-  const [mapKey, setMapKey] = useState(0); // Key to force remount on HMR
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const isMountedRef = useRef(true);
 
   // Hybrid Navigation State
   const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
@@ -123,72 +115,10 @@ export default function CampusMap({
   const accuracyCircleRef = useRef<import('leaflet').Circle | null>(null);
   const hasSetFallbackOrigin = useRef(false);
 
-  // ============================================
-  // LOAD LEAFLET MODULES ON CLIENT SIDE ONLY
-  // ============================================
+  // Reset overlays on mount/unmount
   useEffect(() => {
-    isMountedRef.current = true;
-
-    const loadLeaflet = async () => {
-      try {
-        // Import CSS first (using dynamic import for CSS modules)
-        // @ts-expect-error - CSS imports don't have type declarations
-        await import('leaflet/dist/leaflet.css');
-        // @ts-expect-error - CSS imports don't have type declarations
-        await import('leaflet-routing-machine/dist/leaflet-routing-machine.css');
-
-        // Import Leaflet
-        const L = await import('leaflet');
-
-        // Import react-leaflet components
-        const RL = await import('react-leaflet');
-
-        if (!isMountedRef.current) return;
-
-        // Fix default marker icons
-        delete (L.default.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })
-          ._getIconUrl;
-        L.default.Icon.Default.mergeOptions({
-          iconRetinaUrl: '/images/leaflet/marker-icon-2x.png',
-          iconUrl: '/images/leaflet/marker-icon.png',
-          shadowUrl: '/images/leaflet/marker-shadow.png',
-        });
-
-        setLeafletModule(L.default as unknown as typeof import('leaflet'));
-        setReactLeafletModule({
-          MapContainer: RL.MapContainer,
-          Marker: RL.Marker,
-          Popup: RL.Popup,
-          Polyline: RL.Polyline,
-          useMap: RL.useMap,
-          useMapEvents: RL.useMapEvents,
-        });
-
-        // Generate new key to force clean mount
-        setMapKey((prev) => prev + 1);
-
-        // Small delay to ensure everything is ready
-        setTimeout(() => {
-          if (isMountedRef.current && mapContainerRef.current) {
-            setIsClientReady(true);
-          }
-        }, 100);
-      } catch (error) {
-        mapLog.log('Failed to load Leaflet modules:', error);
-        errorHandler.logError(
-          error instanceof Error ? error : new Error('Failed to load map modules'),
-          'Map Loading',
-          'medium',
-        );
-      }
-    };
-
-    loadLeaflet();
-
     return () => {
-      isMountedRef.current = false;
       setOverlaysReady(false);
-      setIsClientReady(false);
     };
   }, []);
 
@@ -267,41 +197,19 @@ export default function CampusMap({
     [],
   );
 
-  // Create marker icon
+  // Create marker icon using centralized utility
   const getMarkerIcon = useCallback(
     (isSelected: boolean) => {
       if (!leafletModule) return undefined;
-
-      const baseFill = '#a6192e';
-      const selectedFill = '#d6001c';
-      const centerFill = '#ffffff';
-      const fill = isSelected ? selectedFill : baseFill;
-
-      return new leafletModule.Icon({
-        iconUrl: `data:image/svg+xml;base64,${btoa(`
-          <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12.5 0C5.6 0 0 5.6 0 12.5c0 8.7 12.5 28.5 12.5 28.5s12.5-19.8 12.5-28.5C25 5.6 19.4 0 12.5 0z" fill="${fill}"/>
-            <circle cx="12.5" cy="12.5" r="5" fill="${centerFill}"/>
-          </svg>
-        `)}`,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowUrl: '/images/leaflet/marker-shadow.png',
-        shadowSize: [41, 41],
-      });
+      return createMarkerIcon(leafletModule, isSelected);
     },
     [leafletModule],
   );
 
+  // Create user location icon using centralized utility
   const userIcon = useMemo(() => {
     if (!leafletModule) return undefined;
-    return leafletModule.divIcon({
-      className: 'user-location-dot',
-      html: `<div class="pulse"></div>`,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8],
-    });
+    return createUserLocationIcon(leafletModule);
   }, [leafletModule]);
 
   const selectedIcon = useMemo(() => getMarkerIcon(true), [getMarkerIcon]);
@@ -327,7 +235,7 @@ export default function CampusMap({
       clearTimeout(timer);
       setOverlaysReady(false);
     };
-  }, [mapInstance, isMapReady]);
+  }, [mapInstance, isMapReady, isMountedRef]);
 
   // ============================================
   // NATIVE LEAFLET OVERLAYS - Use native API to avoid react-leaflet HMR issues
@@ -1266,105 +1174,116 @@ export default function CampusMap({
           aria-label={t('turnByTurn')}
         >
           {/* Solid opaque card - NO transparency, NO blur */}
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: 'var(--alabaster, #edeade)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            {/* Dark mode support via CSS class */}
-            <div className="dark:hidden">
-              <div
-                style={{
-                  backgroundColor: '#edeade',
-                  color: '#1a1a1a',
-                }}
-              >
-                {/* Header */}
-                <div className="p-4 border-b" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0 pr-2">
-                      <h3
-                        className="font-bold text-lg leading-tight truncate"
-                        style={{ color: '#1a1a1a' }}
-                      >
-                        {t(selectedBuilding.translationKey)}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                        <span
-                          className="text-xs font-mono px-2 py-0.5 rounded"
-                          style={{
-                            backgroundColor: 'rgba(0,0,0,0.06)',
-                            color: '#2b2b2b',
-                          }}
-                        >
-                          {selectedBuilding.id}
+          <div className="rounded-xl overflow-hidden bg-mq-background dark:bg-mq-background shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+            <div className="text-mq-content">
+              {/* Header */}
+              <div className="p-4 border-b border-mq-border">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 min-w-0 pr-2">
+                    <h3 className="font-bold text-lg leading-tight truncate text-mq-content">
+                      {t(selectedBuilding.translationKey)}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-mq-content-secondary">
+                        {selectedBuilding.id}
+                      </span>
+                      {preview && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-mq-primary/10 text-mq-primary dark:text-mq-red-bright">
+                          {t('walkingDirections')}
                         </span>
-                        {preview && (
-                          <span
-                            className="text-xs px-2 py-0.5 rounded"
-                            style={{
-                              backgroundColor: 'rgba(166,25,46,0.1)',
-                              color: '#a6192e',
-                            }}
-                          >
-                            {t('walkingDirections')}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    <button
-                      onClick={() => {
-                        setPreview(null);
-                        setRouteError(null);
-                        setRouteCoords([]);
-                      }}
-                      className="p-1.5 rounded-lg transition-colors flex-shrink-0"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}
-                      aria-label={t('close')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setPreview(null);
+                      setRouteError(null);
+                      setRouteCoords([]);
+                    }}
+                    className="p-1.5 rounded-lg transition-colors flex-shrink-0 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20"
+                    aria-label={t('close')}
+                  >
+                    <svg
+                      className="w-4 h-4 text-mq-content-secondary"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
                     >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 max-h-[calc(60vh-80px)] overflow-y-auto">
+                {isLoadingRoute ? (
+                  <div className="flex items-center justify-center py-6">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-mq-primary dark:border-mq-red-bright border-t-transparent" />
+                    <span className="ml-3 text-sm text-mq-content-secondary">{t('loading')}</span>
+                  </div>
+                ) : routeError ? (
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-lg flex items-start gap-3 bg-red-500/10 border border-red-500/20">
                       <svg
-                        className="w-4 h-4"
+                        className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
                         viewBox="0 0 24 24"
-                        style={{ color: '#4a4a44' }}
                       >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                         />
                       </svg>
+                      <p className="text-sm font-medium text-red-700 dark:text-red-300">
+                        {routeError}
+                      </p>
+                    </div>
+                    <button
+                      onClick={retryRoute}
+                      className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors bg-mq-primary dark:bg-mq-red-bright text-white hover:opacity-90"
+                    >
+                      {t('tryAgain')}
                     </button>
                   </div>
-                </div>
+                ) : (
+                  preview && (
+                    <>
+                      {/* Duration & Distance */}
+                      <div className="mb-4">
+                        <span className="text-3xl font-bold text-emerald-500">
+                          {formatDuration(preview.durationSeconds)}
+                        </span>
+                        <span className="text-sm ml-2 text-mq-content-secondary">
+                          ({formatDistance(preview.distanceMeters)})
+                        </span>
+                      </div>
 
-                {/* Content */}
-                <div className="p-4 max-h-[calc(60vh-80px)] overflow-y-auto">
-                  {isLoadingRoute ? (
-                    <div className="flex items-center justify-center py-6">
-                      <div
-                        className="animate-spin rounded-full h-6 w-6 border-2"
-                        style={{ borderColor: '#a6192e', borderTopColor: 'transparent' }}
-                      />
-                      <span className="ml-3 text-sm" style={{ color: '#4a4a44' }}>
-                        {t('loading')}
-                      </span>
-                    </div>
-                  ) : routeError ? (
-                    <div className="space-y-3">
-                      <div
-                        className="p-3 rounded-lg flex items-start gap-3"
-                        style={{
-                          backgroundColor: 'rgba(239,68,68,0.1)',
-                          border: '1px solid rgba(239,68,68,0.2)',
+                      {/* Navigate Button */}
+                      <button
+                        onClick={() => {
+                          // Use real GPS for external navigation (Google/Apple Maps)
+                          const destGps = getBuildingGps(selectedBuilding);
+                          mapLog.log('Navigate button clicked:', {
+                            buildingId: selectedBuilding.id,
+                            buildingName: selectedBuilding.name,
+                            hasStoredLocation: !!selectedBuilding.location,
+                            storedLocation: selectedBuilding.location,
+                            calculatedGps: destGps,
+                            origin,
+                          });
+                          openBestNavApp(origin, destGps);
                         }}
+                        aria-label={`${t('navigate')} ${selectedBuilding.name}`}
+                        className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2 bg-mq-primary dark:bg-mq-red-bright text-white hover:opacity-90"
                       >
+                        <span>{t('navigate')}</span>
                         <svg
-                          className="w-5 h-5 flex-shrink-0 text-red-600"
+                          className="w-4 h-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -1373,313 +1292,38 @@ export default function CampusMap({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                           />
                         </svg>
-                        <p className="text-sm font-medium text-red-700">{routeError}</p>
-                      </div>
-                      <button
-                        onClick={retryRoute}
-                        className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors"
-                        style={{ backgroundColor: '#a6192e', color: '#ffffff' }}
-                      >
-                        {t('tryAgain')}
                       </button>
-                    </div>
-                  ) : (
-                    preview && (
-                      <>
-                        {/* Duration & Distance */}
-                        <div className="mb-4">
-                          <span className="text-3xl font-bold" style={{ color: '#10b981' }}>
-                            {formatDuration(preview.durationSeconds)}
-                          </span>
-                          <span className="text-sm ml-2" style={{ color: '#4a4a44' }}>
-                            ({formatDistance(preview.distanceMeters)})
-                          </span>
-                        </div>
 
-                        {/* Navigate Button */}
-                        <button
-                          onClick={() => {
-                            // Use real GPS for external navigation (Google/Apple Maps)
-                            const destGps = getBuildingGps(selectedBuilding);
-                            mapLog.log('Navigate button clicked:', {
-                              buildingId: selectedBuilding.id,
-                              buildingName: selectedBuilding.name,
-                              hasStoredLocation: !!selectedBuilding.location,
-                              storedLocation: selectedBuilding.location,
-                              calculatedGps: destGps,
-                              origin,
-                            });
-                            openBestNavApp(origin, destGps);
-                          }}
-                          aria-label={`${t('navigate')} ${selectedBuilding.name}`}
-                          className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2"
-                          style={{ backgroundColor: '#a6192e', color: '#ffffff' }}
-                        >
-                          <span>{t('navigate')}</span>
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* Turn-by-turn */}
-                        {preview.steps.length > 0 && (
-                          <div
-                            className="pt-2 border-t"
-                            style={{ borderColor: 'rgba(0,0,0,0.08)' }}
-                          >
-                            <h4
-                              className="text-xs font-semibold uppercase tracking-wider mb-3"
-                              style={{ color: '#6d6f69' }}
-                            >
-                              {t('turnByTurn')}
-                            </h4>
-                            <div className="relative space-y-4 ml-1">
-                              <div
-                                className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full"
-                                style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-                              />
-                              {preview.steps.slice(0, 6).map((s, i) => (
-                                <div key={i} className="relative pl-6">
-                                  <div
-                                    className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 box-border"
-                                    style={{
-                                      backgroundColor: '#edeade',
-                                      borderColor: i === 0 ? '#10b981' : '#a0a29c',
-                                    }}
-                                  />
-                                  <p className="text-sm leading-snug" style={{ color: '#1a1a1a' }}>
-                                    {s.text}
-                                  </p>
-                                  <p
-                                    className="text-xs font-mono mt-0.5"
-                                    style={{ color: '#6d6f69' }}
-                                  >
-                                    {formatDistance(s.distance)}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
+                      {/* Turn-by-turn */}
+                      {preview.steps.length > 0 && (
+                        <div className="pt-2 border-t border-mq-border">
+                          <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 text-mq-content-tertiary">
+                            {t('turnByTurn')}
+                          </h4>
+                          <div className="relative space-y-4 ml-1">
+                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full bg-black/10 dark:bg-white/15" />
+                            {preview.steps.slice(0, 6).map((s, i) => (
+                              <div key={i} className="relative pl-6">
+                                <div
+                                  className={`absolute left-0 top-1 w-4 h-4 rounded-full border-2 box-border bg-mq-background ${
+                                    i === 0 ? 'border-emerald-500' : 'border-mq-content-tertiary'
+                                  }`}
+                                />
+                                <p className="text-sm leading-snug text-mq-content">{s.text}</p>
+                                <p className="text-xs font-mono mt-0.5 text-mq-content-tertiary">
+                                  {formatDistance(s.distance)}
+                                </p>
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Dark mode version */}
-            <div className="hidden dark:block">
-              <div
-                style={{
-                  backgroundColor: '#262826',
-                  color: '#edeade',
-                }}
-              >
-                {/* Header */}
-                <div className="p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0 pr-2">
-                      <h3
-                        className="font-bold text-lg leading-tight truncate"
-                        style={{ color: '#edeade' }}
-                      >
-                        {t(selectedBuilding.translationKey)}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                        <span
-                          className="text-xs font-mono px-2 py-0.5 rounded"
-                          style={{
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            color: '#c4c6c0',
-                          }}
-                        >
-                          {selectedBuilding.id}
-                        </span>
-                        {preview && (
-                          <span
-                            className="text-xs px-2 py-0.5 rounded"
-                            style={{
-                              backgroundColor: 'rgba(214,0,28,0.2)',
-                              color: '#ff6b7a',
-                            }}
-                          >
-                            {t('walkingDirections')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setPreview(null);
-                        setRouteError(null);
-                        setRouteCoords([]);
-                      }}
-                      className="p-1.5 rounded-lg transition-colors flex-shrink-0"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                      aria-label={t('close')}
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        style={{ color: '#a8aaa3' }}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4 max-h-[calc(60vh-80px)] overflow-y-auto">
-                  {isLoadingRoute ? (
-                    <div className="flex items-center justify-center py-6">
-                      <div
-                        className="animate-spin rounded-full h-6 w-6 border-2"
-                        style={{ borderColor: '#d6001c', borderTopColor: 'transparent' }}
-                      />
-                      <span className="ml-3 text-sm" style={{ color: '#a8aaa3' }}>
-                        {t('loading')}
-                      </span>
-                    </div>
-                  ) : routeError ? (
-                    <div className="space-y-3">
-                      <div
-                        className="p-3 rounded-lg flex items-start gap-3"
-                        style={{
-                          backgroundColor: 'rgba(239,68,68,0.15)',
-                          border: '1px solid rgba(239,68,68,0.3)',
-                        }}
-                      >
-                        <svg
-                          className="w-5 h-5 flex-shrink-0"
-                          fill="none"
-                          stroke="#ef4444"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                          />
-                        </svg>
-                        <p className="text-sm font-medium" style={{ color: '#fca5a5' }}>
-                          {routeError}
-                        </p>
-                      </div>
-                      <button
-                        onClick={retryRoute}
-                        className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors"
-                        style={{ backgroundColor: '#d6001c', color: '#ffffff' }}
-                      >
-                        {t('tryAgain')}
-                      </button>
-                    </div>
-                  ) : (
-                    preview && (
-                      <>
-                        {/* Duration & Distance */}
-                        <div className="mb-4">
-                          <span className="text-3xl font-bold" style={{ color: '#10b981' }}>
-                            {formatDuration(preview.durationSeconds)}
-                          </span>
-                          <span className="text-sm ml-2" style={{ color: '#a8aaa3' }}>
-                            ({formatDistance(preview.distanceMeters)})
-                          </span>
                         </div>
-
-                        {/* Navigate Button */}
-                        <button
-                          onClick={() => {
-                            // Use real GPS for external navigation (Google/Apple Maps)
-                            const destGps = getBuildingGps(selectedBuilding);
-                            openBestNavApp(origin, destGps);
-                          }}
-                          aria-label={`${t('navigate')} ${selectedBuilding.name}`}
-                          className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2"
-                          style={{ backgroundColor: '#d6001c', color: '#ffffff' }}
-                        >
-                          <span>{t('navigate')}</span>
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </button>
-
-                        {/* Turn-by-turn */}
-                        {preview.steps.length > 0 && (
-                          <div
-                            className="pt-2 border-t"
-                            style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-                          >
-                            <h4
-                              className="text-xs font-semibold uppercase tracking-wider mb-3"
-                              style={{ color: '#8a8c86' }}
-                            >
-                              {t('turnByTurn')}
-                            </h4>
-                            <div className="relative space-y-4 ml-1">
-                              <div
-                                className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full"
-                                style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-                              />
-                              {preview.steps.slice(0, 6).map((s, i) => (
-                                <div key={i} className="relative pl-6">
-                                  <div
-                                    className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 box-border"
-                                    style={{
-                                      backgroundColor: '#262826',
-                                      borderColor: i === 0 ? '#10b981' : '#6d6f69',
-                                    }}
-                                  />
-                                  <p className="text-sm leading-snug" style={{ color: '#edeade' }}>
-                                    {s.text}
-                                  </p>
-                                  <p
-                                    className="text-xs font-mono mt-0.5"
-                                    style={{ color: '#8a8c86' }}
-                                  >
-                                    {formatDistance(s.distance)}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )
-                  )}
-                </div>
+                      )}
+                    </>
+                  )
+                )}
               </div>
             </div>
           </div>

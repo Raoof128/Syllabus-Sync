@@ -64,8 +64,6 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-
-
   // Safe session refresh
   let session = null;
   try {

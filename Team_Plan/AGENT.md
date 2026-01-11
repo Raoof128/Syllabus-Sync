@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 0.14.34 | Last Updated: January 11, 2026
+Version: 0.14.35 | Last Updated: January 11, 2026
 
 ---
 
@@ -57,6 +57,57 @@ Version: 0.14.34 | Last Updated: January 11, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ Map Page Full Audit & Improvements v0.14.35 (Raouf)
+- **Date:** January 11, 2026 (Australia/Sydney)
+- **Scope:** Comprehensive audit and refactoring of the map page to improve code quality, reduce duplication, and apply design tokens
+- **Summary:** Fixed 6 identified issues including code duplication, hardcoded colors, inline styles, and extracted reusable hooks/utilities
+
+**Changes Made:**
+
+1. **Code Duplication Fix (MapClient.tsx):**
+   - Replaced duplicated filter logic with `searchBuildings()` from `lib/map/buildings.ts`
+   - Also adds `gridRef` matching that was previously missing
+
+2. **Brand Colors (CampusMap.tsx):**
+   - Updated marker icon to use `BRAND_COLORS.primary` from `lib/config.ts`
+   - Centralized color definitions in new `lib/map/mapUtils.ts`
+
+3. **Navigation Panel Refactor (CampusMap.tsx):**
+   - Eliminated ~200 lines of duplicate light/dark mode code
+   - Replaced all inline styles with Tailwind utility classes (`bg-mq-*`, `text-mq-*`, `border-mq-*`)
+   - Single unified component using `dark:` prefixes for dark mode support
+
+4. **New Hook: `useLeafletLoader` (lib/hooks/useLeafletLoader.ts):**
+   - Extracted ~65 lines of Leaflet loading boilerplate from CampusMap
+   - Handles CSS imports, module loading, icon path fixing
+   - Isolates all `as unknown as` type assertions
+   - Clean API: `{ leafletModule, reactLeafletModule, isClientReady, mapKey, isMountedRef }`
+
+5. **New Utility: `mapUtils.ts` (lib/map/mapUtils.ts):**
+   - `generateMarkerSvgDataUrl()` - Creates SVG marker as data URL
+   - `createMarkerIcon()` - Creates Leaflet Icon instance
+   - `createUserLocationIcon()` - Creates pulsing user location marker
+   - Centralized `MARKER_COLORS` and `MARKER_DIMENSIONS` constants
+
+6. **New Types: `leafletTypes.ts` (lib/map/leafletTypes.ts):**
+   - Type definitions for Leaflet module, map, marker, icons
+   - Type definitions for coordinate systems (pixel, GPS, CRS.Simple)
+   - Documentation for type-safe Leaflet usage
+
+**Files Changed:**
+- `app/map/CampusMap.tsx` - Major refactor (~200 lines reduced)
+- `app/map/MapClient.tsx` - Import + filter logic fix
+
+**Files Created:**
+- `lib/hooks/useLeafletLoader.ts` (110 lines)
+- `lib/map/mapUtils.ts` (92 lines)
+- `lib/map/leafletTypes.ts` (82 lines)
+
+**Verification:**
+- `npm run prepush`: ✅ All checks pass (275 tests, 0 lint errors, build success)
+
+---
 
 #### ✅ Settings Page NotificationSettings State Sync Fix v0.14.34 (Raouf)
 - **Date:** January 11, 2026 (Australia/Sydney)
