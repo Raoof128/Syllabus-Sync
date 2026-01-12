@@ -2,7 +2,25 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 1.0.0-rc.1 | Last Updated: January 11, 2026
+Version: 1.0.0-rc.1 | Last Updated: January 12, 2026
+
+---
+
+## 🧠 Session Start Protocol
+
+**IMPORTANT:** At the start of every session, the AI assistant MUST:
+
+1. **Read Knowledge Graph** - Use `knowledge-graph_read_graph` to load user preferences and context
+2. **Read this AGENT.md** - Understand project structure and recent changes
+3. **Check Changelogs** - Review CHANGELOG.md for recent updates
+
+**At the end of changes, update:**
+- This AGENT.md with new work log entries
+- Changelog files using template: `Raouf: [YYYY-MM-DD] - [description]`
+
+**Key User Preferences (from Knowledge Graph):**
+- No subagents - handle all tasks directly without Task tool
+- Follow raouf-change-protocol workflow
 
 ---
 

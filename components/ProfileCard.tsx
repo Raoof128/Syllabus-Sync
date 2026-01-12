@@ -16,7 +16,7 @@ interface ProfileCardProps {
   profile: UserProfile;
   isCurrent: boolean;
   onEdit: (profile: UserProfile) => void;
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
   onSetCurrent: (id: string) => void;
   onUpdate: (id: string, updates: Partial<UserProfile>) => void;
 }
@@ -127,7 +127,7 @@ const ProfileCard = React.memo(
               >
                 <Check className="w-4 h-4" />
               </Button>
-              {!isCurrent && (
+              {!isCurrent && onDelete && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -235,7 +235,7 @@ const ProfileCard = React.memo(
             </label>
           </div>
 
-          {deleteConfirm && (
+          {deleteConfirm && onDelete && (
             <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
               <p className="text-sm text-mq-error mb-3 font-medium">{t('deleteProfileConfirm')}</p>
               <div className="flex gap-2">

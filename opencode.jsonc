@@ -26,13 +26,6 @@
       "enabled": true,
     },
 
-    // Memory/Knowledge Graph (local)
-    "memory": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
-      "enabled": true,
-    },
-
     // Sequential Thinking (local)
     "sequential-thinking": {
       "type": "local",

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { User, Plus, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Users, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import { Button } from '@/components/ui/mq/button';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -27,7 +27,7 @@ import { apiRequest } from '@/lib/utils/api';
 
 export default function ManageProfilesPage() {
   const { t, language } = useTranslation();
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -36,18 +36,27 @@ export default function ManageProfilesPage() {
     course: '',
     year: '',
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   const {
     profiles,
     currentProfileId,
-    addProfile,
+    isLoading,
+    hasLoaded,
+    fetchProfile,
     updateProfile,
-    deleteProfile,
     setCurrentProfile,
   } = useProfilesStore();
 
   // Gamification store
   const { isDemo, refreshProfile, settings } = useGamificationStore();
+
+  // Fetch profile from database on mount
+  useEffect(() => {
+    if (!hasLoaded && !isLoading) {
+      fetchProfile();
+    }
+  }, [hasLoaded, isLoading, fetchProfile]);
 
   // Check if profile is complete (all required fields filled)
   const isProfileComplete = (data: typeof formData) => {
@@ -85,37 +94,6 @@ export default function ManageProfilesPage() {
     }
   };
 
-  const handleAddProfile = async () => {
-    if (formData.name && formData.email && formData.studentId) {
-      // Check if this is the first complete profile
-      const isFirstCompleteProfile = profiles.length === 0 && isProfileComplete(formData);
-
-      addProfile({
-        ...formData,
-        preferences: {
-          notifications: true,
-          emailReminders: true,
-          pushNotifications: false,
-        },
-      });
-
-      setFormData({
-        name: '',
-        email: '',
-        studentId: '',
-        course: '',
-        year: '',
-      });
-      setShowAddDialog(false);
-      toastUtils.success(t('profileCreated'), t('profileCreatedMsg'));
-
-      // Award XP for first complete profile
-      if (isFirstCompleteProfile) {
-        await awardProfileCompletionXP();
-      }
-    }
-  };
-
   const handleEditProfile = (profile: UserProfile) => {
     setEditingProfile(profile);
     setFormData({
@@ -125,48 +103,73 @@ export default function ManageProfilesPage() {
       course: profile.course,
       year: profile.year,
     });
-    setShowAddDialog(true);
+    setShowEditDialog(true);
   };
 
   const handleUpdateProfile = async () => {
-    if (editingProfile && formData.name && formData.email) {
+    if (!editingProfile || !formData.name) return;
+
+    setIsSaving(true);
+    try {
       // Check if we're completing a previously incomplete profile
       const wasIncomplete = !editingProfile.course || !editingProfile.year;
       const isNowComplete = isProfileComplete(formData);
       const shouldAwardXP = wasIncomplete && isNowComplete;
 
-      updateProfile(editingProfile.id, {
-        ...formData,
+      // Update profile in store (syncs to database)
+      const result = await updateProfile(editingProfile.id, {
+        name: formData.name,
+        studentId: formData.studentId,
+        course: formData.course,
+        year: formData.year,
         preferences: editingProfile.preferences,
       });
 
-      setEditingProfile(null);
-      setFormData({
-        name: '',
-        email: '',
-        studentId: '',
-        course: '',
-        year: '',
-      });
-      setShowAddDialog(false);
-      toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
+      if (result) {
+        setEditingProfile(null);
+        setFormData({
+          name: '',
+          email: '',
+          studentId: '',
+          course: '',
+          year: '',
+        });
+        setShowEditDialog(false);
+        toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
 
-      // Award XP if profile is now complete
-      if (shouldAwardXP) {
-        await awardProfileCompletionXP();
+        // Award XP if profile is now complete
+        if (shouldAwardXP) {
+          await awardProfileCompletionXP();
+        }
+      } else {
+        toastUtils.error(t('error'), t('failedToUpdateProfile'));
       }
+    } catch {
+      toastUtils.error(t('error'), t('failedToUpdateProfile'));
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const handleDeleteProfile = (id: string) => {
-    deleteProfile(id);
-    toastUtils.success(t('profileDeleted'), t('profileDeletedMsg'));
   };
 
   const handleSetCurrentProfile = (id: string) => {
     setCurrentProfile(id);
     toastUtils.success(t('profileSwitched'), t('profileSwitchedMsg'));
   };
+
+  // Show loading state while fetching profile
+  if (isLoading && !hasLoaded) {
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <header className="mb-8">
+          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('manageProfiles')}</h1>
+          <p className="text-mq-content">{t('manageProfilesDesc')}</p>
+        </header>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-mq-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -183,12 +186,6 @@ export default function ManageProfilesPage() {
                 <Users className="h-5 w-5" aria-hidden="true" />
                 {t('allProfiles', { count: profiles.length })}
               </h2>
-              {profiles.length > 0 && (
-                <Button size="sm" onClick={() => setShowAddDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t('createProfile')}
-                </Button>
-              )}
             </CardHeader>
             <CardContent>
               {profiles.length === 0 ? (
@@ -198,12 +195,9 @@ export default function ManageProfilesPage() {
                     {t('noProfilesYet')}
                   </h3>
                   <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-                    {t('createFirstProfile')}
+                    {t('signInToManageProfile')}
                   </p>
-                  <Button onClick={() => setShowAddDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('createProfile')}
-                  </Button>
+                  <Button onClick={() => (window.location.href = '/signin')}>{t('signIn')}</Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -213,7 +207,6 @@ export default function ManageProfilesPage() {
                       profile={profile}
                       isCurrent={profile.id === currentProfileId}
                       onEdit={handleEditProfile}
-                      onDelete={handleDeleteProfile}
                       onSetCurrent={handleSetCurrentProfile}
                       onUpdate={updateProfile}
                     />
@@ -226,28 +219,26 @@ export default function ManageProfilesPage() {
       </MagicCard>
 
       <Dialog
-        open={showAddDialog}
+        open={showEditDialog}
         onOpenChange={(open) => {
-          setShowAddDialog(open);
-          if (!open) setEditingProfile(null);
+          if (!isSaving) {
+            setShowEditDialog(open);
+            if (!open) setEditingProfile(null);
+          }
         }}
       >
         <DialogContent className="sm:max-w-md" aria-describedby="profile-form-description">
           <DialogHeader>
-            <DialogTitle>{editingProfile ? t('editProfile') : t('createNewProfile')}</DialogTitle>
+            <DialogTitle>{t('editProfile')}</DialogTitle>
             <p id="profile-form-description" className="text-mq-sm text-mq-content-secondary">
-              {editingProfile ? t('updateProfileDesc') : t('fillProfileDetails')}
+              {t('updateProfileDesc')}
             </p>
           </DialogHeader>
           <form
             className="space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              if (editingProfile) {
-                handleUpdateProfile();
-              } else {
-                handleAddProfile();
-              }
+              handleUpdateProfile();
             }}
           >
             <div>
@@ -259,6 +250,7 @@ export default function ManageProfilesPage() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder={t('enterFullName')}
                 required
+                disabled={isSaving}
                 aria-describedby="name-help"
               />
               <p id="name-help" className="sr-only">
@@ -273,13 +265,12 @@ export default function ManageProfilesPage() {
                 name="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder={t('emailPlaceholderExample')}
-                required
+                disabled
+                className="bg-mq-background-subtle cursor-not-allowed"
                 aria-describedby="email-help"
               />
-              <p id="email-help" className="sr-only">
-                {t('enterEmailDesc')}
+              <p id="email-help" className="text-mq-xs text-mq-content-tertiary mt-1">
+                {t('emailCannotBeChanged')}
               </p>
             </div>
 
@@ -291,7 +282,7 @@ export default function ManageProfilesPage() {
                 value={formData.studentId}
                 onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
                 placeholder="12345678"
-                required
+                disabled={isSaving}
                 aria-describedby="student-id-help"
               />
               <p id="student-id-help" className="sr-only">
@@ -308,6 +299,7 @@ export default function ManageProfilesPage() {
                   value={formData.course}
                   onChange={(e) => setFormData({ ...formData, course: e.target.value })}
                   placeholder={t('coursePlaceholder')}
+                  disabled={isSaving}
                   aria-describedby="course-help"
                 />
                 <p id="course-help" className="sr-only">
@@ -323,6 +315,7 @@ export default function ManageProfilesPage() {
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                   placeholder={t('yearPlaceholder')}
+                  disabled={isSaving}
                   aria-describedby="year-help"
                 />
                 <p id="year-help" className="sr-only">
@@ -335,15 +328,23 @@ export default function ManageProfilesPage() {
               <Button
                 variant="secondary"
                 type="button"
+                disabled={isSaving}
                 onClick={() => {
-                  setShowAddDialog(false);
+                  setShowEditDialog(false);
                   setEditingProfile(null);
                 }}
               >
                 {t('cancel')}
               </Button>
-              <Button type="submit">
-                {editingProfile ? t('updateProfile') : t('createProfile')}
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('saving')}
+                  </>
+                ) : (
+                  t('updateProfile')
+                )}
               </Button>
             </div>
           </form>

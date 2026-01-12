@@ -268,7 +268,7 @@ const Header = memo(() => {
               id={NOTIFICATION_MENU_ID}
               role="menu"
               aria-label={t('notifications')}
-              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] mq-liquid-glass-elevated rounded-mq-lg border border-[var(--liquid-glass-border)] z-50 max-h-96 overflow-hidden"
+              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
             >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
                 <h3 className="font-semibold text-mq-content" id={`${NOTIFICATION_MENU_ID}-title`}>
@@ -429,7 +429,7 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 bg-mq-card-background border-mq-border shadow-mq-lg [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
+              className="w-48 bg-mq-card-background border-mq-border shadow-mq-lg backdrop-blur-none [backdrop-filter:none] [-webkit-backdrop-filter:none] [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
             >
               <DropdownMenuItem asChild>
                 <Link

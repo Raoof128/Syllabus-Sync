@@ -19,6 +19,7 @@ import { z } from 'zod';
 
 const UpdateProfileSchema = z.object({
   full_name: z.string().min(1).max(100).optional(),
+  student_id: z.string().min(1).max(20).optional(),
   avatar_url: z.string().url().max(500).nullable().optional(),
 });
 
@@ -93,12 +94,13 @@ export async function PUT(request: Request) {
 
     const updates = validation.data;
 
-    // SECURITY: Only allow updating safe fields (full_name, avatar_url)
-    // email and student_id are protected by DB trigger
+    // SECURITY: Only allow updating safe fields (full_name, student_id, avatar_url)
+    // email is protected by DB trigger (cannot be changed)
     const { data: profile, error: updateError } = await supabase
       .from('profiles')
       .update({
         full_name: updates.full_name,
+        student_id: updates.student_id,
         avatar_url: updates.avatar_url,
         updated_at: new Date().toISOString(),
       })

@@ -101,6 +101,9 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
   if (updates.name !== undefined) {
     dbUpdates.full_name = updates.name;
   }
+  if (updates.studentId !== undefined) {
+    dbUpdates.student_id = updates.studentId;
+  }
   if (updates.avatar !== undefined) {
     dbUpdates.avatar_url = updates.avatar || null;
   }

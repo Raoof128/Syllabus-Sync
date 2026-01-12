@@ -10,7 +10,6 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
 import { motion } from 'framer-motion';
 
-
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -322,7 +321,6 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
     );
   }
 
-
   const stressColors = {
     Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
     Busy: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
@@ -335,10 +333,8 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
     High: '😰',
   };
 
-
   return (
     <div className="home-page">
-
       {/* Header */}
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
@@ -485,10 +481,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                             variants={revealChildVariants}
                             className="relative z-0 hover:z-50 focus-within:z-50 h-full"
                           >
-                            <UnitCard
-                              unit={unit}
-                              showActions={false}
-                            />
+                            <UnitCard unit={unit} showActions={false} />
                           </motion.div>
                         ))}
                       </motion.div>
