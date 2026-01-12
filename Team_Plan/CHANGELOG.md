@@ -7,6 +7,77 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0-rc.4] - 2026-01-12
+
+### Fixed
+
+#### Social Media Button Refinements (Raouf)
+
+**Summary:** Refined social media button behavior to prevent expansion on mouse click (focus) and updated links.
+
+**Fixes:**
+1.  **Interaction Logic:** Changed CSS selector from `:focus-within` to `:focus-visible`. This prevents buttons from staying expanded after a mouse click, while preserving accessibility for keyboard users.
+2.  **Sizing:** Further reduced expanded width from 140px to 100px for a more compact look.
+3.  **Links:** Updated Facebook link to correct MQ page.
+
+**Files Changed:**
+- `components/layout/SocialButtons.tsx`
+- `app/styles/social-buttons.css`
+
+**Verification:**
+- Validated via user feedback loop.
+
+#### UI Transparency & Consistency (Raouf)
+
+**Summary:** Enforced solid opaque backgrounds for Dialog and Select components via global CSS overrides to resolve persistent transparency issues caused by theme interference.
+
+**Fixes:**
+1.  **Dialog Transparency:** Added high-specificity global CSS rules (`!important`) for `[data-slot="dialog-content"]` to force strict opaque backgrounds in both light (`#edeade`) and dark (`#373a36`) modes.
+2.  **Select Transparency:** Applied identical overrides for `[data-slot="select-content"]`.
+3.  **Social Button Width:** Enforced 75px fixed width via `!important` and reduced font size to `0.7rem` to prevent text truncation.
+
+**Files Changed:**
+- `app/globals.css` - Added global CSS overrides.
+- `components/ui/dialog.tsx` - Added tailwind class overrides.
+- `components/ui/select.tsx` - Added tailwind class overrides.
+- `app/styles/social-buttons.css` - Added width overrides.
+
+**Verification:**
+- Validated via browser subagent which confirmed opaque background color readings (after global fix) and button dimensions.
+
+---
+
+## [1.0.0-rc.3] - 2026-01-12
+
+### Fixed
+
+#### UI Transparency & Social Links (Raouf)
+
+**Summary:** Fixed UI transparency issues in Dialog and Select components preventing background bleed-through. Also added MQ social media links and fixed social button scaling.
+
+**Fixes:**
+1.  **Glassy/Transparent Dialogs:**
+    - Replaced inline style background with `bg-mq-card-background` utility class in `components/ui/dialog.tsx` and `components/ui/select.tsx`.
+    - This ensures solid opacity in both light/dark modes, fixing form readability.
+
+2.  **Social Media Links:**
+    - Added Facebook, Instagram, TikTok, and YouTube links.
+    - Corrected "X" (Twitter) icon styling.
+
+3.  **Social Button Scaling:**
+    - Reduced hover/focus expansion width from `160px` to `140px` in `app/styles/social-buttons.css`.
+
+**Files Changed:**
+- `components/ui/dialog.tsx`
+- `components/ui/select.tsx`
+- `components/layout/SocialButtons.tsx`
+- `app/styles/social-buttons.css`
+
+**Verification:**
+- Validated via user feedback that forms are readable and buttons scale correctly.
+
+---
+
 ## [1.0.0-rc.2] - 2026-01-12
 
 ### Fixed

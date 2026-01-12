@@ -76,6 +76,80 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Social Media Button Refinements v1.0.0-rc.4 (Raouf)
+- **Date:** January 12, 2026 (Australia/Sydney)
+- **Scope:** Refine social button interaction and styling
+- **Summary:** Fixed "stay open" issue on click and reduced size
+
+**The Problem:**
+- Mouse clicking a social button triggered `:focus-within` styles, keeping it expanded until user clicked elsewhere
+- Hover expansion size (140px) was still deemed "too big" by user logic
+- Facebook link needed updating
+
+**Solution:**
+- Switched CSS selector from `:focus-within` to `:focus-visible` (targets keyboard nav but ignores mouse clicks)
+- Reduced expanded width to 100px
+- Updated Facebook URL
+
+**Files Changed:**
+- `app/styles/social-buttons.css`
+- `components/layout/SocialButtons.tsx`
+
+---
+
+#### ✅ UI Transparency & Consistency v1.0.0-rc.4 (Raouf)
+- **Date:** January 12, 2026 (Australia/Sydney)
+- **Scope:** Fix Dialog/Select transparency and enforce button measures
+- **Summary:** Enforced strict opacity on modal backgrounds and locked social button width
+
+**The Problem:**
+- "Edit" pages (Dialogs) were displaying with transparent backgrounds in Dark Mode despite previous fixes
+- Social button hover animation felt "too wide" even at 100px
+- Theme interference caused `bg-mq-card-background` to render translucency
+
+**Solution:**
+- Added high-specificity global CSS overrides (`!important`) for `[data-slot="dialog-content"]`
+- Explicitly forced `rgba(55, 58, 54, 1)` for Dark Mode dialogs
+- reduced social button hover width to `80px` via specialized CSS
+
+**Files Changed:**
+- `app/globals.css`
+- `app/styles/social-buttons.css`
+
+**Verification:**
+- ✅ Browser subagent confirmed Dialog background is now solid `rgb(55, 58, 54)`
+- ✅ Social button expansion measured strictly at 80px
+
+---
+
+#### ✅ UI Transparency & Social Links Fix v1.0.0-rc.3 (Raouf)
+- **Date:** January 12, 2026 (Australia/Sydney)
+- **Scope:** Fix Dialog/Form transparency and update social media links
+- **Summary:** Resolved glassy background issues in forms and added 4 new MQ social links
+
+**The Problem:**
+- Dialog and Select components had transparent backgrounds, making forms unreadable over content
+- Social media links were limited (missing Facebook, Instagram, TikTok, YouTube)
+- Social buttons expanded too aggressively on hover (160px)
+
+**Solution:**
+- Replaced inline style `backgroundColor` with `bg-mq-card-background` utility class in Dialog/Select to ensure solid opacity
+- Added missing social links with correct icons
+- Reduced social button expansion to 140px
+
+**Files Changed:**
+- `components/ui/dialog.tsx`
+- `components/ui/select.tsx`
+- `components/layout/SocialButtons.tsx`
+- `app/styles/social-buttons.css`
+
+**Verification:**
+- ✅ Forms are now readable with solid background
+- ✅ Social buttons scale appropriately
+- ✅ All MQ social channels are linked
+
+---
+
 #### ✅ Dropdown Menu Readability Fix v1.0.0-rc.2 (Raouf)
 - **Date:** January 12, 2026 (Australia/Sydney)
 - **Scope:** Fix dropdown menu styling for proper readability in both light and dark modes
@@ -4545,3 +4619,13 @@ Scope: Map Runtime Error Fix & UI Polish
 Summary: Fixed critical runtime TypeError in map component causing "Cannot read properties of undefined (reading 'style')" errors and removed ugly hover tooltips from map layer controls. Added defensive null checking with optional chaining for cursor style handling and silenced cascading console errors during component unmount. Simplified layer controls to show only essential information without hover tooltips.
 Files: app/map/CampusMap.tsx, app/map/MapClient.tsx
 Verification: npm run lint (0 errors, 0 warnings), npm run build (30 routes successful), npm run test (248/248 tests passing)
+
+[2026-01-12 21:20] Raouf: Fixed persistent UI transparency in Dialogs/Selects using global CSS overrides (!important). Confirmed Social Button width (100px) and correct links.
+
+[2026-01-12 22:20] Raouf: Finalized UI polish: Dialog/Select transparency in Dark Mode FIXED (global overrides) and Social Button width reduced to 80px.
+
+[2026-01-12 22:35] Raouf: Adjusted Social Button expanded width to 75px (per user request).
+
+[2026-01-12 22:42] Raouf: Reduced Social Button text size to 0.7rem to fit within 75px width. Running verification.
+
+[2026-01-12 23:15] Raouf: Reduced Social Button font size to 0.7rem to prevent truncation at 75px width.

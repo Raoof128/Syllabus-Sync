@@ -45,3 +45,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Force Opaque Backgrounds for Dialogs and Selects */
+[data-slot='dialog-content'] {
+  background-color: #edeade !important;
+  opacity: 1 !important;
+}
+.dark [data-slot='dialog-content'] {
+  background-color: #373a36 !important;
+  opacity: 1 !important;
+}
+
+[data-slot='select-content'] {
+  background-color: #edeade !important;
+  opacity: 1 !important;
+}
+.dark [data-slot='select-content'] {
+  background-color: #373a36 !important;
+  opacity: 1 !important;
+}
+
+/* Explicit Dark Mode Overrides for Radix Portals */
+html.dark [data-slot='dialog-content'],
+.dark [data-slot='dialog-content'] {
+  background-color: rgba(55, 58, 54, 1) !important;
+  opacity: 1 !important;
+  --tw-bg-opacity: 1 !important;
+}
+
+html.dark [data-slot='select-content'],
+.dark [data-slot='select-content'] {
+  background-color: rgba(55, 58, 54, 1) !important;
+  opacity: 1 !important;
+  --tw-bg-opacity: 1 !important;
+}
