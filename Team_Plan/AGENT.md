@@ -76,6 +76,79 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+#### ✅ Dropdown Menu Readability Fix v1.0.0-rc.2 (Raouf)
+- **Date:** January 12, 2026 (Australia/Sydney)
+- **Scope:** Fix dropdown menu styling for proper readability in both light and dark modes
+- **Summary:** Fixed Radix portal dropdown CSS inheritance issue by using explicit hardcoded colors
+
+**The Problem:**
+- Dropdown menus in the header (Manage Profiles, Settings, Sign Out) were unreadable
+- Radix UI portals render outside the main DOM tree, causing CSS variable inheritance to fail
+- Background was transparent in dark mode, making text unreadable
+- CSS variable `bg-mq-card-background` didn't work because `--c-card-background` wasn't accessible to portaled elements
+
+**Root Cause:**
+- Radix dropdown portals render at document root, outside the `.dark` class scope
+- CSS variables like `--c-card-background` depend on `.dark` class for dark mode values
+- This caused `bg-mq-card-background` to render with light mode value even in dark mode
+
+**Solution:**
+Used Tailwind's `dark:` variant with hardcoded color values that work correctly with Tailwind's dark mode detection:
+- Light mode: `bg-[#edeade] text-[#1a1a1a] border-[#a0a29c]` (alabaster theme)
+- Dark mode: `dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]` (charcoal theme)
+
+**Changes Made:**
+1. **DropdownMenuContent** - Used explicit light/dark colors instead of CSS variables
+2. **DropdownMenuSubContent** - Same fix for subcontent menus
+3. **Header dropdown items** - Changed from `text-mq-content-secondary` to `text-mq-content`
+4. **Manage Profiles Sign In button** - Fixed broken `/signin` route to correct `/login` route
+
+**Files Changed:**
+- `components/ui/dropdown-menu.tsx` - Updated DropdownMenuContent and DropdownMenuSubContent with explicit colors
+- `components/layout/Header.tsx` - Updated dropdown menu item text colors
+- `app/manage-profiles/page.tsx` - Fixed Sign In button URL
+
+**Verification:**
+- ✅ Visual: Dropdowns now have solid opaque backgrounds in both light and dark modes
+- ✅ Light mode: Alabaster background (#edeade) with dark text (#1a1a1a)
+- ✅ Dark mode: Charcoal background (#373a36) with light text (#edeade)
+- ✅ Browser tested: Screenshots confirm proper rendering
+
+---
+
+#### ✅ Profile Auto-Creation Fix v1.0.0-rc.2 (Raouf)
+- **Date:** January 12, 2026 (Australia/Sydney)
+- **Scope:** Fix Manage Profiles page showing empty state for authenticated users
+- **Summary:** Updated GET /api/profiles to auto-create profile when it doesn't exist for authenticated users
+
+**The Problem:**
+- Authenticated users who signed up before profile trigger was implemented had no profile in Supabase
+- Manage Profiles page showed "No Profiles Yet" + "Sign In" button even when logged in
+- API returned `null` for valid authenticated users with missing profiles
+
+**Root Cause:**
+- Database signup trigger to create profiles wasn't present when user first signed up
+- API returned `null` instead of creating missing profile
+- UI incorrectly assumed empty profiles = not logged in
+
+**Solution:**
+Updated `GET /api/profiles` to auto-create profile when PGRST116 (not found) error occurs:
+- Creates profile with `user.id`, `user.email`
+- Populates `full_name` from user metadata or email prefix
+- Populates `student_id` from user metadata if available
+
+**Files Changed:**
+- `app/api/profiles/route.ts` - Added auto-create logic in GET endpoint
+
+**Verification:**
+- ✅ API now returns newly created profile for users without existing profiles
+- ✅ Manage Profiles page shows user's profile card with name, email
+- ✅ Profile shows as "Current" with notification toggles working
+- ✅ Browser tested: Screenshot confirms "All Profiles (1)" with user data
+
+---
+
+
 #### ✅ OpenCode MCP File System Configuration Fix v0.14.37 (Pouya)
 - **Date:** January 11, 2026 (Australia/Sydney)
 - **Scope:** Fixed OpenCode file system MCP server not working due to incorrect path configuration

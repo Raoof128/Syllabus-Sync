@@ -48,8 +48,29 @@ export async function GET() {
 
     if (profileError) {
       // PGRST116 is "not found" - profile may not exist yet
+      // Auto-create profile for authenticated users who don't have one
       if (profileError.code === 'PGRST116') {
-        return jsonSuccess(null);
+        console.warn('Profile not found, auto-creating for user:', user.id);
+
+        // Create profile from user metadata
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+            student_id: user.user_metadata?.student_id || null,
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Auto-create profile failed:', createError);
+          // Return null instead of erroring - let client handle it
+          return jsonSuccess(null);
+        }
+
+        return jsonSuccess(newProfile);
       }
       console.error('Profile fetch error:', profileError);
       return jsonError('Failed to fetch profile', 500);

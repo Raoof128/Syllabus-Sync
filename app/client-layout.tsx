@@ -35,7 +35,7 @@ const PROTECTED_ROUTES = [
 // V3.1: Performance optimization - run console.error override once at module load
 // Instead of checking on every error call
 if (typeof window !== 'undefined') {
-  const originalConsoleError = console.error;
+  const originalConsoleError = console.error.bind(console);
   const NEXT_KEY_WARNING = 'Each child in a list should have a unique "key" prop';
   const OUTER_LAYOUT_ROUTER = 'OuterLayoutRouter';
 
@@ -49,7 +49,7 @@ if (typeof window !== 'undefined') {
     ) {
       return; // Silently ignore this specific warning
     }
-    originalConsoleError.apply(console, args);
+    originalConsoleError(...args);
   };
 }
 

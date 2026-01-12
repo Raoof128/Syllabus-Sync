@@ -353,6 +353,7 @@ export default function CalendarClient() {
 
   const handleDeleteUnit = (unit: Unit) => {
     if (
+      // eslint-disable-next-line no-alert -- Intentional confirmation dialog for destructive action
       window.confirm(
         `Are you sure you want to delete ${unit.code} - ${unit.name}? This cannot be undone.`,
       )
@@ -622,6 +623,8 @@ export default function CalendarClient() {
                             return (
                               <div
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
+                                role="button"
+                                tabIndex={0}
                                 className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all"
                                 style={{
                                   top: posInfo.top,
@@ -636,6 +639,13 @@ export default function CalendarClient() {
                                   // Find the original unit with full schedule
                                   const originalUnit = units.find((u) => u.id === unitData.id);
                                   if (originalUnit) openUnitDetail(originalUnit);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    const originalUnit = units.find((u) => u.id === unitData.id);
+                                    if (originalUnit) openUnitDetail(originalUnit);
+                                  }
                                 }}
                               >
                                 <div
@@ -1227,7 +1237,7 @@ export default function CalendarClient() {
                           <div
                             key={deadline.id}
                             className={cn(
-                              'p-3 rounded-lg border-l-4 bg-mq-background-secondary/50',
+                              'p-3 rounded-lg border-l-4 bg-mq-background-secondary',
                               colors.border,
                               isOverdue && 'bg-red-50 dark:bg-red-950/20',
                             )}

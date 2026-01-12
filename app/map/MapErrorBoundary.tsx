@@ -151,7 +151,7 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
       // Default error UI
       return (
         <div
-          className="w-full h-full min-h-[300px] flex flex-col items-center justify-center bg-mq-background-secondary/50 rounded-mq-lg border border-mq-border p-6"
+          className="w-full h-full min-h-[300px] flex flex-col items-center justify-center bg-mq-background-secondary rounded-mq-lg border border-mq-border p-6"
           role="alert"
           aria-live="assertive"
         >

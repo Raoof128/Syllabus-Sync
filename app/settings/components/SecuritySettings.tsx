@@ -139,7 +139,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
           </CardHeader>
           <CardContent className="space-y-3" role="region" aria-labelledby="security-heading">
             {/* Biometric Authentication Section */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-mq-primary/10 rounded-full">
@@ -197,7 +197,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
             </div>
 
             {/* Coming Soon: More Security Features */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border opacity-60">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-mq-info/10 rounded-full">
                   <Info className="h-5 w-5 text-mq-info" aria-hidden="true" />

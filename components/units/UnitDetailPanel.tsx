@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
 import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
@@ -23,7 +22,6 @@ export default function UnitDetailPanel({
   onOpenChange,
   onEditDeadline,
 }: UnitDetailPanelProps) {
-  const { t } = useTranslation();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
 
@@ -47,7 +45,7 @@ export default function UnitDetailPanel({
     if (!unit) return { total: 0, completed: 0, upcoming: 0, overdue: 0 };
 
     const all = unitDeadlines.all;
-    const now = new Date();
+    // Note: we use date-fns isFuture/isPast which compare against current time internally
 
     return {
       total: all.length,
@@ -85,6 +83,8 @@ export default function UnitDetailPanel({
 
     return (
       <div
+        role="button"
+        tabIndex={0}
         className={cn(
           'flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer hover:border-opacity-80',
           status === 'completed' && 'opacity-60 border-mq-border',
@@ -94,6 +94,12 @@ export default function UnitDetailPanel({
         )}
         style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
         onClick={() => onEditDeadline?.(deadline)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onEditDeadline?.(deadline);
+          }
+        }}
       >
         <button
           onClick={(e) => {

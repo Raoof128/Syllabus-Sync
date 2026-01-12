@@ -50,5 +50,18 @@
       "url": "http://localhost:3001/mcp",
       "enabled": true,
     },
+
+    // Claude MCP Server - Custom Rust MCP server with code intelligence
+    // Features: 13+ tools, GPU embeddings, multi-workspace, semantic search
+    // Source: /Users/raoof.r12/Desktop/Raouf/Research/claude-mcp-server
+    "claude-mcp": {
+      "type": "local",
+      "command": [
+        "/Users/raoof.r12/Desktop/Raouf/Research/claude-mcp-server/target/release/mcp-server",
+        "--workspace",
+        "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync",
+      ],
+      "enabled": true,
+    },
   },
 }

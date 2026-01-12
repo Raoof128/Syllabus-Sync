@@ -1093,7 +1093,7 @@ export default function CampusMap({
                         <Badge
                           key={tag}
                           variant="secondary"
-                          className="text-[10px] bg-mq-background-secondary/50"
+                          className="text-[10px] bg-mq-background-secondary"
                         >
                           {t(tag as TranslationKey)}
                         </Badge>
@@ -1116,7 +1116,7 @@ export default function CampusMap({
         </reactLeafletModule.MapContainer>
       ) : (
         /* Show loading placeholder while waiting for client-side mount */
-        <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary/50 rounded-mq-lg">
+        <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary rounded-mq-lg">
           <div className="animate-pulse text-mq-content-secondary">Loading map...</div>
         </div>
       )}

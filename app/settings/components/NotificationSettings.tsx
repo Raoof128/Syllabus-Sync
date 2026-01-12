@@ -263,7 +263,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
           {notificationItems.map(({ key, icon: Icon, label, desc, timing, setTiming }) => (
             <div
               key={key}
-              className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
+              className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
               data-testid={`notification-item-${key}`}
             >
               <div className="flex items-center justify-between">

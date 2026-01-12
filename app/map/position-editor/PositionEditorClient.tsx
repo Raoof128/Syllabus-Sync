@@ -767,7 +767,7 @@ export default function PositionEditorClient() {
         )}
 
         {/* Help Panel */}
-        <div className="absolute top-4 right-4 z-[1000] bg-white/90 dark:bg-gray-800/90 rounded-lg px-3 py-2 text-xs text-gray-600 dark:text-gray-400 backdrop-blur">
+        <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
           <div className="font-medium mb-1">Keyboard Shortcuts</div>
           <div>← → Navigate buildings</div>
           <div>R Reset selected</div>

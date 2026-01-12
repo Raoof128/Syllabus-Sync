@@ -197,7 +197,7 @@ export default function ManageProfilesPage() {
                   <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
                     {t('signInToManageProfile')}
                   </p>
-                  <Button onClick={() => (window.location.href = '/signin')}>{t('signIn')}</Button>
+                  <Button onClick={() => (window.location.href = '/login')}>{t('signIn')}</Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

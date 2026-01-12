@@ -346,7 +346,7 @@ const PrivacySettings = memo(
               aria-labelledby="privacy-security-heading"
             >
               {/* Change Password */}
-              <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
@@ -367,7 +367,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Manage Sessions */}
-              <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
@@ -388,7 +388,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Privacy Policy */}
-              <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('privacyPolicy')}</h3>
@@ -409,7 +409,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Export Data */}
-              <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+              <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('exportData')}</h3>
@@ -429,7 +429,7 @@ const PrivacySettings = memo(
               </div>
 
               {/* Clear All Data */}
-              <div className="p-3 bg-mq-error/5 backdrop-blur-sm rounded-mq-lg border border-mq-error/20 hover:border-mq-error/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
+              <div className="p-3 bg-mq-error/5 rounded-mq-lg border border-mq-error/20 hover:border-mq-error/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-mq-content">{t('clearAllData')}</h3>

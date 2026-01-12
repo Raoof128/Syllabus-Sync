@@ -360,7 +360,7 @@ const FeedClient = memo(() => {
                               ref={(el) => {
                                 if (el) eventRefs.current.set(event.id, el);
                               }}
-                              className={`p-4 bg-mq-background-secondary/50 backdrop-blur-sm rounded-mq-lg border transition-all duration-mq-fast ${
+                              className={`p-4 bg-mq-background-secondary rounded-mq-lg border transition-all duration-mq-fast ${
                                 isHighlighted
                                   ? 'border-mq-primary ring-2 ring-mq-primary/50 shadow-lg shadow-mq-primary/20 animate-pulse'
                                   : 'border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm'

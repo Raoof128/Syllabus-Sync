@@ -507,7 +507,7 @@ export default function MapClient() {
                   placeholder={t('filterBuildings')}
                   value={buildingSearch}
                   onChange={(e) => setBuildingSearch(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 bg-mq-background-secondary/50 border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-mq-background-secondary border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
                 />
                 {buildingSearch && (
                   <button
@@ -595,7 +595,7 @@ export default function MapClient() {
                                   className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
                                     isSelected
                                       ? 'bg-mq-success/10 border-mq-success'
-                                      : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                                      : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
                                   }`}
                                 >
                                   <div
@@ -660,7 +660,7 @@ export default function MapClient() {
                                 className={`group block p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
                                   isSelected
                                     ? 'bg-mq-success/10 border-2 border-mq-success'
-                                    : 'bg-mq-background-secondary/50 border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
+                                    : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
                                 }`}
                               >
                                 <div className="flex items-center justify-between mb-1">
@@ -686,7 +686,7 @@ export default function MapClient() {
                                   {building.category && (
                                     <Badge
                                       variant="secondary"
-                                      className="text-[10px] bg-mq-background/50"
+                                      className="text-[10px] bg-mq-background"
                                     >
                                       {BUILDING_CATEGORY_LABELS[building.category]}
                                     </Badge>

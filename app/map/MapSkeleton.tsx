@@ -98,7 +98,7 @@ export function MapLoadingSkeleton() {
       {/* Center loading indicator */}
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.div
-          className="flex flex-col items-center gap-3 bg-mq-card-background/90 backdrop-blur-sm px-6 py-4 rounded-mq-lg shadow-mq"
+          className="flex flex-col items-center gap-3 bg-mq-card-background px-6 py-4 rounded-mq-lg shadow-mq"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
@@ -134,7 +134,7 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
       {Array.from({ length: count }).map((_, index) => (
         <motion.div
           key={index}
-          className="p-3 rounded-mq-lg bg-mq-background-secondary/50 border border-transparent"
+          className="p-3 rounded-mq-lg bg-mq-background-secondary border border-transparent"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.05 }}

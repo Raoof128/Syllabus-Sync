@@ -46,7 +46,7 @@ export function KeyboardShortcuts() {
           {shortcuts.map((shortcut, index) => (
             <div
               key={index}
-              className="flex items-center justify-between px-2 py-1.5 rounded-mq-md hover:bg-mq-background-secondary/50 text-mq-sm"
+              className="flex items-center justify-between px-2 py-1.5 rounded-mq-md hover:bg-mq-background-secondary text-mq-sm"
             >
               <span className="text-mq-content-secondary">{shortcut.description}</span>
               <div className="flex items-center gap-1">

@@ -427,24 +427,15 @@ const Header = memo(() => {
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 bg-mq-card-background border-mq-border shadow-mq-lg backdrop-blur-none [backdrop-filter:none] [-webkit-backdrop-filter:none] [&_[data-radix-menu-item]]:focus:bg-transparent [&_[data-radix-menu-item]]:hover:bg-transparent"
-            >
+            <DropdownMenuContent align="end" className="w-48 border-mq-border shadow-mq-lg">
               <DropdownMenuItem asChild>
-                <Link
-                  href="/manage-profiles"
-                  className="flex items-center gap-2 text-mq-content-secondary"
-                >
+                <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">
                   <User className="w-4 h-4" />
                   {t('manageProfiles')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link
-                  href="/settings"
-                  className="flex items-center gap-2 text-mq-content-secondary"
-                >
+                <Link href="/settings" className="flex items-center gap-2 text-mq-content">
                   <Settings className="w-4 h-4" />
                   {t('settings')}
                 </Link>
@@ -462,7 +453,7 @@ const Header = memo(() => {
                     console.error('Logout failed:', error);
                   }
                 }}
-                className="flex items-center gap-2 text-mq-content-secondary hover:text-mq-content cursor-pointer"
+                className="flex items-center gap-2 text-mq-content hover:text-mq-content cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 {t('signOut')}

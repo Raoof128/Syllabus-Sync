@@ -7,7 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0-rc.2] - 2026-01-12
+
+### Fixed
+
+#### Dropdown Menu Readability (Raouf)
+
+**Summary:** Fixed Radix portal dropdown CSS inheritance issue causing transparent backgrounds in dark mode. Dropdowns are now fully readable in both light and dark modes using explicit color values.
+
+**Root Cause:**
+- Radix UI portals render at document root, outside the `.dark` class scope
+- CSS variables like `--c-card-background` depend on `.dark` class ancestry
+- This caused `bg-mq-card-background` to fail in dark mode (showed transparent/wrong color)
+
+**Solution:**
+Used Tailwind's `dark:` variant with explicit hex color values:
+- Light mode: `bg-[#edeade] text-[#1a1a1a] border-[#a0a29c]` (alabaster theme)
+- Dark mode: `dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]` (charcoal theme)
+
+**Changes Made:**
+1. Updated `DropdownMenuContent` with explicit light/dark colors
+2. Updated `DropdownMenuSubContent` with same approach
+3. Changed menu item text from `text-mq-content-secondary` to `text-mq-content`
+4. Fixed broken `/signin` route to correct `/login` route
+
+**Files Changed:**
+- `components/ui/dropdown-menu.tsx` - Explicit color classes for portal elements
+- `components/layout/Header.tsx` - Profile dropdown menu items
+- `app/manage-profiles/page.tsx` - Fixed Sign In button URL
+
+**Verification:** Browser tested - dropdowns now show solid backgrounds with readable text in both modes.
+
+---
+
+#### Profile Auto-Creation (Raouf)
+
+**Summary:** Fixed Manage Profiles page showing empty state for authenticated users by auto-creating profiles when they don't exist.
+
+**The Problem:**
+- Users who signed up before profile trigger was implemented had no profile in Supabase
+- Manage Profiles page showed "No Profiles Yet" even when logged in
+- API returned `null` for authenticated users with missing profiles
+
+**Solution:**
+Updated `GET /api/profiles` to auto-create profile when PGRST116 (not found) error:
+- Creates profile using user ID, email, and metadata
+- Populates name from `user_metadata.full_name` or email prefix
+
+**Files Changed:**
+- `app/api/profiles/route.ts` - Added auto-create logic in GET endpoint
+
+**Verification:** Browser tested - "All Profiles (1)" now shows with user profile card displayed correctly.
+
+---
+
+
 ## [1.0.0-rc.1] - 2026-01-11
+
 
 ### Release Candidate 1 - Production Ready Audit
 

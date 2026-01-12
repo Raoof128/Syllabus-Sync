@@ -98,7 +98,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
           </CardHeader>
           <CardContent className="space-y-3" role="region" aria-labelledby="gamification-heading">
             {/* Current Progress Display */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
               <h3 className="font-semibold text-mq-content mb-3">{t('yourProgress')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* XP Notifications Toggle */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('showXPNotifications')}</h3>
@@ -164,7 +164,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* Level Up Notifications Toggle */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('showLevelUpNotifications')}</h3>
@@ -187,7 +187,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* Streak Reminders Toggle */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('showStreakReminders')}</h3>
@@ -210,7 +210,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* Display on Profile Toggle */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('displayOnProfile')}</h3>
@@ -233,7 +233,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* Reset Progress */}
-            <div className="p-3 bg-mq-card-background/50 backdrop-blur-sm rounded-mq-lg border border-mq-border hover:border-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between gap-3">
                 <div className="space-y-1">
                   <h3 className="font-semibold text-mq-content">{t('resetProgress')}</h3>

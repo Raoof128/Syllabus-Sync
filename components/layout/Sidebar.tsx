@@ -201,7 +201,7 @@ const Sidebar = memo(() => {
           ======================================================================== */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-mq-content/60 z-40 backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-mq-content/60 z-40"
           onClick={handleOverlayClick}
           role="presentation"
           aria-hidden="true"
