@@ -193,6 +193,14 @@
     transform-origin: center;
   }
 
+  /* Dark mode: don't let global `span { background: transparent !important; }`
+     wipe out the hamburger bars */
+  html.dark .sidebar-bar-top,
+  html.dark .sidebar-bar-mid,
+  html.dark .sidebar-bar-bottom {
+    background-color: var(--mq-content) !important;
+  }
+
   /* Top bar moves UP on hover */
   .sidebar-shell:hover .sidebar-bar-top,
   .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-top,

@@ -851,10 +851,15 @@ body {
 }
 
 /* Promote to compositor layer for smooth animations */
-.mq-liquid-glass,
+/* NOTE: Do not set `transform` on `.mq-liquid-glass` because it breaks components
+   that rely on their own transforms (e.g., sidebar collapsed translateX). */
 .mq-liquid-btn,
 .mq-mesh-blob {
   transform: translateZ(0);
+}
+
+.mq-liquid-glass {
+  will-change: transform;
 }
 
 /* Contain paint to prevent layout thrashing */
@@ -1191,6 +1196,20 @@ body {
    Features permanent shadow for depth and premium look.
    ---------------------------------------------------------------------------- */
 @media (min-width: 768px) {
+  /* Ensure sidebar collapse works in dark mode too.
+     We re-declare transforms here (liquid-glass.css loads after sidebar.css). */
+  .sidebar-panel.mq-liquid-glass {
+    transform: translateX(calc(-100% + 48px));
+    pointer-events: none;
+  }
+
+  .sidebar-shell:hover .sidebar-panel.mq-liquid-glass,
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-panel.mq-liquid-glass,
+  .sidebar-shell[data-pinned='true'] .sidebar-panel.mq-liquid-glass {
+    transform: translateX(0) !important;
+    pointer-events: auto;
+  }
+
   .sidebar-panel.mq-liquid-glass {
     /* Alabaster-based glass background for light mode */
     background: var(--liquid-glass-bg) !important;
@@ -1274,8 +1293,24 @@ body {
   }
 }
 
+/* Ensure mobile sidebar uses correct background in dark mode */
+@media (max-width: 767px) {
+  .dark .sidebar-panel.mq-liquid-glass {
+    background: rgba(55, 58, 54, 0.95) !important;
+  }
+}
+
 /* Mobile sidebar glass */
 @media (max-width: 767px) {
+  /* Mobile: keep drawer fully off-screen unless open */
+  .sidebar-panel.mq-liquid-glass {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-panel.mq-liquid-glass.sidebar-panel-open {
+    transform: translateX(0) !important;
+  }
+
   .sidebar-panel.mq-liquid-glass {
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);

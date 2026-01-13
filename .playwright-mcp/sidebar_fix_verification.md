@@ -1,0 +1,326 @@
+### New console messages
+
+- [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/rea...
+- [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._....
+- [WARNING] Image with src "/MQ_Logo_Final.png" has either width or height modified, but not the other...
+- [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/\_next/static/chunks/node_modules_next_dist_f...
+- [ERROR] ./app/styles/liquid-glass.css
+  Error evaluating Node.js code
+  CssSyntaxError: /Users/raoof.r12...
+
+### Page state
+
+- Page URL: http://localhost:3000/home
+- Page Title: Dashboard | The Syllabus Sync
+- Page Snapshot:
+
+```yaml
+- generic [ref=e1]:
+    - link "Skip to content" [ref=e2] [cursor=pointer]:
+        - /url: '#main-content'
+    - generic [ref=e3]:
+        - generic [ref=e4]:
+            - button "Open navigation menu" [ref=e5] [cursor=pointer]:
+                - img
+            - complementary:
+                - navigation "Main navigation" [ref=e6]:
+                    - link "Macquarie University Logo" [ref=e8] [cursor=pointer]:
+                        - /url: /home
+                        - img "Macquarie University Logo" [ref=e9]
+                    - 'link "Gamification progress: Level 1 - Freshman, 0 XP" [ref=e10] [cursor=pointer]':
+                        - /url: /settings
+                        - generic [ref=e11]: '1'
+                        - generic [ref=e12]:
+                            - paragraph [ref=e13]: Freshman
+                            - generic [ref=e14]:
+                                - img [ref=e15]
+                                - generic [ref=e18]: 0 XP
+                    - navigation "Main navigation" [ref=e19]:
+                        - link "Home" [ref=e20] [cursor=pointer]:
+                            - /url: /home
+                            - img
+                            - text: Home
+                        - link "Calendar" [ref=e21] [cursor=pointer]:
+                            - /url: /calendar
+                            - img
+                            - text: Calendar
+                        - link "Map" [ref=e22] [cursor=pointer]:
+                            - /url: /map
+                            - img
+                            - text: Map
+                        - link "Events Feed" [ref=e23] [cursor=pointer]:
+                            - /url: /feed
+                            - img
+                            - text: Events Feed
+                        - link "Settings" [ref=e24] [cursor=pointer]:
+                            - /url: /settings
+                            - img
+                            - text: Settings
+                    - list [ref=e26]:
+                        - listitem [ref=e27]:
+                            - link "Facebook (opens in new tab)" [ref=e28] [cursor=pointer]:
+                                - /url: https://www.facebook.com/macquarieuni/
+                                - img [ref=e29]
+                                - generic: Facebook
+                                - generic [ref=e31]: (opens in new tab)
+                        - listitem [ref=e32]:
+                            - link "Instagram (opens in new tab)" [ref=e33] [cursor=pointer]:
+                                - /url: https://www.instagram.com/macquarieuni/
+                                - img [ref=e34]
+                                - generic: Instagram
+                                - generic [ref=e36]: (opens in new tab)
+                        - listitem [ref=e37]:
+                            - link "LinkedIn (opens in new tab)" [ref=e38] [cursor=pointer]:
+                                - /url: https://www.linkedin.com/school/macquarie-university/
+                                - img [ref=e39]
+                                - generic: LinkedIn
+                                - generic [ref=e43]: (opens in new tab)
+                        - listitem [ref=e44]:
+                            - link "TikTok (opens in new tab)" [ref=e45] [cursor=pointer]:
+                                - /url: https://www.tiktok.com/@macquarieuni
+                                - img [ref=e46]
+                                - generic: TikTok
+                                - generic [ref=e48]: (opens in new tab)
+                        - listitem [ref=e49]:
+                            - link "YouTube (opens in new tab)" [ref=e50] [cursor=pointer]:
+                                - /url: https://www.youtube.com/user/MacquarieUniversity
+                                - img [ref=e51]
+                                - generic: YouTube
+                                - generic [ref=e53]: (opens in new tab)
+                        - listitem [ref=e54]:
+                            - link "X (opens in new tab)" [ref=e55] [cursor=pointer]:
+                                - /url: https://x.com/Macquarie_Uni
+                                - img [ref=e56]
+                                - generic: X
+                                - generic [ref=e58]: (opens in new tab)
+            - generic [ref=e59]:
+                - banner [ref=e60]:
+                    - link "Macquarie University Logo" [ref=e62] [cursor=pointer]:
+                        - /url: /
+                        - img "Macquarie University Logo" [ref=e63]
+                    - generic [ref=e64]:
+                        - button "Notifications" [ref=e65] [cursor=pointer]:
+                            - img
+                        - button "Switch to dark mode" [ref=e66] [cursor=pointer]:
+                            - img [ref=e68]
+                        - button "Open profile menu" [ref=e74] [cursor=pointer]:
+                            - generic:
+                                - generic: R
+                - main "Main content" [ref=e75]:
+                    - region "Dashboard overview" [ref=e77]:
+                        - generic [ref=e78]:
+                            - banner [ref=e80]:
+                                - generic [ref=e81]:
+                                    - generic [ref=e82]:
+                                        - heading "Welcome, Raouf!" [level=1] [ref=e83]
+                                        - 'img "Level 1: Freshman" [ref=e86]': '1'
+                                    - paragraph [ref=e87]: Here's your day at a glance.
+                                - generic [ref=e89]:
+                                    - img [ref=e90]
+                                    - 'generic "Workload: Low stress level - you have few upcoming deadlines" [ref=e93]':
+                                        - generic [ref=e94]: 😊
+                            - region "Dashboard overview" [ref=e95]:
+                                - generic [ref=e99] [cursor=pointer]:
+                                    - generic [ref=e100]:
+                                        - heading "Today's Classes" [level=2] [ref=e101]
+                                        - link "View all → Today's Classes" [ref=e102]:
+                                            - /url: /calendar?view=today
+                                            - img [ref=e103]
+                                            - generic [ref=e107]: View all →
+                                    - link "MATH1001 - Foundations of Mathematics, 10:00 - 12:00 at C3C 112" [ref=e110]:
+                                        - /url: /calendar?date=2026-01-13&unit=MATH1001
+                                        - generic [ref=e111]:
+                                            - heading "MATH1001 — Foundations of Mathematics" [level=3] [ref=e112]
+                                            - generic [ref=e113]:
+                                                - generic [ref=e114]:
+                                                    - img [ref=e115]
+                                                    - generic [ref=e118]: 10:00 - 12:00
+                                                - generic [ref=e119]:
+                                                    - img [ref=e120]
+                                                    - generic [ref=e123]: C3C 112
+                                - generic [ref=e127] [cursor=pointer]:
+                                    - generic [ref=e128]:
+                                        - heading "Next Deadline" [level=2] [ref=e129]
+                                        - link "View all → Next Deadline" [ref=e130]:
+                                            - /url: /calendar
+                                            - img [ref=e131]
+                                            - generic [ref=e135]: View all →
+                                    - 'link "View Assignment 1: Network Fundamentals deadline details in calendar" [ref=e137]':
+                                        - /url: /calendar?date=2026-01-16
+                                        - generic [ref=e138]:
+                                            - generic [ref=e139]:
+                                                - generic [ref=e140]:
+                                                    - 'heading "COMP2310 — Assignment 1: Network Fundamentals" [level=3] [ref=e141]'
+                                                    - generic [ref=e142]: High
+                                                - paragraph [ref=e143]: Due Jan 16, 11:59 PM
+                                            - generic [ref=e144]:
+                                                - img [ref=e145]
+                                                - generic [ref=e148]: in 3 days
+                            - region "My Units" [ref=e150]:
+                                - generic [ref=e153] [cursor=pointer]:
+                                    - generic [ref=e154]:
+                                        - heading "My Units" [level=2] [ref=e155]:
+                                            - img [ref=e156]
+                                            - text: My Units
+                                        - link "View all → My Units" [ref=e158]:
+                                            - /url: /calendar
+                                            - img [ref=e159]
+                                            - generic [ref=e163]: View all →
+                                    - generic [ref=e164]:
+                                        - generic [ref=e165]:
+                                            - generic [ref=e166]:
+                                                - paragraph [ref=e167]: '3'
+                                                - paragraph [ref=e168]: Units
+                                            - generic [ref=e169]:
+                                                - paragraph [ref=e170]: '5'
+                                                - paragraph [ref=e171]: Classes/Week
+                                            - generic [ref=e172]:
+                                                - paragraph [ref=e173]: 9h
+                                                - paragraph [ref=e174]: Study Hours
+                                        - generic [ref=e175]:
+                                            - generic [ref=e180]:
+                                                - generic [ref=e182]:
+                                                    - heading "COMP2310 Mon, Wed" [level=2] [ref=e183]:
+                                                        - text: COMP2310
+                                                        - generic [ref=e184]: Mon, Wed
+                                                    - paragraph [ref=e185]: Networking
+                                                - generic [ref=e186]:
+                                                    - img [ref=e187]
+                                                    - generic [ref=e190]: C5C
+                                                    - generic [ref=e191]: Room 204
+                                                - generic [ref=e192]:
+                                                    - generic [ref=e193]:
+                                                        - img [ref=e194]
+                                                        - generic [ref=e197]: Class Times
+                                                    - generic [ref=e198]:
+                                                        - generic [ref=e199]:
+                                                            - generic [ref=e200]: Monday
+                                                            - generic [ref=e201]: 09:00 - 11:00
+                                                        - generic [ref=e202]:
+                                                            - generic [ref=e203]: Wednesday
+                                                            - generic [ref=e204]: 14:00 - 15:00
+                                                - generic [ref=e207]: Color coding for calendar
+                                            - generic [ref=e212]:
+                                                - generic [ref=e214]:
+                                                    - heading "MATH1001 Tue, Thu" [level=2] [ref=e215]:
+                                                        - text: MATH1001
+                                                        - generic [ref=e216]: Tue, Thu
+                                                    - paragraph [ref=e217]: Foundations of Mathematics
+                                                - generic [ref=e218]:
+                                                    - img [ref=e219]
+                                                    - generic [ref=e222]: C3C
+                                                    - generic [ref=e223]: Room 112
+                                                - generic [ref=e224]:
+                                                    - generic [ref=e225]:
+                                                        - img [ref=e226]
+                                                        - generic [ref=e229]: Class Times
+                                                    - generic [ref=e230]:
+                                                        - generic [ref=e231]:
+                                                            - generic [ref=e232]: Tuesday
+                                                            - generic [ref=e233]: 10:00 - 12:00
+                                                        - generic [ref=e234]:
+                                                            - generic [ref=e235]: Thursday
+                                                            - generic [ref=e236]: 13:00 - 14:30
+                                                - generic [ref=e239]: Color coding for calendar
+                                            - generic [ref=e244]:
+                                                - generic [ref=e246]:
+                                                    - heading "HIST2002 Fri" [level=2] [ref=e247]:
+                                                        - text: HIST2002
+                                                        - generic [ref=e248]: Fri
+                                                    - paragraph [ref=e249]: 'Modern Europe: 1789-1914 (Honours Stream A)'
+                                                - generic [ref=e250]:
+                                                    - img [ref=e251]
+                                                    - generic [ref=e254]: W6A
+                                                    - generic [ref=e255]: Room 301
+                                                - generic [ref=e256]:
+                                                    - generic [ref=e257]:
+                                                        - img [ref=e258]
+                                                        - generic [ref=e261]: Class Times
+                                                    - generic [ref=e263]:
+                                                        - generic [ref=e264]: Friday
+                                                        - generic [ref=e265]: 16:00 - 18:00
+                                                - generic [ref=e268]: Color coding for calendar
+                            - region "Today's Events" [ref=e270]:
+                                - heading "Today's Events" [level=2] [ref=e271]
+                                - generic [ref=e274] [cursor=pointer]:
+                                    - generic [ref=e275]:
+                                        - heading "Events Today" [level=2] [ref=e276]
+                                        - button "View all →" [ref=e277]:
+                                            - img [ref=e278]
+                                            - text: View all →
+                                    - generic [ref=e283]:
+                                        - 'button "View event: Free Pizza Friday" [ref=e284]':
+                                            - generic [ref=e285]:
+                                                - heading "Free Pizza Friday" [level=3] [ref=e286]
+                                                - generic [ref=e287]: Free Food
+                                            - generic [ref=e288]:
+                                                - generic [ref=e289]:
+                                                    - img [ref=e290]
+                                                    - text: 12:00 PM - 2:00 PM
+                                                - generic [ref=e293]:
+                                                    - img [ref=e294]
+                                                    - text: Library Courtyard
+                                        - 'button "View event: Student Club Welcome Day" [ref=e297]':
+                                            - generic [ref=e298]:
+                                                - heading "Student Club Welcome Day" [level=3] [ref=e299]
+                                                - generic [ref=e300]: Social
+                                            - generic [ref=e301]:
+                                                - generic [ref=e302]:
+                                                    - img [ref=e303]
+                                                    - text: 10:00 AM - 3:00 PM
+                                                - generic [ref=e306]:
+                                                    - img [ref=e307]
+                                                    - text: Campus Hub
+                            - button "Quick Actions" [ref=e312] [cursor=pointer]:
+                                - img [ref=e314]
+        - contentinfo "Footer" [ref=e315]:
+            - paragraph [ref=e316]: © 2026 Syllabus Sync - Macquarie University
+    - region "Notifications (F8)":
+        - region "Notifications"
+    - generic [active]:
+        - generic [ref=e319]:
+            - generic [ref=e320]:
+                - navigation [ref=e322]:
+                    - button "previous" [disabled] [ref=e323]:
+                        - img "previous" [ref=e324]
+                    - generic [ref=e326]:
+                        - generic [ref=e327]: 1/
+                        - text: '1'
+                    - button "next" [disabled] [ref=e328]:
+                        - img "next" [ref=e329]
+                - generic [ref=e332]:
+                    - img [ref=e333]
+                    - generic "Latest available version is detected (16.1.1)." [ref=e335]: Next.js 16.1.1
+                    - generic [ref=e336]: Turbopack
+            - dialog "Build Error" [ref=e338]:
+                - generic [ref=e341]:
+                    - generic [ref=e342]:
+                        - generic [ref=e343]:
+                            - generic [ref=e345]: Build Error
+                            - generic [ref=e346]:
+                                - button "Copy Error Info" [ref=e347] [cursor=pointer]:
+                                    - img [ref=e348]
+                                - button "No related documentation found" [disabled] [ref=e350]:
+                                    - img [ref=e351]
+                                - button "Attach Node.js inspector" [ref=e353] [cursor=pointer]:
+                                    - img [ref=e354]
+                        - generic [ref=e363]: Error evaluating Node.js code
+                    - generic [ref=e365]:
+                        - generic [ref=e367]:
+                            - img [ref=e369]
+                            - generic [ref=e371]: ./app/styles/liquid-glass.css
+                            - button "Open in editor" [ref=e372] [cursor=pointer]:
+                                - img [ref=e374]
+                        - generic [ref=e378]: 'Error evaluating Node.js code CssSyntaxError: /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/styles/liquid-glass.css:1282:1: Unexpected } [at Input.error (turbopack:///[project]/node_modules/postcss/lib/input.js:135:16)] [at Parser.unexpectedClose (turbopack:///[project]/node_modules/postcss/lib/parser.js:587:22)] [at Parser.end (turbopack:///[project]/node_modules/postcss/lib/parser.js:330:12)] [at Parser.parse (turbopack:///[project]/node_modules/postcss/lib/parser.js:456:16)] [at parse (turbopack:///[project]/node_modules/postcss/lib/parse.js:11:12)] [at new LazyResult (turbopack:///[project]/node_modules/postcss/lib/lazy-result.js:165:16)] [at Processor.process (turbopack:///[project]/node_modules/postcss/lib/processor.js:53:14)] [at transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:51)] [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:29)] [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:115:11)] Import trace: Client Component Browser: ./app/styles/liquid-glass.css [Client Component Browser] ./app/globals.css [Client Component Browser] ./app/layout.tsx [Server Component]'
+                - generic [ref=e379]: '1'
+                - generic [ref=e380]: '2'
+        - generic [ref=e385] [cursor=pointer]:
+            - button "Open Next.js Dev Tools" [ref=e386]:
+                - img [ref=e387]
+            - button "Open issues overlay" [ref=e391]:
+                - generic [ref=e392]:
+                    - generic [ref=e393]: '0'
+                    - generic [ref=e394]: '1'
+                - generic [ref=e395]: Issue
+    - alert [ref=e396]
+```

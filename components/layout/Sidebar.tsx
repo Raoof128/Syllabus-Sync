@@ -300,7 +300,7 @@ const Sidebar = memo(() => {
             <Link
               href="/settings"
               onClick={() => setMobileMenuOpen(false)}
-              className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
+              className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors sidebar-menu-item"
               title={`Level ${profile.level} - ${getLevelTitle()} (${profile.xp.toLocaleString()} XP)`}
               aria-label={`Gamification progress: Level ${profile.level} - ${getLevelTitle()}, ${profile.xp.toLocaleString()} XP`}
             >
