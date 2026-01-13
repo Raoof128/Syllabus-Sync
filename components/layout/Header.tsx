@@ -200,8 +200,12 @@ const Header = memo(() => {
             style={{ width: 'auto' }}
           />
           <div className="hidden sm:block">
-            <h1 className="text-mq-lg font-semibold text-mq-content">{APP_CONFIG.name}</h1>
-            <p className="text-mq-xs text-mq-content-secondary">{UNIVERSITY_CONFIG.shortName}</p>
+            <span className="text-mq-lg font-semibold text-mq-content block">
+              {APP_CONFIG.name}
+            </span>
+            <span className="text-mq-xs text-mq-content-secondary block">
+              {UNIVERSITY_CONFIG.shortName}
+            </span>
           </div>
         </Link>
 
@@ -247,6 +251,8 @@ const Header = memo(() => {
           <DropdownMenuContent
             align="end"
             className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
+            role="menu"
+            aria-label={t('notifications')}
           >
             <div className="p-3 border-b border-mq-border flex items-center justify-between">
               <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
@@ -345,6 +351,7 @@ const Header = memo(() => {
             onClick={toggleTheme}
             className="group relative p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px]"
             aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
+            aria-pressed={resolvedTheme === 'dark'}
             title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
           >
             <div className="relative w-5 h-5">

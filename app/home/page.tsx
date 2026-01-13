@@ -6,11 +6,13 @@ import HomeClient from './HomeClient';
 import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: `${APP_CONFIG.name} - Home`,
-  description: "Dashboard overview for units, deadlines, and today's schedule.",
+  title: 'Dashboard',
+  description:
+    'Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.',
   openGraph: {
-    title: `${APP_CONFIG.name} - Home`,
-    description: "Dashboard overview for units, deadlines, and today's schedule.",
+    title: `Dashboard | ${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+    description:
+      'Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.',
     type: 'website',
     images: [
       {

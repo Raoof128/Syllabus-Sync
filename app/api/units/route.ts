@@ -120,6 +120,18 @@ export async function GET(request: Request) {
       // Get unit IDs for class times query
       const unitIds = unitsData?.map((unit: { id: unknown }) => String(unit.id)) ?? [];
 
+      // Avoid `.in()` with an empty list (can error in PostgREST)
+      if (unitIds.length === 0) {
+        return jsonSuccess([], 200, {
+          pagination: {
+            page: Math.floor(query.offset / query.limit) + 1,
+            limit: query.limit,
+            total: count || 0,
+            totalPages: Math.ceil((count || 0) / query.limit),
+          },
+        });
+      }
+
       // Get class times for these units
       const { data: classTimesData, error: classTimesError } = await supabase
         .from('class_times')
@@ -247,28 +259,81 @@ export async function POST(request: Request) {
         const supabase = await createServerClient();
         const { schedule, location, ...unitData } = validatedData;
 
-        // SECURITY: Use atomic database function to prevent orphaned records
-        // This creates the unit and all class times in a single transaction
-        const { data, error } = await supabase.rpc('create_unit_with_schedule', {
-          p_user_id: userId,
-          p_code: unitData.code,
-          p_name: unitData.name,
-          p_color: unitData.color,
-          p_building: location.building,
-          p_room: location.room,
-          p_description: unitData.description || null,
-          p_schedule: schedule || [],
-        });
+        // 1. Insert Unit
+        const unitId = unitData.id || crypto.randomUUID();
+        const unitPayload = {
+          id: unitId,
+          user_id: userId,
+          code: unitData.code,
+          name: unitData.name,
+          color: unitData.color,
+          building: location.building,
+          room: location.room,
+          description: unitData.description || null,
+          created_at: unitData.createdAt
+            ? unitData.createdAt.toISOString()
+            : new Date().toISOString(),
+        };
 
-        if (error) {
-          if (error.code === '23505') {
+        const { data: unit, error: unitError } = await supabase
+          .from('units')
+          .insert(unitPayload)
+          .select()
+          .single();
+
+        if (unitError) {
+          if (unitError.code === '23505') {
             // Unique constraint violation
             return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
           }
-          return handleDatabaseError(error);
+          return handleDatabaseError(unitError);
         }
 
-        return jsonSuccess(data, 201);
+        type ClassTimeRow = {
+          id: string;
+          day: string;
+          start_time: string;
+          end_time: string;
+        };
+
+        // 2. Insert Class Times (if any)
+        let insertedSchedule: ClassTimeRow[] = [];
+        if (schedule && schedule.length > 0) {
+          const classTimesPayload = schedule.map((ct) => ({
+            id: ct.id || crypto.randomUUID(),
+            unit_id: unitId,
+            day: ct.day,
+            start_time: ct.startTime,
+            end_time: ct.endTime,
+          }));
+
+          const { data: classTimesRaw, error: scheduleError } = await supabase
+            .from('class_times')
+            .insert(classTimesPayload)
+            .select();
+
+          if (scheduleError) {
+            // Rollback: Delete the unit if schedule insertion fails
+            // This mimics the atomic transaction of the RPC
+            await supabase.from('units').delete().eq('id', unitId);
+            return handleDatabaseError(scheduleError);
+          }
+
+          insertedSchedule = ((classTimesRaw ?? []) as unknown[]).map((row) => row as ClassTimeRow);
+        }
+
+        // 3. Construct Response
+        const responseData = {
+          ...mapUnitRow(unit),
+          schedule: insertedSchedule.map((ct) => ({
+            id: ct.id,
+            day: ct.day,
+            startTime: ct.start_time,
+            endTime: ct.end_time,
+          })),
+        };
+
+        return jsonSuccess(responseData, 201);
       } catch (error) {
         console.error(
           'POST /api/units error:',

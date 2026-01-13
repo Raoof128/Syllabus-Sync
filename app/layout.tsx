@@ -23,7 +23,7 @@ const sourceSerif4 = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
+    default: APP_CONFIG.name,
     template: `%s | ${APP_CONFIG.name}`,
   },
   description: APP_CONFIG.fullDescription,

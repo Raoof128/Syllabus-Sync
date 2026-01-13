@@ -359,21 +359,22 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
             {hasHydrated && deadlines.length > 0 && (
               <>
                 <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
-                  <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
+                  <TrendingUp className="h-3 w-3 text-mq-content-secondary" aria-hidden="true" />
                   <Badge
                     className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
-                    aria-label={getStressAriaLabel(stressLevel)}
-                    title={getStressAriaLabel(stressLevel)}
+                    aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                    title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                   >
                     <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
                   </Badge>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
-                  <TrendingUp className="h-4 w-4 text-mq-content-secondary" />
+                  <TrendingUp className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
                   <span className="text-mq-sm text-mq-content">{t('workload')}</span>
                   <Badge
                     className={stressColors[stressLevel]}
-                    aria-label={getStressAriaLabel(stressLevel)}
+                    aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                    title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                   >
                     <span aria-hidden="true">{stressEmoji[stressLevel]}</span> {stressLevel}
                   </Badge>
@@ -429,9 +430,9 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                     {t('myUnits')}
                   </CardTitle>
                   <Button size="sm" variant="outline" className="gap-1" asChild>
-                    <Link href="/calendar" aria-label={t('viewAll')}>
-                      <ExternalLink className="h-4 w-4" />
-                      {t('viewAll')}
+                    <Link href="/calendar" aria-label={`${t('viewAll')} ${t('myUnits')}`}>
+                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                      <span>{t('viewAll')}</span>
                     </Link>
                   </Button>
                 </CardHeader>

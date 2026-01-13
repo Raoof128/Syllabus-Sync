@@ -212,10 +212,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
         {/* Mesh background now rendered in layout.tsx as CSS-only for performance */}
 
         {/* Skip to main content link for accessibility */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-mq-primary focus:text-white focus:rounded-mq focus:shadow-mq-lg focus:outline-none"
-        >
+        <a href="#main-content" className="skip-link">
           {t('skipToContent')}
         </a>
         <div className="layout-shell flex min-h-screen flex-col">

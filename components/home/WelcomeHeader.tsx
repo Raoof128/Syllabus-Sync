@@ -19,7 +19,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { GamificationStats } from '@/components/gamification';
 
@@ -38,8 +38,6 @@ interface WelcomeHeaderProps {
   showGamification?: boolean;
 }
 
-type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
-
 // ============================================
 // MESSAGE POOLS (MOVED TO TRANSLATIONS)
 // ============================================
@@ -51,16 +49,19 @@ type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 // ============================================
 
 /**
- * Determines the current time of day for message selection.
- * Uses local time to provide contextually appropriate messages.
+ * Deterministic daily seed (UTC) for stable messaging.
+ * Avoids re-rolling the message on every page load.
  */
-function getTimeOfDay(): TimeOfDay {
-  const hour = new Date().getHours();
+function getUtcDateKey(date: Date = new Date()): string {
+  return date.toISOString().slice(0, 10);
+}
 
-  if (hour >= 5 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 17) return 'afternoon';
-  if (hour >= 17 && hour < 21) return 'evening';
-  return 'night';
+function hashToIndex(seed: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return modulo === 0 ? 0 : hash % modulo;
 }
 
 /**
@@ -118,17 +119,7 @@ export function WelcomeHeader({
     return fallbackName ? formatDisplayName(fallbackName) : null;
   }, [name, fallbackName]);
 
-  // State for the message key - initialised to null to prevent hydration mismatch
-  const [messageKey, setMessageKey] = useState<string | null>(null);
-
-  // Select message ONCE on client-side mount using translation keys
-  // This prevents:
-  // 1. SSR/CSR hydration mismatches
-  // 2. Message re-rolling on every state change
-  useEffect(() => {
-    const timeOfDay = getTimeOfDay();
-
-    // Define message keys based on time of day
+  const messageKey = useMemo(() => {
     const generalKeys = [
       'welcomeMsg1',
       'welcomeMsg2',
@@ -140,23 +131,9 @@ export function WelcomeHeader({
       'welcomeMsg8',
     ];
 
-    const timeKeys: Record<TimeOfDay, string> = {
-      morning: 'welcomeMsgMorning',
-      afternoon: 'welcomeMsgAfternoon',
-      evening: 'welcomeMsgEvening',
-      night: 'welcomeMsgNight',
-    };
-
-    // 30% chance to use a time-of-day message
-    if (Math.random() < 0.3) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setMessageKey(timeKeys[timeOfDay]);
-    } else {
-      // Select a random general message
-      const randomIndex = Math.floor(Math.random() * generalKeys.length);
-      setMessageKey(generalKeys[randomIndex]);
-    }
-  }, []); // Empty deps = run once on mount
+    const seed = `${getUtcDateKey()}|${displayName ?? fallbackName ?? ''}`;
+    return generalKeys[hashToIndex(seed, generalKeys.length)];
+  }, [displayName, fallbackName]);
 
   // Build the greeting text
   const greeting = displayName ? `${t('welcome')}, ${displayName}!` : `${t('welcome')}!`;

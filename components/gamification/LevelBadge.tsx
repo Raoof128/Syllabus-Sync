@@ -79,6 +79,8 @@ export function LevelBadge({ size = 'md', showTitle = false, className }: LevelB
           levelGradient,
         )}
         title={`Level ${level}: ${title}`}
+        role="img"
+        aria-label={`Level ${level}: ${title}`}
       >
         {level}
       </div>
@@ -141,6 +143,8 @@ export function LevelBadgeInline({ className }: LevelBadgeInlineProps) {
         'bg-mq-primary text-white',
         className,
       )}
+      title={`Level ${level}`}
+      aria-label={`Level ${level}`}
     >
       Lv.{level}
     </span>

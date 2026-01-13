@@ -68,9 +68,9 @@ const NextDeadline = memo(() => {
           >
             <CardTitle>{t('nextDeadline')}</CardTitle>
             <Button size="sm" variant="outline" className="gap-1" asChild>
-              <Link href="/calendar" aria-label={t('viewAll')}>
-                <ExternalLink className="h-4 w-4" />
-                {t('viewAll')}
+              <Link href="/calendar" aria-label={`${t('viewAll')} ${t('nextDeadline')}`}>
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                <span>{t('viewAll')}</span>
               </Link>
             </Button>
           </CardHeader>

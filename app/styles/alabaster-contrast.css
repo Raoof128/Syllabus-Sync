@@ -298,3 +298,68 @@ html:not(.dark) .calendar-page .alabaster-readable,
 html:not(.dark) .home-page .alabaster-readable {
   color: var(--mq-content) !important;
 }
+
+/* ============================================
+   GLOBAL FOCUS INDICATORS - WCAG 2.1 AA
+   Ensure all interactive elements have visible focus
+   ============================================ */
+
+/* Global focus visible styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--mq-focus, #a6192e) !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip link: always visible on focus (keyboard users) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  border-radius: var(--mq-radius, 12px);
+  background: var(--mq-primary, #a6192e);
+  color: #fff;
+  z-index: 100;
+}
+
+/* Ensure buttons, links, and inputs have visible focus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--mq-focus, #a6192e) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(166, 25, 46, 0.2) !important;
+}
+
+/* High contrast focus for dark mode */
+.dark :focus-visible {
+  outline: 2px solid #fff !important;
+  outline-offset: 2px !important;
+}
+
+.dark button:focus-visible,
+.dark a:focus-visible,
+.dark input:focus-visible,
+.dark select:focus-visible,
+.dark textarea:focus-visible,
+.dark [role='button']:focus-visible,
+.dark [tabindex]:focus-visible {
+  outline: 2px solid #fff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3) !important;
+}

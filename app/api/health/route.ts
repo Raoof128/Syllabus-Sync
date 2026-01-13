@@ -1,17 +1,29 @@
 // import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Use admin client for health check to bypass RLS
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  },
+);
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
   try {
-    // Test database connection
-    const supabase = await createServerClient();
-
-    // Simple query to test database connectivity
-    const { error } = await supabase.from('units').select('count', { count: 'exact', head: true });
+    // Simple query to test database connectivity using admin client
+    // Querying 'profiles' table with limit 1 is lightweight
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .select('count', { count: 'exact', head: true });
 
     if (error) {
       // SECURITY: Don't expose database error details in production

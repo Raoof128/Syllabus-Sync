@@ -1,0 +1,292 @@
+### Page state
+
+- Page URL: http://localhost:3000/home
+- Page Title: Dashboard | The Syllabus Sync - Macquarie University | The Syllabus Sync
+- Page Snapshot:
+
+```yaml
+- generic [ref=e1]:
+    - link "Skip to content" [ref=e42] [cursor=pointer]:
+        - /url: '#main-content'
+    - generic [ref=e43]:
+        - generic [ref=e44]:
+            - button "Open navigation menu" [ref=e401] [cursor=pointer]:
+                - img
+            - complementary:
+                - navigation "Main navigation" [ref=e402]:
+                    - link "Macquarie University Logo" [ref=e335] [cursor=pointer]:
+                        - /url: /home
+                        - img "Macquarie University Logo" [ref=e336]
+                    - 'link "Gamification progress: Level 1 - Freshman, 0 XP" [ref=e337] [cursor=pointer]':
+                        - /url: /settings
+                        - generic [ref=e338]: '1'
+                        - generic [ref=e339]:
+                            - paragraph [ref=e340]: Freshman
+                            - generic [ref=e341]:
+                                - img [ref=e342]
+                                - generic [ref=e345]: 0 XP
+                    - navigation "Main navigation" [ref=e346]:
+                        - link "Home" [ref=e347] [cursor=pointer]:
+                            - /url: /home
+                            - img
+                            - text: Home
+                        - link "Calendar" [ref=e348] [cursor=pointer]:
+                            - /url: /calendar
+                            - img
+                            - text: Calendar
+                        - link "Map" [ref=e349] [cursor=pointer]:
+                            - /url: /map
+                            - img
+                            - text: Map
+                        - link "Events Feed" [ref=e350] [cursor=pointer]:
+                            - /url: /feed
+                            - img
+                            - text: Events Feed
+                        - link "Settings" [ref=e351] [cursor=pointer]:
+                            - /url: /settings
+                            - img
+                            - text: Settings
+                    - list [ref=e353]:
+                        - listitem [ref=e354]:
+                            - link "Facebook (opens in new tab)" [ref=e355] [cursor=pointer]:
+                                - /url: https://www.facebook.com/macquarieuni/
+                                - img [ref=e356]
+                                - generic: Facebook
+                                - generic [ref=e358]: (opens in new tab)
+                        - listitem [ref=e359]:
+                            - link "Instagram (opens in new tab)" [ref=e360] [cursor=pointer]:
+                                - /url: https://www.instagram.com/macquarieuni/
+                                - img [ref=e361]
+                                - generic: Instagram
+                                - generic [ref=e363]: (opens in new tab)
+                        - listitem [ref=e364]:
+                            - link "LinkedIn (opens in new tab)" [ref=e365] [cursor=pointer]:
+                                - /url: https://www.linkedin.com/school/macquarie-university/
+                                - img [ref=e366]
+                                - generic: LinkedIn
+                                - generic [ref=e370]: (opens in new tab)
+                        - listitem [ref=e371]:
+                            - link "TikTok (opens in new tab)" [ref=e372] [cursor=pointer]:
+                                - /url: https://www.tiktok.com/@macquarieuni
+                                - img [ref=e373]
+                                - generic: TikTok
+                                - generic [ref=e375]: (opens in new tab)
+                        - listitem [ref=e376]:
+                            - link "YouTube (opens in new tab)" [ref=e377] [cursor=pointer]:
+                                - /url: https://www.youtube.com/user/MacquarieUniversity
+                                - img [ref=e378]
+                                - generic: YouTube
+                                - generic [ref=e380]: (opens in new tab)
+                        - listitem [ref=e381]:
+                            - link "X (opens in new tab)" [ref=e382] [cursor=pointer]:
+                                - /url: https://x.com/Macquarie_Uni
+                                - img [ref=e383]
+                                - generic: X
+                                - generic [ref=e385]: (opens in new tab)
+            - generic [ref=e51]:
+                - banner [ref=e52]:
+                    - link "Macquarie University Logo" [ref=e386] [cursor=pointer]:
+                        - /url: /
+                        - img "Macquarie University Logo" [ref=e55]
+                    - generic [ref=e61]:
+                        - button "Notifications" [ref=e62] [cursor=pointer]:
+                            - img
+                        - button "Switch to dark mode" [ref=e63] [cursor=pointer]:
+                            - img [ref=e65]
+                        - button "Open profile menu" [ref=e71] [cursor=pointer]:
+                            - generic:
+                                - generic: R
+                - main "Main content" [ref=e72]:
+                    - region "Dashboard overview" [ref=e74]:
+                        - generic [ref=e75]:
+                            - banner [ref=e77]:
+                                - generic [ref=e78]:
+                                    - generic [ref=e79]:
+                                        - heading "Welcome, Raouf!" [level=1] [ref=e80]
+                                        - 'img "Level 1: Freshman" [ref=e83]': '1'
+                                    - paragraph [ref=e84]: Here's your day at a glance.
+                                - generic [ref=e387]:
+                                    - img [ref=e388]
+                                    - 'generic "Workload: Low stress level - you have few upcoming deadlines" [ref=e391]':
+                                        - generic [ref=e392]: 😊
+                            - region "Dashboard overview" [ref=e93]:
+                                - generic [ref=e97] [cursor=pointer]:
+                                    - generic [ref=e98]:
+                                        - heading "Today's Classes" [level=2] [ref=e99]
+                                        - link "View all → Today's Classes" [ref=e100]:
+                                            - /url: /calendar?view=today
+                                            - img [ref=e101]
+                                            - generic [ref=e105]: View all →
+                                    - link "MATH1001 - Foundations of Mathematics, 10:00 - 12:00 at C3C 112" [ref=e108]:
+                                        - /url: /calendar?date=2026-01-13&unit=MATH1001
+                                        - generic [ref=e109]:
+                                            - heading "MATH1001 — Foundations of Mathematics" [level=3] [ref=e110]
+                                            - generic [ref=e111]:
+                                                - generic [ref=e112]:
+                                                    - img [ref=e113]
+                                                    - generic [ref=e116]: 10:00 - 12:00
+                                                - generic [ref=e117]:
+                                                    - img [ref=e118]
+                                                    - generic [ref=e121]: C3C 112
+                                - generic [ref=e125] [cursor=pointer]:
+                                    - generic [ref=e126]:
+                                        - heading "Next Deadline" [level=2] [ref=e127]
+                                        - link "View all → Next Deadline" [ref=e128]:
+                                            - /url: /calendar
+                                            - img [ref=e129]
+                                            - generic [ref=e133]: View all →
+                                    - 'link "View Assignment 1: Network Fundamentals deadline details in calendar" [ref=e135]':
+                                        - /url: /calendar?date=2026-01-16
+                                        - generic [ref=e136]:
+                                            - generic [ref=e137]:
+                                                - generic [ref=e138]:
+                                                    - 'heading "COMP2310 — Assignment 1: Network Fundamentals" [level=3] [ref=e139]'
+                                                    - generic [ref=e140]: High
+                                                - paragraph [ref=e141]: Due Jan 16, 11:59 PM
+                                            - generic [ref=e142]:
+                                                - img [ref=e143]
+                                                - generic [ref=e146]: in 3 days
+                            - region "My Units" [ref=e148]:
+                                - generic [ref=e151] [cursor=pointer]:
+                                    - generic [ref=e152]:
+                                        - heading "My Units" [level=2] [ref=e153]:
+                                            - img [ref=e154]
+                                            - text: My Units
+                                        - link "View all → My Units" [ref=e156]:
+                                            - /url: /calendar
+                                            - img [ref=e157]
+                                            - generic [ref=e161]: View all →
+                                    - generic [ref=e162]:
+                                        - generic [ref=e163]:
+                                            - generic [ref=e164]:
+                                                - paragraph [ref=e165]: '3'
+                                                - paragraph [ref=e166]: Units
+                                            - generic [ref=e167]:
+                                                - paragraph [ref=e168]: '5'
+                                                - paragraph [ref=e169]: Classes/Week
+                                            - generic [ref=e170]:
+                                                - paragraph [ref=e171]: 9h
+                                                - paragraph [ref=e172]: Study Hours
+                                        - generic [ref=e173]:
+                                            - generic [ref=e178]:
+                                                - generic [ref=e180]:
+                                                    - heading "COMP2310 Mon, Wed" [level=2] [ref=e181]:
+                                                        - text: COMP2310
+                                                        - generic [ref=e182]: Mon, Wed
+                                                    - paragraph [ref=e183]: Networking
+                                                - generic [ref=e184]:
+                                                    - img [ref=e185]
+                                                    - generic [ref=e188]: C5C
+                                                    - generic [ref=e189]: Room 204
+                                                - generic [ref=e190]:
+                                                    - generic [ref=e191]:
+                                                        - img [ref=e192]
+                                                        - generic [ref=e195]: Class Times
+                                                    - generic [ref=e196]:
+                                                        - generic [ref=e197]:
+                                                            - generic [ref=e198]: Monday
+                                                            - generic [ref=e199]: 09:00 - 11:00
+                                                        - generic [ref=e200]:
+                                                            - generic [ref=e201]: Wednesday
+                                                            - generic [ref=e202]: 14:00 - 15:00
+                                                - generic [ref=e205]: Color coding for calendar
+                                            - generic [ref=e210]:
+                                                - generic [ref=e212]:
+                                                    - heading "MATH1001 Tue, Thu" [level=2] [ref=e213]:
+                                                        - text: MATH1001
+                                                        - generic [ref=e214]: Tue, Thu
+                                                    - paragraph [ref=e215]: Foundations of Mathematics
+                                                - generic [ref=e216]:
+                                                    - img [ref=e217]
+                                                    - generic [ref=e220]: C3C
+                                                    - generic [ref=e221]: Room 112
+                                                - generic [ref=e222]:
+                                                    - generic [ref=e223]:
+                                                        - img [ref=e224]
+                                                        - generic [ref=e227]: Class Times
+                                                    - generic [ref=e228]:
+                                                        - generic [ref=e229]:
+                                                            - generic [ref=e230]: Tuesday
+                                                            - generic [ref=e231]: 10:00 - 12:00
+                                                        - generic [ref=e232]:
+                                                            - generic [ref=e233]: Thursday
+                                                            - generic [ref=e234]: 13:00 - 14:30
+                                                - generic [ref=e237]: Color coding for calendar
+                                            - generic [ref=e242]:
+                                                - generic [ref=e244]:
+                                                    - heading "HIST2002 Fri" [level=2] [ref=e245]:
+                                                        - text: HIST2002
+                                                        - generic [ref=e246]: Fri
+                                                    - paragraph [ref=e247]: 'Modern Europe: 1789-1914 (Honours Stream A)'
+                                                - generic [ref=e248]:
+                                                    - img [ref=e249]
+                                                    - generic [ref=e252]: W6A
+                                                    - generic [ref=e253]: Room 301
+                                                - generic [ref=e254]:
+                                                    - generic [ref=e255]:
+                                                        - img [ref=e256]
+                                                        - generic [ref=e259]: Class Times
+                                                    - generic [ref=e261]:
+                                                        - generic [ref=e262]: Friday
+                                                        - generic [ref=e263]: 16:00 - 18:00
+                                                - generic [ref=e266]: Color coding for calendar
+                            - region "Today's Events" [ref=e268]:
+                                - heading "Today's Events" [level=2] [ref=e269]
+                                - generic [ref=e272] [cursor=pointer]:
+                                    - generic [ref=e273]:
+                                        - heading "Events Today" [level=2] [ref=e274]
+                                        - button "View all →" [ref=e275]:
+                                            - img [ref=e276]
+                                            - text: View all →
+                                    - generic [ref=e281]:
+                                        - 'button "View event: Free Pizza Friday" [ref=e282]':
+                                            - generic [ref=e283]:
+                                                - heading "Free Pizza Friday" [level=3] [ref=e284]
+                                                - generic [ref=e285]: Free Food
+                                            - generic [ref=e286]:
+                                                - generic [ref=e287]:
+                                                    - img [ref=e288]
+                                                    - text: 12:00 PM - 2:00 PM
+                                                - generic [ref=e291]:
+                                                    - img [ref=e292]
+                                                    - text: Library Courtyard
+                                        - 'button "View event: Student Club Welcome Day" [ref=e295]':
+                                            - generic [ref=e296]:
+                                                - heading "Student Club Welcome Day" [level=3] [ref=e297]
+                                                - generic [ref=e298]: Social
+                                            - generic [ref=e299]:
+                                                - generic [ref=e300]:
+                                                    - img [ref=e301]
+                                                    - text: 10:00 AM - 3:00 PM
+                                                - generic [ref=e304]:
+                                                    - img [ref=e305]
+                                                    - text: Campus Hub
+                            - generic [ref=e394]:
+                                - generic [ref=e403]:
+                                    - button "Add Unit" [ref=e404] [cursor=pointer]:
+                                        - img [ref=e405]
+                                        - text: Add Unit
+                                    - button "Add Deadline" [ref=e407] [cursor=pointer]:
+                                        - img [ref=e408]
+                                        - text: Add Deadline
+                                - button "Quick Actions" [expanded] [active] [ref=e395] [cursor=pointer]:
+                                    - img [ref=e397]
+        - contentinfo "Footer" [ref=e308]:
+            - paragraph [ref=e309]: © 2026 Syllabus Sync - Macquarie University
+    - region "Notifications (F8)":
+        - region "Notifications"
+    - generic [ref=e36] [cursor=pointer]:
+        - button "Open Next.js Dev Tools" [ref=e37]:
+            - img [ref=e38]
+        - generic [ref=e322]:
+            - button "Open issues overlay" [ref=e323]:
+                - generic [ref=e324]:
+                    - generic [ref=e325]: '1'
+                    - generic [ref=e326]: '2'
+                - generic [ref=e327]:
+                    - text: Issue
+                    - generic [ref=e328]: s
+            - button "Collapse issues badge" [ref=e329]:
+                - img [ref=e330]
+    - alert [ref=e41]: Dashboard | The Syllabus Sync - Macquarie University | The Syllabus Sync
+```

@@ -29,8 +29,7 @@ export async function GET(request: Request) {
         .order('due_date', { ascending: true });
 
       if (error) {
-        console.error('Database error:', error);
-        return jsonError('Failed to fetch deadlines', 500, ERROR_CODES.DATABASE_ERROR);
+        return jsonError('A database error occurred', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return NextResponse.json(data?.map(mapDeadlineRow) ?? []);

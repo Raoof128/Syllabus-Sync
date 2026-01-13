@@ -1,0 +1,135 @@
+### New console messages
+
+- Error: Hydration failed because the server rendered HTML didn't match the client. As a result this t...
+- [WARNING] Image with src "/MQ_Logo_Final.png" has either width or height modified, but not the other...
+- [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/\_next/static/chunks/node_modules_next_dist_f...
+- [LOG] [Fast Refresh] done in 162ms @ http://localhost:3000/\_next/static/chunks/node_modules_next_dis...
+- [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/\_next/static/chunks/node_modules_next_dist_f...
+- [LOG] [Fast Refresh] done in 115ms @ http://localhost:3000/\_next/static/chunks/node_modules_next_dis...
+
+### Page state
+
+- Page URL: http://localhost:3000/test-auth
+- Page Title: The Syllabus Sync - Macquarie University
+- Page Snapshot:
+
+```yaml
+- generic [active] [ref=e1]:
+    - generic [ref=e26] [cursor=pointer]:
+        - button "Open Next.js Dev Tools" [ref=e27]:
+            - img [ref=e28]
+        - generic [ref=e31]:
+            - button "Open issues overlay" [ref=e32]:
+                - generic [ref=e33]:
+                    - generic [ref=e34]: '0'
+                    - generic [ref=e35]: '1'
+                - generic [ref=e36]: Issue
+            - button "Collapse issues badge" [ref=e37]:
+                - img [ref=e38]
+    - link "Skip to content" [ref=e40] [cursor=pointer]:
+        - /url: '#main-content'
+    - generic [ref=e41]:
+        - generic [ref=e42]:
+            - complementary [ref=e43]:
+                - button "Open navigation menu" [ref=e44] [cursor=pointer]
+                - navigation "Main navigation":
+                    - generic:
+                        - link "Macquarie University Logo":
+                            - /url: /home
+                            - img "Macquarie University Logo"
+                    - 'link "Gamification progress: Level 1 - Freshman, 0 XP"':
+                        - /url: /settings
+                        - generic: '1'
+                        - generic:
+                            - paragraph: Freshman
+                            - generic:
+                                - img
+                                - generic: 0 XP
+                    - navigation "Main navigation":
+                        - link "Home":
+                            - /url: /home
+                            - img
+                            - text: Home
+                        - link "Calendar":
+                            - /url: /calendar
+                            - img
+                            - text: Calendar
+                        - link "Map":
+                            - /url: /map
+                            - img
+                            - text: Map
+                        - link "Events Feed":
+                            - /url: /feed
+                            - img
+                            - text: Events Feed
+                        - link "Settings":
+                            - /url: /settings
+                            - img
+                            - text: Settings
+                    - generic:
+                        - list:
+                            - listitem:
+                                - link "Facebook (opens in new tab)":
+                                    - /url: https://www.facebook.com/macquarieuni/
+                                    - img
+                                    - generic: Facebook
+                                    - generic: (opens in new tab)
+                            - listitem:
+                                - link "Instagram (opens in new tab)":
+                                    - /url: https://www.instagram.com/macquarieuni/
+                                    - img
+                                    - generic: Instagram
+                                    - generic: (opens in new tab)
+                            - listitem:
+                                - link "LinkedIn (opens in new tab)":
+                                    - /url: https://www.linkedin.com/school/macquarie-university/
+                                    - img
+                                    - generic: LinkedIn
+                                    - generic: (opens in new tab)
+                            - listitem:
+                                - link "TikTok (opens in new tab)":
+                                    - /url: https://www.tiktok.com/@macquarieuni
+                                    - img
+                                    - generic: TikTok
+                                    - generic: (opens in new tab)
+                            - listitem:
+                                - link "YouTube (opens in new tab)":
+                                    - /url: https://www.youtube.com/user/MacquarieUniversity
+                                    - img
+                                    - generic: YouTube
+                                    - generic: (opens in new tab)
+                            - listitem:
+                                - link "X (opens in new tab)":
+                                    - /url: https://x.com/Macquarie_Uni
+                                    - img
+                                    - generic: X
+                                    - generic: (opens in new tab)
+            - generic [ref=e49]:
+                - banner [ref=e50]:
+                    - generic [ref=e51]:
+                        - link "Macquarie University Logo The Syllabus Sync Macquarie University" [ref=e52] [cursor=pointer]:
+                            - /url: /
+                            - img "Macquarie University Logo" [ref=e53]
+                            - generic [ref=e54]:
+                                - heading "The Syllabus Sync" [level=1] [ref=e55]
+                                - paragraph [ref=e56]: Macquarie University
+                        - generic [ref=e58]: Tuesday 13 January 2026
+                    - generic [ref=e59]:
+                        - button "Notifications" [ref=e60] [cursor=pointer]:
+                            - img
+                        - button "Switch to dark mode" [ref=e61] [cursor=pointer]:
+                            - img [ref=e63]
+                        - button "Open profile menu" [ref=e69] [cursor=pointer]:
+                            - generic:
+                                - generic: R
+                            - generic "Raouf Developer"
+                - main "Main content" [ref=e70]:
+                    - generic [ref=e72]:
+                        - heading "Debug API" [level=1] [ref=e73]
+                        - generic [ref=e74]: '{ "health": { "success": true, "data": { "status": "healthy", "database": "connected", "timestamp": "2026-01-13T02:59:24.281Z", "version": "1.0.0-rc.1" }, "meta": { "timestamp": "2026-01-13T02:59:24.281Z" } }, "units": { "success": true, "data": [], "meta": { "timestamp": "2026-01-13T02:59:24.677Z", "pagination": { "page": 1, "limit": 50, "total": 0, "totalPages": 0 } } }, "deadlines": [] }'
+        - contentinfo "Footer" [ref=e75]:
+            - paragraph [ref=e76]: © 2026 Syllabus Sync - Macquarie University
+    - region "Notifications (F8)":
+        - region "Notifications"
+    - alert [ref=e77]
+```

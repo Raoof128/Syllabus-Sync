@@ -1,112 +1,51 @@
-// Test page for authentication API
-// SECURITY: This page is only accessible in development mode
 'use client';
+import { useEffect, useState } from 'react';
 
-import { useState } from 'react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
-import { Button } from '@/components/ui/mq/button';
-import { notFound } from 'next/navigation';
+type DebugData = Record<string, unknown>;
 
-// SECURITY: Gate this page to development only at module level
-const isDevelopment = process.env.NODE_ENV === 'development';
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
 
-export default function TestAuthPage() {
-  const { t } = useTranslation();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [result, setResult] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+export default function DebugPage() {
+  const [data, setData] = useState<DebugData>({});
 
-  // SECURITY: Return 404 in production - this check happens on server and client
-  if (!isDevelopment) {
-    notFound();
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const results: DebugData = {};
 
-  const testSignup = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'test2@student.mq.edu.au',
-          password: 'testpassword123!',
-          fullName: 'Test User 2',
-          studentId: '87654321',
-        }),
-      });
-      const data = await response.json();
-      setResult({ action: 'signup', ...data });
-    } catch (error) {
-      setResult({
-        action: 'signup',
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-    setLoading(false);
-  };
+      try {
+        const h = await fetch('/api/health');
+        results.health = await h.json();
+      } catch (error) {
+        results.health = getErrorMessage(error);
+      }
 
-  const testSignin = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'test@student.mq.edu.au',
-          password: 'testpassword123',
-        }),
-      });
-      const data = await response.json();
-      setResult({ action: 'signin', ...data });
-    } catch (error) {
-      setResult({
-        action: 'signin',
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-    setLoading(false);
-  };
+      try {
+        const u = await fetch('/api/units');
+        results.units = await u.json();
+      } catch (error) {
+        results.units = getErrorMessage(error);
+      }
 
-  const testUser = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/auth/user');
-      const data = await response.json();
-      setResult({ action: 'user', ...data });
-    } catch (error) {
-      setResult({ action: 'user', error: error instanceof Error ? error.message : String(error) });
-    }
-    setLoading(false);
-  };
+      try {
+        const d = await fetch('/api/deadlines');
+        results.deadlines = await d.json();
+      } catch (error) {
+        results.deadlines = getErrorMessage(error);
+      }
+
+      setData(results);
+    };
+
+    void fetchData();
+  }, []);
 
   return (
-    <div className="p-8">
-      <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-md text-yellow-800 text-sm">
-        <strong>Development Only:</strong> This page is only accessible in development mode.
-      </div>
-
-      <h1 className="text-2xl font-bold mb-4">{t('authenticationApiTest')}</h1>
-
-      <div className="space-x-4 mb-8">
-        <Button onClick={testSignup} disabled={loading} variant="primary">
-          {t('testSignup')}
-        </Button>
-
-        <Button onClick={testSignin} disabled={loading} variant="secondary">
-          {t('testSignin')}
-        </Button>
-
-        <Button onClick={testUser} disabled={loading} variant="outline">
-          {t('testUser')}
-        </Button>
-      </div>
-
-      {result && (
-        <div className="bg-mq-background-secondary p-4 rounded-mq">
-          <h2 className="font-bold mb-2">{t('resultAction', { action: result.action })}</h2>
-          <pre className="text-sm overflow-auto">{JSON.stringify(result, null, 2)}</pre>
-        </div>
-      )}
+    <div className="p-4 bg-white text-black min-h-screen">
+      <h1 className="text-2xl font-bold mb-4">Debug API</h1>
+      <pre className="whitespace-pre-wrap font-mono text-xs">{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
 }

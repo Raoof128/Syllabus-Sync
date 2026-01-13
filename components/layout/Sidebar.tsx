@@ -301,7 +301,8 @@ const Sidebar = memo(() => {
               href="/settings"
               onClick={() => setMobileMenuOpen(false)}
               className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
-              title={`Level ${profile.level} - ${getLevelTitle()}`}
+              title={`Level ${profile.level} - ${getLevelTitle()} (${profile.xp.toLocaleString()} XP)`}
+              aria-label={`Gamification progress: Level ${profile.level} - ${getLevelTitle()}, ${profile.xp.toLocaleString()} XP`}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mq-primary text-white text-xs font-bold">
                 {profile.level}
@@ -309,7 +310,7 @@ const Sidebar = memo(() => {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-mq-content truncate">{getLevelTitle()}</p>
                 <div className="flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-mq-primary" />
+                  <Sparkles className="h-3 w-3 text-mq-primary" aria-hidden="true" />
                   <span className="text-[10px] text-mq-content-secondary">
                     {profile.xp.toLocaleString()} XP
                   </span>
@@ -337,7 +338,6 @@ const Sidebar = memo(() => {
                       : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
                   )}
                   aria-current={isActive ? 'page' : undefined}
-                  aria-label={t('navigateToItem', { name: t(item.name) })}
                 >
                   <Icon
                     className={cn(

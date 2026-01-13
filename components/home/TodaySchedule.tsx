@@ -9,18 +9,20 @@ import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { MagicCard } from '@/components/ui/MagicCard';
 
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const { t } = useTranslation();
-  const router = useRouter();
 
   const todayLabel = useMemo(() => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[new Date().getDay()];
+  }, []);
+
+  const todayDate = useMemo(() => {
+    return new Date().toISOString().split('T')[0];
   }, []);
 
   const todayClasses = useMemo(() => {
@@ -36,25 +38,20 @@ const TodaySchedule = memo(() => {
     return classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
   }, [todayLabel, units]);
 
-  const handleViewAll = () => {
-    router.push('/calendar');
-  };
-
   return (
     <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{t('todaysClasses')}</CardTitle>
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1"
-              onClick={handleViewAll}
-              aria-label={t('viewAll')}
-            >
-              <ExternalLink className="h-4 w-4" />
-              {t('viewAll')}
+            <Button size="sm" variant="outline" className="gap-1" asChild>
+              <Link
+                href="/calendar?view=today"
+                aria-label={`${t('viewAll')} ${t('todaysClasses')}`}
+              >
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                <span>{t('viewAll')}</span>
+              </Link>
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -77,7 +74,10 @@ const TodaySchedule = memo(() => {
               </div>
             ) : todayClasses.length === 0 ? (
               <div className="text-center py-8">
-                <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <Clock
+                  className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
+                  aria-hidden="true"
+                />
                 <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
               </div>
             ) : (
@@ -85,8 +85,8 @@ const TodaySchedule = memo(() => {
                 {todayClasses.map((cls, index) => (
                   <Link
                     key={`${cls.id}-${cls.code}`}
-                    href="/calendar"
-                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
+                    href={`/calendar?date=${todayDate}&unit=${encodeURIComponent(cls.code)}`}
+                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
                     aria-label={`${cls.code} - ${cls.name}, ${cls.startTime} - ${cls.endTime} at ${cls.location.building} ${cls.location.room}`}
                   >
                     {/* Color indicator */}
@@ -103,12 +103,16 @@ const TodaySchedule = memo(() => {
 
                       <div className="flex items-center gap-4 mt-1 text-sm text-mq-content-secondary">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {cls.startTime} - {cls.endTime}
+                          <Clock className="h-4 w-4" aria-hidden="true" />
+                          <span>
+                            {cls.startTime} - {cls.endTime}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {cls.location.building} {cls.location.room}
+                          <MapPin className="h-4 w-4" aria-hidden="true" />
+                          <span>
+                            {cls.location.building} {cls.location.room}
+                          </span>
                         </div>
                       </div>
                     </div>
