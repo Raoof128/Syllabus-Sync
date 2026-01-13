@@ -250,15 +250,22 @@
 /* Mobile: expand to full width to avoid overlap and truncation */
 @media (max-width: 640px) {
   .social-buttons {
+    flex-direction: column;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 12px;
+  }
+
+  .social-buttons li {
+    width: 100%;
+    height: 48px;
   }
 
   .social-buttons li a {
     position: relative;
     left: 0;
     transform: none;
-    width: 48px;
+    width: 100%;
   }
 
   .social-buttons li:hover a,

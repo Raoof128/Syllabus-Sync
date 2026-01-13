@@ -24,7 +24,7 @@
 'use client';
 
 import { memo, useSyncExternalStore, useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
 
 // ============================================================================
 // CLIENT-SIDE DETECTION
@@ -246,7 +246,7 @@ const Blob = memo(({ config, prefersReducedMotion, isDarkMode }: BlobProps) => {
   }
 
   return (
-    <motion.div
+    <m.div
       style={baseStyle}
       aria-hidden="true"
       animate={{
@@ -331,40 +331,42 @@ const MovingMeshBackground = memo(
     const shouldAnimate = isClient && !forceStatic && !prefersReducedMotion;
 
     return (
-      <div
-        className={`moving-mesh-background ${className || ''}`}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: -20,
-          overflow: 'hidden',
-          pointerEvents: 'none',
-          background: 'var(--c-background, #edeade)',
-        }}
-        aria-hidden="true"
-      >
-        {blobs.map((config) => (
-          <Blob
-            key={config.id}
-            config={config}
-            prefersReducedMotion={!shouldAnimate}
-            isDarkMode={isDarkMode}
-          />
-        ))}
-
-        {/* Subtle noise overlay for texture */}
+      <LazyMotion features={domAnimation}>
         <div
+          className={`moving-mesh-background ${className || ''}`}
           style={{
-            position: 'absolute',
+            position: 'fixed',
             inset: 0,
-            background: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-            opacity: 0.03,
-            mixBlendMode: 'overlay',
+            zIndex: -20,
+            overflow: 'hidden',
             pointerEvents: 'none',
+            background: 'var(--c-background, #edeade)',
           }}
           aria-hidden="true"
-        />
-      </div>
+        >
+          {blobs.map((config) => (
+            <Blob
+              key={config.id}
+              config={config}
+              prefersReducedMotion={!shouldAnimate}
+              isDarkMode={isDarkMode}
+            />
+          ))}
+
+          {/* Subtle noise overlay for texture */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+              opacity: 0.03,
+              mixBlendMode: 'overlay',
+              pointerEvents: 'none',
+            }}
+            aria-hidden="true"
+          />
+        </div>
+      </LazyMotion>
     );
   },
 );

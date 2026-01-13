@@ -5,12 +5,16 @@ import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import CalendarClient from './CalendarClient';
 
 export const metadata: Metadata = {
-  title: `${APP_CONFIG.name} - Calendar`,
-  description: 'Track upcoming deadlines and manage assignment dates.',
+  title: 'Calendar',
+  description: 'View and manage upcoming deadlines, assignments, and events in one calendar.',
+  alternates: {
+    canonical: '/calendar',
+  },
   openGraph: {
     title: `${APP_CONFIG.name} - Calendar`,
-    description: 'Track upcoming deadlines and manage assignment dates.',
+    description: 'View and manage upcoming deadlines, assignments, and events in one calendar.',
     type: 'website',
+    url: '/calendar',
     images: [
       {
         url: `${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`,
@@ -20,6 +24,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    title: `${APP_CONFIG.name} - Calendar`,
+    description: 'View and manage upcoming deadlines, assignments, and events in one calendar.',
     images: [`${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`],
   },
 };

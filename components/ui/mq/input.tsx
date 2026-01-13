@@ -44,7 +44,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            'flex h-10 w-full rounded-mq border border-mq-border bg-mq-input-background px-3 py-2 text-mq-sm text-mq-content placeholder:text-mq-content-tertiary transition-colors duration-mq-fast ease-mq-snap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+            'flex h-10 w-full rounded-mq border border-mq-border bg-mq-input-background px-3 py-2 text-mq-sm text-mq-content placeholder:text-mq-content-tertiary shadow-xs transition-colors duration-mq-fast ease-mq-snap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
             error && 'border-mq-error focus-visible:ring-mq-error',
             className,
           )}

@@ -211,6 +211,9 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
                 {currentProfile.name || t('guest')}
               </h3>
               <p className="text-sm text-mq-content-secondary">{currentProfile.email}</p>
+              {currentProfile.avatar?.startsWith('data:') && (
+                <p className="mt-1 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>
+              )}
             </div>
           </div>
 

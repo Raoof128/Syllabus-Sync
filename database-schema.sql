@@ -1,5 +1,5 @@
 -- Database Schema for Syllabus Sync
--- Last Updated: 2026-01-11
+-- Last Updated: 2026-01-13
 --
 -- REFERENCE DOCUMENT ONLY
 -- =======================
@@ -15,6 +15,21 @@
 --   - JSONB location field (preferred)
 --   - Flat building/room columns (legacy/current remote)
 --
+-- USER DATA FLOW:
+-- ==============
+-- 1. auth.users: Managed by Supabase Auth (email, password, metadata)
+-- 2. profiles: Public user data (full_name, student_id, avatar)
+-- 3. gamification_profiles: XP, streaks, levels
+--
+-- When a user signs up:
+--   - auth.users row is created by Supabase Auth
+--   - on_auth_user_created_safe trigger auto-creates profiles + gamification_profiles
+--   - Signup API also creates these as backup
+--
+-- To query all user data together, use the user_details VIEW:
+--   SELECT * FROM user_details WHERE id = auth.uid();
+-- Or use the get_my_profile() RPC function.
+--
 -- Migrations Applied:
 --   - 20260108131028: Added user_id columns and RLS policies
 --   - 20260108140000: Event column fixes and seed data triggers
@@ -26,6 +41,7 @@
 --   - 20260109012944: Fix auth trigger for new users
 --   - 20260109013033: Check and fix existing triggers
 --   - 20260109013302: Disable all auth triggers
+--   - 20260113000000: Re-enable auth trigger with user_details VIEW
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -852,3 +868,141 @@ GRANT EXECUTE ON FUNCTION create_user_profile TO authenticated;
 -- Grant execute on gamification functions
 GRANT EXECUTE ON FUNCTION calculate_level TO authenticated;
 GRANT EXECUTE ON FUNCTION xp_for_level TO authenticated;
+
+-- ============================================================================
+-- USER DETAILS VIEW - Combines profiles + gamification_profiles
+-- ============================================================================
+
+/**
+ * user_details VIEW - A consolidated view of all user data
+ * 
+ * This view joins profiles with gamification_profiles to provide
+ * a single query point for all user information including XP and level.
+ * 
+ * Usage:
+ *   SELECT * FROM user_details WHERE id = auth.uid();
+ *   -- or use the get_my_profile() function
+ */
+CREATE OR REPLACE VIEW public.user_details AS
+SELECT 
+    p.id,
+    p.email,
+    p.full_name,
+    p.student_id,
+    p.avatar_url,
+    p.created_at,
+    p.updated_at,
+    gp.xp,
+    gp.streak_days,
+    gp.longest_streak,
+    gp.last_activity_date,
+    CASE 
+        WHEN gp.xp IS NULL OR gp.xp < 0 THEN 1
+        ELSE LEAST(100, FLOOR(SQRT(gp.xp::float / 25)) + 1)::integer
+    END AS level
+FROM public.profiles p
+LEFT JOIN public.gamification_profiles gp ON p.id = gp.user_id;
+
+GRANT SELECT ON public.user_details TO authenticated;
+
+/**
+ * get_my_profile() - RPC function to get current user's full profile
+ * 
+ * Returns the current authenticated user's profile with all data
+ * including XP, streak, and calculated level.
+ * 
+ * Usage:
+ *   const { data } = await supabase.rpc('get_my_profile');
+ */
+CREATE OR REPLACE FUNCTION public.get_my_profile()
+RETURNS TABLE (
+    id uuid,
+    email text,
+    full_name text,
+    student_id text,
+    avatar_url text,
+    created_at timestamptz,
+    updated_at timestamptz,
+    xp integer,
+    streak_days integer,
+    longest_streak integer,
+    last_activity_date date,
+    level integer
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        ud.id,
+        ud.email,
+        ud.full_name,
+        ud.student_id,
+        ud.avatar_url,
+        ud.created_at,
+        ud.updated_at,
+        ud.xp,
+        ud.streak_days,
+        ud.longest_streak,
+        ud.last_activity_date,
+        ud.level
+    FROM public.user_details ud
+    WHERE ud.id = auth.uid();
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_my_profile() TO authenticated;
+
+-- ============================================================================
+-- AUTO PROFILE CREATION TRIGGER
+-- ============================================================================
+
+/**
+ * handle_new_user_safe() - Trigger function for auto-creating user profiles
+ * 
+ * This trigger fires AFTER INSERT on auth.users and automatically creates:
+ * 1. A profiles row with email and full_name from user metadata
+ * 2. A gamification_profiles row with initial values (0 XP, 0 streak)
+ * 
+ * Uses error handling to prevent signup failures if profile creation fails.
+ */
+CREATE OR REPLACE FUNCTION public.handle_new_user_safe()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    INSERT INTO public.profiles (id, email, full_name, created_at, updated_at)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+        NOW(),
+        NOW()
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        updated_at = NOW();
+
+    INSERT INTO public.gamification_profiles (user_id, xp, streak_days, longest_streak, created_at, updated_at)
+    VALUES (NEW.id, 0, 0, 0, NOW(), NOW())
+    ON CONFLICT (user_id) DO NOTHING;
+
+    RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE WARNING 'handle_new_user_safe failed for user %: %', NEW.id, SQLERRM;
+        RETURN NEW;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.handle_new_user_safe() TO service_role;
+
+-- Trigger on auth.users for auto profile creation
+CREATE TRIGGER on_auth_user_created_safe
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_new_user_safe();

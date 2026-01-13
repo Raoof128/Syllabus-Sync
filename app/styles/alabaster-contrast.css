@@ -31,7 +31,10 @@
   html:not(.dark) .feed-page,
   html:not(.dark) .map-page,
   html:not(.dark) .calendar-page,
-  html:not(.dark) .home-page
+  html:not(.dark) .home-page,
+  html:not(.dark) .settings-page,
+  html:not(.dark) .login-page,
+  html:not(.dark) .signup-page
 ) {
   --alabaster-bg: var(--alabaster, #edeade);
   --alabaster-text: #1a1a1a;
@@ -46,7 +49,10 @@
 html:not(.dark) .feed-page,
 html:not(.dark) .map-page,
 html:not(.dark) .calendar-page,
-html:not(.dark) .home-page {
+html:not(.dark) .home-page,
+html:not(.dark) .settings-page,
+html:not(.dark) .login-page,
+html:not(.dark) .signup-page {
   --c-content: #1a1a1a;
   --c-content-secondary: #2b2b2b;
   --c-content-tertiary: #4a4a44;
@@ -60,14 +66,20 @@ html:not(.dark) .home-page {
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .calendar-page .mq-magic-card-content,
-html:not(.dark) .home-page .mq-magic-card-content {
+html:not(.dark) .home-page .mq-magic-card-content,
+html:not(.dark) .settings-page .mq-magic-card-content,
+html:not(.dark) .login-page .mq-magic-card-content,
+html:not(.dark) .signup-page .mq-magic-card-content {
   background-color: var(--alabaster, #edeade) !important;
 }
 
 html:not(.dark) .feed-page .btn-premium,
 html:not(.dark) .map-page .btn-premium,
 html:not(.dark) .calendar-page .btn-premium,
-html:not(.dark) .home-page .btn-premium {
+html:not(.dark) .home-page .btn-premium,
+html:not(.dark) .settings-page .btn-premium,
+html:not(.dark) .login-page .btn-premium,
+html:not(.dark) .signup-page .btn-premium {
   background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
 }
@@ -76,18 +88,30 @@ html:not(.dark) .feed-page [data-slot='button'],
 html:not(.dark) .map-page [data-slot='button'],
 html:not(.dark) .calendar-page [data-slot='button'],
 html:not(.dark) .home-page [data-slot='button'],
+html:not(.dark) .settings-page [data-slot='button'],
+html:not(.dark) .login-page [data-slot='button'],
+html:not(.dark) .signup-page [data-slot='button'],
 html:not(.dark) .feed-page .bg-mq-card-background,
 html:not(.dark) .map-page .bg-mq-card-background,
 html:not(.dark) .calendar-page .bg-mq-card-background,
 html:not(.dark) .home-page .bg-mq-card-background,
+html:not(.dark) .settings-page .bg-mq-card-background,
+html:not(.dark) .login-page .bg-mq-card-background,
+html:not(.dark) .signup-page .bg-mq-card-background,
 html:not(.dark) .feed-page .bg-mq-background-secondary,
 html:not(.dark) .map-page .bg-mq-background-secondary,
 html:not(.dark) .calendar-page .bg-mq-background-secondary,
 html:not(.dark) .home-page .bg-mq-background-secondary,
+html:not(.dark) .settings-page .bg-mq-background-secondary,
+html:not(.dark) .login-page .bg-mq-background-secondary,
+html:not(.dark) .signup-page .bg-mq-background-secondary,
 html:not(.dark) .feed-page .bg-mq-success\/10,
 html:not(.dark) .map-page .bg-mq-success\/10,
 html:not(.dark) .calendar-page .bg-mq-success\/10,
-html:not(.dark) .home-page .bg-mq-success\/10 {
+html:not(.dark) .home-page .bg-mq-success\/10,
+html:not(.dark) .settings-page .bg-mq-success\/10,
+html:not(.dark) .login-page .bg-mq-success\/10,
+html:not(.dark) .signup-page .bg-mq-success\/10 {
   background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
 }
@@ -107,7 +131,10 @@ html:not(.dark) .feed-page .stay-connected-banner {
 html:not(.dark) .feed-page,
 html:not(.dark) .map-page,
 html:not(.dark) .calendar-page,
-html:not(.dark) .home-page {
+html:not(.dark) .home-page,
+html:not(.dark) .settings-page,
+html:not(.dark) .login-page,
+html:not(.dark) .signup-page {
   color: #1a1a1a;
 }
 
@@ -127,7 +154,7 @@ html:not(.dark)
       ):not(select)
   ),
 html:not(.dark)
-  .home-page
+  .feed-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
@@ -135,6 +162,27 @@ html:not(.dark)
   ),
 html:not(.dark)
   .calendar-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .settings-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .login-page
+  :where(
+    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
+        textarea
+      ):not(select)
+  ),
+html:not(.dark)
+  .signup-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
@@ -164,10 +212,16 @@ html:not(.dark) .feed-page [class*='text-mq-content'],
 html:not(.dark) .map-page [class*='text-mq-content'],
 html:not(.dark) .home-page [class*='text-mq-content'],
 html:not(.dark) .calendar-page [class*='text-mq-content'],
+html:not(.dark) .settings-page [class*='text-mq-content'],
+html:not(.dark) .login-page [class*='text-mq-content'],
+html:not(.dark) .signup-page [class*='text-mq-content'],
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .home-page .mq-magic-card-content,
-html:not(.dark) .calendar-page .mq-magic-card-content {
+html:not(.dark) .calendar-page .mq-magic-card-content,
+html:not(.dark) .settings-page .mq-magic-card-content,
+html:not(.dark) .login-page .mq-magic-card-content,
+html:not(.dark) .signup-page .mq-magic-card-content {
   color: #1a1a1a !important;
   -webkit-text-fill-color: #1a1a1a !important;
   opacity: 1 !important;
@@ -181,9 +235,16 @@ html:not(.dark) .calendar-page .mq-magic-card-content {
 html:not(.dark) .feed-page .animate-pulse *,
 html:not(.dark) .map-page .animate-pulse *,
 html:not(.dark) .calendar-page .animate-pulse *,
-html:not(.dark) .home-page .animate-pulse * {
+html:not(.dark) .home-page .animate-pulse *,
+html:not(.dark) .settings-page .animate-pulse *,
+html:not(.dark) .login-page .animate-pulse *,
+html:not(.dark) .signup-page .animate-pulse *,
+html:not(.dark) .animate-pulse {
   color: var(--c-content) !important;
   background-color: var(--alabaster, #edeade) !important;
+  -webkit-text-fill-color: var(--c-content) !important;
+  opacity: 1 !important;
+  animation: none !important;
 }
 
 /* ============================================
@@ -300,6 +361,54 @@ html:not(.dark) .home-page .alabaster-readable {
 }
 
 /* ============================================
+   AUTH PAGE CONTRAST OVERRIDES
+   Ensure login/signup text meets WCAG
+   ============================================ */
+
+html:not(.dark) .login-page,
+html:not(.dark) .signup-page {
+  color: #1a1a1a;
+}
+
+html:not(.dark) .login-page .mq-liquid-glass-elevated,
+html:not(.dark) .signup-page .mq-liquid-glass-elevated {
+  background-color: var(--alabaster, #edeade) !important;
+  color: #1a1a1a !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+html:not(.dark) .login-page .mq-liquid-glass-elevated *,
+html:not(.dark) .signup-page .mq-liquid-glass-elevated *,
+html:not(.dark) .login-page h1,
+html:not(.dark) .login-page h2,
+html:not(.dark) .login-page h3,
+html:not(.dark) .login-page p,
+html:not(.dark) .login-page label,
+html:not(.dark) .login-page input,
+html:not(.dark) .signup-page h1,
+html:not(.dark) .signup-page h2,
+html:not(.dark) .signup-page h3,
+html:not(.dark) .signup-page p,
+html:not(.dark) .signup-page label,
+html:not(.dark) .signup-page input,
+html:not(.dark) .login-page .text-mq-content,
+html:not(.dark) .login-page .text-mq-content-secondary,
+html:not(.dark) .signup-page .text-mq-content,
+html:not(.dark) .signup-page .text-mq-content-secondary {
+  color: #1a1a1a !important;
+  -webkit-text-fill-color: #1a1a1a !important;
+  opacity: 1 !important;
+}
+
+html:not(.dark) .login-page .text-mq-primary,
+html:not(.dark) .signup-page .text-mq-primary {
+  color: #7a0a21 !important;
+  -webkit-text-fill-color: #7a0a21 !important;
+  opacity: 1 !important;
+}
+
+/* ============================================
    GLOBAL FOCUS INDICATORS - WCAG 2.1 AA
    Ensure all interactive elements have visible focus
    ============================================ */
@@ -362,4 +471,24 @@ textarea:focus-visible,
   outline: 2px solid #fff !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ============================================
+   INPUT TEXT COLOR FIX
+   Ensure input text uses proper contrast colors
+   matching dropdown elements in both modes
+   ============================================ */
+
+/* Light mode: Input text should be dark (#1a1a1a) on light backgrounds */
+html:not(.dark) input,
+html:not(.dark) textarea {
+  color: var(--c-content, #1a1a1a) !important;
+  -webkit-text-fill-color: var(--c-content, #1a1a1a) !important;
+}
+
+/* Dark mode: Input text should be light (alabaster) on dark backgrounds */
+.dark input,
+.dark textarea {
+  color: var(--c-content, #edeade) !important;
+  -webkit-text-fill-color: var(--c-content, #edeade) !important;
 }

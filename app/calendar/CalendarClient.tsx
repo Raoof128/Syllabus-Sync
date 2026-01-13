@@ -403,14 +403,22 @@ export default function CalendarClient() {
   return (
     <div
       className="container mx-auto p-4 sm:p-6 max-w-7xl calendar-page"
-      role="application"
+      role="region"
+      aria-labelledby="calendar-heading"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       <ScrollReveal>
         <header className="mb-6">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('calendar')}</h1>
+          <h1 id="calendar-heading" className="text-mq-3xl font-bold text-mq-content mb-2">
+            {t('calendar')}
+          </h1>
           <p className="text-mq-content-secondary">{t('trackDeadlinesDesc')}</p>
+          {!hasHydrated && (
+            <p className="mt-2 text-xs text-mq-content-secondary" role="status" aria-live="polite">
+              {t('loading')}
+            </p>
+          )}
         </header>
       </ScrollReveal>
 
@@ -421,14 +429,19 @@ export default function CalendarClient() {
             {/* Calendar Header - Removed add deadline button */}
             <div className="flex items-center justify-between p-4 border-b border-mq-border">
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={goToPreviousWeek}>
-                  <ChevronLeft className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToPreviousWeek}
+                  aria-label="Previous week"
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
                 <Button variant="outline" size="sm" onClick={goToToday}>
                   {t('today')}
                 </Button>
-                <Button variant="outline" size="sm" onClick={goToNextWeek}>
-                  <ChevronRight className="h-4 w-4" />
+                <Button variant="outline" size="sm" onClick={goToNextWeek} aria-label="Next week">
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
               <h2 className="text-lg font-semibold text-mq-content">
@@ -462,7 +475,7 @@ export default function CalendarClient() {
                           className={cn(
                             'text-xl font-semibold mt-1 inline-flex items-center justify-center',
                             isToday(day)
-                              ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
+                              ? 'w-9 h-9 rounded-full bg-[#7A0A21] text-white'
                               : 'text-mq-content',
                           )}
                         >
@@ -477,7 +490,7 @@ export default function CalendarClient() {
                                 <div
                                   key={mqDate.id}
                                   className={cn(
-                                    'text-[8px] px-1 py-0.5 rounded font-medium truncate',
+                                    'text-[8px] px-1 py-0.5 rounded font-medium line-clamp-2 break-words leading-tight',
                                     colors.bg,
                                     colors.text,
                                   )}
@@ -651,7 +664,7 @@ export default function CalendarClient() {
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
                                 role="button"
                                 tabIndex={0}
-                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                                 style={{
                                   top: posInfo.top,
                                   height: posInfo.height,
@@ -660,6 +673,7 @@ export default function CalendarClient() {
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
+                                aria-label={`${unitData.code} ${formatTime(schedule.startTime)} to ${formatTime(schedule.endTime)}${unitData.location?.building ? ` in ${unitData.location.building} ${unitData.location.room}` : ''}`}
                                 title={`Click to view ${unitData.code} details`}
                                 onClick={() => {
                                   // Find the original unit with full schedule
@@ -678,15 +692,15 @@ export default function CalendarClient() {
                                   className="p-1 h-full overflow-hidden"
                                   style={{ color: unitData.color }}
                                 >
-                                  <span className="block text-xs font-bold truncate">
+                                  <span className="block text-xs font-bold line-clamp-2 break-words leading-tight">
                                     {unitData.code}
                                   </span>
-                                  <span className="text-[10px] opacity-80 block truncate">
+                                  <span className="text-[10px] opacity-80 block">
                                     {formatTime(schedule.startTime)} -{' '}
                                     {formatTime(schedule.endTime)}
                                   </span>
                                   {posInfo.height > 50 && (
-                                    <span className="text-[10px] opacity-70 block truncate">
+                                    <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
                                       {unitData.location.building} {unitData.location.room}
                                     </span>
                                   )}
@@ -718,15 +732,17 @@ export default function CalendarClient() {
                               return (
                                 <button
                                   key={deadline.id}
+                                  type="button"
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-xs px-1 py-0.5 rounded shadow-sm truncate font-medium z-10 text-white',
+                                    'absolute left-1 right-1 text-left text-xs px-1 py-0.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
                                     deadline.completed && 'opacity-50 line-through',
                                   )}
                                   style={{
                                     top: 4 + idx * 22,
                                     backgroundColor: deadlineColor,
                                   }}
+                                  aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}`}
                                   title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                                 >
                                   {displayName}
@@ -746,9 +762,10 @@ export default function CalendarClient() {
                             return (
                               <button
                                 key={deadline.id}
+                                type="button"
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
-                                  'absolute text-left text-xs px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4 text-white',
+                                  'absolute text-left text-xs px-1 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
                                   deadline.completed && 'opacity-50 line-through',
                                 )}
                                 style={{
@@ -759,9 +776,12 @@ export default function CalendarClient() {
                                   backgroundColor: `${deadlineColor}dd`,
                                   borderLeftColor: deadlineColor,
                                 }}
+                                aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}`}
                                 title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                               >
-                                <span className="block truncate">{displayName}</span>
+                                <span className="block line-clamp-2 break-words leading-tight">
+                                  {displayName}
+                                </span>
                                 <span className="text-[10px] opacity-80">
                                   {format(dueDate, 'h:mm a')}
                                 </span>
@@ -780,13 +800,15 @@ export default function CalendarClient() {
                               return (
                                 <button
                                   key={event.id}
+                                  type="button"
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
+                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
                                     colors.bg,
                                     colors.text,
                                   )}
                                   style={{ top: offsetTop }}
+                                  aria-label={`Event ${event.title} at ${event.time}`}
                                   title={`Event: ${event.title} @ ${event.time}`}
                                 >
                                   {event.title}
@@ -806,13 +828,15 @@ export default function CalendarClient() {
                               return (
                                 <button
                                   key={event.id}
+                                  type="button"
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10',
+                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
                                     colors.bg,
                                     colors.text,
                                   )}
                                   style={{ top: offsetTop }}
+                                  aria-label={`Event ${event.title} at ${event.time}`}
                                   title={`Event: ${event.title} @ ${event.time}`}
                                 >
                                   {event.title}
@@ -832,9 +856,10 @@ export default function CalendarClient() {
                             return (
                               <button
                                 key={event.id}
+                                type="button"
                                 onClick={() => handleEventClick(event)}
                                 className={cn(
-                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4',
+                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
                                   colors.bg,
                                   colors.text,
                                   'border-green-700',
@@ -845,9 +870,12 @@ export default function CalendarClient() {
                                   left: evtLeft,
                                   width: evtWidth,
                                 }}
+                                aria-label={`Event ${event.title} at ${event.time}`}
                                 title={`Event: ${event.title} @ ${event.time}`}
                               >
-                                <span className="block truncate">{event.title}</span>
+                                <span className="block line-clamp-2 break-words leading-tight">
+                                  {event.title}
+                                </span>
                                 <span className="text-[8px] opacity-80">{event.time}</span>
                               </button>
                             );
@@ -904,8 +932,13 @@ export default function CalendarClient() {
                       <Badge variant="neutral">
                         {assignments.filter((a) => !a.completed).length} {t('pending')}
                       </Badge>
-                      <Button size="sm" variant="outline" onClick={openAddDeadline}>
-                        <Plus className="h-4 w-4" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={openAddDeadline}
+                        aria-label={t('addDeadline')}
+                      >
+                        <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </CardTitle>
@@ -940,7 +973,14 @@ export default function CalendarClient() {
                               )}
                             >
                               <div className="flex items-center gap-3">
-                                <button onClick={() => toggleComplete(assignment.id)}>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleComplete(assignment.id)}
+                                  aria-label={
+                                    assignment.completed ? 'Mark as incomplete' : 'Mark as complete'
+                                  }
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded"
+                                >
                                   {assignment.completed ? (
                                     <CheckCircle2 className="h-5 w-5 text-green-500" />
                                   ) : (
@@ -969,10 +1009,15 @@ export default function CalendarClient() {
                                   {assignment.priority}
                                 </Badge>
                                 <button
+                                  type="button"
                                   onClick={() => openEditDeadline(assignment)}
-                                  className="p-1 hover:bg-mq-hover-background rounded"
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  aria-label={`Edit ${assignment.title}`}
                                 >
-                                  <Edit2 className="h-4 w-4 text-mq-content-secondary" />
+                                  <Edit2
+                                    className="h-4 w-4 text-mq-content-secondary"
+                                    aria-hidden="true"
+                                  />
                                 </button>
                               </div>
                             </div>
@@ -1001,8 +1046,13 @@ export default function CalendarClient() {
                       <Badge variant="neutral">
                         {exams.filter((e) => !e.completed).length} {t('upcoming' as 'title')}
                       </Badge>
-                      <Button size="sm" variant="outline" onClick={openAddDeadline}>
-                        <Plus className="h-4 w-4" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={openAddDeadline}
+                        aria-label={t('addDeadline')}
+                      >
+                        <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </CardTitle>
@@ -1037,7 +1087,14 @@ export default function CalendarClient() {
                               )}
                             >
                               <div className="flex items-center gap-3">
-                                <button onClick={() => toggleComplete(exam.id)}>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleComplete(exam.id)}
+                                  aria-label={
+                                    exam.completed ? 'Mark as incomplete' : 'Mark as complete'
+                                  }
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded"
+                                >
                                   {exam.completed ? (
                                     <CheckCircle2 className="h-5 w-5 text-green-500" />
                                   ) : (
@@ -1063,10 +1120,15 @@ export default function CalendarClient() {
                                   {exam.priority}
                                 </Badge>
                                 <button
+                                  type="button"
                                   onClick={() => openEditDeadline(exam)}
-                                  className="p-1 hover:bg-mq-hover-background rounded"
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  aria-label={`Edit ${exam.title}`}
                                 >
-                                  <Edit2 className="h-4 w-4 text-mq-content-secondary" />
+                                  <Edit2
+                                    className="h-4 w-4 text-mq-content-secondary"
+                                    aria-hidden="true"
+                                  />
                                 </button>
                               </div>
                             </div>
@@ -1098,8 +1160,13 @@ export default function CalendarClient() {
                       <Badge variant="neutral">
                         {units.length} {t('units')}
                       </Badge>
-                      <Button size="sm" variant="outline" onClick={openAddUnit}>
-                        <Plus className="h-4 w-4" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={openAddUnit}
+                        aria-label={t('addUnit')}
+                      >
+                        <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </CardTitle>
@@ -1122,25 +1189,37 @@ export default function CalendarClient() {
                             style={{ backgroundColor: unit.color }}
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm truncate">{unit.code}</h4>
-                            <p className="text-xs text-mq-content-secondary truncate">
+                            <h4 className="font-medium text-sm line-clamp-2 break-words">
+                              {unit.code}
+                            </h4>
+                            <p className="text-xs text-mq-content-secondary line-clamp-2 break-words">
                               {unit.name}
                             </p>
                           </div>
                           <div className="flex items-center gap-1">
                             <button
+                              type="button"
                               onClick={() => openEditUnit(unit)}
-                              className="p-1 hover:bg-mq-hover-background rounded"
+                              className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                               title={`Edit ${unit.code}`}
+                              aria-label={`Edit ${unit.code}`}
                             >
-                              <Edit2 className="h-4 w-4 text-mq-content-secondary" />
+                              <Edit2
+                                className="h-4 w-4 text-mq-content-secondary"
+                                aria-hidden="true"
+                              />
                             </button>
                             <button
+                              type="button"
                               onClick={() => handleDeleteUnit(unit)}
-                              className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded"
+                              className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                               title={`Delete ${unit.code}`}
+                              aria-label={`Delete ${unit.code}`}
                             >
-                              <Trash2 className="h-4 w-4 text-mq-content-secondary hover:text-red-500" />
+                              <Trash2
+                                className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
+                                aria-hidden="true"
+                              />
                             </button>
                           </div>
                         </div>
@@ -1175,8 +1254,9 @@ export default function CalendarClient() {
                           setEditEvent(null);
                           setEventDialogOpen(true);
                         }}
+                        aria-label={t('addEvent')}
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </CardTitle>
@@ -1199,8 +1279,10 @@ export default function CalendarClient() {
                         >
                           <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500" />
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm truncate">{event.title}</h4>
-                            <p className="text-xs text-mq-content-secondary truncate">
+                            <h4 className="font-medium text-sm line-clamp-2 break-words">
+                              {event.title}
+                            </h4>
+                            <p className="text-xs text-mq-content-secondary line-clamp-2 break-words">
                               {event.time} • {event.location}
                             </p>
                           </div>
@@ -1270,7 +1352,9 @@ export default function CalendarClient() {
                           >
                             <div className="flex items-start justify-between">
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-sm truncate">{deadline.title}</h4>
+                                <h4 className="font-medium text-sm line-clamp-2 break-words">
+                                  {deadline.title}
+                                </h4>
                                 <p className="text-xs text-mq-content-secondary mt-1">
                                   {deadline.unitCode} • {deadline.type}
                                 </p>
@@ -1284,10 +1368,15 @@ export default function CalendarClient() {
                                 </p>
                               </div>
                               <button
+                                type="button"
                                 onClick={() => openEditDeadline(deadline)}
-                                className="p-1 hover:bg-mq-hover-background rounded ml-2"
+                                className="p-1 hover:bg-mq-hover-background rounded ml-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                aria-label={`Edit ${deadline.title}`}
                               >
-                                <Edit2 className="h-4 w-4 text-mq-content-secondary" />
+                                <Edit2
+                                  className="h-4 w-4 text-mq-content-secondary"
+                                  aria-hidden="true"
+                                />
                               </button>
                             </div>
                           </div>

@@ -432,6 +432,7 @@
   "emailReminders": "Email Reminders",
   "pushNotifications": "Push Notifications",
   "changeAvatar": "Change Avatar",
+  "avatarLocalOnlyWarning": "Local-only avatar. It won't sync across devices.",
   "idPrefix": "ID: ",
   "editProfileAria": "Edit {{name}}",
   "useProfileAria": "Use {{name}}",

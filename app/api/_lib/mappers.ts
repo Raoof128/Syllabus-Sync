@@ -84,12 +84,15 @@ export const serializeUnit = (unit: Omit<Unit, 'schedule'> & { user_id?: string 
   created_at: unit.createdAt.toISOString(),
 });
 
-export const serializeDeadline = (deadline: Deadline & { user_id?: string }) => ({
+export const serializeDeadline = (deadline: Deadline & { user_id?: string; unit_id?: string }) => ({
   id: deadline.id,
   user_id: deadline.user_id, // Security: Required for user-scoped data
   title: deadline.title,
   unit_code: deadline.unitCode,
+  unit_id: deadline.unitId, // Optional: FK to units table
+  // Set BOTH due_date and due_at for compatibility with remote schema
   due_date: deadline.dueDate.toISOString(),
+  due_at: deadline.dueDate.toISOString(), // Remote schema requires due_at (NOT NULL)
   priority: deadline.priority,
   type: deadline.type,
   completed: deadline.completed,

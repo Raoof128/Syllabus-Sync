@@ -37,7 +37,7 @@ export const useUnitsStore = create<UnitsState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Unit[]>('/api/units');
+          const data = await apiRequest<Unit[]>('/api/units', { noRetry: true });
           set({ units: data.map(normalizeUnit), hasLoaded: true });
         } catch (error) {
           // Silently fail - keep persisted data if API is unavailable

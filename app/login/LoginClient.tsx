@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createBrowserClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { FingerprintButton } from '@/components/auth/FingerprintButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/mq/input';
@@ -48,22 +48,33 @@ export default function LoginClient() {
   const rawRedirect = searchParams.get('redirectTo');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
 
-  // Memoize Supabase client to prevent recreation on every render
-  const supabase = useMemo(() => createBrowserClient(), []);
+  const supabaseRef = useRef<SupabaseClient | null>(null);
+
+  const getSupabaseClient = useCallback(async () => {
+    if (supabaseRef.current) {
+      return supabaseRef.current;
+    }
+
+    const { createBrowserClient } = await import('@/lib/supabase/client');
+    const client = createBrowserClient();
+    supabaseRef.current = client;
+    return client;
+  }, []);
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
       if (isLoading || isSuccess) return;
+      const client = await getSupabaseClient();
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = await client.auth.getSession();
       if (session) {
         router.push(redirectTo);
       }
     };
     checkUser();
-  }, [supabase.auth, router, redirectTo, isLoading, isSuccess]);
+  }, [getSupabaseClient, router, redirectTo, isLoading, isSuccess]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,8 +91,9 @@ export default function LoginClient() {
     setError(null);
 
     try {
+      const client = await getSupabaseClient();
       // Direct Supabase login
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await client.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
@@ -148,7 +160,8 @@ export default function LoginClient() {
     setError(null);
 
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      const client = await getSupabaseClient();
+      const { error: resetError } = await client.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
@@ -166,7 +179,7 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
+    <div className="login-page min-h-screen flex items-center justify-center bg-mq-background p-4">
       <Card className="w-full max-w-md mq-liquid-glass-elevated">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-6">

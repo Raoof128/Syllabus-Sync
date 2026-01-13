@@ -9,7 +9,7 @@ import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
-import { motion } from 'framer-motion';
+import { LazyMotion, m, domAnimation } from 'framer-motion';
 
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
@@ -23,14 +23,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
+import { apiRequest } from '@/lib/utils/api';
+
+type AuthUser = {
+  email?: string;
+  user_metadata?: { full_name?: string; name?: string };
+};
 
 interface HomeClientProps {
-  initialUser: User | null;
+  initialUser?: AuthUser | null;
 }
 
-export default function HomeClient({ initialUser }: HomeClientProps) {
+export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -39,9 +43,8 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // User state from Supabase - initialized from server prop
-  const [user, setUser] = useState<User | null>(initialUser);
-  const supabase = useMemo(() => createBrowserClient(), []);
+  // User state from server auth endpoint
+  const [user, setUser] = useState<AuthUser | null>(initialUser);
 
   // FAB state
   const [fabOpen, setFabOpen] = useState(false);
@@ -58,16 +61,36 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
 
-  // Listen for auth changes (sign out, etc)
+  // Keep user state in sync with auth endpoint
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
-      setUser(session?.user ?? null);
-    });
+    let isActive = true;
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    const loadUser = async () => {
+      try {
+        const data = await apiRequest<{ user?: AuthUser }>('/api/auth/user', { noRetry: true });
+        if (isActive) {
+          setUser(data?.user ?? null);
+        }
+      } catch {
+        if (isActive) {
+          setUser(null);
+        }
+      }
+    };
+
+    void loadUser();
+
+    const handleFocus = () => {
+      void loadUser();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isActive = false;
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // Get display name for welcome message: profile name > user metadata > email extraction > fallback
   const displayName = (() => {
@@ -349,229 +372,233 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   };
 
   return (
-    <div className="home-page">
-      {/* Header */}
-      <ScrollReveal>
-        <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
-          <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name} />
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Stress Level Indicator */}
-            {hasHydrated && deadlines.length > 0 && (
-              <>
-                <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
-                  <TrendingUp className="h-3 w-3 text-mq-content-secondary" aria-hidden="true" />
-                  <Badge
-                    className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
-                    aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                    title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                  >
-                    <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
-                  </Badge>
-                </div>
-                <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
-                  <TrendingUp className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                  <span className="text-mq-sm text-mq-content">{t('workload')}</span>
-                  <Badge
-                    className={stressColors[stressLevel]}
-                    aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                    title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                  >
-                    <span aria-hidden="true">{stressEmoji[stressLevel]}</span> {stressLevel}
-                  </Badge>
-                </div>
-              </>
-            )}
-          </div>
-        </header>
-      </ScrollReveal>
-
-      {/* Get Started Banner */}
-      {!hasUnits && (
-        <ScrollReveal delay={0.1}>
-          <section
-            className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3"
-            aria-labelledby="get-started-heading"
-          >
-            <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
-            <div className="flex-1">
-              <h2 id="get-started-heading" className="sr-only">
-                {t('gettingStartedGuide')}
-              </h2>
-              <p className="text-mq-sm text-mq-info">
-                <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
-              </p>
+    <LazyMotion features={domAnimation}>
+      <div className="home-page">
+        {/* Header */}
+        <ScrollReveal>
+          <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
+            <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name} />
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Stress Level Indicator */}
+              {hasHydrated && deadlines.length > 0 && (
+                <>
+                  <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
+                    <TrendingUp className="h-3 w-3 text-mq-content-secondary" aria-hidden="true" />
+                    <Badge
+                      className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
+                      aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                      title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                    >
+                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
+                    </Badge>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
+                    <TrendingUp className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
+                    <span className="text-mq-sm text-mq-content">{t('workload')}</span>
+                    <Badge
+                      className={stressColors[stressLevel]}
+                      aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                      title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
+                    >
+                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span> {stressLevel}
+                    </Badge>
+                  </div>
+                </>
+              )}
             </div>
+          </header>
+        </ScrollReveal>
+
+        {/* Get Started Banner */}
+        {!hasUnits && (
+          <ScrollReveal delay={0.1}>
+            <section
+              className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3"
+              aria-labelledby="get-started-heading"
+            >
+              <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="flex-1">
+                <h2 id="get-started-heading" className="sr-only">
+                  {t('gettingStartedGuide')}
+                </h2>
+                <p className="text-mq-sm text-mq-info">
+                  <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
+                </p>
+              </div>
+            </section>
+          </ScrollReveal>
+        )}
+
+        {/* Main Dashboard Grid (rendered inside page-level main) */}
+        <section
+          className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
+          aria-label={t('dashboardOverview')}
+        >
+          <ScrollReveal delay={0.1}>
+            <TodaySchedule />
+          </ScrollReveal>
+          <ScrollReveal delay={0.2}>
+            <NextDeadline />
+          </ScrollReveal>
+        </section>
+
+        {/* My Units Section - READ ONLY on Home page */}
+        <ScrollReveal delay={0.3} staggerChildren={0.1}>
+          <section aria-labelledby="units-section-heading" className="mb-6">
+            <MagicCard isLiquidEnhanced>
+              <div className="mq-magic-card-content">
+                <Card className="border-0 shadow-none bg-transparent">
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle id="units-section-heading" className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5" aria-hidden="true" />
+                      {t('myUnits')}
+                    </CardTitle>
+                    <Button size="sm" variant="outline" className="gap-1" asChild>
+                      <Link href="/calendar" aria-label={`${t('viewAll')} ${t('myUnits')}`}>
+                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        <span>{t('viewAll')}</span>
+                      </Link>
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    {!hasHydrated ? (
+                      <div className="h-32 flex items-center justify-center">
+                        <div className="animate-pulse space-y-3 w-full max-w-md">
+                          <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
+                          <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
+                        </div>
+                      </div>
+                    ) : units.length === 0 ? (
+                      <div className="text-center py-12">
+                        <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                        <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
+                          {t('noUnitsYet')}
+                        </h3>
+                        <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                          {t('addFirstUnitDesc')}
+                        </p>
+                        <Button asChild className="gap-2">
+                          <Link href="/calendar">
+                            <Plus className="h-4 w-4" />
+                            {t('addYourFirstUnit')}
+                          </Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Unit Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                          <div className="text-center">
+                            <p className="text-mq-2xl font-bold text-mq-content">
+                              {unitStats.unitCount}
+                            </p>
+                            <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-mq-2xl font-bold text-mq-content">
+                              {unitStats.totalClasses}
+                            </p>
+                            <p className="text-mq-xs text-mq-content-secondary">
+                              {t('classesPerWeek')}
+                            </p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-mq-2xl font-bold text-mq-content">
+                              {unitStats.studyHours}h
+                            </p>
+                            <p className="text-mq-xs text-mq-content-secondary">
+                              {t('studyHours')}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Units Grid - READ ONLY (no edit/delete) */}
+                        <m.div
+                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
+                          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                        >
+                          {units.map((unit) => (
+                            <m.div
+                              key={unit.id}
+                              variants={revealChildVariants}
+                              className="relative z-0 hover:z-50 focus-within:z-50 h-full"
+                            >
+                              <UnitCard unit={unit} showActions={false} />
+                            </m.div>
+                          ))}
+                        </m.div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </MagicCard>
           </section>
         </ScrollReveal>
-      )}
 
-      {/* Main Dashboard Grid (rendered inside page-level main) */}
-      <section
-        className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
-        aria-label={t('dashboardOverview')}
-      >
-        <ScrollReveal delay={0.1}>
-          <TodaySchedule />
+        {/* Events Section */}
+        <ScrollReveal delay={0.4}>
+          <section aria-labelledby="events-section-heading" className="mb-8">
+            <h2 id="events-section-heading" className="sr-only">
+              {t('todaysEvents')}
+            </h2>
+            <EventsFeed />
+          </section>
         </ScrollReveal>
-        <ScrollReveal delay={0.2}>
-          <NextDeadline />
-        </ScrollReveal>
-      </section>
 
-      {/* My Units Section - READ ONLY on Home page */}
-      <ScrollReveal delay={0.3} staggerChildren={0.1}>
-        <section aria-labelledby="units-section-heading" className="mb-6">
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content">
-              <Card className="border-0 shadow-none bg-transparent">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle id="units-section-heading" className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" aria-hidden="true" />
-                    {t('myUnits')}
-                  </CardTitle>
-                  <Button size="sm" variant="outline" className="gap-1" asChild>
-                    <Link href="/calendar" aria-label={`${t('viewAll')} ${t('myUnits')}`}>
-                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                      <span>{t('viewAll')}</span>
-                    </Link>
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {!hasHydrated ? (
-                    <div className="h-32 flex items-center justify-center">
-                      <div className="animate-pulse space-y-3 w-full max-w-md">
-                        <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
-                        <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
-                      </div>
-                    </div>
-                  ) : units.length === 0 ? (
-                    <div className="text-center py-12">
-                      <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                      <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                        {t('noUnitsYet')}
-                      </h3>
-                      <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                        {t('addFirstUnitDesc')}
-                      </p>
-                      <Button asChild className="gap-2">
-                        <Link href="/calendar">
-                          <Plus className="h-4 w-4" />
-                          {t('addYourFirstUnit')}
-                        </Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Unit Stats */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
-                        <div className="text-center">
-                          <p className="text-mq-2xl font-bold text-mq-content">
-                            {unitStats.unitCount}
-                          </p>
-                          <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-mq-2xl font-bold text-mq-content">
-                            {unitStats.totalClasses}
-                          </p>
-                          <p className="text-mq-xs text-mq-content-secondary">
-                            {t('classesPerWeek')}
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-mq-2xl font-bold text-mq-content">
-                            {unitStats.studyHours}h
-                          </p>
-                          <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
-                        </div>
-                      </div>
+        {/* Floating Action Button (FAB) for Quick Actions */}
+        <div className="fixed bottom-6 right-6 z-50 md:hidden">
+          <div className="relative">
+            {/* FAB Menu */}
+            {fabOpen && (
+              <m.div
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
+              >
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    router.push('/calendar?action=add-unit');
+                    setFabOpen(false);
+                  }}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  {t('addUnit')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    router.push('/calendar?action=add-deadline');
+                    setFabOpen(false);
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  {t('addDeadline')}
+                </Button>
+              </m.div>
+            )}
 
-                      {/* Units Grid - READ ONLY (no edit/delete) */}
-                      <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
-                        variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-                      >
-                        {units.map((unit) => (
-                          <motion.div
-                            key={unit.id}
-                            variants={revealChildVariants}
-                            className="relative z-0 hover:z-50 focus-within:z-50 h-full"
-                          >
-                            <UnitCard unit={unit} showActions={false} />
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </MagicCard>
-        </section>
-      </ScrollReveal>
-
-      {/* Events Section */}
-      <ScrollReveal delay={0.4}>
-        <section aria-labelledby="events-section-heading" className="mb-8">
-          <h2 id="events-section-heading" className="sr-only">
-            {t('todaysEvents')}
-          </h2>
-          <EventsFeed />
-        </section>
-      </ScrollReveal>
-
-      {/* Floating Action Button (FAB) for Quick Actions */}
-      <div className="fixed bottom-6 right-6 z-50 md:hidden">
-        <div className="relative">
-          {/* FAB Menu */}
-          {fabOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.8 }}
-              className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
+            {/* Main FAB Button */}
+            <Button
+              size="lg"
+              className="h-14 w-14 rounded-full shadow-lg p-0"
+              onClick={() => setFabOpen(!fabOpen)}
+              aria-expanded={fabOpen}
+              aria-label={t('quickActions')}
             >
-              <Button
-                size="sm"
-                variant="secondary"
-                className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                  router.push('/calendar?action=add-unit');
-                  setFabOpen(false);
-                }}
-              >
-                <BookOpen className="h-4 w-4" />
-                {t('addUnit')}
-              </Button>
-              <Button
-                size="sm"
-                variant="secondary"
-                className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                onClick={() => {
-                  router.push('/calendar?action=add-deadline');
-                  setFabOpen(false);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                {t('addDeadline')}
-              </Button>
-            </motion.div>
-          )}
-
-          {/* Main FAB Button */}
-          <Button
-            size="lg"
-            className="h-14 w-14 rounded-full shadow-lg p-0"
-            onClick={() => setFabOpen(!fabOpen)}
-            aria-expanded={fabOpen}
-            aria-label={t('quickActions')}
-          >
-            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
-              <Plus className="h-6 w-6" />
-            </motion.div>
-          </Button>
+              <m.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+                <Plus className="h-6 w-6" />
+              </m.div>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </LazyMotion>
   );
 }

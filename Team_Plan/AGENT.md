@@ -76,6 +76,250 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+Raouf: 2026-01-13 - Fix database schema orphans and UI transparency issues
+
+#### Database Schema & UI Polish (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Database integrity and UI visual consistency
+- **Summary:** Resolved critical database schema issue where tables referenced an empty `public.users` table instead of `auth.users`. Fixed "glassy" form inputs by enforcing solid backgrounds and depth shadows.
+
+**Database Changes:**
+- Dropped redundant `public.users` table
+- Updated Foreign Keys in all 8 tables to reference `auth.users(id)`
+- Verified connections with mock data generation
+
+**UI Changes:**
+- **Inputs:** Added `shadow-xs` and solid background colors (#fff light, #151515 dark)
+- **Dark Mode:** Removed aggressive `background: transparent !important` rule from `text-mq-content` class in `dark-mode.css` that was making dialogs transparent.
+
+**Files Changed:**
+- `supabase/migrations/20260113110000_schema_cleanup_and_fixes.sql` (NEW)
+- `components/ui/mq/input.tsx`
+- `app/mq-tokens.css`
+- `app/styles/dark-mode.css`
+
+**Verification:**
+- `npm run prepush` (Pending)
+
+Raouf: 2026-01-13 - Fix unreadable input text colors in dialog forms
+
+#### Input Text Color Fix (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** UI accessibility and readability
+- **Summary:** Fixed unreadable input text in dialog forms (DeadlineForm, UnitForm, EventForm) by adding explicit color rules for input elements in both light and dark modes. Input text now uses the same color as dropdown elements for consistent readability.
+
+**Files Changed:**
+- `app/styles/alabaster-contrast.css` - Added explicit input text color rules for both light and dark modes
+- `app/styles/dark-mode.css` - Enhanced form element text color rules with !important and webkit-text-fill-color
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Test forms in both light and dark modes to confirm readability
+- Check other form components for similar issues
+
+Raouf: 2026-01-13 - Avoid 401s on unauthenticated auth user checks
+
+#### Auth User 401 Fix (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Auth user API stability
+- **Summary:** Returned `200` with `user: null` from `/api/auth/user` when unauthenticated to prevent noisy 401s.
+
+**Files Changed:**
+- `app/api/auth/user/route.ts`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Confirm any callers relying on 401 handling.
+
+Raouf: 2026-01-13 - Address calendar accessibility, contrast, and SEO gaps
+
+#### Calendar Accessibility & SEO Fixes (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Calendar page UX, accessibility, and metadata
+- **Summary:** Improved calendar event readability, focus visibility, icon labels, sidebar contrast cues, and calendar metadata/canonical tags.
+
+**Files Changed:**
+- `app/calendar/page.tsx`
+- `app/calendar/CalendarClient.tsx`
+- `components/layout/Sidebar.tsx`
+- `components/layout/Header.tsx`
+- `app/styles/social-buttons.css`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Confirm keyboard navigation order in Calendar grid on all breakpoints.
+
+Raouf: 2026-01-13 - Remove Sentry capture from app errors to fix HMR
+
+#### Error Boundary HMR Fix (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Stabilize dev error boundaries
+- **Summary:** Removed Sentry capture calls from `app/error.tsx` and `app/global-error.tsx` to prevent Turbopack HMR module factory errors.
+
+**Files Changed:**
+- `app/error.tsx`
+- `app/global-error.tsx`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Reintroduce Sentry capture via server-side logging if needed.
+
+Raouf: 2026-01-13 - Push Supabase client into login-only chunk
+
+#### Supabase Split Pass (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Reduce shared client chunk size
+- **Summary:** Switched login to lazy-load Supabase client, moved map CSS to map route, and reran analyzer to confirm Sentry removal.
+
+**Files Changed:**
+- `app/login/LoginClient.tsx`
+- `app/map/MapClient.tsx`
+
+**Verification:**
+- `ANALYZE=true npm run build -- --webpack`
+
+**Follow-ups:**
+- Review chunk `static/chunks/7716*.js` to ensure it only loads on auth flows.
+
+Raouf: 2026-01-13 - Trim dev bundles by lazy loading Sentry and motion
+
+#### Bundle Trim Pass (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Reduce slow render and compile hot spots
+- **Summary:** Lazily loaded Sentry and Framer Motion, removed global Leaflet CSS, moved auth/session fetches to API, and aliased Sentry out when disabled.
+
+**Files Changed:**
+- `app/client-layout.tsx`
+- `components/layout/Header.tsx`
+- `app/home/HomeClient.tsx`
+- `components/ui/ScrollReveal.tsx`
+- `app/template.tsx`
+- `app/map/MapClient.tsx`
+- `app/map/MapSkeleton.tsx`
+- `components/ui/MeshGradient.tsx`
+- `components/ui/MovingMeshBackground.tsx`
+- `app/error.tsx`
+- `app/global-error.tsx`
+- `sentry.client.config.ts`
+- `sentry.server.config.ts`
+- `sentry.edge.config.ts`
+- `lib/store/profilesStore.ts`
+- `app/globals.css`
+- `next.config.ts`
+
+**Verification:**
+- `ANALYZE=true npm run build -- --webpack`
+
+**Follow-ups:**
+- Consider splitting Supabase auth to route-only chunks if login size remains high.
+
+Raouf: 2026-01-13 - Fix analyzer build with safe import modularization
+
+#### Analyzer Build Fix (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Restore build after modularization changes
+- **Summary:** Removed lucide-react modularization that broke Turbopack builds and reran the webpack analyzer successfully.
+
+**Files Changed:**
+- `next.config.ts`
+
+**Verification:**
+- `ANALYZE=true npm run build -- --webpack`
+
+**Follow-ups:**
+- Review `.next/analyze/*.html` for largest chunks.
+
+Raouf: 2026-01-13 - Speed up dev compile with leaner Next config
+
+#### Compile Speed Pass (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Reduce slow renders and compilation overhead
+- **Summary:** Disabled Sentry build plugin outside production and enabled modularized imports for large icon/date packages to reduce compile overhead.
+
+**Files Changed:**
+- `next.config.ts`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Run bundle analyzer to confirm reduced chunk sizes.
+
+Raouf: 2026-01-13 - Make hard reloads snappier with deferred loads
+
+#### Reload Perf Pass (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Reduce blocking work on hard reload
+- **Summary:** Deferred auth-dependent API loads and service worker registration, and removed retry delays for initial data fetches to speed hard reloads.
+
+**Files Changed:**
+- `app/client-layout.tsx`
+- `lib/store/unitsStore.ts`
+- `lib/store/deadlinesStore.ts`
+- `lib/store/notificationsStore.ts`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Profile bundle size and critical CSS to identify remaining slow points.
+
+Raouf: 2026-01-13 - Reduce hard reload latency by trimming auth fetches
+
+#### Hard Reload Latency Trim (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Minimize blocking auth lookups on reload
+- **Summary:** Removed server-side auth lookup from the home page and relied on client session fetches to cut hard reload latency.
+
+**Files Changed:**
+- `app/home/page.tsx`
+- `app/home/HomeClient.tsx`
+- `components/layout/Header.tsx`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Consider consolidating auth state into a shared store to eliminate duplicate session checks.
+
+Raouf: 2026-01-13 - Upload avatars to Supabase Storage and warn on local-only avatars
+
+#### Avatar Storage Sync (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Persist profile avatars via Supabase Storage
+- **Summary:** Uploaded avatar data URLs to Supabase Storage, saved public URLs to profiles, and surfaced local-only avatar warnings in profile screens.
+
+**Files Changed:**
+- `lib/store/profilesStore.ts`
+- `components/ProfileCard.tsx`
+- `app/settings/components/AccountSettings.tsx`
+- `locales/en/translations.json`
+
+**Verification:**
+- Not run (not requested)
+
+**Follow-ups:**
+- Ensure the `avatars` storage bucket exists and is public.
+
+#### ✅ Profile Update Payload Guard (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Prevent profile update requests from exceeding body size limits
+- **Summary:** Skipped server sync for data URL or oversized avatar strings while keeping the avatar local-only, avoiding 413 errors on `/api/profiles`.
+
+**Files Changed:**
+- `lib/store/profilesStore.ts`
+
+**Verification:**
+- Not run (not requested)
+
 #### ✅ UI/UX Polish & Feature Enhancements (Raouf)
 - **Date:** January 13, 2026 (Australia/Sydney)
 - **Scope:** Implement 21 identified UI/UX improvements across the application

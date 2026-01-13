@@ -9,7 +9,6 @@
  * ├── tokens.css          - Design tokens and CSS custom properties
  * ├── animations.css      - Keyframes and animation utilities
  * ├── dark-mode.css       - Dark mode overrides
- * ├── leaflet.css         - Map component styling
  * ├── btn-premium.css     - Premium button animations
  * ├── fingerprint.css     - Fingerprint login animation
  * ├── magic-card.css      - Magic card hover effects
@@ -32,7 +31,6 @@
 @import './styles/btn-premium.css';
 @import './styles/fingerprint.css';
 @import './styles/magic-card.css';
-@import './styles/leaflet.css';
 @import './styles/social-buttons.css';
 @import './styles/sidebar.css';
 @import './styles/settings-page.css';

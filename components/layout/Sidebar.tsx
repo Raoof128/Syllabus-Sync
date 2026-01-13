@@ -334,7 +334,7 @@ const Sidebar = memo(() => {
                   className={cn(
                     'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item',
                     isActive
-                      ? 'bg-mq-primary text-white shadow-mq-sm'
+                      ? 'bg-[#7A0A21] text-white shadow-mq-sm border border-white/10 border-l-4 border-white/80 pl-2 pr-3 font-semibold'
                       : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
                   )}
                   aria-current={isActive ? 'page' : undefined}

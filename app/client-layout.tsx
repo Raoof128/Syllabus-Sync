@@ -1,7 +1,7 @@
 // app/client-layout.tsx
 'use client';
 
-import React, { useEffect, useState, useMemo, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -14,7 +14,7 @@ import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { apiRequest } from '@/lib/utils/api';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
@@ -53,6 +53,15 @@ if (typeof window !== 'undefined') {
   };
 }
 
+const scheduleIdleTask = (callback: () => void) => {
+  if (typeof window === 'undefined') return;
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => callback());
+  } else {
+    setTimeout(callback, 200);
+  }
+};
+
 // V3.1: Wrapped with React.memo to prevent unnecessary re-renders
 // Using named function for better debugging in React DevTools
 function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
@@ -61,9 +70,6 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const language = useLanguageStore((state) => state.language);
-
-  // Memoize Supabase client to prevent recreation on every render
-  const supabase = useMemo(() => createBrowserClient(), []);
 
   // Use stable selectors to reduce subscription overhead
   const loadUnits = useUnitsStore((state) => state.loadUnits);
@@ -75,52 +81,44 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
-    // Check authentication status
+    let isActive = true;
+
     const checkAuth = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const authenticated = !!session;
+        const data = await apiRequest<{ user?: { id: string } }>('/api/auth/user', {
+          noRetry: true,
+        });
+        if (!isActive) return;
+        const authenticated = Boolean(data?.user?.id);
         setIsAuthenticated(authenticated);
 
-        // Handle redirects based on auth status
         if (authenticated && isAuthRoute) {
-          // Redirect authenticated users away from auth pages
           router.push('/home');
         } else if (!authenticated && isProtectedRoute) {
-          // Redirect unauthenticated users to login
           router.push(`/login?redirectTo=${pathname}`);
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
+      } catch {
+        if (!isActive) return;
         setIsAuthenticated(false);
+        if (isProtectedRoute) {
+          router.push(`/login?redirectTo=${pathname}`);
+        }
       }
     };
 
     checkAuth();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (event: string, session: { user?: { id: string; email?: string } } | null) => {
-        const authenticated = !!session;
-        setIsAuthenticated(authenticated);
+    const handleFocus = () => {
+      void checkAuth();
+    };
 
-        /* 
-         Raouf: Disabled auto-redirect for auth routes in the listener to prevent
-         interrupting the fingerprint login animation. 
-         LoginClient handles its own redirect after the animation completes.
-      */
-        if (!authenticated && isProtectedRoute) {
-          router.push(`/login?redirectTo=${pathname}`);
-        }
-      },
-    );
+    window.addEventListener('focus', handleFocus);
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth, router, pathname, isAuthRoute, isProtectedRoute]);
+    return () => {
+      isActive = false;
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [router, pathname, isAuthRoute, isProtectedRoute]);
 
   // Set up global error handlers
   useEffect(() => {
@@ -143,7 +141,9 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     window.addEventListener('error', handleError);
 
     // Register service worker for offline support
-    registerServiceWorker();
+    scheduleIdleTask(() => {
+      void registerServiceWorker();
+    });
 
     // Cleanup
     return () => {
@@ -155,9 +155,11 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   // Load data when authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      void loadUnits();
-      void loadDeadlines();
-      void loadNotifications();
+      scheduleIdleTask(() => {
+        void loadUnits();
+        void loadDeadlines();
+        void loadNotifications();
+      });
     }
   }, [isAuthenticated, loadUnits, loadDeadlines, loadNotifications]);
 

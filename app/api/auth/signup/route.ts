@@ -152,6 +152,22 @@ export async function POST(request: NextRequest) {
         if (profileError) {
           console.warn('Profile creation failed:', profileError.message);
           // Don't fail signup - user can still use the app, profile will be created on first access
+        } else {
+          // Also create gamification_profile for the new user
+          const { error: gamError } = await adminClient.from('gamification_profiles').upsert(
+            {
+              user_id: data.user.id,
+              xp: 0,
+              streak_days: 0,
+              longest_streak: 0,
+              last_activity_date: null,
+            },
+            { onConflict: 'user_id' },
+          );
+
+          if (gamError) {
+            console.warn('Gamification profile creation failed:', gamError.message);
+          }
         }
       } else {
         // Fallback: Try to create profile with regular client (relies on RLS INSERT policy)
@@ -167,6 +183,22 @@ export async function POST(request: NextRequest) {
 
         if (profileError) {
           console.warn('Profile creation (non-admin) failed:', profileError.message);
+        } else {
+          // Also create gamification_profile for the new user (non-admin fallback)
+          const { error: gamError } = await supabase.from('gamification_profiles').upsert(
+            {
+              user_id: data.user.id,
+              xp: 0,
+              streak_days: 0,
+              longest_streak: 0,
+              last_activity_date: null,
+            },
+            { onConflict: 'user_id' },
+          );
+
+          if (gamError) {
+            console.warn('Gamification profile creation (non-admin) failed:', gamError.message);
+          }
         }
       }
     }

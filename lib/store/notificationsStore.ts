@@ -42,7 +42,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Notification[]>('/api/notifications');
+          const data = await apiRequest<Notification[]>('/api/notifications', { noRetry: true });
           // Limit notifications and sort by date (newest first)
           const normalized = data
             .map(normalizeNotification)

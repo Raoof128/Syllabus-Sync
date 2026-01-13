@@ -233,6 +233,9 @@ const ProfileCard = React.memo(
                 className="hidden"
               />
             </label>
+            {profile.avatar?.startsWith('data:') && (
+              <p className="mt-2 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>
+            )}
           </div>
 
           {deleteConfirm && onDelete && (

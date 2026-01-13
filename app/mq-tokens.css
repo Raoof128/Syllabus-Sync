@@ -126,7 +126,7 @@
   /* Visible border for Alabaster background */
   --c-focus: var(--c-red);
   --c-card-background: var(--alabaster);
-  --c-input-background: var(--alabaster);
+  --c-input-background: #ffffff;
   /* Make buttons slightly different than background to pop */
   --c-button-secondary: var(--c-sand-200);
   --c-hover-background: var(--c-sand-100);
@@ -301,7 +301,8 @@
 
   /* Background variations for components - unified charcoal palette */
   --c-card-background: var(--c-charcoal-800);
-  --c-input-background: var(--c-charcoal-800);
+  /* Solid almost-black for inputs in dark mode to ensure high contrast and solid look */
+  --c-input-background: #151515;
   --c-button-secondary: var(--c-charcoal-700);
   --c-hover-background: var(--c-charcoal-700);
 

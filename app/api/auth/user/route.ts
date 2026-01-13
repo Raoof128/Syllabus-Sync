@@ -11,7 +11,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (error || !user) {
-      return jsonError('Not authenticated', 401);
+      return jsonSuccess({ user: null, profile: null });
     }
 
     // Get profile data

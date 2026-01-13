@@ -69,6 +69,57 @@ export interface ProfilesState {
 // HELPERS
 // ============================================================================
 
+const AVATAR_URL_MAX_LENGTH = 500;
+const AVATAR_STORAGE_BUCKET = 'avatars';
+
+const isDataUrl = (value: string) => value.startsWith('data:');
+
+const normalizeAvatarExtension = (mimeType: string) => {
+  const rawExtension = mimeType.split('/')[1] || 'png';
+  return rawExtension.replace('svg+xml', 'svg');
+};
+
+async function uploadAvatarToStorage(dataUrl: string, profileId: string): Promise<string | null> {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const { createBrowserClient, isSupabaseConfigured } = await import('@/lib/supabase/client');
+
+    if (!isSupabaseConfigured()) {
+      return null;
+    }
+
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    const mimeType = blob.type || 'image/png';
+    const extension = normalizeAvatarExtension(mimeType);
+    const filename = `${crypto.randomUUID()}.${extension}`;
+    const path = `${profileId}/${filename}`;
+
+    const supabase = createBrowserClient();
+    const { error } = await supabase.storage
+      .from(AVATAR_STORAGE_BUCKET)
+      .upload(path, blob, { contentType: mimeType, upsert: true });
+
+    if (error) {
+      errorHandler.logError(error, 'ProfilesStore.uploadAvatarToStorage', 'medium');
+      return null;
+    }
+
+    const { data } = supabase.storage.from(AVATAR_STORAGE_BUCKET).getPublicUrl(path);
+    return data?.publicUrl ?? null;
+  } catch (error) {
+    errorHandler.logError(
+      error instanceof Error ? error : new Error('Failed to upload avatar to storage'),
+      'ProfilesStore.uploadAvatarToStorage',
+      'medium',
+    );
+    return null;
+  }
+}
+
 /**
  * Map database profile (snake_case) to client profile (camelCase)
  */
@@ -105,7 +156,12 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
     dbUpdates.student_id = updates.studentId;
   }
   if (updates.avatar !== undefined) {
-    dbUpdates.avatar_url = updates.avatar || null;
+    const avatar = updates.avatar?.trim();
+    if (!avatar) {
+      dbUpdates.avatar_url = null;
+    } else if (!isDataUrl(avatar) && avatar.length <= AVATAR_URL_MAX_LENGTH) {
+      dbUpdates.avatar_url = avatar;
+    }
   }
 
   return dbUpdates;
@@ -220,8 +276,25 @@ export const useProfilesStore = create<ProfilesState>()(
           profiles: state.profiles.map((p) => (p.id === id ? optimisticProfile : p)),
         }));
 
+        let uploadedAvatarUrl: string | null = null;
+        if (updates.avatar && isDataUrl(updates.avatar)) {
+          uploadedAvatarUrl = await uploadAvatarToStorage(updates.avatar, id);
+          if (uploadedAvatarUrl) {
+            const resolvedAvatarUrl = uploadedAvatarUrl ?? undefined;
+            set((state) => ({
+              profiles: state.profiles.map((p) =>
+                p.id === id ? { ...p, avatar: resolvedAvatarUrl, lastLogin: new Date() } : p,
+              ),
+            }));
+          }
+        }
+
+        const updatesForDb = uploadedAvatarUrl
+          ? { ...updates, avatar: uploadedAvatarUrl }
+          : updates;
+
         // Determine which fields need server sync
-        const dbUpdates = mapClientToDb(updates);
+        const dbUpdates = mapClientToDb(updatesForDb);
         const hasServerUpdates = Object.keys(dbUpdates).length > 0;
 
         if (hasServerUpdates) {

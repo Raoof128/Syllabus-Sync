@@ -4,7 +4,6 @@
 import { useEffect } from 'react';
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import Link from 'next/link';
-import * as Sentry from '@sentry/nextjs';
 import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -21,16 +20,6 @@ export default function Error({
   useEffect(() => {
     // Log to local error handler
     errorHandler.logError(error, 'App Error Boundary', 'high');
-
-    // Report to Sentry with additional context
-    Sentry.captureException(error, {
-      tags: {
-        errorBoundary: 'app',
-      },
-      extra: {
-        digest: error.digest,
-      },
-    });
   }, [error]);
 
   return (

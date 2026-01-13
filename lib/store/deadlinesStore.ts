@@ -41,7 +41,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Deadline[]>('/api/deadlines');
+          const data = await apiRequest<Deadline[]>('/api/deadlines', { noRetry: true });
           // Ensure loaded data has valid UUIDs (filter out bad ones from API if any)
           const validData = data.map(normalizeDeadline).filter((d) => {
             if (!isValidUUID(d.id)) {

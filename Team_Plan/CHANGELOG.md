@@ -7,8 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-13 - Fix database schema orphans and UI transparency issues
+Raouf: 2026-01-13 - Fix unreadable input text colors in dialog forms
+Raouf: 2026-01-13 - Avoid 401s on unauthenticated auth user checks
+Raouf: 2026-01-13 - Address calendar accessibility, contrast, and SEO gaps
+Raouf: 2026-01-13 - Remove Sentry capture from app errors to fix HMR
+Raouf: 2026-01-13 - Push Supabase client into login-only chunk
+Raouf: 2026-01-13 - Trim dev bundles by lazy loading Sentry and motion
+Raouf: 2026-01-13 - Fix analyzer build with safe import modularization
+Raouf: 2026-01-13 - Speed up dev compile with leaner Next config
+Raouf: 2026-01-13 - Make hard reloads snappier with deferred loads
+Raouf: 2026-01-13 - Reduce hard reload latency by trimming auth fetches
+Raouf: 2026-01-13 - Upload avatars to Supabase Storage and warn on local-only avatars
 Raouf: 2026-01-13 - Implement comprehensive UI/UX polish (Forgot password, password strength, mobile FAB, calendar keyboard nav, XP badges)
 Raouf: 2026-01-13 - Resolve UI/UX audit items (single main landmark, keyboard-friendly notifications menu, pinnable sidebar, client routing, remove global dialog/select overrides)
+Raouf: 2026-01-13 - Avoid profile update 413s by skipping data URL/oversized avatar sync to /api/profiles
+
+## [1.0.0-rc.6] - 2026-01-13
+
+### Fixed
+#### Database Schema & UI Polish (Raouf)
+- **Database Schema:** Resolved critical issue where tables referenced an empty `public.users` table. Dropped redundant table and relinked all Foreign Keys to `auth.users(id)`.
+- **UI Inputs:** Fixed "glassy" form inputs by enforcing solid backgrounds (#fff light, #151515 dark) and adding `shadow-xs` for depth.
+- **Dark Mode:** Fixed transparent dialog/card backgrounds by removing aggressive CSS rule in `dark-mode.css` that was wiping backgrounds.
+- **Data Integrity:** Verified schema connections with mock data generation for multiple users.
 
 ## [1.0.0-rc.5] - 2026-01-13
 

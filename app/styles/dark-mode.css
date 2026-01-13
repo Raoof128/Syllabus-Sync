@@ -68,7 +68,8 @@
 .dark select {
   background-color: var(--c-input-background);
   border-color: var(--c-border);
-  color: var(--c-content);
+  color: var(--c-content) !important;
+  -webkit-text-fill-color: var(--c-content) !important;
 }
 
 .dark input::placeholder,
@@ -165,8 +166,6 @@ html.dark h6,
 html.dark p,
 html.dark span,
 html.dark label,
-html.dark .text-mq-content,
-html.dark .text-mq-content-secondary,
 html.dark .text-mq-3xl,
 html.dark .text-mq-2xl,
 html.dark .text-mq-lg {

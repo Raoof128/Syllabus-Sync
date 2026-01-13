@@ -26,7 +26,7 @@
 // ============================================================================
 'use client';
 
-import React, { useEffect, useState, memo, useMemo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -47,7 +47,7 @@ import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { apiRequest } from '@/lib/utils/api';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocaleString } from '@/lib/utils/locale';
 import { clearAllClientStorage } from '@/lib/utils/clientStorage';
@@ -70,9 +70,6 @@ const Header = memo(() => {
   const { t, language } = useTranslation();
   const router = useRouter();
 
-  // Memoize Supabase client to prevent recreation on every render
-  const supabase = useMemo(() => createBrowserClient(), []);
-
   const [user, setUser] = useState<{
     email?: string;
     user_metadata?: { full_name?: string; name?: string };
@@ -91,42 +88,38 @@ const Header = memo(() => {
 
   // Load user authentication state
   useEffect(() => {
+    let isActive = true;
+
     const getUser = async () => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setUser(user);
-      } catch (error) {
-        console.error('Failed to get user:', error);
+        const data = await apiRequest<{
+          user?: { email?: string; user_metadata?: { full_name?: string; name?: string } };
+        }>('/api/auth/user', { noRetry: true });
+        if (!isActive) return;
+        setUser(data?.user ?? null);
+      } catch {
+        if (!isActive) return;
+        setUser(null);
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     };
 
-    getUser();
+    void getUser();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (
-        _event: string,
-        session: {
-          user: {
-            id: string;
-            email?: string;
-            user_metadata?: { full_name?: string; name?: string };
-          };
-        } | null,
-      ) => {
-        setUser(session?.user ?? null);
-        setIsLoading(false);
-      },
-    );
+    const handleFocus = () => {
+      void getUser();
+    };
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      isActive = false;
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // Handle notifications seeding (only if authenticated)
   useEffect(() => {
@@ -387,7 +380,7 @@ const Header = memo(() => {
                   {currentProfile?.avatar ? (
                     <Image
                       src={currentProfile.avatar}
-                      alt={currentProfile.name}
+                      alt={currentProfile.name ? `${currentProfile.name} avatar` : 'Profile avatar'}
                       width={32}
                       height={32}
                       className="w-full h-full object-cover"
@@ -427,8 +420,9 @@ const Header = memo(() => {
                   try {
                     // SECURITY: Clear client storage before signing out
                     // This prevents sensitive data from persisting after logout
-                    clearAllClientStorage();
-                    await supabase.auth.signOut();
+                    await clearAllClientStorage();
+                    await apiRequest('/api/auth/signout', { method: 'POST', noRetry: true });
+                    setUser(null);
                     router.push('/login');
                   } catch (error) {
                     console.error('Logout failed:', error);
