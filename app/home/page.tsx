@@ -73,14 +73,9 @@ export default async function HomePage() {
 
   return (
     <Suspense fallback={<HomeSkeleton />}>
-      <main
-        id="main-content"
-        className="container mx-auto p-6 max-w-7xl"
-        role="main"
-        aria-label="Dashboard overview"
-      >
+      <section className="container mx-auto p-6 max-w-7xl" aria-label="Dashboard overview">
         <HomeClient initialUser={user} />
-      </main>
+      </section>
     </Suspense>
   );
 }

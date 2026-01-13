@@ -66,14 +66,9 @@ function MapSkeleton() {
 export default function MapPage() {
   return (
     <Suspense fallback={<MapSkeleton />}>
-      <main
-        id="main-content"
-        className="container mx-auto p-4 max-w-7xl map-page"
-        role="main"
-        aria-label="Campus Map"
-      >
+      <section className="container mx-auto p-4 max-w-7xl map-page" aria-label="Campus Map">
         <MapClient />
-      </main>
+      </section>
     </Suspense>
   );
 }

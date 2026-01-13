@@ -59,7 +59,8 @@
 
   /* Shift main content when sidebar is hovered */
   .layout-shell:has(.sidebar-shell:hover) .layout-main,
-  .layout-shell:has(.sidebar-shell[data-keyboard-open='true']) .layout-main {
+  .layout-shell:has(.sidebar-shell[data-keyboard-open='true']) .layout-main,
+  .layout-shell:has(.sidebar-shell[data-pinned='true']) .layout-main {
     margin-left: calc(14rem + 12px); /* 224px (w-56 sidebar) + 12px breathing room */
   }
 }
@@ -137,7 +138,8 @@
 
   /* Enhanced trigger shadow on hover */
   .sidebar-shell:hover .sidebar-trigger,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-trigger {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-trigger,
+  .sidebar-shell[data-pinned='true'] .sidebar-trigger {
     box-shadow:
       3px 0 16px rgba(0, 0, 0, 0.18),
       6px 0 32px rgba(0, 0, 0, 0.12);
@@ -145,7 +147,8 @@
 
   /* Panel expands on shell hover or keyboard navigation */
   .sidebar-shell:hover .sidebar-panel,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-panel {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-panel,
+  .sidebar-shell[data-pinned='true'] .sidebar-panel {
     transform: translateX(0);
     pointer-events: auto; /* Enable clicks when visible */
     /* OPEN animation - slightly slower for fluid feel */
@@ -157,7 +160,8 @@
   }
 
   /* Ensure panel closes properly when hover ends */
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-panel {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-panel {
     transform: translateX(calc(-100% + 48px));
     pointer-events: none;
     /* Faster close transition for snappy feel */
@@ -191,26 +195,32 @@
 
   /* Top bar moves UP on hover */
   .sidebar-shell:hover .sidebar-bar-top,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-top {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-top,
+  .sidebar-shell[data-pinned='true'] .sidebar-bar-top {
     transform: translateY(-6px);
   }
 
   /* Bottom bar moves DOWN on hover */
   .sidebar-shell:hover .sidebar-bar-bottom,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-bottom {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-bottom,
+  .sidebar-shell[data-pinned='true'] .sidebar-bar-bottom {
     transform: translateY(6px);
   }
 
   /* Middle bar stretches vertically on hover */
   .sidebar-shell:hover .sidebar-bar-mid,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-mid {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-bar-mid,
+  .sidebar-shell[data-pinned='true'] .sidebar-bar-mid {
     transform: scaleY(1.8);
   }
 
   /* Reset bars when not hovering */
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-top,
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-mid,
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-bar-bottom {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-bar-top,
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-bar-mid,
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-bar-bottom {
     transform: none;
   }
 
@@ -235,7 +245,8 @@
 
   /* Visible state on shell hover or keyboard navigation */
   .sidebar-shell:hover .sidebar-menu-item,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-menu-item {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-menu-item,
+  .sidebar-shell[data-pinned='true'] .sidebar-menu-item {
     transform: translateX(0);
     opacity: 1;
   }
@@ -258,7 +269,8 @@
   }
 
   /* Instant hide on mouse leave (no stagger delay) */
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-menu-item {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-menu-item {
     transform: translateX(-20px);
     opacity: 0;
     transition-delay: 0ms;
@@ -283,12 +295,14 @@
   }
 
   .sidebar-shell:hover .sidebar-logo,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-logo {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-logo,
+  .sidebar-shell[data-pinned='true'] .sidebar-logo {
     transform: translateX(0) scale(1);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-logo {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-logo {
     transform: translateX(-10px) scale(0.95);
     opacity: 0;
     transition-delay: 0ms;
@@ -308,12 +322,14 @@
   }
 
   .sidebar-shell:hover .sidebar-social,
-  .sidebar-shell[data-keyboard-open='true'] .sidebar-social {
+  .sidebar-shell[data-keyboard-open='true'] .sidebar-social,
+  .sidebar-shell[data-pinned='true'] .sidebar-social {
     transform: translateX(0);
     opacity: 1;
   }
 
-  .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-social {
+  .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+    .sidebar-social {
     transform: translateX(-10px);
     opacity: 0;
     transition-delay: 0ms;
@@ -390,20 +406,25 @@
   @media (min-width: 768px) {
     .sidebar-shell:hover .sidebar-menu-item,
     .sidebar-shell[data-keyboard-open='true'] .sidebar-menu-item,
+    .sidebar-shell[data-pinned='true'] .sidebar-menu-item,
     .sidebar-shell:hover .sidebar-logo,
     .sidebar-shell[data-keyboard-open='true'] .sidebar-logo,
+    .sidebar-shell[data-pinned='true'] .sidebar-logo,
     .sidebar-shell:hover .sidebar-social,
-    .sidebar-shell[data-keyboard-open='true'] .sidebar-social {
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-social,
+    .sidebar-shell[data-pinned='true'] .sidebar-social {
       transform: none !important;
       opacity: 1 !important;
     }
 
     .sidebar-shell:hover .sidebar-panel,
-    .sidebar-shell[data-keyboard-open='true'] .sidebar-panel {
+    .sidebar-shell[data-keyboard-open='true'] .sidebar-panel,
+    .sidebar-shell[data-pinned='true'] .sidebar-panel {
       transform: translateX(0) !important;
     }
 
-    .sidebar-shell:not(:hover):not([data-keyboard-open='true']) .sidebar-panel {
+    .sidebar-shell:not(:hover):not([data-keyboard-open='true']):not([data-pinned='true'])
+      .sidebar-panel {
       transform: translateX(calc(-100% + 48px)) !important;
     }
   }

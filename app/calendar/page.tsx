@@ -55,14 +55,9 @@ function CalendarSkeleton() {
 export default function CalendarPage() {
   return (
     <Suspense fallback={<CalendarSkeleton />}>
-      <main
-        id="main-content"
-        className="container mx-auto p-6 max-w-7xl calendar-page"
-        role="main"
-        aria-label="Calendar"
-      >
+      <section className="container mx-auto p-6 max-w-7xl calendar-page" aria-label="Calendar">
         <CalendarClient />
-      </main>
+      </section>
     </Suspense>
   );
 }

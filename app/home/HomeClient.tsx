@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import NextDeadline from '@/components/home/NextDeadline';
 import EventsFeed from '@/components/home/EventsFeed';
@@ -31,6 +32,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ initialUser }: HomeClientProps) {
   const { t } = useTranslation();
+  const router = useRouter();
 
   // -- HOOKS MUST BE DECLARED BEFORE ANY RETURNS --
   // Global error boundary for home page
@@ -40,6 +42,9 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   // User state from Supabase - initialized from server prop
   const [user, setUser] = useState<User | null>(initialUser);
   const supabase = useMemo(() => createBrowserClient(), []);
+
+  // FAB state
+  const [fabOpen, setFabOpen] = useState(false);
 
   const units = useUnitsStore((state) => state.units);
   const addUnit = useUnitsStore((state) => state.addUnit);
@@ -171,12 +176,12 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
   useEffect(() => {
     const handleAddUnitEvent = () => {
       // Navigate to calendar page where units can be managed
-      window.location.href = '/calendar';
+      router.push('/calendar');
     };
 
     const handleAddDeadlineEvent = () => {
       // Navigate to calendar page where deadline can be added
-      window.location.href = '/calendar';
+      router.push('/calendar');
     };
 
     // Keyboard shortcuts for power users
@@ -208,7 +213,7 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
       window.removeEventListener('add-deadline', handleAddDeadlineEvent);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [router]);
 
   const hasUnits = units.length > 0;
   const stressLevel = useMemo(() => {
@@ -333,6 +338,16 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
     High: '😰',
   };
 
+  // Get aria-label for stress level
+  const getStressAriaLabel = (level: 'Low' | 'Busy' | 'High') => {
+    const labels = {
+      Low: t('stressLevelLow'),
+      Busy: t('stressLevelBusy'),
+      High: t('stressLevelHigh'),
+    };
+    return labels[level];
+  };
+
   return (
     <div className="home-page">
       {/* Header */}
@@ -347,10 +362,10 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                   <TrendingUp className="h-3 w-3 text-mq-content-secondary" />
                   <Badge
                     className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
-                    aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
-                    title={`${t('workload')}: ${stressLevel}`}
+                    aria-label={getStressAriaLabel(stressLevel)}
+                    title={getStressAriaLabel(stressLevel)}
                   >
-                    {stressEmoji[stressLevel]}
+                    <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
                   </Badge>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
@@ -358,9 +373,9 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
                   <span className="text-mq-sm text-mq-content">{t('workload')}</span>
                   <Badge
                     className={stressColors[stressLevel]}
-                    aria-label={`${t('currentWorkloadLevel')}: ${stressLevel}`}
+                    aria-label={getStressAriaLabel(stressLevel)}
                   >
-                    {stressEmoji[stressLevel]} {stressLevel}
+                    <span aria-hidden="true">{stressEmoji[stressLevel]}</span> {stressLevel}
                   </Badge>
                 </div>
               </>
@@ -503,6 +518,59 @@ export default function HomeClient({ initialUser }: HomeClientProps) {
           <EventsFeed />
         </section>
       </ScrollReveal>
+
+      {/* Floating Action Button (FAB) for Quick Actions */}
+      <div className="fixed bottom-6 right-6 z-50 md:hidden">
+        <div className="relative">
+          {/* FAB Menu */}
+          {fabOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.8 }}
+              className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
+            >
+              <Button
+                size="sm"
+                variant="secondary"
+                className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                  router.push('/calendar?action=add-unit');
+                  setFabOpen(false);
+                }}
+              >
+                <BookOpen className="h-4 w-4" />
+                {t('addUnit')}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                onClick={() => {
+                  router.push('/calendar?action=add-deadline');
+                  setFabOpen(false);
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                {t('addDeadline')}
+              </Button>
+            </motion.div>
+          )}
+
+          {/* Main FAB Button */}
+          <Button
+            size="lg"
+            className="h-14 w-14 rounded-full shadow-lg p-0"
+            onClick={() => setFabOpen(!fabOpen)}
+            aria-expanded={fabOpen}
+            aria-label={t('quickActions')}
+          >
+            <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+              <Plus className="h-6 w-6" />
+            </motion.div>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

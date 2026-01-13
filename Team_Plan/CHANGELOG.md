@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-13 - Implement comprehensive UI/UX polish (Forgot password, password strength, mobile FAB, calendar keyboard nav, XP badges)
+Raouf: 2026-01-13 - Resolve UI/UX audit items (single main landmark, keyboard-friendly notifications menu, pinnable sidebar, client routing, remove global dialog/select overrides)
+
+## [1.0.0-rc.5] - 2026-01-13
+
+### Added
+#### UI/UX Polish & Feature Enhancements (Raouf)
+- Added **Forgot Password** flow and email reset functionality to Login page.
+- Added **Password Strength Indicator** and visibility toggles to Signup/Login pages.
+- Added **Floating Action Button (FAB)** to Home page for quick mobile access to "Add Unit" and "Add Deadline".
+- Added **XP/Level Badge** to Sidebar showing real-time gamification progress.
+- Added **Keyboard Navigation** to Calendar (Arrow keys for weeks, 'T' for today).
+- Added **Delete Profile** functionality to Manage Profiles page with confirmation.
+
+### Fixed
+- Improved **Calendar Readability**: Increased font sizes (10px -> 12px) and added proper accessibility landmarks.
+- Enhanced **Accessibility**: Added aria-labels to stress level emojis and replaced window.confirm with accessible modals.
+- Fixed **Loading State Visibility**: Made "Loading..." text visible to users (removed `sr-only`).
+- **Internationalization**: Translated "Copy Link", "Show More/Less", and Map category filters.
+
 ## [1.0.0-rc.4] - 2026-01-12
 
 ### Fixed

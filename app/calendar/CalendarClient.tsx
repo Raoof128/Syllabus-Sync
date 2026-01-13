@@ -15,6 +15,7 @@ import {
   GraduationCap,
   PartyPopper,
   Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -267,6 +268,10 @@ export default function CalendarClient() {
   const [unitDetailOpen, setUnitDetailOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
 
+  // Delete confirmation modal state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
+
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 }),
@@ -319,6 +324,20 @@ export default function CalendarClient() {
   const goToNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
   const goToToday = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
+  // Keyboard navigation for weeks
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      goToPreviousWeek();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      goToNextWeek();
+    } else if (e.key === 't' || e.key === 'T') {
+      e.preventDefault();
+      goToToday();
+    }
+  };
+
   // Deadline handlers
   const openAddDeadline = () => {
     setEditDeadline(null);
@@ -352,13 +371,15 @@ export default function CalendarClient() {
   };
 
   const handleDeleteUnit = (unit: Unit) => {
-    if (
-      // eslint-disable-next-line no-alert -- Intentional confirmation dialog for destructive action
-      window.confirm(
-        `Are you sure you want to delete ${unit.code} - ${unit.name}? This cannot be undone.`,
-      )
-    ) {
-      removeUnit(unit.id);
+    setUnitToDelete(unit);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteUnit = () => {
+    if (unitToDelete) {
+      removeUnit(unitToDelete.id);
+      setDeleteConfirmOpen(false);
+      setUnitToDelete(null);
     }
   };
 
@@ -380,7 +401,12 @@ export default function CalendarClient() {
   const exams = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz');
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-7xl calendar-page">
+    <div
+      className="container mx-auto p-4 sm:p-6 max-w-7xl calendar-page"
+      role="application"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <ScrollReveal>
         <header className="mb-6">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('calendar')}</h1>
@@ -652,15 +678,15 @@ export default function CalendarClient() {
                                   className="p-1 h-full overflow-hidden"
                                   style={{ color: unitData.color }}
                                 >
-                                  <span className="block text-[10px] font-bold truncate">
+                                  <span className="block text-xs font-bold truncate">
                                     {unitData.code}
                                   </span>
-                                  <span className="text-[8px] opacity-80 block truncate">
+                                  <span className="text-[10px] opacity-80 block truncate">
                                     {formatTime(schedule.startTime)} -{' '}
                                     {formatTime(schedule.endTime)}
                                   </span>
                                   {posInfo.height > 50 && (
-                                    <span className="text-[8px] opacity-70 block truncate">
+                                    <span className="text-[10px] opacity-70 block truncate">
                                       {unitData.location.building} {unitData.location.room}
                                     </span>
                                   )}
@@ -694,7 +720,7 @@ export default function CalendarClient() {
                                   key={deadline.id}
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm truncate font-medium z-10 text-white',
+                                    'absolute left-1 right-1 text-left text-xs px-1 py-0.5 rounded shadow-sm truncate font-medium z-10 text-white',
                                     deadline.completed && 'opacity-50 line-through',
                                   )}
                                   style={{
@@ -722,7 +748,7 @@ export default function CalendarClient() {
                                 key={deadline.id}
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
-                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4 text-white',
+                                  'absolute text-left text-xs px-1 py-0.5 rounded-md shadow-md truncate font-medium z-10 border-l-4 text-white',
                                   deadline.completed && 'opacity-50 line-through',
                                 )}
                                 style={{
@@ -736,7 +762,7 @@ export default function CalendarClient() {
                                 title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                               >
                                 <span className="block truncate">{displayName}</span>
-                                <span className="text-[8px] opacity-80">
+                                <span className="text-[10px] opacity-80">
                                   {format(dueDate, 'h:mm a')}
                                 </span>
                               </button>
@@ -1295,6 +1321,44 @@ export default function CalendarClient() {
         onOpenChange={setUnitDetailOpen}
         onEditDeadline={handleEditDeadlineFromPanel}
       />
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && unitToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteUnitConfirm')}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {unitToDelete.code} - {unitToDelete.name}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteUnitConfirmDesc')}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setUnitToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDeleteUnit}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

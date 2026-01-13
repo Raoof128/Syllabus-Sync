@@ -33,9 +33,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X } from 'lucide-react';
+import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
 
 import { TranslationKey } from '@/lib/i18n/translations';
 
@@ -67,10 +68,15 @@ const Sidebar = memo(() => {
   const { t } = useTranslation();
   const pathname = usePathname();
 
+  // Gamification profile for XP badge
+  const profile = useGamificationStore((state) => state.profile);
+  const getLevelTitle = useGamificationStore((state) => state.getLevelTitle);
+
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Keyboard navigation state for desktop sidebar
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const [pinnedOpen, setPinnedOpen] = useState(false);
 
   // Refs for focus management
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -219,9 +225,12 @@ const Sidebar = memo(() => {
         ref={sidebarShellRef}
         className="relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell"
         data-keyboard-open={keyboardOpen ? 'true' : undefined}
+        data-pinned={pinnedOpen ? 'true' : undefined}
         onMouseLeave={() => {
           // Close keyboard-open state when mouse leaves (user switched to mouse navigation)
-          setKeyboardOpen(false);
+          if (!pinnedOpen) {
+            setKeyboardOpen(false);
+          }
         }}
       >
         {/* ----------------------------------------------------------------------
@@ -231,9 +240,14 @@ const Sidebar = memo(() => {
             Hovering this area triggers the sidebar to expand.
             Uses Alabaster background in light mode, charcoal in dark mode.
             ---------------------------------------------------------------------- */}
-        <div
-          aria-hidden="true"
+        <button
+          type="button"
           className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger mq-liquid-glass-subtle"
+          aria-label={pinnedOpen ? t('closeMenu') : t('openMenu')}
+          aria-pressed={pinnedOpen}
+          aria-expanded={pinnedOpen}
+          onClick={() => setPinnedOpen((prev) => !prev)}
+          title={pinnedOpen ? t('closeMenu') : t('openMenu')}
         >
           {/* Hamburger bars - animate on hover (expand outward) */}
           <span className="flex flex-col items-center gap-2 sidebar-bars">
@@ -241,7 +255,7 @@ const Sidebar = memo(() => {
             <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-mid" />
             <span className="h-5 w-0.5 rounded-full bg-mq-content sidebar-bar-bottom" />
           </span>
-        </div>
+        </button>
 
         {/* ----------------------------------------------------------------------
             SLIDING PANEL - LIQUID GLASS
@@ -254,7 +268,7 @@ const Sidebar = memo(() => {
         <div
           ref={sidebarRef}
           id="mobile-sidebar"
-          role="dialog"
+          role={mobileMenuOpen ? 'dialog' : 'navigation'}
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(
@@ -263,7 +277,7 @@ const Sidebar = memo(() => {
           )}
         >
           {/* Logo - bounces in with slight overshoot */}
-          <div className="mb-8 sidebar-logo">
+          <div className="mb-4 sidebar-logo">
             <Link
               href="/home"
               className="flex items-center gap-2"
@@ -280,6 +294,29 @@ const Sidebar = memo(() => {
               />
             </Link>
           </div>
+
+          {/* XP/Level Badge */}
+          {profile && (
+            <Link
+              href="/settings"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
+              title={`Level ${profile.level} - ${getLevelTitle()}`}
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mq-primary text-white text-xs font-bold">
+                {profile.level}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-mq-content truncate">{getLevelTitle()}</p>
+                <div className="flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-mq-primary" />
+                  <span className="text-[10px] text-mq-content-secondary">
+                    {profile.xp.toLocaleString()} XP
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )}
 
           {/* Navigation Links - staggered slide-in animation */}
           <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>

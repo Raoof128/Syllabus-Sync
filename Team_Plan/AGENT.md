@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 1.0.0-rc.1 | Last Updated: January 12, 2026
+Version: 1.0.0-rc.5 | Last Updated: January 13, 2026
 
 ---
 
@@ -75,6 +75,43 @@ Version: 1.0.0-rc.1 | Last Updated: January 12, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+#### ✅ UI/UX Polish & Feature Enhancements (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Implement 21 identified UI/UX improvements across the application
+- **Summary:** Added forgot password flow, password strength/visibility toggles, mobile FAB for quick actions, keyboard navigation for calendar, accessible stress indicators, and XP/level badges in sidebar.
+
+**Files Changed:**
+- `locales/en/translations.json`
+- `app/login/LoginClient.tsx`
+- `app/signup/SignupClient.tsx`
+- `app/home/HomeClient.tsx`
+- `app/calendar/CalendarClient.tsx`
+- `app/map/MapClient.tsx`
+- `app/manage-profiles/page.tsx`
+- `app/loading.tsx`
+- `components/layout/Sidebar.tsx`
+
+---
+
+#### ✅ UI/UX Audit Fixes (Raouf)
+- **Date:** January 13, 2026 (Australia/Sydney)
+- **Scope:** Address UI/UX audit findings
+- **Summary:** Removed duplicate main landmarks, made notifications menu keyboard-friendly, added sidebar pin toggle, switched home shortcuts to client routing, and removed global dialog/select overrides.
+
+**Files Changed:**
+- `components/layout/Header.tsx`
+- `components/layout/Sidebar.tsx`
+- `app/styles/sidebar.css`
+- `app/client-layout.tsx`
+- `app/home/page.tsx`
+- `app/calendar/page.tsx`
+- `app/feed/page.tsx`
+- `app/map/page.tsx`
+- `app/home/HomeClient.tsx`
+- `app/globals.css`
+
+---
 
 #### ✅ Social Media Button Refinements v1.0.0-rc.4 (Raouf)
 - **Date:** January 12, 2026 (Australia/Sydney)

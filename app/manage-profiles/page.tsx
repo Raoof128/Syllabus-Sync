@@ -46,6 +46,7 @@ export default function ManageProfilesPage() {
     fetchProfile,
     updateProfile,
     setCurrentProfile,
+    deleteProfile,
   } = useProfilesStore();
 
   // Gamification store
@@ -156,6 +157,11 @@ export default function ManageProfilesPage() {
     toastUtils.success(t('profileSwitched'), t('profileSwitchedMsg'));
   };
 
+  const handleDeleteProfile = (id: string) => {
+    deleteProfile(id);
+    toastUtils.success(t('profileDeleted'), t('profileDeletedMsg'));
+  };
+
   // Show loading state while fetching profile
   if (isLoading && !hasLoaded) {
     return (
@@ -209,6 +215,7 @@ export default function ManageProfilesPage() {
                       onEdit={handleEditProfile}
                       onSetCurrent={handleSetCurrentProfile}
                       onUpdate={updateProfile}
+                      onDelete={handleDeleteProfile}
                     />
                   ))}
                 </div>

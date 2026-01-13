@@ -74,19 +74,19 @@ const FILTER_CATEGORIES = [
 const CATEGORY_FILTERS: {
   id: BuildingCategory | 'all';
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: TranslationKey;
   color: string;
 }[] = [
-  { id: 'all', icon: LayoutGrid, label: 'All', color: 'text-mq-content' },
-  { id: 'academic', icon: BookOpen, label: 'Teaching', color: 'text-blue-500' },
-  { id: 'food', icon: Utensils, label: 'Food', color: 'text-orange-500' },
-  { id: 'services', icon: Briefcase, label: 'Services', color: 'text-purple-500' },
-  { id: 'health', icon: Stethoscope, label: 'Health', color: 'text-red-500' },
-  { id: 'sports', icon: Dumbbell, label: 'Sports', color: 'text-green-500' },
-  { id: 'venue', icon: Theater, label: 'Venues', color: 'text-pink-500' },
-  { id: 'research', icon: FlaskConical, label: 'Research', color: 'text-cyan-500' },
-  { id: 'residential', icon: Home, label: 'Housing', color: 'text-amber-500' },
-  { id: 'other', icon: Building2, label: 'Other', color: 'text-gray-500' },
+  { id: 'all', icon: LayoutGrid, labelKey: 'categoryAll', color: 'text-mq-content' },
+  { id: 'academic', icon: BookOpen, labelKey: 'categoryTeaching', color: 'text-blue-500' },
+  { id: 'food', icon: Utensils, labelKey: 'categoryFood', color: 'text-orange-500' },
+  { id: 'services', icon: Briefcase, labelKey: 'categoryServices', color: 'text-purple-500' },
+  { id: 'health', icon: Stethoscope, labelKey: 'categoryHealth', color: 'text-red-500' },
+  { id: 'sports', icon: Dumbbell, labelKey: 'categorySports', color: 'text-green-500' },
+  { id: 'venue', icon: Theater, labelKey: 'categoryVenues', color: 'text-pink-500' },
+  { id: 'research', icon: FlaskConical, labelKey: 'categoryResearch', color: 'text-cyan-500' },
+  { id: 'residential', icon: Home, labelKey: 'categoryHousing', color: 'text-amber-500' },
+  { id: 'other', icon: Building2, labelKey: 'categoryOther', color: 'text-gray-500' },
 ];
 
 // Map overlay icons
@@ -372,7 +372,7 @@ export default function MapClient() {
                       title="Copy shareable URL with current layers"
                     >
                       <LinkIcon className="h-4 w-4" />
-                      Copy Link
+                      {t('copyLink')}
                     </Button>
                     <Button variant="ghost" size="sm" onClick={clearOverlays} className="gap-1">
                       <X className="h-4 w-4" />
@@ -539,7 +539,7 @@ export default function MapClient() {
                       aria-pressed={isActive}
                     >
                       <Icon className={`h-3.5 w-3.5 ${isActive ? '' : cat.color}`} />
-                      <span>{cat.label}</span>
+                      <span>{t(cat.labelKey)}</span>
                       {count > 0 && (
                         <span
                           className={`text-[10px] px-1.5 py-0.5 rounded-full ${
@@ -725,12 +725,12 @@ export default function MapClient() {
                         {showAllBuildings ? (
                           <>
                             <ChevronUp className="h-4 w-4" />
-                            Show Less
+                            {t('showLess')}
                           </>
                         ) : (
                           <>
                             <ChevronDown className="h-4 w-4" />
-                            Show All ({sidebarBuildings.length - 12} more)
+                            {t('showAllBuildings')} ({sidebarBuildings.length - 12})
                           </>
                         )}
                       </Button>

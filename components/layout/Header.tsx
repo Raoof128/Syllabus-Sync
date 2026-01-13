@@ -26,7 +26,7 @@
 // ============================================================================
 'use client';
 
-import React, { useEffect, useState, useRef, memo, useMemo } from 'react';
+import React, { useEffect, useState, memo, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -66,9 +66,6 @@ const notificationIcons = {
   system: Info,
 };
 
-// Stable ID for notification menu (avoids useId hydration mismatch)
-const NOTIFICATION_MENU_ID = 'header-notification-menu';
-
 const Header = memo(() => {
   const { t, language } = useTranslation();
   const router = useRouter();
@@ -89,10 +86,8 @@ const Header = memo(() => {
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
 
-  const [showNotifications, setShowNotifications] = useState(false);
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Load user authentication state
   useEffect(() => {
@@ -163,17 +158,6 @@ const Header = memo(() => {
     setIsClient(true);
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   // Only calculate unread count on client to avoid hydration mismatch
   const unreadCount = isClient ? getUnreadCount() : 0;
 
@@ -239,75 +223,65 @@ const Header = memo(() => {
       {/* Right side - Actions (far right) */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
         {/* Notifications */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
-            aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
-            aria-expanded={showNotifications}
-            aria-haspopup="menu"
-            aria-controls={NOTIFICATION_MENU_ID}
-            onClick={() => setShowNotifications(!showNotifications)}
-          >
-            <Bell
-              className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
-              aria-hidden="true"
-            />
-            {unreadCount > 0 && (
-              <span
-                className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
-                aria-hidden="true"
-              >
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
-
-          {/* Notifications Dropdown */}
-          {showNotifications && (
-            <div
-              id={NOTIFICATION_MENU_ID}
-              role="menu"
-              aria-label={t('notifications')}
-              className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
+              aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+              aria-haspopup="menu"
             >
-              <div className="p-3 border-b border-mq-border flex items-center justify-between">
-                <h3 className="font-semibold text-mq-content" id={`${NOTIFICATION_MENU_ID}-title`}>
-                  {t('notifications')}
-                </h3>
-                {unreadCount > 0 && (
-                  <button
-                    onClick={() => markAllAsRead()}
-                    className="text-xs text-mq-info hover:text-mq-info/80 rounded-mq focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background"
-                    aria-label={t('markAllRead')}
-                  >
-                    {t('markAllRead')}
-                  </button>
-                )}
-              </div>
-              <div
-                className="max-h-72 overflow-y-auto"
-                role="list"
-                aria-labelledby={`${NOTIFICATION_MENU_ID}-title`}
-              >
-                {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-mq-content-tertiary text-sm" role="listitem">
-                    {t('noNotificationsYet')}
-                  </div>
-                ) : (
-                  notifications.slice(0, 10).map((notification) => {
-                    const Icon = notificationIcons[notification.type];
-                    return (
+              <Bell
+                className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
+                aria-hidden="true"
+              />
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
+                  aria-hidden="true"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
+          >
+            <div className="p-3 border-b border-mq-border flex items-center justify-between">
+              <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
+              {unreadCount > 0 && (
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    markAllAsRead();
+                  }}
+                  className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent"
+                >
+                  {t('markAllRead')}
+                </DropdownMenuItem>
+              )}
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="p-4 text-center text-mq-content-tertiary text-sm">
+                  {t('noNotificationsYet')}
+                </div>
+              ) : (
+                notifications.slice(0, 10).map((notification) => {
+                  const Icon = notificationIcons[notification.type];
+                  return (
+                    <DropdownMenuItem
+                      key={notification.id}
+                      asChild
+                      onSelect={() => markAsRead(notification.id)}
+                      className={`p-0 border-b border-mq-border last:border-0 ${
+                        !notification.read ? 'bg-mq-info/10' : ''
+                      }`}
+                    >
                       <Link
-                        key={notification.id}
                         href={notification.link || '#'}
-                        role="menuitem"
-                        onClick={() => {
-                          markAsRead(notification.id);
-                          setShowNotifications(false);
-                        }}
-                        className={`block p-3 border-b border-mq-border last:border-0 hover:bg-mq-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background ${
-                          !notification.read ? 'bg-mq-info/10' : ''
-                        }`}
+                        className="block w-full p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
                       >
                         <div className="flex gap-3">
                           <div
@@ -357,13 +331,13 @@ const Header = memo(() => {
                           )}
                         </div>
                       </Link>
-                    );
-                  })
-                )}
-              </div>
+                    </DropdownMenuItem>
+                  );
+                })
+              )}
             </div>
-          )}
-        </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Theme Toggle */}
         {isClient && (
