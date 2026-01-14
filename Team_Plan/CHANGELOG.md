@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-14 - Fix Navigation Proxy failures
+
+### Fixed
+- **Map Navigation:** Resolved "Navigation service temporarily unavailable" errors by updating the server-side `ORS_API_KEY` with a verified working token.
+- **Security:** Removed deprecated `NEXT_PUBLIC_ORS_API_KEY` to prevent client-side exposure and enforce server-side proxy usage.
+- **Logging:** Downgraded handled navigation proxy errors to warnings to reduce noise in error tracking systems.
+
+---
+
 Raouf: 2026-01-14 - Fix Supabase initialization error during build
 
 ### Fixed

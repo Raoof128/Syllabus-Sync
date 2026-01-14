@@ -55,7 +55,8 @@ export async function fetchORSRoute(
     if (!response.ok || !json.success) {
       // Extract error message from our API response format
       const errorMessage = json.error?.message || `Route Failed: ${response.status}`;
-      console.error('Navigation Proxy Failed:', errorMessage);
+      // Log as warning rather than error to avoid flooding error trackers for transient upstream issues
+      console.warn('Navigation Proxy Failed:', errorMessage);
       return { coordinates: [], preview: null, error: errorMessage };
     }
 

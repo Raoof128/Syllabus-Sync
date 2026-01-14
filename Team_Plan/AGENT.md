@@ -77,6 +77,26 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-14 (Australia/Sydney)
+Scope: Map - Navigation Fix.
+Summary:
+  - Fixed "Navigation service temporarily unavailable" error by replacing the broken server-side ORS_API_KEY with a verified working token.
+  - Removed deprecated NEXT_PUBLIC_ORS_API_KEY from .env.local to enforce server-side security.
+  - Downgraded proxy failure logs from error to warning in ors.ts to reduce console noise for handled availability issues.
+Files: .env.local, lib/services/ors.ts.
+Verification: Manual curl verified new API key returns valid routing data.
+Follow-ups: Monitor ORS usage quota with the new key.
+
+Raouf: 2026-01-14 (Australia/Sydney)
+Scope: Map - Navigation Fix.
+Summary:
+  - Fixed "Navigation service temporarily unavailable" error by replacing the broken server-side ORS_API_KEY with a verified working token.
+  - Removed deprecated NEXT_PUBLIC_ORS_API_KEY from .env.local to enforce server-side security.
+  - Downgraded proxy failure logs from error to warning in ors.ts to reduce console noise for handled availability issues.
+Files: .env.local, lib/services/ors.ts.
+Verification: Manual curl verified new API key returns valid routing data.
+Follow-ups: Monitor ORS usage quota with the new key.
+
+Raouf: 2026-01-14 (Australia/Sydney)
 Scope: Infrastructure - Build Fix.
 Summary:
   - Resolved "supabaseUrl is required" error during build by refactoring the health check API.
