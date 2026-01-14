@@ -1,3 +1,5 @@
+'use client';
+
 import { Keyboard, Command } from 'lucide-react';
 import {
   DropdownMenu,
@@ -14,11 +16,11 @@ export function KeyboardShortcuts() {
   const { t } = useTranslation();
 
   const shortcuts = [
-    { description: t('addUnit'), keys: ['U'], highlight: true },
-    { description: t('addDeadline'), keys: ['D'], highlight: true },
-    { description: t('search'), keys: ['K'] },
-    { description: t('save'), keys: ['S'] },
-    { description: t('close'), keys: ['Esc'] },
+    { id: 'add-unit', description: t('addUnit'), keys: ['U'], highlight: true },
+    { id: 'add-deadline', description: t('addDeadline'), keys: ['D'], highlight: true },
+    { id: 'search', description: t('search'), keys: ['K'] },
+    { id: 'save', description: t('save'), keys: ['S'] },
+    { id: 'close', description: t('close'), keys: ['Esc'] },
   ];
 
   return (
@@ -43,16 +45,16 @@ export function KeyboardShortcuts() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-mq-border" />
         <div className="space-y-1 mt-1">
-          {shortcuts.map((shortcut, index) => (
+          {shortcuts.map((shortcut) => (
             <div
-              key={index}
+              key={shortcut.id}
               className="flex items-center justify-between px-2 py-1.5 rounded-mq-md hover:bg-mq-background-secondary text-mq-sm"
             >
               <span className="text-mq-content-secondary">{shortcut.description}</span>
               <div className="flex items-center gap-1">
-                {shortcut.keys.map((key, kIndex) => (
-                  <div key={kIndex} className="flex items-center gap-1">
-                    {kIndex === 0 && shortcut.keys.length > 0 && key !== 'Esc' && (
+                {shortcut.keys.map((key) => (
+                  <div key={`${shortcut.id}-${key}`} className="flex items-center gap-1">
+                    {shortcut.keys.length > 0 && key !== 'Esc' && (
                       <>
                         <kbd className="inline-flex h-5 items-center gap-1 rounded border border-mq-border bg-mq-background-tertiary px-1.5 font-mono text-[10px] font-medium text-mq-content-secondary opacity-100">
                           Ctrl

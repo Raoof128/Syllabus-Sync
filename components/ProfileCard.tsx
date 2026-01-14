@@ -80,6 +80,7 @@ const ProfileCard = React.memo(
                     accept="image/*"
                     onChange={handleAvatarChange}
                     className="hidden"
+                    aria-label={t('changeAvatar')}
                   />
                 </label>
 
@@ -231,6 +232,7 @@ const ProfileCard = React.memo(
                 accept="image/*"
                 onChange={handleAvatarChange}
                 className="hidden"
+                aria-label={t('changeAvatar')}
               />
             </label>
             {profile.avatar?.startsWith('data:') && (

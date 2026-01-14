@@ -426,8 +426,9 @@ const Header = memo(() => {
                     await apiRequest('/api/auth/signout', { method: 'POST', noRetry: true });
                     setUser(null);
                     router.push('/login');
-                  } catch (error) {
-                    console.error('Logout failed:', error);
+                  } catch {
+                    // Silent fail - redirect to login anyway
+                    router.push('/login');
                   }
                 }}
                 className="flex items-center gap-2 text-mq-content hover:text-mq-content cursor-pointer"

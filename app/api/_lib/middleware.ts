@@ -276,7 +276,14 @@ export const cors = (config: CorsConfig = {}) => {
   // Format: comma-separated URLs, e.g., "http://localhost:3000,https://myapp.com"
   const defaultOrigins = process.env.CORS_ALLOWED_ORIGINS
     ? process.env.CORS_ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
-    : ['http://localhost:3000', 'https://localhost:3000'];
+    : [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://127.0.0.1:3002',
+      ];
 
   const {
     allowedOrigins = defaultOrigins,

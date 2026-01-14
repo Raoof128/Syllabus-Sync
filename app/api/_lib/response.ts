@@ -207,7 +207,7 @@ function getErrorCodeFromStatus(status: number): ErrorCode {
  * Generate request ID for tracking
  */
 export const generateRequestId = (): string => {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 };
 
 // ============================================================================

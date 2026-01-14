@@ -25,7 +25,7 @@ SEARCH_RADIUS = 1500  # meters
 
 def fetch_osm_buildings():
     """Fetch buildings from OpenStreetMap Overpass API."""
-    overpass_url = "http://overpass-api.de/api/interpreter"
+    overpass_url = "https://overpass-api.de/api/interpreter"
 
     # Query for buildings around MQ campus
     query = f"""
@@ -47,7 +47,7 @@ def fetch_osm_buildings():
 
 def fetch_osm_buildings_with_center():
     """Fetch buildings with center coordinates."""
-    overpass_url = "http://overpass-api.de/api/interpreter"
+    overpass_url = "https://overpass-api.de/api/interpreter"
 
     # Query for buildings with center point
     query = f"""

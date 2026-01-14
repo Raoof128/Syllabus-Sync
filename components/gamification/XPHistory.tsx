@@ -21,6 +21,27 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
+// LOCALE MAPPING
+// ============================================================================
+
+/**
+ * Maps language codes to full locale identifiers for date/time formatting.
+ * Used by Intl.DateTimeFormat and Intl.RelativeTimeFormat.
+ */
+const LOCALE_MAP: Record<string, string> = {
+  en: 'en-AU',
+  es: 'es-ES',
+  fa: 'fa-IR',
+  zh: 'zh-CN',
+  ar: 'ar-SA',
+  hi: 'hi-IN',
+  ko: 'ko-KR',
+  ja: 'ja-JP',
+};
+
+const DEFAULT_LOCALE = 'en-AU';
+
+// ============================================================================
 // EVENT TYPE CONFIG
 // ============================================================================
 
@@ -199,19 +220,7 @@ export const XPHistory = memo(
     const isLoading = useGamificationStore((state) => state.isLoading);
 
     // Get locale string for formatting
-    const locale = useMemo(() => {
-      const localeMap: Record<string, string> = {
-        en: 'en-AU',
-        es: 'es-ES',
-        fa: 'fa-IR',
-        zh: 'zh-CN',
-        ar: 'ar-SA',
-        hi: 'hi-IN',
-        ko: 'ko-KR',
-        ja: 'ja-JP',
-      };
-      return localeMap[language] || 'en-AU';
-    }, [language]);
+    const locale = useMemo(() => LOCALE_MAP[language] || DEFAULT_LOCALE, [language]);
 
     // Limit events to display
     const displayEvents = useMemo(
@@ -316,15 +325,7 @@ export const XPHistoryCompact = memo(({ maxEvents = 5, className }: XPHistoryCom
   const { language } = useTranslation();
   const recentEvents = useGamificationStore((state) => state.recentEvents);
 
-  const locale = useMemo(() => {
-    const localeMap: Record<string, string> = {
-      en: 'en-AU',
-      es: 'es-ES',
-      fa: 'fa-IR',
-      zh: 'zh-CN',
-    };
-    return localeMap[language] || 'en-AU';
-  }, [language]);
+  const locale = useMemo(() => LOCALE_MAP[language] || DEFAULT_LOCALE, [language]);
 
   const displayEvents = useMemo(() => recentEvents.slice(0, maxEvents), [recentEvents, maxEvents]);
 

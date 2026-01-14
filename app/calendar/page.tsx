@@ -4,6 +4,35 @@ import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import CalendarClient from './CalendarClient';
 
+// Generate dynamic event dates based on current date
+function getUpcomingEventDates() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  // Career fair: next Wednesday
+  const careerFairDate = new Date(year, month, now.getDate());
+  careerFairDate.setDate(careerFairDate.getDate() + ((3 - careerFairDate.getDay() + 7) % 7 || 7));
+
+  // Pizza Friday: next Friday
+  const pizzaDate = new Date(year, month, now.getDate());
+  pizzaDate.setDate(pizzaDate.getDate() + ((5 - pizzaDate.getDay() + 7) % 7 || 7));
+
+  const careerFairDateStr = careerFairDate.toISOString().split('T')[0];
+  const pizzaDateStr = pizzaDate.toISOString().split('T')[0];
+
+  return {
+    careerFair: {
+      start: `${careerFairDateStr}T10:00:00+11:00`,
+      end: `${careerFairDateStr}T16:00:00+11:00`,
+    },
+    pizza: {
+      start: `${pizzaDateStr}T12:00:00+11:00`,
+      end: `${pizzaDateStr}T14:00:00+11:00`,
+    },
+  };
+}
+
 export const metadata: Metadata = {
   title: 'Calendar | Syllabus Sync',
   description:
@@ -62,6 +91,8 @@ function CalendarSkeleton() {
 }
 
 export default function CalendarPage() {
+  const eventDates = getUpcomingEventDates();
+
   return (
     <Suspense fallback={<CalendarSkeleton />}>
       <main id="main-content" className="container mx-auto p-6 max-w-7xl calendar-page" role="main">
@@ -87,10 +118,10 @@ export default function CalendarPage() {
               {
                 '@context': 'https://schema.org',
                 '@type': 'Event',
-                name: 'Career Fair 2026',
+                name: 'Career Fair',
                 description: 'Annual career fair for Macquarie University students',
-                startDate: '2026-01-15T10:00:00+11:00',
-                endDate: '2026-01-15T16:00:00+11:00',
+                startDate: eventDates.careerFair.start,
+                endDate: eventDates.careerFair.end,
                 location: {
                   '@type': 'Place',
                   name: 'Macquarie University Campus',
@@ -106,8 +137,8 @@ export default function CalendarPage() {
                 '@type': 'Event',
                 name: 'Free Pizza Friday',
                 description: 'Weekly free pizza event for students',
-                startDate: '2026-01-17T12:00:00+11:00',
-                endDate: '2026-01-17T14:00:00+11:00',
+                startDate: eventDates.pizza.start,
+                endDate: eventDates.pizza.end,
                 location: {
                   '@type': 'Place',
                   name: 'Macquarie University Campus',

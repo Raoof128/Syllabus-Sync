@@ -169,11 +169,23 @@ export function validateOrigin(request: NextRequest): {
  * Get list of allowed origins
  */
 function getAllowedOrigins(): string[] {
-  const origins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  const origins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
+  ];
 
   // Add production URL
   if (process.env.NEXT_PUBLIC_APP_URL) {
-    origins.push(process.env.NEXT_PUBLIC_APP_URL);
+    try {
+      const publicUrl = new URL(process.env.NEXT_PUBLIC_APP_URL);
+      origins.push(publicUrl.origin);
+    } catch {
+      // Ignore invalid URL
+    }
   }
 
   // Add Vercel preview URLs

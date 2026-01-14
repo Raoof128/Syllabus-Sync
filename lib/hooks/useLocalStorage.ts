@@ -1,46 +1,53 @@
 // lib/hooks/useLocalStorage.ts
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
  * Hook to sync state with localStorage.
- * Handles SSR gracefully by only reading from localStorage on client.
+ * Uses lazy initialization to read from localStorage on first render.
+ * Handles SSR gracefully by checking for window availability.
  */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void] {
-  // State to store our value
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  // Read from localStorage on mount
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
+  // Lazy initialization - reads from localStorage on first render only
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
     try {
       const item = window.localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      }
-    } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      return item ? (JSON.parse(item) as T) : initialValue;
+    } catch {
+      // Silent fail - localStorage may be unavailable or JSON parse error
+      return initialValue;
     }
-  }, [key]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  });
+
+  // Use ref to avoid stale closure in setValue
+  const storedValueRef = useRef(storedValue);
+
+  // Update ref when storedValue changes
+  useEffect(() => {
+    storedValueRef.current = storedValue;
+  }, [storedValue]);
 
   // Return a wrapped version of useState's setter function
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
         // Allow value to be a function so we have same API as useState
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
+        // Use ref to get current value to avoid stale closure
+        const valueToStore = value instanceof Function ? value(storedValueRef.current) : value;
         setStoredValue(valueToStore);
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      } catch (error) {
-        console.warn(`Error setting localStorage key "${key}":`, error);
+      } catch {
+        // Silent fail - localStorage may be unavailable
       }
     },
-    [key, storedValue],
+    [key],
   );
 
   return [storedValue, setValue];

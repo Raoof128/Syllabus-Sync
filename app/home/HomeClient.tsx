@@ -175,8 +175,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         validDeadlines.forEach(addDeadline);
         localStorage.setItem(deadlinesSeededKey, 'true');
       }
-    } catch (error) {
-      console.warn('Failed to load sample data, falling back to direct addition:', error);
+    } catch {
       try {
         // Fallback: add data without localStorage
         const validUnits = sampleUnits.filter(
@@ -188,8 +187,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
         validUnits.forEach(addUnit);
         validDeadlines.forEach(addDeadline);
-      } catch (fallbackError) {
-        console.error('Critical error: Could not load sample data:', fallbackError);
+      } catch {
+        // Silent fail - sample data loading is not critical
       }
     }
     hasSeededRef.current = true;
@@ -243,8 +242,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     if (!hasHydrated) return 'Low';
     try {
       return getStressLevel();
-    } catch (error) {
-      console.warn('Error calculating stress level:', error);
+    } catch {
       return 'Low';
     }
   }, [hasHydrated, getStressLevel]);
@@ -273,8 +271,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               }
 
               return hours + Math.max(0, endH - startH + (endM - startM) / 60);
-            } catch (error) {
-              console.warn('Error calculating hours for schedule:', s, error);
+            } catch {
               return hours;
             }
           }, 0)
@@ -286,8 +283,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         totalClasses,
         studyHours: Math.max(0, Math.round(totalStudyHours)),
       };
-    } catch (error) {
-      console.error('Error calculating unit stats:', error);
+    } catch {
       return {
         unitCount: units.length,
         totalClasses: 0,
@@ -306,13 +302,11 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   // Catch any unhandled errors in child components
   useEffect(() => {
     const handleUnhandledError = (event: ErrorEvent) => {
-      console.error('Unhandled error in home page:', event.error);
       setHasError(true);
       setErrorMessage(event.error?.message || 'An unexpected error occurred');
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection in home page:', event.reason);
       setHasError(true);
       setErrorMessage(event.reason?.message || 'An unexpected error occurred');
     };

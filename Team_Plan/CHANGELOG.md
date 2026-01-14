@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-14 - Fix CSRF origin validation and complete audit fixes
+
+### Fixed
+- **Security:** Resolved CSRF origin validation and CORS 403 errors by allowing localhost ports 3001 and 3002.
+- **State Management:** Fixed `useLocalStorage` hook to avoid cascading renders by using lazy initialization for initial state.
+- **Accessibility:** Added missing `aria-label` to avatar upload inputs in `ProfileCard.tsx`.
+- **Code Quality:** Fixed index-as-key in `DeadlineForm.tsx`, removed duplicated locale maps in `XPHistory.tsx`, and replaced deprecated `substr()` with `substring()`.
+
+---
+
 Raouf: 2026-01-14 - Fix Navigation Proxy failures
 
 ### Fixed

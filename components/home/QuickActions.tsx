@@ -1,4 +1,6 @@
 // components/home/QuickActions.tsx
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { Map, Calendar } from 'lucide-react';

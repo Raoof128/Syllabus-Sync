@@ -435,8 +435,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
             {Object.keys(errors).length > 0 && (
               <div className="p-3 bg-mq-error/10 border border-mq-error/20 rounded-lg text-sm text-mq-error">
-                {Object.values(errors).map((error, index) => (
-                  <div key={index}>• {error}</div>
+                {Object.entries(errors).map(([field, error]) => (
+                  <div key={field}>• {error}</div>
                 ))}
               </div>
             )}

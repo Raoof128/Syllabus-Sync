@@ -99,7 +99,6 @@ export default function LoginClient() {
       });
 
       if (authError) {
-        console.error('Login error:', authError.message);
         setIsError(true);
 
         // Map Supabase errors to user-friendly messages
@@ -133,8 +132,7 @@ export default function LoginClient() {
       setTimeout(() => {
         router.push(redirectTo);
       }, 800);
-    } catch (err) {
-      console.error('Unexpected login error:', err);
+    } catch {
       setIsError(true);
       setError(t('unexpectedError'));
       setIsLoading(false);

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { redirect } from 'next/navigation';
 
 type DebugData = Record<string, unknown>;
 
@@ -11,6 +12,19 @@ function getErrorMessage(error: unknown): string {
 export default function DebugPage() {
   const [data, setData] = useState<DebugData>({});
 
+  // Block access in production
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      redirect('/home');
+    }
+  }, []);
+
+  // Don't render anything in production
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const fetchData = async () => {
       const results: DebugData = {};
@@ -44,7 +58,7 @@ export default function DebugPage() {
 
   return (
     <div className="p-4 bg-white text-black min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Debug API</h1>
+      <h1 className="text-2xl font-bold mb-4">Debug API (Dev Only)</h1>
       <pre className="whitespace-pre-wrap font-mono text-xs">{JSON.stringify(data, null, 2)}</pre>
     </div>
   );

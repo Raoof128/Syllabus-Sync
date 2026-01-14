@@ -72,7 +72,7 @@ const FeedClient = memo(() => {
   // Notifications store
   const addNotification = useNotificationsStore((state) => state.addNotification);
 
-  // User events store - used to check if event is user-created
+  // User events store - load events for potential future use
   useEventsStore((state) => state.events);
 
   // Scroll to and highlight the event when component mounts or highlight changes
@@ -144,9 +144,8 @@ const FeedClient = memo(() => {
 
             // Refresh profile to update XP display
             await refreshProfile();
-          } catch (xpError) {
+          } catch {
             // XP error is not critical, continue with reminder
-            console.warn('Failed to award XP:', xpError);
           }
         }
 
@@ -162,7 +161,6 @@ const FeedClient = memo(() => {
           setRemindedEvents((prev) => new Set(prev).add(eventId));
           toastUtils.info('Already Reminded', 'You already set a reminder for this event');
         } else {
-          console.error('Failed to set reminder:', error);
           toastUtils.error('Failed', 'Could not set reminder. Please try again.');
         }
       } finally {

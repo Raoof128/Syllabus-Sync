@@ -77,6 +77,19 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-14 (Australia/Sydney)
+Scope: Security & Audit - Phase 3.
+Summary:
+  - Fixed CSRF origin validation and CORS errors by adding ports 3001 and 3002 to allowed origins list.
+  - Resolved `useLocalStorage` lint error by implementing lazy initialization pattern in `useState`.
+  - Fixed index-as-key issue in `DeadlineForm.tsx` by using field names as keys.
+  - Centralized duplicated locale mapping in `XPHistory.tsx` into a shared constant.
+  - Added accessible `aria-label` to file inputs in `ProfileCard.tsx` for better screen reader support.
+  - Replaced deprecated `substr()` with `substring()` in `response.ts`.
+Files: lib/security/csrf.ts, app/api/_lib/middleware.ts, lib/hooks/useLocalStorage.ts, components/deadlines/DeadlineForm.tsx, components/gamification/XPHistory.tsx, components/ProfileCard.tsx, app/api/_lib/response.ts.
+Verification: `npm run typecheck`, `npm run lint`, `npm run test` (all 275 tests passed).
+Follow-ups: None.
+
+Raouf: 2026-01-14 (Australia/Sydney)
 Scope: Map - Navigation Fix.
 Summary:
   - Fixed "Navigation service temporarily unavailable" error by replacing the broken server-side ORS_API_KEY with a verified working token.

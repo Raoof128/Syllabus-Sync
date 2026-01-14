@@ -1,7 +1,7 @@
 // components/calendar/WeeklyCalendar.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Clock, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -104,12 +104,29 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
   };
 
   // Get current time position for the time indicator line
-  const currentTimePosition = useMemo(() => {
+  const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(() => {
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
     if (hours < 6 || hours >= 24) return null;
     return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
+  });
+
+  // Update current time position every minute
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      if (hours < 6 || hours >= 24) {
+        setCurrentTimePosition(null);
+      } else {
+        setCurrentTimePosition((hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT);
+      }
+    };
+
+    const interval = setInterval(updateTime, 60000); // Update every minute
+    return () => clearInterval(interval);
   }, []);
 
   return (
