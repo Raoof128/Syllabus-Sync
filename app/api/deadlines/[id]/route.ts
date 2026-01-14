@@ -51,7 +51,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
       if (parsed.data.dueDate) {
         updatePayload.due_date = parsed.data.dueDate.toISOString();
-        updatePayload.due_at = parsed.data.dueDate.toISOString(); // Remote schema uses due_at
         delete updatePayload.dueDate;
       }
       if (parsed.data.createdAt) {
