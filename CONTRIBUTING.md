@@ -1,169 +1,41 @@
-# Contributing to The Syllabus Sync
+# Contributing to Syllabus Sync
 
-Thank you for your interest in contributing to The Syllabus Sync! This document provides guidelines and information for contributors.
+First off, thank you for considering contributing to Syllabus Sync! It's people like you that make this a great tool for the Macquarie University community.
 
-## 🤝 How to Contribute
+### 🚩 Quick Start
 
-### Reporting Bugs
+1. **Fork** the repository.
+2. **Clone** your fork: `git clone https://github.com/YOUR_USERNAME/syllabus-sync.git`
+3. **Install** dependencies: `npm install`
+4. **Create** a branch: `git checkout -b feat/your-feature`
+5. **Verify**: Ensure the project builds and tests pass: `npm run prepush`
 
-- Use the [GitHub Issues](https://github.com/your-username/syllabus-sync/issues) page
-- Provide a clear description of the bug
-- Include steps to reproduce
-- Add screenshots if applicable
-- Specify your environment (OS, browser, Node.js version)
+### 🏗️ Project Standards
 
-### Suggesting Features
+#### 1. Code Quality
+- **TypeScript**: No `as any` (unless for dynamic i18n keys). Use strict typing.
+- **Components**: Follow the "Apple Liquid Glass" design system (see `docs/ARCHITECTURE.md`).
+- **Tests**: Every new feature requires unit tests in `tests/`.
 
-- Open an issue with the "enhancement" label
-- Provide a clear description of the feature
-- Explain the use case and benefits
-- Consider if it fits the project's goals
+#### 2. Workflow
+- We use **Conventional Commits**:
+  - `feat:` for new features
+  - `fix:` for bug fixes
+  - `docs:` for documentation
+  - `refactor:` for code changes that neither fix a bug nor add a feature
+- **Pre-push Hook**: We enforce `npm run prepush` which runs linting, typechecking, and tests.
 
-### Code Contributions
+#### 3. Pull Request Process
+- Ensure your PR is linked to an issue.
+- Maintain a clean commit history (rebase if necessary).
+- PRs require at least one approval from the core team (Pouya or Raouf).
 
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Make your changes**
-4. **Follow the coding standards** (see below)
-5. **Add tests** for new functionality
-6. **Run tests and linting**
-   ```bash
-   npm test
-   npm run lint
-   npm run format
-   ```
-7. **Commit your changes**
-   ```bash
-   git commit -m "feat: add your feature description"
-   ```
-8. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-9. **Create a Pull Request**
-
-## 📝 Coding Standards
-
-### TypeScript/React
-
-- Use TypeScript strict mode
-- Define types for all props and state
-- Avoid `any` type
-- Use functional components with hooks
-- Keep components small and focused (< 200 lines)
-- Use proper key props in lists
-
-### Styling
-
-- Use Tailwind CSS utility classes
-- Follow mobile-first approach
-- Use Shadcn UI components for consistency
-- Maintain Macquarie University branding colors
-
-### File Naming
-
-- Components: PascalCase (e.g., `UnitCard.tsx`)
-- Utilities: camelCase (e.g., `utils.ts`)
-- Pages: lowercase (e.g., `page.tsx`)
-
-### Commit Messages
-
-Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
-
-- `feat:` New feature
-- `fix:` Bug fix
-- `docs:` Documentation changes
-- `style:` Code formatting
-- `refactor:` Code restructuring
-- `test:` Test updates
-- `chore:` Build/config changes
-
-## 🧪 Testing
-
-- Write tests for new components and functionality
-- Use Vitest and Testing Library
-- Aim for good test coverage
-- Test user interactions and edge cases
-
-## 📋 Project Structure
-
-```
-syllabus-sync/
-├── app/                      # Next.js pages
-├── components/               # React components
-├── lib/                     # Utilities and logic
-├── data/                    # Sample data
-├── tests/                   # Test files
-├── public/                  # Static assets
-└── Team_Plan/              # Documentation
-```
-
-## 🎨 Design Guidelines
-
-### Macquarie University Branding
-
-- **Primary Red:** `#A6192E`
-- **Primary Blue:** `#002A45`
-- **Accent Gold:** `#FFB81C`
-
-### UI/UX Principles
-
-- Mobile-first responsive design
-- Accessibility first (ARIA labels, keyboard navigation)
-- Consistent component usage
-- Clear visual hierarchy
-
-## 🚀 Development Setup
-
-1. **Clone your fork**
-
-   ```bash
-   git clone https://github.com/your-username/syllabus-sync.git
-   cd syllabus-sync
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **Run tests**
-   ```bash
-   npm test
-   ```
-
-## 📖 Documentation
-
-- Keep documentation up to date
-- Update AGENT.md for technical changes
-- Update CHANGELOG.md for version changes
-- Add comments for complex logic
-
-## 🤓 Team Roles
-
-- **Frontend Lead**: Pouya - UI/UX, Components, State Management
-- **Backend Lead**: Raouf - Database, API, Configuration
-
-See [TEAM_ROLES.md](Team_Plan/TEAM_ROLES.md) for detailed responsibilities.
-
-## 📄 License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
-## 🙏 Code of Conduct
-
-Please be respectful and professional in all interactions. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
+### 🎨 Design System
+Our UI is built on a custom extension of Shadcn UI, tailored for MQ's brand.
+- **Colors**: Use variables from `app/mq-tokens.css`.
+- **Icons**: Exclusively use `lucide-react`.
+- **Animations**: Use `framer-motion` for fluid transitions.
 
 ---
 
-**Thank you for contributing to The Syllabus Sync!** 🎓
+**Built with 💡 by the MQ Community.**

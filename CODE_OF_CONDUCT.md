@@ -1,70 +1,39 @@
-# Code of Conduct
+# Contributor Covenant Code of Conduct
 
 ## Our Pledge
 
-We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socioeconomic status, nationality, personal appearance, race, religion, or sexual identity and sexual orientation.
-
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
+In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual orientation.
 
 ## Our Standards
 
-### Expected Behavior
+Examples of behavior that contributes to creating a positive environment include:
 
-- **Be respectful**: Treat others with respect and professionalism
-- **Be inclusive**: Welcome and embrace diverse perspectives
-- **Be collaborative**: Work together constructively
-- **Be constructive**: Provide helpful feedback and suggestions
-- **Be accountable**: Take responsibility for your actions and learn from mistakes
+* Using welcoming and inclusive language
+* Being respectful of differing viewpoints and experiences
+* Gracefully accepting constructive criticism
+* Focusing on what is best for the community
+* Showing empathy towards other community members
 
-### Unacceptable Behavior
+Examples of unacceptable behavior by participants include:
 
-- **Harassment**: Any form of harassment, including sexual harassment
-- **Discrimination**: Discriminatory language or actions
-- **Personal attacks**: Insults, ad hominem attacks, or personal criticism
-- **Spam**: Unwanted commercial content or self-promotion
-- **Disruption**: Behavior that disrupts community discussions
-- **Privacy violations**: Sharing private information without consent
+* The use of sexualized language or imagery and unwelcome sexual attention or advances
+* Trolling, insulting/derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or electronic address, without explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
+
+## Our Responsibilities
+
+Project maintainers are responsible for clarifying the standards of acceptable behavior and are expected to take appropriate and fair corrective action in response to any instances of unacceptable behavior.
 
 ## Scope
 
-This Code of Conduct applies to all community spaces, including but not limited to:
-
-- GitHub repositories (issues, pull requests, discussions)
-- Communication channels (Slack, Discord, email)
-- In-person meetings and events
-- Social media platforms related to the project
+This Code of Conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
 
 ## Enforcement
 
-### Reporting
-
-If you experience or witness unacceptable behavior, please report it to:
-
-- **Project Maintainers**:
-  - Pouya (Frontend Lead)
-  - Raouf (Backend Lead)
-- **Email**: [project-email@example.com]
-
-All reports will be reviewed and investigated promptly and confidentially.
-
-### Consequences
-
-Community members who violate this Code of Conduct may face:
-
-1. **Warning**: A private warning from the project maintainers
-2. **Temporary Suspension**: Temporary removal from community spaces
-3. **Permanent Ban**: Permanent removal from the project
-
-The consequences will be determined by the severity of the violation and the impact on the community.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 2.1, available at [https://www.contributor-covenant.org/version/2/1/code_of_conduct.html](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html).
-
-## Questions
-
-If you have questions about this Code of Conduct, please contact the project maintainers.
-
----
-
-**Thank you for helping us create a welcoming and inclusive community!** 🤝
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 1.4.

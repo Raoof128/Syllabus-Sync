@@ -1,293 +1,193 @@
-# The Syllabus Sync
+# 🎓 The Syllabus Sync
 
-**Campus Navigation and Schedule Management for Macquarie University**
+**Next-Generation Campus Management & Productivity Platform for Macquarie University**
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![Version](https://img.shields.io/badge/version-1.0.0--rc.7-blue)]()
-[![Node.js](https://img.shields.io/badge/Node.js-22+-brightgreen)]()
-
----
-
-## Overview
-
-**The Syllabus Sync** is a comprehensive campus management web application designed to help Macquarie University students seamlessly manage their academic and campus life. Built with enterprise-grade code quality and modern web technologies, it provides an all-in-one platform for schedule management, deadline tracking, event discovery, and campus navigation.
-
-**Current Version:** 1.0.0-rc.7  
-**Current Status:** Production-ready with Supabase backend, comprehensive security measures, and 19-language internationalization support.
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.2-blue?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
+[![Vitest](https://img.shields.io/badge/Tests-275_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
 
 ---
 
-## Quick Start
+## 🌟 Overview
+
+**The Syllabus Sync** is a professional-grade campus management ecosystem tailored specifically for Macquarie University students. Built with **Next.js 16 (App Router)** and **React 19**, it leverages cutting-edge web technologies to provide a high-performance, accessible, and beautiful experience.
+
+From real-time building navigation to advanced deadline tracking with automated stress analysis, Syllabus Sync is designed to be the ultimate student companion.
+
+### 🗺️ System Architecture
+
+```mermaid
+graph TD
+    User([User / Browser])
+
+    subgraph "Frontend (Next.js 16 + React 19)"
+        UI[Apple Liquid Glass UI]
+        State[Zustand Stores]
+        Auth[Supabase Auth Client]
+        SW[Service Workers / Notifications]
+    end
+
+    subgraph "Backend (Next.js API Routes)"
+        Middleware{Security Middleware}
+        RL[Rate Limiting - Upstash]
+        CSRF[CSRF Validation]
+        API[Feature Endpoints]
+    end
+
+    subgraph "External Services"
+        Supabase[(PostgreSQL / RLS)]
+        ORS[OpenRouteService Proxy]
+        OSM[OpenStreetMap Data]
+    end
+
+    User <--> UI
+    UI <--> State
+    State <--> Auth
+    UI <--> SW
+
+    UI <--> Middleware
+    Middleware --> RL
+    Middleware --> CSRF
+    CSRF --> API
+
+    API <--> Supabase
+    API <--> ORS
+    ORS <--> OSM
+```
+
+### 💎 Key Achievements
+
+- **Apple Liquid Glass 2025 UI:** A premium, high-fidelity design system featuring organic SVG refractions and fluid mesh gradients.
+- **Enterprise Security:** Hardened with distributed rate limiting, CSRF protection, and strict Row Level Security (RLS).
+- **Global Reach:** Full support for **19 languages**, including RTL support (Arabic, Persian, Urdu, Hebrew).
+- **Accessibility First:** WCAG 2.1 AA compliant with ARIA grid semantics, 44px tap targets, and keyboard-first navigation.
+
+---
+
+## 🚀 Features
+
+### 📅 Smart Calendar & Deadlines
+
+- **Automated Stress Indicator:** Real-time calculation of academic workload based on upcoming assignment density.
+- **Dynamic Weekly View:** Interactive calendar with time indicators and CRUD management for units and deadlines.
+- **JSON-LD Integration:** Structured data for SEO and rich snippets.
+
+### 🗺️ Precision Campus Map
+
+- **Hybrid Navigation:** Walking path previews via OpenRouteService proxy with handoff to Google/Apple Maps.
+- **Building Directory:** Exhaustive data for 100+ campus structures sourced from OpenStreetMap.
+- **Overlay Layers:** Toggleable views for Car Parking, Drinking Water, Accessibility, and Exam Sites.
+
+### 🎮 Gamification Engine
+
+- **XP & Levels:** Earn experience points for completing deadlines and engaging with campus events.
+- **Streak Tracking:** Maintain daily activity streaks with milestone rewards.
+- **Tiered Badging:** Visual progression from Freshman to Grand Scholar.
+
+### 🔔 Enterprise Notifications
+
+- **Intelligent Scheduling:** Automated browser push notifications for upcoming classes and deadlines.
+- **Preference Management:** Granular control over notification types and timing.
+
+---
+
+## 🛠️ Technical Stack
+
+| Category     | Technologies                                               |
+| :----------- | :--------------------------------------------------------- |
+| **Frontend** | React 19, Next.js 16 (Turbopack), Zustand, Framer Motion   |
+| **Backend**  | Supabase (Auth/DB/Storage), Node.js API Routes             |
+| **Styling**  | Tailwind CSS, Radix UI Primitives, Lucide Icons            |
+| **Security** | Upstash Redis (Rate Limiting), CSRF Validation, CSP Nonces |
+| **Testing**  | Vitest (Unit/Store), Playwright (E2E/Accessibility)        |
+| **i18n**     | Custom JSON-based 19-language translation engine           |
+
+---
+
+## 📥 Getting Started
 
 ### Prerequisites
 
-- **Node.js 22+** (required)
-- **npm** (comes with Node.js)
-- **Supabase account** (for database and authentication)
+- **Node.js 22+** (LTS recommended)
+- **Supabase Account**
+- **Upstash Redis** (for production rate limiting)
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone & Install**
 
    ```bash
    git clone https://github.com/mrpouyaalavi/syllabus-sync.git
    cd syllabus-sync
-   ```
-
-2. **Install dependencies**
-
-   ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+2. **Environment Configuration**
 
    ```bash
    cp .env.example .env.local
    ```
 
-   Edit `.env.local` and add your credentials:
+   Add your Supabase URLs, API Keys, and Redis credentials to `.env.local`.
 
-   | Variable                        | Description                    | Required | Where to get it                                                             |
-   | ------------------------------- | ------------------------------ | -------- | --------------------------------------------------------------------------- |
-   | `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL           | Yes      | [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api) |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public (anon) key     | Yes      | Same as above                                                               |
-   | `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key      | Yes\*    | Same as above (Settings > API > service_role)                               |
-   | `UPSTASH_REDIS_REST_URL`        | Upstash Redis URL              | Prod     | [Upstash Console](https://console.upstash.com/)                             |
-   | `UPSTASH_REDIS_REST_TOKEN`      | Upstash Redis token            | Prod     | Same as above                                                               |
-   | `ADMIN_SECRET_TOKEN`            | Admin API authentication token | Dev      | Generate a secure random string                                             |
-   | `ADMIN_API_ENABLED`             | Enable admin endpoints         | Dev      | Set to `true` in development only                                           |
+3. **Database Setup**
+   Execute `database-schema.sql` in your Supabase SQL Editor to initialize tables, RLS policies, and triggers.
 
-   > **Note:** `*` Service role key is needed for server-side operations. Never expose this in client code.
-
-4. **Set up the database**
-
-   Run the database schema in your Supabase SQL Editor:
-
-   ```bash
-   # The schema is in database-schema.sql
-   # Copy the contents and run in Supabase Dashboard > SQL Editor
-   ```
-
-5. **Run development server**
-
+4. **Development Launch**
    ```bash
    npm run dev
    ```
 
-6. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
-
-### Available Scripts
-
-```bash
-# Development
-npm run dev          # Start development server (Turbopack)
-npm run dev:safe     # Start without Turbopack
-npm run build        # Build for production
-npm run start        # Start production server
-
-# Testing
-npm run test         # Run unit tests (Vitest)
-npm run test:watch   # Run tests in watch mode
-npm run test:e2e     # Run end-to-end tests (Playwright)
-npm run test:e2e:ui  # Run E2E tests with UI
-npm run test:accessibility # Run accessibility tests
-npm run test:ci      # Run all tests (unit + e2e)
-
-# Quality Assurance
-npm run lint         # Run ESLint
-npm run typecheck    # TypeScript type checking
-npm run format       # Format code with Prettier
-npm run format:check # Check code formatting
-npm run check:secrets # Check for exposed secrets
-npm run prepush      # Run all checks before pushing
-
-# Analysis
-npm run analyze      # Bundle analysis
-npm run lighthouse   # Performance audit
-```
-
 ---
 
-## Security Configuration
-
-### Rate Limiting (Production)
-
-For production deployments, configure distributed rate limiting:
-
-```env
-# Upstash Redis (Recommended)
-UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your-token
-
-# OR Vercel KV
-KV_REST_API_URL=https://your-kv.vercel-storage.com
-KV_REST_API_TOKEN=your-token
-```
-
-Without these, rate limiting falls back to in-memory storage (not suitable for serverless).
-
-### Admin Endpoints (Development Only)
-
-Admin endpoints are disabled by default. To enable in development:
-
-```env
-ADMIN_API_ENABLED=true
-ADMIN_SECRET_TOKEN=your-secure-random-token
-```
-
-**Warning:** Never enable admin endpoints in production without proper authentication.
-
-### CORS Configuration
-
-Configure allowed origins for API access:
-
-```env
-CORS_ALLOWED_ORIGINS=http://localhost:3000,https://your-domain.com
-```
-
----
-
-## Database Setup
-
-### Supabase Configuration
-
-1. Create a new Supabase project
-2. Go to SQL Editor and run `database-schema.sql`
-3. Configure Row Level Security (RLS) policies (included in schema)
-4. Enable email authentication in Authentication > Providers
-
-### Database Schema
-
-The application uses the following tables:
-
-- `profiles` - User profiles and settings
-- `units` - Academic units/courses
-- `class_times` - Class schedules
-- `deadlines` - Assignment deadlines
-- `events` - Campus events
-- `notifications` - User notifications
-- `gamification_profiles` - Gamification/XP tracking
-- `xp_events` - XP earning events
-
-### Migrations
-
-Database migrations are managed via SQL files:
-
-```
-database-schema.sql           # Full schema
-supabase/migrations/          # Incremental migrations
-```
-
----
-
-## Project Structure
+## 🏗️ Project Architecture
 
 ```
 syllabus-sync/
-├── app/                      # Next.js App Router
-│   ├── api/                  # API routes
-│   │   ├── _lib/            # Shared API utilities
-│   │   ├── units/           # Unit endpoints
-│   │   ├── deadlines/       # Deadline endpoints
-│   │   ├── events/          # Event endpoints
-│   │   └── auth/            # Authentication endpoints
-│   ├── home/                # Home dashboard
-│   ├── calendar/            # Calendar view
-│   ├── map/                 # Campus map
-│   ├── feed/                # Events feed
-│   └── settings/            # Settings page
-├── components/              # React components
-│   ├── layout/             # Layout components
-│   ├── ui/                 # UI primitives
-│   └── ...                 # Feature components
+├── app/                  # Next.js 16 App Router (Server/Client Components)
+│   ├── api/              # Standardized REST API with Middleware
+│   ├── home/             # Main Dashboard Engine
+│   └── ...               # Feature-based routing
+├── components/           # Atomic Design Component Library
+│   ├── ui/mq/           # Macquarie University Design System components
+│   └── gamification/     # XP and Leveling components
 ├── lib/
-│   ├── store/              # Zustand stores
-│   ├── supabase/           # Supabase client
-│   ├── security/           # Security utilities
-│   ├── services/           # Business logic
-│   └── utils/              # Utility functions
-├── data/                   # Sample data
-└── tests/                  # Test files
+│   ├── store/            # Zustand State Management (Units, Deadlines, Auth)
+│   ├── security/         # CSRF & CSP protection logic
+│   └── services/         # ORS Routing & Rate Limiting services
+└── tests/                # 275+ Unit and E2E Tests
 ```
 
 ---
 
-## API Documentation
+## 🔒 Security & Quality Assurance
 
-### Authentication
+We maintain a production-ready security posture:
 
-All mutation endpoints require authentication via Supabase session cookies.
-
-### Endpoints
-
-| Method | Endpoint              | Description           | Auth Required |
-| ------ | --------------------- | --------------------- | ------------- |
-| GET    | `/api/units`          | List user's units     | Yes           |
-| POST   | `/api/units`          | Create a unit         | Yes           |
-| PUT    | `/api/units/[id]`     | Update a unit         | Yes           |
-| DELETE | `/api/units/[id]`     | Delete a unit         | Yes           |
-| GET    | `/api/deadlines`      | List deadlines        | Yes           |
-| POST   | `/api/deadlines`      | Create a deadline     | Yes           |
-| PUT    | `/api/deadlines/[id]` | Update a deadline     | Yes           |
-| DELETE | `/api/deadlines/[id]` | Delete a deadline     | Yes           |
-| GET    | `/api/events`         | List events           | Yes           |
-| POST   | `/api/events`         | Create an event       | Yes           |
-| GET    | `/api/gamification`   | Get user's XP profile | Yes           |
-| POST   | `/api/gamification`   | Record activity       | Yes           |
-
-### Security Features
-
-- **CSRF Protection**: Origin validation on all mutation endpoints
-- **Rate Limiting**: Distributed rate limiting (30 req/min for mutations)
-- **Body Size Limits**: JSON payloads limited to 100KB
-- **Input Validation**: Zod schemas for all inputs
-- **Row Level Security**: Database-level access control
+- **CSRF Protection:** Strict origin validation across all mutation endpoints.
+- **Rate Limiting:** IP-based distributed limiting for authentication and API routes.
+- **Data Integrity:** Zod schema validation and PostgreSQL foreign key constraints.
+- **CI/CD:** Automated checks for secrets, formatting, linting, and 100% test pass rate.
 
 ---
 
-## Tech Stack
+## 📄 Documentation
 
-| Category             | Technology               | Purpose                               |
-| -------------------- | ------------------------ | ------------------------------------- |
-| **Framework**        | Next.js 16 (React 19)    | Full-stack React framework            |
-| **Language**         | TypeScript 5.x           | Type-safe JavaScript                  |
-| **Database**         | Supabase (PostgreSQL)    | Backend-as-a-Service                  |
-| **Styling**          | Tailwind CSS + Shadcn UI | Utility-first CSS                     |
-| **State Management** | Zustand                  | Client-side state with persistence    |
-| **Testing**          | Vitest + Playwright      | Unit and E2E testing                  |
-| **Security**         | Custom middleware        | Rate limiting, CSRF, input validation |
+- **[AGENT.md](Team_Plan/AGENT.md)** - Detailed technical work logs and team protocols.
+- **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history and feature rollout.
+- **[API Reference](docs/api.md)** - Comprehensive endpoint documentation.
 
 ---
 
-## Contributing
+## 👥 Contributors
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Run quality checks (`npm run prepush`)
-4. Commit changes (`git commit -m 'Add amazing feature'`)
-5. Push to branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+- **Pouya** - Frontend Lead (UI/UX, Components, State Management)
+- **Raouf** - Backend Lead (API, Database, Security, Infrastructure)
+- **Kit** - AI Integration Specialist
 
 ---
 
-## Documentation
-
-- **[AGENT.md](Team_Plan/AGENT.md)** - Complete project documentation
-- **[CHANGELOG.md](Team_Plan/CHANGELOG.md)** - Version history
-- **[SECURITY.md](SECURITY.md)** - Security policy
-
----
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-**Made with care for Macquarie University students**
+**Built for the Macquarie University community with modern engineering standards.**
