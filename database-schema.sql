@@ -1,5 +1,5 @@
 -- Database Schema for Syllabus Sync
--- Last Updated: 2026-01-13
+-- Last Updated: 2026-01-14
 --
 -- REFERENCE DOCUMENT ONLY
 -- =======================
@@ -11,10 +11,6 @@
 --
 -- See supabase/README.md for more information.
 --
--- IMPORTANT: The API mappers (app/api/_lib/mappers.ts) handle both:
---   - JSONB location field (preferred)
---   - Flat building/room columns (legacy/current remote)
---
 -- USER DATA FLOW:
 -- ==============
 -- 1. auth.users: Managed by Supabase Auth (email, password, metadata)
@@ -24,24 +20,18 @@
 -- When a user signs up:
 --   - auth.users row is created by Supabase Auth
 --   - on_auth_user_created_safe trigger auto-creates profiles + gamification_profiles
---   - Signup API also creates these as backup
+--   - Signup API also creates these as backup (upsert with ON CONFLICT)
 --
 -- To query all user data together, use the user_details VIEW:
 --   SELECT * FROM user_details WHERE id = auth.uid();
 -- Or use the get_my_profile() RPC function.
 --
 -- Migrations Applied:
---   - 20260108131028: Added user_id columns and RLS policies
---   - 20260108140000: Event column fixes and seed data triggers
---   - 20260108150000: Fixed RLS policies with TO authenticated, added class_times RLS
---   - 20260109012136: Create user profile function
---   - 20260109012243: Add gamification system tables
---   - 20260109012548: Fix permissions and schema alignment
---   - 20260109012721: Add missing deadline columns
---   - 20260109012944: Fix auth trigger for new users
---   - 20260109013033: Check and fix existing triggers
---   - 20260109013302: Disable all auth triggers
---   - 20260113000000: Re-enable auth trigger with user_details VIEW
+--   - 20260104000000: Initial schema with tables, indexes, basic RLS
+--   - 20260104000001: Fix schema issues
+--   - 20260114010403: Add course and year columns to profiles, update views
+--   - 20260114011650: Comprehensive fix - user_id columns, gamification, RLS, triggers
+--   - 20260114013136: Complete schema audit fix - defaults, orphans, constraints, all_day events
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

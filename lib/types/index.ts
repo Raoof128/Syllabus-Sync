@@ -54,6 +54,10 @@ export type Event = {
   imageUrl?: string;
   translationKey?: string;
   descriptionKey?: string;
+  // New fields for proper time range support
+  allDay?: boolean; // true for all-day events
+  startAt?: Date; // Full timestamp for event start
+  endAt?: Date; // Full timestamp for event end
 };
 
 export type Notification = {

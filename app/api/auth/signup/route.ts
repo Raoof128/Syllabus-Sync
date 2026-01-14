@@ -134,8 +134,9 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // CRITICAL: Create profile using admin client since auth trigger was removed
-    // The database migration dropped the auth.users trigger, so we must create profile manually
+    // Create profile as backup (auth trigger should have done this, but upsert ensures it exists)
+    // The database has a trigger on auth.users that auto-creates profiles and gamification_profiles
+    // This is a backup in case the trigger fails or is disabled
     if (data.user) {
       const adminClient = createAdminClient();
       if (adminClient) {

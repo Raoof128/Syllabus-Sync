@@ -61,6 +61,9 @@ export const mapEventRow = (row: Row): Event => ({
   building: row.building ? String(row.building) : undefined,
   category: row.category as Event['category'],
   imageUrl: row.image_url ? String(row.image_url) : undefined,
+  allDay: row.all_day != null ? Boolean(row.all_day) : undefined,
+  startAt: row.start_at ? parseDate(row.start_at) : undefined,
+  endAt: row.end_at ? parseDate(row.end_at) : undefined,
 });
 
 export const mapNotificationRow = (row: Row): Notification => ({
@@ -97,4 +100,20 @@ export const serializeDeadline = (deadline: Deadline & { user_id?: string; unit_
   type: deadline.type,
   completed: deadline.completed,
   created_at: deadline.createdAt.toISOString(),
+});
+
+export const serializeEvent = (event: Event & { user_id?: string }) => ({
+  id: event.id,
+  user_id: event.user_id, // Security: Required for user-owned events (null for public)
+  title: event.title,
+  description: event.description,
+  event_date: event.date instanceof Date ? event.date.toISOString().split('T')[0] : event.date,
+  event_time: event.time,
+  location: event.location,
+  building: event.building,
+  category: event.category,
+  image_url: event.imageUrl,
+  all_day: event.allDay ?? false,
+  start_at: event.startAt?.toISOString(),
+  end_at: event.endAt?.toISOString(),
 });
