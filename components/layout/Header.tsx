@@ -219,124 +219,126 @@ const Header = memo(() => {
 
       {/* Right side - Actions (far right) */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-        {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
-              aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
-              aria-haspopup="menu"
-            >
-              <Bell
-                className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
-                aria-hidden="true"
-              />
-              {unreadCount > 0 && (
-                <span
-                  className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
+        {/* Notifications - wrapped in isClient to prevent hydration mismatch with Radix UI IDs */}
+        {isClient && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
+                aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+                aria-haspopup="menu"
+              >
+                <Bell
+                  className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
                   aria-hidden="true"
-                >
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
-            role="menu"
-            aria-label={t('notifications')}
-          >
-            <div className="p-3 border-b border-mq-border flex items-center justify-between">
-              <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
-              {unreadCount > 0 && (
-                <DropdownMenuItem
-                  onSelect={(event) => {
-                    event.preventDefault();
-                    markAllAsRead();
-                  }}
-                  className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent"
-                >
-                  {t('markAllRead')}
-                </DropdownMenuItem>
-              )}
-            </div>
-            <div className="max-h-72 overflow-y-auto">
-              {notifications.length === 0 ? (
-                <div className="p-4 text-center text-mq-content-tertiary text-sm">
-                  {t('noNotificationsYet')}
-                </div>
-              ) : (
-                notifications.slice(0, 10).map((notification) => {
-                  const Icon = notificationIcons[notification.type];
-                  return (
-                    <DropdownMenuItem
-                      key={notification.id}
-                      asChild
-                      onSelect={() => markAsRead(notification.id)}
-                      className={`p-0 border-b border-mq-border last:border-0 ${
-                        !notification.read ? 'bg-mq-info/10' : ''
-                      }`}
-                    >
-                      <Link
-                        href={notification.link || '#'}
-                        className="block w-full p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
+                />
+                {unreadCount > 0 && (
+                  <span
+                    className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
+                    aria-hidden="true"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
+              role="menu"
+              aria-label={t('notifications')}
+            >
+              <div className="p-3 border-b border-mq-border flex items-center justify-between">
+                <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
+                {unreadCount > 0 && (
+                  <DropdownMenuItem
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      markAllAsRead();
+                    }}
+                    className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent"
+                  >
+                    {t('markAllRead')}
+                  </DropdownMenuItem>
+                )}
+              </div>
+              <div className="max-h-72 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-mq-content-tertiary text-sm">
+                    {t('noNotificationsYet')}
+                  </div>
+                ) : (
+                  notifications.slice(0, 10).map((notification) => {
+                    const Icon = notificationIcons[notification.type];
+                    return (
+                      <DropdownMenuItem
+                        key={notification.id}
+                        asChild
+                        onSelect={() => markAsRead(notification.id)}
+                        className={`p-0 border-b border-mq-border last:border-0 ${
+                          !notification.read ? 'bg-mq-info/10' : ''
+                        }`}
                       >
-                        <div className="flex gap-3">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              notification.type === 'deadline'
-                                ? 'bg-mq-warning/20'
-                                : notification.type === 'event'
-                                  ? 'bg-mq-purple/20'
-                                  : notification.type === 'class'
-                                    ? 'bg-mq-info/20'
-                                    : 'bg-mq-background-secondary'
-                            }`}
-                            aria-hidden="true"
-                          >
-                            <Icon
-                              className={`w-4 h-4 ${
-                                notification.type === 'deadline'
-                                  ? 'text-mq-warning'
-                                  : notification.type === 'event'
-                                    ? 'text-mq-purple'
-                                    : notification.type === 'class'
-                                      ? 'text-mq-info'
-                                      : 'text-mq-content-secondary'
-                              }`}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
-                            >
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-mq-content-secondary line-clamp-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-mq-content-tertiary mt-1">
-                              {formatDistanceToNow(new Date(notification.createdAt), {
-                                addSuffix: true,
-                              })}
-                            </p>
-                          </div>
-                          {!notification.read && (
+                        <Link
+                          href={notification.link || '#'}
+                          className="block w-full p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
+                        >
+                          <div className="flex gap-3">
                             <div
-                              className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
-                              aria-label="Unread"
-                            />
-                          )}
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })
-              )}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                notification.type === 'deadline'
+                                  ? 'bg-mq-warning/20'
+                                  : notification.type === 'event'
+                                    ? 'bg-mq-purple/20'
+                                    : notification.type === 'class'
+                                      ? 'bg-mq-info/20'
+                                      : 'bg-mq-background-secondary'
+                              }`}
+                              aria-hidden="true"
+                            >
+                              <Icon
+                                className={`w-4 h-4 ${
+                                  notification.type === 'deadline'
+                                    ? 'text-mq-warning'
+                                    : notification.type === 'event'
+                                      ? 'text-mq-purple'
+                                      : notification.type === 'class'
+                                        ? 'text-mq-info'
+                                        : 'text-mq-content-secondary'
+                                }`}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
+                              >
+                                {notification.title}
+                              </p>
+                              <p className="text-xs text-mq-content-secondary line-clamp-2">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-mq-content-tertiary mt-1">
+                                {formatDistanceToNow(new Date(notification.createdAt), {
+                                  addSuffix: true,
+                                })}
+                              </p>
+                            </div>
+                            {!notification.read && (
+                              <div
+                                className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
+                                aria-label="Unread"
+                              />
+                            )}
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })
+                )}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         {/* Theme Toggle */}
         {isClient && (

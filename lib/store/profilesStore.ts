@@ -23,6 +23,8 @@ interface DbProfile {
   email: string;
   full_name: string | null;
   student_id: string | null;
+  course: string | null;
+  year: string | null;
   avatar_url: string | null;
   created_at: string;
   updated_at: string | null;
@@ -37,9 +39,10 @@ export interface UserProfile {
   email: string;
   studentId: string;
   avatar?: string;
-  // Local-only fields (not stored in Supabase)
+  // Profile fields stored in Supabase
   course: string;
   year: string;
+  // Local-only fields (not stored in Supabase)
   preferences: {
     notifications: boolean;
     emailReminders: boolean;
@@ -130,9 +133,10 @@ function mapDbToClient(db: DbProfile, existing?: Partial<UserProfile>): UserProf
     email: db.email,
     studentId: db.student_id || '',
     avatar: db.avatar_url || undefined,
-    // Preserve local-only fields from existing profile or use defaults
-    course: existing?.course || '',
-    year: existing?.year || '',
+    // Profile fields from database
+    course: db.course || '',
+    year: db.year || '',
+    // Local-only fields from existing profile or use defaults
     preferences: existing?.preferences || {
       notifications: true,
       emailReminders: false,
@@ -154,6 +158,12 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
   }
   if (updates.studentId !== undefined) {
     dbUpdates.student_id = updates.studentId;
+  }
+  if (updates.course !== undefined) {
+    dbUpdates.course = updates.course || null;
+  }
+  if (updates.year !== undefined) {
+    dbUpdates.year = updates.year || null;
   }
   if (updates.avatar !== undefined) {
     const avatar = updates.avatar?.trim();

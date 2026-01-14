@@ -90,13 +90,21 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
 
     setIsSaving(true);
     try {
-      const result = await updateProfile(currentProfile.id, {
+      // Only include studentId if it's being set for the first time (was empty/null)
+      // The database prevents modifying student_id once it's set
+      const updates: Parameters<typeof updateProfile>[1] = {
         name: formData.name,
-        studentId: formData.studentId,
         course: formData.course,
         year: formData.year,
         preferences: currentProfile.preferences,
-      });
+      };
+
+      // Only send studentId if it wasn't previously set
+      if (!currentProfile.studentId && formData.studentId) {
+        updates.studentId = formData.studentId;
+      }
+
+      const result = await updateProfile(currentProfile.id, updates);
 
       if (result) {
         setIsEditing(false);

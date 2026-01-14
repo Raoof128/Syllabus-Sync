@@ -18,7 +18,7 @@
 -- USER DATA FLOW:
 -- ==============
 -- 1. auth.users: Managed by Supabase Auth (email, password, metadata)
--- 2. profiles: Public user data (full_name, student_id, avatar)
+-- 2. profiles: Public user data (full_name, student_id, course, year, avatar)
 -- 3. gamification_profiles: XP, streaks, levels
 --
 -- When a user signs up:
@@ -51,6 +51,8 @@ CREATE TABLE public.profiles (
   email text NOT NULL,
   full_name text,
   student_id text,
+  course text,
+  year text,
   avatar_url text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
@@ -889,6 +891,8 @@ SELECT
     p.email,
     p.full_name,
     p.student_id,
+    p.course,
+    p.year,
     p.avatar_url,
     p.created_at,
     p.updated_at,
@@ -920,6 +924,8 @@ RETURNS TABLE (
     email text,
     full_name text,
     student_id text,
+    course text,
+    year text,
     avatar_url text,
     created_at timestamptz,
     updated_at timestamptz,
@@ -940,6 +946,8 @@ BEGIN
         ud.email,
         ud.full_name,
         ud.student_id,
+        ud.course,
+        ud.year,
         ud.avatar_url,
         ud.created_at,
         ud.updated_at,
