@@ -52,20 +52,33 @@ export const mapDeadlineRow = (row: Row): Deadline => ({
   createdAt: parseDate(row.created_at ?? row.createdAt),
 });
 
-export const mapEventRow = (row: Row): Event => ({
-  id: String(row.id ?? ''),
-  title: String(row.title ?? ''),
-  description: String(row.description ?? ''),
-  date: parseDate(row.event_date ?? row.date), // Handle both event_date and legacy date
-  time: String(row.event_time ?? row.time ?? ''),
-  location: String(row.location ?? ''),
-  building: row.building ? String(row.building) : undefined,
-  category: row.category as Event['category'],
-  imageUrl: row.image_url ? String(row.image_url) : undefined,
-  allDay: row.all_day != null ? Boolean(row.all_day) : undefined,
-  startAt: row.start_at ? parseDate(row.start_at) : undefined,
-  endAt: row.end_at ? parseDate(row.end_at) : undefined,
-});
+export const mapEventRow = (row: Row): Event => {
+  // Parse start_at (required in new schema)
+  const startAt = parseDate(row.start_at ?? row.startAt ?? row.event_date ?? row.date);
+
+  // Derive legacy date/time for backward compatibility
+  const date = startAt;
+  const time = row.all_day
+    ? ''
+    : startAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  return {
+    id: String(row.id ?? ''),
+    title: String(row.title ?? ''),
+    description: String(row.description ?? ''),
+    location: String(row.location ?? ''),
+    building: row.building ? String(row.building) : undefined,
+    category: row.category as Event['category'],
+    imageUrl: row.image_url ? String(row.image_url) : undefined,
+    // Primary time fields
+    startAt,
+    endAt: row.end_at ? parseDate(row.end_at) : undefined,
+    allDay: Boolean(row.all_day ?? false),
+    // Legacy fields (computed)
+    date,
+    time,
+  };
+};
 
 export const mapNotificationRow = (row: Row): Notification => ({
   id: String(row.id ?? ''),
@@ -106,13 +119,12 @@ export const serializeEvent = (event: Event & { user_id?: string }) => ({
   user_id: event.user_id, // Security: Required for user-owned events (null for public)
   title: event.title,
   description: event.description,
-  event_date: event.date instanceof Date ? event.date.toISOString().split('T')[0] : event.date,
-  event_time: event.time,
   location: event.location,
   building: event.building,
   category: event.category,
   image_url: event.imageUrl,
-  all_day: event.allDay ?? false,
-  start_at: event.startAt?.toISOString(),
+  // Primary time fields (no more event_date/event_time)
+  start_at: event.startAt.toISOString(),
   end_at: event.endAt?.toISOString(),
+  all_day: event.allDay,
 });

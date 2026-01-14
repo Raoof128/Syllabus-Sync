@@ -38,7 +38,7 @@ const EVENT_CATEGORIES: Event['category'][] = ['Academic', 'Career', 'Social', '
 // Helper to get initial form values
 function getInitialValues(editEvent?: Event | null) {
   if (editEvent) {
-    const parsedDate = new Date(editEvent.date);
+    const parsedDate = new Date(editEvent.startAt);
     return {
       title: editEvent.title,
       description: editEvent.description,
@@ -119,12 +119,38 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     const [year, month, day] = date.split('-').map(Number);
     const dateObj = new Date(year, month - 1, day);
 
+    // Parse time to create startAt timestamp
+    // Supports formats like "2:00 PM", "14:00", "2:00 PM - 4:00 PM"
+    const timeStr = time.trim();
+    let startAt = dateObj;
+    let allDay = false;
+
+    if (timeStr) {
+      // Try to parse the start time from various formats
+      const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (timeMatch) {
+        let hours = parseInt(timeMatch[1], 10);
+        const minutes = parseInt(timeMatch[2], 10);
+        const meridiem = timeMatch[3]?.toUpperCase();
+
+        if (meridiem === 'PM' && hours < 12) hours += 12;
+        if (meridiem === 'AM' && hours === 12) hours = 0;
+
+        startAt = new Date(year, month - 1, day, hours, minutes);
+      }
+    } else {
+      allDay = true;
+    }
+
     const eventData: Event = {
       id: editEvent?.id || uuidv4(),
       title: title.trim(),
       description: description.trim(),
-      date: dateObj,
-      time: time.trim(),
+      startAt,
+      endAt: undefined, // Could be parsed from "2:00 PM - 4:00 PM" format
+      allDay,
+      date: startAt, // Computed for backward compatibility
+      time: timeStr, // Keep original time string for display
       location: location.trim(),
       building: building.trim() || undefined,
       category,

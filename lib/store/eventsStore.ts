@@ -43,7 +43,7 @@ export const useEventsStore = create<EventsState>()(
         targetDate.setHours(0, 0, 0, 0);
 
         return events.filter((event) => {
-          const eventDate = new Date(event.date);
+          const eventDate = new Date(event.startAt);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate.getTime() === targetDate.getTime();
         });
@@ -56,10 +56,10 @@ export const useEventsStore = create<EventsState>()(
 
         return events
           .filter((event) => {
-            const eventDate = new Date(event.date);
+            const eventDate = new Date(event.startAt);
             return eventDate >= now && eventDate <= futureDate;
           })
-          .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
       },
     }),
     {

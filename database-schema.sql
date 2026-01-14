@@ -36,8 +36,8 @@
 --
 -- 3. deadlines uses due_date only (due_at was removed as redundant)
 --
--- 4. events has legacy fields (event_date, event_time) and new fields (start_at, end_at, all_day)
---    A trigger syncs between them for backward compatibility
+-- 4. events table was simplified - legacy fields (event_date, event_time) were REMOVED
+--    Now uses only: start_at (required), end_at (optional), all_day (required)
 --
 -- Migrations Applied:
 --   - 20260104000000: Initial schema with tables, indexes, basic RLS
@@ -47,6 +47,7 @@
 --   - 20260114013136: Complete schema audit fix - defaults, orphans, constraints, all_day events
 --   - 20260114013519: Add soft deletes, constraints, seed functions
 --   - 20260114014506: Schema cleanup - remove due_at, add FK constraints, sync event timestamps
+--   - 20260114015445: Simplify events - remove event_date/event_time, standardize on start_at/end_at/all_day
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -122,13 +123,10 @@ CREATE TABLE public.events (
   user_id uuid, -- Owner of this event (NULL = public/shared event)
   title text NOT NULL,
   description text NOT NULL,
-  -- Legacy fields (kept for backward compatibility)
-  event_date date NOT NULL,
-  event_time text NOT NULL, -- "2:00 PM" or "14:00" format
-  -- New fields (preferred for proper time handling)
-  start_at timestamp with time zone, -- Full timestamp for event start
-  end_at timestamp with time zone, -- Full timestamp for event end
-  all_day boolean DEFAULT false, -- True for all-day events
+  -- Time fields (simplified - no legacy fields)
+  start_at timestamp with time zone NOT NULL, -- Event start (required)
+  end_at timestamp with time zone, -- Event end (optional)
+  all_day boolean NOT NULL DEFAULT false, -- True for all-day events
   location text NOT NULL,
   building text, -- For map navigation
   category text NOT NULL DEFAULT 'Academic' CHECK (category = ANY (ARRAY['Career'::text, 'Social'::text, 'Academic'::text, 'Free Food'::text])),
@@ -138,43 +136,8 @@ CREATE TABLE public.events (
   deleted_at timestamp with time zone, -- Soft delete support
   CONSTRAINT events_pkey PRIMARY KEY (id),
   CONSTRAINT events_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
-  CONSTRAINT events_time_format CHECK (event_time ~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]$|^(1[0-2]|0?[1-9]):[0-5][0-9] [AP]M$'),
-  CONSTRAINT events_valid_time_range CHECK (end_at IS NULL OR start_at IS NULL OR end_at >= start_at)
+  CONSTRAINT events_valid_time_range CHECK (end_at IS NULL OR end_at >= start_at)
 );
-
--- Trigger to sync event_date/event_time with start_at/end_at
-CREATE OR REPLACE FUNCTION sync_event_timestamps()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- If start_at not provided, compute from event_date + event_time
-    IF NEW.start_at IS NULL AND NEW.event_date IS NOT NULL THEN
-        IF NEW.event_time IS NOT NULL AND NEW.event_time ~ '^([01]?[0-9]|2[0-3]):[0-5][0-9]' THEN
-            NEW.start_at := (NEW.event_date || ' ' || NEW.event_time)::timestamptz;
-        ELSE
-            NEW.start_at := NEW.event_date::timestamptz;
-            NEW.all_day := COALESCE(NEW.all_day, true);
-        END IF;
-    END IF;
-    
-    -- If event_date not provided but start_at is, extract date
-    IF NEW.event_date IS NULL AND NEW.start_at IS NOT NULL THEN
-        NEW.event_date := NEW.start_at::date;
-        NEW.event_time := to_char(NEW.start_at, 'HH24:MI');
-    END IF;
-    
-    -- Default end_at to start_at + 1 hour if not provided
-    IF NEW.end_at IS NULL AND NEW.start_at IS NOT NULL AND NOT COALESCE(NEW.all_day, false) THEN
-        NEW.end_at := NEW.start_at + INTERVAL '1 hour';
-    END IF;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER sync_event_timestamps_trigger
-    BEFORE INSERT OR UPDATE ON public.events
-    FOR EACH ROW
-    EXECUTE FUNCTION sync_event_timestamps();
 
 CREATE TABLE public.notifications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -273,11 +236,10 @@ CREATE INDEX IF NOT EXISTS idx_deadlines_completed ON public.deadlines(completed
 CREATE INDEX IF NOT EXISTS idx_deadlines_user_id ON public.deadlines(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON public.notifications(read);
-CREATE INDEX IF NOT EXISTS idx_events_date ON public.events(event_date);
-CREATE INDEX IF NOT EXISTS idx_events_category ON public.events(category);
-CREATE INDEX IF NOT EXISTS idx_events_user_id ON public.events(user_id);
 CREATE INDEX IF NOT EXISTS idx_events_start_at ON public.events(start_at);
 CREATE INDEX IF NOT EXISTS idx_events_end_at ON public.events(end_at);
+CREATE INDEX IF NOT EXISTS idx_events_category ON public.events(category);
+CREATE INDEX IF NOT EXISTS idx_events_user_id ON public.events(user_id);
 CREATE INDEX IF NOT EXISTS idx_gamification_profiles_user_id ON public.gamification_profiles(user_id);
 CREATE INDEX IF NOT EXISTS idx_xp_events_user_id ON public.xp_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_xp_events_created_at ON public.xp_events(created_at);

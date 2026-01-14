@@ -46,18 +46,19 @@ export type Event = {
   id: string;
   title: string;
   description: string;
-  date: Date;
-  time: string; // "2:00 PM"
   location: string; // "Library Room 204"
   building?: string; // "C5C" - for map navigation
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   imageUrl?: string;
   translationKey?: string;
   descriptionKey?: string;
-  // New fields for proper time range support
-  allDay?: boolean; // true for all-day events
-  startAt?: Date; // Full timestamp for event start
-  endAt?: Date; // Full timestamp for event end
+  // Time fields - startAt is the source of truth
+  startAt: Date; // Full timestamp for event start (required)
+  endAt?: Date; // Full timestamp for event end (optional)
+  allDay: boolean; // true for all-day events
+  // Computed fields for backward compatibility in UI (derived from startAt)
+  date: Date; // Same as startAt (for UI compatibility)
+  time: string; // Formatted time string ("2:00 PM") or empty for all-day
 };
 
 export type Notification = {
