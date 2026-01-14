@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-14 - Fix Supabase initialization error during build
+
+### Fixed
+- **Infrastructure:** Resolved critical build failure "supabaseUrl is required" caused by module-level Supabase client initialization in `/api/health`. The client is now lazily initialized within the request handler using the project's standard `createAdminClient` utility, allowing the build process to complete even when environment variables are not present.
+
+---
+
 Raouf: 2026-01-14 - Synchronize project documentation with recent changes
 
 ### Changed

@@ -1,24 +1,29 @@
 // import { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-// Use admin client for health check to bypass RLS
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  },
-);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
   try {
+    const supabaseAdmin = createAdminClient();
+
+    if (!supabaseAdmin) {
+      // If admin client can't be initialized (e.g. during build or missing env),
+      // return a simulated healthy status in dev/build, or error in prod
+      if (!isProduction) {
+        return jsonSuccess({
+          status: 'healthy',
+          database: 'not_configured (dev/build mode)',
+          timestamp: new Date().toISOString(),
+          version: process.env.npm_package_version || 'dev',
+        });
+      }
+
+      return jsonError('Database configuration missing', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
     // Simple query to test database connectivity using admin client
     // Querying 'profiles' table with limit 1 is lightweight
     const { error } = await supabaseAdmin

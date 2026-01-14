@@ -77,6 +77,16 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-14 (Australia/Sydney)
+Scope: Infrastructure - Build Fix.
+Summary:
+  - Resolved "supabaseUrl is required" error during build by refactoring the health check API.
+  - Moved Supabase client initialization from module level to request level in /api/health/route.ts.
+  - Integrated createAdminClient helper for safer, lazily-initialized database connections.
+Files: app/api/health/route.ts.
+Verification: npm run build (passed successfully).
+Follow-ups: None.
+
+Raouf: 2026-01-14 (Australia/Sydney)
 Scope: Accessibility & SEO - Phase 2.
 Summary:
   - Implemented full ARIA grid semantics for the Calendar component (`role="grid"`, `role="columnheader"`, `role="rowheader"`).
