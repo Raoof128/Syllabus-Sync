@@ -48,6 +48,7 @@
 --   - 20260114013519: Add soft deletes, constraints, seed functions
 --   - 20260114014506: Schema cleanup - remove due_at, add FK constraints, sync event timestamps
 --   - 20260114015445: Simplify events - remove event_date/event_time, standardize on start_at/end_at/all_day
+--   - 20260114000000: Add missing materialized views (analytics, leaderboard, activity)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -320,6 +321,56 @@ FROM public.profiles p
 LEFT JOIN public.gamification_profiles gp ON p.id = gp.user_id;
 
 GRANT SELECT ON public.user_details TO authenticated;
+
+-- ============================================================================
+-- MATERIALIZED VIEWS (Analytics & Stats)
+-- ============================================================================
+
+-- 1. Deadline Analytics
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_deadline_analytics AS
+SELECT
+    d.user_id,
+    COUNT(*) AS total_deadlines,
+    COUNT(*) FILTER (WHERE d.completed = true) AS completed_count,
+    COUNT(*) FILTER (WHERE d.completed = false) AS pending_count,
+    COUNT(*) FILTER (WHERE d.completed = false AND d.due_date < NOW()) AS overdue_count,
+    MIN(d.due_date) FILTER (WHERE d.completed = false AND d.due_date > NOW()) AS next_deadline_date
+FROM public.deadlines d
+GROUP BY d.user_id;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_deadline_analytics_key ON public.mv_deadline_analytics(user_id);
+
+-- 2. XP Leaderboard
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_xp_leaderboard AS
+SELECT
+    gp.user_id,
+    p.full_name,
+    p.avatar_url,
+    gp.xp,
+    gp.streak_days,
+    LEAST(100, FLOOR(SQRT(gp.xp::float / 25)) + 1)::integer AS level,
+    RANK() OVER (ORDER BY gp.xp DESC) AS rank
+FROM public.gamification_profiles gp
+JOIN public.profiles p ON gp.user_id = p.id;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_xp_leaderboard_user_id ON public.mv_xp_leaderboard(user_id);
+
+-- 3. User Activity Summary
+CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_user_activity_summary AS
+SELECT
+    gp.user_id,
+    gp.last_activity_date,
+    gp.streak_days,
+    gp.longest_streak,
+    (SELECT COUNT(*) FROM public.xp_events xe WHERE xe.user_id = gp.user_id) AS total_actions,
+    (SELECT MAX(created_at) FROM public.xp_events xe WHERE xe.user_id = gp.user_id) AS last_action_at
+FROM public.gamification_profiles gp;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_user_activity_summary_user_id ON public.mv_user_activity_summary(user_id);
+
+GRANT SELECT ON public.mv_deadline_analytics TO authenticated;
+GRANT SELECT ON public.mv_xp_leaderboard TO authenticated;
+GRANT SELECT ON public.mv_user_activity_summary TO authenticated;
 
 -- ============================================================================
 -- HELPER FUNCTIONS
