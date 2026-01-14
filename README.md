@@ -5,7 +5,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8)](https://tailwindcss.com/)
-[![Version](https://img.shields.io/badge/version-0.14.25-blue)]()
+[![Version](https://img.shields.io/badge/version-1.0.0--rc.7-blue)]()
 [![Node.js](https://img.shields.io/badge/Node.js-22+-brightgreen)]()
 
 ---
@@ -14,7 +14,7 @@
 
 **The Syllabus Sync** is a comprehensive campus management web application designed to help Macquarie University students seamlessly manage their academic and campus life. Built with enterprise-grade code quality and modern web technologies, it provides an all-in-one platform for schedule management, deadline tracking, event discovery, and campus navigation.
 
-**Current Version:** 0.14.25  
+**Current Version:** 1.0.0-rc.7  
 **Current Status:** Production-ready with Supabase backend, comprehensive security measures, and 19-language internationalization support.
 
 ---

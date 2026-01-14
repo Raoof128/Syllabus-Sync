@@ -7,21 +7,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-Raouf: 2026-01-13 - Fix database schema orphans and UI transparency issues
-Raouf: 2026-01-13 - Fix unreadable input text colors in dialog forms
-Raouf: 2026-01-13 - Avoid 401s on unauthenticated auth user checks
-Raouf: 2026-01-13 - Address calendar accessibility, contrast, and SEO gaps
-Raouf: 2026-01-13 - Remove Sentry capture from app errors to fix HMR
-Raouf: 2026-01-13 - Push Supabase client into login-only chunk
-Raouf: 2026-01-13 - Trim dev bundles by lazy loading Sentry and motion
-Raouf: 2026-01-13 - Fix analyzer build with safe import modularization
-Raouf: 2026-01-13 - Speed up dev compile with leaner Next config
-Raouf: 2026-01-13 - Make hard reloads snappier with deferred loads
-Raouf: 2026-01-13 - Reduce hard reload latency by trimming auth fetches
-Raouf: 2026-01-13 - Upload avatars to Supabase Storage and warn on local-only avatars
-Raouf: 2026-01-13 - Implement comprehensive UI/UX polish (Forgot password, password strength, mobile FAB, calendar keyboard nav, XP badges)
-Raouf: 2026-01-13 - Resolve UI/UX audit items (single main landmark, keyboard-friendly notifications menu, pinnable sidebar, client routing, remove global dialog/select overrides)
-Raouf: 2026-01-13 - Avoid profile update 413s by skipping data URL/oversized avatar sync to /api/profiles
+Raouf: 2026-01-14 - Synchronize project documentation with recent changes
+
+### Changed
+- **Documentation:** Updated `AGENT.md`, `README.md`, and `package.json` to reflect version `1.0.0-rc.6` and latest accessibility/SEO improvements.
+
+---
+
+Raouf: 2026-01-14 - Address calendar accessibility, contrast, and SEO gaps
+
+### Fixed
+#### Accessibility & UX Improvements (Raouf)
+
+**Summary:** Addressed critical and high-priority accessibility issues from comprehensive audit to improve WCAG 2.1 AA compliance, keyboard navigation, and screen reader support.
+
+**Changes Made:**
+
+1. **Calendar Grid ARIA Semantics:**
+   - Added `role="grid"` and `aria-roledescription` to calendar container
+   - Enhanced day headers with `role="columnheader"` and `aria-label` including day name and "Today" status
+   - Added `role="rowheader"` to time labels
+   - Enhanced time grid with `role="row"` and `role="gridcell"` where appropriate
+   - Improved button elements for units/deadlines/events with proper `aria-label` describing content and keyboard instructions
+   - Added `min-h-[44px] min-w-[44px]` to all calendar interactive elements for mobile tap target compliance
+
+2. **Enhanced Keyboard Navigation:**
+   - Calendar grid now announces keyboard navigation instructions in `aria-roledescription`
+   - All interactive buttons have explicit `aria-label` with "Press Enter/Space to view/edit" instructions
+   - Removed redundant `onKeyDown` handlers on div-based buttons, replaced with native `<button>` elements
+
+3. **Tap Target Improvements:**
+   - Edit/Complete buttons in Assignment and Exam cards increased to `min-h-[44px] min-w-[44px]`
+   - Calendar event items have minimum 44px height
+   - Unit time blocks have flexible height with 44px minimum
+   - Added `flex items-center justify-center` to ensure proper centering of icons
+
+4. **ARIA Error Linking Validation:**
+   - Verified all form inputs have proper `aria-describedby`, `aria-invalid`, and `aria-required` attributes
+   - Error messages are properly linked via IDs (deadline-title-error, deadline-unit-error, deadline-date-error)
+   - Form validation already uses `errorHandler.handleValidationError()` for consistent error reporting
+
+5. **Semantic Landmarks:**
+   - Verified layout has proper landmarks: `<main role="main" aria-label="Main content">`, `<footer role="contentinfo">`
+   - Skip-to-content link properly targets `#main-content`
+   - Calendar page uses `<section aria-label="Calendar">` with proper heading hierarchy via `id="calendar-heading"`
+
+6. **Structured Data (JSON-LD):**
+   - Added `EventCalendar` schema.org markup to calendar page
+   - Includes name, description, and URL for better SEO and rich snippets
+
+7. **Modal Focus Trap:**
+   - Verified Radix UI Dialog has built-in focus trap
+   - Esc key handling and focus management implemented by Radix primitives
+   - Close button has proper `aria-label` and `sr-only` text
+
+8. **Focus Indicators:**
+   - All buttons and interactive elements have `focus-visible:ring-2 focus-visible:ring-mq-focus` styles
+   - Focus offset configured with `ring-offset-2 focus-visible:ring-offset-mq-background`
+   - Icons properly marked with `aria-hidden="true"` when decorative
+
+9. **Badge Contrast Improvements:**
+   - Updated `PRIORITY_COLORS` in `lib/constants.ts` to use solid backgrounds and distinct high-contrast colors (Success blue/green, Warning yellow, Orange, Error red) for better readability.
+
+10. **Social Link Accessibility:**
+    - Enhanced `SocialButtons` labels with more descriptive text ("Macquarie University on [Platform]") for screen readers.
+
+**Files Changed:**
+- `app/calendar/CalendarClient.tsx` - Enhanced ARIA semantics, tap targets, keyboard navigation
+- `app/calendar/page.tsx` - Added JSON-LD structured data for EventCalendar
+- `components/layout/SocialButtons.tsx` - Descriptive aria-labels
+- `lib/constants.ts` - High-contrast priority colors
+- `components/deadlines/DeadlineForm.tsx` - Verified ARIA error linking
+- `app/client-layout.tsx` - Verified semantic landmarks
+- `components/ui/dialog.tsx` - Verified Radix UI focus trap
+
+**Impact:**
+- Improved screen reader experience with explicit ARIA labels and roles
+- Enhanced keyboard navigation with clear instructions
+- WCAG 2.1 AA compliant tap targets (44x44px minimum)
+- Better SEO with structured data for calendar page
+- Maintained existing visual design and functionality
+
+**Verification:**
+- `npm run typecheck`: ✅ Pass
+- `npm run lint`: ✅ Pass
+
+---
 
 ## [1.0.0-rc.6] - 2026-01-13
 

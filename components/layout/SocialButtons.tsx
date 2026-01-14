@@ -61,37 +61,37 @@ const socialLinks: SocialLink[] = [
     name: 'facebook',
     icon: FacebookIcon,
     href: 'https://www.facebook.com/macquarieuni/',
-    label: 'Facebook',
+    label: 'Macquarie University on Facebook',
   },
   {
     name: 'instagram',
     icon: InstagramIcon,
     href: 'https://www.instagram.com/macquarieuni/',
-    label: 'Instagram',
+    label: 'Macquarie University on Instagram',
   },
   {
     name: 'linkedin',
     icon: Linkedin,
     href: 'https://www.linkedin.com/school/macquarie-university/',
-    label: 'LinkedIn',
+    label: 'Macquarie University on LinkedIn',
   },
   {
     name: 'tiktok',
     icon: TikTokIcon,
     href: 'https://www.tiktok.com/@macquarieuni',
-    label: 'TikTok',
+    label: 'Macquarie University on TikTok',
   },
   {
     name: 'youtube',
     icon: YouTubeIcon,
     href: 'https://www.youtube.com/user/MacquarieUniversity',
-    label: 'YouTube',
+    label: 'Macquarie University on YouTube',
   },
   {
     name: 'x',
     icon: XIcon,
     href: 'https://x.com/Macquarie_Uni',
-    label: 'X',
+    label: 'Macquarie University on X',
   },
 ];
 

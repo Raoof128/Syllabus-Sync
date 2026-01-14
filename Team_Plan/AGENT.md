@@ -2,7 +2,7 @@
 
 **Complete Technical Reference & Team Guide**
 
-Version: 1.0.0-rc.5 | Last Updated: January 13, 2026
+Version: 1.0.0-rc.7 | Last Updated: January 14, 2026
 
 ---
 
@@ -75,6 +75,56 @@ Version: 1.0.0-rc.5 | Last Updated: January 13, 2026
 Macquarie University Administration - February 2025
 
 ### Recent Work Log
+
+Raouf: 2026-01-14 (Australia/Sydney)
+Scope: Accessibility & SEO - Phase 2.
+Summary:
+  - Implemented full ARIA grid semantics for the Calendar component (`role="grid"`, `role="columnheader"`, `role="rowheader"`).
+  - Enhanced all interactive elements with explicit instructions in `aria-label` for screen readers.
+  - Standardized mobile tap targets to 44x44px minimum for WCAG compliance.
+  - Added JSON-LD structured data for EventCalendar to improve search visibility.
+Files: app/calendar/CalendarClient.tsx, app/calendar/page.tsx.
+Verification: `npm run lint`, `npm run typecheck` (all passed).
+Follow-ups: None.
+
+Raouf: 2026-01-14 (Australia/Sydney)
+Scope: UI Polish - Social Buttons Redesign.
+Summary:
+  - Reduced social button expanded width to 75px to fit more compactly.
+  - Scaled down font size to 0.7rem to prevent text truncation at smaller widths.
+Files: app/styles/social-buttons.css.
+Verification: Visual verification of layout stability.
+Follow-ups: None.
+
+
+Raouf: 2026-01-14 - Address calendar accessibility, contrast, and SEO gaps
+
+#### Accessibility, Contrast & SEO Gaps (Raouf)
+- **Date:** January 14, 2026 (Australia/Sydney)
+- **Scope:** WCAG 2.1 compliance, SEO, and visual contrast
+- **Summary:** Implemented comprehensive accessibility fixes including ARIA grid semantics, keyboard navigation instructions, 44px tap targets, JSON-LD structured data for SEO, and high-contrast priority badges.
+
+**Accessibility Changes:**
+- **ARIA Semantics:** Added `role="grid"`, `columnheader`, `rowheader` to calendar.
+- **Keyboard Nav:** Added screen-reader only instructions for calendar interactions.
+- **Tap Targets:** Enforced `min-h-[44px]` on all calendar interactive elements.
+- **Social Links:** Updated labels to "Macquarie University on [Platform]" for clarity.
+
+**UI/Contrast Changes:**
+- **Priority Colors:** Switched from translucent backgrounds to solid, distinct colors for Low/Medium/High/Urgent badges to meet contrast requirements.
+
+**SEO Changes:**
+-**Structured Data:** Added JSON-LD `EventCalendar` schema to the calendar route.
+
+**Files Changed:**
+- `app/calendar/CalendarClient.tsx`
+- `app/calendar/page.tsx`
+- `components/layout/SocialButtons.tsx`
+- `lib/constants.ts`
+
+**Verification:**
+- `npm run typecheck`
+- `npm run lint`
 
 Raouf: 2026-01-13 - Fix database schema orphans and UI transparency issues
 

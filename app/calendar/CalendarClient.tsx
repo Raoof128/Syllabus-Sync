@@ -423,7 +423,7 @@ export default function CalendarClient() {
       </ScrollReveal>
 
       {/* Apple/Google Calendar Style Weekly View */}
-      <ScrollReveal delay={0.1}>
+      <ScrollReveal delay={0.1} className="mt-6">
         <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0">
             {/* Calendar Header - Removed add deadline button */}
@@ -451,33 +451,54 @@ export default function CalendarClient() {
             </div>
 
             {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
-            <div className="overflow-auto" style={{ maxHeight: '700px' }}>
+            <div
+              className="overflow-auto"
+              style={{ maxHeight: '700px' }}
+              role="grid"
+              aria-label="Weekly calendar"
+              aria-roledescription="Interactive weekly calendar showing units, deadlines, and events from 6 AM to 11 PM. Use arrow keys to navigate weeks. Tab through calendar items to interact."
+            >
               <div className="min-w-[800px]">
                 {/* Day Headers - Sticky with MQ Key Dates */}
-                <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-0 bg-mq-background z-20">
-                  <div className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border" />
+                <div
+                  className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-0 bg-mq-background z-20"
+                  role="row"
+                >
+                  <div
+                    className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border"
+                    aria-hidden="true"
+                  />
                   {weekDays.map((day) => {
                     const dayMQDates = getMQKeyDatesForDay(day).filter(
                       (d) => d.category !== 'classes',
                     );
+                    const dayName = format(day, 'EEEE');
+                    const dayDate = format(day, 'd');
+                    const isTodayCell = isToday(day);
                     return (
                       <div
                         key={day.toISOString()}
                         className={cn(
                           'p-2 text-center border-r border-mq-border last:border-r-0',
-                          isToday(day) && 'bg-mq-primary/5',
+                          isTodayCell && 'bg-mq-primary/5',
                         )}
+                        role="columnheader"
+                        aria-label={`${dayName}, ${dayDate}${isTodayCell ? ', Today' : ''}`}
                       >
-                        <div className="text-xs text-mq-content-secondary uppercase font-medium">
+                        <div
+                          className="text-xs text-mq-content-secondary uppercase font-medium"
+                          aria-hidden="true"
+                        >
                           {format(day, 'EEE')}
                         </div>
                         <div
                           className={cn(
                             'text-xl font-semibold mt-1 inline-flex items-center justify-center',
-                            isToday(day)
+                            isTodayCell
                               ? 'w-9 h-9 rounded-full bg-[#7A0A21] text-white'
                               : 'text-mq-content',
                           )}
+                          aria-hidden="true"
                         >
                           {format(day, 'd')}
                         </div>
@@ -513,16 +534,26 @@ export default function CalendarClient() {
                 </div>
 
                 {/* Time Grid */}
-                <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT + 12 }}>
+                <div
+                  className="relative"
+                  style={{ height: HOURS.length * HOUR_HEIGHT + 12 }}
+                  role="presentation"
+                  aria-hidden="true"
+                >
                   {/* Hour Lines */}
                   {HOURS.map((hour, index) => (
                     <div
                       key={hour}
                       className="absolute left-0 right-0 grid grid-cols-[60px_repeat(7,1fr)]"
                       style={{ top: index * HOUR_HEIGHT + 8 }}
+                      role="row"
                     >
                       {/* Time Label */}
-                      <div className="text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border">
+                      <div
+                        className="text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border"
+                        role="rowheader"
+                        aria-label={`${format(new Date().setHours(hour, 0), 'h a')}`}
+                      >
                         {format(new Date().setHours(hour, 0), 'h a')}
                       </div>
                       {/* Hour Lines for each day */}
@@ -534,6 +565,8 @@ export default function CalendarClient() {
                             isToday(day) && 'bg-mq-primary/[0.02]',
                           )}
                           style={{ height: HOUR_HEIGHT }}
+                          role="gridcell"
+                          aria-hidden="true"
                         />
                       ))}
                     </div>
@@ -660,32 +693,23 @@ export default function CalendarClient() {
                             };
 
                             return (
-                              <div
+                              <button
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                role="button"
-                                tabIndex={0}
-                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                type="button"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center"
                                 style={{
                                   top: posInfo.top,
-                                  height: posInfo.height,
+                                  height: Math.max(posInfo.height, 44),
                                   left,
                                   width,
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
-                                aria-label={`${unitData.code} ${formatTime(schedule.startTime)} to ${formatTime(schedule.endTime)}${unitData.location?.building ? ` in ${unitData.location.building} ${unitData.location.room}` : ''}`}
+                                aria-label={`${unitData.code} class, ${formatTime(schedule.startTime)} to ${formatTime(schedule.endTime)}${unitData.location?.building ? ` in ${unitData.location.building} ${unitData.location.room}` : ''}. Press Enter or Space to view details.`}
                                 title={`Click to view ${unitData.code} details`}
                                 onClick={() => {
-                                  // Find the original unit with full schedule
                                   const originalUnit = units.find((u) => u.id === unitData.id);
                                   if (originalUnit) openUnitDetail(originalUnit);
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    const originalUnit = units.find((u) => u.id === unitData.id);
-                                    if (originalUnit) openUnitDetail(originalUnit);
-                                  }
                                 }}
                               >
                                 <div
@@ -705,7 +729,7 @@ export default function CalendarClient() {
                                     </span>
                                   )}
                                 </div>
-                              </div>
+                              </button>
                             );
                           })}
 
@@ -735,17 +759,17 @@ export default function CalendarClient() {
                                   type="button"
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-xs px-1 py-0.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+                                    'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                     deadline.completed && 'opacity-50 line-through',
                                   )}
                                   style={{
-                                    top: 4 + idx * 22,
+                                    top: 4 + idx * 24,
                                     backgroundColor: deadlineColor,
                                   }}
-                                  aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}`}
+                                  aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}. Press Enter to edit.`}
                                   title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                                 >
-                                  {displayName}
+                                  <span className="block truncate">{displayName}</span>
                                 </button>
                               );
                             }
@@ -765,18 +789,18 @@ export default function CalendarClient() {
                                 type="button"
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
-                                  'absolute text-left text-xs px-1 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+                                  'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                   deadline.completed && 'opacity-50 line-through',
                                 )}
                                 style={{
                                   top: posInfo.top,
-                                  height: posInfo.height,
+                                  height: Math.max(posInfo.height, 44),
                                   left,
                                   width,
                                   backgroundColor: `${deadlineColor}dd`,
                                   borderLeftColor: deadlineColor,
                                 }}
-                                aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}`}
+                                aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}. Press Enter to edit. ${deadline.completed ? 'Completed' : 'Not completed'}.`}
                                 title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
                               >
                                 <span className="block line-clamp-2 break-words leading-tight">
@@ -796,22 +820,22 @@ export default function CalendarClient() {
 
                             if (!timeInfo) {
                               // Show at top if no valid time
-                              const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
+                              const offsetTop = 4 + dayDeadlines.length * 24 + idx * 24;
                               return (
                                 <button
                                   key={event.id}
                                   type="button"
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
-                                    'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+                                    'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                     colors.bg,
                                     colors.text,
                                   )}
                                   style={{ top: offsetTop }}
-                                  aria-label={`Event ${event.title} at ${event.time}`}
+                                  aria-label={`Event ${event.title} at ${event.time}. Press Enter to view details.`}
                                   title={`Event: ${event.title} @ ${event.time}`}
                                 >
-                                  {event.title}
+                                  <span className="block truncate">{event.title}</span>
                                 </button>
                               );
                             }
@@ -859,18 +883,18 @@ export default function CalendarClient() {
                                 type="button"
                                 onClick={() => handleEventClick(event)}
                                 className={cn(
-                                  'absolute text-left text-[10px] px-1 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+                                  'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                   colors.bg,
                                   colors.text,
                                   'border-green-700',
                                 )}
                                 style={{
                                   top: posInfo.top,
-                                  height: posInfo.height,
+                                  height: Math.max(posInfo.height, 44),
                                   left: evtLeft,
                                   width: evtWidth,
                                 }}
-                                aria-label={`Event ${event.title} at ${event.time}`}
+                                aria-label={`Event ${event.title} at ${event.time}. Press Enter to view details.`}
                                 title={`Event: ${event.title} @ ${event.time}`}
                               >
                                 <span className="block line-clamp-2 break-words leading-tight">
@@ -979,12 +1003,18 @@ export default function CalendarClient() {
                                   aria-label={
                                     assignment.completed ? 'Mark as incomplete' : 'Mark as complete'
                                   }
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
                                 >
                                   {assignment.completed ? (
-                                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                    <CheckCircle2
+                                      className="h-5 w-5 text-green-500"
+                                      aria-hidden="true"
+                                    />
                                   ) : (
-                                    <Circle className="h-5 w-5 text-mq-content-secondary" />
+                                    <Circle
+                                      className="h-5 w-5 text-mq-content-secondary"
+                                      aria-hidden="true"
+                                    />
                                   )}
                                 </button>
                                 <div>
@@ -1011,7 +1041,7 @@ export default function CalendarClient() {
                                 <button
                                   type="button"
                                   onClick={() => openEditDeadline(assignment)}
-                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                   aria-label={`Edit ${assignment.title}`}
                                 >
                                   <Edit2
@@ -1093,12 +1123,18 @@ export default function CalendarClient() {
                                   aria-label={
                                     exam.completed ? 'Mark as incomplete' : 'Mark as complete'
                                   }
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
                                 >
                                   {exam.completed ? (
-                                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                    <CheckCircle2
+                                      className="h-5 w-5 text-green-500"
+                                      aria-hidden="true"
+                                    />
                                   ) : (
-                                    <Circle className="h-5 w-5 text-mq-content-secondary" />
+                                    <Circle
+                                      className="h-5 w-5 text-mq-content-secondary"
+                                      aria-hidden="true"
+                                    />
                                   )}
                                 </button>
                                 <div>
@@ -1122,7 +1158,7 @@ export default function CalendarClient() {
                                 <button
                                   type="button"
                                   onClick={() => openEditDeadline(exam)}
-                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                   aria-label={`Edit ${exam.title}`}
                                 >
                                   <Edit2

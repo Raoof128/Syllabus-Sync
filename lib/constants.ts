@@ -50,10 +50,10 @@ export const EVENT_CATEGORIES = ['Career', 'Social', 'Academic', 'Free Food'] as
 
 // Priority colors for badges
 export const PRIORITY_COLORS: Record<Deadline['priority'], string> = {
-  Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
-  Medium: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
-  High: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
-  Urgent: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
+  Low: 'bg-mq-success text-white border border-mq-success',
+  Medium: 'bg-mq-warning text-black border border-mq-warning',
+  High: 'bg-orange-600 text-white border border-orange-600',
+  Urgent: 'bg-mq-error text-white border border-mq-error',
 };
 
 // Category colors for events
