@@ -125,32 +125,13 @@ export class AppErrorHandler {
   }
 
   private reportToService(error: AppError, severity: ErrorSeverity): void {
-    // ==========================================================================
-    // ERROR REPORTING SERVICE INTEGRATION
-    // ==========================================================================
-    // To enable production error tracking:
-    //
-    // 1. SENTRY (Recommended):
-    //    npm install @sentry/nextjs
-    //    Then uncomment:
-    //    import * as Sentry from '@sentry/nextjs';
-    //    Sentry.captureException(new Error(error.message), {
-    //      level: severity === 'high' ? 'error' : severity === 'medium' ? 'warning' : 'info',
-    //      tags: { context: error.context },
-    //      extra: error.details,
-    //    });
-    //
-    // 2. LOGROCKET:
-    //    npm install logrocket
-    //    import LogRocket from 'logrocket';
-    //    LogRocket.captureException(new Error(error.message), { extra: error });
-    //
-    // 3. Custom endpoint:
-    //    fetch('/api/errors', { method: 'POST', body: JSON.stringify(error) });
-    // ==========================================================================
-
     const isProduction = process.env.NODE_ENV === 'production';
     const isBrowser = typeof window !== 'undefined';
+
+    // Report to Sentry if available (dynamically imported to avoid build issues)
+    if (isProduction || process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
+      this.reportToSentry(error, severity);
+    }
 
     // In production, log high-severity errors to console (picked up by Vercel logs)
     if (isProduction && severity === 'high') {
@@ -183,6 +164,33 @@ export class AppErrorHandler {
         // Ignore localStorage errors
       }
     }
+  }
+
+  /**
+   * Report error to Sentry (dynamically loaded to avoid build-time dependency)
+   */
+  private reportToSentry(error: AppError, severity: ErrorSeverity): void {
+    // Dynamic import to avoid issues when Sentry is not configured
+    import('@sentry/nextjs')
+      .then((Sentry) => {
+        const sentryLevel =
+          severity === 'high' ? 'error' : severity === 'medium' ? 'warning' : 'info';
+
+        Sentry.captureException(new Error(error.message), {
+          level: sentryLevel,
+          tags: {
+            context: error.context || 'unknown',
+            errorCode: error.code,
+          },
+          extra: {
+            details: error.details,
+            timestamp: error.timestamp,
+          },
+        });
+      })
+      .catch(() => {
+        // Sentry not available, silently ignore
+      });
   }
 
   /**

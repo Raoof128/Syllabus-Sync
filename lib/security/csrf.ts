@@ -218,19 +218,21 @@ export function withCSRFProtection<T>(
       );
     }
 
-    // Note: Full CSRF token validation is optional for Supabase apps
-    // because Supabase uses SameSite=Lax cookies
-    // Uncomment below for stricter protection:
-    /*
-    const csrfResult = validateCSRFToken(request);
-    if (!csrfResult.valid) {
-      console.warn('CSRF token validation failed:', csrfResult.reason);
-      return NextResponse.json(
-        { error: { code: 'CSRF_ERROR', message: 'Invalid CSRF token' } },
-        { status: 403 }
-      );
+    // SECURITY: Full CSRF token validation (double-submit cookie pattern)
+    // This provides defense-in-depth on top of Supabase's SameSite=Lax cookies
+    // Can be disabled by setting CSRF_VALIDATION_ENABLED=false in production if needed
+    const csrfEnabled = process.env.CSRF_VALIDATION_ENABLED !== 'false';
+    
+    if (csrfEnabled) {
+      const csrfResult = validateCSRFToken(request);
+      if (!csrfResult.valid) {
+        console.warn('CSRF token validation failed:', csrfResult.reason);
+        return NextResponse.json(
+          { error: { code: 'CSRF_ERROR', message: 'Invalid CSRF token' } },
+          { status: 403 },
+        );
+      }
     }
-    */
 
     return handler(request);
   };

@@ -19,15 +19,80 @@ export interface ApiRequestOptions extends RequestInit {
   noRetry?: boolean;
   /** Maximum retry attempts (default: 3) */
   maxRetries?: number;
+  /** Skip CSRF token (for GET requests or special cases) */
+  skipCsrf?: boolean;
 }
+
+// ============================================================================
+// CSRF TOKEN HELPERS
+// ============================================================================
+
+const CSRF_COOKIE_NAME = '__Host-csrf';
+const CSRF_HEADER_NAME = 'x-csrf-token';
+
+/**
+ * Get CSRF token from cookie
+ */
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === CSRF_COOKIE_NAME) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+/**
+ * Generate and set a new CSRF token (called on app init)
+ */
+export function initCsrfToken(): string {
+  if (typeof document === 'undefined') return '';
+
+  // Check if token already exists
+  let token = getCsrfToken();
+  if (token) return token;
+
+  // Generate new token
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  token = Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
+
+  // Set cookie (secure in production, sameSite strict)
+  const isSecure = window.location.protocol === 'https:';
+  const cookieValue = `${CSRF_COOKIE_NAME}=${token}; path=/; max-age=86400; samesite=strict${isSecure ? '; secure' : ''}`;
+  document.cookie = cookieValue;
+
+  return token;
+}
+
+// Methods that require CSRF protection
+const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
 /**
  * Makes an API request with automatic retry logic for network and server errors.
  * Retries on: network failures, timeouts, and 5xx server errors.
  * Does NOT retry on: 4xx client errors (400, 401, 403, 404, etc.)
+ *
+ * SECURITY: Automatically includes CSRF token for mutation requests (POST, PUT, PATCH, DELETE)
  */
 export async function apiRequest<T>(input: RequestInfo, init?: ApiRequestOptions): Promise<T> {
-  const { noRetry = false, maxRetries = 3, ...fetchInit } = init || {};
+  const { noRetry = false, maxRetries = 3, skipCsrf = false, ...fetchInit } = init || {};
+
+  // Add CSRF token for mutation methods
+  const method = (fetchInit.method || 'GET').toUpperCase();
+  if (!skipCsrf && MUTATION_METHODS.includes(method)) {
+    const csrfToken = getCsrfToken() || initCsrfToken();
+    if (csrfToken) {
+      fetchInit.headers = {
+        ...fetchInit.headers,
+        [CSRF_HEADER_NAME]: csrfToken,
+      };
+    }
+  }
 
   const executeRequest = async (): Promise<T> => {
     const response = await fetch(input, fetchInit);

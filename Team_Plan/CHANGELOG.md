@@ -9,15 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Raouf: 2026-01-15 - v1.0.0-rc.7 - Comprehensive Codebase Audit & Hardening
 
+### Added
+- **Security:** Implemented defense-in-depth CSRF protection using double-submit cookie pattern.
+- **Monitoring:** Added structured `RequestLogger` for production API telemetry.
+- **Infrastructure:** Added `check:i18n` script for CI translation completeness validation.
+- **Testing:** Enabled V8 code coverage reporting for Vitest with 40% initial threshold.
+
 ### Fixed
 - **Type Safety:** Resolved 14 TypeScript `any` usages across the codebase, including store migrations, API middleware, form components, and test files.
 - **Logging:** Replaced all production `console.log` and `console.warn` calls with a dedicated `devLog` utility in `clientStorage.ts` to prevent data leakage in production logs.
 - **Error Handling:** Updated `ErrorBoundary.tsx` and `errorHandling.ts` to reflect completed Sentry integration.
 - **Test Stability:** Fixed date-related test failures in `NextDeadline.test.tsx` by using proper invalid date constructors.
 - **Accessibility Tests:** Properly typed `axe-core` integrations in Playwright tests.
+- **Migration logic:** Improved unit ID migration in `unitsStore.ts` to handle dynamic ID mapping using random UUIDs for legacy string IDs.
 
 ### Changed
 - **Documentation:** Updated `ARCHITECTURE.md` with comprehensive system diagrams, directory structure, security architecture, and testing strategy.
+- **Security Headers:** Hardened `next.config.ts` with additional security headers (DNS Prefetch, Cross-Origin policies).
+- **CI/CD:** Integrated i18n checks and Codecov coverage reporting into GitHub Actions.
 
 ---
 

@@ -184,7 +184,8 @@ export const useUnitsStore = create<UnitsState>()(
       version: 2,
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
-          // Migration from version 1 to 2: Convert old string IDs to UUIDs
+          // Migration from version 1 to 2: Convert old non-UUID string IDs to UUIDs
+          // This migration handles legacy data that used string IDs like 'unit-comp2310'
           const StateSchema = z.object({
             state: z
               .object({
@@ -206,29 +207,42 @@ export const useUnitsStore = create<UnitsState>()(
             return persistedState;
           }
 
+          // Helper to check if a string is already a valid UUID
+          const isUUID = (str: string): boolean =>
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+          // Helper to generate a deterministic UUID from a string (for consistency across migrations)
+          const generateUUID = (): string => {
+            // Generate a random UUID v4 format
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+              const r = (Math.random() * 16) | 0;
+              const v = c === 'x' ? r : (r & 0x3) | 0x8;
+              return v.toString(16);
+            });
+          };
+
           const state = parsed.data;
           if (state?.state?.units && Array.isArray(state.state.units)) {
-            const idMap: Record<string, string> = {
-              'unit-comp2310': '550e8400-e29b-41d4-a716-446655440100',
-              'unit-math1001': '550e8400-e29b-41d4-a716-446655440200',
-              'unit-hist2002': '550e8400-e29b-41d4-a716-446655440300',
-            };
+            // Create a mapping of old IDs to new UUIDs (generated once per migration run)
+            const idMigrationMap = new Map<string, string>();
 
             state.state.units = state.state.units.map((unit) => {
-              if (unit.id && idMap[unit.id]) {
-                // Also update schedule IDs
-                const updatedUnit = { ...unit, id: idMap[unit.id] };
+              // Skip if already a valid UUID
+              if (unit.id && !isUUID(unit.id)) {
+                // Get or create a new UUID for this old ID
+                if (!idMigrationMap.has(unit.id)) {
+                  idMigrationMap.set(unit.id, generateUUID());
+                }
+                const updatedUnit = { ...unit, id: idMigrationMap.get(unit.id)! };
+
+                // Also migrate schedule IDs if present
                 if (updatedUnit.schedule && Array.isArray(updatedUnit.schedule)) {
-                  const scheduleIdMap: Record<string, string> = {
-                    'comp2310-lecture': '550e8400-e29b-41d4-a716-446655440101',
-                    'comp2310-tutorial': '550e8400-e29b-41d4-a716-446655440102',
-                    'math1001-lecture': '550e8400-e29b-41d4-a716-446655440201',
-                    'math1001-workshop': '550e8400-e29b-41d4-a716-446655440202',
-                    'hist2002-lecture': '550e8400-e29b-41d4-a716-446655440301',
-                  };
                   updatedUnit.schedule = updatedUnit.schedule.map((schedule) => {
-                    if (schedule.id && scheduleIdMap[schedule.id]) {
-                      return { ...schedule, id: scheduleIdMap[schedule.id] };
+                    if (schedule.id && !isUUID(schedule.id)) {
+                      if (!idMigrationMap.has(schedule.id)) {
+                        idMigrationMap.set(schedule.id, generateUUID());
+                      }
+                      return { ...schedule, id: idMigrationMap.get(schedule.id)! };
                     }
                     return schedule;
                   });

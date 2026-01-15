@@ -79,20 +79,35 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: [
+          // Prevent MIME type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Prevent clickjacking
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // Control referrer information
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // XSS protection (legacy, but still useful for older browsers)
           { key: 'X-XSS-Protection', value: '1; mode=block' },
+          // Force HTTPS
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains',
+            value: 'max-age=31536000; includeSubDomains; preload',
           },
           // CSP is now handled by middleware.ts with nonces
           // Keeping basic headers here for static assets
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self)',
+            value: 'camera=(), microphone=(), geolocation=(self), payment=(), usb=()',
           },
+          // Prevent DNS prefetching (privacy)
+          { key: 'X-DNS-Prefetch-Control', value: 'off' },
+          // Prevent IE from executing downloads in site's context
+          { key: 'X-Download-Options', value: 'noopen' },
+          // Restrict Adobe Flash and PDF cross-domain access
+          { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+          // Indicate this is not an Electron/webview app
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          // Prevent loading resources from other origins
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
         ],
       },
     ];
