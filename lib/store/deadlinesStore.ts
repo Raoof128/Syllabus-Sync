@@ -240,13 +240,11 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       storage: createJSONStorage(() => localStorage),
       version: 4,
       migrate: (persistedState: unknown, version: number) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const state = persistedState as { state: { deadlines: any[] } };
+        const state = persistedState as { state: { deadlines: Partial<Deadline>[] } };
         if (version < 4) {
           if (state?.state?.deadlines && Array.isArray(state.state.deadlines)) {
             // Migration: Version 4 forces ALL IDs to be valid UUIDs
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            state.state.deadlines = state.state.deadlines.map((deadline: any) => {
+            state.state.deadlines = state.state.deadlines.map((deadline: Partial<Deadline>) => {
               // Legacy hardcoded map
               const idMap: Record<string, string> = {
                 'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',
@@ -254,12 +252,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
                 'deadline-hist2002-essay-1': '550e8400-e29b-41d4-a716-446655440003',
               };
 
-              let newId = deadline.id;
+              let newId = deadline.id ?? '';
 
               if (newId && idMap[newId]) {
                 // Known legacy ID -> Map to specific UUID
                 newId = idMap[newId];
-              } else if (!isValidUUID(newId)) {
+              } else if (!newId || !isValidUUID(newId)) {
                 // Unknown legacy/invalid ID -> Generate random UUID
                 newId = uuidv4();
               }

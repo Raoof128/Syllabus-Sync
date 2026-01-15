@@ -13,11 +13,13 @@ First off, thank you for considering contributing to Syllabus Sync! It's people 
 ### 🏗️ Project Standards
 
 #### 1. Code Quality
+
 - **TypeScript**: No `as any` (unless for dynamic i18n keys). Use strict typing.
 - **Components**: Follow the "Apple Liquid Glass" design system (see `docs/ARCHITECTURE.md`).
 - **Tests**: Every new feature requires unit tests in `tests/`.
 
 #### 2. Workflow
+
 - We use **Conventional Commits**:
   - `feat:` for new features
   - `fix:` for bug fixes
@@ -26,12 +28,15 @@ First off, thank you for considering contributing to Syllabus Sync! It's people 
 - **Pre-push Hook**: We enforce `npm run prepush` which runs linting, typechecking, and tests.
 
 #### 3. Pull Request Process
+
 - Ensure your PR is linked to an issue.
 - Maintain a clean commit history (rebase if necessary).
 - PRs require at least one approval from the core team (Pouya or Raouf).
 
 ### 🎨 Design System
+
 Our UI is built on a custom extension of Shadcn UI, tailored for MQ's brand.
+
 - **Colors**: Use variables from `app/mq-tokens.css`.
 - **Icons**: Exclusively use `lucide-react`.
 - **Animations**: Use `framer-motion` for fluid transitions.

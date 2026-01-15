@@ -45,8 +45,7 @@ export function useTranslation() {
     (key: TranslationKey, vars?: Record<string, string | number>): string => {
       // Get translation from current language, fallback to English
       const langTranslations = translations[language];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let text = (langTranslations as any)?.[key] || en[key] || key;
+      let text = (langTranslations as Record<string, string> | undefined)?.[key] || en[key] || key;
 
       if (vars) {
         Object.entries(vars).forEach(([k, v]) => {

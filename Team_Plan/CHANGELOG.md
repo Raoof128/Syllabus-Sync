@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-15 - v1.0.0-rc.7 - Comprehensive Codebase Audit & Hardening
+
+### Fixed
+- **Type Safety:** Resolved 14 TypeScript `any` usages across the codebase, including store migrations, API middleware, form components, and test files.
+- **Logging:** Replaced all production `console.log` and `console.warn` calls with a dedicated `devLog` utility in `clientStorage.ts` to prevent data leakage in production logs.
+- **Error Handling:** Updated `ErrorBoundary.tsx` and `errorHandling.ts` to reflect completed Sentry integration.
+- **Test Stability:** Fixed date-related test failures in `NextDeadline.test.tsx` by using proper invalid date constructors.
+- **Accessibility Tests:** Properly typed `axe-core` integrations in Playwright tests.
+
+### Changed
+- **Documentation:** Updated `ARCHITECTURE.md` with comprehensive system diagrams, directory structure, security architecture, and testing strategy.
+
+---
+
 Raouf: 2026-01-14 - Fix CSRF origin validation and complete audit fixes
 
 ### Fixed

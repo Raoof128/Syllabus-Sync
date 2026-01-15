@@ -7,6 +7,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Deadline } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
   DialogContent,
@@ -339,8 +340,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
                     <SelectItem key={p} value={p}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {t(`priority_${p}` as any)}
+                      {t(`priority_${p}` as TranslationKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -356,8 +356,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 <SelectContent>
                   {DEADLINE_TYPES.map((type) => (
                     <SelectItem key={type} value={type}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {t(`type_${type}` as any)}
+                      {t(`type_${type}` as TranslationKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>

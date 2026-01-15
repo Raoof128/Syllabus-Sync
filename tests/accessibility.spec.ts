@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
+import type { TestInfo, Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import type { AxeResults, Result as AxeResult } from 'axe-core';
 import fs from 'fs';
 
-async function logComputedStylesForViolations(page: any, results: any, testInfo: any) {
-  const colorViolations = results.violations.filter((v: any) => v.id === 'color-contrast');
+async function logComputedStylesForViolations(page: Page, results: AxeResults, testInfo: TestInfo) {
+  const colorViolations = results.violations.filter((v: AxeResult) => v.id === 'color-contrast');
   if (!colorViolations.length) return;
 
   // Utility: in-page computation to extract styles, pseudo-element info and ancestor states
@@ -22,13 +24,15 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
         }
 
         function getBgColor(el: Element | null) {
-          let cur: any = el;
+          let cur: Element | null = el;
           while (cur) {
             try {
               const cs = getComputedStyle(cur);
               const bg = cs.backgroundColor;
               if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
-            } catch (e) {}
+            } catch {
+              // ignore
+            }
             cur = cur.parentElement;
           }
           return getComputedStyle(document.documentElement).backgroundColor || 'transparent';
@@ -42,8 +46,8 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
             const after = getComputedStyle(el as Element, '::after');
 
             // get ancestor opacity/blend states
-            const ancestors: any[] = [];
-            let cur: any = el;
+            const ancestors: { node: string; opacity?: string; mixBlendMode?: string }[] = [];
+            let cur: Element | null = el;
             while (cur) {
               try {
                 const a = getComputedStyle(cur);
@@ -51,7 +55,9 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
                   ancestors.push({ node: cur.tagName, opacity: a.opacity });
                 if (a.mixBlendMode && a.mixBlendMode !== 'normal')
                   ancestors.push({ node: cur.tagName, mixBlendMode: a.mixBlendMode });
-              } catch (e) {}
+              } catch {
+                // ignore
+              }
               cur = cur.parentElement;
             }
 
@@ -122,13 +128,15 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
     return await page.evaluate(
       ({ snippet, debugAttr }: { snippet: string; debugAttr: string }) => {
         function getBgColor(el: Element | null) {
-          let cur: any = el;
+          let cur: Element | null = el;
           while (cur) {
             try {
               const cs = getComputedStyle(cur);
               const bg = cs.backgroundColor;
               if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
-            } catch {}
+            } catch {
+              // ignore
+            }
             cur = cur.parentElement;
           }
           return getComputedStyle(document.documentElement).backgroundColor || 'transparent';
@@ -140,8 +148,8 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
             const cs = getComputedStyle(el as Element);
             const before = getComputedStyle(el as Element, '::before');
             const after = getComputedStyle(el as Element, '::after');
-            const ancestors: any[] = [];
-            let cur: any = el;
+            const ancestors: { node: string; opacity?: string; mixBlendMode?: string }[] = [];
+            let cur: Element | null = el;
             while (cur) {
               try {
                 const a = getComputedStyle(cur);
@@ -149,7 +157,9 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
                   ancestors.push({ node: cur.tagName, opacity: a.opacity });
                 if (a.mixBlendMode && a.mixBlendMode !== 'normal')
                   ancestors.push({ node: cur.tagName, mixBlendMode: a.mixBlendMode });
-              } catch (e) {}
+              } catch {
+                // ignore
+              }
               cur = cur.parentElement;
             }
 
@@ -183,7 +193,7 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
         const match = nodes.find((n) => {
           try {
             return n.outerHTML && n.outerHTML.includes(snippet);
-          } catch (e) {
+          } catch {
             return false;
           }
         });
@@ -191,7 +201,9 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
         if (match) {
           try {
             match.setAttribute(debugAttr, '1');
-          } catch (e) {}
+          } catch {
+            // ignore
+          }
           return { computed: computeForEl(match), debugAttr };
         }
 
@@ -201,14 +213,16 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
             return (
               n.textContent && n.textContent.includes(snippet.replace(/<[^>]+>/g, '').slice(0, 100))
             );
-          } catch (e) {
+          } catch {
             return false;
           }
         });
         if (textMatch) {
           try {
             textMatch.setAttribute(debugAttr, '1');
-          } catch (e) {}
+          } catch {
+            // ignore
+          }
           return { computed: computeForEl(textMatch), debugAttr };
         }
 
@@ -237,20 +251,21 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
     for (let nIndex = 0; nIndex < violation.nodes.length; nIndex++) {
       const node = violation.nodes[nIndex];
       const selector = node.target && node.target[0];
-      const info: any = {
-        selector,
+      const selectorStr = typeof selector === 'string' ? selector : String(selector);
+      const info: Record<string, unknown> = {
+        selector: selectorStr,
         html: node.html,
         failureSummary: node.failureSummary,
         rootVars,
       };
 
-      let computed: any = null;
+      let computed: Record<string, unknown> | null = null;
       let debugAttr: string | null = null;
 
       // Try selector-based computation (safe evaluate arg passing)
       if (selector) {
         try {
-          computed = await computeViaSelector(selector);
+          computed = await computeViaSelector(selectorStr);
         } catch (err) {
           info.selectorError = String(err);
         }
@@ -297,15 +312,15 @@ async function logComputedStylesForViolations(page: any, results: any, testInfo:
       const outPath = testInfo.outputPath(`axe-violation-v${vIndex}-n${nIndex}.json`);
       try {
         await fs.promises.writeFile(outPath, JSON.stringify(info, null, 2));
-        console.log('Wrote computed style info to', outPath);
+        console.warn('Wrote computed style info to', outPath);
       } catch (err) {
         console.error('Failed to write computed style info', err);
       }
 
-      console.log(
+      console.warn(
         `Axe color-contrast failure: selector=${selector} summary=${node.failureSummary}`,
       );
-      if (info.computed) console.log('Computed:', info.computed);
+      if (info.computed) console.warn('Computed:', info.computed);
     }
   }
 }
@@ -318,7 +333,7 @@ test.describe('Accessibility Tests', () => {
     try {
       await page.waitForSelector('#main-content', { state: 'visible', timeout: 5000 });
       await page.waitForTimeout(100); // let CSS / font paint settle
-    } catch (e) {
+    } catch {
       // continue - tests will still run but diagnostics may show null computed styles
     }
 
@@ -339,7 +354,9 @@ test.describe('Accessibility Tests', () => {
     try {
       await page.waitForSelector('#main-content', { state: 'visible', timeout: 5000 });
       await page.waitForTimeout(100);
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
@@ -373,7 +390,9 @@ test.describe('Accessibility Tests', () => {
     try {
       await page.waitForSelector('#main-content', { state: 'visible', timeout: 5000 });
       await page.waitForTimeout(100);
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

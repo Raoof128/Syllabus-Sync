@@ -6,6 +6,7 @@ import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
 import { UNIT_COLORS } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
   DialogContent,
@@ -326,8 +327,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {t(c.translationKey as any)}
+                      {t(c.translationKey as TranslationKey)}
                     </div>
                   </SelectItem>
                 ))}
@@ -368,8 +368,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         <SelectContent>
                           {DAYS.map((day) => (
                             <SelectItem key={day} value={day}>
-                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                              {t(day.toLowerCase() as any)}
+                              {t(day.toLowerCase() as TranslationKey)}
                             </SelectItem>
                           ))}
                         </SelectContent>

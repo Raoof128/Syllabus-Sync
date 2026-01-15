@@ -51,7 +51,7 @@ describe('NextDeadline', () => {
         id: 'deadline-invalid',
         title: 'Broken Date',
         unitCode: 'COMP0000',
-        dueDate: 'invalid-date' as any,
+        dueDate: new Date('invalid-date'),
         priority: 'High',
         type: 'Assignment',
         completed: false,

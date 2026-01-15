@@ -438,13 +438,10 @@ export const validateRequest = <T>(
       const result = schema.safeParse(bodyResult.data);
 
       if (!result.success) {
-        return jsonError(
-          'Request validation failed',
-          400,
-          ERROR_CODES.VALIDATION_ERROR,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          { errors: (result.error as any).errors },
-        );
+        const zodError = result.error as { errors?: unknown[] };
+        return jsonError('Request validation failed', 400, ERROR_CODES.VALIDATION_ERROR, {
+          errors: zodError.errors ?? [],
+        });
       }
 
       return await handler(result.data!);

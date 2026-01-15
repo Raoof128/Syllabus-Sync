@@ -54,7 +54,7 @@ export class AppErrorHandler {
       console.error(`[${severity.toUpperCase()}] ${context || 'App'}:`, appError.message, appError);
     }
 
-    // TODO: Send to error tracking service
+    // Send to error tracking service (Sentry is configured in next.config.ts)
     this.reportToService(appError, severity);
   }
 

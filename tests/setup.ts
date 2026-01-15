@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 
 const originalEmitWarning = process.emitWarning;
-process.emitWarning = ((warning: any, ...args: any[]) => {
+process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
   const message = typeof warning === 'string' ? warning : warning?.message;
   if (message?.includes('--localstorage-file')) {
     return;
   }
-  return originalEmitWarning(warning, ...args);
+  return originalEmitWarning(warning as string, ...(args as [string]));
 }) as typeof process.emitWarning;
 
 if (!globalThis.localStorage || typeof globalThis.localStorage.setItem !== 'function') {

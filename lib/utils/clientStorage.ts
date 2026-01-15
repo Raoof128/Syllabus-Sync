@@ -12,6 +12,8 @@
 
 'use client';
 
+import { devLog } from './devLog';
+
 // ============================================================================
 // STORAGE KEYS
 // ============================================================================
@@ -73,11 +75,10 @@ export function clearAllClientStorage(preservePreferences = true): void {
     // Clear sessionStorage completely (always cleared on logout)
     sessionStorage.clear();
 
-    // eslint-disable-next-line no-console
-    console.log('[Security] Client storage cleared on logout');
+    devLog.auth.info('Client storage cleared on logout');
   } catch (error) {
     // Storage might be unavailable (private browsing, etc.)
-    console.warn('Failed to clear client storage:', error);
+    devLog.auth.warn('Failed to clear client storage', error);
   }
 }
 
@@ -93,7 +94,7 @@ export function clearStoreData(): void {
       localStorage.removeItem(key);
     }
   } catch (error) {
-    console.warn('Failed to clear store data:', error);
+    devLog.store.warn('Failed to clear store data', error);
   }
 }
 
