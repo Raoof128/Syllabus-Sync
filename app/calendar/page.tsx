@@ -4,31 +4,57 @@ import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import CalendarClient from './CalendarClient';
 
-// Generate dynamic event dates based on current date
+// Format a date in local time with timezone offset (e.g., 2026-01-17T10:00:00+11:00)
+function formatLocalISO(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const offsetMinutes = -date.getTimezoneOffset(); // invert to get sign-friendly offset
+  const offsetSign = offsetMinutes >= 0 ? '+' : '-';
+  const offsetAbs = Math.abs(offsetMinutes);
+  const offsetHours = String(Math.floor(offsetAbs / 60)).padStart(2, '0');
+  const offsetMins = String(offsetAbs % 60).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${offsetHours}:${offsetMins}`;
+}
+
+// Generate dynamic event dates based on current date (local time + correct offset)
 function getUpcomingEventDates() {
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  // Career fair: next Wednesday
-  const careerFairDate = new Date(year, month, now.getDate());
-  careerFairDate.setDate(careerFairDate.getDate() + ((3 - careerFairDate.getDay() + 7) % 7 || 7));
+  const getNextDay = (targetDay: number) => {
+    const d = new Date(base);
+    const delta = (targetDay - d.getDay() + 7) % 7 || 7;
+    d.setDate(d.getDate() + delta);
+    return d;
+  };
 
-  // Pizza Friday: next Friday
-  const pizzaDate = new Date(year, month, now.getDate());
-  pizzaDate.setDate(pizzaDate.getDate() + ((5 - pizzaDate.getDay() + 7) % 7 || 7));
+  const careerFairDay = getNextDay(3); // Wednesday
+  const pizzaDay = getNextDay(5); // Friday
 
-  const careerFairDateStr = careerFairDate.toISOString().split('T')[0];
-  const pizzaDateStr = pizzaDate.toISOString().split('T')[0];
+  const careerFairStart = new Date(careerFairDay);
+  careerFairStart.setHours(10, 0, 0, 0);
+  const careerFairEnd = new Date(careerFairDay);
+  careerFairEnd.setHours(16, 0, 0, 0);
+
+  const pizzaStart = new Date(pizzaDay);
+  pizzaStart.setHours(12, 0, 0, 0);
+  const pizzaEnd = new Date(pizzaDay);
+  pizzaEnd.setHours(14, 0, 0, 0);
 
   return {
     careerFair: {
-      start: `${careerFairDateStr}T10:00:00+11:00`,
-      end: `${careerFairDateStr}T16:00:00+11:00`,
+      start: formatLocalISO(careerFairStart),
+      end: formatLocalISO(careerFairEnd),
     },
     pizza: {
-      start: `${pizzaDateStr}T12:00:00+11:00`,
-      end: `${pizzaDateStr}T14:00:00+11:00`,
+      start: formatLocalISO(pizzaStart),
+      end: formatLocalISO(pizzaEnd),
     },
   };
 }

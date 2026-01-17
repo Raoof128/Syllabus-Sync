@@ -349,13 +349,22 @@ export default function CalendarClient() {
     return unit?.color || '#6366f1'; // fallback to indigo
   };
 
-  // Current time position for the red line indicator
-  const currentTimePosition = useMemo(() => {
+  const computeCurrentTimePosition = () => {
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
     if (hours < START_HOUR || hours >= 24) return null;
     return (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
+  };
+
+  // Current time position for the red line indicator (updates every minute)
+  const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(null);
+
+  useEffect(() => {
+    const update = () => setCurrentTimePosition(computeCurrentTimePosition());
+    update();
+    const intervalId = window.setInterval(update, 60_000);
+    return () => clearInterval(intervalId);
   }, []);
 
   // Navigation handlers
