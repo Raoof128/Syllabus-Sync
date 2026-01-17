@@ -7,6 +7,76 @@ import { LevelBadge } from './LevelBadge';
 import { XPProgressBar } from './XPProgressBar';
 import { StreakBadge } from './StreakIndicator';
 
+type LevelColors = {
+  pillGradientStyle: string;
+  ringClass: string;
+  ringColor: string;
+  trackBgStyle: string;
+  trackBorderStyle: string;
+  fillGradientStyle: string;
+};
+
+function getLevelColors(level: number): LevelColors {
+  if (level <= 5) {
+    return {
+      pillGradientStyle: 'linear-gradient(90deg, #f59e0b, #b45309)',
+      ringClass: 'ring-amber-500/60',
+      ringColor: '#f59e0b',
+      trackBgStyle: 'rgba(245, 158, 11, 0.18)',
+      trackBorderStyle: 'rgba(245, 158, 11, 0.35)',
+      fillGradientStyle: 'linear-gradient(90deg, #fff7ed, #fef3c7, #fff7ed)',
+    };
+  }
+  if (level <= 10) {
+    return {
+      pillGradientStyle: 'linear-gradient(90deg, #cbd5e1, #475569)',
+      ringClass: 'ring-slate-400/60',
+      ringColor: '#cbd5e1',
+      trackBgStyle: 'rgba(203, 213, 225, 0.18)',
+      trackBorderStyle: 'rgba(203, 213, 225, 0.35)',
+      fillGradientStyle: 'linear-gradient(90deg, #ffffff, #f8fafc, #ffffff)',
+    };
+  }
+  if (level <= 20) {
+    return {
+      pillGradientStyle: 'linear-gradient(90deg, #facc15, #d97706)',
+      ringClass: 'ring-amber-400/60',
+      ringColor: '#facc15',
+      trackBgStyle: 'rgba(250, 204, 21, 0.18)',
+      trackBorderStyle: 'rgba(250, 204, 21, 0.35)',
+      fillGradientStyle: 'linear-gradient(90deg, #fefce8, #fef3c7, #fefce8)',
+    };
+  }
+  if (level <= 35) {
+    return {
+      pillGradientStyle: 'linear-gradient(90deg, #22d3ee, #2563eb)',
+      ringClass: 'ring-cyan-400/60',
+      ringColor: '#22d3ee',
+      trackBgStyle: 'rgba(34, 211, 238, 0.16)',
+      trackBorderStyle: 'rgba(34, 211, 238, 0.3)',
+      fillGradientStyle: 'linear-gradient(90deg, #f8fdff, #ecfeff, #f8fdff)',
+    };
+  }
+  if (level <= 50) {
+    return {
+      pillGradientStyle: 'linear-gradient(90deg, #c084fc, #4f46e5)',
+      ringClass: 'ring-purple-400/60',
+      ringColor: '#c084fc',
+      trackBgStyle: 'rgba(192, 132, 252, 0.16)',
+      trackBorderStyle: 'rgba(192, 132, 252, 0.3)',
+      fillGradientStyle: 'linear-gradient(90deg, #fbf7ff, #f5f3ff, #fbf7ff)',
+    };
+  }
+  return {
+    pillGradientStyle: 'linear-gradient(90deg, #f43f5e, #b91c1c)',
+    ringClass: 'ring-rose-500/60',
+    ringColor: '#f43f5e',
+    trackBgStyle: 'rgba(244, 63, 94, 0.16)',
+    trackBorderStyle: 'rgba(244, 63, 94, 0.3)',
+    fillGradientStyle: 'linear-gradient(90deg, #fff5f7, #ffe4e6, #fff5f7)',
+  };
+}
+
 interface GamificationStatsProps {
   /** Display variant */
   variant?: 'compact' | 'full' | 'card';
@@ -30,7 +100,7 @@ export function GamificationStats({
   className,
 }: GamificationStatsProps) {
   const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
-  const { currentXP, level, xpToNext } = useXPProgress();
+  const { currentXP, level, xpToNext, progress } = useXPProgress();
   const { days } = useStreak();
 
   // Load profile on mount
@@ -52,9 +122,49 @@ export function GamificationStats({
   }
 
   if (variant === 'compact') {
+    const rawProgress = Math.min(100, Math.max(0, Math.round((progress ?? 0) * 100)));
+    // Ensure a visible sliver for low progress without exceeding 100%
+    const progressPercent = rawProgress <= 0 ? 0 : Math.min(100, Math.max(rawProgress, 18));
+    const levelAriaLabel = `Level ${level}, ${currentXP} XP, ${xpToNext} XP to next level`;
+    const levelColors = getLevelColors(level);
+
     return (
       <div className={cn('flex items-center gap-3', className)}>
-        <LevelBadge size="sm" />
+        <span
+          className={cn(
+            'relative inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-white shadow-md ring-2',
+            levelColors.ringClass,
+          )}
+          style={{
+            background: levelColors.pillGradientStyle,
+            boxShadow: `0 0 0 2px ${levelColors.ringColor}`,
+          }}
+          aria-label={levelAriaLabel}
+          data-testid="level-badge"
+        >
+          Level {level}
+          <span
+            className={cn(
+              'h-2 w-12 rounded-full overflow-hidden shadow-inner border',
+            )}
+            style={{
+              background: levelColors.trackBgStyle,
+              borderColor: levelColors.trackBorderStyle,
+            }}
+            aria-hidden="true"
+          >
+            <span
+              className={cn(
+                'block h-full transition-[width] duration-300 shadow-[0_0_10px_rgba(255,255,255,0.75)]',
+              )}
+              style={{
+                width: `${progressPercent}%`,
+                background: levelColors.fillGradientStyle,
+              }}
+              aria-hidden="true"
+            />
+          </span>
+        </span>
         {showStreak && days > 0 && <StreakBadge />}
         {isDemo && (
           <span className="text-xs text-mq-content-tertiary bg-mq-background-secondary px-1.5 py-0.5 rounded">

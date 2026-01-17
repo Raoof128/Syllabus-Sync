@@ -76,6 +76,50 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: UI Polish - Home, Settings, Calendar
+Summary:
+  - Gamification badge on the home welcome header now shows a single “Level N” pill (badge removed) for clarity.
+  - Removed the duplicate Account/Profile card from Settings since profile management lives in Manage Profiles.
+  - Highlighted “Last date to enrol” calendar key dates with priority styling (ringed red pill + icon, sorted to the top) so the warning is obvious.
+Files: components/gamification/GamificationStats.tsx; app/settings/page.tsx; app/calendar/CalendarClient.tsx.
+Verification: `npm run lint -- components/gamification/GamificationStats.tsx app/settings/page.tsx app/calendar/CalendarClient.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Tooling - Browser MCP Integration
+Summary:
+  - Added local Browser MCP server entry pointing to `browser_mcp_agent/mcp_server.py` for Playwright automation access in Codex CLI.
+  - Mirrored the entry in both workspace and team OpenCode configs for consistency.
+Files: opencode.jsonc; team-opencode-config/opencode.jsonc.
+Verification: Config edit only (no runtime check yet).
+Follow-ups: Install Python deps in `/Users/raoof.r12/Desktop/Raouf/Agents/MY_Agents/browser_mcp_agent` (`pip install -r requirements.txt` + `playwright install`) before first use if not already done.
+
+Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Gamification Compact Pill UX
+Summary:
+  - Added inline micro progress bar inside the Level pill, increased track size, minimum fill visibility, and enriched aria-label with XP context for screen readers.
+Files: components/gamification/GamificationStats.tsx.
+Verification: `npm run lint -- components/gamification/GamificationStats.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Gamification Pill Level Colors
+Summary:
+  - Level pill now picks gradient, ring, track, and fill colors per level tier (amber, silver, gold, cyan, purple, rose) to match badge tiers, with minimum visible progress fill and inline styles to ensure colors render.
+Files: components/gamification/GamificationStats.tsx.
+Verification: `npm run lint -- components/gamification/GamificationStats.tsx` (pass). Visual check via MCP browser on /home (`level-pill-2.png`).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Calendar HMR Stability
+Summary:
+  - Removed the unused `GraduationCap` icon import in `CalendarClient.tsx` to eliminate Turbopack “module factory not available” errors during dev HMR on the calendar page.
+  - Refactored highlight handling to derive from the URL param without state, preventing the `react-hooks/set-state-in-effect` lint violation.
+Files: app/calendar/CalendarClient.tsx.
+Verification: `npm run lint -- app/calendar/CalendarClient.tsx` (pass).
+Follow-ups: None.
+
 Raouf: 2026-01-15 (Australia/Sydney)
 Scope: CI/CD Stabilization & Coverage Optimization (v1.0.0-rc.8)
 Summary:

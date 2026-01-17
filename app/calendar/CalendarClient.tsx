@@ -12,7 +12,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  GraduationCap,
   PartyPopper,
   Trash2,
   AlertTriangle,
@@ -287,30 +286,30 @@ export default function CalendarClient() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
 
-  // Highlighted unit state (from URL query param)
-  const [highlightedUnitId, setHighlightedUnitId] = useState<string | null>(null);
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
 
-  // Handle highlighted unit from URL query parameter
+  // Highlighted unit derived from URL query parameter
+  const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
+
+  // Handle highlighted unit side effects (scroll + auto-clear)
   useEffect(() => {
-    const highlightUnit = searchParams.get('highlightUnit');
-    if (highlightUnit) {
-      setHighlightedUnitId(highlightUnit);
-      // Scroll to units section after a short delay to allow render
-      setTimeout(() => {
-        unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-      // Clear the highlight after 3 seconds
-      const timer = setTimeout(() => {
-        setHighlightedUnitId(null);
-        // Update URL to remove the query param without navigation
-        const url = new URL(window.location.href);
-        url.searchParams.delete('highlightUnit');
-        window.history.replaceState({}, '', url.toString());
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams]);
+    if (!highlightedUnitId) return;
+
+    const scrollTimer = window.setTimeout(() => {
+      unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightUnit');
+      window.history.replaceState({}, '', url.toString());
+    }, 3000);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [highlightedUnitId]);
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
@@ -531,9 +530,13 @@ export default function CalendarClient() {
                     aria-hidden="true"
                   />
                   {weekDays.map((day) => {
-                    const dayMQDates = getMQKeyDatesForDay(day).filter(
-                      (d) => d.category !== 'classes',
-                    );
+                    const dayMQDates = getMQKeyDatesForDay(day)
+                      .filter((d) => d.category !== 'classes')
+                      .sort((a, b) => {
+                        const isEnroll = (event: string) =>
+                          /last date to enrol/i.test(event) ? 0 : 1;
+                        return isEnroll(a.event) - isEnroll(b.event);
+                      });
                     const dayName = format(day, 'EEEE');
                     const dayDate = format(day, 'd');
                     const isTodayCell = isToday(day);
@@ -568,19 +571,25 @@ export default function CalendarClient() {
                         {dayMQDates.length > 0 && (
                           <div className="mt-1 flex flex-col gap-1">
                             {dayMQDates.slice(0, 2).map((mqDate) => {
+                              const isLastEnroll = /last date to enrol/i.test(mqDate.event);
                               const colors = MQ_DATE_COLORS[mqDate.category];
                               return (
                                 <div
                                   key={mqDate.id}
                                   className={cn(
                                     'text-[9px] px-1.5 py-0.5 rounded-md font-semibold line-clamp-2 break-words leading-tight shadow-sm border',
-                                    colors.bg,
-                                    colors.text,
-                                    colors.border,
+                                    isLastEnroll &&
+                                      'text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white',
+                                    !isLastEnroll && [colors.bg, colors.text, colors.border],
                                   )}
                                   title={`${mqDate.event} - ${mqDate.term}`}
                                 >
-                                  {mqDate.event}
+                                  <span className="flex items-center justify-center gap-1">
+                                    {isLastEnroll && (
+                                      <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                                    )}
+                                    {mqDate.event}
+                                  </span>
                                 </div>
                               );
                             })}

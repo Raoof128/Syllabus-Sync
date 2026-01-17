@@ -28,7 +28,6 @@ import {
   HelpSupport,
   SettingsSkeleton,
   GamificationSettings,
-  AccountSettings,
 } from './components';
 
 // Helper to get device label
@@ -98,9 +97,6 @@ function SettingsContent() {
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-        {/* Account Settings */}
-        <AccountSettings t={t} />
-
         {/* Notification Settings */}
         <NotificationSettings t={t} />
 

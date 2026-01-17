@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Calendar HMR Stability
+
+### Fixed
+- Removed unused `GraduationCap` icon import from `app/calendar/CalendarClient.tsx` to stop Turbopack dev HMR crashes complaining about missing lucide-react module factory.
+- Refactored the highlight-from-URL logic to avoid state updates inside effects, clearing the `react-hooks/set-state-in-effect` lint violation and keeping highlight auto-clear behavior.
+
+---
+
+Raouf: 2026-01-17 - UI Polish (Home, Settings, Calendar)
+
+### Fixed
+- Home hero gamification badge now shows a single “Level N” pill (badge removed) for clearer status.
+- Removed the redundant Account/Profile card from Settings (profile management stays in Manage Profiles).
+- “Last date to enrol” calendar key dates are now sorted to the top and emphasized with a ringed red pill + alert icon for visibility.
+
+### Verification
+- `npm run lint -- components/gamification/GamificationStats.tsx app/settings/page.tsx app/calendar/CalendarClient.tsx`
+
+---
+
+Raouf: 2026-01-17 - Tooling: Browser MCP Integration
+
+### Added
+- Configured a local Browser MCP server in both workspace and team OpenCode configs, pointing to `/Users/raoof.r12/Desktop/Raouf/Agents/MY_Agents/browser_mcp_agent/mcp_server.py` for Playwright-based browser automation.
+
+### Notes
+- Requires Python deps + Playwright install in that agent directory before first use.
+
+---
+
+Raouf: 2026-01-18 - Gamification Compact Pill UX
+
+### Fixed
+- Added an inline micro progress bar inside the Level pill (larger track, minimum visible fill) and improved accessibility with a detailed aria-label including XP context.
+
+### Verification
+- `npm run lint -- components/gamification/GamificationStats.tsx`
+
+---
+
+Raouf: 2026-01-18 - Gamification Pill Level Colors
+
+### Changed
+- Level pill now uses tier-based colors (amber, silver, gold, cyan, purple, rose) for pill, ring, track, and fill, matching level tiers, with a minimum visible progress fill and inline styles to guarantee color rendering.
+
+### Verification
+- `npm run lint -- components/gamification/GamificationStats.tsx`
+- Visual check via MCP browser on /home (`level-pill-2.png`, `level-pill-verify-2.png`)
+
+---
+
 Raouf: 2026-01-15 - v1.0.0-rc.8 - CI/CD Stabilization & Coverage Optimization
 
 ### Fixed
