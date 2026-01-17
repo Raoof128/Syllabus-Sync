@@ -1,10 +1,9 @@
+import dayjs from 'dayjs';
 import { Event } from '@/lib/types';
 
 // Helper to get dates relative to today
 const getDate = (daysFromNow: number): Date => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysFromNow);
-  return date;
+  return dayjs().add(daysFromNow, 'day').toDate();
 };
 
 // Helper to create an event with proper startAt/endAt from time string
@@ -20,11 +19,11 @@ const createEvent = (
   building: string,
   category: Event['category'],
 ): Event => {
-  const date = getDate(daysFromNow);
+  const date = dayjs(getDate(daysFromNow)).startOf('day');
 
   // Parse start time from time string (e.g., "10:00 AM - 4:00 PM")
   const timeMatch = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  let startAt = new Date(date);
+  let startAt = date;
 
   if (timeMatch) {
     let hours = parseInt(timeMatch[1], 10);
@@ -34,8 +33,7 @@ const createEvent = (
     if (meridiem === 'PM' && hours < 12) hours += 12;
     if (meridiem === 'AM' && hours === 12) hours = 0;
 
-    startAt = new Date(date);
-    startAt.setHours(hours, minutes, 0, 0);
+    startAt = date.hour(hours).minute(minutes).second(0).millisecond(0);
   }
 
   return {
@@ -44,10 +42,10 @@ const createEvent = (
     description,
     translationKey,
     descriptionKey,
-    startAt,
+    startAt: startAt.toDate(),
     endAt: undefined,
     allDay: false,
-    date: startAt, // Computed for backward compatibility
+    date: startAt.toDate(), // Computed for backward compatibility
     time,
     location,
     building,

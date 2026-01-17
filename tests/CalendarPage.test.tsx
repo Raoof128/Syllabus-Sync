@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import CalendarPage from '@/app/calendar/page';
+import translations from '@/locales/en/translations.json';
 
 const deadlinesState = {
   deadlines: [
@@ -78,7 +79,7 @@ describe('CalendarPage', () => {
     render(<CalendarPage />);
 
     // Check that the main calendar heading is present
-    expect(screen.getByRole('heading', { name: 'Calendar' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: translations.calendar })).toBeInTheDocument();
   });
 
   it('displays deadline information in the sidebar', async () => {
@@ -93,7 +94,9 @@ describe('CalendarPage', () => {
     render(<CalendarPage />);
 
     // Check for the Assignments section heading
-    const assignmentsHeading = screen.getByRole('heading', { name: /Assignments.*pending/i });
+    const assignmentsHeading = screen.getByRole('heading', {
+      name: new RegExp(`${translations.assignments}.*${translations.pending}`, 'i'),
+    });
     expect(assignmentsHeading).toBeInTheDocument();
   });
 
@@ -101,7 +104,7 @@ describe('CalendarPage', () => {
     render(<CalendarPage />);
 
     // Find the Today button which should be present
-    const todayButton = screen.getByRole('button', { name: 'Today' });
+    const todayButton = screen.getByRole('button', { name: translations.today });
     expect(todayButton).toBeInTheDocument();
 
     // Check that the button is focusable

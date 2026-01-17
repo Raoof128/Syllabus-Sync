@@ -77,6 +77,17 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Calendar i18n + dayjs alignment
+Summary:
+  - Replaced calendar hardcoded labels/ARIA/metadata with i18n keys and localized formatting.
+  - Migrated calendar date logic to dayjs and locale-aware formatting helpers.
+  - Aligned calendar type colors and status labels with MQ tokens and translation keys.
+  - Updated calendar tests to use translations and added dayjs dependency.
+Files: app/calendar/page.tsx; app/calendar/CalendarClient.tsx; data/sampleEvents.ts; tests/CalendarPage.test.tsx; locales/*/translations.json; package.json; package-lock.json.
+Verification: `npm run lint -- app/calendar/CalendarClient.tsx app/calendar/page.tsx data/sampleEvents.ts tests/CalendarPage.test.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: UI Polish - Home, Settings, Calendar
 Summary:
   - Gamification badge on the home welcome header now shows a single “Level N” pill (badge removed) for clarity.

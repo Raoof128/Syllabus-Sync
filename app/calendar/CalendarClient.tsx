@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import {
   CheckCircle2,
   Circle,
@@ -27,24 +29,16 @@ import { Deadline, Event, Unit } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { sampleEvents } from '@/data/sampleEvents';
 import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
-import {
-  format,
-  isSameDay,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  isToday,
-  addWeeks,
-  subWeeks,
-  getHours,
-  getMinutes,
-} from 'date-fns';
+import { formatLocalizedDate } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
+
+dayjs.extend(isoWeek);
 
 // Dynamically import forms
 const EventForm = dynamic(() => import('@/components/events/EventForm'), {
@@ -74,11 +68,11 @@ const START_HOUR = 6; // First visible hour
 
 // Type colors for the calendar
 const TYPE_COLORS = {
-  Assignment: { bg: 'bg-blue-500', border: 'border-blue-600', text: 'text-white' },
-  Exam: { bg: 'bg-red-500', border: 'border-red-600', text: 'text-white' },
-  Quiz: { bg: 'bg-amber-500', border: 'border-amber-600', text: 'text-white' },
-  Presentation: { bg: 'bg-purple-500', border: 'border-purple-600', text: 'text-white' },
-  Event: { bg: 'bg-green-500', border: 'border-green-600', text: 'text-white' },
+  Assignment: { bg: 'bg-mq-info', border: 'border-mq-info', text: 'text-white' },
+  Exam: { bg: 'bg-mq-error', border: 'border-mq-error', text: 'text-white' },
+  Event: { bg: 'bg-mq-success', border: 'border-mq-success', text: 'text-white' },
+  Presentation: { bg: 'bg-mq-purple', border: 'border-mq-purple', text: 'text-white' },
+  Quiz: { bg: 'bg-mq-warning', border: 'border-mq-warning', text: 'text-black' },
 };
 
 // Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" or "09:00 - 11:00" to start/end hours
@@ -260,7 +254,7 @@ export default function CalendarClient() {
   const removeUnit = useUnitsStore((state) => state.removeUnit);
 
   const hasHydrated = useHydration();
-  const { t } = useTranslation();
+  const { language, t } = useTranslation();
 
   // Dialog states
   const [deadlineDialogOpen, setDeadlineDialogOpen] = useState(false);
@@ -313,21 +307,22 @@ export default function CalendarClient() {
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
+    dayjs().startOf('isoWeek').toDate(),
   );
 
   // Get days of the current week
-  const weekDays = useMemo(() => {
-    const weekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
-    return eachDayOfInterval({ start: currentWeekStart, end: weekEnd });
-  }, [currentWeekStart]);
+  const weekDays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, index) => dayjs(currentWeekStart).add(index, 'day').toDate()),
+    [currentWeekStart],
+  );
 
   // Combine all events
   const allEvents = useMemo(() => [...sampleEvents, ...userEvents], [userEvents]);
 
   // Get unit schedules for a specific day
   const getUnitsForDay = (date: Date) => {
-    const dayName = format(date, 'EEEE'); // Monday, Tuesday, etc.
+    const dayName = dayjs(date).locale('en').format('dddd'); // Monday, Tuesday, etc.
     return units.flatMap((unit) =>
       unit.schedule.filter((s) => s.day === dayName).map((s) => ({ ...unit, schedule: s })),
     );
@@ -335,24 +330,65 @@ export default function CalendarClient() {
 
   // Get items for a specific day (filtering out "classes" category from MQ dates since we show units instead)
   const getItemsForDay = (date: Date) => {
-    const dayDeadlines = deadlines.filter((d) => isSameDay(new Date(d.dueDate), date));
-    const dayEvents = allEvents.filter((e) => isSameDay(new Date(e.date), date));
+    const dayDeadlines = deadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
+    const dayEvents = allEvents.filter((e) => dayjs(e.date).isSame(date, 'day'));
     const dayMQDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
     const dayUnits = getUnitsForDay(date);
     return { deadlines: dayDeadlines, events: dayEvents, mqDates: dayMQDates, units: dayUnits };
   };
 
+  const formatLocalized = (date: Date, options: Intl.DateTimeFormatOptions) =>
+    formatLocalizedDate(date, language, options);
+
+  const formatDayNumber = (date: Date) => formatLocalized(date, { day: 'numeric' });
+  const formatMonthYear = (date: Date) => formatLocalized(date, { month: 'long', year: 'numeric' });
+  const formatWeekdayLong = (date: Date) => formatLocalized(date, { weekday: 'long' });
+  const formatWeekdayShort = (date: Date) => formatLocalized(date, { weekday: 'short' });
+  const formatTimeShort = (date: Date) =>
+    formatLocalized(date, { hour: 'numeric', minute: '2-digit' });
+  const formatWeekdayMonthDayTime = (date: Date) =>
+    formatLocalized(date, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  const formatMonthDayTime = (date: Date) =>
+    formatLocalized(date, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+  const formatHourLabel = (hour: number) =>
+    formatLocalized(dayjs().hour(hour).minute(0).second(0).millisecond(0).toDate(), {
+      hour: 'numeric',
+    });
+
+  const formatScheduleTime = (time: string) => {
+    const [hourStr, minuteStr] = time.split(':');
+    const hour = Number(hourStr);
+    const minute = Number(minuteStr);
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return time;
+    return formatLocalized(dayjs().hour(hour).minute(minute).second(0).millisecond(0).toDate(), {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  const getEventTitle = (event: Event) =>
+    event.translationKey ? t(event.translationKey as TranslationKey) : event.title;
+
+  const getDeadlineTypeLabel = (type: Deadline['type']) => t(`type_${type}` as TranslationKey);
+
   // Get color for a deadline (custom color or unit color)
   const getDeadlineColor = (deadline: Deadline): string => {
     if (deadline.color) return deadline.color;
     const unit = units.find((u) => u.code === deadline.unitCode);
-    return unit?.color || '#6366f1'; // fallback to indigo
+    return unit?.color || 'var(--c-primary)';
   };
 
   const computeCurrentTimePosition = () => {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
+    const now = dayjs();
+    const hours = now.hour();
+    const minutes = now.minute();
     if (hours < START_HOUR || hours >= 24) return null;
     return (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
   };
@@ -368,9 +404,10 @@ export default function CalendarClient() {
   }, []);
 
   // Navigation handlers
-  const goToPreviousWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
-  const goToNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
-  const goToToday = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const goToPreviousWeek = () =>
+    setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
+  const goToNextWeek = () => setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
+  const goToToday = () => setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
 
   // Keyboard navigation for weeks
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -503,19 +540,24 @@ export default function CalendarClient() {
                   variant="outline"
                   size="sm"
                   onClick={goToPreviousWeek}
-                  aria-label="Previous week"
+                  aria-label={t('calendarPreviousWeek')}
                 >
                   <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
                 <Button variant="outline" size="sm" onClick={goToToday}>
                   {t('today')}
                 </Button>
-                <Button variant="outline" size="sm" onClick={goToNextWeek} aria-label="Next week">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToNextWeek}
+                  aria-label={t('calendarNextWeek')}
+                >
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
               <h2 className="text-lg font-semibold text-mq-content">
-                {format(currentWeekStart, 'MMMM yyyy')}
+                {formatMonthYear(currentWeekStart)}
               </h2>
               <div className="w-24" /> {/* Spacer for balance */}
             </div>
@@ -525,8 +567,8 @@ export default function CalendarClient() {
               className="overflow-auto"
               style={{ maxHeight: '700px' }}
               role="grid"
-              aria-label="Weekly calendar"
-              aria-roledescription="Interactive weekly calendar showing units, deadlines, and events from 6 AM to 11 PM. Use arrow keys to navigate weeks. Tab through calendar items to interact."
+              aria-label={t('calendarWeeklyGridLabel')}
+              aria-roledescription={t('calendarWeeklyGridDescription')}
             >
               <div className="min-w-[800px]">
                 {/* Day Headers - Sticky with MQ Key Dates */}
@@ -546,9 +588,9 @@ export default function CalendarClient() {
                           /last date to enrol/i.test(event) ? 0 : 1;
                         return isEnroll(a.event) - isEnroll(b.event);
                       });
-                    const dayName = format(day, 'EEEE');
-                    const dayDate = format(day, 'd');
-                    const isTodayCell = isToday(day);
+                    const dayName = formatWeekdayLong(day);
+                    const dayDate = formatDayNumber(day);
+                    const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
                     return (
                       <div
                         key={day.toISOString()}
@@ -557,24 +599,32 @@ export default function CalendarClient() {
                           isTodayCell && 'bg-mq-primary/5',
                         )}
                         role="columnheader"
-                        aria-label={`${dayName}, ${dayDate}${isTodayCell ? ', Today' : ''}`}
+                        aria-label={
+                          isTodayCell
+                            ? t('calendarDayAriaLabelToday', {
+                                dayDate,
+                                dayName,
+                                todayLabel: t('today'),
+                              })
+                            : t('calendarDayAriaLabel', { dayDate, dayName })
+                        }
                       >
                         <div
                           className="text-xs text-mq-content-secondary uppercase font-medium"
                           aria-hidden="true"
                         >
-                          {format(day, 'EEE')}
+                          {formatWeekdayShort(day)}
                         </div>
                         <div
                           className={cn(
                             'text-xl font-semibold mt-1 inline-flex items-center justify-center',
                             isTodayCell
-                              ? 'w-9 h-9 rounded-full bg-[#7A0A21] text-white'
+                              ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
                               : 'text-mq-content',
                           )}
                           aria-hidden="true"
                         >
-                          {format(day, 'd')}
+                          {formatDayNumber(day)}
                         </div>
                         {/* MQ Key Dates badges in header */}
                         {dayMQDates.length > 0 && (
@@ -604,7 +654,7 @@ export default function CalendarClient() {
                             })}
                             {dayMQDates.length > 2 && (
                               <div className="text-[9px] text-mq-content-secondary font-medium">
-                                +{dayMQDates.length - 2} more
+                                {t('calendarMoreKeyDates', { count: dayMQDates.length - 2 })}
                               </div>
                             )}
                           </div>
@@ -633,9 +683,9 @@ export default function CalendarClient() {
                       <div
                         className="text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border"
                         role="rowheader"
-                        aria-label={`${format(new Date().setHours(hour, 0), 'h a')}`}
+                        aria-label={formatHourLabel(hour)}
                       >
-                        {format(new Date().setHours(hour, 0), 'h a')}
+                        {formatHourLabel(hour)}
                       </div>
                       {/* Hour Lines for each day */}
                       {weekDays.map((day) => (
@@ -643,7 +693,7 @@ export default function CalendarClient() {
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
                             'border-t border-mq-border/50 border-r border-mq-border/30 last:border-r-0',
-                            isToday(day) && 'bg-mq-primary/[0.02]',
+                            dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.02]',
                           )}
                           style={{ height: HOUR_HEIGHT }}
                           role="gridcell"
@@ -699,9 +749,9 @@ export default function CalendarClient() {
 
                       // Add deadlines
                       dayDeadlines.forEach((deadline) => {
-                        const dueDate = new Date(deadline.dueDate);
-                        const hours = getHours(dueDate);
-                        const minutes = getMinutes(dueDate);
+                        const dueDayjs = dayjs(deadline.dueDate);
+                        const hours = dueDayjs.hour();
+                        const minutes = dueDayjs.minute();
                         if (hours >= START_HOUR) {
                           calendarItems.push({
                             id: `deadline-${deadline.id}`,
@@ -765,13 +815,12 @@ export default function CalendarClient() {
                             const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
                             const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
 
-                            // Format time for display (e.g., "9:00 AM")
-                            const formatTime = (time: string) => {
-                              const [h, m] = time.split(':').map(Number);
-                              const hour = h % 12 || 12;
-                              const period = h >= 12 ? 'PM' : 'AM';
-                              return `${hour}:${m.toString().padStart(2, '0')} ${period}`;
-                            };
+                            const locationSuffix = unitData.location?.building
+                              ? t('calendarUnitLocationSuffix', {
+                                  building: unitData.location.building,
+                                  room: unitData.location.room,
+                                })
+                              : '';
 
                             return (
                               <button
@@ -786,8 +835,14 @@ export default function CalendarClient() {
                                   backgroundColor: `${unitData.color}20`,
                                   borderLeftColor: unitData.color,
                                 }}
-                                aria-label={`${unitData.code} class, ${formatTime(schedule.startTime)} to ${formatTime(schedule.endTime)}${unitData.location?.building ? ` in ${unitData.location.building} ${unitData.location.room}` : ''}. Press Enter or Space to view details.`}
-                                title={`Click to view ${unitData.code} details`}
+                                aria-label={t('calendarUnitAriaLabel', {
+                                  endTime: formatScheduleTime(schedule.endTime),
+                                  instruction: t('calendarPressEnterOrSpaceToViewDetails'),
+                                  locationSuffix,
+                                  startTime: formatScheduleTime(schedule.startTime),
+                                  unitCode: unitData.code,
+                                })}
+                                title={t('calendarUnitTitle', { unitCode: unitData.code })}
                                 onClick={() => {
                                   const originalUnit = units.find((u) => u.id === unitData.id);
                                   if (originalUnit) openUnitDetail(originalUnit);
@@ -801,8 +856,8 @@ export default function CalendarClient() {
                                     {unitData.code}
                                   </span>
                                   <span className="text-[10px] opacity-80 block">
-                                    {formatTime(schedule.startTime)} -{' '}
-                                    {formatTime(schedule.endTime)}
+                                    {formatScheduleTime(schedule.startTime)} -{' '}
+                                    {formatScheduleTime(schedule.endTime)}
                                   </span>
                                   {posInfo.height > 50 && (
                                     <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
@@ -816,10 +871,12 @@ export default function CalendarClient() {
 
                           {/* Deadlines - filled time block with unit color */}
                           {dayDeadlines.map((deadline, idx) => {
-                            const dueDate = new Date(deadline.dueDate);
-                            const hours = getHours(dueDate);
-                            const minutes = getMinutes(dueDate);
+                            const dueDayjs = dayjs(deadline.dueDate);
+                            const dueDate = dueDayjs.toDate();
+                            const hours = dueDayjs.hour();
+                            const minutes = dueDayjs.minute();
                             const deadlineColor = getDeadlineColor(deadline);
+                            const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
 
                             // Default 1 hour duration from due time
                             const posInfo = getTimePositionAndHeight(
@@ -847,8 +904,17 @@ export default function CalendarClient() {
                                     top: 4 + idx * 24,
                                     backgroundColor: deadlineColor,
                                   }}
-                                  aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}. Press Enter to edit.`}
-                                  title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
+                                  aria-label={t('calendarDeadlineAriaLabel', {
+                                    displayName,
+                                    instruction: t('calendarPressEnterToEdit'),
+                                    time: formatTimeShort(dueDate),
+                                    type: deadlineTypeLabel,
+                                  })}
+                                  title={t('calendarDeadlineTitle', {
+                                    displayName,
+                                    time: formatTimeShort(dueDate),
+                                    type: deadlineTypeLabel,
+                                  })}
                                 >
                                   <span className="block truncate">{displayName}</span>
                                 </button>
@@ -881,14 +947,26 @@ export default function CalendarClient() {
                                   backgroundColor: `${deadlineColor}dd`,
                                   borderLeftColor: deadlineColor,
                                 }}
-                                aria-label={`${deadline.type} ${displayName} due ${format(dueDate, 'h:mm a')}. Press Enter to edit. ${deadline.completed ? 'Completed' : 'Not completed'}.`}
-                                title={`${deadline.type}: ${displayName} @ ${format(dueDate, 'h:mm a')}`}
+                                aria-label={t('calendarDeadlineAriaLabelStatus', {
+                                  displayName,
+                                  instruction: t('calendarPressEnterToEdit'),
+                                  status: deadline.completed
+                                    ? t('calendarCompletedStatus')
+                                    : t('calendarNotCompletedStatus'),
+                                  time: formatTimeShort(dueDate),
+                                  type: deadlineTypeLabel,
+                                })}
+                                title={t('calendarDeadlineTitle', {
+                                  displayName,
+                                  time: formatTimeShort(dueDate),
+                                  type: deadlineTypeLabel,
+                                })}
                               >
                                 <span className="block line-clamp-2 break-words leading-tight">
                                   {displayName}
                                 </span>
                                 <span className="text-[10px] opacity-80">
-                                  {format(dueDate, 'h:mm a')}
+                                  {formatTimeShort(dueDate)}
                                 </span>
                               </button>
                             );
@@ -898,6 +976,7 @@ export default function CalendarClient() {
                           {dayEvents.map((event, idx) => {
                             const timeInfo = parseTimeRange(event.time);
                             const colors = TYPE_COLORS.Event;
+                            const eventTitle = getEventTitle(event);
 
                             if (!timeInfo) {
                               // Show at top if no valid time
@@ -913,10 +992,17 @@ export default function CalendarClient() {
                                     colors.text,
                                   )}
                                   style={{ top: offsetTop }}
-                                  aria-label={`Event ${event.title} at ${event.time}. Press Enter to view details.`}
-                                  title={`Event: ${event.title} @ ${event.time}`}
+                                  aria-label={t('calendarEventAriaLabel', {
+                                    instruction: t('calendarPressEnterToViewDetails'),
+                                    time: event.time,
+                                    title: eventTitle,
+                                  })}
+                                  title={t('calendarEventTitle', {
+                                    time: event.time,
+                                    title: eventTitle,
+                                  })}
                                 >
-                                  <span className="block truncate">{event.title}</span>
+                                  <span className="block truncate">{eventTitle}</span>
                                 </button>
                               );
                             }
@@ -941,10 +1027,16 @@ export default function CalendarClient() {
                                     colors.text,
                                   )}
                                   style={{ top: offsetTop }}
-                                  aria-label={`Event ${event.title} at ${event.time}`}
-                                  title={`Event: ${event.title} @ ${event.time}`}
+                                  aria-label={t('calendarEventAriaLabelShort', {
+                                    time: event.time,
+                                    title: eventTitle,
+                                  })}
+                                  title={t('calendarEventTitle', {
+                                    time: event.time,
+                                    title: eventTitle,
+                                  })}
                                 >
-                                  {event.title}
+                                  {eventTitle}
                                 </button>
                               );
                             }
@@ -966,8 +1058,8 @@ export default function CalendarClient() {
                                 className={cn(
                                   'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                   colors.bg,
+                                  colors.border,
                                   colors.text,
-                                  'border-green-700',
                                 )}
                                 style={{
                                   top: posInfo.top,
@@ -975,11 +1067,18 @@ export default function CalendarClient() {
                                   left: evtLeft,
                                   width: evtWidth,
                                 }}
-                                aria-label={`Event ${event.title} at ${event.time}. Press Enter to view details.`}
-                                title={`Event: ${event.title} @ ${event.time}`}
+                                aria-label={t('calendarEventAriaLabel', {
+                                  instruction: t('calendarPressEnterToViewDetails'),
+                                  time: event.time,
+                                  title: eventTitle,
+                                })}
+                                title={t('calendarEventTitle', {
+                                  time: event.time,
+                                  title: eventTitle,
+                                })}
                               >
                                 <span className="block line-clamp-2 break-words leading-tight">
-                                  {event.title}
+                                  {eventTitle}
                                 </span>
                                 <span className="text-[8px] opacity-80">{event.time}</span>
                               </button>
@@ -1007,7 +1106,7 @@ export default function CalendarClient() {
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <FileText className="h-5 w-5 text-blue-500" />
-                      {t('assignments' as 'title')}
+                      {t('assignments')}
                     </span>
                     <div className="flex items-center gap-2">
                       <Badge variant="neutral">
@@ -1017,7 +1116,7 @@ export default function CalendarClient() {
                         size="sm"
                         variant="outline"
                         onClick={openAddAssignment}
-                        aria-label={t('addAssignment' as 'title') || 'Add Assignment'}
+                        aria-label={t('addAssignment')}
                       >
                         <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
@@ -1028,19 +1127,15 @@ export default function CalendarClient() {
                   {assignments.length === 0 ? (
                     <div className="text-center py-8">
                       <FileText className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">
-                        {t('noAssignmentsYet' as 'title')}
-                      </p>
+                      <p className="text-mq-content-secondary text-sm">{t('noAssignmentsYet')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                       {assignments
-                        .sort(
-                          (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
-                        )
+                        .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
                         .map((assignment) => {
-                          const due = new Date(assignment.dueDate);
-                          const isOverdue = !assignment.completed && due < new Date();
+                          const due = dayjs(assignment.dueDate);
+                          const isOverdue = !assignment.completed && due.isBefore(dayjs());
                           return (
                             <div
                               key={assignment.id}
@@ -1058,7 +1153,9 @@ export default function CalendarClient() {
                                   type="button"
                                   onClick={() => toggleComplete(assignment.id)}
                                   aria-label={
-                                    assignment.completed ? 'Mark as incomplete' : 'Mark as complete'
+                                    assignment.completed
+                                      ? t('markIncomplete')
+                                      : t('markAsCompleted')
                                   }
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
                                 >
@@ -1084,7 +1181,7 @@ export default function CalendarClient() {
                                     {assignment.title}
                                   </h4>
                                   <p className="text-xs text-mq-content-secondary">
-                                    {assignment.unitCode} • {format(due, 'MMM d, h:mm a')}
+                                    {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
                                   </p>
                                 </div>
                               </div>
@@ -1093,13 +1190,13 @@ export default function CalendarClient() {
                                   className={PRIORITY_COLORS[assignment.priority]}
                                   variant="neutral"
                                 >
-                                  {assignment.priority}
+                                  {t(`priority_${assignment.priority}` as TranslationKey)}
                                 </Badge>
                                 <button
                                   type="button"
                                   onClick={() => openEditAssignment(assignment)}
                                   className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
-                                  aria-label={`Edit ${assignment.title}`}
+                                  aria-label={t('calendarEditItem', { title: assignment.title })}
                                 >
                                   <Edit2
                                     className="h-4 w-4 text-mq-content-secondary"
@@ -1127,17 +1224,17 @@ export default function CalendarClient() {
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-red-500" />
-                      {t('exams' as 'title')}
+                      {t('exams')}
                     </span>
                     <div className="flex items-center gap-2">
                       <Badge variant="neutral">
-                        {exams.filter((e) => !e.completed).length} {t('upcoming' as 'title')}
+                        {exams.filter((e) => !e.completed).length} {t('upcoming')}
                       </Badge>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={openAddExam}
-                        aria-label={t('addDeadline')}
+                        aria-label={t('addExam')}
                       >
                         <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
@@ -1148,19 +1245,16 @@ export default function CalendarClient() {
                   {exams.length === 0 ? (
                     <div className="text-center py-8">
                       <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">
-                        {t('noExamsYet' as 'title')}
-                      </p>
+                      <p className="text-mq-content-secondary text-sm">{t('noExamsYet')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                       {exams
-                        .sort(
-                          (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
-                        )
+                        .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
                         .map((exam) => {
-                          const due = new Date(exam.dueDate);
-                          const isOverdue = !exam.completed && due < new Date();
+                          const due = dayjs(exam.dueDate);
+                          const isOverdue = !exam.completed && due.isBefore(dayjs());
+                          const examTypeLabel = getDeadlineTypeLabel(exam.type);
                           return (
                             <div
                               key={exam.id}
@@ -1178,7 +1272,7 @@ export default function CalendarClient() {
                                   type="button"
                                   onClick={() => toggleComplete(exam.id)}
                                   aria-label={
-                                    exam.completed ? 'Mark as incomplete' : 'Mark as complete'
+                                    exam.completed ? t('markIncomplete') : t('markAsCompleted')
                                   }
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
                                 >
@@ -1204,19 +1298,20 @@ export default function CalendarClient() {
                                     {exam.title}
                                   </h4>
                                   <p className="text-xs text-mq-content-secondary">
-                                    {exam.unitCode} • {exam.type} • {format(due, 'MMM d, h:mm a')}
+                                    {exam.unitCode} • {examTypeLabel} •{' '}
+                                    {formatMonthDayTime(due.toDate())}
                                   </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge className={PRIORITY_COLORS[exam.priority]} variant="neutral">
-                                  {exam.priority}
+                                  {t(`priority_${exam.priority}` as TranslationKey)}
                                 </Badge>
                                 <button
                                   type="button"
                                   onClick={() => openEditExam(exam)}
                                   className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
-                                  aria-label={`Edit ${exam.title}`}
+                                  aria-label={t('calendarEditItem', { title: exam.title })}
                                 >
                                   <Edit2
                                     className="h-4 w-4 text-mq-content-secondary"
@@ -1298,8 +1393,8 @@ export default function CalendarClient() {
                               type="button"
                               onClick={() => openEditUnit(unit)}
                               className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                              title={`Edit ${unit.code}`}
-                              aria-label={`Edit ${unit.code}`}
+                              title={t('calendarEditItem', { title: unit.code })}
+                              aria-label={t('calendarEditItem', { title: unit.code })}
                             >
                               <Edit2
                                 className="h-4 w-4 text-mq-content-secondary"
@@ -1310,8 +1405,8 @@ export default function CalendarClient() {
                               type="button"
                               onClick={() => handleDeleteUnit(unit)}
                               className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                              title={`Delete ${unit.code}`}
-                              aria-label={`Delete ${unit.code}`}
+                              title={t('calendarDeleteItem', { title: unit.code })}
+                              aria-label={t('calendarDeleteItem', { title: unit.code })}
                             >
                               <Trash2
                                 className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
@@ -1338,11 +1433,11 @@ export default function CalendarClient() {
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <PartyPopper className="h-5 w-5 text-green-500" />
-                      {t('events' as 'title')}
+                      {t('events')}
                     </span>
                     <div className="flex items-center gap-2">
                       <Badge variant="neutral">
-                        {allEvents.length} {t('total' as 'title')}
+                        {allEvents.length} {t('total')}
                       </Badge>
                       <Button
                         size="sm"
@@ -1362,29 +1457,30 @@ export default function CalendarClient() {
                   {allEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <PartyPopper className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                      <p className="text-mq-content-secondary text-sm">
-                        {t('noEventsYet' as 'title')}
-                      </p>
+                      <p className="text-mq-content-secondary text-sm">{t('noEventsYet')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                      {allEvents.slice(0, 5).map((event) => (
-                        <button
-                          key={event.id}
-                          onClick={() => handleEventClick(event)}
-                          className="w-full flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-green-300 transition-all text-left"
-                        >
-                          <div className="w-3 h-3 rounded-full flex-shrink-0 bg-green-500" />
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm line-clamp-2 break-words">
-                              {event.title}
-                            </h4>
-                            <p className="text-xs text-mq-content-secondary line-clamp-2 break-words">
-                              {event.time} • {event.location}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                      {allEvents.slice(0, 5).map((event) => {
+                        const eventTitle = getEventTitle(event);
+                        return (
+                          <button
+                            key={event.id}
+                            onClick={() => handleEventClick(event)}
+                            className="w-full flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-mq-success/40 transition-all text-left"
+                          >
+                            <div className="w-3 h-3 rounded-full flex-shrink-0 bg-mq-success" />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm line-clamp-2 break-words">
+                                {eventTitle}
+                              </h4>
+                              <p className="text-xs text-mq-content-secondary line-clamp-2 break-words">
+                                {event.time} • {event.location}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
@@ -1411,7 +1507,12 @@ export default function CalendarClient() {
                         {deadlines.filter((d) => !d.completed).length} {t('pending')}
                       </Badge>
                     )}
-                    <Button size="sm" variant="outline" onClick={openAddDeadline}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={openAddDeadline}
+                      aria-label={t('addDeadline')}
+                    >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1430,13 +1531,14 @@ export default function CalendarClient() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[...deadlines]
-                      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                      .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
                       .filter((d) => !d.completed)
                       .slice(0, 9)
                       .map((deadline) => {
-                        const due = new Date(deadline.dueDate);
-                        const isOverdue = due < new Date();
+                        const due = dayjs(deadline.dueDate);
+                        const isOverdue = due.isBefore(dayjs());
                         const colors = TYPE_COLORS[deadline.type];
+                        const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
 
                         return (
                           <div
@@ -1453,7 +1555,7 @@ export default function CalendarClient() {
                                   {deadline.title}
                                 </h4>
                                 <p className="text-xs text-mq-content-secondary mt-1">
-                                  {deadline.unitCode} • {deadline.type}
+                                  {deadline.unitCode} • {deadlineTypeLabel}
                                 </p>
                                 <p
                                   className={cn(
@@ -1461,14 +1563,14 @@ export default function CalendarClient() {
                                     isOverdue ? 'text-red-600' : 'text-mq-content-secondary',
                                   )}
                                 >
-                                  {format(due, 'EEE, MMM d @ h:mm a')}
+                                  {formatWeekdayMonthDayTime(due.toDate())}
                                 </p>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => openEditDeadline(deadline)}
                                 className="p-1 hover:bg-mq-hover-background rounded ml-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                aria-label={`Edit ${deadline.title}`}
+                                aria-label={t('calendarEditItem', { title: deadline.title })}
                               >
                                 <Edit2
                                   className="h-4 w-4 text-mq-content-secondary"

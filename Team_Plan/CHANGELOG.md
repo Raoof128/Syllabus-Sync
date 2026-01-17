@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Calendar i18n + dayjs alignment
+
+### Fixed
+- Replaced calendar hardcoded labels, ARIA strings, and metadata with i18n keys and localized formatting.
+- Migrated calendar date logic to dayjs and locale-aware formatting helpers for UI output.
+- Aligned calendar type colors and status labels with MQ tokens and translation keys.
+- Updated calendar tests to use translations and added dayjs dependency.
+
+### Verification
+- `npm run lint -- app/calendar/CalendarClient.tsx app/calendar/page.tsx data/sampleEvents.ts tests/CalendarPage.test.tsx`
+
+---
+
 Raouf: 2026-01-17 - Calendar HMR Stability
 
 ### Fixed

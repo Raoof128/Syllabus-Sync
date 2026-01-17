@@ -144,9 +144,7 @@ export function GamificationStats({
         >
           Level {level}
           <span
-            className={cn(
-              'h-2 w-12 rounded-full overflow-hidden shadow-inner border',
-            )}
+            className={cn('h-2 w-12 rounded-full overflow-hidden shadow-inner border')}
             style={{
               background: levelColors.trackBgStyle,
               borderColor: levelColors.trackBorderStyle,

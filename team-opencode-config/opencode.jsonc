@@ -59,7 +59,10 @@
     // Browser MCP - Playwright-based browser automation agent
     "browser-mcp": {
       "type": "local",
-      "command": ["python3", "/Users/raoof.r12/Desktop/Raouf/Agents/MY_Agents/browser_mcp_agent/mcp_server.py"],
+      "command": [
+        "python3",
+        "/Users/raoof.r12/Desktop/Raouf/Agents/MY_Agents/browser_mcp_agent/mcp_server.py",
+      ],
       "enabled": true,
     },
 
