@@ -49,7 +49,7 @@ function getInitialValues(editEvent?: Event | null) {
       location: editEvent.location,
       building: editEvent.building || '',
       category: editEvent.category,
-      color: editEvent.color || '',
+      color: editEvent.color || UNIT_COLORS[0].value,
     };
   }
   return {
@@ -60,7 +60,7 @@ function getInitialValues(editEvent?: Event | null) {
     location: '',
     building: '',
     category: 'Academic' as Event['category'],
-    color: '',
+    color: UNIT_COLORS[0].value,
   };
 }
 
@@ -160,7 +160,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       location: location.trim(),
       building: building.trim() || undefined,
       category,
-      color: color || undefined, // Only include if user selected a color
+      color,
     };
 
     if (editEvent) {
@@ -294,35 +294,22 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </Select>
           </div>
 
-          {/* Color (Optional) */}
+          {/* Color Selection */}
           <div className="space-y-2">
-            <Label htmlFor="event-color">
-              {t('color' as TranslationKey) || 'Color'} (
-              {t('optional' as TranslationKey) || 'Optional'})
-            </Label>
-            <Select value={color || 'none'} onValueChange={(v) => setColor(v === 'none' ? '' : v)}>
+            <Label htmlFor="event-color">{t('color' as TranslationKey) || 'Color'}</Label>
+            <Select value={color} onValueChange={setColor}>
               <SelectTrigger id="event-color">
                 <div className="flex items-center gap-2">
-                  {color ? (
-                    <div
-                      className="w-4 h-4 rounded-full border border-mq-border"
-                      style={{ backgroundColor: color }}
-                    />
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border border-dashed border-mq-border" />
-                  )}
+                  <div
+                    className="w-4 h-4 rounded-full border border-mq-border"
+                    style={{ backgroundColor: color }}
+                  />
                   <SelectValue
-                    placeholder={t('selectColor' as TranslationKey) || 'Select a color (optional)'}
+                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
                   />
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full border border-dashed border-mq-border" />
-                    <span>{t('noColor' as TranslationKey) || 'No color'}</span>
-                  </div>
-                </SelectItem>
                 {UNIT_COLORS.map((colorOption) => (
                   <SelectItem key={colorOption.value} value={colorOption.value}>
                     <div className="flex items-center gap-2">

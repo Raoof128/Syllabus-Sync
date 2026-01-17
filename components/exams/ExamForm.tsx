@@ -46,8 +46,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
-  const [color, setColor] = useState<string>('');
-  const [useUnitColor, setUseUnitColor] = useState(true);
+  const [color, setColor] = useState<string>(UNIT_COLORS[0].value);
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('09:00'); // Exams typically start in the morning
   const [priority, setPriority] = useState<Deadline['priority']>('High'); // Exams are usually high priority
@@ -56,18 +55,10 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Get selected unit for color inheritance
+  // Get selected unit for reference
   const selectedUnit = useMemo(() => {
     return units.find((u) => u.code === unitCode);
   }, [units, unitCode]);
-
-  // Effective color (either unit color or custom override)
-  const effectiveColor = useMemo(() => {
-    if (useUnitColor && selectedUnit) {
-      return selectedUnit.color;
-    }
-    return color || selectedUnit?.color || UNIT_COLORS[0].value;
-  }, [useUnitColor, selectedUnit, color]);
 
   // Save operation with retry logic
   const performSave = useCallback(
@@ -90,8 +81,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const resetForm = () => {
     setTitle('');
     setUnitCode('');
-    setColor('');
-    setUseUnitColor(true);
+    setColor(UNIT_COLORS[0].value);
     setDueDate('');
     setDueTime('09:00');
     setPriority('High');
@@ -103,13 +93,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
     if (editExam) {
       setTitle(editExam.title);
       setUnitCode(editExam.unitCode);
-      if (editExam.color) {
-        setColor(editExam.color);
-        setUseUnitColor(false);
-      } else {
-        setColor('');
-        setUseUnitColor(true);
-      }
+      setColor(editExam.color || UNIT_COLORS[0].value);
       const parsedDate = new Date(editExam.dueDate);
       if (isValid(parsedDate)) {
         setDueDate(format(parsedDate, 'yyyy-MM-dd'));
@@ -162,7 +146,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       title: title.trim(),
       unitCode,
       unitId: selectedUnit?.id,
-      color: useUnitColor ? undefined : effectiveColor,
+      color,
       dueDate: dueDateObj,
       priority,
       type: 'Exam', // Fixed type for exams
@@ -322,58 +306,34 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </div>
 
             {/* Color Selection */}
-            <div className="space-y-3">
-              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
-
-              <div className="flex items-center gap-2">
-                <input
-                  id="exam-useUnitColor"
-                  type="checkbox"
-                  checked={useUnitColor}
-                  onChange={(e) => setUseUnitColor(e.target.checked)}
-                  disabled={!selectedUnit}
-                  className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                />
-                <Label htmlFor="exam-useUnitColor" className="text-sm font-normal">
-                  {t('useUnitColor' as TranslationKey) || 'Use unit color'}
-                </Label>
-                {selectedUnit && (
-                  <div
-                    className="w-4 h-4 rounded-full border border-mq-border ml-1"
-                    style={{ backgroundColor: selectedUnit.color }}
-                    title={selectedUnit.code}
-                  />
-                )}
-              </div>
-
-              {!useUnitColor && (
-                <Select value={color || UNIT_COLORS[0].value} onValueChange={setColor}>
-                  <SelectTrigger>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full border border-mq-border"
-                        style={{ backgroundColor: color || UNIT_COLORS[0].value }}
-                      />
-                      <SelectValue
-                        placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                      />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNIT_COLORS.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full border border-mq-border"
-                            style={{ backgroundColor: c.value }}
-                          />
-                          <span>{t(c.translationKey as TranslationKey)}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+            <div className="space-y-2">
+              <Label htmlFor="exam-color">{t('color' as TranslationKey) || 'Color'}</Label>
+              <Select value={color} onValueChange={setColor}>
+                <SelectTrigger id="exam-color">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-full border border-mq-border"
+                      style={{ backgroundColor: color }}
+                    />
+                    <SelectValue
+                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                    />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {UNIT_COLORS.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded-full border border-mq-border"
+                          style={{ backgroundColor: c.value }}
+                        />
+                        <span>{t(c.translationKey as TranslationKey)}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Completed */}
