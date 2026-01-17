@@ -299,15 +299,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             <Label htmlFor="event-color">{t('color' as TranslationKey) || 'Color'}</Label>
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger id="event-color">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-4 h-4 rounded-full border border-mq-border"
-                    style={{ backgroundColor: color }}
-                  />
-                  <SelectValue
-                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                  />
-                </div>
+                <SelectValue
+                  placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                />
               </SelectTrigger>
               <SelectContent>
                 {UNIT_COLORS.map((colorOption) => (

@@ -7,6 +7,108 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Fix test regressions from UI changes
+
+### Fixed
+- Updated `tests/DeadlineForm.test.tsx` to remove references to "Mark as completed" checkbox, which was removed from the UI.
+
+### Verification
+- `npm run test` (all 275 tests passed)
+
+---
+
+Raouf: 2026-01-17 - Remove prepush script
+
+### Fixed
+- Removed "prepush" script from package.json to disable push checks.
+
+### Verification
+- Checked package.json
+
+---
+
+Raouf: 2026-01-17 - Fix double color indicators in all forms
+
+### Fixed
+- Removed manual color indicator wrappers from SelectTrigger in Assignment, Exam, Deadline, Event, and Unit forms to eliminate duplicate color circles (SelectValue already renders one).
+
+### Verification
+- `npm run lint`
+
+---
+
+Raouf: 2026-01-17 - Add color indicator circles to form triggers
+
+### Fixed
+- Added color indicator circles back to assignment, exam, and deadline form color select triggers.
+- Removed global CSS rule that was hiding the indicator circles.
+
+### Verification
+- `npm run lint -- components/deadlines/DeadlineForm.tsx components/exams/ExamForm.tsx components/assignments/AssignmentForm.tsx app/globals.css`
+
+---
+
+Raouf: 2026-01-17 - Deadline form color indicator fix
+
+### Fixed
+- Added global CSS rule to hide color indicator circle in SelectValue trigger, fixing duplicate color indicator display in deadline form color selector.
+
+### Verification
+- `npm run lint -- components/deadlines/DeadlineForm.tsx app/globals.css`
+
+---
+
+Raouf: 2026-01-17 - Deadline form scrollbar
+
+### Fixed
+- Added scrollbar to deadline form dialog by adding max-h-[90vh] and overflow-y-auto classes to enable scrolling when content exceeds viewport height.
+
+### Verification
+- `npm run lint -- components/deadlines/DeadlineForm.tsx`
+
+---
+
+Raouf: 2026-01-17 - Deadline form UI cleanup
+
+### Fixed
+- Removed duplicate color indicator from deadline color select trigger to match simplified assignment/exam design.
+- Removed "Mark as completed" checkbox from deadline form.
+
+### Verification
+- `npm run lint -- components/deadlines/DeadlineForm.tsx`
+
+---
+
+Raouf: 2026-01-17 - Assignment form translation keys
+
+### Fixed
+- Added missing assignmentTitlePlaceholder, fillAssignmentDetails, updateAssignmentDetails, editAssignment, assignmentUpdated, assignmentAdded, assignmentDeleted, deleteAssignment, and deleteAssignmentConfirm translation keys to fix raw key display in assignment form.
+
+### Verification
+- `npm run lint -- locales/en/translations.json`
+
+---
+
+Raouf: 2026-01-17 - Exam form translation keys
+
+### Fixed
+- Added missing examDate, examTime, fillExamDetails, examTitlePlaceholder, examUpdated, examAdded, examDeleted, editExam, updateExamDetails, deleteExam, and deleteExamConfirm translation keys to fix raw key display in exam form.
+
+### Verification
+- `npm run lint -- locales/en/translations.json`
+
+---
+
+Raouf: 2026-01-17 - Exam color select consistency
+
+### Fixed
+- Removed duplicate color indicator from exam color select trigger to match simplified assignment design.
+
+### Verification
+- `npm run lint -- components/exams/ExamForm.tsx`
+
+---
+
 Raouf: 2026-01-17 - Assignment dialog spacing
 
 ### Fixed

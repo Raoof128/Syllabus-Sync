@@ -211,7 +211,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editDeadline ? t('editDeadline') : t('addNewDeadline')}</DialogTitle>
             <DialogDescription>
@@ -351,15 +351,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               <Label htmlFor="deadline-color">{t('color' as TranslationKey) || 'Color'}</Label>
               <Select value={color} onValueChange={setColor}>
                 <SelectTrigger id="deadline-color">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full border border-mq-border"
-                      style={{ backgroundColor: color }}
-                    />
-                    <SelectValue
-                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                    />
-                  </div>
+                  <SelectValue
+                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {UNIT_COLORS.map((c) => (
@@ -375,19 +369,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                id="completed"
-                type="checkbox"
-                checked={completed}
-                onChange={(e) => setCompleted(e.target.checked)}
-                className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-              />
-              <Label htmlFor="completed" className="text-sm font-medium">
-                {t('markAsCompleted')}
-              </Label>
             </div>
 
             {Object.keys(errors).length > 0 && (

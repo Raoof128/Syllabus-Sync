@@ -77,6 +77,99 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Fix test regressions from UI changes
+Summary:
+  - Updated `tests/DeadlineForm.test.tsx` to remove references to "Mark as completed" checkbox, which was removed from the UI.
+  - Verified all 275 tests pass.
+Files: tests/DeadlineForm.test.tsx.
+Verification: `npm run test` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Remove prepush script
+Summary:
+  - Removed "prepush" script from package.json as requested.
+  - Verified no active pre-push hook exists in .git/hooks.
+Files: package.json.
+Verification: Checked package.json.
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Fix double color indicators in all forms
+Summary:
+  - Removed manual color indicator wrappers from SelectTrigger in Assignment, Exam, Deadline, Event, and Unit forms.
+  - Relies on SelectValue to render the single color indicator from the selected item content.
+Files: components/assignments/AssignmentForm.tsx, components/exams/ExamForm.tsx, components/deadlines/DeadlineForm.tsx, components/events/EventForm.tsx, components/units/UnitForm.tsx.
+Verification: `npm run lint` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Add color indicator circles to form triggers
+Summary:
+  - Added color indicator circles back to assignment, exam, and deadline form color select triggers.
+  - Removed global CSS rule that was hiding the indicator circles.
+Files: components/assignments/AssignmentForm.tsx, components/exams/ExamForm.tsx, components/deadlines/DeadlineForm.tsx, app/globals.css.
+Verification: `npm run lint -- components/deadlines/DeadlineForm.tsx components/exams/ExamForm.tsx components/assignments/AssignmentForm.tsx app/globals.css` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Deadline form color indicator fix
+Summary:
+  - Added global CSS rule to hide color indicator circle in SelectValue trigger, fixing duplicate color indicator display in deadline form color selector.
+Files: app/globals.css, components/deadlines/DeadlineForm.tsx.
+Verification: `npm run lint -- components/deadlines/DeadlineForm.tsx app/globals.css` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Deadline form scrollbar
+Summary:
+  - Added scrollbar to deadline form dialog by adding max-h-[90vh] and overflow-y-auto classes to DialogContent.
+Files: components/deadlines/DeadlineForm.tsx.
+Verification: `npm run lint -- components/deadlines/DeadlineForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Deadline form UI cleanup
+Summary:
+  - Removed duplicate color indicator from deadline color select trigger to match simplified assignment/exam design.
+  - Removed "Mark as completed" checkbox from deadline form.
+Files: components/deadlines/DeadlineForm.tsx.
+Verification: `npm run lint -- components/deadlines/DeadlineForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Assignment form translation keys
+Summary:
+  - Added missing assignmentTitlePlaceholder, fillAssignmentDetails, updateAssignmentDetails, editAssignment, assignmentUpdated, assignmentAdded, assignmentDeleted, deleteAssignment, and deleteAssignmentConfirm translation keys to fix raw key display in assignment form.
+Files: locales/en/translations.json.
+Verification: `npm run lint -- locales/en/translations.json` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Exam title placeholder translation
+Summary:
+  - Added missing examTitlePlaceholder translation key to fix raw key display in exam title input.
+Files: locales/en/translations.json.
+Verification: `npm run lint -- locales/en/translations.json` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Exam form translation keys
+Summary:
+  - Added missing examDate, examTime, fillExamDetails, examTitlePlaceholder, examUpdated, examAdded, examDeleted, editExam, updateExamDetails, deleteExam, and deleteExamConfirm translation keys to fix raw key display in exam form.
+Files: locales/en/translations.json.
+Verification: `npm run lint -- locales/en/translations.json` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Exam color select consistency
+Summary:
+  - Removed duplicate color indicator from exam color select trigger to match simplified assignment design.
+Files: components/exams/ExamForm.tsx.
+Verification: `npm run lint -- components/exams/ExamForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Assignment dialog spacing
 Summary:
   - Added spacing between the assignment dialog description and form fields.

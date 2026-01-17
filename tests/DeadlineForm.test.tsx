@@ -69,11 +69,9 @@ describe('DeadlineForm', () => {
     const titleInput = screen.getByLabelText(/Title/i) as HTMLInputElement;
     const dateInput = screen.getByLabelText(/Due Date/i) as HTMLInputElement;
     const timeInput = screen.getByLabelText(/Due Time/i) as HTMLInputElement;
-    const completedInput = screen.getByLabelText('Mark as completed') as HTMLInputElement;
 
     expect(titleInput.value).toBe('Assignment 1');
     expect(dateInput.value).toBe('2025-01-15');
     expect(timeInput.value).toBe('14:30');
-    expect(completedInput.checked).toBe(true);
   });
 });

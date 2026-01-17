@@ -25,7 +25,6 @@
     "typecheck": "tsc --noEmit",
     "check:secrets": "node scripts/check-no-secret-prints.js",
     "check:i18n": "node scripts/check-i18n-completeness.cjs",
-    "prepush": "npm run check:secrets && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "lighthouse": "lhci autorun",
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json"
   },
