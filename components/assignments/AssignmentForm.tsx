@@ -1,4 +1,4 @@
-// components/deadlines/DeadlineForm.tsx
+// components/assignments/AssignmentForm.tsx
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -28,31 +28,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PRIORITY_LEVELS, DEADLINE_TYPES } from '@/lib/constants';
+import { PRIORITY_LEVELS } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 
-interface DeadlineFormProps {
+interface AssignmentFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editDeadline?: Deadline | null;
+  editAssignment?: Deadline | null;
 }
 
-export default function DeadlineForm({ open, onOpenChange, editDeadline }: DeadlineFormProps) {
+export default function AssignmentForm({
+  open,
+  onOpenChange,
+  editAssignment,
+}: AssignmentFormProps) {
   const { t } = useTranslation();
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
-  const [color, setColor] = useState<string>(''); // Custom color override
-  const [useUnitColor, setUseUnitColor] = useState(true); // Toggle for unit color inheritance
+  const [color, setColor] = useState<string>('');
+  const [useUnitColor, setUseUnitColor] = useState(true);
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('23:59');
   const [priority, setPriority] = useState<Deadline['priority']>('Medium');
-  const [type, setType] = useState<Deadline['type']>('Assignment');
   const [completed, setCompleted] = useState(false);
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Get selected unit for color inheritance
   const selectedUnit = useMemo(() => {
@@ -67,24 +73,21 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     return color || selectedUnit?.color || UNIT_COLORS[0].value;
   }, [useUnitColor, selectedUnit, color]);
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
   // Save operation with retry logic
   const performSave = useCallback(
-    async (deadlineData: Deadline) => {
-      if (editDeadline) {
-        updateDeadline(editDeadline.id, deadlineData);
+    async (assignmentData: Deadline) => {
+      if (editAssignment) {
+        updateDeadline(editAssignment.id, assignmentData);
       } else {
-        addDeadline(deadlineData);
+        addDeadline(assignmentData);
       }
     },
-    [editDeadline, updateDeadline, addDeadline],
+    [editAssignment, updateDeadline, addDeadline],
   );
 
   const { execute: saveWithRetry } = useRetry(performSave, {
     maxAttempts: 3,
-    showToastOnError: false, // We'll handle toasts manually
+    showToastOnError: false,
     errorMessage: t('failedToSaveDeadline'),
   });
 
@@ -96,24 +99,22 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     setDueDate('');
     setDueTime('23:59');
     setPriority('Medium');
-    setType('Assignment');
     setCompleted(false);
     setErrors({});
   };
 
   useEffect(() => {
-    if (editDeadline) {
-      setTitle(editDeadline.title);
-      setUnitCode(editDeadline.unitCode);
-      // Check if deadline has custom color
-      if (editDeadline.color) {
-        setColor(editDeadline.color);
+    if (editAssignment) {
+      setTitle(editAssignment.title);
+      setUnitCode(editAssignment.unitCode);
+      if (editAssignment.color) {
+        setColor(editAssignment.color);
         setUseUnitColor(false);
       } else {
         setColor('');
         setUseUnitColor(true);
       }
-      const parsedDate = new Date(editDeadline.dueDate);
+      const parsedDate = new Date(editAssignment.dueDate);
       if (isValid(parsedDate)) {
         setDueDate(format(parsedDate, 'yyyy-MM-dd'));
         setDueTime(format(parsedDate, 'HH:mm'));
@@ -121,15 +122,13 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
         setDueDate('');
         setDueTime('23:59');
       }
-      setPriority(editDeadline.priority);
-      setType(editDeadline.type);
-      setCompleted(editDeadline.completed);
+      setPriority(editAssignment.priority);
+      setCompleted(editAssignment.completed);
     } else {
       resetForm();
     }
-    // Use editDeadline?.id to avoid re-running when object reference changes but content is same
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editDeadline?.id, open]);
+  }, [editAssignment?.id, open]);
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({
@@ -162,31 +161,30 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       hasValidTime ? parsedMinutes : 59,
     );
 
-    const deadlineData: Deadline = {
-      id: editDeadline?.id || uuidv4(),
+    const assignmentData: Deadline = {
+      id: editAssignment?.id || uuidv4(),
       title: title.trim(),
       unitCode,
       unitId: selectedUnit?.id,
       color: useUnitColor ? undefined : effectiveColor,
       dueDate: dueDateObj,
       priority,
-      type,
+      type: 'Assignment', // Fixed type for assignments
       completed,
-      createdAt: editDeadline?.createdAt || new Date(),
+      createdAt: editAssignment?.createdAt || new Date(),
     };
 
-    const result = await saveWithRetry(deadlineData);
+    const result = await saveWithRetry(assignmentData);
     if (result !== null) {
-      // Success - show toast and close form
-      if (editDeadline) {
+      if (editAssignment) {
         toastUtils.success(
-          t('deadlineUpdated'),
-          `"${deadlineData.title}" has been updated successfully.`,
+          t('assignmentUpdated' as TranslationKey) || 'Assignment Updated',
+          `"${assignmentData.title}" has been updated successfully.`,
         );
       } else {
         toastUtils.success(
-          t('deadlineAdded'),
-          `"${deadlineData.title}" has been added successfully.`,
+          t('assignmentAdded' as TranslationKey) || 'Assignment Added',
+          `"${assignmentData.title}" has been added successfully.`,
         );
       }
       onOpenChange(false);
@@ -195,15 +193,18 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   };
 
   const handleDelete = () => {
-    if (editDeadline) {
+    if (editAssignment) {
       setShowDeleteConfirm(true);
     }
   };
 
   const confirmDelete = () => {
-    if (editDeadline) {
-      removeDeadline(editDeadline.id);
-      toastUtils.success(t('deadlineDeleted'), `"${editDeadline.title}" ${t('deletedMsg')}`);
+    if (editAssignment) {
+      removeDeadline(editAssignment.id);
+      toastUtils.success(
+        t('assignmentDeleted' as TranslationKey) || 'Assignment Deleted',
+        `"${editAssignment.title}" ${t('deletedMsg')}`,
+      );
       onOpenChange(false);
       resetForm();
     }
@@ -215,60 +216,55 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
     resetForm();
   };
 
-  const titleDescribedBy = [errors.title ? 'deadline-title-error' : '', 'deadline-title-help']
-    .filter(Boolean)
-    .join(' ');
-  const unitDescribedBy = [errors.unitCode ? 'deadline-unit-error' : '', 'deadline-unit-help']
-    .filter(Boolean)
-    .join(' ');
-  const dateDescribedBy = [errors.dueDate ? 'deadline-date-error' : '', 'deadline-date-help']
-    .filter(Boolean)
-    .join(' ');
-
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editDeadline ? t('editDeadline') : t('addNewDeadline')}</DialogTitle>
+            <DialogTitle>
+              {editAssignment
+                ? t('editAssignment' as TranslationKey) || 'Edit Assignment'
+                : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+            </DialogTitle>
             <DialogDescription>
-              {editDeadline ? t('updateDeadlineDetails') : t('fillDeadlineDetails')}
+              {editAssignment
+                ? t('updateAssignmentDetails' as TranslationKey) ||
+                  'Update the assignment details below.'
+                : t('fillAssignmentDetails' as TranslationKey) ||
+                  'Fill in the assignment details below.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
+            {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">
+              <Label htmlFor="assignment-title">
                 {t('title')} <span className="text-mq-error">*</span>
               </Label>
               <Input
-                id="title"
-                placeholder={t('titlePlaceholder')}
+                id="assignment-title"
+                placeholder={
+                  t('assignmentTitlePlaceholder' as TranslationKey) ||
+                  'e.g., Essay on Climate Change'
+                }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                aria-describedby={titleDescribedBy}
                 aria-invalid={Boolean(errors.title)}
                 aria-required="true"
                 className={errors.title ? 'border-mq-error' : ''}
               />
-              <p id="deadline-title-help" className="text-xs text-mq-content-tertiary">
-                {t('titleHelp')}
-              </p>
-              {errors.title && (
-                <p id="deadline-title-error" className="text-sm text-mq-error">
-                  {errors.title}
-                </p>
-              )}
+              {errors.title && <p className="text-sm text-mq-error">{errors.title}</p>}
             </div>
 
+            {/* Unit */}
             <div className="space-y-2">
-              <Label htmlFor="unitCode">
+              <Label htmlFor="assignment-unit">
                 {t('unitCode')} <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
                 <SelectTrigger
+                  id="assignment-unit"
                   className={errors.unitCode ? 'border-mq-error' : ''}
-                  aria-describedby={unitDescribedBy}
                   aria-invalid={Boolean(errors.unitCode)}
                   aria-required="true"
                 >
@@ -282,59 +278,45 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   ))}
                 </SelectContent>
               </Select>
-              <p id="deadline-unit-help" className="text-xs text-mq-content-tertiary">
-                {t('unitHelp')}
-              </p>
-              {errors.unitCode && (
-                <p id="deadline-unit-error" className="text-sm text-mq-error">
-                  {errors.unitCode}
-                </p>
-              )}
+              {errors.unitCode && <p className="text-sm text-mq-error">{errors.unitCode}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="dueDate">
-                {t('dueDate')} <span className="text-mq-error">*</span>
-              </Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                aria-describedby={dateDescribedBy}
-                aria-invalid={Boolean(errors.dueDate)}
-                aria-required="true"
-                className={errors.dueDate ? 'border-mq-error' : ''}
-              />
-              <p id="deadline-date-help" className="text-xs text-mq-content-tertiary">
-                {t('dateHelp')}
-              </p>
-              {errors.dueDate && (
-                <p id="deadline-date-error" className="text-sm text-mq-error">
-                  {errors.dueDate}
-                </p>
-              )}
+            {/* Due Date and Time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="assignment-date">
+                  {t('dueDate')} <span className="text-mq-error">*</span>
+                </Label>
+                <Input
+                  id="assignment-date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  aria-invalid={Boolean(errors.dueDate)}
+                  aria-required="true"
+                  className={errors.dueDate ? 'border-mq-error' : ''}
+                />
+                {errors.dueDate && <p className="text-sm text-mq-error">{errors.dueDate}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="assignment-time">{t('dueTime')}</Label>
+                <Input
+                  id="assignment-time"
+                  type="time"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                />
+              </div>
             </div>
 
+            {/* Priority */}
             <div className="space-y-2">
-              <Label htmlFor="dueTime">
-                {t('dueTime')} <span className="text-mq-error">*</span>
-              </Label>
-              <Input
-                id="dueTime"
-                type="time"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="priority">{t('priority')}</Label>
+              <Label htmlFor="assignment-priority">{t('priority')}</Label>
               <Select
                 value={priority}
                 onValueChange={(v) => setPriority(v as Deadline['priority'])}
               >
-                <SelectTrigger>
+                <SelectTrigger id="assignment-priority">
                   <SelectValue placeholder={t('selectPriority')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,37 +329,20 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="type">{t('type')}</Label>
-              <Select value={type} onValueChange={(v) => setType(v as Deadline['type'])}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('selectType')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {DEADLINE_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {t(`type_${type}` as TranslationKey)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Color Selection */}
             <div className="space-y-3">
               <Label>{t('color' as TranslationKey) || 'Color'}</Label>
 
-              {/* Unit color inheritance toggle */}
               <div className="flex items-center gap-2">
                 <input
-                  id="useUnitColor"
+                  id="assignment-useUnitColor"
                   type="checkbox"
                   checked={useUnitColor}
                   onChange={(e) => setUseUnitColor(e.target.checked)}
                   disabled={!selectedUnit}
                   className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                 />
-                <Label htmlFor="useUnitColor" className="text-sm font-normal">
+                <Label htmlFor="assignment-useUnitColor" className="text-sm font-normal">
                   {t('useUnitColor' as TranslationKey) || 'Use unit color'}
                 </Label>
                 {selectedUnit && (
@@ -389,7 +354,6 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 )}
               </div>
 
-              {/* Custom color picker dropdown (shown when not using unit color) */}
               {!useUnitColor && (
                 <Select value={color || UNIT_COLORS[0].value} onValueChange={setColor}>
                   <SelectTrigger>
@@ -420,30 +384,23 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               )}
             </div>
 
+            {/* Completed */}
             <div className="flex items-center gap-2">
               <input
-                id="completed"
+                id="assignment-completed"
                 type="checkbox"
                 checked={completed}
                 onChange={(e) => setCompleted(e.target.checked)}
                 className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
               />
-              <Label htmlFor="completed" className="text-sm font-medium">
+              <Label htmlFor="assignment-completed" className="text-sm font-medium">
                 {t('markAsCompleted')}
               </Label>
             </div>
-
-            {Object.keys(errors).length > 0 && (
-              <div className="p-3 bg-mq-error/10 border border-mq-error/20 rounded-lg text-sm text-mq-error">
-                {Object.entries(errors).map(([field, error]) => (
-                  <div key={field}>• {error}</div>
-                ))}
-              </div>
-            )}
           </div>
 
           <DialogFooter className="flex gap-2">
-            {editDeadline && (
+            {editAssignment && (
               <Button variant="destructive" onClick={handleDelete}>
                 {t('delete')}
               </Button>
@@ -453,7 +410,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               {t('cancel')}
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0}>
-              {editDeadline ? t('saveChanges') : t('addDeadline')}
+              {editAssignment
+                ? t('saveChanges')
+                : t('addAssignment' as TranslationKey) || 'Add Assignment'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -463,8 +422,13 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('deleteDeadline')}</DialogTitle>
-            <DialogDescription>{t('deleteDeadlineConfirm')}</DialogDescription>
+            <DialogTitle>
+              {t('deleteAssignment' as TranslationKey) || 'Delete Assignment'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('deleteAssignmentConfirm' as TranslationKey) ||
+                'Are you sure you want to delete this assignment? This action cannot be undone.'}
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>

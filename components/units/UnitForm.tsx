@@ -312,22 +312,30 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             </div>
           </div>
 
-          {/* Color */}
+          {/* Color Selection */}
           <div className="space-y-2">
             <Label htmlFor="color">{t('unitColor')}</Label>
             <Select value={color} onValueChange={setColor}>
-              <SelectTrigger>
+              <SelectTrigger id="color">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
-                  <SelectValue />
+                  <div
+                    className="w-4 h-4 rounded-full border border-mq-border"
+                    style={{ backgroundColor: color }}
+                  />
+                  <SelectValue
+                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                  />
                 </div>
               </SelectTrigger>
               <SelectContent>
                 {UNIT_COLORS.map((c) => (
                   <SelectItem key={c.value} value={c.value}>
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded" style={{ backgroundColor: c.value }} />
-                      {t(c.translationKey as TranslationKey)}
+                      <div
+                        className="w-4 h-4 rounded-full border border-mq-border"
+                        style={{ backgroundColor: c.value }}
+                      />
+                      <span>{t(c.translationKey as TranslationKey)}</span>
                     </div>
                   </SelectItem>
                 ))}

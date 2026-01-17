@@ -6,6 +6,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { format, isValid } from 'date-fns';
+import { UNIT_COLORS } from '@/lib/config';
 
 interface EventFormProps {
   open: boolean;
@@ -47,6 +49,7 @@ function getInitialValues(editEvent?: Event | null) {
       location: editEvent.location,
       building: editEvent.building || '',
       category: editEvent.category,
+      color: editEvent.color || '',
     };
   }
   return {
@@ -57,6 +60,7 @@ function getInitialValues(editEvent?: Event | null) {
     location: '',
     building: '',
     category: 'Academic' as Event['category'],
+    color: '',
   };
 }
 
@@ -74,6 +78,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
   const [location, setLocation] = useState(initialValues.location);
   const [building, setBuilding] = useState(initialValues.building);
   const [category, setCategory] = useState<Event['category']>(initialValues.category);
+  const [color, setColor] = useState(initialValues.color);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -89,6 +94,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     setLocation(values.location);
     setBuilding(values.building);
     setCategory(values.category);
+    setColor(values.color);
     setErrors({});
     setShowDeleteConfirm(false);
   };
@@ -154,6 +160,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       location: location.trim(),
       building: building.trim() || undefined,
       category,
+      color: color || undefined, // Only include if user selected a color
     };
 
     if (editEvent) {
@@ -281,6 +288,50 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 {EVENT_CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {t(`category_${cat.replace(/ /g, '')}` as 'category_Academic')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Color (Optional) */}
+          <div className="space-y-2">
+            <Label htmlFor="event-color">
+              {t('color' as TranslationKey) || 'Color'} (
+              {t('optional' as TranslationKey) || 'Optional'})
+            </Label>
+            <Select value={color || 'none'} onValueChange={(v) => setColor(v === 'none' ? '' : v)}>
+              <SelectTrigger id="event-color">
+                <div className="flex items-center gap-2">
+                  {color ? (
+                    <div
+                      className="w-4 h-4 rounded-full border border-mq-border"
+                      style={{ backgroundColor: color }}
+                    />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border border-dashed border-mq-border" />
+                  )}
+                  <SelectValue
+                    placeholder={t('selectColor' as TranslationKey) || 'Select a color (optional)'}
+                  />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full border border-dashed border-mq-border" />
+                    <span>{t('noColor' as TranslationKey) || 'No color'}</span>
+                  </div>
+                </SelectItem>
+                {UNIT_COLORS.map((colorOption) => (
+                  <SelectItem key={colorOption.value} value={colorOption.value}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full border border-mq-border"
+                        style={{ backgroundColor: colorOption.value }}
+                      />
+                      <span>{t(colorOption.translationKey as TranslationKey)}</span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>

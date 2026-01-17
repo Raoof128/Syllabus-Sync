@@ -49,6 +49,7 @@ export type Event = {
   location: string; // "Library Room 204"
   building?: string; // "C5C" - for map navigation
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  color?: string; // Optional custom color (hex value like "#A6192E")
   imageUrl?: string;
   translationKey?: string;
   descriptionKey?: string;

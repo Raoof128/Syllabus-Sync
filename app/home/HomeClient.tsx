@@ -517,7 +517,13 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                               variants={revealChildVariants}
                               className="relative z-0 hover:z-50 focus-within:z-50 h-full"
                             >
-                              <UnitCard unit={unit} showActions={false} />
+                              <UnitCard 
+                                unit={unit} 
+                                showActions={false} 
+                                onClick={(clickedUnit) => {
+                                  router.push(`/calendar?highlightUnit=${encodeURIComponent(clickedUnit.id)}`);
+                                }}
+                              />
                             </m.div>
                           ))}
                         </m.div>

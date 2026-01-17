@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   CheckCircle2,
   Circle,
@@ -57,6 +57,14 @@ const UnitForm = dynamic(() => import('@/components/units/UnitForm'), {
 });
 
 const UnitDetailPanel = dynamic(() => import('@/components/units/UnitDetailPanel'), {
+  loading: () => null,
+});
+
+const AssignmentForm = dynamic(() => import('@/components/assignments/AssignmentForm'), {
+  loading: () => null,
+});
+
+const ExamForm = dynamic(() => import('@/components/exams/ExamForm'), {
   loading: () => null,
 });
 
@@ -245,6 +253,7 @@ function calculateOverlapGroups(
 
 export default function CalendarClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const userEvents = useEventsStore((state) => state.events);
@@ -257,6 +266,12 @@ export default function CalendarClient() {
   // Dialog states
   const [deadlineDialogOpen, setDeadlineDialogOpen] = useState(false);
   const [editDeadline, setEditDeadline] = useState<Deadline | null>(null);
+
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [editAssignment, setEditAssignment] = useState<Deadline | null>(null);
+
+  const [examDialogOpen, setExamDialogOpen] = useState(false);
+  const [editExam, setEditExam] = useState<Deadline | null>(null);
 
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [editEvent, setEditEvent] = useState<Event | null>(null);
@@ -271,6 +286,31 @@ export default function CalendarClient() {
   // Delete confirmation modal state
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
+
+  // Highlighted unit state (from URL query param)
+  const [highlightedUnitId, setHighlightedUnitId] = useState<string | null>(null);
+  const unitsWidgetRef = useRef<HTMLDivElement>(null);
+
+  // Handle highlighted unit from URL query parameter
+  useEffect(() => {
+    const highlightUnit = searchParams.get('highlightUnit');
+    if (highlightUnit) {
+      setHighlightedUnitId(highlightUnit);
+      // Scroll to units section after a short delay to allow render
+      setTimeout(() => {
+        unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      // Clear the highlight after 3 seconds
+      const timer = setTimeout(() => {
+        setHighlightedUnitId(null);
+        // Update URL to remove the query param without navigation
+        const url = new URL(window.location.href);
+        url.searchParams.delete('highlightUnit');
+        window.history.replaceState({}, '', url.toString());
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
@@ -347,6 +387,28 @@ export default function CalendarClient() {
   const openEditDeadline = (deadline: Deadline) => {
     setEditDeadline(deadline);
     setDeadlineDialogOpen(true);
+  };
+
+  // Assignment handlers
+  const openAddAssignment = () => {
+    setEditAssignment(null);
+    setAssignmentDialogOpen(true);
+  };
+
+  const openEditAssignment = (assignment: Deadline) => {
+    setEditAssignment(assignment);
+    setAssignmentDialogOpen(true);
+  };
+
+  // Exam handlers
+  const openAddExam = () => {
+    setEditExam(null);
+    setExamDialogOpen(true);
+  };
+
+  const openEditExam = (exam: Deadline) => {
+    setEditExam(exam);
+    setExamDialogOpen(true);
   };
 
   // Event handlers - navigate to feed with highlight
@@ -504,16 +566,17 @@ export default function CalendarClient() {
                         </div>
                         {/* MQ Key Dates badges in header */}
                         {dayMQDates.length > 0 && (
-                          <div className="mt-1 flex flex-col gap-0.5">
+                          <div className="mt-1 flex flex-col gap-1">
                             {dayMQDates.slice(0, 2).map((mqDate) => {
                               const colors = MQ_DATE_COLORS[mqDate.category];
                               return (
                                 <div
                                   key={mqDate.id}
                                   className={cn(
-                                    'text-[8px] px-1 py-0.5 rounded font-medium line-clamp-2 break-words leading-tight',
+                                    'text-[9px] px-1.5 py-0.5 rounded-md font-semibold line-clamp-2 break-words leading-tight shadow-sm border',
                                     colors.bg,
                                     colors.text,
+                                    colors.border,
                                   )}
                                   title={`${mqDate.event} - ${mqDate.term}`}
                                 >
@@ -522,7 +585,7 @@ export default function CalendarClient() {
                               );
                             })}
                             {dayMQDates.length > 2 && (
-                              <div className="text-[8px] text-mq-content-secondary">
+                              <div className="text-[9px] text-mq-content-secondary font-medium">
                                 +{dayMQDates.length - 2} more
                               </div>
                             )}
@@ -911,30 +974,6 @@ export default function CalendarClient() {
                 </div>
               </div>
             </div>
-
-            {/* Legend */}
-            <div className="flex flex-wrap gap-4 p-4 border-t border-mq-border">
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded bg-gradient-to-r from-violet-500 to-purple-500" />
-                <span>{t('myUnits')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded bg-blue-500" />
-                <span>{t('assignment' as 'title')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded bg-red-500" />
-                <span>{t('exam' as 'title')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded bg-green-500" />
-                <span>{t('event' as 'title')}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <GraduationCap className="h-3 w-3 text-mq-content-secondary" />
-                <span>MQ Key Dates</span>
-              </div>
-            </div>
           </div>
         </MagicCard>
       </ScrollReveal>
@@ -959,8 +998,8 @@ export default function CalendarClient() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={openAddDeadline}
-                        aria-label={t('addDeadline')}
+                        onClick={openAddAssignment}
+                        aria-label={t('addAssignment' as 'title') || 'Add Assignment'}
                       >
                         <Plus className="h-4 w-4" aria-hidden="true" />
                       </Button>
@@ -1040,7 +1079,7 @@ export default function CalendarClient() {
                                 </Badge>
                                 <button
                                   type="button"
-                                  onClick={() => openEditDeadline(assignment)}
+                                  onClick={() => openEditAssignment(assignment)}
                                   className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                   aria-label={`Edit ${assignment.title}`}
                                 >
@@ -1079,7 +1118,7 @@ export default function CalendarClient() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={openAddDeadline}
+                        onClick={openAddExam}
                         aria-label={t('addDeadline')}
                       >
                         <Plus className="h-4 w-4" aria-hidden="true" />
@@ -1157,7 +1196,7 @@ export default function CalendarClient() {
                                 </Badge>
                                 <button
                                   type="button"
-                                  onClick={() => openEditDeadline(exam)}
+                                  onClick={() => openEditExam(exam)}
                                   className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                   aria-label={`Edit ${exam.title}`}
                                 >
@@ -1184,7 +1223,7 @@ export default function CalendarClient() {
         {/* Add Unit Widget */}
         <ScrollReveal delay={0.3}>
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0">
+            <div className="mq-magic-card-content p-0" ref={unitsWidgetRef}>
               <Card className="border-0 shadow-none bg-transparent">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -1218,7 +1257,11 @@ export default function CalendarClient() {
                       {units.map((unit) => (
                         <div
                           key={unit.id}
-                          className="flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-mq-primary/20 transition-all"
+                          className={`flex items-center gap-3 p-2 rounded-lg border transition-all ${
+                            highlightedUnitId === unit.id
+                              ? 'border-mq-primary bg-mq-primary/10 ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background animate-pulse'
+                              : 'border-mq-border hover:border-mq-primary/20'
+                          }`}
                         >
                           <div
                             className="w-3 h-3 rounded-full flex-shrink-0"
@@ -1432,6 +1475,16 @@ export default function CalendarClient() {
         onOpenChange={setDeadlineDialogOpen}
         editDeadline={editDeadline}
       />
+
+      {/* Assignment Form Dialog */}
+      <AssignmentForm
+        open={assignmentDialogOpen}
+        onOpenChange={setAssignmentDialogOpen}
+        editAssignment={editAssignment}
+      />
+
+      {/* Exam Form Dialog */}
+      <ExamForm open={examDialogOpen} onOpenChange={setExamDialogOpen} editExam={editExam} />
 
       {/* Event Form Dialog */}
       <EventForm open={eventDialogOpen} onOpenChange={setEventDialogOpen} editEvent={editEvent} />
