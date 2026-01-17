@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Remove pre-commit hook and fix ESLint warning
+
+### Fixed
+- Fixed ESLint warning in DeadlineForm.test.tsx by changing `open={true}` to `open` (boolean attribute).
+- Removed `.git/hooks/pre-commit` hook to disable automatic checks on commit/push.
+
+### Verification
+- `npm run lint -- tests/DeadlineForm.test.tsx`
+
+---
+
 Raouf: 2026-01-17 - Fix test regressions from UI changes
 
 ### Fixed

@@ -63,7 +63,7 @@ describe('DeadlineForm', () => {
     };
 
     render(
-      <DeadlineForm open={true} onOpenChange={mockOnOpenChange} editDeadline={editDeadline} />,
+      <DeadlineForm open onOpenChange={mockOnOpenChange} editDeadline={editDeadline} />,
     );
 
     const titleInput = screen.getByLabelText(/Title/i) as HTMLInputElement;

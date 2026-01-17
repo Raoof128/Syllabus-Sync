@@ -77,6 +77,15 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Remove pre-commit hook and fix ESLint warning
+Summary:
+  - Fixed ESLint warning in DeadlineForm.test.tsx by changing `open={true}` to `open`.
+  - Removed `.git/hooks/pre-commit` hook to disable automatic checks on commit/push.
+Files: tests/DeadlineForm.test.tsx, .git/hooks/pre-commit (deleted).
+Verification: `npm run lint -- tests/DeadlineForm.test.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Fix test regressions from UI changes
 Summary:
   - Updated `tests/DeadlineForm.test.tsx` to remove references to "Mark as completed" checkbox, which was removed from the UI.
