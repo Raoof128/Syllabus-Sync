@@ -63,6 +63,7 @@ export const metadata: Metadata = {
   title: 'Calendar | Syllabus Sync',
   description:
     'Track your Macquarie University assignments, exams, and campus events in one integrated calendar.',
+  metadataBase: new URL(UNIVERSITY_CONFIG.website || 'https://syllabus-sync.vercel.app'),
   alternates: {
     canonical: '/calendar',
   },
