@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Assignment dialog spacing
+
+### Fixed
+- Added spacing between the assignment dialog description and form fields.
+
+### Verification
+- `npm run lint -- components/assignments/AssignmentForm.tsx`
+
+---
+
+Raouf: 2026-01-17 - Assignment color select alignment
+
+### Fixed
+- Centered the selected color value within the assignment color select trigger.
+
+### Verification
+- `npm run lint -- components/assignments/AssignmentForm.tsx`
+
+---
+
+Raouf: 2026-01-17 - Color label cleanup
+
+### Fixed
+- Removed the "University" prefix from unit color labels in the palette.
+
+### Verification
+- `npm run lint -- lib/config.ts components/assignments/AssignmentForm.tsx`
+
+---
+
+Raouf: 2026-01-17 - Assignments UI cleanup
+
+### Fixed
+- Removed the "Mark as completed" toggle from the Add Assignment dialog.
+- Simplified assignment color select to show a single color indicator.
+
+### Verification
+- `npm run lint -- components/assignments/AssignmentForm.tsx`
+
+---
+
 Raouf: 2026-01-17 - Calendar i18n + dayjs alignment
 
 ### Fixed

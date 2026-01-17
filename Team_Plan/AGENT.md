@@ -77,6 +77,39 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Assignment dialog spacing
+Summary:
+  - Added spacing between the assignment dialog description and form fields.
+Files: components/assignments/AssignmentForm.tsx.
+Verification: `npm run lint -- components/assignments/AssignmentForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Assignment color select alignment
+Summary:
+  - Centered the selected color value within the assignment color select trigger.
+Files: components/assignments/AssignmentForm.tsx.
+Verification: `npm run lint -- components/assignments/AssignmentForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Color label cleanup
+Summary:
+  - Removed "University" prefix from unit color labels in the palette.
+Files: lib/config.ts; locales/en/translations.json.
+Verification: `npm run lint -- lib/config.ts components/assignments/AssignmentForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Assignments UI cleanup
+Summary:
+  - Removed the "Mark as completed" toggle from the Add Assignment dialog.
+  - Simplified assignment color select to show a single color indicator.
+Files: components/assignments/AssignmentForm.tsx.
+Verification: `npm run lint -- components/assignments/AssignmentForm.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Calendar i18n + dayjs alignment
 Summary:
   - Replaced calendar hardcoded labels/ARIA/metadata with i18n keys and localized formatting.

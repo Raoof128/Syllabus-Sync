@@ -204,7 +204,7 @@ export default function AssignmentForm({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
+          <DialogHeader className="mb-4">
             <DialogTitle>
               {editAssignment
                 ? t('editAssignment' as TranslationKey) || 'Edit Assignment'
@@ -317,16 +317,11 @@ export default function AssignmentForm({
             <div className="space-y-2">
               <Label htmlFor="assignment-color">{t('color' as TranslationKey) || 'Color'}</Label>
               <Select value={color} onValueChange={setColor}>
-                <SelectTrigger id="assignment-color">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full border border-mq-border"
-                      style={{ backgroundColor: color }}
-                    />
-                    <SelectValue
-                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                    />
-                  </div>
+                <SelectTrigger
+                  id="assignment-color"
+                  className="*:data-[slot=select-value]:justify-center"
+                >
+                  <SelectValue placeholder={t('selectColor' as TranslationKey) || 'Select a color'} />
                 </SelectTrigger>
                 <SelectContent>
                   {UNIT_COLORS.map((c) => (
@@ -342,20 +337,6 @@ export default function AssignmentForm({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Completed */}
-            <div className="flex items-center gap-2">
-              <input
-                id="assignment-completed"
-                type="checkbox"
-                checked={completed}
-                onChange={(e) => setCompleted(e.target.checked)}
-                className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-              />
-              <Label htmlFor="assignment-completed" className="text-sm font-medium">
-                {t('markAsCompleted')}
-              </Label>
             </div>
           </div>
 

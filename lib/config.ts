@@ -67,9 +67,9 @@ export const BRAND_COLORS = {
  * Colors available for users to assign to their units/courses
  */
 export const UNIT_COLORS = [
-  { name: 'University Red', value: '#A6192E', translationKey: 'colorUniversityRed' },
-  { name: 'University Blue', value: '#002A45', translationKey: 'colorUniversityBlue' },
-  { name: 'University Gold', value: '#FFB81C', translationKey: 'colorUniversityGold' },
+  { name: 'Red', value: '#A6192E', translationKey: 'colorUniversityRed' },
+  { name: 'Blue', value: '#002A45', translationKey: 'colorUniversityBlue' },
+  { name: 'Gold', value: '#FFB81C', translationKey: 'colorUniversityGold' },
   { name: 'Green', value: '#10b981', translationKey: 'colorGreen' },
   { name: 'Purple', value: '#a855f7', translationKey: 'colorPurple' },
   { name: 'Orange', value: '#f97316', translationKey: 'colorOrange' },
