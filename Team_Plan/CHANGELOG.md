@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-18 - Fix NotificationSettings tests and align CI Node versions
+
+### Fixed
+- Updated NotificationSettings store mock to honor selector usage, resolving `initialize is not a function` test failures.
+- Aligned lint/test GitHub Actions workflows to Node 22.x to match project engines.
+
+### Verification
+- `npx vitest run tests/settings/NotificationSettings.test.tsx`
+
+---
+
 Raouf: 2026-01-17 - Fix event reminder scheduling in Feed
 
 ### Fixed

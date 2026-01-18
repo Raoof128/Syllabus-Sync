@@ -76,6 +76,15 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Fix NotificationSettings tests and CI Node versions
+Summary:
+  - Updated NotificationSettings store mock to honor selectors, fixing `initialize is not a function` failures.
+  - Aligned lint/test GitHub Actions workflows to Node 22.x to match project engines.
+Files: tests/settings/NotificationSettings.test.tsx; .github/workflows/lint.yml; .github/workflows/test.yml.
+Verification: `npx vitest run tests/settings/NotificationSettings.test.tsx` (pass).
+Follow-ups: None.
+
 Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Fix event reminder scheduling in Feed
 Summary:

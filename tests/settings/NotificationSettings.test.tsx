@@ -35,7 +35,9 @@ const mockStore = {
 };
 
 vi.mock('@/lib/store/notificationPreferencesStore', () => ({
-  useNotificationPreferencesStore: () => mockStore,
+  useNotificationPreferencesStore: (
+    selector?: (state: typeof mockStore) => unknown,
+  ) => (selector ? selector(mockStore) : mockStore),
 }));
 
 // Mock Notification API in window
