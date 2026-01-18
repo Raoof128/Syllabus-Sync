@@ -5290,3 +5290,12 @@ Summary: Fixed remaining 400 validation errors on “Remind Me” by removing cl
 Files changed: app/feed/FeedClient.tsx, lib/store/notificationsStore.ts
 Verification: npm run lint (pass)
 Follow-ups: None.
+
+### Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Notification UX & Geolocation Logging
+Summary:
+- Notification dropdown now hides read items immediately; mark-all-read leaves the menu empty (unread only view).
+- Toggled geolocation timeout logging to avoid noisy errors; timeouts no longer logged as errors (still update status).
+Files changed: components/layout/Header.tsx; app/map/CampusMap.tsx
+Verification: npm run lint (pass)
+Follow-ups: None.

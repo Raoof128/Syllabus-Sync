@@ -82,6 +82,7 @@ const Header = memo(() => {
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
+  const unreadNotifications = notifications.filter((n) => !n.read);
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -263,12 +264,12 @@ const Header = memo(() => {
                 )}
               </div>
               <div className="max-h-72 overflow-y-auto">
-                {notifications.length === 0 ? (
+                {unreadNotifications.length === 0 ? (
                   <div className="p-4 text-center text-mq-content-tertiary text-sm">
                     {t('noNotificationsYet')}
                   </div>
                 ) : (
-                  notifications.slice(0, 10).map((notification) => {
+                  unreadNotifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
                     return (
                       <DropdownMenuItem

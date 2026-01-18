@@ -583,8 +583,9 @@ export default function CampusMap({
         });
 
         const isPermissionDenied = err.code === 1;
+        const isTimeout = err.code === 3;
 
-        if (!isPermissionDenied) {
+        if (!isPermissionDenied && !isTimeout) {
           errorHandler.logError(
             new Error(`Location tracking failed: ${err.message}`),
             'Map Geolocation',
@@ -594,6 +595,8 @@ export default function CampusMap({
 
         if (isPermissionDenied) {
           setLocationStatus('denied');
+        } else if (isTimeout) {
+          setLocationStatus('error');
         } else {
           setLocationStatus('error');
         }
