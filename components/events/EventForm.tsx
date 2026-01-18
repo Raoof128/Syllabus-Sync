@@ -299,9 +299,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             <Label htmlFor="event-color">{t('color' as TranslationKey) || 'Color'}</Label>
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger id="event-color">
-                <SelectValue
-                  placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                />
+                <SelectValue placeholder={t('selectColor' as TranslationKey) || 'Select a color'} />
               </SelectTrigger>
               <SelectContent>
                 {UNIT_COLORS.map((colorOption) => (

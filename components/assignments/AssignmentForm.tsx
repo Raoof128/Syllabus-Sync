@@ -321,7 +321,9 @@ export default function AssignmentForm({
                   id="assignment-color"
                   className="*:data-[slot=select-value]:justify-center"
                 >
-                  <SelectValue placeholder={t('selectColor' as TranslationKey) || 'Select a color'} />
+                  <SelectValue
+                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {UNIT_COLORS.map((c) => (

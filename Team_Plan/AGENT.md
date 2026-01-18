@@ -77,12 +77,41 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Fix Prettier formatting issues
+Summary:
+  - Fixed code formatting issues in 4 files using Prettier --write.
+  - Files: components/assignments/AssignmentForm.tsx, components/events/EventForm.tsx, components/units/UnitForm.tsx, tests/DeadlineForm.test.tsx.
+  - All files now conform to Prettier code style.
+Verification: `npm run format:check` now passes (All matched files use Prettier code style!).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Add comprehensive quality check script
+Summary:
+  - Added "check" script to package.json that runs all quality checks in sequence.
+  - Combines check:secrets, format:check, typecheck, lint, test, and build commands.
+  - Can be run with `npm run check` for comprehensive project validation.
+Files: package.json.
+Verification: Script tested successfully with first commands.
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Remove pre-commit hook and fix ESLint warning
 Summary:
   - Fixed ESLint warning in DeadlineForm.test.tsx by changing `open={true}` to `open`.
   - Removed `.git/hooks/pre-commit` hook to disable automatic checks on commit/push.
 Files: tests/DeadlineForm.test.tsx, .git/hooks/pre-commit (deleted).
 Verification: `npm run lint -- tests/DeadlineForm.test.tsx` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Fix social media links to properly open in new tabs
+Summary:
+  - Updated social media links to use programmatic window.open() for better cross-platform compatibility.
+  - Ensures links open in new tabs consistently across all devices and browsers.
+  - Added noopener,noreferrer security flags.
+Files: components/layout/SocialButtons.tsx.
+Verification: `npm run lint -- components/layout/SocialButtons.tsx` (pass).
 Follow-ups: None.
 
 Raouf: 2026-01-17 (Australia/Sydney)

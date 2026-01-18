@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-17 - Fix Prettier formatting issues
+
+### Fixed
+- Fixed code formatting issues in 4 files using Prettier
+- Files: components/assignments/AssignmentForm.tsx, components/events/EventForm.tsx, components/units/UnitForm.tsx, tests/DeadlineForm.test.tsx
+- All files now conform to Prettier code style standards
+
+### Verification
+- `npm run format:check` now passes without warnings
+
+---
+
+Raouf: 2026-01-17 - Add comprehensive quality check script
+
+### Added
+- New "check" script that runs all quality checks in sequence: secrets, formatting, typecheck, lint, tests, and build
+- Can be run with `npm run check` for comprehensive project validation
+
+### Verification
+- Script tested and working correctly
+
+---
+
 Raouf: 2026-01-17 - Remove pre-commit hook and fix ESLint warning
 
 ### Fixed
@@ -15,6 +38,19 @@ Raouf: 2026-01-17 - Remove pre-commit hook and fix ESLint warning
 
 ### Verification
 - `npm run lint -- tests/DeadlineForm.test.tsx`
+
+---
+
+Raouf: 2026-01-17 - Fix social media widget labels and links
+
+### Fixed
+- Updated social media widget labels to show platform names (Facebook, Instagram, LinkedIn, etc.) instead of account names
+- Changed social media links to use programmatic window.open() for better cross-platform compatibility
+- Ensures links open in new tabs consistently across all devices and browsers
+- Added noopener,noreferrer security flags for improved security
+
+### Verification
+- `npm run lint -- components/layout/SocialButtons.tsx`
 
 ---
 

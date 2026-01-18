@@ -317,9 +317,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             <Label htmlFor="color">{t('unitColor')}</Label>
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger id="color">
-                <SelectValue
-                  placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                />
+                <SelectValue placeholder={t('selectColor' as TranslationKey) || 'Select a color'} />
               </SelectTrigger>
               <SelectContent>
                 {UNIT_COLORS.map((c) => (

@@ -24,6 +24,7 @@
     "test:ci": "npm run test && npm run test:e2e",
     "typecheck": "tsc --noEmit",
     "check:secrets": "node scripts/check-no-secret-prints.js",
+    "check": "npm run check:secrets && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "check:i18n": "node scripts/check-i18n-completeness.cjs",
     "lighthouse": "lhci autorun",
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json"

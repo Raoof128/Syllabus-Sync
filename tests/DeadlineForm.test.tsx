@@ -62,9 +62,7 @@ describe('DeadlineForm', () => {
       createdAt: new Date(),
     };
 
-    render(
-      <DeadlineForm open onOpenChange={mockOnOpenChange} editDeadline={editDeadline} />,
-    );
+    render(<DeadlineForm open onOpenChange={mockOnOpenChange} editDeadline={editDeadline} />);
 
     const titleInput = screen.getByLabelText(/Title/i) as HTMLInputElement;
     const dateInput = screen.getByLabelText(/Due Date/i) as HTMLInputElement;

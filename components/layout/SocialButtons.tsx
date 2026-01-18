@@ -58,40 +58,40 @@ interface SocialLink {
 
 const socialLinks: SocialLink[] = [
   {
-    name: 'facebook',
+    name: 'Facebook',
     icon: FacebookIcon,
-    href: 'https://www.facebook.com/macquarieuni/',
-    label: 'Macquarie University on Facebook',
+    href: 'https://www.facebook.com/macquarieuniversity/',
+    label: 'Facebook',
   },
   {
-    name: 'instagram',
+    name: 'Instagram',
     icon: InstagramIcon,
     href: 'https://www.instagram.com/macquarieuni/',
-    label: 'Macquarie University on Instagram',
+    label: 'Instagram',
   },
   {
-    name: 'linkedin',
+    name: 'LinkedIn',
     icon: Linkedin,
     href: 'https://www.linkedin.com/school/macquarie-university/',
-    label: 'Macquarie University on LinkedIn',
+    label: 'LinkedIn',
   },
   {
-    name: 'tiktok',
+    name: 'TikTok',
     icon: TikTokIcon,
     href: 'https://www.tiktok.com/@macquarieuni',
-    label: 'Macquarie University on TikTok',
+    label: 'TikTok',
   },
   {
-    name: 'youtube',
+    name: 'YouTube',
     icon: YouTubeIcon,
     href: 'https://www.youtube.com/user/MacquarieUniversity',
-    label: 'Macquarie University on YouTube',
+    label: 'YouTube',
   },
   {
-    name: 'x',
+    name: 'X',
     icon: XIcon,
     href: 'https://x.com/Macquarie_Uni',
-    label: 'Macquarie University on X',
+    label: 'X',
   },
 ];
 
@@ -106,8 +106,13 @@ const SocialButtons = memo(() => {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${link.label} (opens in new tab)`}
-              title={`${link.label} (opens in new tab)`}
+              aria-label={`Follow Macquarie University on ${link.label} (opens in new tab)`}
+              title={`Follow Macquarie University on ${link.label} (opens in new tab)`}
+              onClick={(e) => {
+                // Ensure it opens in new tab and doesn't interfere with navigation
+                e.preventDefault();
+                window.open(link.href, '_blank', 'noopener,noreferrer');
+              }}
             >
               <Icon className="social-icon h-5 w-5" aria-hidden="true" />
               <span className="social-title">{link.label}</span>
