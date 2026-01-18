@@ -66,11 +66,12 @@ export class AppErrorHandler {
       formErrors[error.field] = error.message;
     });
 
-    // Log validation errors as low severity
-    const validationError = new Error(
-      `Form validation failed: ${errors.map((e) => e.field).join(', ')}`,
-    );
-    this.logError(validationError, 'FormValidation', 'low');
+    if (errors.length > 0) {
+      const validationError = new Error(
+        `Form validation failed: ${errors.map((e) => e.field).join(', ')}`,
+      );
+      this.logError(validationError, 'FormValidation', 'low');
+    }
 
     return formErrors;
   }

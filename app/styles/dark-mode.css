@@ -200,3 +200,16 @@ html.dark .map-page {
   background-color: transparent !important;
   background: transparent !important;
 }
+
+/* Calendar grid line color for dark mode */
+html.dark .calendar-page {
+  --calendar-grid-line: rgba(255, 255, 255, 0.18);
+  --calendar-card-bg: rgba(255, 255, 255, 0.06);
+  --calendar-card-border: rgba(255, 255, 255, 0.18);
+}
+
+/* Calendar cards (MagicCard content) alignment with theme */
+html.dark .calendar-page .mq-magic-card-content {
+  background-color: var(--calendar-card-bg, rgba(255, 255, 255, 0.06)) !important;
+  border-color: var(--calendar-card-border, rgba(255, 255, 255, 0.18)) !important;
+}

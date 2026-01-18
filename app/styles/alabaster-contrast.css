@@ -56,6 +56,9 @@ html:not(.dark) .signup-page {
   --c-content: #1a1a1a;
   --c-content-secondary: #2b2b2b;
   --c-content-tertiary: #4a4a44;
+  --calendar-grid-line: rgba(0, 0, 0, 0.6);
+  --calendar-card-bg: #f7f3ea;
+  --calendar-card-border: rgba(0, 0, 0, 0.18);
 }
 
 /* ============================================
@@ -70,7 +73,8 @@ html:not(.dark) .home-page .mq-magic-card-content,
 html:not(.dark) .settings-page .mq-magic-card-content,
 html:not(.dark) .login-page .mq-magic-card-content,
 html:not(.dark) .signup-page .mq-magic-card-content {
-  background-color: var(--alabaster, #edeade) !important;
+  background-color: var(--calendar-card-bg, var(--alabaster, #edeade)) !important;
+  border-color: var(--calendar-card-border, rgba(0, 0, 0, 0.18)) !important;
 }
 
 html:not(.dark) .feed-page .btn-premium,
@@ -114,6 +118,15 @@ html:not(.dark) .login-page .bg-mq-success\/10,
 html:not(.dark) .signup-page .bg-mq-success\/10 {
   background-color: var(--alabaster, #edeade) !important;
   color: var(--c-content) !important;
+}
+
+/* Calendar grid lines - light mode */
+html:not(.dark) .calendar-page .calendar-grid-cell {
+  border-color: rgba(0, 0, 0, 0.65) !important;
+}
+
+html:not(.dark) .calendar-page .calendar-day-column {
+  border-right-color: rgba(0, 0, 0, 0.65) !important;
 }
 
 /* Stay connected banner styling */

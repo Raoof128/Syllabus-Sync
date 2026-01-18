@@ -79,13 +79,20 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     errorMessage: t('failedToSaveUnit'),
   });
 
+  const createDefaultClassTime = () => ({
+    id: uuidv4(),
+    day: 'Monday',
+    startTime: '09:00',
+    endTime: '11:00',
+  });
+
   const resetForm = () => {
     setCode('');
     setName('');
     setBuilding('');
     setRoom('');
     setColor(UNIT_COLORS[0].value);
-    setSchedule([]);
+    setSchedule([createDefaultClassTime()]);
     setErrors({});
   };
 
@@ -100,6 +107,10 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       setSchedule([...editUnit.schedule]);
     } else {
       resetForm();
+      // Ensure at least one class time is present for new units
+      if (schedule.length === 0) {
+        setSchedule([createDefaultClassTime()]);
+      }
     }
     // Use editUnit?.id to avoid re-running when object reference changes but content is same
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,6 +135,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   };
 
   const validateForm = (): boolean => {
+    const TIME_REGEX = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+
     const validator = createFormValidator({
       code: validationRules.required(t('unitCode')),
       name: validationRules.required(t('unitName')),
@@ -138,6 +151,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     // Validate class times separately
     const classTimeErrors: Array<{ field: string; message: string }> = [];
     schedule.forEach((ct, index) => {
+      if (!ct.startTime || !ct.endTime || !TIME_REGEX.test(ct.startTime) || !TIME_REGEX.test(ct.endTime)) {
+        classTimeErrors.push({
+          field: `time_${index}`,
+          message: t('endTimeAfterStart'),
+        });
+        return;
+      }
+
       if (ct.startTime >= ct.endTime) {
         classTimeErrors.push({
           field: `time_${index}`,

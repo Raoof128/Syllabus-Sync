@@ -7,6 +7,7 @@ import { Unit, ClassTime } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 interface UnitsState {
   units: Unit[];
@@ -53,7 +54,11 @@ export const useUnitsStore = create<UnitsState>()(
         // For testing compatibility, update state synchronously first
         const normalized = normalizeUnit({
           ...unit,
-          id: unit.id || `unit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: unit.id && unit.id.match(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+          )
+            ? unit.id
+            : uuidv4(),
           createdAt: unit.createdAt || new Date(),
         });
 
@@ -65,10 +70,14 @@ export const useUnitsStore = create<UnitsState>()(
         });
 
         try {
+          const apiPayload: Partial<Unit> = { ...normalized };
+          // API will set createdAt; remove to avoid date serialization issues
+          delete apiPayload.createdAt;
+
           const created = await apiRequest<Unit>('/api/units', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(normalized),
+            body: JSON.stringify(apiPayload),
           });
           const serverNormalized = normalizeUnit(created);
           // Update with server response if different

@@ -667,7 +667,14 @@ export default function CalendarClient() {
                 {/* Time Grid */}
                 <div
                   className="relative"
-                  style={{ height: HOURS.length * HOUR_HEIGHT + 12 }}
+                  style={{
+                    height: HOURS.length * HOUR_HEIGHT + 12,
+                    // Subtle grid to improve readability in light mode (also visible in dark)
+                    backgroundImage:
+                      'linear-gradient(to right, var(--calendar-grid-line, rgba(0,0,0,0.26)) 1px, transparent 1px), linear-gradient(to bottom, var(--calendar-grid-line, rgba(0,0,0,0.26)) 1px, transparent 1px)',
+                    backgroundSize: `calc((100% - 60px) / 7) ${HOUR_HEIGHT}px`,
+                    backgroundPosition: '60px 8px',
+                  }}
                   role="presentation"
                   aria-hidden="true"
                 >
@@ -692,8 +699,8 @@ export default function CalendarClient() {
                         <div
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
-                            'border-t border-mq-border/50 border-r border-mq-border/30 last:border-r-0',
-                            dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.02]',
+                            'calendar-grid-cell border-t border-mq-border/90 border-r border-mq-border/80 last:border-r-0',
+                            dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.03]',
                           )}
                           style={{ height: HOUR_HEIGHT }}
                           role="gridcell"
@@ -787,7 +794,7 @@ export default function CalendarClient() {
                       return (
                         <div
                           key={day.toISOString()}
-                          className="relative border-r border-mq-border/30 last:border-r-0"
+                          className="calendar-day-column relative border-r border-mq-border/60 last:border-r-0"
                         >
                           {/* Units - filled time block with unit color */}
                           {dayUnits.map((unitData) => {
@@ -826,14 +833,13 @@ export default function CalendarClient() {
                               <button
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
                                 type="button"
-                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center"
+                              className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur"
                                 style={{
                                   top: posInfo.top,
                                   height: Math.max(posInfo.height, 44),
                                   left,
                                   width,
-                                  backgroundColor: `${unitData.color}20`,
-                                  borderLeftColor: unitData.color,
+                                borderLeftColor: unitData.color,
                                 }}
                                 aria-label={t('calendarUnitAriaLabel', {
                                   endTime: formatScheduleTime(schedule.endTime),
@@ -848,10 +854,7 @@ export default function CalendarClient() {
                                   if (originalUnit) openUnitDetail(originalUnit);
                                 }}
                               >
-                                <div
-                                  className="p-1 h-full overflow-hidden"
-                                  style={{ color: unitData.color }}
-                                >
+                                <div className="p-1 h-full overflow-hidden text-mq-content">
                                   <span className="block text-xs font-bold line-clamp-2 break-words leading-tight">
                                     {unitData.code}
                                   </span>
