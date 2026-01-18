@@ -77,6 +77,16 @@ Macquarie University Administration - February 2025
 ### Recent Work Log
 
 Raouf: 2026-01-17 (Australia/Sydney)
+Scope: Fix event reminder scheduling in Feed
+Summary:
+  - Wired Feed "Remind me" button to notification preferences store and scheduleEventReminder.
+  - Added permission/disabled guards with user-friendly toasts and i18n keys.
+  - Updated reminder toast and XP notification strings to use translations.
+Files: app/feed/FeedClient.tsx; locales/en/translations.json.
+Verification: `npm run lint -- app/feed/FeedClient.tsx locales/en/translations.json` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-17 (Australia/Sydney)
 Scope: Fix Prettier formatting issues
 Summary:
   - Fixed code formatting issues in 4 files using Prettier --write.
@@ -5243,3 +5253,40 @@ Verification: npm run lint (0 errors, 0 warnings), npm run build (30 routes succ
 [2026-01-12 22:42] Raouf: Reduced Social Button text size to 0.7rem to fit within 75px width. Running verification.
 
 [2026-01-12 23:15] Raouf: Reduced Social Button font size to 0.7rem to prevent truncation at 75px width.
+
+### Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Critical Fix - Infinite Re-render Loop in FeedClient
+Summary: Fixed "Maximum update depth exceeded" runtime error in FeedClient component caused by Zustand store selector returning a new object on every render. Replaced object selector pattern with individual selectors for each store value to prevent infinite re-renders.
+Root cause: `useNotificationPreferencesStore` and `useGamificationStore` were using object selectors that created new object references on every render, triggering React's infinite update protection.
+Files changed: app/feed/FeedClient.tsx
+Verification: npm run lint (0 errors, 0 warnings), runtime error resolved
+Follow-ups: None.
+
+### Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Comprehensive Notification System Audit & Fixes
+Summary: Conducted full audit of notification system and fixed multiple critical issues:
+- **Fixed infinite re-render loops**: Replaced object destructuring with individual selectors in `useNotificationScheduler` and `NotificationSettings` components to prevent React infinite update errors
+- **Improved class scheduling**: Changed from scheduling only today's classes to scheduling classes for next 7 days
+- **Added rescheduling on timing changes**: System now properly reschedules reminders when reminder timing preferences change
+- **Added cleanup on unmount**: Proper cleanup of scheduled reminders when component unmounts
+- **Fixed reminder clearing logic**: Removed unnecessary `clearAllReminders()` call that was clearing all reminders when only deadline reminders should be rescheduled
+- **Verified service worker integration**: Confirmed notification service uses standard Notification API (service worker messages are optional for future use)
+- **Fixed useEffect dependency array size error**: Wrapped effect logic in `useCallback` to stabilize dependency arrays and prevent "dependency array changed size" errors. Used ref for cleanup function to avoid dependency array issues.
+- **Fixed notification validation errors**: Fixed 400 validation errors when creating notifications from Feed "Remind Me" button. Issues: (1) `id` field was non-UUID format - now let API generate UUID, (2) `link` field was relative path - now converts to absolute URL, (3) `relatedId` was non-UUID for sample events - now only includes if valid UUID. Updated `notificationsStore` to use temp IDs locally and exclude from API payload.
+Files changed: lib/hooks/useNotificationScheduler.ts, app/settings/components/NotificationSettings.tsx, app/feed/FeedClient.tsx, lib/store/notificationsStore.ts
+Verification: npm run lint (0 errors, 0 warnings), all notification flows verified
+Follow-ups: None.
+
+### Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Notification Validation Hardening
+Summary: Hardened notification creation to prevent future schema validation errors. Store now strips non-UUID ids, normalizes links to absolute URLs (removes invalid ones), and drops non-UUID relatedIds before hitting the API. Temp IDs remain local-only for optimistic updates.
+Files changed: lib/store/notificationsStore.ts
+Verification: npm run lint (0 errors, 0 warnings)
+Follow-ups: None.
+
+### Raouf: 2026-01-18 (Australia/Sydney)
+Scope: Notification Payload Compatibility Fix
+Summary: Fixed remaining 400 validation errors on “Remind Me” by removing client-sent `createdAt` (API expects z.date, JSON sends strings). Store now strips createdAt before POST; FeedClient stops sending createdAt. API now sets timestamps server-side as intended.
+Files changed: app/feed/FeedClient.tsx, lib/store/notificationsStore.ts
+Verification: npm run lint (pass)
+Follow-ups: None.

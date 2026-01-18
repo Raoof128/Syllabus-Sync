@@ -56,26 +56,54 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
   // Use useSyncExternalStore to detect client without setState in effect
   const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
-  // Use the notification preferences store
-  const {
-    permissionStatus,
-    pushEnabled,
-    deadlinesEnabled,
-    classesEnabled,
-    eventsEnabled,
-    deadlineReminderTiming,
-    classReminderTiming,
-    eventReminderTiming,
-    initialize,
-    requestPermission,
-    setDeadlinesEnabled,
-    setClassesEnabled,
-    setEventsEnabled,
-    setPushEnabled,
-    setDeadlineReminderTiming,
-    setClassReminderTiming,
-    setEventReminderTiming,
-  } = useNotificationPreferencesStore();
+  // Use individual selectors to prevent infinite re-renders
+  const permissionStatus = useNotificationPreferencesStore(
+    (state) => state.permissionStatus,
+  );
+  const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
+  const deadlinesEnabled = useNotificationPreferencesStore(
+    (state) => state.deadlinesEnabled,
+  );
+  const classesEnabled = useNotificationPreferencesStore(
+    (state) => state.classesEnabled,
+  );
+  const eventsEnabled = useNotificationPreferencesStore(
+    (state) => state.eventsEnabled,
+  );
+  const deadlineReminderTiming = useNotificationPreferencesStore(
+    (state) => state.deadlineReminderTiming,
+  );
+  const classReminderTiming = useNotificationPreferencesStore(
+    (state) => state.classReminderTiming,
+  );
+  const eventReminderTiming = useNotificationPreferencesStore(
+    (state) => state.eventReminderTiming,
+  );
+  const initialize = useNotificationPreferencesStore((state) => state.initialize);
+  const requestPermission = useNotificationPreferencesStore(
+    (state) => state.requestPermission,
+  );
+  const setDeadlinesEnabled = useNotificationPreferencesStore(
+    (state) => state.setDeadlinesEnabled,
+  );
+  const setClassesEnabled = useNotificationPreferencesStore(
+    (state) => state.setClassesEnabled,
+  );
+  const setEventsEnabled = useNotificationPreferencesStore(
+    (state) => state.setEventsEnabled,
+  );
+  const setPushEnabled = useNotificationPreferencesStore(
+    (state) => state.setPushEnabled,
+  );
+  const setDeadlineReminderTiming = useNotificationPreferencesStore(
+    (state) => state.setDeadlineReminderTiming,
+  );
+  const setClassReminderTiming = useNotificationPreferencesStore(
+    (state) => state.setClassReminderTiming,
+  );
+  const setEventReminderTiming = useNotificationPreferencesStore(
+    (state) => state.setEventReminderTiming,
+  );
 
   // Initialize on mount - single source of truth from store
   useEffect(() => {

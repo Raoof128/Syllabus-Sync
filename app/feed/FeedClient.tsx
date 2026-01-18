@@ -25,11 +25,13 @@ import { sampleEvents } from '@/data/sampleEvents';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { apiRequest } from '@/lib/utils/api';
 import { Event } from '@/lib/types';
@@ -46,6 +48,15 @@ const categoryColors: Record<string, string> = {
   Academic: 'bg-mq-success/10 text-mq-success',
   'Free Food': 'bg-mq-warning/10 text-mq-warning',
 };
+
+const REMINDER_TIMING_OPTIONS: { labelKey: TranslationKey; value: number }[] = [
+  { labelKey: 'timing15min', value: 15 },
+  { labelKey: 'timing30min', value: 30 },
+  { labelKey: 'timing1hour', value: 60 },
+  { labelKey: 'timing2hours', value: 120 },
+  { labelKey: 'timing1day', value: 1440 },
+  { labelKey: 'timing2days', value: 2880 },
+];
 
 type FilterType = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
 
@@ -65,12 +76,32 @@ const FeedClient = memo(() => {
 
   // Ref for scrolling to highlighted event
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
+  const highlightAttemptsRef = useRef(0);
 
-  // Gamification store
-  const { isDemo, refreshProfile, settings } = useGamificationStore();
+  // Gamification store - use individual selectors to prevent re-renders
+  const isDemo = useGamificationStore((state) => state.isDemo);
+  const refreshProfile = useGamificationStore((state) => state.refreshProfile);
+  const settings = useGamificationStore((state) => state.settings);
 
   // Notifications store
   const addNotification = useNotificationsStore((state) => state.addNotification);
+  
+  // Notification preferences store - use individual selectors to prevent infinite re-renders
+  const eventReminderTiming = useNotificationPreferencesStore(
+    (state) => state.eventReminderTiming,
+  );
+  const eventsEnabled = useNotificationPreferencesStore((state) => state.eventsEnabled);
+  const permissionStatus = useNotificationPreferencesStore(
+    (state) => state.permissionStatus,
+  );
+  const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
+  const requestPermission = useNotificationPreferencesStore(
+    (state) => state.requestPermission,
+  );
+  const scheduleEventReminder = useNotificationPreferencesStore(
+    (state) => state.scheduleEventReminder,
+  );
+  const cancelReminder = useNotificationPreferencesStore((state) => state.cancelReminder);
 
   // User events store - load events for potential future use
   useEventsStore((state) => state.events);
@@ -80,46 +111,106 @@ const FeedClient = memo(() => {
     if (highlightEventId) {
       setHighlightedEvent(highlightEventId);
 
-      // Wait for render, then scroll to the event
-      const timer = setTimeout(() => {
+      highlightAttemptsRef.current = 0;
+
+      const scrollToHighlight = () => {
         const eventElement = eventRefs.current.get(highlightEventId);
         if (eventElement) {
           eventElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-          // Remove highlight after animation
           setTimeout(() => {
             setHighlightedEvent(null);
-          }, 3000);
+          }, 5000);
+          return;
         }
-      }, 500);
+        if (highlightAttemptsRef.current < 3) {
+          highlightAttemptsRef.current += 1;
+          setTimeout(scrollToHighlight, 200);
+        }
+      };
 
+      const timer = setTimeout(scrollToHighlight, 300);
       return () => clearTimeout(timer);
     }
   }, [highlightEventId]);
 
   // Handle "Remind Me" button click - awards XP for event attendance and creates notification
   const handleRemindMe = useCallback(
-    async (eventId: string, eventTitle: string, eventTime: string) => {
-      // Already reminded for this event
-      if (remindedEvents.has(eventId)) {
-        toastUtils.info('Already Reminded', 'You already set a reminder for this event');
+    async (
+      eventId: string,
+      eventTitle: string,
+      eventStartAt: Date,
+      eventLocation: string,
+    ) => {
+      const isAlreadyReminded = remindedEvents.has(eventId);
+
+      // Toggle off if already reminded
+      if (isAlreadyReminded) {
+        setLoadingEvents((prev) => new Set(prev).add(eventId));
+        try {
+          cancelReminder(eventId);
+          setRemindedEvents((prev) => {
+            const next = new Set(prev);
+            next.delete(eventId);
+            return next;
+          });
+        } finally {
+          setLoadingEvents((prev) => {
+            const next = new Set(prev);
+            next.delete(eventId);
+            return next;
+          });
+        }
         return;
       }
+
+      // Already reminded for this event
+      if (remindedEvents.has(eventId)) {
+        toastUtils.info(t('eventReminderAlreadyTitle'), t('eventReminderAlreadyMsg'));
+        return;
+      }
+
+      if (!pushEnabled || !eventsEnabled) {
+        toastUtils.info(t('eventRemindersDisabledTitle'), t('eventRemindersDisabledMsg'));
+        return;
+      }
+
+      const resolvedPermission =
+        permissionStatus === 'default' ? await requestPermission() : permissionStatus;
+      if (resolvedPermission !== 'granted') {
+        toastUtils.error(t('permissionDenied'), t('permissionDeniedMsg'));
+        return;
+      }
+
+      const timingOption = REMINDER_TIMING_OPTIONS.find(
+        (option) => option.value === eventReminderTiming,
+      );
+      const timingLabel = timingOption
+        ? t(timingOption.labelKey)
+        : t('timingMinutes', { minutes: eventReminderTiming });
 
       // Mark as loading
       setLoadingEvents((prev) => new Set(prev).add(eventId));
 
       try {
-        // Create a notification for the reminder
+        scheduleEventReminder(eventId, eventTitle, eventLocation, eventStartAt);
+        
+        // Create notification - don't provide id (let API generate UUID)
+        // Convert relative link to absolute URL for validation (schema requires full URL)
+        const notificationLink =
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/feed?highlight=${encodeURIComponent(eventId)}`
+            : undefined;
+        
+        // Only include relatedId if eventId is a valid UUID format (sample events use 'event-1' format)
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventId);
+        
         await addNotification({
-          id: `reminder-${eventId}-${Date.now()}`,
-          title: `Reminder: ${eventTitle}`,
-          message: `Event starting at ${eventTime}`,
+          title: t('reminderTimingUpdated'),
+          message: t('reminderTimingUpdatedMsg', { timing: timingLabel }),
           type: 'event',
           read: false,
-          createdAt: new Date(),
-          link: `/feed?highlight=${eventId}`,
-          relatedId: eventId,
+          ...(notificationLink && { link: notificationLink }),
+          ...(isValidUUID && { relatedId: eventId }),
         });
 
         // If user is authenticated (not demo mode), award XP
@@ -139,7 +230,7 @@ const FeedClient = memo(() => {
 
             // Show XP notification if enabled
             if (settings.showXPNotifications) {
-              showXPEarnedNotification(response.result.xpAwarded, 'Event Reminder Set', language);
+              showXPEarnedNotification(response.result.xpAwarded, t('eventReminderSetTitle'), language);
             }
 
             // Refresh profile to update XP display
@@ -153,15 +244,15 @@ const FeedClient = memo(() => {
         setRemindedEvents((prev) => new Set(prev).add(eventId));
         toastUtils.success(
           t('reminderTimingUpdated'),
-          `You will be reminded about "${eventTitle}"`,
+          t('reminderTimingUpdatedMsg', { timing: timingLabel }),
         );
       } catch (error) {
         // Check if it's a "already awarded" error (409 conflict)
         if (error instanceof Error && error.message.includes('already awarded')) {
           setRemindedEvents((prev) => new Set(prev).add(eventId));
-          toastUtils.info('Already Reminded', 'You already set a reminder for this event');
+          toastUtils.info(t('eventReminderAlreadyTitle'), t('eventReminderAlreadyMsg'));
         } else {
-          toastUtils.error('Failed', 'Could not set reminder. Please try again.');
+          toastUtils.error(t('eventReminderFailedTitle'), t('eventReminderFailedMsg'));
         }
       } finally {
         setLoadingEvents((prev) => {
@@ -172,9 +263,16 @@ const FeedClient = memo(() => {
       }
     },
     [
+      eventReminderTiming,
+      eventsEnabled,
       isDemo,
+      permissionStatus,
+      pushEnabled,
+      cancelReminder,
+      requestPermission,
       remindedEvents,
       refreshProfile,
+      scheduleEventReminder,
       settings.showXPNotifications,
       language,
       t,
@@ -360,7 +458,7 @@ const FeedClient = memo(() => {
                               }}
                               className={`p-4 bg-mq-background-secondary rounded-mq-lg border transition-all duration-mq-fast ${
                                 isHighlighted
-                                  ? 'border-mq-primary ring-2 ring-mq-primary/50 shadow-lg shadow-mq-primary/20 animate-pulse'
+                                  ? 'border-mq-primary ring-2 ring-mq-primary/50 shadow-lg shadow-mq-primary/20'
                                   : 'border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm'
                               }`}
                               aria-posinset={index + 1}
@@ -430,7 +528,8 @@ const FeedClient = memo(() => {
                                           typeof t
                                         >[0],
                                       ),
-                                      event.time,
+                                      event.startAt,
+                                      event.location,
                                     )
                                   }
                                   disabled={isLoading}

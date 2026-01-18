@@ -68,29 +68,64 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       addNotification: async (notificationData) => {
+        // Small helper to validate UUID format
+        const isValidUUID = (value?: string) =>
+          typeof value === 'string' &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
         const notification: Notification = {
           ...notificationData,
-          id:
-            notificationData.id || `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          // Let the API generate a UUID. If callers pass an id, we'll drop it unless valid UUID.
           createdAt: notificationData.createdAt || new Date(),
         };
 
         const normalized = normalizeNotification(notification);
+
+        // Generate temporary ID for local state (not sent to API)
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const localNotification = { ...normalized, id: tempId };
+
         // Add to front and limit total count
         set((state) => ({
-          notifications: [normalized, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
+          notifications: [localNotification, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
         }));
 
         try {
+          // Prepare payload for API - enforce schema constraints
+          const apiPayload: Partial<Notification> = { ...normalized };
+
+          // Drop id unless it's a valid UUID (temp ids and non-UUIDs are removed)
+          if (apiPayload.id && !isValidUUID(apiPayload.id)) {
+            delete apiPayload.id;
+          }
+
+          // createdAt in schema is z.date(); client JSON sends strings. Let API set it.
+          delete apiPayload.createdAt;
+
+          // Normalize link to absolute URL if possible; remove if invalid
+          if (apiPayload.link) {
+            try {
+              const base = typeof window !== 'undefined' ? window.location.origin : undefined;
+              apiPayload.link = new URL(apiPayload.link, base).toString();
+            } catch {
+              delete apiPayload.link;
+            }
+          }
+
+          // relatedId must be UUID if provided
+          if (apiPayload.relatedId && !isValidUUID(apiPayload.relatedId)) {
+            delete apiPayload.relatedId;
+          }
+
           const created = await apiRequest<Notification>('/api/notifications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(normalized),
+            body: JSON.stringify(apiPayload),
           });
           const serverNormalized = normalizeNotification(created);
           set((state) => ({
             notifications: state.notifications.map((n) =>
-              n.id === normalized.id ? serverNormalized : n,
+              n.id === tempId ? serverNormalized : n,
             ),
           }));
           return serverNormalized;
