@@ -290,9 +290,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               onChange={(e) => setName(e.target.value)}
               aria-required="true"
               aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? 'unit-name-error' : undefined}
               className={errors.name ? 'border-mq-error' : ''}
             />
-            {errors.name && <p className="text-sm text-mq-error">{errors.name}</p>}
+            {errors.name && (
+              <p id="unit-name-error" className="text-sm text-mq-error" role="alert">
+                {errors.name}
+              </p>
+            )}
           </div>
 
           {/* Location */}
@@ -332,9 +337,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 onChange={(e) => setRoom(e.target.value)}
                 aria-required="true"
                 aria-invalid={Boolean(errors.room)}
+                aria-describedby={errors.room ? 'unit-room-error' : undefined}
                 className={errors.room ? 'border-mq-error' : ''}
               />
-              {errors.room && <p className="text-sm text-mq-error">{errors.room}</p>}
+              {errors.room && (
+                <p id="unit-room-error" className="text-sm text-mq-error" role="alert">
+                  {errors.room}
+                </p>
+              )}
             </div>
           </div>
 

@@ -85,6 +85,30 @@ const Sidebar = memo(() => {
   const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
   // ============================================================================
+  // SCROLL LOCK FOR MOBILE MENU
+  // ============================================================================
+  // When mobile menu opens, prevent background scrolling for better UX.
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      // Save current scroll position and lock body
+      const scrollY = window.scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      return () => {
+        // Restore body styles and scroll position
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [mobileMenuOpen]);
+
+  // ============================================================================
   // FOCUS TRAP FOR MOBILE MENU
   // ============================================================================
   // When mobile menu opens, trap focus within the sidebar for accessibility.

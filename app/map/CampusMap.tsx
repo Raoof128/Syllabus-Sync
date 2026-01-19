@@ -595,10 +595,32 @@ export default function CampusMap({
 
         if (isPermissionDenied) {
           setLocationStatus('denied');
+          // Notify user that location access was denied
+          toastUtils.warning(
+            t('locationAccessDenied'),
+            t('locationDeniedDesc' as TranslationKey) ||
+              'Enable location access in your browser settings to see your position on the map.',
+          );
         } else if (isTimeout) {
           setLocationStatus('error');
+          // Only show toast for timeout if it's a persistent issue (first error)
+          if (!hasSetFallbackOrigin.current) {
+            toastUtils.info(
+              t('locationError'),
+              t('positionUnavailableDesc' as TranslationKey) ||
+                'Could not determine your location. Using campus center as reference.',
+            );
+          }
         } else {
           setLocationStatus('error');
+          // Notify user of generic location error
+          if (!hasSetFallbackOrigin.current) {
+            toastUtils.warning(
+              t('locationError'),
+              t('positionUnavailableDesc' as TranslationKey) ||
+                'Could not determine your location.',
+            );
+          }
         }
 
         if (!hasSetFallbackOrigin.current) {

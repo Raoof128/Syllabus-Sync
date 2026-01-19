@@ -86,22 +86,54 @@ const UnitCard = React.memo(
           }
           aria-label={onClick ? `${t('view')} ${unit.code} - ${unit.name}` : undefined}
         >
-          {/* Color indicator bar */}
+          {/* Color indicator bar with unit code initials for accessibility */}
           <div
-            className="h-2 rounded-t-[calc(var(--c-radius-lg)-3px)]"
+            className="h-2 rounded-t-[calc(var(--c-radius-lg)-3px)] relative overflow-hidden"
             style={{ backgroundColor: unit.color }}
-          />
+            aria-hidden="true"
+          >
+            {/* Pattern overlay for colorblind users */}
+            <div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage: `repeating-linear-gradient(
+                  45deg,
+                  transparent,
+                  transparent 2px,
+                  rgba(255,255,255,0.3) 2px,
+                  rgba(255,255,255,0.3) 4px
+                )`,
+              }}
+            />
+          </div>
 
           <div className="p-4 flex-grow flex flex-col gap-3">
             <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-mq-medium">
-                  {unit.code}
-                  <Badge variant="neutral" className="ml-2 font-normal">
-                    {getUniqueDays()}
-                  </Badge>
-                </CardTitle>
-                <p className="text-mq-sm text-mq-content-secondary mt-1">{unit.name}</p>
+              <div className="flex items-start gap-2">
+                {/* Unit initials badge for colorblind accessibility */}
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  style={{ backgroundColor: unit.color }}
+                  aria-hidden="true"
+                  title={unit.code}
+                >
+                  {unit.code.replace(/[0-9]/g, '').slice(0, 2)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <CardTitle as="h3" className="text-mq-medium">
+                      {unit.code}
+                    </CardTitle>
+                    <Badge
+                      variant="neutral"
+                      className="font-normal"
+                      aria-label={`${t('days')}: ${getUniqueDays()}`}
+                    >
+                      <span aria-hidden="true">{getUniqueDays()}</span>
+                    </Badge>
+                  </div>
+                  <p className="text-mq-sm text-mq-content-secondary mt-1">{unit.name}</p>
+                </div>
               </div>
 
               {showActions && (

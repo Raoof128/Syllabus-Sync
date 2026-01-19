@@ -210,9 +210,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('enterEventTitle')}
+              aria-invalid={Boolean(errors.title)}
+              aria-required="true"
+              aria-describedby={errors.title ? 'event-title-error' : undefined}
               className={errors.title ? 'border-mq-error' : ''}
             />
-            {errors.title && <p className="text-xs text-mq-error">{errors.title}</p>}
+            {errors.title && (
+              <p id="event-title-error" className="text-xs text-mq-error" role="alert">
+                {errors.title}
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -235,9 +242,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
+                aria-invalid={Boolean(errors.date)}
+                aria-required="true"
+                aria-describedby={errors.date ? 'event-date-error' : undefined}
                 className={errors.date ? 'border-mq-error' : ''}
               />
-              {errors.date && <p className="text-xs text-mq-error">{errors.date}</p>}
+              {errors.date && (
+                <p id="event-date-error" className="text-xs text-mq-error" role="alert">
+                  {errors.date}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-time">{t('time' as 'title')}</Label>
@@ -247,9 +261,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 placeholder="e.g., 2:00 PM - 4:00 PM"
+                aria-invalid={Boolean(errors.time)}
+                aria-required="true"
+                aria-describedby={errors.time ? 'event-time-error' : undefined}
                 className={errors.time ? 'border-mq-error' : ''}
               />
-              {errors.time && <p className="text-xs text-mq-error">{errors.time}</p>}
+              {errors.time && (
+                <p id="event-time-error" className="text-xs text-mq-error" role="alert">
+                  {errors.time}
+                </p>
+              )}
             </div>
           </div>
 
@@ -262,9 +283,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder={t('enterLocation' as 'title')}
+                aria-invalid={Boolean(errors.location)}
+                aria-required="true"
+                aria-describedby={errors.location ? 'event-location-error' : undefined}
                 className={errors.location ? 'border-mq-error' : ''}
               />
-              {errors.location && <p className="text-xs text-mq-error">{errors.location}</p>}
+              {errors.location && (
+                <p id="event-location-error" className="text-xs text-mq-error" role="alert">
+                  {errors.location}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-building">{t('buildingCode' as 'title')}</Label>

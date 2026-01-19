@@ -241,9 +241,14 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
                 aria-required="true"
+                aria-describedby={errors.title ? 'exam-title-error' : undefined}
                 className={errors.title ? 'border-mq-error' : ''}
               />
-              {errors.title && <p className="text-sm text-mq-error">{errors.title}</p>}
+              {errors.title && (
+                <p id="exam-title-error" className="text-sm text-mq-error" role="alert">
+                  {errors.title}
+                </p>
+              )}
             </div>
 
             {/* Unit */}
@@ -257,6 +262,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   className={errors.unitCode ? 'border-mq-error' : ''}
                   aria-invalid={Boolean(errors.unitCode)}
                   aria-required="true"
+                  aria-describedby={errors.unitCode ? 'exam-unit-error' : undefined}
                 >
                   <SelectValue placeholder={t('selectUnit')} />
                 </SelectTrigger>
@@ -268,7 +274,11 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   ))}
                 </SelectContent>
               </Select>
-              {errors.unitCode && <p className="text-sm text-mq-error">{errors.unitCode}</p>}
+              {errors.unitCode && (
+                <p id="exam-unit-error" className="text-sm text-mq-error" role="alert">
+                  {errors.unitCode}
+                </p>
+              )}
             </div>
 
             {/* Exam Date and Time */}
@@ -285,9 +295,14 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   onChange={(e) => setDueDate(e.target.value)}
                   aria-invalid={Boolean(errors.dueDate)}
                   aria-required="true"
+                  aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
                   className={errors.dueDate ? 'border-mq-error' : ''}
                 />
-                {errors.dueDate && <p className="text-sm text-mq-error">{errors.dueDate}</p>}
+                {errors.dueDate && (
+                  <p id="exam-date-error" className="text-sm text-mq-error" role="alert">
+                    {errors.dueDate}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-time">{t('examTime' as TranslationKey) || 'Exam Time'}</Label>

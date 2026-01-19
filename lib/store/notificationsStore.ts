@@ -162,10 +162,19 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       markAsRead: async (id) => {
+        // Helper to validate UUID format
+        const isValidUUID = (value: string) =>
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
         // Update local state immediately
         set((state) => ({
           notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
         }));
+
+        // Skip API call for sample/local notifications (non-UUID or temp IDs)
+        if (!isValidUUID(id) || id.startsWith('temp-')) {
+          return;
+        }
 
         try {
           await apiRequest<Notification>(`/api/notifications/${id}`, {
@@ -174,7 +183,14 @@ export const useNotificationsStore = create<NotificationsState>()(
             body: JSON.stringify({ read: true }),
           });
         } catch (error) {
-          // Revert on error
+          // For 404 errors (notification doesn't exist in DB), just keep the local state change
+          // This can happen with sample notifications that have UUID-like IDs but aren't in DB
+          const is404 = error instanceof Error && error.message.includes('404');
+          if (is404) {
+            return; // Keep the local read state, don't revert
+          }
+
+          // Revert on other errors
           set((state) => ({
             notifications: state.notifications.map((n) =>
               n.id === id ? { ...n, read: false } : n,
@@ -202,7 +218,15 @@ export const useNotificationsStore = create<NotificationsState>()(
             method: 'PUT',
           });
         } catch (error) {
-          // Revert to original read states on error
+          // For 404/500 errors with sample data, keep local state (sample notifications aren't in DB)
+          const isExpectedError =
+            error instanceof Error &&
+            (error.message.includes('404') || error.message.includes('500'));
+          if (isExpectedError) {
+            return; // Keep the local read states
+          }
+
+          // Revert to original read states on other errors
           set((state) => ({
             notifications: state.notifications.map((n) => ({
               ...n,

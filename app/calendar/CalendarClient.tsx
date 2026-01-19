@@ -351,6 +351,14 @@ export default function CalendarClient() {
     dayjs().startOf('isoWeek').toDate(),
   );
 
+  // Mobile: track the currently selected day index (0-6 for Mon-Sun)
+  const [mobileSelectedDayIndex, setMobileSelectedDayIndex] = useState(() => {
+    // Default to today's day of week (0 = Monday in isoWeek)
+    const today = dayjs();
+    const weekStart = dayjs().startOf('isoWeek');
+    return today.diff(weekStart, 'day');
+  });
+
   // Get days of the current week
   const weekDays = useMemo(
     () =>
@@ -448,7 +456,36 @@ export default function CalendarClient() {
   const goToPreviousWeek = () =>
     setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
   const goToNextWeek = () => setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
-  const goToToday = () => setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
+  const goToToday = () => {
+    setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
+    // Also reset mobile day to today
+    const today = dayjs();
+    const weekStart = dayjs().startOf('isoWeek');
+    setMobileSelectedDayIndex(today.diff(weekStart, 'day'));
+  };
+
+  // Mobile day navigation
+  const goToPreviousDay = () => {
+    if (mobileSelectedDayIndex > 0) {
+      setMobileSelectedDayIndex(mobileSelectedDayIndex - 1);
+    } else {
+      // Go to previous week, select Sunday (index 6)
+      setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
+      setMobileSelectedDayIndex(6);
+    }
+  };
+  const goToNextDay = () => {
+    if (mobileSelectedDayIndex < 6) {
+      setMobileSelectedDayIndex(mobileSelectedDayIndex + 1);
+    } else {
+      // Go to next week, select Monday (index 0)
+      setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
+      setMobileSelectedDayIndex(0);
+    }
+  };
+
+  // Get the currently selected mobile day
+  const mobileSelectedDay = weekDays[mobileSelectedDayIndex] || weekDays[0];
 
   // Keyboard navigation for weeks
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -574,9 +611,10 @@ export default function CalendarClient() {
       <ScrollReveal delay={0.1} className="mt-6">
         <MagicCard isLiquidEnhanced>
           <div className="mq-magic-card-content p-0">
-            {/* Calendar Header - Removed add deadline button */}
+            {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
             <div className="flex items-center justify-between p-4 border-b border-mq-border">
-              <div className="flex items-center gap-2">
+              {/* Desktop week navigation */}
+              <div className="hidden md:flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -597,15 +635,75 @@ export default function CalendarClient() {
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
-              <h2 className="text-lg font-semibold text-mq-content">
+              {/* Mobile day navigation */}
+              <div className="flex md:hidden items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToPreviousDay}
+                  aria-label={t('calendarPreviousDay' as TranslationKey) || 'Previous day'}
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={goToToday}>
+                  {t('today')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={goToNextDay}
+                  aria-label={t('calendarNextDay' as TranslationKey) || 'Next day'}
+                >
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </div>
+              {/* Desktop: Month/Year title */}
+              <h2 className="hidden md:block text-lg font-semibold text-mq-content">
                 {formatMonthYear(currentWeekStart)}
+              </h2>
+              {/* Mobile: Selected day title */}
+              <h2 className="md:hidden text-lg font-semibold text-mq-content">
+                {formatWeekdayLong(mobileSelectedDay)}, {formatDayNumber(mobileSelectedDay)}
               </h2>
               <div className="w-24" /> {/* Spacer for balance */}
             </div>
 
+            {/* Mobile: Week day quick picker */}
+            <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary/50">
+              {weekDays.map((day, index) => {
+                const isSelected = index === mobileSelectedDayIndex;
+                const isTodayPill = dayjs(day).isSame(dayjs(), 'day');
+                return (
+                  <button
+                    key={day.toISOString()}
+                    type="button"
+                    onClick={() => setMobileSelectedDayIndex(index)}
+                    className={cn(
+                      'flex flex-col items-center justify-center w-10 h-14 rounded-lg transition-all',
+                      isSelected
+                        ? 'bg-mq-primary text-white shadow-md'
+                        : isTodayPill
+                          ? 'bg-mq-primary/10 text-mq-primary'
+                          : 'bg-mq-background hover:bg-mq-hover-background text-mq-content',
+                    )}
+                    aria-label={`${formatWeekdayLong(day)}, ${formatDayNumber(day)}`}
+                    aria-pressed={isSelected}
+                  >
+                    <span className="text-[10px] font-medium uppercase">
+                      {formatWeekdayShort(day).slice(0, 2)}
+                    </span>
+                    <span className={cn('text-sm font-semibold', isSelected && 'text-white')}>
+                      {formatDayNumber(day)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
+            {/* Desktop: Full week view */}
             <div
-              className="overflow-auto"
+              className="hidden md:block overflow-auto"
               style={{ maxHeight: '700px' }}
               role="grid"
               aria-label={t('calendarWeeklyGridLabel')}
@@ -1196,6 +1294,340 @@ export default function CalendarClient() {
                       );
                     })}
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile: Single day view */}
+            <div
+              className="md:hidden overflow-auto"
+              style={{ maxHeight: '600px' }}
+              role="region"
+              aria-label={t('calendarDayViewLabel' as TranslationKey) || 'Day view'}
+            >
+              {/* Mobile Day Header with MQ Key Dates */}
+              {(() => {
+                const dayMQDates = getMQKeyDatesForDay(mobileSelectedDay).filter(
+                  (d) => d.category !== 'classes',
+                );
+                const isTodayCell = dayjs(mobileSelectedDay).isSame(dayjs(), 'day');
+
+                return (
+                  <div
+                    className={cn(
+                      'p-3 border-b border-mq-border',
+                      isTodayCell && 'bg-mq-primary/5',
+                    )}
+                  >
+                    {/* MQ Key Dates for mobile */}
+                    {dayMQDates.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {dayMQDates.map((mqDate) => {
+                          const colors = MQ_DATE_COLORS[mqDate.category];
+                          const isAlert = /last date to enrol/i.test(mqDate.event);
+                          return (
+                            <div
+                              key={mqDate.id}
+                              className={cn(
+                                'px-2 py-1 rounded-md text-xs font-semibold',
+                                isAlert
+                                  ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 text-white'
+                                  : cn(colors.bg, colors.text, colors.border, 'border'),
+                              )}
+                              title={
+                                mqDate.description
+                                  ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                  : `${mqDate.event} - ${mqDate.term}`
+                              }
+                            >
+                              {isAlert && (
+                                <AlertTriangle className="inline h-3 w-3 mr-1" aria-hidden="true" />
+                              )}
+                              {mqDate.event}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Mobile Time Grid */}
+              <div
+                className="relative"
+                style={{
+                  height: HOURS.length * HOUR_HEIGHT + 12,
+                }}
+              >
+                {/* Hour Lines */}
+                {HOURS.map((hour, index) => (
+                  <div
+                    key={hour}
+                    className="absolute left-0 right-0 flex"
+                    style={{ top: index * HOUR_HEIGHT + 8 }}
+                  >
+                    {/* Time Label */}
+                    <div className="w-14 text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border flex-shrink-0">
+                      {formatHourLabel(hour)}
+                    </div>
+                    {/* Hour line */}
+                    <div
+                      className={cn(
+                        'flex-1 border-t border-mq-border/90',
+                        dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.03]',
+                      )}
+                      style={{ height: HOUR_HEIGHT }}
+                    />
+                  </div>
+                ))}
+
+                {/* Current Time Indicator (only if viewing today) */}
+                {currentTimePosition !== null &&
+                  dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && (
+                    <div
+                      className="absolute left-[56px] right-0 z-30 pointer-events-none"
+                      style={{ top: currentTimePosition + 8 }}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
+                        <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
+                      </div>
+                    </div>
+                  )}
+
+                {/* Mobile Events Overlay */}
+                <div className="absolute left-[56px] right-0 top-[8px] bottom-0">
+                  {(() => {
+                    const {
+                      deadlines: dayDeadlines,
+                      events: dayEvents,
+                      units: dayUnits,
+                    } = getItemsForDay(mobileSelectedDay);
+
+                    // Build calendar items for collision detection
+                    const calendarItems: CalendarItem[] = [];
+
+                    // Add units
+                    dayUnits.forEach((unitData) => {
+                      const schedule = unitData.schedule;
+                      const timeInfo = parseTimeRange(
+                        `${schedule.startTime} - ${schedule.endTime}`,
+                      );
+                      if (timeInfo) {
+                        calendarItems.push({
+                          id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
+                          startHour: timeInfo.startHour,
+                          startMin: timeInfo.startMin,
+                          endHour: timeInfo.endHour,
+                          endMin: timeInfo.endMin,
+                          type: 'unit',
+                          data: unitData,
+                        });
+                      }
+                    });
+
+                    // Add deadlines
+                    dayDeadlines.forEach((deadline) => {
+                      const dueDayjs = dayjs(deadline.dueDate);
+                      const hours = dueDayjs.hour();
+                      const minutes = dueDayjs.minute();
+                      if (hours >= START_HOUR) {
+                        calendarItems.push({
+                          id: `deadline-${deadline.id}`,
+                          startHour: hours,
+                          startMin: minutes,
+                          endHour: hours + 1,
+                          endMin: minutes,
+                          type: 'deadline',
+                          data: deadline,
+                        });
+                      }
+                    });
+
+                    // Add events
+                    dayEvents.forEach((event) => {
+                      const timeInfo = parseTimeRange(event.time);
+                      if (timeInfo) {
+                        calendarItems.push({
+                          id: `event-${event.id}`,
+                          startHour: timeInfo.startHour,
+                          startMin: timeInfo.startMin,
+                          endHour: timeInfo.endHour,
+                          endMin: timeInfo.endMin,
+                          type: 'event',
+                          data: event,
+                        });
+                      }
+                    });
+
+                    // Calculate overlap groups
+                    const overlapInfo = calculateOverlapGroups(calendarItems);
+
+                    return (
+                      <>
+                        {/* Units */}
+                        {dayUnits.map((unitData) => {
+                          const schedule = unitData.schedule;
+                          const timeInfo = parseTimeRange(
+                            `${schedule.startTime} - ${schedule.endTime}`,
+                          );
+                          if (!timeInfo) return null;
+
+                          const posInfo = getTimePositionAndHeight(
+                            timeInfo.startHour,
+                            timeInfo.startMin,
+                            timeInfo.endHour,
+                            timeInfo.endMin,
+                          );
+                          if (!posInfo) return null;
+
+                          const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
+                          const overlap = overlapInfo.get(itemId) || {
+                            column: 0,
+                            totalColumns: 1,
+                          };
+                          const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                          const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                          return (
+                            <button
+                              key={`mobile-${unitData.id}-${schedule.day}-${schedule.startTime}`}
+                              type="button"
+                              className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur p-2"
+                              style={{
+                                top: posInfo.top,
+                                height: Math.max(posInfo.height, 44),
+                                left,
+                                width,
+                                borderLeftColor: unitData.color,
+                              }}
+                              onClick={() => {
+                                const originalUnit = units.find((u) => u.id === unitData.id);
+                                if (originalUnit) openUnitDetail(originalUnit);
+                              }}
+                            >
+                              <span className="text-xs font-bold text-mq-content line-clamp-1">
+                                {unitData.code}
+                              </span>
+                              <span className="text-[10px] text-mq-content-secondary">
+                                {formatScheduleTime(schedule.startTime)} -{' '}
+                                {formatScheduleTime(schedule.endTime)}
+                              </span>
+                              <span className="text-[10px] text-mq-content-secondary line-clamp-1">
+                                {formatLocation(
+                                  unitData.location.building,
+                                  unitData.location.room,
+                                  t('room'),
+                                )}
+                              </span>
+                            </button>
+                          );
+                        })}
+
+                        {/* Deadlines */}
+                        {dayDeadlines.map((deadline) => {
+                          const dueDayjs = dayjs(deadline.dueDate);
+                          const dueDate = dueDayjs.toDate();
+                          const hours = dueDayjs.hour();
+                          const minutes = dueDayjs.minute();
+                          const deadlineColor = getDeadlineColor(deadline);
+
+                          const posInfo = getTimePositionAndHeight(
+                            hours,
+                            minutes,
+                            hours + 1,
+                            minutes,
+                          );
+                          if (!posInfo || hours < START_HOUR) return null;
+
+                          const itemId = `deadline-${deadline.id}`;
+                          const overlap = overlapInfo.get(itemId) || {
+                            column: 0,
+                            totalColumns: 1,
+                          };
+                          const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                          const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                          return (
+                            <button
+                              key={`mobile-deadline-${deadline.id}`}
+                              type="button"
+                              onClick={() => openEditDeadline(deadline)}
+                              className={cn(
+                                'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px]',
+                                deadline.completed && 'opacity-50 line-through',
+                              )}
+                              style={{
+                                top: posInfo.top,
+                                height: Math.max(posInfo.height, 44),
+                                left,
+                                width,
+                                backgroundColor: `${deadlineColor}dd`,
+                                borderLeftColor: deadlineColor,
+                              }}
+                            >
+                              <span className="block line-clamp-2">
+                                {deadline.unitCode} – {deadline.title}
+                              </span>
+                              <span className="text-[10px] opacity-80">
+                                {formatTimeShort(dueDate)}
+                              </span>
+                            </button>
+                          );
+                        })}
+
+                        {/* Events */}
+                        {dayEvents.map((event) => {
+                          const timeInfo = parseTimeRange(event.time);
+                          const eventColors = getEventColors(event);
+                          const eventTitle = getEventTitle(event);
+
+                          if (!timeInfo) return null;
+
+                          const posInfo = getTimePositionAndHeight(
+                            timeInfo.startHour,
+                            timeInfo.startMin,
+                            timeInfo.endHour,
+                            timeInfo.endMin,
+                          );
+                          if (!posInfo) return null;
+
+                          const itemId = `event-${event.id}`;
+                          const overlap = overlapInfo.get(itemId) || {
+                            column: 0,
+                            totalColumns: 1,
+                          };
+                          const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                          const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                          return (
+                            <button
+                              key={`mobile-event-${event.id}`}
+                              type="button"
+                              onClick={() => handleEventClick(event)}
+                              className={cn(
+                                'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px]',
+                                eventColors.bg,
+                                eventColors.border,
+                                eventColors.text,
+                              )}
+                              style={{
+                                top: posInfo.top,
+                                height: Math.max(posInfo.height, 44),
+                                left,
+                                width,
+                                ...eventColors.style,
+                              }}
+                            >
+                              <span className="block line-clamp-2">{eventTitle}</span>
+                              <span className="text-[10px] opacity-80">{event.time}</span>
+                            </button>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>

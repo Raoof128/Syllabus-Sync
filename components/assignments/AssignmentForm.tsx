@@ -250,9 +250,14 @@ export default function AssignmentForm({
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
                 aria-required="true"
+                aria-describedby={errors.title ? 'assignment-title-error' : undefined}
                 className={errors.title ? 'border-mq-error' : ''}
               />
-              {errors.title && <p className="text-sm text-mq-error">{errors.title}</p>}
+              {errors.title && (
+                <p id="assignment-title-error" className="text-sm text-mq-error" role="alert">
+                  {errors.title}
+                </p>
+              )}
             </div>
 
             {/* Unit */}
@@ -266,6 +271,7 @@ export default function AssignmentForm({
                   className={errors.unitCode ? 'border-mq-error' : ''}
                   aria-invalid={Boolean(errors.unitCode)}
                   aria-required="true"
+                  aria-describedby={errors.unitCode ? 'assignment-unit-error' : undefined}
                 >
                   <SelectValue placeholder={t('selectUnit')} />
                 </SelectTrigger>
@@ -277,7 +283,11 @@ export default function AssignmentForm({
                   ))}
                 </SelectContent>
               </Select>
-              {errors.unitCode && <p className="text-sm text-mq-error">{errors.unitCode}</p>}
+              {errors.unitCode && (
+                <p id="assignment-unit-error" className="text-sm text-mq-error" role="alert">
+                  {errors.unitCode}
+                </p>
+              )}
             </div>
 
             {/* Due Date and Time */}
@@ -293,9 +303,14 @@ export default function AssignmentForm({
                   onChange={(e) => setDueDate(e.target.value)}
                   aria-invalid={Boolean(errors.dueDate)}
                   aria-required="true"
+                  aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
                   className={errors.dueDate ? 'border-mq-error' : ''}
                 />
-                {errors.dueDate && <p className="text-sm text-mq-error">{errors.dueDate}</p>}
+                {errors.dueDate && (
+                  <p id="assignment-date-error" className="text-sm text-mq-error" role="alert">
+                    {errors.dueDate}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="assignment-time">{t('dueTime')}</Label>

@@ -55,7 +55,7 @@ export const sampleNotifications: Notification[] = [
     link: '/calendar',
   },
   {
-    id: 'notif-6',
+    id: '550e8400-e29b-41d4-a716-446655440015',
     title: 'Study Skills Workshop',
     message: 'Reminder: Study Skills Workshop starts tomorrow at 2:00 PM.',
     type: 'event',
@@ -64,7 +64,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-7',
+    id: '550e8400-e29b-41d4-a716-446655440016',
     title: 'Tech Networking Night',
     message:
       'Join us for Tech Networking Night this Friday at 6:00 PM. Great opportunity to meet industry professionals!',
@@ -74,7 +74,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-8',
+    id: '550e8400-e29b-41d4-a716-446655440017',
     title: 'Class Cancelled',
     message: 'Your COMP2310 lecture today has been cancelled. Check your email for details.',
     type: 'class',
@@ -83,7 +83,7 @@ export const sampleNotifications: Notification[] = [
     link: '/home',
   },
   {
-    id: 'notif-9',
+    id: '550e8400-e29b-41d4-a716-446655440018',
     title: 'Exam Schedule Released',
     message: 'Your exam schedule is now available. Check the calendar to view all exam dates.',
     type: 'deadline',
@@ -92,7 +92,7 @@ export const sampleNotifications: Notification[] = [
     link: '/calendar',
   },
   {
-    id: 'notif-10',
+    id: '550e8400-e29b-41d4-a716-446655440019',
     title: 'International Food Festival',
     message:
       "Don't miss the International Food Festival tomorrow! Free samples from around the world.",
@@ -102,7 +102,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-11',
+    id: '550e8400-e29b-41d4-a716-446655440020',
     title: 'New Feature: Campus Map',
     message: 'Navigate campus easily with our new interactive map feature.',
     type: 'system',
@@ -111,7 +111,7 @@ export const sampleNotifications: Notification[] = [
     link: '/map',
   },
   {
-    id: 'notif-12',
+    id: '550e8400-e29b-41d4-a716-446655440021',
     title: 'Library Hours Extended',
     message: 'Good news! The library will be open until midnight during exam period.',
     type: 'system',
@@ -120,7 +120,7 @@ export const sampleNotifications: Notification[] = [
     link: '/home',
   },
   {
-    id: 'notif-13',
+    id: '550e8400-e29b-41d4-a716-446655440022',
     title: 'Research Seminar: AI in Healthcare',
     message:
       'Join us for an exciting research seminar on AI applications in medicine this Thursday.',
@@ -130,7 +130,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-14',
+    id: '550e8400-e29b-41d4-a716-446655440023',
     title: 'Deadline Extension',
     message: 'Great news! Your assignment deadline has been extended by 3 days.',
     type: 'deadline',
@@ -139,7 +139,7 @@ export const sampleNotifications: Notification[] = [
     link: '/calendar',
   },
   {
-    id: 'notif-15',
+    id: '550e8400-e29b-41d4-a716-446655440024',
     title: 'Student Club Welcome Day',
     message: 'Discover new clubs and societies on campus. Free snacks provided!',
     type: 'event',
@@ -148,7 +148,7 @@ export const sampleNotifications: Notification[] = [
     link: '/feed',
   },
   {
-    id: 'notif-16',
+    id: '550e8400-e29b-41d4-a716-446655440025',
     title: 'Profile Update Reminder',
     message:
       'Please review your profile details (name, email, and units) to keep notifications accurate.',

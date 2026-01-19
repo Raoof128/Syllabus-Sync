@@ -233,7 +233,11 @@ const Header = memo(() => {
             <DropdownMenuTrigger asChild>
               <button
                 className={`group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
-                aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+                aria-label={
+                  unreadCount > 0
+                    ? t('viewUnreadNotifications', { count: unreadCount })
+                    : t('notifications')
+                }
                 aria-haspopup="menu"
                 title={unreadCount > 0 ? t('notificationsBellHint') : t('notifications')}
               >
@@ -354,6 +358,17 @@ const Header = memo(() => {
                   })
                 )}
               </div>
+              {/* View All link when there are notifications */}
+              {notifications.length > 0 && (
+                <div className="p-2 border-t border-mq-border">
+                  <Link
+                    href="/settings#notifications"
+                    className="block text-xs text-mq-info hover:text-mq-info/80 text-center py-2 hover:bg-mq-background-secondary rounded-mq transition-colors"
+                  >
+                    {t('viewAllNotifications')} ({notifications.length})
+                  </Link>
+                </div>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
