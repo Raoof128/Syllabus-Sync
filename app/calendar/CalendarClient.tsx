@@ -32,7 +32,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { sampleEvents } from '@/data/sampleEvents';
+// Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
 import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
@@ -319,6 +319,36 @@ export default function CalendarClient() {
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
 
+  // Highlighted widget derived from URL query parameter (e.g., "units" for My Units widget)
+  const [highlightedWidget, setHighlightedWidget] = useState<string | null>(null);
+
+  // Handle highlighted widget side effects (scroll + auto-clear URL)
+  useEffect(() => {
+    const widgetParam = searchParams.get('highlightWidget');
+    if (!widgetParam) return;
+
+    setHighlightedWidget(widgetParam);
+
+    const scrollTimer = window.setTimeout(() => {
+      if (widgetParam === 'units') {
+        unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+    // Clear highlight and URL parameter after 3 seconds
+    const clearTimer = window.setTimeout(() => {
+      setHighlightedWidget(null);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightWidget');
+      window.history.replaceState({}, '', url.toString());
+    }, 3000);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [searchParams]);
+
   // Handle highlighted unit side effects (scroll + auto-open detail panel + auto-clear URL)
   useEffect(() => {
     if (!highlightedUnitId) return;
@@ -366,8 +396,8 @@ export default function CalendarClient() {
     [currentWeekStart],
   );
 
-  // Combine all events
-  const allEvents = useMemo(() => [...sampleEvents, ...userEvents], [userEvents]);
+  // Events from store (loaded from Supabase API)
+  const allEvents = useMemo(() => userEvents, [userEvents]);
 
   // Get unit schedules for a specific day
   const getUnitsForDay = (date: Date) => {
@@ -839,11 +869,11 @@ export default function CalendarClient() {
                                 <div
                                   key={mqDate.id}
                                   className={cn(
-                                    'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-semibold flex items-center justify-center text-center leading-tight shadow-sm',
+                                    'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-bold flex items-center justify-center text-center leading-tight shadow-md ring-1 ring-inset ring-white/20',
                                     colors.bg,
                                     colors.text,
                                     colors.border,
-                                    'border',
+                                    'border-2',
                                   )}
                                   title={
                                     mqDate.description
@@ -851,7 +881,9 @@ export default function CalendarClient() {
                                       : `${mqDate.event} - ${mqDate.term}`
                                   }
                                 >
-                                  <span className="line-clamp-2">{mqDate.event}</span>
+                                  <span className="line-clamp-2 drop-shadow-sm">
+                                    {mqDate.event}
+                                  </span>
                                 </div>
                               );
                             })}
@@ -867,11 +899,6 @@ export default function CalendarClient() {
                   className="relative"
                   style={{
                     height: HOURS.length * HOUR_HEIGHT + 12,
-                    // Subtle grid to improve readability in light mode (also visible in dark)
-                    backgroundImage:
-                      'linear-gradient(to right, var(--calendar-grid-line, rgba(0,0,0,0.26)) 1px, transparent 1px), linear-gradient(to bottom, var(--calendar-grid-line, rgba(0,0,0,0.26)) 1px, transparent 1px)',
-                    backgroundSize: `calc((100% - 60px) / 7) ${HOUR_HEIGHT}px`,
-                    backgroundPosition: '60px 8px',
                   }}
                   role="presentation"
                   aria-hidden="true"
@@ -886,18 +913,19 @@ export default function CalendarClient() {
                     >
                       {/* Time Label */}
                       <div
-                        className="text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border"
+                        className="text-xs text-mq-content-secondary text-right pr-2 -mt-2"
                         role="rowheader"
                         aria-label={formatHourLabel(hour)}
                       >
                         {formatHourLabel(hour)}
                       </div>
                       {/* Hour Lines for each day */}
-                      {weekDays.map((day) => (
+                      {weekDays.map((day, dayIndex) => (
                         <div
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
                             'calendar-grid-cell border-t border-mq-border/90 border-r border-mq-border/80 last:border-r-0',
+                            dayIndex === 0 && 'border-l border-mq-border/80',
                             dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.03]',
                           )}
                           style={{ height: HOUR_HEIGHT }}
@@ -1329,10 +1357,10 @@ export default function CalendarClient() {
                             <div
                               key={mqDate.id}
                               className={cn(
-                                'px-2 py-1 rounded-md text-xs font-semibold',
+                                'px-2 py-1 rounded-md text-xs font-bold shadow-md ring-1 ring-inset ring-white/20',
                                 isAlert
-                                  ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 text-white'
-                                  : cn(colors.bg, colors.text, colors.border, 'border'),
+                                  ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background bg-red-600 text-white'
+                                  : cn(colors.bg, colors.text, colors.border, 'border-2'),
                               )}
                               title={
                                 mqDate.description
@@ -1343,7 +1371,7 @@ export default function CalendarClient() {
                               {isAlert && (
                                 <AlertTriangle className="inline h-3 w-3 mr-1" aria-hidden="true" />
                               )}
-                              {mqDate.event}
+                              <span className="drop-shadow-sm">{mqDate.event}</span>
                             </div>
                           );
                         })}
@@ -1879,7 +1907,14 @@ export default function CalendarClient() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Add Unit Widget */}
         <ScrollReveal delay={0.3}>
-          <MagicCard isLiquidEnhanced>
+          <MagicCard
+            isLiquidEnhanced
+            className={
+              highlightedWidget === 'units'
+                ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+                : ''
+            }
+          >
             <div className="mq-magic-card-content p-0" ref={unitsWidgetRef}>
               <Card className="border-0 shadow-none bg-transparent">
                 <CardHeader>
@@ -1917,7 +1952,7 @@ export default function CalendarClient() {
                           key={unit.id}
                           className={`flex items-center gap-3 p-2 rounded-lg border transition-all cursor-pointer ${
                             highlightedUnitId === unit.id
-                              ? 'border-mq-primary bg-mq-primary/10 ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background animate-pulse'
+                              ? 'border-mq-primary ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-[inset_0_0_0_1px_rgba(var(--c-primary-rgb),0.2)]'
                               : 'border-mq-border hover:border-mq-primary/20 hover:bg-mq-hover-background'
                           }`}
                           onClick={() => openUnitDetail(unit)}

@@ -1,20 +1,26 @@
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
-import { mapEventRow } from '@/app/api/_lib/mappers';
+import { mapEventRow, serializeEvent } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
+import type { Event } from '@/lib/types';
 
+// Schema matching the database: start_at, end_at, all_day
 const eventSchema = z.object({
   id: z.string().min(1).optional(),
   title: z.string().min(1),
   description: z.string().min(1),
-  date: z.date(),
-  time: z.string().min(1),
   location: z.string().min(1),
   building: z.string().optional(),
   category: z.enum(['Career', 'Social', 'Academic', 'Free Food']),
   imageUrl: z.string().optional(),
-  createdAt: z.date().optional(),
+  // Primary time fields
+  startAt: z.preprocess((val) => (typeof val === 'string' ? new Date(val) : val), z.date()),
+  endAt: z.preprocess(
+    (val) => (val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
+    z.date().optional(),
+  ),
+  allDay: z.boolean().default(false),
 });
 
 export async function GET(request: Request) {
@@ -26,12 +32,13 @@ export async function GET(request: Request) {
       const { data, error } = await supabase
         .from('events')
         .select('*')
+        .is('deleted_at', null) // Exclude soft-deleted events
         .or(`user_id.is.null,user_id.eq.${userId}`)
-        .order('event_date', { ascending: true });
+        .order('start_at', { ascending: true });
 
       if (error) {
         // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error:', error.code);
+        console.error('Database error fetching events:', error.code, error.message);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
@@ -58,39 +65,45 @@ export async function POST(request: Request) {
       const parsed = eventSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
+        console.error('Event validation failed:', parsed.error.issues);
         return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR);
       }
 
       const supabase = await createServerClient();
 
-      const payload = {
-        ...parsed.data,
+      // Create Event object for serialization
+      const eventData: Event & { user_id: string } = {
         id: parsed.data.id ?? crypto.randomUUID(),
         user_id: userId, // Security: Associate event with current user
-        createdAt: parsed.data.createdAt ?? new Date(),
+        title: parsed.data.title,
+        description: parsed.data.description,
+        location: parsed.data.location,
+        building: parsed.data.building,
+        category: parsed.data.category,
+        imageUrl: parsed.data.imageUrl,
+        startAt: parsed.data.startAt,
+        endAt: parsed.data.endAt,
+        allDay: parsed.data.allDay,
+        // Computed fields for backward compatibility
+        date: parsed.data.startAt,
+        time: parsed.data.allDay
+          ? ''
+          : parsed.data.startAt.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            }),
       };
 
       const { data, error } = await supabase
         .from('events')
-        .insert({
-          id: payload.id,
-          user_id: payload.user_id, // Security: Required for user-scoped data
-          title: payload.title,
-          description: payload.description,
-          event_date: payload.date.toISOString().split('T')[0], // Date only
-          event_time: payload.time,
-          location: payload.location,
-          building: payload.building,
-          category: payload.category,
-          image_url: payload.imageUrl,
-          created_at: payload.createdAt.toISOString(),
-        })
+        .insert(serializeEvent(eventData))
         .select('*')
         .single();
 
       if (error) {
         // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error:', error.code);
+        console.error('Database error creating event:', error.code, error.message);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 

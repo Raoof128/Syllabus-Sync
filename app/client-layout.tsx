@@ -14,6 +14,7 @@ import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
 import { apiRequest } from '@/lib/utils/api';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
@@ -75,6 +76,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const loadUnits = useUnitsStore((state) => state.loadUnits);
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
+  const loadEvents = useEventsStore((state) => state.loadEvents);
 
   // V3.1: Performance optimization - use pre-defined constant arrays
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
@@ -159,9 +161,10 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
         void loadUnits();
         void loadDeadlines();
         void loadNotifications();
+        void loadEvents();
       });
     }
-  }, [isAuthenticated, loadUnits, loadDeadlines, loadNotifications]);
+  }, [isAuthenticated, loadUnits, loadDeadlines, loadNotifications, loadEvents]);
 
   // Initialize notification scheduler for push notifications
   useNotificationScheduler();

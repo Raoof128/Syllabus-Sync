@@ -459,7 +459,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                     </CardTitle>
                     <Button size="sm" variant="outline" className="gap-1.5" asChild>
                       <Link
-                        href="/calendar"
+                        href="/calendar?highlightWidget=units"
                         aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
                       >
                         <Pencil className="h-3.5 w-3.5" aria-hidden="true" />

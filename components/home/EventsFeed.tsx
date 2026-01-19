@@ -1,11 +1,11 @@
 // components/home/EventsFeed.tsx
+// Events are loaded from Supabase via eventsStore
 'use client';
 
 import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, ExternalLink, Calendar } from 'lucide-react';
-import { sampleEvents } from '@/data/sampleEvents';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { isToday } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -25,11 +25,10 @@ const categoryColors: Record<string, string> = {
 const EventsFeed = memo(() => {
   const { t } = useTranslation();
   const router = useRouter();
-  const userEvents = useEventsStore((state) => state.events);
+  const events = useEventsStore((state) => state.events);
 
-  // Combine sample events with user events and filter to today
-  const allEvents = [...sampleEvents, ...userEvents];
-  const todayEvents = allEvents.filter((event) => isToday(new Date(event.date)));
+  // Filter events to today only
+  const todayEvents = events.filter((event) => isToday(new Date(event.date)));
 
   const handleViewAll = () => {
     router.push('/feed');

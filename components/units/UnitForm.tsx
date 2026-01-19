@@ -151,19 +151,19 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     // Validate class times separately
     const classTimeErrors: Array<{ field: string; message: string }> = [];
     schedule.forEach((ct, index) => {
-      if (
-        !ct.startTime ||
-        !ct.endTime ||
-        !TIME_REGEX.test(ct.startTime) ||
-        !TIME_REGEX.test(ct.endTime)
-      ) {
+      // Check for missing or invalid time format
+      const startTimeValid = ct.startTime && TIME_REGEX.test(ct.startTime);
+      const endTimeValid = ct.endTime && TIME_REGEX.test(ct.endTime);
+
+      if (!startTimeValid || !endTimeValid) {
         classTimeErrors.push({
           field: `time_${index}`,
-          message: t('endTimeAfterStart'),
+          message: t('invalidTimeFormat'),
         });
         return;
       }
 
+      // Check that end time is after start time
       if (ct.startTime >= ct.endTime) {
         classTimeErrors.push({
           field: `time_${index}`,
@@ -388,72 +388,80 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             )}
 
             <div className="space-y-3">
-              {schedule.map((ct, index) => (
-                <div key={ct.id} className="flex items-start gap-2 p-3 border rounded-lg">
-                  <div className="flex-1 grid grid-cols-3 gap-2">
-                    {/* Day */}
-                    <div className="space-y-1">
-                      <Label className="text-xs">{t('day')}</Label>
-                      <Select
-                        value={ct.day}
-                        onValueChange={(value) => updateClassTime(ct.id, 'day', value)}
-                      >
-                        <SelectTrigger className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {DAYS.map((day) => (
-                            <SelectItem key={day} value={day}>
-                              {t(day.toLowerCase() as TranslationKey)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Start Time */}
-                    <div className="space-y-1">
-                      <Label className="text-xs">{t('start')}</Label>
-                      <Input
-                        type="time"
-                        value={ct.startTime}
-                        onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-
-                    {/* End Time */}
-                    <div className="space-y-1">
-                      <Label className="text-xs">{t('end')}</Label>
-                      <Input
-                        type="time"
-                        value={ct.endTime}
-                        onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
-                        className="h-9"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Remove Button */}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeClassTime(ct.id)}
-                    className="mt-6"
-                    aria-label={t('removeClassTime')}
+              {schedule.map((ct, index) => {
+                const hasTimeError = errors[`time_${index}`] || errors[`duplicate_${index}`];
+                return (
+                  <div
+                    key={ct.id}
+                    className={`p-3 border rounded-lg ${hasTimeError ? 'border-mq-error' : ''}`}
                   >
-                    <X className="w-4 h-4" />
-                  </Button>
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 grid grid-cols-3 gap-2">
+                        {/* Day */}
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('day')}</Label>
+                          <Select
+                            value={ct.day}
+                            onValueChange={(value) => updateClassTime(ct.id, 'day', value)}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DAYS.map((day) => (
+                                <SelectItem key={day} value={day}>
+                                  {t(day.toLowerCase() as TranslationKey)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
 
-                  {/* Errors for this class time */}
-                  {(errors[`time_${index}`] || errors[`duplicate_${index}`]) && (
-                    <div className="col-span-4 text-xs text-mq-error">
-                      {errors[`time_${index}`] || errors[`duplicate_${index}`]}
+                        {/* Start Time */}
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('start')}</Label>
+                          <Input
+                            type="time"
+                            value={ct.startTime}
+                            onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
+                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                          />
+                        </div>
+
+                        {/* End Time */}
+                        <div className="space-y-1">
+                          <Label className="text-xs">{t('end')}</Label>
+                          <Input
+                            type="time"
+                            value={ct.endTime}
+                            onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
+                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Remove Button */}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeClassTime(ct.id)}
+                        className="mt-6"
+                        aria-label={t('removeClassTime')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {/* Errors for this class time - now properly below inputs */}
+                    {hasTimeError && (
+                      <p className="mt-2 text-xs text-mq-error" role="alert">
+                        {errors[`time_${index}`] || errors[`duplicate_${index}`]}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

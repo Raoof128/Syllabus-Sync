@@ -198,11 +198,22 @@ const Sidebar = memo(() => {
     };
   }, []);
 
+  // Toggle mobile menu with both click and touch support
+  const toggleMobileMenu = useCallback(() => {
+    setMobileMenuOpen((prev) => !prev);
+  }, []);
+
   // Close menu when clicking the overlay backdrop
   const handleOverlayClick = useCallback(() => {
     setMobileMenuOpen(false);
     menuButtonRef.current?.focus();
   }, []);
+
+  // Close mobile menu when route changes (navigation occurred)
+  useEffect(() => {
+    // Close menu on navigation
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   return (
     <>
@@ -214,8 +225,14 @@ const Sidebar = memo(() => {
           ======================================================================== */}
       <button
         ref={menuButtonRef}
+        type="button"
         className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center btn-premium"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        onClick={toggleMobileMenu}
+        onTouchEnd={(e) => {
+          // Prevent ghost clicks and double-firing on touch devices
+          e.preventDefault();
+          toggleMobileMenu();
+        }}
         aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
         aria-expanded={mobileMenuOpen}
         aria-controls="mobile-sidebar"

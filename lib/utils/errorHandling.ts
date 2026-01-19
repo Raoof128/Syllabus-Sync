@@ -59,19 +59,14 @@ export class AppErrorHandler {
   }
 
   // Handle form validation errors
+  // NOTE: Validation errors are expected user input issues, not application errors.
+  // They are displayed inline to the user and should not be logged to console.
   handleValidationError(errors: ValidationError[]): FormErrors {
     const formErrors: FormErrors = {};
 
     errors.forEach((error) => {
       formErrors[error.field] = error.message;
     });
-
-    if (errors.length > 0) {
-      const validationError = new Error(
-        `Form validation failed: ${errors.map((e) => e.field).join(', ')}`,
-      );
-      this.logError(validationError, 'FormValidation', 'low');
-    }
 
     return formErrors;
   }

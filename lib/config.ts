@@ -68,7 +68,7 @@ export const BRAND_COLORS = {
  */
 export const UNIT_COLORS = [
   { name: 'Red', value: '#A6192E', translationKey: 'colorUniversityRed' },
-  { name: 'Blue', value: '#002A45', translationKey: 'colorUniversityBlue' },
+  { name: 'Blue', value: '#1E5AA8', translationKey: 'colorUniversityBlue' },
   { name: 'Gold', value: '#FFB81C', translationKey: 'colorUniversityGold' },
   { name: 'Green', value: '#10b981', translationKey: 'colorGreen' },
   { name: 'Purple', value: '#a855f7', translationKey: 'colorPurple' },

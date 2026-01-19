@@ -21,7 +21,7 @@ import {
   Check,
   Plus,
 } from 'lucide-react';
-import { sampleEvents } from '@/data/sampleEvents';
+// Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -77,6 +77,9 @@ const FeedClient = memo(() => {
   // Ref for scrolling to highlighted event
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
   const highlightAttemptsRef = useRef(0);
+
+  // Events store - get all events from Supabase
+  const storeEvents = useEventsStore((state) => state.events);
 
   // Gamification store - use individual selectors to prevent re-renders
   const isDemo = useGamificationStore((state) => state.isDemo);
@@ -294,28 +297,28 @@ const FeedClient = memo(() => {
   const filteredEvents = useMemo(
     () =>
       activeFilter === 'All'
-        ? sampleEvents
-        : sampleEvents.filter((event) => event.category === activeFilter),
-    [activeFilter],
+        ? storeEvents
+        : storeEvents.filter((event) => event.category === activeFilter),
+    [activeFilter, storeEvents],
   );
 
   // Calculate stats
   const stats = useMemo(() => {
-    const thisWeeksEvents = sampleEvents.filter((event) => {
+    const thisWeeksEvents = storeEvents.filter((event) => {
       const eventDate = new Date(event.date);
       const now = new Date();
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       return eventDate >= now && eventDate <= weekFromNow;
     });
 
-    const freeFoodEvents = sampleEvents.filter((event) => event.category === 'Free Food');
+    const freeFoodEvents = storeEvents.filter((event) => event.category === 'Free Food');
 
     return {
-      total: sampleEvents.length,
+      total: storeEvents.length,
       thisWeek: thisWeeksEvents.length,
       freeFood: freeFoodEvents.length,
     };
-  }, []);
+  }, [storeEvents]);
 
   const filters: FilterType[] = ['All', 'Academic', 'Career', 'Social', 'Free Food'];
 
