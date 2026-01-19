@@ -147,10 +147,20 @@ export const useEventsStore = create<EventsState>()(
         const currentEvent = get().events.find((e) => e.id === id);
         if (!currentEvent) return null;
 
+        // Check if this is a public event (userId is null or undefined)
+        // Public events cannot be updated by users - they're read-only
+        const isPublicEvent = !currentEvent.userId;
+
         const optimisticUpdate = normalizeEvent({ ...currentEvent, ...updates });
         set((state) => ({
           events: state.events.map((e) => (e.id === id ? optimisticUpdate : e)),
         }));
+
+        // Skip API call for public events - just keep the local update for UI purposes
+        if (isPublicEvent) {
+          console.log('Skipping API update for public event:', id);
+          return optimisticUpdate;
+        }
 
         try {
           const updatePayload: Record<string, unknown> = {};
@@ -168,45 +178,18 @@ export const useEventsStore = create<EventsState>()(
               updates.endAt instanceof Date ? updates.endAt.toISOString() : updates.endAt;
           if (updates.allDay !== undefined) updatePayload.allDay = updates.allDay;
 
-          try {
-            const updated = await apiRequest<Event>(`/api/events/${id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(updatePayload),
-            });
-            const serverNormalized = normalizeEvent(updated);
-            set((state) => ({
-              events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
-            }));
-            return serverNormalized;
-          } catch (putError) {
-            const errorMessage = putError instanceof Error ? putError.message : String(putError);
-            if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-              const created = await apiRequest<Event>('/api/events', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  id,
-                  title: updatePayload.title ?? currentEvent.title,
-                  description: updatePayload.description ?? currentEvent.description ?? '',
-                  location: updatePayload.location ?? currentEvent.location ?? '',
-                  building: updatePayload.building ?? currentEvent.building ?? '',
-                  category: updatePayload.category ?? currentEvent.category ?? 'General',
-                  imageUrl: updatePayload.imageUrl ?? currentEvent.imageUrl ?? null,
-                  startAt: updatePayload.startAt ?? currentEvent.startAt.toISOString(),
-                  endAt: updatePayload.endAt ?? currentEvent.endAt?.toISOString() ?? null,
-                  allDay: updatePayload.allDay ?? currentEvent.allDay ?? false,
-                }),
-              });
-              const serverNormalized = normalizeEvent(created);
-              set((state) => ({
-                events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
-              }));
-              return serverNormalized;
-            }
-            throw putError;
-          }
+          const updated = await apiRequest<Event>(`/api/events/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatePayload),
+          });
+          const serverNormalized = normalizeEvent(updated);
+          set((state) => ({
+            events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
+          }));
+          return serverNormalized;
         } catch (error) {
+          // Revert to original state on error
           set((state) => ({
             events: state.events.map((e) => (e.id === id ? currentEvent : e)),
           }));
@@ -222,6 +205,13 @@ export const useEventsStore = create<EventsState>()(
       removeEvent: async (id) => {
         const eventToRestore = get().events.find((e) => e.id === id);
 
+        // Check if this is a public event - public events cannot be deleted
+        if (eventToRestore && !eventToRestore.userId) {
+          console.warn('Cannot delete public event:', id);
+          return;
+        }
+
+        // Optimistic delete
         set((state) => ({
           events: state.events.filter((e) => e.id !== id),
         }));
@@ -229,17 +219,15 @@ export const useEventsStore = create<EventsState>()(
         try {
           await apiRequest<{ id: string }>(`/api/events/${id}`, { method: 'DELETE' });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          if (!errorMessage.includes('404') && !errorMessage.includes('not found')) {
-            if (eventToRestore) {
-              set((state) => ({ events: [...state.events, eventToRestore] }));
-            }
-            errorHandler.logError(
-              error instanceof Error ? error : new Error(`Failed to remove event ${id}`),
-              'EventsStore.removeEvent',
-              'high',
-            );
+          // On error, restore the event to local state
+          if (eventToRestore) {
+            set((state) => ({ events: [...state.events, eventToRestore] }));
           }
+          errorHandler.logError(
+            error instanceof Error ? error : new Error(`Failed to remove event ${id}`),
+            'EventsStore.removeEvent',
+            'high',
+          );
         }
       },
 

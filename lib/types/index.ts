@@ -44,6 +44,7 @@ export type Deadline = {
 
 export type Event = {
   id: string;
+  userId?: string | null; // null for public/campus events, user ID for personal events
   title: string;
   description: string;
   location: string; // "Library Room 204"

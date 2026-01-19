@@ -64,6 +64,7 @@ export const mapEventRow = (row: Row): Event => {
 
   return {
     id: String(row.id ?? ''),
+    userId: row.user_id ? String(row.user_id) : null, // null for public events
     title: String(row.title ?? ''),
     description: String(row.description ?? ''),
     location: String(row.location ?? ''),
