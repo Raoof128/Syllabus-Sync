@@ -221,6 +221,17 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           }));
           return normalized;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // Fix for 404: If deadline is missing on server (e.g. from migration), create it instead
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            console.warn(
+              `Deadline ${id} not found on server during update, attempting to create it...`,
+            );
+            const fullDeadline = { ...currentDeadline, ...updatedDeadline };
+            return get().addDeadline(fullDeadline);
+          }
+
           set((state) => ({
             deadlines: state.deadlines.map((d) => (d.id === id ? currentDeadline : d)),
           }));

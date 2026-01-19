@@ -42,12 +42,18 @@ const unitSchema = z.object({
     .max(20, 'Unit code must be 20 characters or less')
     .transform((val) => val.trim().toUpperCase()), // Normalize: trim and uppercase
   name: z.string().min(1, 'Unit name is required').max(200),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color').default('#3B82F6'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
+    .default('#3B82F6'),
   description: z.string().max(500).optional(),
-  location: z.object({
-    building: z.string().max(100).default(''),
-    room: z.string().max(50).default(''),
-  }).optional().default({ building: '', room: '' }),
+  location: z
+    .object({
+      building: z.string().max(100).default(''),
+      room: z.string().max(50).default(''),
+    })
+    .optional()
+    .default({ building: '', room: '' }),
   schedule: z.array(classTimeSchema).optional().default([]), // Max 14 class times per week
   createdAt: dateSchema.optional(),
 });
@@ -269,15 +275,17 @@ export async function POST(request: Request) {
           code: unitData.code,
           name: unitData.name,
           color: unitData.color,
-          location: location ? { building: location.building || '', room: location.room || '' } : null,
+          location: location
+            ? { building: location.building || '', room: location.room || '' }
+            : null,
           description: unitData.description || null,
           created_at: unitData.createdAt
             ? unitData.createdAt.toISOString()
             : new Date().toISOString(),
         };
 
-        console.log('Creating unit for user:', userId);
-        console.log('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
+        console.warn('Creating unit for user:', userId);
+        console.warn('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
 
         const { data: unit, error: unitError } = await supabase
           .from('units')
@@ -286,7 +294,13 @@ export async function POST(request: Request) {
           .single();
 
         if (unitError) {
-          console.error('Unit insert error:', unitError.code, unitError.message, unitError.details, unitError.hint);
+          console.error(
+            'Unit insert error:',
+            unitError.code,
+            unitError.message,
+            unitError.details,
+            unitError.hint,
+          );
           if (unitError.code === '23505') {
             // Unique constraint violation
             return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);

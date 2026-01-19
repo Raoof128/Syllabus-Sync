@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-Raouf: 2026-01-19 - Fix CSS import type safety
+Raouf: 2026-01-19 - Remove "Mark as completed" from Add Exam form + lint/build fixes
+
+### Changed
+- Removed "Mark as completed" checkbox and associated state from ExamForm.tsx.
+- Aligns exam form with simplified assignment form design.
+
+### Fixed
+- Fixed syntax error in scripts/inspect-unit-structure.js (typo in function call).
+- Fixed formatting in app/api/auth/signup/route.ts and app/api/units/route.ts.
+- Fixed ZodError type casting in app/api/deadlines/route.ts (use proper ZodError type with .issues).
+- Removed unused `schedule` destructuring in app/api/units/[id]/route.ts.
+- Changed console.log to console.warn in app/api/units/route.ts.
+
+### Verification
+- `npm run check` (all 275 tests pass, lint OK, build success)
 
 ### Fixed
 - Added `types/global.d.ts` to properly declare CSS imports in TypeScript.

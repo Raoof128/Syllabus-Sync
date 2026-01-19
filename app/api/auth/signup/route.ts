@@ -22,14 +22,18 @@ const signupSchema = z.object({
   course: z.string().optional(),
   year: z.string().optional(),
   // Nested options format (from frontend)
-  options: z.object({
-    data: z.object({
-      full_name: z.string().optional(),
-      student_id: z.string().optional(),
-      course: z.string().optional(),
-      year: z.string().optional(),
-    }).optional(),
-  }).optional(),
+  options: z
+    .object({
+      data: z
+        .object({
+          full_name: z.string().optional(),
+          student_id: z.string().optional(),
+          course: z.string().optional(),
+          year: z.string().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 // Developer emails that can bypass email confirmation in development

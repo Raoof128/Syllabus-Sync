@@ -136,9 +136,19 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
   const validateForm = (): boolean => {
     const TIME_REGEX = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    const UNIT_CODE_REGEX = /^[A-Z]{2,6}\d{0,4}[A-Z]?$/;
 
     const validator = createFormValidator({
-      code: validationRules.required(t('unitCode')),
+      code: (value) => {
+        const requiredError = validationRules.required(t('unitCode'))(value);
+        if (requiredError) return requiredError;
+
+        const stringValue = String(value).trim().toUpperCase();
+        if (!UNIT_CODE_REGEX.test(stringValue)) {
+          return t('invalidUnitCodeFormat');
+        }
+        return null;
+      },
       name: validationRules.required(t('unitName')),
       building: validationRules.required(t('building')),
       room: validationRules.required(t('room')),

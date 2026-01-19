@@ -16,10 +16,6 @@ const supabase = createClient(supabaseUrl, serviceRoleKey);
 async function inspect() {
   console.log('--- Inspecting Database with Service Role Key ---');
 
-  // 1. List tables (using a trick or just checking if select works)
-  // Actually, standard way is to query pg_catalog if possible, or just try to select from known tables.
-  // We'll try to select 1 row from 'units' to see if table exists and columns.
-
   console.log('\nChecking table: units');
   const { data: units, error: unitsError } = await supabase.from('units').select('*').limit(1);
   if (unitsError) {
@@ -27,7 +23,11 @@ async function inspect() {
   } else {
     console.log('Successfully queried units. Row count:', units.length);
     if (units.length > 0) {
-      console.log('Sample row keys:', Object.keys(units[0]));
+      const unit = units[0];
+      console.log('Sample row keys:', Object.keys(unit));
+      console.log('Has "location" column:', 'location' in unit);
+      console.log('Has "building" column:', 'building' in unit);
+      console.log('Has "room" column:', 'room' in unit);
     } else {
       console.log('Table is empty.');
     }

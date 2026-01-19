@@ -782,6 +782,7 @@
   "roomLabel": "Room",
   "classTimesLabel": "Class Times",
   "unitCodeHelp": "Use the official unit code (letters + numbers).",
+  "invalidUnitCodeFormat": "Invalid format. Must be 2-6 letters followed by 0-4 numbers (e.g. COMP1000).",
   "buildingHelp": "Use the campus building code from the map list.",
   "titleHelp": "Keep titles short for calendar readability.",
   "unitHelp": "Pick the unit that owns this deadline.",

@@ -35,7 +35,8 @@ const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const unitUpdateSchema = z.object({
   code: z.string().min(1).optional(),
   name: z.string().min(1).optional(),
-  color: z.string().optional(),
+  color: z.string().min(1).optional(),
+  description: z.string().max(500).optional(),
   location: z
     .object({
       building: z.string().default(''),
@@ -71,12 +72,41 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       const supabase = await createServerClient();
 
+      // Destructure to handle special fields
+      const { location, /* schedule: _schedule, */ createdAt, ...rest } = parsed.data;
+
       const updatePayload: Record<string, unknown> = {
-        ...parsed.data,
+        ...rest,
       };
-      if (parsed.data.createdAt) {
-        updatePayload.created_at = parsed.data.createdAt.toISOString();
-        delete updatePayload.createdAt;
+
+      // Map location object to flat columns
+      if (location) {
+        updatePayload.building = location.building;
+        updatePayload.room = location.room;
+      }
+
+      // Map createdAt to created_at
+      if (createdAt) {
+        updatePayload.created_at = createdAt.toISOString();
+      }
+
+      // If payload is empty (e.g. only schedule updated), fetch current unit to return it
+      // Note: Schedule updates are not yet handled in this atomic update
+      if (Object.keys(updatePayload).length === 0) {
+        const { data, error } = await supabase
+          .from('units')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', userId)
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
+          }
+          return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+        }
+        return jsonSuccess(mapUnitRow(data));
       }
 
       const { data, error } = await supabase
@@ -92,6 +122,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         console.error('Database error updating unit:', error.code, error.message);
         if (error.code === 'PGRST116') {
           return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
+        }
+        if (error.code === '23505') {
+          return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
         }
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }

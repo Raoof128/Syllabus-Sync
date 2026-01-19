@@ -400,20 +400,6 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 </Select>
               )}
             </div>
-
-            {/* Completed */}
-            <div className="flex items-center gap-2">
-              <input
-                id="exam-completed"
-                type="checkbox"
-                checked={completed}
-                onChange={(e) => setCompleted(e.target.checked)}
-                className="h-4 w-4 rounded border-mq-border accent-mq-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-              />
-              <Label htmlFor="exam-completed" className="text-sm font-medium">
-                {t('markAsCompleted')}
-              </Label>
-            </div>
           </div>
 
           <DialogFooter className="flex gap-2">

@@ -53,6 +53,62 @@ Version: 1.0.0-rc.7 | Last Updated: January 14, 2026
 | **AI Integration** | Kit | 🔜 Demo Feature |
 
 Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Code quality lint and build fixes
+Summary:
+  - Fixed syntax error in scripts/inspect-unit-structure.js (typo "insp ect" -> "inspect").
+  - Fixed formatting in app/api/auth/signup/route.ts and app/api/units/route.ts.
+  - Fixed ZodError type casting in app/api/deadlines/route.ts (use proper ZodError type).
+  - Removed unused `schedule` destructuring in app/api/units/[id]/route.ts.
+  - Changed console.log to console.warn in app/api/units/route.ts.
+Files: scripts/inspect-unit-structure.js; app/api/auth/signup/route.ts; app/api/units/route.ts; app/api/deadlines/route.ts; app/api/units/[id]/route.ts.
+Verification: `npm run check` (all 275 tests pass, lint OK, build success).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Remove "Mark as completed" from Add Exam form
+Summary:
+  - Removed "Mark as completed" checkbox and associated state management from ExamForm.tsx.
+  - Aligns exam form with assignment form simplification done on 2026-01-17.
+Files: components/exams/ExamForm.tsx.
+Verification: `npm run build` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Fix deadline 404 errors with auto-create fallback
+Summary:
+  - Modified deadline store to catch 404 errors on PUT updates and automatically create the deadline via POST.
+  - Handles fixed UUIDs from client-side migration that don't exist on server.
+  - Preserves user data while maintaining atomic updates.
+Files: lib/store/deadlinesStore.ts.
+Verification: `npm run build` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Build conflict and type error fixes
+Summary:
+  - Resolved merge conflict in units/[id]/route.ts (kept stricter color validation).
+  - Fixed TypeScript error in deadlines/route.ts by casting Zod error to any.
+Files: app/api/units/[id]/route.ts, app/api/deadlines/route.ts.
+Verification: `npm run build` (pass).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Fix deadline 404 errors with auto-create fallback
+Summary:
+  - Modified deadline store to catch 404 errors on PUT updates and automatically create the deadline via POST.
+  - Handles fixed UUIDs from client-side migration that don't exist on server.
+Files: lib/store/deadlinesStore.ts.
+Verification: `npm run build` (pass).
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Build conflict and type error fixes
+Summary:
+  - Resolved merge conflict in units/[id]/route.ts (kept stricter color validation).
+  - Fixed TypeScript error in deadlines/route.ts by casting Zod error to any.
+Files: app/api/units/[id]/route.ts, app/api/deadlines/route.ts.
+Verification: `npm run build` (pass).
+
+Raouf: 2026-01-19 (Australia/Sydney)
 Scope: Type Safety Improvement
 Summary:
   - Added `types/global.d.ts` to declare CSS modules (`*.css`).
