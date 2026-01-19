@@ -1,5 +1,5 @@
 -- Database Schema for Syllabus Sync
--- Last Updated: 2026-01-14
+-- Last Updated: 2026-01-19
 --
 -- REFERENCE DOCUMENT ONLY
 -- =======================
@@ -11,11 +11,20 @@
 --
 -- See supabase/README.md for more information.
 --
+-- USER-CENTRIC ARCHITECTURE:
+-- =========================
+-- This database follows a strict user-centric design where:
+-- 1. auth.users.id is the SINGLE source of truth for user identity
+-- 2. profiles.id = auth.users.id (1:1 relationship, same UUID)
+-- 3. All domain data is OWNED by exactly one user via user_id FK
+-- 4. RLS policies enforce complete data isolation between users
+--
 -- USER DATA FLOW:
 -- ==============
 -- 1. auth.users: Managed by Supabase Auth (email, password, metadata)
 -- 2. profiles: Public user data (full_name, student_id, course, year, avatar)
--- 3. gamification_profiles: XP, streaks, levels
+--    - profiles.id = auth.users.id (NOT a separate ID!)
+-- 3. gamification_profiles: XP, streaks, levels (linked via user_id)
 --
 -- When a user signs up:
 --   - auth.users row is created by Supabase Auth
@@ -25,6 +34,21 @@
 -- To query all user data together, use the user_details VIEW:
 --   SELECT * FROM user_details WHERE id = auth.uid();
 -- Or use the get_my_profile() RPC function.
+--
+-- DATA OWNERSHIP:
+-- ==============
+-- Every record in domain tables MUST have a user_id that references auth.users.id:
+--   - units.user_id (required) - each user has their own units
+--   - deadlines.user_id (required) - each user has their own deadlines
+--   - events.user_id (nullable) - NULL = public event, set = private user event
+--   - notifications.user_id (required) - private to each user
+--   - user_preferences.user_id (required, unique) - one per user
+--
+-- UNIT ISOLATION:
+-- ==============
+-- Units are normalized PER USER. The constraint units_user_code_unique UNIQUE(user_id, code)
+-- ensures that each user can have their own "COMP2310" unit without conflicts.
+-- This enables complete data isolation: updating Pouya's COMP2310 never affects Kate's.
 --
 -- IMPORTANT CLARIFICATIONS:
 -- ========================
@@ -48,6 +72,7 @@
 --   - 20260114013519: Add soft deletes, constraints, seed functions
 --   - 20260114014506: Schema cleanup - remove due_at, add FK constraints, sync event timestamps
 --   - 20260114015445: Simplify events - remove event_date/event_time, standardize on start_at/end_at/all_day
+--   - 20260119000000: Multi-user demo seed - creates isolated data for Pouya, Raoof, Kate
 --   - 20260114000000: Add missing materialized views (analytics, leaderboard, activity)
 
 -- Enable UUID extension
@@ -299,7 +324,7 @@ GRANT SELECT ON public.xp_config TO authenticated;
 -- to provide all user data in one query. The gamification fields are NOT duplicated.
 
 CREATE OR REPLACE VIEW public.user_details AS
-SELECT 
+SELECT
     p.id,
     p.email,
     p.full_name,
@@ -313,7 +338,7 @@ SELECT
     gp.streak_days,
     gp.longest_streak,
     gp.last_activity_date,
-    CASE 
+    CASE
         WHEN gp.xp IS NULL OR gp.xp < 0 THEN 1
         ELSE LEAST(100, FLOOR(SQRT(gp.xp::float / 25)) + 1)::integer
     END AS level

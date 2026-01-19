@@ -4,7 +4,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { sampleDeadlines } from '@/data/sampleUnits';
+// NOTE: Sample data fallback removed - authenticated users load from database only
+// This ensures proper user isolation and data ownership
 
 interface DeadlinesState {
   deadlines: Deadline[];
@@ -17,6 +18,7 @@ interface DeadlinesState {
   toggleComplete: (id: string) => Promise<void>;
   getUpcoming: (limit?: number) => Deadline[];
   getStressLevel: () => StressLevel;
+  clearDeadlines: () => void;
 }
 
 const normalizeDeadline = (deadline: Deadline): Deadline => ({
@@ -52,13 +54,9 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             return true;
           });
 
-          // If no deadlines from API, seed with sample data for demo
-          if (validData.length === 0) {
-            const seededDeadlines = sampleDeadlines.map(normalizeDeadline);
-            set({ deadlines: seededDeadlines, hasLoaded: true });
-          } else {
-            set({ deadlines: validData, hasLoaded: true });
-          }
+          // Use database data directly - no sample data fallback for authenticated users
+          // This ensures proper user isolation and data ownership
+          set({ deadlines: validData, hasLoaded: true });
         } catch (error) {
           // Silently fail for auth errors - expected when not logged in
           const isAuthError =
@@ -67,16 +65,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
               error.message.includes('authentication') ||
               error.message.includes('Unauthorized'));
 
-          if (!isAuthError) {
-            console.warn('Failed to load deadlines from API:', error);
-          }
-
-          // If no persisted deadlines, seed with sample data for demo
-          const currentDeadlines = get().deadlines;
-          if (currentDeadlines.length === 0) {
-            const seededDeadlines = sampleDeadlines.map(normalizeDeadline);
-            set({ deadlines: seededDeadlines, hasLoaded: true });
+          if (isAuthError) {
+            // Auth failure: clear persisted data to prevent showing stale user data
+            set({ deadlines: [], hasLoaded: true });
           } else {
+            console.warn('Failed to load deadlines from API:', error);
+            // Non-auth error: keep persisted data but mark as loaded
             set({ hasLoaded: true });
           }
         } finally {
@@ -257,6 +251,10 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         } catch {
           return 'Low';
         }
+      },
+
+      clearDeadlines: () => {
+        set({ deadlines: [], hasLoaded: false, isLoading: false });
       },
     }),
     {

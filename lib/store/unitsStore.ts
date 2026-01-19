@@ -19,6 +19,7 @@ interface UnitsState {
   updateUnit: (id: string, unit: Partial<Unit>) => Promise<Unit | null>;
   getUnitByCode: (code: string) => Unit | undefined;
   getTodayClasses: () => (Unit & ClassTime)[];
+  clearUnits: () => void;
 }
 
 const normalizeUnit = (unit: Unit): Unit => ({
@@ -39,12 +40,25 @@ export const useUnitsStore = create<UnitsState>()(
         set({ isLoading: true });
         try {
           const data = await apiRequest<Unit[]>('/api/units', { noRetry: true });
+          // Use database data directly - no sample data fallback for authenticated users
+          // This ensures proper user isolation and data ownership
           set({ units: data.map(normalizeUnit), hasLoaded: true });
         } catch (error) {
-          // Silently fail - keep persisted data if API is unavailable
-          // This allows the app to work with local data until database is set up
-          console.warn('Failed to load units from API, using persisted data:', error);
-          set({ hasLoaded: true }); // Mark as loaded to prevent retry
+          // Check if this is an auth error
+          const isAuthError =
+            error instanceof Error &&
+            (error.message.includes('401') ||
+              error.message.includes('authentication') ||
+              error.message.includes('Unauthorized'));
+
+          if (isAuthError) {
+            // Auth failure: clear persisted data to prevent showing stale user data
+            set({ units: [], hasLoaded: true });
+          } else {
+            // Non-auth error: keep persisted data but mark as loaded
+            console.warn('Failed to load units from API, using persisted data:', error);
+            set({ hasLoaded: true });
+          }
         } finally {
           set({ isLoading: false });
         }
@@ -185,6 +199,10 @@ export const useUnitsStore = create<UnitsState>()(
         );
 
         return todayClasses.sort((a, b) => a.startTime.localeCompare(b.startTime));
+      },
+
+      clearUnits: () => {
+        set({ units: [], hasLoaded: false, isLoading: false });
       },
     }),
     {

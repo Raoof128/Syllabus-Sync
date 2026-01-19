@@ -6,7 +6,8 @@ import { persist } from 'zustand/middleware';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
-import { sampleNotifications } from '@/data/sampleNotifications';
+// NOTE: Sample data fallback removed - authenticated users load from database only
+// This ensures proper user isolation and data ownership
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
@@ -24,6 +25,7 @@ interface NotificationsState {
   removeNotification: (id: string) => Promise<void>;
   clearAll: () => Promise<void>;
   getUnreadCount: () => number;
+  clearNotifications: () => void;
 }
 
 const normalizeNotification = (notification: Notification): Notification => ({
@@ -52,39 +54,24 @@ export const useNotificationsStore = create<NotificationsState>()(
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .slice(0, MAX_NOTIFICATIONS);
 
-          // If no notifications from API, seed with sample data for demo
-          if (normalized.length === 0) {
-            const seededNotifications = sampleNotifications
-              .map(normalizeNotification)
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .slice(0, MAX_NOTIFICATIONS);
-            set({ notifications: seededNotifications, hasLoaded: true });
-          } else {
-            set({ notifications: normalized, hasLoaded: true });
-          }
+          // Use database data directly - no sample data fallback for authenticated users
+          // This ensures proper user isolation and data ownership
+          set({ notifications: normalized, hasLoaded: true });
         } catch (error) {
-          // Silently fail for auth errors (401) - expected when not logged in
-          // For other errors, seed with sample data if no persisted data exists
+          // Check if this is an auth error
           const isAuthError =
             error instanceof Error &&
             (error.message.includes('401') ||
               error.message.includes('authentication') ||
               error.message.includes('Unauthorized'));
 
-          if (!isAuthError) {
-            console.warn('Failed to load notifications from API, using sample data:', error);
-          }
-
-          // If no persisted notifications, seed with sample data for demo
-          const currentNotifications = get().notifications;
-          if (currentNotifications.length === 0) {
-            const seededNotifications = sampleNotifications
-              .map(normalizeNotification)
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .slice(0, MAX_NOTIFICATIONS);
-            set({ notifications: seededNotifications, hasLoaded: true });
+          if (isAuthError) {
+            // Auth failure: clear persisted data to prevent showing stale user data
+            set({ notifications: [], hasLoaded: true });
           } else {
-            set({ hasLoaded: true }); // Mark as loaded to prevent retry
+            // Non-auth error: keep persisted data but mark as loaded
+            console.warn('Failed to load notifications from API:', error);
+            set({ hasLoaded: true });
           }
         } finally {
           set({ isLoading: false });
@@ -283,6 +270,10 @@ export const useNotificationsStore = create<NotificationsState>()(
 
       getUnreadCount: () => {
         return get().notifications.filter((n) => !n.read).length;
+      },
+
+      clearNotifications: () => {
+        set({ notifications: [], hasLoaded: false, isLoading: false });
       },
     }),
     {

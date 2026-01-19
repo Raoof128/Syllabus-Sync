@@ -20,6 +20,7 @@ interface EventsState {
   removeEvent: (id: string) => Promise<void>;
   getEventsByDate: (date: Date) => Event[];
   getUpcomingEvents: (days?: number) => Event[];
+  clearEvents: () => void;
 }
 
 // Normalize event dates from API response
@@ -53,12 +54,24 @@ export const useEventsStore = create<EventsState>()(
         set({ isLoading: true });
         try {
           const data = await apiRequest<Event[]>('/api/events', { noRetry: true });
+          // Use database data directly - includes public events (user_id = NULL) and user's own events
           set({ events: data.map(normalizeEvent), hasLoaded: true });
         } catch (error) {
-          // Silently fail - keep persisted data if API is unavailable
-          // This allows the app to work with local data until database is set up
-          console.warn('Failed to load events from API, using persisted data:', error);
-          set({ hasLoaded: true }); // Mark as loaded to prevent retry
+          // Check if this is an auth error
+          const isAuthError =
+            error instanceof Error &&
+            (error.message.includes('401') ||
+              error.message.includes('authentication') ||
+              error.message.includes('Unauthorized'));
+
+          if (isAuthError) {
+            // Auth failure: clear persisted data to prevent showing stale user data
+            set({ events: [], hasLoaded: true });
+          } else {
+            // Non-auth error: keep persisted data but mark as loaded
+            console.warn('Failed to load events from API, using persisted data:', error);
+            set({ hasLoaded: true });
+          }
         } finally {
           set({ isLoading: false });
         }
@@ -225,6 +238,10 @@ export const useEventsStore = create<EventsState>()(
             return eventDate >= now && eventDate <= futureDate;
           })
           .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+      },
+
+      clearEvents: () => {
+        set({ events: [], hasLoaded: false, isLoading: false });
       },
     }),
     {

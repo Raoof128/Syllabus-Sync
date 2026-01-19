@@ -50,7 +50,7 @@ import { useProfilesStore } from '@/lib/store/profilesStore';
 import { apiRequest } from '@/lib/utils/api';
 import { formatDistanceToNow } from 'date-fns';
 import { getLocaleString } from '@/lib/utils/locale';
-import { clearAllClientStorage } from '@/lib/utils/clientStorage';
+import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -453,8 +453,10 @@ const Header = memo(() => {
               <DropdownMenuItem
                 onClick={async () => {
                   try {
-                    // SECURITY: Clear client storage before signing out
+                    // SECURITY: Reset all stores and clear client storage before signing out
                     // This prevents sensitive data from persisting after logout
+                    // and ensures fresh data is loaded on next login
+                    await resetAllStores();
                     await clearAllClientStorage();
                     await apiRequest('/api/auth/signout', { method: 'POST', noRetry: true });
                     setUser(null);

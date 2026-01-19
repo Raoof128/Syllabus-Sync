@@ -25,7 +25,9 @@ import { devLog } from './devLog';
 const ZUSTAND_STORAGE_KEYS = [
   'units-storage', // lib/store/unitsStore.ts
   'deadlines-storage', // lib/store/deadlinesStore.ts
+  'events-storage', // lib/store/eventsStore.ts
   'notifications-storage', // lib/store/notificationsStore.ts
+  'profiles-storage', // lib/store/profilesStore.ts
   'syllabus-sync-gamification', // lib/store/gamificationStore.ts
 ] as const;
 
@@ -126,4 +128,43 @@ export function hasUserData(): boolean {
     }
   }
   return false;
+}
+
+/**
+ * Reset all Zustand stores to their initial state.
+ * This should be called on logout to ensure stores are properly cleared
+ * and will reload fresh data on next login.
+ *
+ * Note: This imports stores dynamically to avoid circular dependencies.
+ */
+export async function resetAllStores(): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  try {
+    // Dynamic imports to avoid circular dependencies
+    const [
+      { useUnitsStore },
+      { useDeadlinesStore },
+      { useEventsStore },
+      { useProfilesStore },
+      { useNotificationsStore },
+    ] = await Promise.all([
+      import('@/lib/store/unitsStore'),
+      import('@/lib/store/deadlinesStore'),
+      import('@/lib/store/eventsStore'),
+      import('@/lib/store/profilesStore'),
+      import('@/lib/store/notificationsStore'),
+    ]);
+
+    // Clear each store's state and reset hasLoaded flag
+    useUnitsStore.getState().clearUnits();
+    useDeadlinesStore.getState().clearDeadlines();
+    useEventsStore.getState().clearEvents();
+    useProfilesStore.getState().clearProfiles();
+    useNotificationsStore.getState().clearNotifications();
+
+    devLog.auth.info('All stores reset on logout');
+  } catch (error) {
+    devLog.auth.warn('Failed to reset stores', error);
+  }
 }
