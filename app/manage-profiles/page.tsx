@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import { Button } from '@/components/ui/mq/button';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 
 // Dynamically import ProfileCard for better code splitting
 const ProfileCard = dynamic(() => import('@/components/ProfileCard'), {
@@ -27,6 +28,7 @@ import { apiRequest } from '@/lib/utils/api';
 
 export default function ManageProfilesPage() {
   const { t, language } = useTranslation();
+  const router = useRouter();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<UserProfile | null>(null);
   const [formData, setFormData] = useState({
@@ -113,7 +115,13 @@ export default function ManageProfilesPage() {
     setIsSaving(true);
     try {
       // Check if we're completing a previously incomplete profile
-      const wasIncomplete = !editingProfile.course || !editingProfile.year;
+      const wasIncomplete = !isProfileComplete({
+        name: editingProfile.name,
+        email: editingProfile.email,
+        studentId: editingProfile.studentId,
+        course: editingProfile.course,
+        year: editingProfile.year,
+      });
       const isNowComplete = isProfileComplete(formData);
       const shouldAwardXP = wasIncomplete && isNowComplete;
 
@@ -203,7 +211,7 @@ export default function ManageProfilesPage() {
                   <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
                     {t('signInToManageProfile')}
                   </p>
-                  <Button onClick={() => (window.location.href = '/login')}>{t('signIn')}</Button>
+                  <Button onClick={() => router.push('/login')}>{t('signIn')}</Button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

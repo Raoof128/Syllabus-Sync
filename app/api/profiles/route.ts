@@ -148,3 +148,33 @@ export async function PUT(request: Request) {
     return jsonError('Internal server error', 500);
   }
 }
+
+// ============================================================================
+// DELETE /api/profiles - Delete current user's profile
+// ============================================================================
+
+export async function DELETE() {
+  try {
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return jsonUnauthorized('Not authenticated');
+    }
+
+    const { error } = await supabase.from('profiles').delete().eq('id', user.id);
+    if (error) {
+      return jsonError('Failed to delete profile', 500);
+    }
+
+    await supabase.from('user_preferences').delete().eq('user_id', user.id);
+
+    return jsonSuccess({ id: user.id });
+  } catch (error) {
+    console.error('Profile DELETE error:', error);
+    return jsonError('Internal server error', 500);
+  }
+}

@@ -129,6 +129,41 @@ Files: app/calendar/CalendarClient.tsx; components/layout/Sidebar.tsx; component
 Verification: `npm run lint`.
 Follow-ups: None.
 
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Notifications header action visibility
+Summary:
+  - Always show the "Mark all read" action in the notifications dropdown header, disabled when there are no unread items.
+Files: components/layout/Header.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: CalendarClient runtime fix
+Summary:
+  - Added missing useCallback import to fix runtime ReferenceError in CalendarClient.
+Files: app/calendar/CalendarClient.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Profile update validation fix
+Summary:
+  - Avoided sending empty full name or student ID values in profile update payloads to satisfy API validation.
+Files: lib/store/profilesStore.ts.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Manage Profiles audit fixes
+Summary:
+  - Persisted profile preferences via user preferences API and mapping in profiles store.
+  - Added user preferences API plus push notifications column/migration support.
+  - Improved profile completion XP logic and sign-in routing in Manage Profiles.
+  - Added profile deletion endpoint and guarded delete sync behavior.
+Files: app/manage-profiles/page.tsx; lib/store/profilesStore.ts; app/api/user-preferences/route.ts; app/api/profiles/route.ts; database-schema.sql; supabase/migrations/20260119000000_add_push_notifications_to_user_preferences.sql.
+Verification: `npm run lint`.
+Follow-ups: None.
+
 Raouf: 2026-01-18 (Australia/Sydney)
 Scope: Fix NotificationSettings tests and CI Node versions
 Summary:

@@ -186,6 +186,7 @@ CREATE TABLE public.user_preferences (
   theme text DEFAULT 'system' CHECK (theme = ANY (ARRAY['light'::text, 'dark'::text, 'system'::text])),
   notifications_enabled boolean DEFAULT true,
   email_notifications boolean DEFAULT false,
+  push_notifications boolean DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT user_preferences_pkey PRIMARY KEY (id),

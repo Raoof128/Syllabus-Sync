@@ -73,6 +73,49 @@ Raouf: 2026-01-19 - Fix lint errors in calendar, sidebar, home, map
 
 ---
 
+Raouf: 2026-01-19 - Show mark all read action in notifications header
+
+### Changed
+- Always show the "Mark all read" action in the notifications dropdown header (disabled when no unread items).
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Fix CalendarClient missing useCallback import
+
+### Fixed
+- Added missing `useCallback` import to resolve runtime ReferenceError in CalendarClient.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Prevent invalid profile updates
+
+### Fixed
+- Avoid sending empty full name or student ID values in profile update payloads to satisfy API validation.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Manage Profiles audit fixes
+
+### Fixed
+- Persisted profile preferences via user preferences API.
+- Added user preferences API and push notification column support.
+- Updated profile completion XP logic and sign-in routing.
+- Added profile deletion endpoint (cleaning user preferences).
+
+### Verification
+- `npm run lint`
+
+---
+
 Raouf: 2026-01-18 - Fix NotificationSettings tests and align CI Node versions
 
 ### Fixed

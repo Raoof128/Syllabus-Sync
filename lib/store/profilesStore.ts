@@ -30,6 +30,13 @@ interface DbProfile {
   updated_at: string | null;
 }
 
+interface DbUserPreferences {
+  user_id: string;
+  notifications_enabled: boolean | null;
+  email_notifications: boolean | null;
+  push_notifications: boolean | null;
+}
+
 /**
  * Client-side profile with additional local preferences (camelCase)
  */
@@ -59,7 +66,7 @@ export interface ProfilesState {
   hasLoaded: boolean;
   // Actions
   addProfile: (profile: Omit<UserProfile, 'id' | 'createdAt'>) => void;
-  deleteProfile: (id: string) => void;
+  deleteProfile: (id: string) => Promise<void>;
   fetchProfile: () => Promise<void>;
   updateProfile: (id: string, updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   setCurrentProfile: (id: string | null) => void;
@@ -154,10 +161,16 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
   const dbUpdates: Partial<DbProfile> = {};
 
   if (updates.name !== undefined) {
-    dbUpdates.full_name = updates.name;
+    const trimmed = updates.name.trim();
+    if (trimmed) {
+      dbUpdates.full_name = trimmed;
+    }
   }
   if (updates.studentId !== undefined) {
-    dbUpdates.student_id = updates.studentId;
+    const trimmed = updates.studentId.trim();
+    if (trimmed) {
+      dbUpdates.student_id = trimmed;
+    }
   }
   if (updates.course !== undefined) {
     dbUpdates.course = updates.course || null;
@@ -175,6 +188,34 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
   }
 
   return dbUpdates;
+}
+
+function mapDbPreferencesToClient(
+  dbPreferences?: DbUserPreferences | null,
+  existing?: UserProfile['preferences'],
+): UserProfile['preferences'] {
+  if (!dbPreferences) {
+    return (
+      existing || {
+        notifications: true,
+        emailReminders: false,
+        pushNotifications: true,
+      }
+    );
+  }
+  return {
+    notifications: dbPreferences.notifications_enabled ?? true,
+    emailReminders: dbPreferences.email_notifications ?? false,
+    pushNotifications: dbPreferences.push_notifications ?? true,
+  };
+}
+
+function mapClientPreferencesToDb(preferences: UserProfile['preferences']) {
+  return {
+    notifications_enabled: preferences.notifications,
+    email_notifications: preferences.emailReminders,
+    push_notifications: preferences.pushNotifications,
+  };
 }
 
 // ============================================================================
@@ -210,7 +251,7 @@ export const useProfilesStore = create<ProfilesState>()(
        * Delete a local profile
        * Note: This only removes from local state, not from Supabase
        */
-      deleteProfile: (id) => {
+      deleteProfile: async (id) => {
         set((state) => {
           const newProfiles = state.profiles.filter((p) => p.id !== id);
           const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
@@ -219,6 +260,18 @@ export const useProfilesStore = create<ProfilesState>()(
             currentProfileId: newCurrentProfileId,
           };
         });
+
+        if (get().currentProfileId !== id) return;
+
+        try {
+          await apiRequest<{ id: string }>('/api/profiles', { method: 'DELETE' });
+        } catch (error) {
+          errorHandler.logError(
+            error instanceof Error ? error : new Error('Failed to delete profile'),
+            'ProfilesStore.deleteProfile',
+            'high',
+          );
+        }
       },
 
       fetchProfile: async () => {
@@ -230,7 +283,21 @@ export const useProfilesStore = create<ProfilesState>()(
 
           if (dbProfile) {
             const existingProfile = get().profiles.find((p) => p.id === dbProfile.id);
-            const clientProfile = mapDbToClient(dbProfile, existingProfile);
+            let preferences = existingProfile?.preferences;
+            try {
+              const dbPreferences = await apiRequest<DbUserPreferences | null>(
+                '/api/user-preferences',
+                { noRetry: true },
+              );
+              preferences = mapDbPreferencesToClient(dbPreferences, preferences);
+            } catch {
+              // Keep existing preferences if API fails (e.g. unauthenticated)
+            }
+
+            const clientProfile = mapDbToClient(dbProfile, {
+              ...existingProfile,
+              preferences,
+            });
 
             set((state) => {
               const existingIndex = state.profiles.findIndex((p) => p.id === dbProfile.id);
@@ -303,9 +370,13 @@ export const useProfilesStore = create<ProfilesState>()(
           ? { ...updates, avatar: uploadedAvatarUrl }
           : updates;
 
+        const preferences = updatesForDb.preferences;
+
         // Determine which fields need server sync
         const dbUpdates = mapClientToDb(updatesForDb);
         const hasServerUpdates = Object.keys(dbUpdates).length > 0;
+
+        let serverProfile = optimisticProfile;
 
         if (hasServerUpdates) {
           try {
@@ -315,13 +386,10 @@ export const useProfilesStore = create<ProfilesState>()(
               body: JSON.stringify(dbUpdates),
             });
 
-            // Update with server response
-            const serverProfile = mapDbToClient(dbProfile, optimisticProfile);
+            serverProfile = mapDbToClient(dbProfile, optimisticProfile);
             set((state) => ({
               profiles: state.profiles.map((p) => (p.id === id ? serverProfile : p)),
             }));
-
-            return serverProfile;
           } catch (error) {
             // Revert on error
             set((state) => ({
@@ -337,8 +405,37 @@ export const useProfilesStore = create<ProfilesState>()(
           }
         }
 
-        // Local-only update succeeded
-        return optimisticProfile;
+        if (preferences) {
+          try {
+            const dbPreferences = await apiRequest<DbUserPreferences>('/api/user-preferences', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(mapClientPreferencesToDb(preferences)),
+            });
+            const nextPreferences = mapDbPreferencesToClient(
+              dbPreferences,
+              serverProfile.preferences,
+            );
+            serverProfile = { ...serverProfile, preferences: nextPreferences };
+            set((state) => ({
+              profiles: state.profiles.map((p) => (p.id === id ? serverProfile : p)),
+            }));
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            if (
+              !errorMessage.includes('authentication') &&
+              !errorMessage.includes('unauthorized')
+            ) {
+              errorHandler.logError(
+                error instanceof Error ? error : new Error('Failed to update preferences'),
+                'ProfilesStore.updatePreferences',
+                'medium',
+              );
+            }
+          }
+        }
+
+        return serverProfile;
       },
 
       setCurrentProfile: (id) => {

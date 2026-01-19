@@ -263,17 +263,17 @@ const Header = memo(() => {
             >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
                 <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
-                {unreadCount > 0 && (
-                  <DropdownMenuItem
-                    onSelect={(event) => {
-                      event.preventDefault();
-                      markAllAsRead();
-                    }}
-                    className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent"
-                  >
-                    {t('markAllRead')}
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem
+                  disabled={unreadCount === 0}
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    if (unreadCount === 0) return;
+                    markAllAsRead();
+                  }}
+                  className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent data-[disabled]:opacity-60"
+                >
+                  {t('markAllRead')}
+                </DropdownMenuItem>
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
