@@ -651,6 +651,7 @@
   "closeMenu": "Close navigation menu",
   "openMenu": "Open navigation menu",
   "mainNavigation": "Main navigation",
+  "markAsRead": "Mark as read",
   "markAllRead": "Mark all read",
   "signOut": "Sign out",
   "switchToLight": "Switch to light mode",

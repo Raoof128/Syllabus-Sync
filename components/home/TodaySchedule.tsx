@@ -124,14 +124,10 @@ const TodaySchedule = memo(() => {
     const sorted = classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
     // Mark the first upcoming class as "next"
-    let foundNext = false;
-    return sorted.map((cls) => {
-      if (!foundNext && cls.status === 'upcoming') {
-        foundNext = true;
-        return { ...cls, status: 'next' as ClassStatus };
-      }
-      return cls;
-    });
+    const nextIndex = sorted.findIndex((cls) => cls.status === 'upcoming');
+    return sorted.map((cls, index) =>
+      index === nextIndex ? { ...cls, status: 'next' as ClassStatus } : cls,
+    );
   }, [todayLabel, units, currentMinutes]);
 
   // Calculate remaining classes count

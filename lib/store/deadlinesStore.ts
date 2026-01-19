@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
 
@@ -31,6 +32,16 @@ const normalizeDeadline = (deadline: Deadline): Deadline => ({
 const isValidUUID = (id: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
+};
+
+const shouldSyncDeadlines = async (): Promise<boolean> => {
+  if (!isSupabaseConfigured()) return false;
+  try {
+    const data = await apiRequest<{ user?: { id?: string } }>('/api/auth/user', { noRetry: true });
+    return Boolean(data?.user?.id);
+  } catch {
+    return false;
+  }
 };
 
 export const useDeadlinesStore = create<DeadlinesState>()(
@@ -97,10 +108,22 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         });
 
         try {
+          const canSync = await shouldSyncDeadlines();
+          if (!canSync) {
+            return normalized;
+          }
+
+          const apiPayload: Deadline = { ...normalized };
+          // API sets createdAt; remove to avoid serialization issues
+          delete apiPayload.createdAt;
+          if (apiPayload.unitId && !isValidUUID(apiPayload.unitId)) {
+            delete apiPayload.unitId;
+          }
+
           const created = await apiRequest<Deadline>('/api/deadlines', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(normalized),
+            body: JSON.stringify(apiPayload),
           });
           const serverNormalized = normalizeDeadline(created);
           set((state) => ({
@@ -136,6 +159,11 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         }));
 
         try {
+          const canSync = await shouldSyncDeadlines();
+          if (!canSync) {
+            return;
+          }
+
           await apiRequest<{ id: string }>(`/api/deadlines/${id}`, { method: 'DELETE' });
         } catch (error) {
           if (deadlineToRemove) {
@@ -170,10 +198,23 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         }));
 
         try {
+          const canSync = await shouldSyncDeadlines();
+          if (!canSync) {
+            return optimisticUpdate;
+          }
+
+          const apiPayload: Partial<Deadline> = { ...updatedDeadline };
+          if (apiPayload.createdAt) {
+            delete apiPayload.createdAt;
+          }
+          if (apiPayload.unitId && !isValidUUID(apiPayload.unitId)) {
+            delete apiPayload.unitId;
+          }
+
           const updated = await apiRequest<Deadline>(`/api/deadlines/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedDeadline),
+            body: JSON.stringify(apiPayload),
           });
           const normalized = normalizeDeadline(updated);
           set((state) => ({

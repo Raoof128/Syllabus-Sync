@@ -33,6 +33,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Bell,
+  Check,
   Settings,
   User,
   Clock,
@@ -82,7 +83,6 @@ const Header = memo(() => {
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
-  const unreadNotifications = notifications.filter((n) => !n.read);
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -291,68 +291,84 @@ const Header = memo(() => {
                     return (
                       <DropdownMenuItem
                         key={notification.id}
-                        asChild
-                        onSelect={() => {
-                          if (!notification.read) {
-                            markAsRead(notification.id);
-                          }
-                        }}
                         className={`p-0 border-b border-mq-border last:border-0 ${
                           !notification.read ? 'bg-mq-info/10' : ''
                         }`}
                       >
-                        <Link
-                          href={notification.link || '#'}
-                          className="block w-full p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
-                        >
-                          <div className="flex gap-3">
-                            <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                notification.type === 'deadline'
-                                  ? 'bg-mq-warning/20'
-                                  : notification.type === 'event'
-                                    ? 'bg-mq-purple/20'
-                                    : notification.type === 'class'
-                                      ? 'bg-mq-info/20'
-                                      : 'bg-mq-background-secondary'
-                              }`}
-                              aria-hidden="true"
-                            >
-                              <Icon
-                                className={`w-4 h-4 ${
-                                  notification.type === 'deadline'
-                                    ? 'text-mq-warning'
-                                    : notification.type === 'event'
-                                      ? 'text-mq-purple'
-                                      : notification.type === 'class'
-                                        ? 'text-mq-info'
-                                        : 'text-mq-content-secondary'
-                                }`}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p
-                                className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
-                              >
-                                {notification.title}
-                              </p>
-                              <p className="text-xs text-mq-content-secondary line-clamp-2">
-                                {notification.message}
-                              </p>
-                              <p className="text-xs text-mq-content-tertiary mt-1">
-                                {formatDistanceToNow(new Date(notification.createdAt), {
-                                  addSuffix: true,
-                                })}
-                              </p>
-                            </div>
-                            {!notification.read && (
+                        <div className="flex w-full items-start gap-1">
+                          <Link
+                            href={notification.link || '#'}
+                            onClick={() => {
+                              if (!notification.read) {
+                                markAsRead(notification.id);
+                              }
+                            }}
+                            className="block flex-1 min-w-0 p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
+                          >
+                            <div className="flex gap-3">
                               <div
-                                className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
-                                aria-label="Unread"
-                              />
-                            )}
-                          </div>
-                        </Link>
+                                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                  notification.type === 'deadline'
+                                    ? 'bg-mq-warning/20'
+                                    : notification.type === 'event'
+                                      ? 'bg-mq-purple/20'
+                                      : notification.type === 'class'
+                                        ? 'bg-mq-info/20'
+                                        : 'bg-mq-background-secondary'
+                                }`}
+                                aria-hidden="true"
+                              >
+                                <Icon
+                                  className={`w-4 h-4 ${
+                                    notification.type === 'deadline'
+                                      ? 'text-mq-warning'
+                                      : notification.type === 'event'
+                                        ? 'text-mq-purple'
+                                        : notification.type === 'class'
+                                          ? 'text-mq-info'
+                                          : 'text-mq-content-secondary'
+                                  }`}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p
+                                  className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
+                                >
+                                  {notification.title}
+                                </p>
+                                <p className="text-xs text-mq-content-secondary line-clamp-2">
+                                  {notification.message}
+                                </p>
+                                <p className="text-xs text-mq-content-tertiary mt-1">
+                                  {formatDistanceToNow(new Date(notification.createdAt), {
+                                    addSuffix: true,
+                                  })}
+                                </p>
+                              </div>
+                              {!notification.read && (
+                                <div
+                                  className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
+                                  aria-label="Unread"
+                                />
+                              )}
+                            </div>
+                          </Link>
+                          {!notification.read && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                markAsRead(notification.id);
+                              }}
+                              className="mr-2 mt-3 flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                              aria-label={t('markAsRead')}
+                              title={t('markAsRead')}
+                            >
+                              <Check className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                          )}
+                        </div>
                       </DropdownMenuItem>
                     );
                   })
@@ -362,7 +378,7 @@ const Header = memo(() => {
               {notifications.length > 0 && (
                 <div className="p-2 border-t border-mq-border">
                   <Link
-                    href="/settings#notifications"
+                    href="/calendar"
                     className="block text-xs text-mq-info hover:text-mq-info/80 text-center py-2 hover:bg-mq-background-secondary rounded-mq transition-colors"
                   >
                     {t('viewAllNotifications')} ({notifications.length})

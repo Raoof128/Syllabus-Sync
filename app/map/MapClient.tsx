@@ -10,11 +10,7 @@ import {
   MapPin,
   Navigation,
   Building2,
-  Info,
-  Copy,
   X,
-  Eye,
-  EyeOff,
   CheckCircle2,
   Filter as FilterIcon,
   Accessibility,
@@ -55,7 +51,6 @@ import {
 import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import Link from 'next/link';
-import { errorHandler } from '@/lib/utils/errorHandling';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -105,8 +100,6 @@ const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 export default function MapClient() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const [coordPickerMode, setCoordPickerMode] = useState(false);
-  const [copiedCoords, setCopiedCoords] = useState<string>('');
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -214,27 +207,6 @@ export default function MapClient() {
   const clearFilters = useCallback(() => {
     setActiveFilters([]);
   }, []);
-
-  // Handle coordinate picker click
-  const handleMapClick = (e: { latlng: { lat: number; lng: number } }) => {
-    if (coordPickerMode) {
-      const coords = `[${Math.round(e.latlng.lat)}, ${Math.round(e.latlng.lng)}]`;
-      navigator.clipboard
-        ?.writeText(coords)
-        .then(() => {
-          setCopiedCoords(coords);
-          setTimeout(() => setCopiedCoords(''), 2000);
-        })
-        .catch((error) => {
-          errorHandler.logError(
-            error instanceof Error ? error : new Error('Failed to copy coordinates'),
-            'Map Clipboard',
-            'low',
-          );
-          setCopiedCoords('');
-        });
-    }
-  };
 
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
@@ -404,8 +376,6 @@ export default function MapClient() {
                     <MapErrorBoundary>
                       <CampusMap
                         selectedBuilding={selectedBuilding}
-                        coordPickerMode={coordPickerMode}
-                        onMapClick={handleMapClick}
                         activeOverlays={activeOverlays}
                       />
                     </MapErrorBoundary>
@@ -415,45 +385,6 @@ export default function MapClient() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </MagicCard>
-
-        {/* Coordinate Picker - Developer Tool */}
-        <MagicCard isLiquidEnhanced className="mb-6">
-          <div className="mq-magic-card-content p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Info className="h-5 w-5 text-mq-info" />
-              <div>
-                <p className="text-mq-sm font-medium text-mq-info">{t('coordPickerMode')}</p>
-                <p className="text-mq-xs text-mq-info">{t('coordPickerDesc')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {copiedCoords && (
-                <div className="flex items-center gap-2 text-mq-sm text-mq-success">
-                  <Copy className="h-4 w-4" />
-                  {t('copied')} {copiedCoords}
-                </div>
-              )}
-              <Button
-                variant={coordPickerMode ? 'primary' : 'secondary'}
-                size="sm"
-                onClick={() => setCoordPickerMode(!coordPickerMode)}
-                className="gap-2"
-              >
-                {coordPickerMode ? (
-                  <>
-                    <Eye className="h-4 w-4" />
-                    {t('enabled')}
-                  </>
-                ) : (
-                  <>
-                    <EyeOff className="h-4 w-4" />
-                    {t('disabled')}
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
         </MagicCard>
 

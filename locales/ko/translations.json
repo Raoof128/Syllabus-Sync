@@ -519,6 +519,7 @@
   "closeMenu": "메뉴 닫기",
   "openMenu": "메뉴 열기",
   "mainNavigation": "메인 내비게이션",
+  "markAsRead": "Mark as read",
   "markAllRead": "모두 읽음으로 표시",
   "signOut": "로그아웃",
   "switchToLight": "라이트 모드로 전환",

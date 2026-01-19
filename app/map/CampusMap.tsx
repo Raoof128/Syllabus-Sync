@@ -72,17 +72,10 @@ const OVERLAY_PATHS: Record<MapOverlayId, string> = {
 
 interface CampusMapProps {
   selectedBuilding?: Building;
-  coordPickerMode: boolean;
-  onMapClick: (e: { latlng: { lat: number; lng: number } }) => void;
   activeOverlays?: MapOverlayId[];
 }
 
-export default function CampusMap({
-  selectedBuilding,
-  coordPickerMode,
-  onMapClick,
-  activeOverlays = [],
-}: CampusMapProps) {
+export default function CampusMap({ selectedBuilding, activeOverlays = [] }: CampusMapProps) {
   const { t } = useTranslation();
 
   // ============================================
@@ -95,7 +88,6 @@ export default function CampusMap({
   // COMPONENT STATE
   // ============================================
   const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
-  const [pickedLocation, setPickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [overlaysReady, setOverlaysReady] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
@@ -652,7 +644,7 @@ export default function CampusMap({
         mapLog.log('Marker cleanup error (likely already removed):', error);
       }
     };
-  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng]);
+  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng, t]);
 
   // ============================================
   // CENTER ON USER ACTION
@@ -825,20 +817,14 @@ export default function CampusMap({
   const MapController = useMemo(() => {
     if (!reactLeafletModule || !leafletModule) return null;
 
-    const { useMap, useMapEvents } = reactLeafletModule;
+    const { useMap } = reactLeafletModule;
 
     const Controller = ({
       selectedBuildingProp,
-      coordPickerModeProp,
-      onMapClickProp,
       setMapInstanceProp,
-      setPickedLocationProp,
     }: {
       selectedBuildingProp?: Building;
-      coordPickerModeProp: boolean;
-      onMapClickProp: (e: { latlng: { lat: number; lng: number } }) => void;
       setMapInstanceProp: (map: import('leaflet').Map) => void;
-      setPickedLocationProp: (latlng: { lat: number; lng: number } | null) => void;
     }) => {
       const map = useMap();
       const [isReady, setIsReady] = useState(false);
@@ -862,21 +848,6 @@ export default function CampusMap({
           map.off('load', checkReady);
         };
       }, [map, setMapInstanceProp]);
-
-      useMapEvents({
-        click: (e) => {
-          if (coordPickerModeProp) {
-            setPickedLocationProp({ lat: e.latlng.lat, lng: e.latlng.lng });
-          }
-          onMapClickProp({ latlng: { lat: e.latlng.lat, lng: e.latlng.lng } });
-        },
-      });
-
-      useEffect(() => {
-        if (!coordPickerModeProp) {
-          setPickedLocationProp(null);
-        }
-      }, [coordPickerModeProp, setPickedLocationProp]);
 
       useEffect(() => {
         if (!isReady || !isMapReady(map)) return;
@@ -922,19 +893,6 @@ export default function CampusMap({
         }
       }, [selectedBuildingProp, map, isReady]);
 
-      useEffect(() => {
-        if (!isReady || !isMapReady(map)) return;
-
-        try {
-          const container = map.getContainer();
-          if (container?.style) {
-            container.style.cursor = coordPickerModeProp ? 'crosshair' : '';
-          }
-        } catch {
-          // Silently ignore cursor style errors during HMR/unmount
-        }
-      }, [coordPickerModeProp, map, isReady]);
-
       return null;
     };
 
@@ -966,10 +924,7 @@ export default function CampusMap({
 
           <MapController
             selectedBuildingProp={selectedBuilding}
-            coordPickerModeProp={coordPickerMode}
-            onMapClickProp={onMapClick}
             setMapInstanceProp={setMapInstance}
-            setPickedLocationProp={setPickedLocation}
           />
 
           {/* Route Polyline - only render when overlays are ready */}
@@ -980,24 +935,6 @@ export default function CampusMap({
               weight={5}
               opacity={0.7}
             />
-          )}
-
-          {/* Picked Location Marker - only render when overlays are ready */}
-          {overlaysReady && pickedLocation && selectedIcon && (
-            <reactLeafletModule.Marker
-              position={[pickedLocation.lat, pickedLocation.lng]}
-              icon={selectedIcon}
-            >
-              <reactLeafletModule.Popup>
-                <div className="p-2">
-                  <p className="font-semibold text-mq-content">{t('coordPickerMode')}</p>
-                  <p className="text-xs font-mono text-mq-content-secondary mt-1">
-                    {Math.round(pickedLocation.lat * 100000) / 100000},{' '}
-                    {Math.round(pickedLocation.lng * 100000) / 100000}
-                  </p>
-                </div>
-              </reactLeafletModule.Popup>
-            </reactLeafletModule.Marker>
           )}
 
           {/* Building markers - only show when a building is selected and overlays are ready */}

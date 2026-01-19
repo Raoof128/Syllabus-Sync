@@ -209,12 +209,6 @@ const Sidebar = memo(() => {
     menuButtonRef.current?.focus();
   }, []);
 
-  // Close mobile menu when route changes (navigation occurred)
-  useEffect(() => {
-    // Close menu on navigation
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
   return (
     <>
       {/* ========================================================================

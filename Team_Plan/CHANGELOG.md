@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-19 - Notification dropdown actions and map cleanup
+
+### Added
+- Added a per-notification "Mark as read" action in the notifications dropdown.
+
+### Changed
+- "View all notifications" now links to the Calendar page.
+- Removed coordinate picker mode and map click handling from the Map page.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Fix notification dropdown action layout
+
+### Fixed
+- Adjusted notification dropdown layout so the "Mark as read" action is visible next to each item.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Harden deadline payloads before API calls
+
+### Fixed
+- Strip invalid `unitId` and client `createdAt` values from deadline create/update payloads to avoid database 500s.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Skip deadline API calls in demo mode
+
+### Fixed
+- Avoided deadline create/update/delete API calls when Supabase is not configured to prevent 500 errors.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Skip deadline sync when unauthenticated
+
+### Fixed
+- Skipped deadline create/update/delete API calls when the user is not authenticated to avoid 500 errors.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Fix lint errors in calendar, sidebar, home, map
+
+### Fixed
+- Removed setState-in-effect lint violations in CalendarClient and Sidebar.
+- Fixed TodaySchedule immutability rule and cleaned unused imports/vars.
+- Added missing hook dependency in CampusMap.
+
+### Verification
+- `npm run lint`
+
+---
+
 Raouf: 2026-01-18 - Fix NotificationSettings tests and align CI Node versions
 
 ### Fixed

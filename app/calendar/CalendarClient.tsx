@@ -318,26 +318,45 @@ export default function CalendarClient() {
 
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
+  const highlightedUnit = useMemo(() => {
+    if (!highlightedUnitId) return null;
+    return units.find((unit) => unit.id === highlightedUnitId) ?? null;
+  }, [highlightedUnitId, units]);
+
+  const effectiveSelectedUnit = highlightedUnit ?? selectedUnit;
+  const effectiveUnitDetailOpen = unitDetailOpen || Boolean(highlightedUnit);
+
+  const handleUnitDetailOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        setUnitDetailOpen(false);
+        if (highlightedUnitId) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('highlightUnit');
+          window.history.replaceState({}, '', url.toString());
+        }
+        return;
+      }
+      setUnitDetailOpen(true);
+    },
+    [highlightedUnitId],
+  );
 
   // Highlighted widget derived from URL query parameter (e.g., "units" for My Units widget)
-  const [highlightedWidget, setHighlightedWidget] = useState<string | null>(null);
+  const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);
 
   // Handle highlighted widget side effects (scroll + auto-clear URL)
   useEffect(() => {
-    const widgetParam = searchParams.get('highlightWidget');
-    if (!widgetParam) return;
-
-    setHighlightedWidget(widgetParam);
+    if (!highlightedWidget) return;
 
     const scrollTimer = window.setTimeout(() => {
-      if (widgetParam === 'units') {
+      if (highlightedWidget === 'units') {
         unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
 
     // Clear highlight and URL parameter after 3 seconds
     const clearTimer = window.setTimeout(() => {
-      setHighlightedWidget(null);
       const url = new URL(window.location.href);
       url.searchParams.delete('highlightWidget');
       window.history.replaceState({}, '', url.toString());
@@ -347,18 +366,11 @@ export default function CalendarClient() {
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [searchParams]);
+  }, [highlightedWidget]);
 
-  // Handle highlighted unit side effects (scroll + auto-open detail panel + auto-clear URL)
+  // Handle highlighted unit side effects (scroll + auto-clear URL)
   useEffect(() => {
     if (!highlightedUnitId) return;
-
-    // Find the unit and open detail panel
-    const highlightedUnit = units.find((u) => u.id === highlightedUnitId);
-    if (highlightedUnit) {
-      setSelectedUnit(highlightedUnit);
-      setUnitDetailOpen(true);
-    }
 
     const scrollTimer = window.setTimeout(() => {
       unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -374,7 +386,7 @@ export default function CalendarClient() {
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedUnitId, units]);
+  }, [highlightedUnitId]);
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
@@ -2216,9 +2228,9 @@ export default function CalendarClient() {
 
       {/* Unit Detail Panel */}
       <UnitDetailPanel
-        unit={selectedUnit}
-        open={unitDetailOpen}
-        onOpenChange={setUnitDetailOpen}
+        unit={effectiveSelectedUnit}
+        open={effectiveUnitDetailOpen}
+        onOpenChange={handleUnitDetailOpenChange}
         onEditDeadline={handleEditDeadlineFromPanel}
       />
 

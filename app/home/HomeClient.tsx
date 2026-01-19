@@ -16,7 +16,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, TrendingUp, ExternalLink, Eye, Pencil } from 'lucide-react';
+import { Info, Plus, BookOpen, TrendingUp, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';

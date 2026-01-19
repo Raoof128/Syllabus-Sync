@@ -76,6 +76,59 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Notifications dropdown and map cleanup
+Summary:
+  - Added a per-notification "Mark as read" action in the notifications dropdown.
+  - Updated "View all notifications" to link to the Calendar page.
+  - Removed the coordinate picker mode UI and click handling from the Map page.
+Files: components/layout/Header.tsx; app/map/MapClient.tsx; app/map/CampusMap.tsx; locales/*/translations.json.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Notification dropdown action layout
+Summary:
+  - Adjusted notification dropdown layout so the "Mark as read" action is visible next to each item.
+Files: components/layout/Header.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Deadline API payload hardening
+Summary:
+  - Stripped invalid unitId values and client createdAt from deadline create/update payloads to prevent database 500s.
+Files: lib/store/deadlinesStore.ts.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Deadline demo-mode API guard
+Summary:
+  - Skipped deadline create/update/delete API calls when Supabase is not configured to avoid 500 errors.
+Files: lib/store/deadlinesStore.ts.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Deadline unauthenticated sync guard
+Summary:
+  - Skipped deadline create/update/delete API calls when the user is not authenticated to avoid 500 errors.
+Files: lib/store/deadlinesStore.ts.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Lint fixes across calendar, sidebar, home, map
+Summary:
+  - Refactored CalendarClient highlight handling to avoid setState-in-effect lint errors.
+  - Removed Sidebar route-change effect to satisfy hooks lint rule.
+  - Fixed TodaySchedule immutability warning and cleaned unused imports/vars.
+  - Added missing t dependency in CampusMap effect.
+Files: app/calendar/CalendarClient.tsx; components/layout/Sidebar.tsx; components/home/TodaySchedule.tsx; app/home/HomeClient.tsx; components/layout/Header.tsx; app/map/CampusMap.tsx.
+Verification: `npm run lint`.
+Follow-ups: None.
+
 Raouf: 2026-01-18 (Australia/Sydney)
 Scope: Fix NotificationSettings tests and CI Node versions
 Summary:
