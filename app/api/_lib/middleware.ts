@@ -439,6 +439,9 @@ export const validateRequest = <T>(
 
       if (!result.success) {
         const zodError = result.error as { errors?: unknown[] };
+        // Log validation errors server-side for debugging
+        console.error('Validation failed:', JSON.stringify(zodError.errors ?? [], null, 2));
+        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
         return jsonError('Request validation failed', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: zodError.errors ?? [],
         });

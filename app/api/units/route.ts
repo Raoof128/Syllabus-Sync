@@ -38,17 +38,17 @@ const unitSchema = z.object({
   id: z.string().uuid().optional(),
   code: z
     .string()
-    .min(1)
-    .max(20)
-    .regex(/^[A-Z]{2,6}\d{0,4}[A-Z]?$/, 'Unit code format invalid (e.g., COMP1234, CS101, BIO2A)'),
-  name: z.string().min(1).max(200),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
+    .min(1, 'Unit code is required')
+    .max(20, 'Unit code must be 20 characters or less')
+    .transform((val) => val.trim().toUpperCase()), // Normalize: trim and uppercase
+  name: z.string().min(1, 'Unit name is required').max(200),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color').default('#3B82F6'),
   description: z.string().max(500).optional(),
   location: z.object({
     building: z.string().max(100).default(''),
     room: z.string().max(50).default(''),
-  }).default({ building: '', room: '' }),
-  schedule: z.array(classTimeSchema).min(0).max(14).default([]), // Max 14 class times per week
+  }).optional().default({ building: '', room: '' }),
+  schedule: z.array(classTimeSchema).optional().default([]), // Max 14 class times per week
   createdAt: dateSchema.optional(),
 });
 

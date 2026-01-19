@@ -8,13 +8,13 @@ import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
   id: z.string().min(1).optional(),
-  title: z.string().min(1),
-  unitCode: z.string().min(1),
+  title: z.string().min(1, 'Title is required'),
+  unitCode: z.string().min(1, 'Unit code is required').transform((val) => val.trim().toUpperCase()),
   unitId: z.string().optional(),
   dueDate: dateSchema,
-  priority: z.enum(['Low', 'Medium', 'High', 'Urgent']),
-  type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']),
-  completed: z.boolean(),
+  priority: z.enum(['Low', 'Medium', 'High', 'Urgent']).default('Medium'),
+  type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']).default('Assignment'),
+  completed: z.boolean().default(false),
   createdAt: dateSchema.optional(),
 });
 
@@ -56,7 +56,11 @@ export async function POST(request: Request) {
       const parsed = deadlineSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
-        return jsonError('Invalid deadline payload.', 400, ERROR_CODES.VALIDATION_ERROR);
+        console.error('Deadline validation failed:', JSON.stringify(parsed.error.errors, null, 2));
+        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
+        return jsonError('Invalid deadline payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
+          errors: parsed.error.errors,
+        });
       }
 
       // Resolve unit_id logic:

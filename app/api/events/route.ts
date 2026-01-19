@@ -8,11 +8,11 @@ import type { Event } from '@/lib/types';
 // Schema matching the database: start_at, end_at, all_day
 const eventSchema = z.object({
   id: z.string().min(1).optional(),
-  title: z.string().min(1),
-  description: z.string().min(1),
-  location: z.string().min(1),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().default(''),
+  location: z.string().default(''),
   building: z.string().optional(),
-  category: z.enum(['Career', 'Social', 'Academic', 'Free Food']),
+  category: z.enum(['Career', 'Social', 'Academic', 'Free Food']).default('Academic'),
   imageUrl: z.string().optional(),
   // Primary time fields
   startAt: z.preprocess((val) => (typeof val === 'string' ? new Date(val) : val), z.date()),
