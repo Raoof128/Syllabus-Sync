@@ -269,13 +269,15 @@ export async function POST(request: Request) {
           code: unitData.code,
           name: unitData.name,
           color: unitData.color,
-          building: location.building,
-          room: location.room,
+          location: location ? { building: location.building || '', room: location.room || '' } : null,
           description: unitData.description || null,
           created_at: unitData.createdAt
             ? unitData.createdAt.toISOString()
             : new Date().toISOString(),
         };
+
+        console.log('Creating unit for user:', userId);
+        console.log('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
 
         const { data: unit, error: unitError } = await supabase
           .from('units')
@@ -284,6 +286,7 @@ export async function POST(request: Request) {
           .single();
 
         if (unitError) {
+          console.error('Unit insert error:', unitError.code, unitError.message, unitError.details, unitError.hint);
           if (unitError.code === '23505') {
             // Unique constraint violation
             return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);

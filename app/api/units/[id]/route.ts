@@ -26,11 +26,11 @@ const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const unitUpdateSchema = z.object({
   code: z.string().min(1).optional(),
   name: z.string().min(1).optional(),
-  color: z.string().min(1).optional(),
+  color: z.string().optional(),
   location: z
     .object({
-      building: z.string().min(1),
-      room: z.string().min(1),
+      building: z.string().default(''),
+      room: z.string().default(''),
     })
     .optional(),
   schedule: z.array(classTimeSchema).optional(),

@@ -118,7 +118,15 @@ export const handleValidationError = (error: ZodError): NextResponse<ApiResponse
  * Handle database errors
  */
 export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<never>> => {
-  console.error('Database error:', error);
+  // Log detailed error information server-side
+  const err = error as { code?: string; message?: string; details?: string; hint?: string };
+  console.error('Database error:', {
+    code: err.code,
+    message: err.message,
+    details: err.details,
+    hint: err.hint,
+    fullError: error,
+  });
 
   // Don't expose internal database errors to clients
   return jsonError(
