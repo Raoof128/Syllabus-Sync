@@ -4,8 +4,20 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
-// UUID validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+// More permissive UUID validation - accepts any valid UUID format
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Helper to check if ID is valid (UUID or numeric string for legacy data)
+function isValidEventId(id: string): boolean {
+  if (!id || id.trim() === '') return false;
+  // Accept UUIDs
+  if (UUID_REGEX.test(id)) return true;
+  // Accept numeric IDs (for legacy/static data)
+  if (/^\d+$/.test(id)) return true;
+  // Accept any alphanumeric string (for flexibility)
+  if (/^[a-zA-Z0-9_-]+$/.test(id)) return true;
+  return false;
+}
 
 const eventUpdateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -31,8 +43,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     try {
       const { id } = await params;
 
-      // Validate UUID format
-      if (!UUID_REGEX.test(id)) {
+      // Validate ID format (accepts UUIDs, numeric IDs, alphanumeric strings)
+      if (!isValidEventId(id)) {
+        console.warn('Invalid event ID received for PUT:', id);
         return jsonError('Invalid event ID format', 400, ERROR_CODES.BAD_REQUEST);
       }
 
@@ -99,8 +112,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     try {
       const { id } = await params;
 
-      // Validate UUID format
-      if (!UUID_REGEX.test(id)) {
+      // Validate ID format (accepts UUIDs, numeric IDs, alphanumeric strings)
+      if (!isValidEventId(id)) {
+        console.warn('Invalid event ID received for DELETE:', id);
         return jsonError('Invalid event ID format', 400, ERROR_CODES.BAD_REQUEST);
       }
 

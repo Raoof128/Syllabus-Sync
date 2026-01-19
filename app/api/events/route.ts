@@ -65,8 +65,11 @@ export async function POST(request: Request) {
       const parsed = eventSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
-        console.error('Event validation failed:', parsed.error.issues);
-        return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR);
+        console.error('Event validation failed:', JSON.stringify(parsed.error.issues, null, 2));
+        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
+        return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
+          errors: parsed.error.issues,
+        });
       }
 
       const supabase = await createServerClient();
@@ -95,6 +98,8 @@ export async function POST(request: Request) {
             }),
       };
 
+      console.log('Creating event with serialized payload:', JSON.stringify(serializeEvent(eventData), null, 2));
+
       const { data, error } = await supabase
         .from('events')
         .insert(serializeEvent(eventData))
@@ -103,7 +108,12 @@ export async function POST(request: Request) {
 
       if (error) {
         // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error creating event:', error.code, error.message);
+        console.error('Database error creating event:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 

@@ -4,8 +4,17 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
-// UUID validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+// More permissive UUID validation - accepts any valid UUID format
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Helper to check if ID is valid (UUID or other formats for legacy data)
+function isValidId(id: string): boolean {
+  if (!id || id.trim() === '') return false;
+  if (UUID_REGEX.test(id)) return true;
+  if (/^\d+$/.test(id)) return true;
+  if (/^[a-zA-Z0-9_-]+$/.test(id)) return true;
+  return false;
+}
 
 const daySchema = z.enum([
   'Monday',
@@ -43,8 +52,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     try {
       const { id } = await params;
 
-      // Validate UUID format
-      if (!UUID_REGEX.test(id)) {
+      // Validate ID format
+      if (!isValidId(id)) {
+        console.warn('Invalid unit ID received for PUT:', id);
         return jsonError('Invalid unit ID format', 400, ERROR_CODES.BAD_REQUEST);
       }
 
@@ -100,8 +110,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     try {
       const { id } = await params;
 
-      // Validate UUID format
-      if (!UUID_REGEX.test(id)) {
+      // Validate ID format
+      if (!isValidId(id)) {
+        console.warn('Invalid unit ID received for DELETE:', id);
         return jsonError('Invalid unit ID format', 400, ERROR_CODES.BAD_REQUEST);
       }
 
