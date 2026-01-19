@@ -43,20 +43,20 @@ console.log('══════════════════════�
 
 // Get all profiles
 console.log('📋 Current Profiles:');
-const { data: profiles, error: profilesError } = await supabase
-  .from('profiles')
-  .select('*');
+const { data: profiles, error: profilesError } = await supabase.from('profiles').select('*');
 
 if (profilesError) {
   console.error('Error fetching profiles:', profilesError.message);
 } else {
   if (profiles?.length > 0) {
-    console.table(profiles.map(p => ({
-      id: p.id?.slice(0, 8) + '...',
-      email: p.email,
-      full_name: p.full_name,
-      student_id: p.student_id
-    })));
+    console.table(
+      profiles.map((p) => ({
+        id: p.id?.slice(0, 8) + '...',
+        email: p.email,
+        full_name: p.full_name,
+        student_id: p.student_id,
+      })),
+    );
   } else {
     console.log('No profiles found.');
   }
@@ -71,11 +71,13 @@ if (authError) {
   console.error('Error fetching auth users:', authError.message);
 } else {
   if (authUsers?.users?.length > 0) {
-    console.table(authUsers.users.map(u => ({
-      id: u.id?.slice(0, 8) + '...',
-      email: u.email,
-      created_at: u.created_at?.slice(0, 10),
-    })));
+    console.table(
+      authUsers.users.map((u) => ({
+        id: u.id?.slice(0, 8) + '...',
+        email: u.email,
+        created_at: u.created_at?.slice(0, 10),
+      })),
+    );
   }
   console.log(`Total auth users: ${authUsers?.users?.length || 0}\n`);
 }
@@ -91,12 +93,14 @@ if (unitsError) {
   console.error('Error fetching units:', unitsError.message);
 } else {
   if (units?.length > 0) {
-    console.table(units.map(u => ({
-      id: u.id?.slice(0, 8) + '...',
-      user_id: u.user_id?.slice(0, 8) + '...',
-      code: u.code,
-      name: u.name
-    })));
+    console.table(
+      units.map((u) => ({
+        id: u.id?.slice(0, 8) + '...',
+        user_id: u.user_id?.slice(0, 8) + '...',
+        code: u.code,
+        name: u.name,
+      })),
+    );
   } else {
     console.log('No units found.');
   }
@@ -116,7 +120,7 @@ const newUserStudentId = '15555';
 
 // Check if auth user exists
 let userId = null;
-const existingUser = authUsers?.users?.find(u => u.email === newUserEmail);
+const existingUser = authUsers?.users?.find((u) => u.email === newUserEmail);
 
 if (existingUser) {
   userId = existingUser.id;
@@ -130,8 +134,8 @@ if (existingUser) {
     password: 'TempPassword123!', // Temporary password
     user_metadata: {
       full_name: newUserFullName,
-      student_id: newUserStudentId
-    }
+      student_id: newUserStudentId,
+    },
   });
 
   if (createAuthError) {
@@ -159,7 +163,7 @@ if (userId) {
       .update({
         full_name: newUserFullName,
         student_id: newUserStudentId,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', userId)
       .select()
@@ -169,12 +173,14 @@ if (userId) {
       console.error('Error updating profile:', updateError.message);
     } else {
       console.log('✅ Updated profile:');
-      console.table([{
-        id: updatedProfile.id.slice(0, 8) + '...',
-        email: updatedProfile.email,
-        full_name: updatedProfile.full_name,
-        student_id: updatedProfile.student_id
-      }]);
+      console.table([
+        {
+          id: updatedProfile.id.slice(0, 8) + '...',
+          email: updatedProfile.email,
+          full_name: updatedProfile.full_name,
+          student_id: updatedProfile.student_id,
+        },
+      ]);
     }
   } else {
     // Create profile
@@ -187,7 +193,7 @@ if (userId) {
         full_name: newUserFullName,
         student_id: newUserStudentId,
         course: 'Computer Science',
-        year: '2026'
+        year: '2026',
       })
       .select()
       .single();
@@ -196,12 +202,14 @@ if (userId) {
       console.error('Error creating profile:', createProfileError.message);
     } else {
       console.log(`✅ Created profile successfully!`);
-      console.table([{
-        id: newProfile.id.slice(0, 8) + '...',
-        email: newProfile.email,
-        full_name: newProfile.full_name,
-        student_id: newProfile.student_id
-      }]);
+      console.table([
+        {
+          id: newProfile.id.slice(0, 8) + '...',
+          email: newProfile.email,
+          full_name: newProfile.full_name,
+          student_id: newProfile.student_id,
+        },
+      ]);
     }
   }
 
@@ -214,14 +222,12 @@ if (userId) {
 
   if (!existingGamProfile) {
     console.log(`📝 Creating gamification profile...`);
-    const { error: gamCreateError } = await supabase
-      .from('gamification_profiles')
-      .insert({
-        user_id: userId,
-        xp: 0,
-        streak_days: 0,
-        longest_streak: 0
-      });
+    const { error: gamCreateError } = await supabase.from('gamification_profiles').insert({
+      user_id: userId,
+      xp: 0,
+      streak_days: 0,
+      longest_streak: 0,
+    });
 
     if (gamCreateError) {
       console.error('Error creating gamification profile:', gamCreateError.message);
@@ -287,14 +293,16 @@ if (deadlinesError) {
   console.log('📭 No deadlines found in database.');
 } else {
   console.log(`⏰ Found ${allDeadlines.length} deadlines:\n`);
-  console.table(allDeadlines.map(d => ({
-    title: d.title?.slice(0, 25),
-    unit_code: d.unit_code,
-    due_date: d.due_date?.slice(0, 10),
-    type: d.type,
-    priority: d.priority,
-    completed: d.completed ? '✅' : '❌'
-  })));
+  console.table(
+    allDeadlines.map((d) => ({
+      title: d.title?.slice(0, 25),
+      unit_code: d.unit_code,
+      due_date: d.due_date?.slice(0, 10),
+      type: d.type,
+      priority: d.priority,
+      completed: d.completed ? '✅' : '❌',
+    })),
+  );
 }
 
 console.log('\n✅ Database operations completed!');

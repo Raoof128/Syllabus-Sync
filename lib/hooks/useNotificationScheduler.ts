@@ -15,38 +15,28 @@ export function useNotificationScheduler() {
   const units = useUnitsStore((state) => state.units);
 
   // Use individual selectors to prevent infinite re-renders
-  const permissionStatus = useNotificationPreferencesStore(
-    (state) => state.permissionStatus,
-  );
+  const permissionStatus = useNotificationPreferencesStore((state) => state.permissionStatus);
   const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
-  const deadlinesEnabled = useNotificationPreferencesStore(
-    (state) => state.deadlinesEnabled,
-  );
-  const classesEnabled = useNotificationPreferencesStore(
-    (state) => state.classesEnabled,
-  );
+  const deadlinesEnabled = useNotificationPreferencesStore((state) => state.deadlinesEnabled);
+  const classesEnabled = useNotificationPreferencesStore((state) => state.classesEnabled);
   const scheduleDeadlineReminder = useNotificationPreferencesStore(
     (state) => state.scheduleDeadlineReminder,
   );
   const scheduleClassReminder = useNotificationPreferencesStore(
     (state) => state.scheduleClassReminder,
   );
-  const clearAllReminders = useNotificationPreferencesStore(
-    (state) => state.clearAllReminders,
-  );
+  const clearAllReminders = useNotificationPreferencesStore((state) => state.clearAllReminders);
   const deadlineReminderTiming = useNotificationPreferencesStore(
     (state) => state.deadlineReminderTiming,
   );
-  const classReminderTiming = useNotificationPreferencesStore(
-    (state) => state.classReminderTiming,
-  );
+  const classReminderTiming = useNotificationPreferencesStore((state) => state.classReminderTiming);
 
   // Track if we've initialized to avoid re-scheduling on every render
   const initializedRef = useRef(false);
   const lastDeadlinesRef = useRef<string>('');
   const lastUnitsRef = useRef<string>('');
   const clearAllRemindersRef = useRef(clearAllReminders);
-  
+
   // Keep ref updated with latest function
   useEffect(() => {
     clearAllRemindersRef.current = clearAllReminders;

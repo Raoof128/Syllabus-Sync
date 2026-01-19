@@ -103,12 +103,11 @@ describe('CalendarPage', () => {
   it('renders navigation controls', async () => {
     render(<CalendarPage />);
 
-    // Find the Today button which should be present
-    const todayButton = screen.getByRole('button', { name: translations.today });
-    expect(todayButton).toBeInTheDocument();
+    const todayButtons = screen.getAllByRole('button', { name: translations.today });
+    expect(todayButtons.length).toBeGreaterThan(0);
 
     // Check that the button is focusable
-    todayButton.focus();
-    expect(document.activeElement).toBe(todayButton);
+    todayButtons[0].focus();
+    expect(document.activeElement).toBe(todayButtons[0]);
   });
 });

@@ -40,9 +40,7 @@ async function main() {
 
   // Get all profiles
   console.log('📋 Current Profiles:');
-  const { data: profiles, error: profilesError } = await supabase
-    .from('profiles')
-    .select('*');
+  const { data: profiles, error: profilesError } = await supabase.from('profiles').select('*');
 
   if (profilesError) {
     console.error('Error fetching profiles:', profilesError.message);
@@ -58,7 +56,7 @@ async function main() {
   if (authError) {
     console.error('Error fetching auth users:', authError.message);
   } else {
-    const usersSummary = authUsers?.users?.map(u => ({
+    const usersSummary = authUsers?.users?.map((u) => ({
       id: u.id,
       email: u.email,
       created_at: u.created_at,
@@ -70,53 +68,58 @@ async function main() {
 
   // Get all units
   console.log('📚 Current Units:');
-  const { data: units, error: unitsError } = await supabase
-    .from('units')
-    .select('*');
+  const { data: units, error: unitsError } = await supabase.from('units').select('*');
 
   if (unitsError) {
     console.error('Error fetching units:', unitsError.message);
   } else {
-    console.table(units?.map(u => ({ id: u.id?.slice(0, 8) + '...', user_id: u.user_id?.slice(0, 8) + '...', code: u.code, name: u.name })));
+    console.table(
+      units?.map((u) => ({
+        id: u.id?.slice(0, 8) + '...',
+        user_id: u.user_id?.slice(0, 8) + '...',
+        code: u.code,
+        name: u.name,
+      })),
+    );
     console.log(`Total units: ${units?.length || 0}\n`);
   }
 
   // Get all events
   console.log('📅 Current Events:');
-  const { data: events, error: eventsError } = await supabase
-    .from('events')
-    .select('*');
+  const { data: events, error: eventsError } = await supabase.from('events').select('*');
 
   if (eventsError) {
     console.error('Error fetching events:', eventsError.message);
   } else {
-    console.table(events?.map(e => ({
-      id: e.id?.slice(0, 8) + '...',
-      user_id: e.user_id ? e.user_id.slice(0, 8) + '...' : 'PUBLIC',
-      title: e.title?.slice(0, 30),
-      start_at: e.start_at,
-      category: e.category
-    })));
+    console.table(
+      events?.map((e) => ({
+        id: e.id?.slice(0, 8) + '...',
+        user_id: e.user_id ? e.user_id.slice(0, 8) + '...' : 'PUBLIC',
+        title: e.title?.slice(0, 30),
+        start_at: e.start_at,
+        category: e.category,
+      })),
+    );
     console.log(`Total events: ${events?.length || 0}\n`);
   }
 
   // Get all deadlines
   console.log('⏰ Current Deadlines:');
-  const { data: deadlines, error: deadlinesError } = await supabase
-    .from('deadlines')
-    .select('*');
+  const { data: deadlines, error: deadlinesError } = await supabase.from('deadlines').select('*');
 
   if (deadlinesError) {
     console.error('Error fetching deadlines:', deadlinesError.message);
   } else {
-    console.table(deadlines?.map(d => ({
-      id: d.id?.slice(0, 8) + '...',
-      user_id: d.user_id?.slice(0, 8) + '...',
-      title: d.title?.slice(0, 25),
-      unit_code: d.unit_code,
-      due_date: d.due_date,
-      type: d.type
-    })));
+    console.table(
+      deadlines?.map((d) => ({
+        id: d.id?.slice(0, 8) + '...',
+        user_id: d.user_id?.slice(0, 8) + '...',
+        title: d.title?.slice(0, 25),
+        unit_code: d.unit_code,
+        due_date: d.due_date,
+        type: d.type,
+      })),
+    );
     console.log(`Total deadlines: ${deadlines?.length || 0}\n`);
   }
 
@@ -129,12 +132,14 @@ async function main() {
   if (gamError) {
     console.error('Error fetching gamification profiles:', gamError.message);
   } else {
-    console.table(gamProfiles?.map(g => ({
-      id: g.id?.slice(0, 8) + '...',
-      user_id: g.user_id?.slice(0, 8) + '...',
-      xp: g.xp,
-      streak_days: g.streak_days
-    })));
+    console.table(
+      gamProfiles?.map((g) => ({
+        id: g.id?.slice(0, 8) + '...',
+        user_id: g.user_id?.slice(0, 8) + '...',
+        xp: g.xp,
+        streak_days: g.streak_days,
+      })),
+    );
     console.log(`Total gamification profiles: ${gamProfiles?.length || 0}\n`);
   }
 
@@ -151,7 +156,7 @@ async function main() {
 
   // Check if auth user exists
   let userId: string | null = null;
-  const existingUser = authUsers?.users?.find(u => u.email === newUserEmail);
+  const existingUser = authUsers?.users?.find((u) => u.email === newUserEmail);
 
   if (existingUser) {
     userId = existingUser.id;
@@ -165,8 +170,8 @@ async function main() {
       password: 'TempPassword123!', // Temporary password
       user_metadata: {
         full_name: newUserFullName,
-        student_id: newUserStudentId
-      }
+        student_id: newUserStudentId,
+      },
     });
 
     if (createAuthError) {
@@ -199,7 +204,7 @@ async function main() {
           full_name: newUserFullName,
           student_id: newUserStudentId,
           course: 'Computer Science',
-          year: '2026'
+          year: '2026',
         })
         .select()
         .single();
@@ -221,14 +226,12 @@ async function main() {
 
     if (!existingGamProfile) {
       console.log(`📝 Creating gamification profile...`);
-      const { error: gamCreateError } = await supabase
-        .from('gamification_profiles')
-        .insert({
-          user_id: userId,
-          xp: 0,
-          streak_days: 0,
-          longest_streak: 0
-        });
+      const { error: gamCreateError } = await supabase.from('gamification_profiles').insert({
+        user_id: userId,
+        xp: 0,
+        streak_days: 0,
+        longest_streak: 0,
+      });
 
       if (gamCreateError) {
         console.error('Error creating gamification profile:', gamCreateError.message);

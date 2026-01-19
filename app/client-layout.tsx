@@ -20,6 +20,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 // V3.1: Performance optimization - move constant arrays outside component
 // Prevents recreation on every render
@@ -84,9 +85,15 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let isActive = true;
+    const supabaseConfigured = isSupabaseConfigured();
 
     const checkAuth = async () => {
       try {
+        if (!supabaseConfigured) {
+          setIsAuthenticated(true);
+          return;
+        }
+
         const data = await apiRequest<{ user?: { id: string } }>('/api/auth/user', {
           noRetry: true,
         });
@@ -96,15 +103,10 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
 
         if (authenticated && isAuthRoute) {
           router.push('/home');
-        } else if (!authenticated && isProtectedRoute) {
-          router.push(`/login?redirectTo=${pathname}`);
         }
       } catch {
         if (!isActive) return;
-        setIsAuthenticated(false);
-        if (isProtectedRoute) {
-          router.push(`/login?redirectTo=${pathname}`);
-        }
+        setIsAuthenticated(true);
       }
     };
 

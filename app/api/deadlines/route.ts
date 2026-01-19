@@ -94,8 +94,8 @@ export async function POST(request: Request) {
         } else {
           // Auto-create the unit if it doesn't exist
           // This ensures strict referential integrity without blocking the user
-          console.log(`Auto-creating unit for code: ${parsed.data.unitCode}`);
-           const { data: newUnit, error: createError } = await supabase
+          console.warn(`Auto-creating unit for code: ${parsed.data.unitCode}`);
+          const { data: newUnit, error: createError } = await supabase
             .from('units')
             .insert({
               user_id: userId,
@@ -106,19 +106,19 @@ export async function POST(request: Request) {
             .select('id')
             .single();
 
-           if (newUnit) {
-             unitId = newUnit.id;
-           } else {
-             console.error('Failed to auto-create unit:', createError);
-             // One last try: maybe it was created concurrently?
-             const { data: retryUnit } = await supabase
-               .from('units')
-               .select('id')
-               .eq('user_id', userId)
-               .eq('code', parsed.data.unitCode)
-               .maybeSingle();
-             if (retryUnit) unitId = retryUnit.id;
-           }
+          if (newUnit) {
+            unitId = newUnit.id;
+          } else {
+            console.error('Failed to auto-create unit:', createError);
+            // One last try: maybe it was created concurrently?
+            const { data: retryUnit } = await supabase
+              .from('units')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('code', parsed.data.unitCode)
+              .maybeSingle();
+            if (retryUnit) unitId = retryUnit.id;
+          }
         }
       }
 
@@ -144,7 +144,11 @@ export async function POST(request: Request) {
           error.details,
         );
         // Return actual error for debugging
-        return jsonError(`Failed to create deadline: ${error.message}`, 500, ERROR_CODES.DATABASE_ERROR);
+        return jsonError(
+          `Failed to create deadline: ${error.message}`,
+          500,
+          ERROR_CODES.DATABASE_ERROR,
+        );
       }
 
       return NextResponse.json(mapDeadlineRow(data));

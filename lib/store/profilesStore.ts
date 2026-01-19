@@ -376,7 +376,7 @@ export const useProfilesStore = create<ProfilesState>()(
         const dbUpdates = mapClientToDb(updatesForDb);
         const hasServerUpdates = Object.keys(dbUpdates).length > 0;
 
-        let serverProfile = optimisticProfile;
+        let serverProfile: UserProfile = optimisticProfile;
 
         if (hasServerUpdates) {
           try {

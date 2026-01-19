@@ -8,3 +8,5 @@ coverage
 public
 Team_Plan
 security
+database-schema.sql
+supabase/migrations

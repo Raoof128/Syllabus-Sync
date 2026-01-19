@@ -52,6 +52,27 @@ Version: 1.0.0-rc.7 | Last Updated: January 14, 2026
 | **Settings Tab** | Raouf | ✅ Complete |
 | **AI Integration** | Kit | 🔜 Demo Feature |
 
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Type Safety Improvement
+Summary:
+  - Added `types/global.d.ts` to declare CSS modules (`*.css`).
+  - Removed `@ts-expect-error` suppressions in `lib/hooks/useLeafletLoader.ts`.
+  - Verified secrets check (passed) and console logs (suppressed).
+Files: types/global.d.ts; lib/hooks/useLeafletLoader.ts.
+Verification: Static analysis.
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Full Static Site Audit
+Summary:
+  - Performed static analysis due to environment restriction on dynamic `npm run check`.
+  - Verified configurations (`eslint`, `tsconfig`, `next.config.ts`) are strict and security-focused.
+  - Scanned for technical debt: No `TODO` or `FIXME` comments found.
+  - Verified `console.log` usage is minimal and contained to logging utilities/admin routes.
+Files: eslint.config.mjs; tsconfig.json; next.config.ts; lib/utils/devLog.ts.
+Verification: Static analysis (regex search).
+Follow-ups: None.
+
 ### Team Members
 
 - **Raouf**: Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Infrastructure
@@ -162,6 +183,39 @@ Summary:
   - Added profile deletion endpoint and guarded delete sync behavior.
 Files: app/manage-profiles/page.tsx; lib/store/profilesStore.ts; app/api/user-preferences/route.ts; app/api/profiles/route.ts; database-schema.sql; supabase/migrations/20260119000000_add_push_notifications_to_user_preferences.sql.
 Verification: `npm run lint`.
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Demo-mode navigation
+Summary:
+  - Treat demo mode (Supabase not configured) as authenticated in client layout to avoid redirects away from Calendar/Manage Profiles.
+Files: app/client-layout.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Demo-mode auth fallback
+Summary:
+  - Fallback to authenticated state when auth check fails so demo mode never redirects away from protected routes.
+Files: app/client-layout.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Remove unauthenticated redirects
+Summary:
+  - Stopped redirecting to login for protected routes when auth is missing, keeping Calendar/Manage Profiles in place without Supabase auth.
+Files: app/client-layout.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-19 (Australia/Sydney)
+Scope: Calendar/unit test stabilization and payload cleanup
+Summary:
+  - Adjusted calendar navigation tests for duplicate Today buttons and aligned UnitCard schedule expectations with localized times.
+  - Cleaned deadline payload typing and lint warnings to satisfy typecheck/lint.
+Files: tests/CalendarPage.test.tsx; tests/UnitCard.test.tsx; lib/store/deadlinesStore.ts.
+Verification: `npm run check`.
 Follow-ups: None.
 
 Raouf: 2026-01-18 (Australia/Sydney)

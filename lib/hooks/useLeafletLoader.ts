@@ -53,9 +53,7 @@ export function useLeafletLoader(): UseLeafletLoaderResult {
     const loadLeaflet = async () => {
       try {
         // Import CSS first (using dynamic import for CSS modules)
-        // @ts-expect-error - CSS imports don't have type declarations
         await import('leaflet/dist/leaflet.css');
-        // @ts-expect-error - CSS imports don't have type declarations
         await import('leaflet-routing-machine/dist/leaflet-routing-machine.css');
 
         // Import Leaflet

@@ -113,12 +113,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             return normalized;
           }
 
-          const apiPayload: Deadline = { ...normalized };
-          // API sets createdAt; remove to avoid serialization issues
-          delete apiPayload.createdAt;
-          if (apiPayload.unitId && !isValidUUID(apiPayload.unitId)) {
-            delete apiPayload.unitId;
-          }
+          const { createdAt, unitId, ...rest } = normalized;
+          void createdAt;
+          const apiPayload: Partial<Deadline> = {
+            ...rest,
+            ...(unitId && isValidUUID(unitId) ? { unitId } : {}),
+          };
 
           const created = await apiRequest<Deadline>('/api/deadlines', {
             method: 'POST',
@@ -203,13 +203,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             return optimisticUpdate;
           }
 
-          const apiPayload: Partial<Deadline> = { ...updatedDeadline };
-          if (apiPayload.createdAt) {
-            delete apiPayload.createdAt;
-          }
-          if (apiPayload.unitId && !isValidUUID(apiPayload.unitId)) {
-            delete apiPayload.unitId;
-          }
+          const { createdAt, unitId, ...rest } = updatedDeadline;
+          void createdAt;
+          const apiPayload: Partial<Deadline> = {
+            ...rest,
+            ...(unitId && isValidUUID(unitId) ? { unitId } : {}),
+          };
 
           const updated = await apiRequest<Deadline>(`/api/deadlines/${id}`, {
             method: 'PUT',

@@ -68,11 +68,11 @@ export const useUnitsStore = create<UnitsState>()(
         // For testing compatibility, update state synchronously first
         const normalized = normalizeUnit({
           ...unit,
-          id: unit.id && unit.id.match(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-          )
-            ? unit.id
-            : uuidv4(),
+          id:
+            unit.id &&
+            unit.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+              ? unit.id
+              : uuidv4(),
           createdAt: unit.createdAt || new Date(),
         });
 

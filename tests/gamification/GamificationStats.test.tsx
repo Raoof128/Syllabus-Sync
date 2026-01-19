@@ -294,14 +294,17 @@ describe('XPIndicator', () => {
   it('shows streak count when streak > 0', () => {
     render(<XPIndicator />);
 
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByLabelText(/5 day streak/i)).toBeInTheDocument();
   });
 
   it('has title with streak info', () => {
     render(<XPIndicator />);
 
-    const streakText = screen.getByText('5');
-    expect(streakText).toHaveAttribute('title', '5 day streak');
+    const streakText = screen.getByLabelText(/5 day streak/i);
+    expect(streakText).toHaveAttribute(
+      'title',
+      '5 day streak! Complete tasks daily to keep it going. Longest: 10 days.',
+    );
   });
 
   it('applies custom className', () => {

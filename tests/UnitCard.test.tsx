@@ -55,9 +55,11 @@ describe('UnitCard', () => {
     render(<UnitCard unit={mockUnit} />);
 
     expect(screen.getByText('Monday')).toBeInTheDocument();
-    expect(screen.getByText('09:00 - 11:00')).toBeInTheDocument();
+    expect(screen.getByText(/9:00 am/i)).toBeInTheDocument();
+    expect(screen.getByText(/11:00 am/i)).toBeInTheDocument();
     expect(screen.getByText('Thursday')).toBeInTheDocument();
-    expect(screen.getByText('14:00 - 16:00')).toBeInTheDocument();
+    expect(screen.getByText(/2:00 pm/i)).toBeInTheDocument();
+    expect(screen.getByText(/4:00 pm/i)).toBeInTheDocument();
   });
 
   it('shows edit button when onEdit is provided', () => {

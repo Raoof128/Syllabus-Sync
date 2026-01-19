@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-19 - Fix CSS import type safety
+
+### Fixed
+- Added `types/global.d.ts` to properly declare CSS imports in TypeScript.
+- Removed `@ts-expect-error` comments in `useLeafletLoader.ts`.
+
+### Verified
+- **Secrets:** Ran static analysis for secret patterns in console logs (Clean).
+- **Linting:** Confirmed all `console.log` instances have explicit ESLint suppressions.
+
+---
+
+Raouf: 2026-01-19 - Full Static Site Audit
+
+### Verified
+- **Configuration:** Confirmed strict TypeScript (`strict: true`) and ESLint settings.
+- **Security:** Verified `next.config.ts` includes comprehensive security headers (HSTS, CSP, X-Frame-Options).
+- **Code Quality:** Zero `TODO` or `FIXME` markers found in `app/`, `lib/`, or `components/`.
+- **Logging:** Confirmed `console.log` usage is restricted to designated logging utilities and admin routes.
+
+### Verification
+- Static analysis via file inspection and regex search.
+
+---
+
 Raouf: 2026-01-19 - Notification dropdown actions and map cleanup
 
 ### Added
@@ -113,6 +138,48 @@ Raouf: 2026-01-19 - Manage Profiles audit fixes
 
 ### Verification
 - `npm run lint`
+
+---
+
+Raouf: 2026-01-19 - Allow navigation in demo mode
+
+### Fixed
+- Treat demo (Supabase not configured) as authenticated in client layout to stop redirects away from Calendar/Manage Profiles.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Demo mode auth fallback
+
+### Fixed
+- Fallback to authenticated state on auth check failure so demo mode never redirects away from protected routes.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Remove unauthenticated redirects
+
+### Fixed
+- Stopped redirecting to login for protected routes when auth is missing, so Calendar/Manage Profiles stay in place even without Supabase auth.
+
+### Verification
+- Not run (not requested).
+
+---
+
+Raouf: 2026-01-19 - Stabilize calendar/navigation tests and deadline payloads
+
+### Fixed
+- Adjusted calendar navigation test helpers to handle duplicate Today buttons.
+- Updated UnitCard schedule expectations to match localized time formatting.
+- Cleaned deadline payload typing and lint warnings.
+
+### Verification
+- `npm run check`
 
 ---
 
