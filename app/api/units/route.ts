@@ -94,10 +94,12 @@ export async function GET(request: Request) {
       });
 
       // Get units with pagination and search - SECURITY: filter by user_id to prevent IDOR
+      // Exclude soft-deleted records
       let unitsQuery = supabase
         .from('units')
         .select('*', { count: 'exact' })
         .eq('user_id', userId) // Security: Only return user's own units
+        .is('deleted_at', null) // Exclude soft-deleted
         .order(query.sortBy, { ascending: query.sortOrder === 'asc' });
 
       // Apply search filter (sanitized to prevent SQL injection)

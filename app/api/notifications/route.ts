@@ -64,6 +64,7 @@ export async function GET(request: Request) {
         .from('notifications')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
+        .is('deleted_at', null) // Exclude soft-deleted
         .order('created_at', { ascending: false });
 
       // Apply filters
