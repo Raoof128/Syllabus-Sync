@@ -576,14 +576,16 @@ export default function CalendarClient() {
     setExamDialogOpen(true);
   };
 
-  // Event handlers - navigate to feed with highlight
+  // Event handlers - open edit dialog for user's events or navigate to feed with highlight
   const handleEventClick = (event: Event) => {
-    if (userEvents.find((e) => e.id === event.id)) {
-      setEditEvent(event);
-      setEventDialogOpen(true);
-    } else {
-      router.push(`/feed?highlight=${event.id}`);
-    }
+    // All events are user-owned now, so open edit dialog
+    setEditEvent(event);
+    setEventDialogOpen(true);
+  };
+
+  // Navigate to feed with event highlighted
+  const handleViewEventInFeed = (event: Event) => {
+    router.push(`/feed?highlight=${event.id}`);
   };
 
   // Unit handlers

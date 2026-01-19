@@ -54,7 +54,7 @@ export const useEventsStore = create<EventsState>()(
         set({ isLoading: true });
         try {
           const data = await apiRequest<Event[]>('/api/events', { noRetry: true });
-          // Use database data directly - includes public events (user_id = NULL) and user's own events
+          // All events are user-owned (like units) - no public events
           set({ events: data.map(normalizeEvent), hasLoaded: true });
         } catch (error) {
           // Check if this is an auth error
@@ -147,20 +147,11 @@ export const useEventsStore = create<EventsState>()(
         const currentEvent = get().events.find((e) => e.id === id);
         if (!currentEvent) return null;
 
-        // Check if this is a public event (userId is null or undefined)
-        // Public events cannot be updated by users - they're read-only
-        const isPublicEvent = !currentEvent.userId;
-
         const optimisticUpdate = normalizeEvent({ ...currentEvent, ...updates });
         set((state) => ({
           events: state.events.map((e) => (e.id === id ? optimisticUpdate : e)),
         }));
 
-        // Skip API call for public events - just keep the local update for UI purposes
-        if (isPublicEvent) {
-          console.log('Skipping API update for public event:', id);
-          return optimisticUpdate;
-        }
 
         try {
           const updatePayload: Record<string, unknown> = {};
@@ -205,11 +196,6 @@ export const useEventsStore = create<EventsState>()(
       removeEvent: async (id) => {
         const eventToRestore = get().events.find((e) => e.id === id);
 
-        // Check if this is a public event - public events cannot be deleted
-        if (eventToRestore && !eventToRestore.userId) {
-          console.warn('Cannot delete public event:', id);
-          return;
-        }
 
         // Optimistic delete
         set((state) => ({

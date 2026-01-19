@@ -27,13 +27,13 @@ export async function GET(request: Request) {
   return requireAuth(request, async (userId) => {
     try {
       const supabase = await createServerClient();
-      // Security: Return public events (user_id IS NULL) OR user's own events
-      // This allows shared campus events while protecting user-specific data
+      // Security: Only return user's own events (like units)
+      // Events are user-scoped, not public
       const { data, error } = await supabase
         .from('events')
         .select('*')
+        .eq('user_id', userId) // Only user's own events
         .is('deleted_at', null) // Exclude soft-deleted events
-        .or(`user_id.is.null,user_id.eq.${userId}`)
         .order('start_at', { ascending: true });
 
       if (error) {
