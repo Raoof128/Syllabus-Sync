@@ -35,7 +35,7 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { sampleEvents } from '@/data/sampleEvents';
 import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
-import { formatLocalizedDate } from '@/lib/utils/locale';
+import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
 
 dayjs.extend(isoWeek);
@@ -74,6 +74,40 @@ const TYPE_COLORS = {
   Presentation: { bg: 'bg-mq-purple', border: 'border-mq-purple', text: 'text-white' },
   Quiz: { bg: 'bg-mq-warning', border: 'border-mq-warning', text: 'text-black' },
 };
+
+// Category-specific colors for events
+const EVENT_CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
+  Career: { bg: 'bg-indigo-500', border: 'border-indigo-600', text: 'text-white' },
+  Social: { bg: 'bg-pink-500', border: 'border-pink-600', text: 'text-white' },
+  Academic: { bg: 'bg-cyan-500', border: 'border-cyan-600', text: 'text-white' },
+  'Free Food': { bg: 'bg-orange-500', border: 'border-orange-600', text: 'text-white' },
+};
+
+// Helper to get event colors based on custom color, category, or default
+function getEventColors(event: Event): {
+  bg: string;
+  border: string;
+  text: string;
+  style?: React.CSSProperties;
+} {
+  // Use custom color if provided
+  if (event.color) {
+    return {
+      bg: '',
+      border: '',
+      text: 'text-white',
+      style: { backgroundColor: event.color, borderColor: event.color },
+    };
+  }
+
+  // Use category-specific color if available
+  if (event.category && EVENT_CATEGORY_COLORS[event.category]) {
+    return EVENT_CATEGORY_COLORS[event.category];
+  }
+
+  // Fallback to default event color
+  return TYPE_COLORS.Event;
+}
 
 // Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" or "09:00 - 11:00" to start/end hours
 function parseTimeRange(
@@ -285,9 +319,16 @@ export default function CalendarClient() {
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
 
-  // Handle highlighted unit side effects (scroll + auto-clear)
+  // Handle highlighted unit side effects (scroll + auto-open detail panel + auto-clear URL)
   useEffect(() => {
     if (!highlightedUnitId) return;
+
+    // Find the unit and open detail panel
+    const highlightedUnit = units.find((u) => u.id === highlightedUnitId);
+    if (highlightedUnit) {
+      setSelectedUnit(highlightedUnit);
+      setUnitDetailOpen(true);
+    }
 
     const scrollTimer = window.setTimeout(() => {
       unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -303,7 +344,7 @@ export default function CalendarClient() {
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedUnitId]);
+  }, [highlightedUnitId, units]);
 
   // Calendar state
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>
@@ -641,7 +682,11 @@ export default function CalendarClient() {
                                       'text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white',
                                     !isLastEnroll && [colors.bg, colors.text, colors.border],
                                   )}
-                                  title={`${mqDate.event} - ${mqDate.term}`}
+                                  title={
+                                    mqDate.description
+                                      ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                      : `${mqDate.event} - ${mqDate.term}`
+                                  }
                                 >
                                   <span className="flex items-center justify-center gap-1">
                                     {isLastEnroll && (
@@ -833,13 +878,13 @@ export default function CalendarClient() {
                               <button
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
                                 type="button"
-                              className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur"
                                 style={{
                                   top: posInfo.top,
                                   height: Math.max(posInfo.height, 44),
                                   left,
                                   width,
-                                borderLeftColor: unitData.color,
+                                  borderLeftColor: unitData.color,
                                 }}
                                 aria-label={t('calendarUnitAriaLabel', {
                                   endTime: formatScheduleTime(schedule.endTime),
@@ -864,7 +909,11 @@ export default function CalendarClient() {
                                   </span>
                                   {posInfo.height > 50 && (
                                     <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
-                                      {unitData.location.building} {unitData.location.room}
+                                      {formatLocation(
+                                        unitData.location.building,
+                                        unitData.location.room,
+                                        t('room'),
+                                      )}
                                     </span>
                                   )}
                                 </div>
@@ -978,7 +1027,7 @@ export default function CalendarClient() {
                           {/* Events - filled time block */}
                           {dayEvents.map((event, idx) => {
                             const timeInfo = parseTimeRange(event.time);
-                            const colors = TYPE_COLORS.Event;
+                            const eventColors = getEventColors(event);
                             const eventTitle = getEventTitle(event);
 
                             if (!timeInfo) {
@@ -991,10 +1040,10 @@ export default function CalendarClient() {
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
-                                    colors.bg,
-                                    colors.text,
+                                    eventColors.bg,
+                                    eventColors.text,
                                   )}
-                                  style={{ top: offsetTop }}
+                                  style={{ top: offsetTop, ...eventColors.style }}
                                   aria-label={t('calendarEventAriaLabel', {
                                     instruction: t('calendarPressEnterToViewDetails'),
                                     time: event.time,
@@ -1026,10 +1075,10 @@ export default function CalendarClient() {
                                   onClick={() => handleEventClick(event)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
-                                    colors.bg,
-                                    colors.text,
+                                    eventColors.bg,
+                                    eventColors.text,
                                   )}
-                                  style={{ top: offsetTop }}
+                                  style={{ top: offsetTop, ...eventColors.style }}
                                   aria-label={t('calendarEventAriaLabelShort', {
                                     time: event.time,
                                     title: eventTitle,
@@ -1060,15 +1109,16 @@ export default function CalendarClient() {
                                 onClick={() => handleEventClick(event)}
                                 className={cn(
                                   'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
-                                  colors.bg,
-                                  colors.border,
-                                  colors.text,
+                                  eventColors.bg,
+                                  eventColors.border,
+                                  eventColors.text,
                                 )}
                                 style={{
                                   top: posInfo.top,
                                   height: Math.max(posInfo.height, 44),
                                   left: evtLeft,
                                   width: evtWidth,
+                                  ...eventColors.style,
                                 }}
                                 aria-label={t('calendarEventAriaLabel', {
                                   instruction: t('calendarPressEnterToViewDetails'),
@@ -1373,11 +1423,21 @@ export default function CalendarClient() {
                       {units.map((unit) => (
                         <div
                           key={unit.id}
-                          className={`flex items-center gap-3 p-2 rounded-lg border transition-all ${
+                          className={`flex items-center gap-3 p-2 rounded-lg border transition-all cursor-pointer ${
                             highlightedUnitId === unit.id
                               ? 'border-mq-primary bg-mq-primary/10 ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background animate-pulse'
-                              : 'border-mq-border hover:border-mq-primary/20'
+                              : 'border-mq-border hover:border-mq-primary/20 hover:bg-mq-hover-background'
                           }`}
+                          onClick={() => openUnitDetail(unit)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              openUnitDetail(unit);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={t('calendarUnitTitle', { unitCode: unit.code })}
                         >
                           <div
                             className="w-3 h-3 rounded-full flex-shrink-0"
@@ -1394,7 +1454,10 @@ export default function CalendarClient() {
                           <div className="flex items-center gap-1">
                             <button
                               type="button"
-                              onClick={() => openEditUnit(unit)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditUnit(unit);
+                              }}
                               className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                               title={t('calendarEditItem', { title: unit.code })}
                               aria-label={t('calendarEditItem', { title: unit.code })}
@@ -1406,7 +1469,10 @@ export default function CalendarClient() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleDeleteUnit(unit)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteUnit(unit);
+                              }}
                               className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                               title={t('calendarDeleteItem', { title: unit.code })}
                               aria-label={t('calendarDeleteItem', { title: unit.code })}

@@ -10,11 +10,12 @@ import { Button } from '@/components/ui/mq/button';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   const todayLabel = useMemo(() => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -87,7 +88,7 @@ const TodaySchedule = memo(() => {
                     key={`${cls.id}-${cls.code}`}
                     href={`/calendar?date=${todayDate}&unit=${encodeURIComponent(cls.code)}`}
                     className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
-                    aria-label={`${cls.code} - ${cls.name}, ${cls.startTime} - ${cls.endTime} at ${cls.location.building} ${cls.location.room}`}
+                    aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}`}
                   >
                     {/* Color indicator */}
                     <div
@@ -105,13 +106,14 @@ const TodaySchedule = memo(() => {
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" aria-hidden="true" />
                           <span>
-                            {cls.startTime} - {cls.endTime}
+                            {formatScheduleTime(cls.startTime, language)} -{' '}
+                            {formatScheduleTime(cls.endTime, language)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" aria-hidden="true" />
                           <span>
-                            {cls.location.building} {cls.location.room}
+                            {formatLocation(cls.location.building, cls.location.room, t('room'))}
                           </span>
                         </div>
                       </div>

@@ -6,6 +6,7 @@ import { persist } from 'zustand/middleware';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
+import { sampleNotifications } from '@/data/sampleNotifications';
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
@@ -15,7 +16,9 @@ interface NotificationsState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadNotifications: () => Promise<void>;
-  addNotification: (notification: Notification) => Promise<Notification | null>;
+  addNotification: (
+    notification: Omit<Notification, 'id' | 'createdAt'> & { id?: string; createdAt?: Date },
+  ) => Promise<Notification | null>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   removeNotification: (id: string) => Promise<void>;
@@ -48,10 +51,20 @@ export const useNotificationsStore = create<NotificationsState>()(
             .map(normalizeNotification)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .slice(0, MAX_NOTIFICATIONS);
-          set({ notifications: normalized, hasLoaded: true });
+
+          // If no notifications from API, seed with sample data for demo
+          if (normalized.length === 0) {
+            const seededNotifications = sampleNotifications
+              .map(normalizeNotification)
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, MAX_NOTIFICATIONS);
+            set({ notifications: seededNotifications, hasLoaded: true });
+          } else {
+            set({ notifications: normalized, hasLoaded: true });
+          }
         } catch (error) {
           // Silently fail for auth errors (401) - expected when not logged in
-          // For other errors, keep persisted data if API is unavailable
+          // For other errors, seed with sample data if no persisted data exists
           const isAuthError =
             error instanceof Error &&
             (error.message.includes('401') ||
@@ -59,9 +72,20 @@ export const useNotificationsStore = create<NotificationsState>()(
               error.message.includes('Unauthorized'));
 
           if (!isAuthError) {
-            console.warn('Failed to load notifications from API, using persisted data:', error);
+            console.warn('Failed to load notifications from API, using sample data:', error);
           }
-          set({ hasLoaded: true }); // Mark as loaded to prevent retry
+
+          // If no persisted notifications, seed with sample data for demo
+          const currentNotifications = get().notifications;
+          if (currentNotifications.length === 0) {
+            const seededNotifications = sampleNotifications
+              .map(normalizeNotification)
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, MAX_NOTIFICATIONS);
+            set({ notifications: seededNotifications, hasLoaded: true });
+          } else {
+            set({ hasLoaded: true }); // Mark as loaded to prevent retry
+          }
         } finally {
           set({ isLoading: false });
         }
@@ -73,16 +97,16 @@ export const useNotificationsStore = create<NotificationsState>()(
           typeof value === 'string' &&
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 
+        // Generate temporary ID for local state
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
         const notification: Notification = {
           ...notificationData,
-          // Let the API generate a UUID. If callers pass an id, we'll drop it unless valid UUID.
+          id: notificationData.id || tempId,
           createdAt: notificationData.createdAt || new Date(),
         };
 
         const normalized = normalizeNotification(notification);
-
-        // Generate temporary ID for local state (not sent to API)
-        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const localNotification = { ...normalized, id: tempId };
 
         // Add to front and limit total count
@@ -124,9 +148,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           });
           const serverNormalized = normalizeNotification(created);
           set((state) => ({
-            notifications: state.notifications.map((n) =>
-              n.id === tempId ? serverNormalized : n,
-            ),
+            notifications: state.notifications.map((n) => (n.id === tempId ? serverNormalized : n)),
           }));
           return serverNormalized;
         } catch (error) {

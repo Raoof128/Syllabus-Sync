@@ -82,6 +82,7 @@ export const sampleUnits: Unit[] = [
 ];
 
 export const sampleDeadlines: Deadline[] = [
+  // Assignments
   {
     id: '550e8400-e29b-41d4-a716-446655440001',
     title: 'Assignment 1: Network Fundamentals',
@@ -93,6 +94,48 @@ export const sampleDeadlines: Deadline[] = [
     createdAt: getDate(-7, 10, 0),
   },
   {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    title: 'Assignment 2: TCP/IP Protocol Analysis',
+    unitCode: 'COMP2310',
+    dueDate: getDate(10, 23, 59),
+    priority: 'Medium',
+    type: 'Assignment',
+    completed: false,
+    createdAt: getDate(-3, 14, 0),
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440005',
+    title: 'Problem Set 1: Derivatives & Integrals',
+    unitCode: 'MATH1001',
+    dueDate: getDate(5, 17, 0),
+    priority: 'Medium',
+    type: 'Assignment',
+    completed: false,
+    createdAt: getDate(-4, 11, 0),
+  },
+  // Exams
+  {
+    id: '550e8400-e29b-41d4-a716-446655440006',
+    title: 'Midterm Exam',
+    unitCode: 'COMP2310',
+    dueDate: getDate(14, 9, 0),
+    priority: 'Urgent',
+    type: 'Exam',
+    completed: false,
+    createdAt: getDate(-10, 8, 0),
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    title: 'Final Exam',
+    unitCode: 'MATH1001',
+    dueDate: getDate(28, 14, 0),
+    priority: 'High',
+    type: 'Exam',
+    completed: false,
+    createdAt: getDate(-7, 9, 0),
+  },
+  // Quizzes
+  {
     id: '550e8400-e29b-41d4-a716-446655440002',
     title: 'Quiz 1: Linear Algebra Basics',
     unitCode: 'MATH1001',
@@ -103,13 +146,34 @@ export const sampleDeadlines: Deadline[] = [
     createdAt: getDate(-5, 9, 30),
   },
   {
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    title: 'Quiz 2: Network Security Concepts',
+    unitCode: 'COMP2310',
+    dueDate: getDate(6, 14, 0),
+    priority: 'Medium',
+    type: 'Quiz',
+    completed: false,
+    createdAt: getDate(-2, 10, 0),
+  },
+  // Completed items (showing progress)
+  {
     id: '550e8400-e29b-41d4-a716-446655440003',
-    title: 'Essay 1: Revolution, Reform & Resilience (1200 words)',
+    title: 'Essay 1: Revolution, Reform & Resilience',
     unitCode: 'HIST2002',
     dueDate: getDate(-2, 17, 0),
     priority: 'Low',
     type: 'Presentation',
     completed: true,
     createdAt: getDate(-20, 12, 15),
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440009',
+    title: 'Lab Report 1: Network Topologies',
+    unitCode: 'COMP2310',
+    dueDate: getDate(-5, 23, 59),
+    priority: 'Medium',
+    type: 'Assignment',
+    completed: true,
+    createdAt: getDate(-14, 9, 0),
   },
 ];

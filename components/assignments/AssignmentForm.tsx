@@ -50,7 +50,8 @@ export default function AssignmentForm({
 
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
-  const [color, setColor] = useState<string>(UNIT_COLORS[0].value);
+  const [color, setColor] = useState<string>(''); // Empty means inherit from unit
+  const [useCustomColor, setUseCustomColor] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('23:59');
   const [priority, setPriority] = useState<Deadline['priority']>('Medium');
@@ -63,6 +64,12 @@ export default function AssignmentForm({
   const selectedUnit = useMemo(() => {
     return units.find((u) => u.code === unitCode);
   }, [units, unitCode]);
+
+  // Effective color: custom color if set, otherwise unit color
+  const effectiveColor = useMemo(() => {
+    if (useCustomColor && color) return color;
+    return selectedUnit?.color || UNIT_COLORS[0].value;
+  }, [useCustomColor, color, selectedUnit]);
 
   // Save operation with retry logic
   const performSave = useCallback(
@@ -85,7 +92,8 @@ export default function AssignmentForm({
   const resetForm = () => {
     setTitle('');
     setUnitCode('');
-    setColor(UNIT_COLORS[0].value);
+    setColor('');
+    setUseCustomColor(false);
     setDueDate('');
     setDueTime('23:59');
     setPriority('Medium');
@@ -97,7 +105,14 @@ export default function AssignmentForm({
     if (editAssignment) {
       setTitle(editAssignment.title);
       setUnitCode(editAssignment.unitCode);
-      setColor(editAssignment.color || UNIT_COLORS[0].value);
+      // If assignment has a custom color, use it; otherwise inherit from unit
+      if (editAssignment.color) {
+        setColor(editAssignment.color);
+        setUseCustomColor(true);
+      } else {
+        setColor('');
+        setUseCustomColor(false);
+      }
       const parsedDate = new Date(editAssignment.dueDate);
       if (isValid(parsedDate)) {
         setDueDate(format(parsedDate, 'yyyy-MM-dd'));
@@ -150,7 +165,7 @@ export default function AssignmentForm({
       title: title.trim(),
       unitCode,
       unitId: selectedUnit?.id,
-      color,
+      color: useCustomColor ? color : undefined, // Only save custom color
       dueDate: dueDateObj,
       priority,
       type: 'Assignment', // Fixed type for assignments
@@ -316,29 +331,70 @@ export default function AssignmentForm({
             {/* Color Selection */}
             <div className="space-y-2">
               <Label htmlFor="assignment-color">{t('color' as TranslationKey) || 'Color'}</Label>
-              <Select value={color} onValueChange={setColor}>
-                <SelectTrigger
-                  id="assignment-color"
-                  className="*:data-[slot=select-value]:justify-center"
+
+              {/* Unit Color Inheritance Toggle */}
+              <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
+                <div
+                  className="w-6 h-6 rounded-full border-2 border-mq-border flex-shrink-0"
+                  style={{ backgroundColor: effectiveColor }}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-mq-content">
+                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                  </p>
+                  <p className="text-xs text-mq-content-secondary truncate">
+                    {useCustomColor
+                      ? UNIT_COLORS.find((c) => c.value === color)?.translationKey
+                        ? t(
+                            UNIT_COLORS.find((c) => c.value === color)!
+                              .translationKey as TranslationKey,
+                          )
+                        : color
+                      : selectedUnit
+                        ? `From ${selectedUnit.code}`
+                        : 'Select a unit first'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!useCustomColor) {
+                      setColor(selectedUnit?.color || UNIT_COLORS[0].value);
+                    }
+                    setUseCustomColor(!useCustomColor);
+                  }}
+                  className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  <SelectValue
-                    placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNIT_COLORS.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-4 h-4 rounded-full border border-mq-border"
-                          style={{ backgroundColor: c.value }}
-                        />
-                        <span>{t(c.translationKey as TranslationKey)}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                </button>
+              </div>
+
+              {/* Custom Color Picker */}
+              {useCustomColor && (
+                <Select value={color} onValueChange={setColor}>
+                  <SelectTrigger
+                    id="assignment-color"
+                    className="*:data-[slot=select-value]:justify-center"
+                  >
+                    <SelectValue
+                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {UNIT_COLORS.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full border border-mq-border"
+                            style={{ backgroundColor: c.value }}
+                          />
+                          <span>{t(c.translationKey as TranslationKey)}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 

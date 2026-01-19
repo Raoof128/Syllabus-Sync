@@ -85,19 +85,13 @@ const FeedClient = memo(() => {
 
   // Notifications store
   const addNotification = useNotificationsStore((state) => state.addNotification);
-  
+
   // Notification preferences store - use individual selectors to prevent infinite re-renders
-  const eventReminderTiming = useNotificationPreferencesStore(
-    (state) => state.eventReminderTiming,
-  );
+  const eventReminderTiming = useNotificationPreferencesStore((state) => state.eventReminderTiming);
   const eventsEnabled = useNotificationPreferencesStore((state) => state.eventsEnabled);
-  const permissionStatus = useNotificationPreferencesStore(
-    (state) => state.permissionStatus,
-  );
+  const permissionStatus = useNotificationPreferencesStore((state) => state.permissionStatus);
   const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
-  const requestPermission = useNotificationPreferencesStore(
-    (state) => state.requestPermission,
-  );
+  const requestPermission = useNotificationPreferencesStore((state) => state.requestPermission);
   const scheduleEventReminder = useNotificationPreferencesStore(
     (state) => state.scheduleEventReminder,
   );
@@ -135,12 +129,7 @@ const FeedClient = memo(() => {
 
   // Handle "Remind Me" button click - awards XP for event attendance and creates notification
   const handleRemindMe = useCallback(
-    async (
-      eventId: string,
-      eventTitle: string,
-      eventStartAt: Date,
-      eventLocation: string,
-    ) => {
+    async (eventId: string, eventTitle: string, eventStartAt: Date, eventLocation: string) => {
       const isAlreadyReminded = remindedEvents.has(eventId);
 
       // Toggle off if already reminded
@@ -193,17 +182,19 @@ const FeedClient = memo(() => {
 
       try {
         scheduleEventReminder(eventId, eventTitle, eventLocation, eventStartAt);
-        
+
         // Create notification - don't provide id (let API generate UUID)
         // Convert relative link to absolute URL for validation (schema requires full URL)
         const notificationLink =
           typeof window !== 'undefined'
             ? `${window.location.origin}/feed?highlight=${encodeURIComponent(eventId)}`
             : undefined;
-        
+
         // Only include relatedId if eventId is a valid UUID format (sample events use 'event-1' format)
-        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(eventId);
-        
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          eventId,
+        );
+
         await addNotification({
           title: t('reminderTimingUpdated'),
           message: t('reminderTimingUpdatedMsg', { timing: timingLabel }),
@@ -230,7 +221,11 @@ const FeedClient = memo(() => {
 
             // Show XP notification if enabled
             if (settings.showXPNotifications) {
-              showXPEarnedNotification(response.result.xpAwarded, t('eventReminderSetTitle'), language);
+              showXPEarnedNotification(
+                response.result.xpAwarded,
+                t('eventReminderSetTitle'),
+                language,
+              );
             }
 
             // Refresh profile to update XP display
@@ -679,7 +674,7 @@ const FeedClient = memo(() => {
                         </Badge>
                         <div className="min-w-0">
                           <h4 className="font-semibold text-mq-content text-mq-sm">
-                            {t('welcomeToApp', { appName: 'MQ Sync' })}
+                            {t('welcomeToApp', { appName: 'Syllabus Sync' })}
                           </h4>
                           <p className="text-mq-xs text-mq-content-secondary mt-1">
                             {t('appCompanionDesc')}

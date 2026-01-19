@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { formatScheduleTime } from '@/lib/utils/locale';
 
 interface UnitCardProps {
   unit: Unit;
@@ -27,7 +28,7 @@ const UnitCard = React.memo(
     showActions = true,
     isHighlighted = false,
   }: UnitCardProps) => {
-    const { t } = useTranslation();
+    const { t, language } = useTranslation();
 
     const DAY_SHORT: { [key: string]: string } = {
       Monday: t('mon'),
@@ -39,10 +40,25 @@ const UnitCard = React.memo(
       Sunday: t('sun'),
     };
 
-    // Get unique days
+    // Day order for sorting (Monday first, Sunday last)
+    const DAY_ORDER: Record<string, number> = {
+      Monday: 0,
+      Tuesday: 1,
+      Wednesday: 2,
+      Thursday: 3,
+      Friday: 4,
+      Saturday: 5,
+      Sunday: 6,
+    };
+
+    // Get unique days sorted chronologically
     const getUniqueDays = () => {
-      const days = new Set(unit.schedule.map((ct) => DAY_SHORT[ct.day]));
-      return Array.from(days).join(', ');
+      const uniqueDays = [...new Set(unit.schedule.map((ct) => ct.day))];
+      // Sort by day order (Mon, Tue, Wed...) then map to short names
+      return uniqueDays
+        .sort((a, b) => DAY_ORDER[a] - DAY_ORDER[b])
+        .map((day) => DAY_SHORT[day])
+        .join(', ');
     };
 
     const handleCardClick = () => {
@@ -135,7 +151,9 @@ const UnitCard = React.memo(
               <MapPin className="w-4 h-4 text-mq-content-tertiary" />
               <span className="font-medium text-mq-content">{unit.location.building}</span>
               <span className="text-mq-content-tertiary">
-                {t('room')} {unit.location.room}
+                {unit.location.room.toLowerCase().startsWith('room')
+                  ? unit.location.room
+                  : `${t('room')} ${unit.location.room}`}
               </span>
             </div>
 
@@ -150,7 +168,8 @@ const UnitCard = React.memo(
                   <div key={ct.id} className="text-mq-sm flex items-center justify-between">
                     <span className="font-medium text-mq-content">{ct.day}</span>
                     <span className="text-mq-content-secondary">
-                      {ct.startTime} - {ct.endTime}
+                      {formatScheduleTime(ct.startTime, language)} -{' '}
+                      {formatScheduleTime(ct.endTime, language)}
                     </span>
                   </div>
                 ))}

@@ -128,3 +128,44 @@ export function formatRelativeTime(date: Date, language: Language): string {
     return rtf.format(diffInYears, 'year');
   }
 }
+
+/**
+ * Formats a schedule time string (HH:MM or HH:MM:SS) to a user-friendly format
+ * e.g., "09:00" -> "9:00 AM", "14:30" -> "2:30 PM"
+ *
+ * @param time - Time string in HH:MM or HH:MM:SS format
+ * @param language - The app's language code
+ * @returns Formatted time string (e.g., "9:00 AM")
+ */
+export function formatScheduleTime(time: string, language: Language): string {
+  const parts = time.split(':');
+  const hour = Number(parts[0]);
+  const minute = Number(parts[1]);
+
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return time;
+
+  const date = new Date();
+  date.setHours(hour, minute, 0, 0);
+
+  const locale = getLocaleString(language);
+  return new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(date);
+}
+
+/**
+ * Formats a location for display
+ * Consistently formats building + room, avoiding duplication of "Room" prefix
+ *
+ * @param building - Building code (e.g., "C5C")
+ * @param room - Room identifier (e.g., "204" or "Room 204")
+ * @param roomLabel - The translated "Room" label
+ * @returns Formatted location string (e.g., "C5C Room 204")
+ */
+export function formatLocation(building: string, room: string, roomLabel = 'Room'): string {
+  // If room already starts with "Room" (case-insensitive), don't add the prefix
+  const roomWithPrefix = room.toLowerCase().startsWith('room') ? room : `${roomLabel} ${room}`;
+
+  return `${building} ${roomWithPrefix}`;
+}

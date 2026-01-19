@@ -79,9 +79,9 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     errorMessage: t('failedToSaveUnit'),
   });
 
-  const createDefaultClassTime = () => ({
+  const createDefaultClassTime = (): ClassTime => ({
     id: uuidv4(),
-    day: 'Monday',
+    day: 'Monday' as DayOfWeek,
     startTime: '09:00',
     endTime: '11:00',
   });
@@ -151,7 +151,12 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     // Validate class times separately
     const classTimeErrors: Array<{ field: string; message: string }> = [];
     schedule.forEach((ct, index) => {
-      if (!ct.startTime || !ct.endTime || !TIME_REGEX.test(ct.startTime) || !TIME_REGEX.test(ct.endTime)) {
+      if (
+        !ct.startTime ||
+        !ct.endTime ||
+        !TIME_REGEX.test(ct.startTime) ||
+        !TIME_REGEX.test(ct.endTime)
+      ) {
         classTimeErrors.push({
           field: `time_${index}`,
           message: t('endTimeAfterStart'),

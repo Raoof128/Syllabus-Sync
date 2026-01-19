@@ -6,6 +6,15 @@ const getDate = (daysFromNow: number): Date => {
   return dayjs().add(daysFromNow, 'day').toDate();
 };
 
+// Helper to get the next occurrence of a specific day of week (0=Sunday, 5=Friday)
+const getNextDayOfWeek = (dayOfWeek: number): number => {
+  const today = dayjs();
+  const currentDay = today.day();
+  let daysUntil = dayOfWeek - currentDay;
+  if (daysUntil <= 0) daysUntil += 7; // If today or past, get next week
+  return daysUntil;
+};
+
 // Helper to create an event with proper startAt/endAt from time string
 const createEvent = (
   id: string,
@@ -72,7 +81,7 @@ export const sampleEvents: Event[] = [
     'Join us for free pizza and networking with fellow students!',
     'event_freePizzaFriday_title',
     'event_freePizzaFriday_desc',
-    0,
+    getNextDayOfWeek(5), // Always schedule on next Friday (5 = Friday)
     '12:00 PM - 2:00 PM',
     'Library Courtyard',
     'C3C',

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import { formatLocation } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Deadline, Unit, DayOfWeek } from '@/lib/types';
@@ -271,7 +272,11 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                           </div>
                           {height > 50 && (
                             <div className="text-mq-content-secondary truncate">
-                              {classItem.unit.location.building} {classItem.unit.location.room}
+                              {formatLocation(
+                                classItem.unit.location.building,
+                                classItem.unit.location.room,
+                                t('room'),
+                              )}
                             </div>
                           )}
                         </div>

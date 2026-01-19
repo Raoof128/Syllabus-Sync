@@ -26,7 +26,7 @@ export const UNIVERSITY_CONFIG = {
  */
 export const APP_CONFIG = {
   // App name displayed in header and title
-  name: 'The Syllabus Sync',
+  name: 'Syllabus Sync',
   // App tagline/description
   description: 'Campus navigation and schedule management',
   // Full description for metadata

@@ -118,9 +118,11 @@ interface StreakBadgeProps {
  * Compact streak badge for profile headers
  */
 export function StreakBadge({ className }: StreakBadgeProps) {
-  const { days, isActive } = useStreak();
+  const { days, isActive, longest } = useStreak();
 
   if (days === 0) return null;
+
+  const streakTooltip = `${days} day streak! Complete tasks daily to keep it going. Your longest streak: ${longest} days.`;
 
   return (
     <span
@@ -131,6 +133,8 @@ export function StreakBadge({ className }: StreakBadgeProps) {
           : 'bg-mq-background-secondary text-mq-content-tertiary',
         className,
       )}
+      title={streakTooltip}
+      aria-label={streakTooltip}
     >
       <span role="img" aria-hidden="true">
         🔥

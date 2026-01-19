@@ -127,6 +127,7 @@ export function GamificationStats({
     const progressPercent = rawProgress <= 0 ? 0 : Math.min(100, Math.max(rawProgress, 18));
     const levelAriaLabel = `Level ${level}, ${currentXP} XP, ${xpToNext} XP to next level`;
     const levelColors = getLevelColors(level);
+    const levelTooltip = `Level ${level} • ${currentXP.toLocaleString()} XP earned. Complete tasks to earn XP and level up!`;
 
     return (
       <div className={cn('flex items-center gap-3', className)}>
@@ -140,6 +141,7 @@ export function GamificationStats({
             boxShadow: `0 0 0 2px ${levelColors.ringColor}`,
           }}
           aria-label={levelAriaLabel}
+          title={levelTooltip}
           data-testid="level-badge"
         >
           Level {level}
@@ -256,7 +258,7 @@ export function GamificationStats({
  */
 export function XPIndicator({ className }: { className?: string }) {
   const { profile, loadProfile, hasLoaded } = useGamificationStore();
-  const { days } = useStreak();
+  const { days, longest } = useStreak();
 
   useEffect(() => {
     if (!hasLoaded) {
@@ -265,18 +267,28 @@ export function XPIndicator({ className }: { className?: string }) {
   }, [hasLoaded, loadProfile]);
 
   const level = profile?.level ?? 1;
+  const xp = profile?.xp ?? 0;
+  const levelTooltip = `Level ${level} • ${xp.toLocaleString()} XP earned. Complete tasks to earn XP and level up!`;
+  const streakTooltip =
+    days > 0
+      ? `${days} day streak! Complete tasks daily to keep it going. Longest: ${longest} days.`
+      : 'Start a streak by completing tasks daily!';
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {/* Level */}
-      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-mq-primary text-white text-xs font-bold">
+      <span
+        className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-mq-primary text-white text-xs font-bold"
+        title={levelTooltip}
+        aria-label={levelTooltip}
+      >
         {level}
       </span>
 
       {/* Streak (only if active) */}
       {days > 0 && (
-        <span className="text-orange-500 text-sm" title={`${days} day streak`}>
-          {days}
+        <span className="text-orange-500 text-sm" title={streakTooltip} aria-label={streakTooltip}>
+          🔥{days}
         </span>
       )}
     </div>

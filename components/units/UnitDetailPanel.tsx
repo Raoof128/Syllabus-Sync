@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/mq/badge';
 import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/hooks/useTranslation';
+import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;
@@ -24,6 +26,7 @@ export default function UnitDetailPanel({
 }: UnitDetailPanelProps) {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
+  const { t, language } = useTranslation();
 
   // Filter deadlines for this unit
   const unitDeadlines = useMemo(() => {
@@ -187,9 +190,7 @@ export default function UnitDetailPanel({
         <div className="flex flex-wrap gap-4 py-3 border-b border-mq-border">
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <MapPin className="h-4 w-4" />
-            <span>
-              {unit.location.building} {unit.location.room}
-            </span>
+            <span>{formatLocation(unit.location.building, unit.location.room, t('room'))}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <Clock className="h-4 w-4" />
@@ -309,7 +310,8 @@ export default function UnitDetailPanel({
                 >
                   <span className="font-medium">{s.day.slice(0, 3)}</span>
                   <span>
-                    {s.startTime} - {s.endTime}
+                    {formatScheduleTime(s.startTime, language)} -{' '}
+                    {formatScheduleTime(s.endTime, language)}
                   </span>
                 </div>
               ))}

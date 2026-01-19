@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { sampleDeadlines } from '@/data/sampleUnits';
 
 interface DeadlinesState {
   deadlines: Deadline[];
@@ -50,11 +51,34 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             }
             return true;
           });
-          set({ deadlines: validData, hasLoaded: true });
+
+          // If no deadlines from API, seed with sample data for demo
+          if (validData.length === 0) {
+            const seededDeadlines = sampleDeadlines.map(normalizeDeadline);
+            set({ deadlines: seededDeadlines, hasLoaded: true });
+          } else {
+            set({ deadlines: validData, hasLoaded: true });
+          }
         } catch (error) {
-          // Silently fail - keep persisted data if API is unavailable
-          console.warn('Failed to load deadlines from API, using persisted data:', error);
-          set({ hasLoaded: true });
+          // Silently fail for auth errors - expected when not logged in
+          const isAuthError =
+            error instanceof Error &&
+            (error.message.includes('401') ||
+              error.message.includes('authentication') ||
+              error.message.includes('Unauthorized'));
+
+          if (!isAuthError) {
+            console.warn('Failed to load deadlines from API:', error);
+          }
+
+          // If no persisted deadlines, seed with sample data for demo
+          const currentDeadlines = get().deadlines;
+          if (currentDeadlines.length === 0) {
+            const seededDeadlines = sampleDeadlines.map(normalizeDeadline);
+            set({ deadlines: seededDeadlines, hasLoaded: true });
+          } else {
+            set({ hasLoaded: true });
+          }
         } finally {
           set({ isLoading: false });
         }

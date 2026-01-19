@@ -16,6 +16,7 @@ export interface MQKeyDate {
   date: Date;
   endDate?: Date; // For date ranges
   event: string;
+  description?: string; // Optional explanation of what this date means
   term: string;
   category: MQDateCategory;
   program: MQProgram;
@@ -23,6 +24,10 @@ export interface MQKeyDate {
 
 // Helper to create date with AEST timezone
 const createDate = (year: number, month: number, day: number) => new Date(year, month - 1, day);
+
+// Common descriptions for key academic dates
+const CENSUS_DATE_DESCRIPTION =
+  'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.';
 
 // General MQ dates for 2025
 const generalDates2025: MQKeyDate[] = [
@@ -129,6 +134,8 @@ const generalDates2025: MQKeyDate[] = [
     id: 'mq-16',
     date: createDate(2025, 3, 21),
     event: 'Teaching Census',
+    description:
+      'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'Session 1',
     category: 'admin',
     program: 'general',
@@ -221,6 +228,8 @@ const generalDates2025: MQKeyDate[] = [
     id: 'mq-48',
     date: createDate(2025, 8, 22),
     event: 'Teaching Census',
+    description:
+      'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'Session 2',
     category: 'admin',
     program: 'general',
@@ -327,6 +336,8 @@ const businessSchoolDates: MQKeyDate[] = [
     id: 'mbs-t1-census',
     date: createDate(2026, 1, 28),
     event: 'Census date',
+    description:
+      'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'MBS Term 1',
     category: 'admin',
     program: 'business-school',
@@ -378,6 +389,7 @@ const businessSchoolDates: MQKeyDate[] = [
     id: 'mbs-t2-census',
     date: createDate(2026, 4, 22),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 2',
     category: 'admin',
     program: 'business-school',
@@ -429,6 +441,7 @@ const businessSchoolDates: MQKeyDate[] = [
     id: 'mbs-t3-census',
     date: createDate(2026, 7, 15),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 3',
     category: 'admin',
     program: 'business-school',
@@ -480,6 +493,7 @@ const businessSchoolDates: MQKeyDate[] = [
     id: 'mbs-t4-census',
     date: createDate(2026, 10, 7),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 4',
     category: 'admin',
     program: 'business-school',
@@ -535,6 +549,7 @@ const collegeDates: MQKeyDate[] = [
     id: 'mqc-t1-census',
     date: createDate(2026, 3, 13),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 1',
     category: 'admin',
     program: 'college',
@@ -586,6 +601,7 @@ const collegeDates: MQKeyDate[] = [
     id: 'mqc-t2-census',
     date: createDate(2026, 5, 29),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 2',
     category: 'admin',
     program: 'college',
@@ -637,6 +653,7 @@ const collegeDates: MQKeyDate[] = [
     id: 'mqc-t3-census',
     date: createDate(2026, 8, 14),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 3',
     category: 'admin',
     program: 'college',
@@ -688,6 +705,7 @@ const collegeDates: MQKeyDate[] = [
     id: 'mqc-t4-census',
     date: createDate(2026, 10, 23),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 4',
     category: 'admin',
     program: 'college',
@@ -739,6 +757,7 @@ const collegeDates: MQKeyDate[] = [
     id: 'mqc-t5-census',
     date: createDate(2027, 1, 8),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 5',
     category: 'admin',
     program: 'college',
@@ -794,6 +813,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o1-census',
     date: createDate(2026, 1, 21),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 1',
     category: 'admin',
     program: 'global-mba',
@@ -836,6 +856,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o2-census',
     date: createDate(2026, 3, 18),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 2',
     category: 'admin',
     program: 'global-mba',
@@ -878,6 +899,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o3-census',
     date: createDate(2026, 5, 13),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 3',
     category: 'admin',
     program: 'global-mba',
@@ -920,6 +942,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o4-census',
     date: createDate(2026, 7, 8),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 4',
     category: 'admin',
     program: 'global-mba',
@@ -962,6 +985,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o5-census',
     date: createDate(2026, 9, 2),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 5',
     category: 'admin',
     program: 'global-mba',
@@ -1004,6 +1028,7 @@ const globalMBADates: MQKeyDate[] = [
     id: 'gmba-o6-census',
     date: createDate(2026, 10, 28),
     event: 'Census date',
+    description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 6',
     category: 'admin',
     program: 'global-mba',

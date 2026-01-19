@@ -78,7 +78,7 @@ const Header = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
 
   const notifications = useNotificationsStore((state) => state.notifications);
-  // const addNotification = useNotificationsStore((state) => state.addNotification);
+  const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
@@ -86,6 +86,13 @@ const Header = memo(() => {
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
+
+  // Load notifications on mount
+  useEffect(() => {
+    if (isClient) {
+      loadNotifications();
+    }
+  }, [isClient, loadNotifications]);
 
   // Load user authentication state
   useEffect(() => {
@@ -264,18 +271,22 @@ const Header = memo(() => {
                 )}
               </div>
               <div className="max-h-72 overflow-y-auto">
-                {unreadNotifications.length === 0 ? (
+                {notifications.length === 0 ? (
                   <div className="p-4 text-center text-mq-content-tertiary text-sm">
                     {t('noNotificationsYet')}
                   </div>
                 ) : (
-                  unreadNotifications.slice(0, 10).map((notification) => {
+                  notifications.slice(0, 10).map((notification) => {
                     const Icon = notificationIcons[notification.type];
                     return (
                       <DropdownMenuItem
                         key={notification.id}
                         asChild
-                        onSelect={() => markAsRead(notification.id)}
+                        onSelect={() => {
+                          if (!notification.read) {
+                            markAsRead(notification.id);
+                          }
+                        }}
                         className={`p-0 border-b border-mq-border last:border-0 ${
                           !notification.read ? 'bg-mq-info/10' : ''
                         }`}
