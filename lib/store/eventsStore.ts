@@ -168,18 +168,45 @@ export const useEventsStore = create<EventsState>()(
               updates.endAt instanceof Date ? updates.endAt.toISOString() : updates.endAt;
           if (updates.allDay !== undefined) updatePayload.allDay = updates.allDay;
 
-          const updated = await apiRequest<Event>(`/api/events/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatePayload),
-          });
-          const serverNormalized = normalizeEvent(updated);
-          set((state) => ({
-            events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
-          }));
-          return serverNormalized;
+          try {
+            const updated = await apiRequest<Event>(`/api/events/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updatePayload),
+            });
+            const serverNormalized = normalizeEvent(updated);
+            set((state) => ({
+              events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
+            }));
+            return serverNormalized;
+          } catch (putError) {
+            const errorMessage = putError instanceof Error ? putError.message : String(putError);
+            if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+              const created = await apiRequest<Event>('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id,
+                  title: updatePayload.title ?? currentEvent.title,
+                  description: updatePayload.description ?? currentEvent.description ?? '',
+                  location: updatePayload.location ?? currentEvent.location ?? '',
+                  building: updatePayload.building ?? currentEvent.building ?? '',
+                  category: updatePayload.category ?? currentEvent.category ?? 'General',
+                  imageUrl: updatePayload.imageUrl ?? currentEvent.imageUrl ?? null,
+                  startAt: updatePayload.startAt ?? currentEvent.startAt.toISOString(),
+                  endAt: updatePayload.endAt ?? currentEvent.endAt?.toISOString() ?? null,
+                  allDay: updatePayload.allDay ?? currentEvent.allDay ?? false,
+                }),
+              });
+              const serverNormalized = normalizeEvent(created);
+              set((state) => ({
+                events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
+              }));
+              return serverNormalized;
+            }
+            throw putError;
+          }
         } catch (error) {
-          // Revert to original state on error
           set((state) => ({
             events: state.events.map((e) => (e.id === id ? currentEvent : e)),
           }));
@@ -195,7 +222,6 @@ export const useEventsStore = create<EventsState>()(
       removeEvent: async (id) => {
         const eventToRestore = get().events.find((e) => e.id === id);
 
-        // Optimistic delete
         set((state) => ({
           events: state.events.filter((e) => e.id !== id),
         }));
@@ -203,15 +229,17 @@ export const useEventsStore = create<EventsState>()(
         try {
           await apiRequest<{ id: string }>(`/api/events/${id}`, { method: 'DELETE' });
         } catch (error) {
-          // On error, restore the event to local state
-          if (eventToRestore) {
-            set((state) => ({ events: [...state.events, eventToRestore] }));
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (!errorMessage.includes('404') && !errorMessage.includes('not found')) {
+            if (eventToRestore) {
+              set((state) => ({ events: [...state.events, eventToRestore] }));
+            }
+            errorHandler.logError(
+              error instanceof Error ? error : new Error(`Failed to remove event ${id}`),
+              'EventsStore.removeEvent',
+              'high',
+            );
           }
-          errorHandler.logError(
-            error instanceof Error ? error : new Error(`Failed to remove event ${id}`),
-            'EventsStore.removeEvent',
-            'high',
-          );
         }
       },
 
