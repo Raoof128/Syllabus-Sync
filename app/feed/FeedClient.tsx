@@ -565,8 +565,8 @@ const FeedClient = memo(() => {
                           <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                             {t('noEventsFound')}
                           </h3>
-                          <p className="text-mq-content-secondary max-w-md mx-auto">
-                            {t('noEventsFound')}
+                          <p className="text-mq-content-secondary text-sm max-w-md mx-auto">
+                            {t('noEventsFoundDesc')}
                           </p>
                         </div>
                       )}

@@ -232,17 +232,18 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium"
+                className={`group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
                 aria-label={`${t('notifications')}${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
                 aria-haspopup="menu"
+                title={unreadCount > 0 ? t('notificationsBellHint') : t('notifications')}
               >
                 <Bell
-                  className="w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95"
+                  className={`w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
                   aria-hidden="true"
                 />
                 {unreadCount > 0 && (
                   <span
-                    className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium"
+                    className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium animate-bounce-subtle"
                     aria-hidden="true"
                   >
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -272,8 +273,13 @@ const Header = memo(() => {
               </div>
               <div className="max-h-72 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-mq-content-tertiary text-sm">
-                    {t('noNotificationsYet')}
+                  <div className="p-4 text-center">
+                    <p className="text-mq-content-tertiary text-sm font-medium">
+                      {t('noNotificationsYet')}
+                    </p>
+                    <p className="text-mq-content-tertiary/70 text-xs mt-1">
+                      {t('noNotificationsYetDesc')}
+                    </p>
                   </div>
                 ) : (
                   notifications.slice(0, 10).map((notification) => {

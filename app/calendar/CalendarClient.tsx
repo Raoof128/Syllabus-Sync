@@ -667,20 +667,85 @@ export default function CalendarClient() {
                         >
                           {formatDayNumber(day)}
                         </div>
-                        {/* MQ Key Dates badges in header */}
-                        {dayMQDates.length > 0 && (
+                        {/* MQ Key Dates badges in header - only show important alerts */}
+                        {dayMQDates.filter((d) => /last date to enrol/i.test(d.event)).length >
+                          0 && (
                           <div className="mt-1 flex flex-col gap-1">
-                            {dayMQDates.slice(0, 2).map((mqDate) => {
-                              const isLastEnroll = /last date to enrol/i.test(mqDate.event);
+                            {dayMQDates
+                              .filter((d) => /last date to enrol/i.test(d.event))
+                              .slice(0, 1)
+                              .map((mqDate) => {
+                                return (
+                                  <div
+                                    key={mqDate.id}
+                                    className="text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white rounded-md font-semibold"
+                                    title={
+                                      mqDate.description
+                                        ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                        : `${mqDate.event} - ${mqDate.term}`
+                                    }
+                                  >
+                                    <span className="flex items-center justify-center gap-1">
+                                      <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                                      {mqDate.event}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Full-Day Events Row - MQ Key Dates as visual blocks */}
+                {(() => {
+                  // Check if any day has MQ key dates (non-class)
+                  const hasAnyFullDayEvents = weekDays.some((day) => {
+                    const mqDates = getMQKeyDatesForDay(day).filter(
+                      (d) => d.category !== 'classes',
+                    );
+                    return mqDates.length > 0;
+                  });
+
+                  if (!hasAnyFullDayEvents) return null;
+
+                  return (
+                    <div
+                      className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary/50"
+                      role="row"
+                    >
+                      {/* Label column */}
+                      <div className="p-2 text-xs text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end">
+                        {t('calendarAllDay')}
+                      </div>
+                      {/* Full-day events for each day */}
+                      {weekDays.map((day) => {
+                        const dayMQDates = getMQKeyDatesForDay(day).filter(
+                          (d) => d.category !== 'classes' && !/last date to enrol/i.test(d.event),
+                        );
+                        const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
+
+                        return (
+                          <div
+                            key={`fullday-${day.toISOString()}`}
+                            className={cn(
+                              'min-h-[48px] p-1 border-r border-mq-border/80 last:border-r-0 flex flex-col gap-1',
+                              isTodayCell && 'bg-mq-primary/5',
+                            )}
+                          >
+                            {dayMQDates.map((mqDate) => {
                               const colors = MQ_DATE_COLORS[mqDate.category];
                               return (
                                 <div
                                   key={mqDate.id}
                                   className={cn(
-                                    'text-[9px] px-1.5 py-0.5 rounded-md font-semibold line-clamp-2 break-words leading-tight shadow-sm border',
-                                    isLastEnroll &&
-                                      'text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white',
-                                    !isLastEnroll && [colors.bg, colors.text, colors.border],
+                                    'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-semibold flex items-center justify-center text-center leading-tight shadow-sm',
+                                    colors.bg,
+                                    colors.text,
+                                    colors.border,
+                                    'border',
                                   )}
                                   title={
                                     mqDate.description
@@ -688,26 +753,16 @@ export default function CalendarClient() {
                                       : `${mqDate.event} - ${mqDate.term}`
                                   }
                                 >
-                                  <span className="flex items-center justify-center gap-1">
-                                    {isLastEnroll && (
-                                      <AlertTriangle className="h-3 w-3" aria-hidden="true" />
-                                    )}
-                                    {mqDate.event}
-                                  </span>
+                                  <span className="line-clamp-2">{mqDate.event}</span>
                                 </div>
                               );
                             })}
-                            {dayMQDates.length > 2 && (
-                              <div className="text-[9px] text-mq-content-secondary font-medium">
-                                {t('calendarMoreKeyDates', { count: dayMQDates.length - 2 })}
-                              </div>
-                            )}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
 
                 {/* Time Grid */}
                 <div
@@ -1181,6 +1236,9 @@ export default function CalendarClient() {
                     <div className="text-center py-8">
                       <FileText className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
                       <p className="text-mq-content-secondary text-sm">{t('noAssignmentsYet')}</p>
+                      <p className="text-mq-content-tertiary text-xs mt-1">
+                        {t('noAssignmentsYetDesc')}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
@@ -1299,6 +1357,7 @@ export default function CalendarClient() {
                     <div className="text-center py-8">
                       <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
                       <p className="text-mq-content-secondary text-sm">{t('noExamsYet')}</p>
+                      <p className="text-mq-content-tertiary text-xs mt-1">{t('noExamsYetDesc')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
@@ -1417,6 +1476,7 @@ export default function CalendarClient() {
                     <div className="text-center py-8">
                       <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
                       <p className="text-mq-content-secondary text-sm">{t('noUnitsYet')}</p>
+                      <p className="text-mq-content-tertiary text-xs mt-1">{t('noUnitsYetDesc')}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
@@ -1527,6 +1587,9 @@ export default function CalendarClient() {
                     <div className="text-center py-8">
                       <PartyPopper className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
                       <p className="text-mq-content-secondary text-sm">{t('noEventsYet')}</p>
+                      <p className="text-mq-content-tertiary text-xs mt-1">
+                        {t('noEventsYetDesc')}
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
@@ -1595,7 +1658,10 @@ export default function CalendarClient() {
                 ) : deadlines.length === 0 ? (
                   <div className="text-center py-8">
                     <CalendarDays className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
-                    <p className="text-mq-content-secondary">{t('noDeadlinesYet')}</p>
+                    <p className="text-mq-content-secondary font-medium">{t('noDeadlinesYet')}</p>
+                    <p className="text-mq-content-tertiary text-sm mt-1">
+                      {t('noDeadlinesYetDesc')}
+                    </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

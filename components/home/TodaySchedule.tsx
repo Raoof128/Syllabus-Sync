@@ -1,21 +1,70 @@
 // components/home/TodaySchedule.tsx
 'use client';
 
-import React, { useMemo, memo } from 'react';
+import React, { useMemo, memo, useState, useEffect } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Clock, MapPin, ExternalLink } from 'lucide-react';
+import { Clock, MapPin, CalendarDays, Zap, CheckCircle2 } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 
+// Parse time string "HH:MM" to minutes since midnight
+function parseTimeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+// Format minutes difference to human readable string
+function formatTimeDiff(minutes: number): string {
+  if (minutes < 1) return '<1 min';
+  if (minutes < 60) return `${Math.round(minutes)} min`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
+
+type ClassStatus = 'now' | 'next' | 'upcoming' | 'done';
+
+interface ClassWithStatus {
+  id: string;
+  code: string;
+  name: string;
+  color: string;
+  location: { building: string; room: string };
+  startTime: string;
+  endTime: string;
+  day: string;
+  status: ClassStatus;
+  minutesUntilStart?: number;
+  minutesUntilEnd?: number;
+  progressPercent?: number;
+}
+
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const { t, language } = useTranslation();
+  const [currentMinutes, setCurrentMinutes] = useState(() => {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  });
+
+  // Update current time every minute
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentMinutes(now.getHours() * 60 + now.getMinutes());
+    };
+
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const todayLabel = useMemo(() => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -26,32 +75,133 @@ const TodaySchedule = memo(() => {
     return new Date().toISOString().split('T')[0];
   }, []);
 
-  const todayClasses = useMemo(() => {
+  // Get classes with smart status
+  const classesWithStatus = useMemo((): ClassWithStatus[] => {
     const classes = units.flatMap((unit) =>
       unit.schedule
         .filter((schedule) => schedule.day === todayLabel)
-        .map((schedule) => ({
-          ...unit,
-          ...schedule,
-        })),
+        .map((schedule) => {
+          const startMinutes = parseTimeToMinutes(schedule.startTime);
+          const endMinutes = parseTimeToMinutes(schedule.endTime);
+
+          let status: ClassStatus;
+          let minutesUntilStart: number | undefined;
+          let minutesUntilEnd: number | undefined;
+          let progressPercent: number | undefined;
+
+          if (currentMinutes >= endMinutes) {
+            // Class has ended
+            status = 'done';
+          } else if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+            // Class is in progress
+            status = 'now';
+            minutesUntilEnd = endMinutes - currentMinutes;
+            progressPercent = ((currentMinutes - startMinutes) / (endMinutes - startMinutes)) * 100;
+          } else {
+            // Class hasn't started
+            status = 'upcoming';
+            minutesUntilStart = startMinutes - currentMinutes;
+          }
+
+          return {
+            id: unit.id,
+            code: unit.code,
+            name: unit.name,
+            color: unit.color,
+            location: unit.location,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+            day: schedule.day,
+            status,
+            minutesUntilStart,
+            minutesUntilEnd,
+            progressPercent,
+          };
+        }),
     );
 
-    return classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
-  }, [todayLabel, units]);
+    // Sort by start time
+    const sorted = classes.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+    // Mark the first upcoming class as "next"
+    let foundNext = false;
+    return sorted.map((cls) => {
+      if (!foundNext && cls.status === 'upcoming') {
+        foundNext = true;
+        return { ...cls, status: 'next' as ClassStatus };
+      }
+      return cls;
+    });
+  }, [todayLabel, units, currentMinutes]);
+
+  // Calculate remaining classes count
+  const remainingClasses = classesWithStatus.filter(
+    (cls) => cls.status === 'now' || cls.status === 'next' || cls.status === 'upcoming',
+  ).length;
+
+  const getStatusBadge = (status: ClassStatus) => {
+    switch (status) {
+      case 'now':
+        return (
+          <Badge className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 animate-pulse flex items-center gap-1">
+            <Zap className="h-3 w-3" aria-hidden="true" />
+            {t('classNow')}
+          </Badge>
+        );
+      case 'next':
+        return (
+          <Badge className="bg-mq-primary text-white text-[10px] px-1.5 py-0.5">
+            {t('classNext')}
+          </Badge>
+        );
+      case 'upcoming':
+        return (
+          <Badge
+            variant="neutral"
+            className="bg-mq-background-tertiary text-mq-content-secondary text-[10px] px-1.5 py-0.5"
+          >
+            {t('classUpcoming')}
+          </Badge>
+        );
+      case 'done':
+        return (
+          <Badge
+            variant="neutral"
+            className="bg-mq-background-tertiary text-mq-content-tertiary text-[10px] px-1.5 py-0.5 flex items-center gap-1"
+          >
+            <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+            {t('classDone')}
+          </Badge>
+        );
+    }
+  };
 
   return (
     <MagicCard isLiquidEnhanced>
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t('todaysClasses')}</CardTitle>
-            <Button size="sm" variant="outline" className="gap-1" asChild>
+            <div className="flex items-center gap-2">
+              <CardTitle>{t('todaysClasses')}</CardTitle>
+              {/* Smart indicator - remaining classes */}
+              {isHydrated && classesWithStatus.length > 0 && (
+                <Badge
+                  variant="neutral"
+                  className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+                >
+                  {remainingClasses > 0
+                    ? t('classesRemaining', { count: remainingClasses })
+                    : t('allClassesDone')}
+                </Badge>
+              )}
+            </div>
+            <Button size="sm" variant="outline" className="gap-1.5" asChild>
               <Link
                 href="/calendar?view=today"
-                aria-label={`${t('viewAll')} ${t('todaysClasses')}`}
+                aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}
               >
-                <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                <span>{t('viewAll')}</span>
+                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{t('viewInCalendar')}</span>
               </Link>
             </Button>
           </CardHeader>
@@ -73,50 +223,90 @@ const TodaySchedule = memo(() => {
                   </div>
                 </div>
               </div>
-            ) : todayClasses.length === 0 ? (
+            ) : classesWithStatus.length === 0 ? (
               <div className="text-center py-8">
                 <Clock
                   className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
                   aria-hidden="true"
                 />
                 <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
+                <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {todayClasses.map((cls, index) => (
+              <div className="space-y-2">
+                {classesWithStatus.map((cls) => (
                   <Link
-                    key={`${cls.id}-${cls.code}`}
-                    href={`/calendar?date=${todayDate}&unit=${encodeURIComponent(cls.code)}`}
-                    className={`group flex items-start gap-3 p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${index > 0 ? 'border-t-2 border-t-mq-border' : ''}`}
-                    aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}`}
+                    key={`${cls.id}-${cls.code}-${cls.startTime}`}
+                    href={`/calendar?date=${todayDate}&highlightUnit=${encodeURIComponent(cls.id)}`}
+                    className={`group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${
+                      cls.status === 'now'
+                        ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 shadow-sm'
+                        : cls.status === 'next'
+                          ? 'bg-mq-primary/5 border-mq-primary/20 shadow-sm'
+                          : cls.status === 'done'
+                            ? 'bg-mq-background-secondary border-mq-border/50 opacity-60'
+                            : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                    }`}
+                    aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}, ${cls.status}`}
                   >
-                    {/* Color indicator */}
+                    {/* Progress bar for "now" status */}
+                    {cls.status === 'now' && cls.progressPercent !== undefined && (
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-100 dark:bg-green-900/30 rounded-b-lg overflow-hidden">
+                        <div
+                          className="h-full bg-green-500 transition-all duration-1000"
+                          style={{ width: `${cls.progressPercent}%` }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Color indicator - thicker for emphasis */}
                     <div
-                      className="w-1 h-full rounded-full flex-shrink-0"
+                      className="w-1.5 self-stretch rounded-full flex-shrink-0"
                       style={{ backgroundColor: cls.color }}
                     />
 
                     {/* Class info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-mq-content">
-                        {cls.code} — {cls.name}
-                      </h3>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <h3
+                          className={`font-semibold text-mq-content ${cls.status === 'done' ? 'line-through' : ''}`}
+                        >
+                          {cls.code}
+                        </h3>
+                        {getStatusBadge(cls.status)}
+                      </div>
 
-                      <div className="flex items-center gap-4 mt-1 text-sm text-mq-content-secondary">
+                      <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1">
+                        {cls.name}
+                      </p>
+
+                      <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-mq-content-secondary">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" aria-hidden="true" />
+                          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>
                             {formatScheduleTime(cls.startTime, language)} -{' '}
                             {formatScheduleTime(cls.endTime, language)}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" aria-hidden="true" />
+                          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>
                             {formatLocation(cls.location.building, cls.location.room, t('room'))}
                           </span>
                         </div>
                       </div>
+
+                      {/* Smart time indicator */}
+                      {cls.status === 'now' && cls.minutesUntilEnd !== undefined && (
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-1.5 font-medium">
+                          {t('classEndsIn', { time: formatTimeDiff(cls.minutesUntilEnd) })}
+                        </p>
+                      )}
+                      {cls.status === 'next' && cls.minutesUntilStart !== undefined && (
+                        <p className="text-xs text-mq-primary mt-1.5 font-medium">
+                          {t('classStartsIn', { time: formatTimeDiff(cls.minutesUntilStart) })}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 ))}

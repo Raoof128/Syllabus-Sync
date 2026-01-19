@@ -227,10 +227,8 @@ export default function UnitDetailPanel({
           {unitDeadlines.all.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-mq-content-tertiary mx-auto mb-3" />
-              <p className="text-mq-content-secondary">No deadlines for this unit yet</p>
-              <p className="text-xs text-mq-content-tertiary mt-1">
-                Add assignments, exams, or deadlines to track your progress
-              </p>
+              <p className="text-mq-content-secondary">{t('noUnitsForDeadline')}</p>
+              <p className="text-xs text-mq-content-tertiary mt-1">{t('noUnitsForDeadlineDesc')}</p>
             </div>
           ) : (
             <>
@@ -239,7 +237,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <FileText className="h-4 w-4 text-blue-500" />
-                    Assignments ({unitDeadlines.assignments.length})
+                    {t('assignments')} ({unitDeadlines.assignments.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.assignments.map((d) => (
@@ -254,7 +252,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <BookOpen className="h-4 w-4 text-red-500" />
-                    Exams ({unitDeadlines.exams.length})
+                    {t('exams')} ({unitDeadlines.exams.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.exams.map((d) => (
@@ -269,7 +267,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <AlertCircle className="h-4 w-4 text-amber-500" />
-                    Quizzes ({unitDeadlines.quizzes.length})
+                    {t('quizzes')} ({unitDeadlines.quizzes.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.quizzes.map((d) => (
@@ -284,7 +282,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <Clock className="h-4 w-4 text-purple-500" />
-                    Presentations ({unitDeadlines.presentations.length})
+                    {t('presentations')} ({unitDeadlines.presentations.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.presentations.map((d) => (
@@ -300,7 +298,7 @@ export default function UnitDetailPanel({
         {/* Schedule Preview */}
         {unit.schedule.length > 0 && (
           <div className="flex-shrink-0 pt-3 border-t border-mq-border">
-            <h3 className="text-sm font-medium mb-2">Weekly Schedule</h3>
+            <h3 className="text-sm font-medium mb-2">{t('weeklySchedule')}</h3>
             <div className="flex flex-wrap gap-2">
               {unit.schedule.map((s) => (
                 <div

@@ -16,7 +16,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, TrendingUp, ExternalLink } from 'lucide-react';
+import { Info, Plus, BookOpen, TrendingUp, ExternalLink, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -446,11 +446,24 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                     <CardTitle id="units-section-heading" className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5" aria-hidden="true" />
                       {t('myUnits')}
+                      {/* View Only Badge - makes read-only state obvious */}
+                      {hasHydrated && units.length > 0 && (
+                        <Badge
+                          variant="neutral"
+                          className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
+                        >
+                          <Eye className="h-3 w-3" aria-hidden="true" />
+                          {t('viewOnly')}
+                        </Badge>
+                      )}
                     </CardTitle>
-                    <Button size="sm" variant="outline" className="gap-1" asChild>
-                      <Link href="/calendar" aria-label={`${t('viewAll')} ${t('myUnits')}`}>
-                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                        <span>{t('viewAll')}</span>
+                    <Button size="sm" variant="outline" className="gap-1.5" asChild>
+                      <Link
+                        href="/calendar"
+                        aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
+                      >
+                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>{t('manageInCalendar')}</span>
                       </Link>
                     </Button>
                   </CardHeader>
@@ -505,6 +518,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                             </p>
                           </div>
                         </div>
+
+                        {/* View-only hint */}
+                        <p className="text-mq-xs text-mq-content-tertiary mb-3 flex items-center gap-1.5">
+                          <Info className="h-3 w-3" aria-hidden="true" />
+                          {t('homeViewOnlyHint')}
+                        </p>
 
                         {/* Units Grid - READ ONLY (no edit/delete) */}
                         <m.div
