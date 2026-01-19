@@ -16,8 +16,20 @@ import { z } from 'zod';
 const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(12, 'Password must be at least 12 characters'),
+  // Direct fields (legacy format)
   fullName: z.string().min(1).optional(),
   studentId: z.string().optional(),
+  course: z.string().optional(),
+  year: z.string().optional(),
+  // Nested options format (from frontend)
+  options: z.object({
+    data: z.object({
+      full_name: z.string().optional(),
+      student_id: z.string().optional(),
+      course: z.string().optional(),
+      year: z.string().optional(),
+    }).optional(),
+  }).optional(),
 });
 
 // Developer emails that can bypass email confirmation in development
@@ -67,14 +79,20 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createServerClient();
-    const { email, password, fullName, studentId } = parsed.data;
+    const { email, password, fullName, studentId, course, year, options } = parsed.data;
+
+    // Extract profile data from either direct fields or nested options.data format
+    const profileFullName = fullName || options?.data?.full_name || null;
+    const profileStudentId = studentId || options?.data?.student_id || null;
+    const profileCourse = course || options?.data?.course || null;
+    const profileYear = year || options?.data?.year || null;
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: profileFullName,
           // SECURITY: Don't store studentId in auth metadata, only in profiles table with RLS
         },
         emailRedirectTo: undefined,
@@ -144,8 +162,10 @@ export async function POST(request: NextRequest) {
           {
             id: data.user.id,
             email: data.user.email,
-            full_name: fullName || null,
-            student_id: studentId || null,
+            full_name: profileFullName,
+            student_id: profileStudentId,
+            course: profileCourse,
+            year: profileYear,
           },
           { onConflict: 'id' },
         );
@@ -176,8 +196,10 @@ export async function POST(request: NextRequest) {
           {
             id: data.user.id,
             email: data.user.email,
-            full_name: fullName || null,
-            student_id: studentId || null,
+            full_name: profileFullName,
+            student_id: profileStudentId,
+            course: profileCourse,
+            year: profileYear,
           },
           { onConflict: 'id' },
         );

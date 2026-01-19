@@ -40,15 +40,15 @@ const unitSchema = z.object({
     .string()
     .min(1)
     .max(20)
-    .regex(/^[A-Z]{3,4}\d{3,4}$/, 'Unit code must be in format AAA123 or AAAA1234'),
+    .regex(/^[A-Z]{2,6}\d{0,4}[A-Z]?$/, 'Unit code format invalid (e.g., COMP1234, CS101, BIO2A)'),
   name: z.string().min(1).max(200),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
   description: z.string().max(500).optional(),
   location: z.object({
-    building: z.string().min(1).max(100),
-    room: z.string().min(1).max(50),
-  }),
-  schedule: z.array(classTimeSchema).min(0).max(14), // Max 14 class times per week
+    building: z.string().max(100).default(''),
+    room: z.string().max(50).default(''),
+  }).default({ building: '', room: '' }),
+  schedule: z.array(classTimeSchema).min(0).max(14).default([]), // Max 14 class times per week
   createdAt: dateSchema.optional(),
 });
 
