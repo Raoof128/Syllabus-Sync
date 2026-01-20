@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-20 - Map Directions & Navigation Polish
+
+### Fixed
+- **Hybrid Navigation:** Fixed step-by-step directions not appearing on the map by correctly converting GPS route coordinates to `CRS.Simple` pixels for rendering.
+- **Direction List:** Removed the limit on turn-by-turn steps display, allowing users to scroll through the complete route instructions.
+- **Hook Dependencies:** Resolved `react-hooks/exhaustive-deps` warnings in `CampusMap.tsx` by correctly including `gpsToPixelLatLng` in routing effects.
+
+### Verification
+- `npm run lint` (pass for Map component)
+- Manual coordinate transform validation.
+
 Raouf: 2026-01-20 - Map Calibration & Navigation Fixes
 
 ### Fixed

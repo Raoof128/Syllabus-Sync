@@ -767,7 +767,13 @@ export default function CampusMap({
     const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, destGps);
 
     if (routeData) {
-      setRouteCoords(coordinates);
+      // Convert GPS route coordinates to CRS.Simple pixels for map display
+      const pixelCoords = coordinates
+        .map((c) => gpsToPixelLatLng(c[0], c[1]))
+        .filter((p): p is { lat: number; lng: number } => p !== null)
+        .map((p) => [p.lat, p.lng] as [number, number]);
+
+      setRouteCoords(pixelCoords);
       setPreview(routeData);
     } else {
       setRouteError(error || t('unknownError'));
@@ -776,7 +782,7 @@ export default function CampusMap({
     }
 
     setIsLoadingRoute(false);
-  }, [selectedBuilding, origin, t]);
+  }, [selectedBuilding, origin, t, gpsToPixelLatLng]);
 
   // ============================================
   // ROUTING LOGIC
@@ -838,7 +844,13 @@ export default function CampusMap({
       const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, destGps);
 
       if (routeData) {
-        setRouteCoords(coordinates);
+        // Convert GPS route coordinates to CRS.Simple pixels for map display
+        const pixelCoords = coordinates
+          .map((c) => gpsToPixelLatLng(c[0], c[1]))
+          .filter((p): p is { lat: number; lng: number } => p !== null)
+          .map((p) => [p.lat, p.lng] as [number, number]);
+
+        setRouteCoords(pixelCoords);
         setPreview(routeData);
       } else {
         setRouteError(error || t('unknownError'));
@@ -850,7 +862,7 @@ export default function CampusMap({
 
     const timer = setTimeout(updateRoute, 100);
     return () => clearTimeout(timer);
-  }, [selectedBuilding, origin, t]);
+  }, [selectedBuilding, origin, t, gpsToPixelLatLng]);
 
   // ============================================
   // MAP CONTROLLER COMPONENT (defined inside to access hooks)
@@ -1176,7 +1188,7 @@ export default function CampusMap({
       </button>
 
       {/* Navigation Panel - Solid Card Design matching website style */}
-      {selectedBuilding && (preview || routeError || isLoadingRoute) && (
+      {selectedBuilding && (
         <div
           className="route-panel absolute bottom-4 left-4 right-4 md:right-auto z-[1000] md:w-80 max-h-[60vh] overflow-hidden"
           role="region"
@@ -1232,37 +1244,19 @@ export default function CampusMap({
                     <div className="animate-spin rounded-full h-6 w-6 border-2 border-mq-primary dark:border-mq-red-bright border-t-transparent" />
                     <span className="ml-3 text-sm text-mq-content-secondary">{t('loading')}</span>
                   </div>
-                ) : routeError ? (
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-lg flex items-start gap-3 bg-red-500/10 border border-red-500/20">
-                      <svg
-                        className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                      <p className="text-sm font-medium text-red-700 dark:text-red-300">
-                        {routeError}
-                      </p>
-                    </div>
-                    <button
-                      onClick={retryRoute}
-                      className="w-full py-2.5 px-4 rounded-lg font-medium transition-colors bg-mq-primary dark:bg-mq-red-bright text-white hover:opacity-90"
-                    >
-                      {t('tryAgain')}
-                    </button>
-                  </div>
                 ) : (
-                  preview && (
-                    <>
-                      {/* Duration & Distance */}
+                  <>
+                    {/* Status Message if no route preview */}
+                    {!preview && !routeError && (
+                      <div className="mb-4">
+                        <p className="text-sm text-mq-content-secondary">
+                          {!origin ? 'Waiting for location...' : 'Calculating route...'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Stats if available */}
+                    {preview && (
                       <div className="mb-4">
                         <span className="text-3xl font-bold text-emerald-500">
                           {formatDuration(preview.durationSeconds)}
@@ -1271,67 +1265,99 @@ export default function CampusMap({
                           ({formatDistance(preview.distanceMeters)})
                         </span>
                       </div>
+                    )}
 
-                      {/* Navigate Button */}
-                      <button
-                        onClick={() => {
-                          // Use real GPS for external navigation (Google/Apple Maps)
-                          const destGps = getBuildingGps(selectedBuilding);
-                          mapLog.log('Navigate button clicked:', {
-                            buildingId: selectedBuilding.id,
-                            buildingName: selectedBuilding.name,
-                            hasStoredLocation: !!selectedBuilding.location,
-                            storedLocation: selectedBuilding.location,
-                            calculatedGps: destGps,
-                            origin,
-                          });
-                          openBestNavApp(origin, destGps);
-                        }}
-                        aria-label={`${t('navigate')} ${selectedBuilding.name}`}
-                        className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2 bg-mq-primary dark:bg-mq-red-bright text-white hover:opacity-90"
+                    {/* Navigate Button - ALWAYS VISIBLE */}
+                    <button
+                      onClick={() => {
+                        const destGps = getBuildingGps(selectedBuilding);
+                        mapLog.log('Navigate button clicked:', {
+                          buildingId: selectedBuilding.id,
+                          hasStoredLocation: !!selectedBuilding.location,
+                          origin,
+                        });
+                        openBestNavApp(origin, destGps);
+                      }}
+                      aria-label={`${t('navigate')} ${selectedBuilding.name}`}
+                      className="w-full font-bold py-3 px-4 rounded-lg mb-4 transition-all flex items-center justify-center gap-2 bg-mq-primary dark:bg-mq-red-bright text-white hover:opacity-90 shadow-md hover:shadow-lg active:scale-[0.98]"
+                    >
+                      <span>{t('navigate')}</span>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <span>{t('navigate')}</span>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                          />
-                        </svg>
-                      </button>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </button>
 
-                      {/* Turn-by-turn */}
-                      {preview.steps.length > 0 && (
-                        <div className="pt-2 border-t border-mq-border">
-                          <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 text-mq-content-tertiary">
-                            {t('turnByTurn')}
-                          </h4>
-                          <div className="relative space-y-4 ml-1">
-                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full bg-black/10 dark:bg-white/15" />
-                            {preview.steps.slice(0, 6).map((s, i) => (
-                              <div key={i} className="relative pl-6">
-                                <div
-                                  className={`absolute left-0 top-1 w-4 h-4 rounded-full border-2 box-border bg-mq-background ${
-                                    i === 0 ? 'border-emerald-500' : 'border-mq-content-tertiary'
-                                  }`}
-                                />
-                                <p className="text-sm leading-snug text-mq-content">{s.text}</p>
-                                <p className="text-xs font-mono mt-0.5 text-mq-content-tertiary">
-                                  {formatDistance(s.distance)}
-                                </p>
-                              </div>
-                            ))}
+                    {/* Error Details */}
+                    {routeError && (
+                      <div className="space-y-3">
+                        <div className="p-3 rounded-lg flex items-start gap-3 bg-red-500/10 border border-red-500/20 mb-3">
+                          <svg
+                            className="w-5 h-5 flex-shrink-0 text-red-600 dark:text-red-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-red-700 dark:text-red-300">
+                              {routeError}
+                            </p>
+                            <button
+                              onClick={retryRoute}
+                              className="mt-2 text-xs font-semibold text-red-700 dark:text-red-300 hover:underline"
+                            >
+                              {t('tryAgain')}
+                            </button>
                           </div>
                         </div>
-                      )}
-                    </>
-                  )
+                      </div>
+                    )}
+
+                    {/* Turn-by-turn Steps */}
+                    {preview && preview.steps.length > 0 && (
+                      <div className="pt-2 border-t border-mq-border">
+                        <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 text-mq-content-tertiary">
+                          {t('turnByTurn')}
+                        </h4>
+                        <div className="relative space-y-4 ml-1">
+                          <div className="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full bg-black/10 dark:bg-white/15" />
+                          {preview.steps.map((s, i) => (
+                            <div key={i} className="relative pl-6">
+                              <div
+                                className={`absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-mq-background ${
+                                  i === 0
+                                    ? 'bg-emerald-500'
+                                    : i === preview.steps.length - 1
+                                      ? 'bg-red-500'
+                                      : 'bg-mq-content-tertiary'
+                                }`}
+                              />
+                              <p className="text-sm text-mq-content">{s.text}</p>
+                              <p className="text-xs text-mq-content-tertiary mt-0.5">
+                                {formatDistance(s.distance)} • {formatDuration(s.time)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
