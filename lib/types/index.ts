@@ -35,6 +35,8 @@ export type Deadline = {
   unitCode: string; // "COMP2310"
   unitId?: string; // Reference to Unit.id for color inheritance
   color?: string; // Custom color override (defaults to unit color)
+  building?: string; // Building code for exams (e.g., "C5C")
+  room?: string; // Room number for exams (e.g., "204")
   dueDate: Date;
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
@@ -47,8 +49,9 @@ export type Event = {
   userId?: string | null; // null for public/campus events, user ID for personal events
   title: string;
   description: string;
-  location: string; // "Library Room 204"
-  building?: string; // "C5C" - for map navigation
+  building: string; // Building code (e.g., "C5C") - required for map navigation
+  room: string; // Room number (e.g., "204")
+  location?: string; // Legacy: combined "Building Room" string for backward compatibility
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   color?: string; // Optional custom color (hex value like "#A6192E")
   imageUrl?: string;

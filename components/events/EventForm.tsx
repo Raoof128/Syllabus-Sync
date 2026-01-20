@@ -46,8 +46,8 @@ function getInitialValues(editEvent?: Event | null) {
       description: editEvent.description,
       date: isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : '',
       time: editEvent.time,
-      location: editEvent.location,
       building: editEvent.building || '',
+      room: editEvent.room || '',
       category: editEvent.category,
       color: editEvent.color || UNIT_COLORS[0].value,
     };
@@ -57,8 +57,8 @@ function getInitialValues(editEvent?: Event | null) {
     description: '',
     date: '',
     time: '',
-    location: '',
     building: '',
+    room: '',
     category: 'Academic' as Event['category'],
     color: UNIT_COLORS[0].value,
   };
@@ -75,8 +75,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
   const [description, setDescription] = useState(initialValues.description);
   const [date, setDate] = useState(initialValues.date);
   const [time, setTime] = useState(initialValues.time);
-  const [location, setLocation] = useState(initialValues.location);
   const [building, setBuilding] = useState(initialValues.building);
+  const [room, setRoom] = useState(initialValues.room);
   const [category, setCategory] = useState<Event['category']>(initialValues.category);
   const [color, setColor] = useState(initialValues.color);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -93,8 +93,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       setDescription(values.description);
       setDate(values.date);
       setTime(values.time);
-      setLocation(values.location);
       setBuilding(values.building);
+      setRoom(values.room);
       setCategory(values.category);
       setColor(values.color);
       setErrors({});
@@ -108,8 +108,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     setDescription(values.description);
     setDate(values.date);
     setTime(values.time);
-    setLocation(values.location);
     setBuilding(values.building);
+    setRoom(values.room);
     setCategory(values.category);
     setColor(values.color);
     setErrors({});
@@ -128,8 +128,11 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     if (!time.trim()) {
       formErrors.time = t('fieldRequired');
     }
-    if (!location.trim()) {
-      formErrors.location = t('fieldRequired');
+    if (!building.trim()) {
+      formErrors.building = t('fieldRequired');
+    }
+    if (!room.trim()) {
+      formErrors.room = t('fieldRequired');
     }
 
     setErrors(formErrors);
@@ -174,8 +177,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       allDay,
       date: startAt, // Computed for backward compatibility
       time: timeStr, // Keep original time string for display
-      location: location.trim(),
-      building: building.trim() || undefined,
+      building: building.trim(),
+      room: room.trim(),
+      location: `${building.trim()} ${room.trim()}`.trim(), // Legacy field
       category,
       color,
     };
@@ -221,7 +225,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
         <div className="space-y-4 py-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="event-title">{t('eventTitle')}</Label>
+            <Label htmlFor="event-title">
+              {t('title')} <span className="text-mq-error">*</span>
+            </Label>
             <Input
               id="event-title"
               value={title}
@@ -253,7 +259,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           {/* Date and Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="event-date">{t('date' as 'title')}</Label>
+              <Label htmlFor="event-date">
+                {t('date' as 'title')} <span className="text-mq-error">*</span>
+              </Label>
               <Input
                 id="event-date"
                 type="date"
@@ -271,7 +279,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="event-time">{t('time' as 'title')}</Label>
+              <Label htmlFor="event-time">
+                {t('time' as 'title')} <span className="text-mq-error">*</span>
+              </Label>
               <Input
                 id="event-time"
                 type="text"
@@ -291,34 +301,47 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </div>
           </div>
 
-          {/* Location and Building */}
+          {/* Building and Room */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="event-location">{t('location' as 'title')}</Label>
+              <Label htmlFor="event-building">
+                {t('building' as 'title')} <span className="text-mq-error">*</span>
+              </Label>
               <Input
-                id="event-location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder={t('enterLocation' as 'title')}
-                aria-invalid={Boolean(errors.location)}
+                id="event-building"
+                value={building}
+                onChange={(e) => setBuilding(e.target.value.toUpperCase())}
+                placeholder="e.g., C5C"
+                aria-invalid={Boolean(errors.building)}
                 aria-required="true"
-                aria-describedby={errors.location ? 'event-location-error' : undefined}
-                className={errors.location ? 'border-mq-error' : ''}
+                aria-describedby={errors.building ? 'event-building-error' : undefined}
+                className={errors.building ? 'border-mq-error' : ''}
               />
-              {errors.location && (
-                <p id="event-location-error" className="text-xs text-mq-error" role="alert">
-                  {errors.location}
+              {errors.building && (
+                <p id="event-building-error" className="text-xs text-mq-error" role="alert">
+                  {errors.building}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="event-building">{t('buildingCode' as 'title')}</Label>
+              <Label htmlFor="event-room">
+                {t('room' as 'title')} <span className="text-mq-error">*</span>
+              </Label>
               <Input
-                id="event-building"
-                value={building}
-                onChange={(e) => setBuilding(e.target.value)}
-                placeholder="e.g., C5C"
+                id="event-room"
+                value={room}
+                onChange={(e) => setRoom(e.target.value)}
+                placeholder="e.g., 204"
+                aria-invalid={Boolean(errors.room)}
+                aria-required="true"
+                aria-describedby={errors.room ? 'event-room-error' : undefined}
+                className={errors.room ? 'border-mq-error' : ''}
               />
+              {errors.room && (
+                <p id="event-room-error" className="text-xs text-mq-error" role="alert">
+                  {errors.room}
+                </p>
+              )}
             </div>
           </div>
 

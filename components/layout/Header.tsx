@@ -59,6 +59,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import WeatherWidget from './WeatherWidget';
 
 const notificationIcons = {
   deadline: Clock,
@@ -210,9 +211,9 @@ const Header = memo(() => {
           </div>
         </Link>
 
-        {/* Date display - next to logo/title */}
+        {/* Date and Weather display - next to logo/title */}
         {isClient && (
-          <div className="hidden md:flex items-center ml-4 pl-4 border-l border-mq-border">
+          <div className="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
             <span className="text-mq-sm font-medium text-mq-content-secondary">
               {new Date().toLocaleDateString(getLocaleString(language), {
                 weekday: 'long',
@@ -221,6 +222,8 @@ const Header = memo(() => {
                 year: 'numeric',
               })}
             </span>
+            <div className="w-px h-4 bg-mq-border" />
+            <WeatherWidget />
           </div>
         )}
       </div>

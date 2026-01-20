@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/components/home/TodaySchedule';
-import NextDeadline from '@/components/home/NextDeadline';
+import UpcomingDeadlines from '@/components/home/UpcomingDeadlines';
 import EventsFeed from '@/components/home/EventsFeed';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
@@ -432,7 +432,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
             <TodaySchedule />
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
-            <NextDeadline />
+            <UpcomingDeadlines />
           </ScrollReveal>
         </section>
 
