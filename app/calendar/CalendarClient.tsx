@@ -17,6 +17,7 @@ import {
   PartyPopper,
   Trash2,
   AlertTriangle,
+  MapPin,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -747,6 +748,22 @@ export default function CalendarClient() {
       setEventDeleteConfirmOpen(false);
       setEventToDelete(null);
     }
+  };
+
+  // Navigate to map with building highlighted
+  const navigateToMap = (building: string | undefined) => {
+    if (building) {
+      router.push(`/map?building=${encodeURIComponent(building)}`);
+    }
+  };
+
+  // Get building info for a deadline (either from deadline itself or from its unit)
+  const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
+    // First check if deadline has its own building (for exams)
+    if (deadline.building) return deadline.building;
+    // Otherwise, get building from the associated unit
+    const unit = units.find((u) => u.code === deadline.unitCode);
+    return unit?.location?.building;
   };
 
   // Event edit handler
@@ -1963,6 +1980,25 @@ export default function CalendarClient() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                {getDeadlineBuilding(assignment) && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigateToMap(getDeadlineBuilding(assignment));
+                                    }}
+                                    className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                    aria-label={t('navigateToBuildingAria', {
+                                      building: getDeadlineBuilding(assignment) || '',
+                                    })}
+                                    title={t('viewOnMap' as 'title') || 'View on Map'}
+                                  >
+                                    <MapPin
+                                      className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                )}
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -2104,6 +2140,25 @@ export default function CalendarClient() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                {getDeadlineBuilding(exam) && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigateToMap(getDeadlineBuilding(exam));
+                                    }}
+                                    className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                    aria-label={t('navigateToBuildingAria', {
+                                      building: getDeadlineBuilding(exam) || '',
+                                    })}
+                                    title={t('viewOnMap' as 'title') || 'View on Map'}
+                                  >
+                                    <MapPin
+                                      className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                )}
                                 <button
                                   type="button"
                                   onClick={() => openEditExam(exam)}
@@ -2215,6 +2270,25 @@ export default function CalendarClient() {
                             </p>
                           </div>
                           <div className="flex items-center gap-1">
+                            {unit.location?.building && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigateToMap(unit.location.building);
+                                }}
+                                className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                title={`${unit.location.building}${unit.location.room ? ` ${unit.location.room}` : ''}`}
+                                aria-label={t('navigateToBuildingAria', {
+                                  building: unit.location.building,
+                                })}
+                              >
+                                <MapPin
+                                  className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            )}
                             <button
                               type="button"
                               onClick={(e) => {
@@ -2322,6 +2396,25 @@ export default function CalendarClient() {
                               </p>
                             </div>
                             <div className="flex items-center gap-1">
+                              {event.building && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigateToMap(event.building);
+                                  }}
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  aria-label={t('navigateToBuildingAria', {
+                                    building: event.building,
+                                  })}
+                                  title={t('viewOnMap' as 'title') || 'View on Map'}
+                                >
+                                  <MapPin
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={(e) => {
