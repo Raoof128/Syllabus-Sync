@@ -92,20 +92,45 @@ export async function PUT(request: Request) {
       return jsonError('No preference updates provided', 400, 'VALIDATION_ERROR');
     }
 
-    const { data, error } = await supabase
+    // First check if the record exists
+    const { data: existing } = await supabase
       .from('user_preferences')
-      .upsert(
-        {
-          user_id: user.id,
-          ...updates,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' },
-      )
-      .select('*')
+      .select('id')
+      .eq('user_id', user.id)
       .single();
 
+    let data;
+    let error;
+
+    if (existing) {
+      // Update existing record
+      const result = await supabase
+        .from('user_preferences')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id)
+        .select('*')
+        .single();
+      data = result.data;
+      error = result.error;
+    } else {
+      // Insert new record
+      const result = await supabase
+        .from('user_preferences')
+        .insert({
+          user_id: user.id,
+          ...updates,
+        })
+        .select('*')
+        .single();
+      data = result.data;
+      error = result.error;
+    }
+
     if (error) {
+      console.error('User preferences update/insert error:', error);
       return jsonError('Failed to update user preferences', 500);
     }
 

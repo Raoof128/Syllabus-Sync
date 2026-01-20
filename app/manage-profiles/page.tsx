@@ -97,6 +97,7 @@ export default function ManageProfilesPage() {
     year: '',
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isTogglingPreference, setIsTogglingPreference] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Get current profile
@@ -242,20 +243,26 @@ export default function ManageProfilesPage() {
   // Handle preference toggles
   const togglePreference = useCallback(
     async (key: keyof UserProfile['preferences']) => {
-      if (!currentProfile) return;
+      if (!currentProfile || isTogglingPreference) return;
 
       const newPreferences = {
         ...currentProfile.preferences,
         [key]: !currentProfile.preferences[key],
       };
 
+      setIsTogglingPreference(true);
       try {
-        await updateProfile(currentProfile.id, { preferences: newPreferences });
+        const result = await updateProfile(currentProfile.id, { preferences: newPreferences });
+        if (!result) {
+          toastUtils.error(t('error'), t('failedToUpdateProfile'));
+        }
       } catch {
         toastUtils.error(t('error'), t('failedToUpdateProfile'));
+      } finally {
+        setIsTogglingPreference(false);
       }
     },
-    [currentProfile, updateProfile, t],
+    [currentProfile, updateProfile, t, isTogglingPreference],
   );
 
   // Toggle switch component
@@ -263,19 +270,23 @@ export default function ManageProfilesPage() {
     checked,
     onChange,
     ariaLabel,
+    disabled = false,
   }: {
     checked: boolean;
     onChange: () => void;
     ariaLabel: string;
+    disabled?: boolean;
   }) => (
     <button
       role="switch"
       aria-checked={checked}
       aria-label={ariaLabel}
       onClick={onChange}
+      disabled={disabled}
       className={cn(
         'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
         checked ? 'bg-mq-success' : 'bg-mq-background-tertiary',
+        disabled && 'opacity-50 cursor-not-allowed',
       )}
     >
       <span
@@ -376,8 +387,10 @@ export default function ManageProfilesPage() {
               {currentProfile.studentId && (
                 <p className="text-mq-content-tertiary text-sm mt-1 flex items-center justify-center sm:justify-start gap-2">
                   <IdCard className="h-4 w-4" />
-                  {t('idPrefix')}
-                  {currentProfile.studentId}
+                  <span>
+                    {t('idPrefix')}
+                    {currentProfile.studentId}
+                  </span>
                 </p>
               )}
               {currentProfile.avatar?.startsWith('data:') && (
@@ -558,6 +571,7 @@ export default function ManageProfilesPage() {
                   checked={currentProfile.preferences.notifications}
                   onChange={() => togglePreference('notifications')}
                   ariaLabel={t('emailNotifications')}
+                  disabled={isTogglingPreference}
                 />
               </div>
 
@@ -577,6 +591,7 @@ export default function ManageProfilesPage() {
                   checked={currentProfile.preferences.emailReminders}
                   onChange={() => togglePreference('emailReminders')}
                   ariaLabel={t('emailReminders')}
+                  disabled={isTogglingPreference}
                 />
               </div>
             </CardContent>
