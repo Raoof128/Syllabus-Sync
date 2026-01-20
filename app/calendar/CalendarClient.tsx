@@ -2488,6 +2488,18 @@ export default function CalendarClient() {
         open={effectiveUnitDetailOpen}
         onOpenChange={handleUnitDetailOpenChange}
         onEditDeadline={handleEditDeadlineFromPanel}
+        onEditUnit={() => {
+          if (effectiveSelectedUnit) {
+            handleUnitDetailOpenChange(false);
+            openEditUnit(effectiveSelectedUnit);
+          }
+        }}
+        onDeleteUnit={() => {
+          if (effectiveSelectedUnit) {
+            handleUnitDetailOpenChange(false);
+            handleDeleteUnit(effectiveSelectedUnit);
+          }
+        }}
       />
 
       {/* Delete Confirmation Modal for Units */}

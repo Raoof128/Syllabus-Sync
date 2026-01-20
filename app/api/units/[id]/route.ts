@@ -72,8 +72,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       const supabase = await createServerClient();
 
-      // Destructure to handle special fields
-      const { location, /* schedule: _schedule, */ createdAt, ...rest } = parsed.data;
+      // Destructure to handle special fields - schedule is stored in class_times table, not units
+      const { location, schedule, createdAt, ...rest } = parsed.data;
 
       const updatePayload: Record<string, unknown> = {
         ...rest,
@@ -92,8 +92,41 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         updatePayload.created_at = createdAt.toISOString();
       }
 
+      // Handle schedule updates (stored in separate class_times table)
+      if (schedule && schedule.length >= 0) {
+        // Delete existing class times for this unit
+        const { error: deleteError } = await supabase
+          .from('class_times')
+          .delete()
+          .eq('unit_id', id);
+
+        if (deleteError) {
+          console.error('Error deleting class times:', deleteError.code, deleteError.message);
+          return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+        }
+
+        // Insert new class times if any
+        if (schedule.length > 0) {
+          const classTimesPayload = schedule.map((ct) => ({
+            id: ct.id && UUID_REGEX.test(ct.id) ? ct.id : crypto.randomUUID(),
+            unit_id: id,
+            day: ct.day,
+            start_time: ct.startTime,
+            end_time: ct.endTime,
+          }));
+
+          const { error: insertError } = await supabase
+            .from('class_times')
+            .insert(classTimesPayload);
+
+          if (insertError) {
+            console.error('Error inserting class times:', insertError.code, insertError.message);
+            return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+          }
+        }
+      }
+
       // If payload is empty (e.g. only schedule updated), fetch current unit to return it
-      // Note: Schedule updates are not yet handled in this atomic update
       if (Object.keys(updatePayload).length === 0) {
         const { data, error } = await supabase
           .from('units')
@@ -108,7 +141,24 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           }
           return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
         }
-        return jsonSuccess(mapUnitRow(data));
+
+        // Fetch class times for this unit
+        const { data: classTimesData } = await supabase
+          .from('class_times')
+          .select('*')
+          .eq('unit_id', id);
+
+        const unitSchedule = (classTimesData ?? []).map((ct: Record<string, unknown>) => ({
+          id: String(ct.id),
+          day: String(ct.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+          startTime: String(ct.start_time),
+          endTime: String(ct.end_time),
+        }));
+
+        return jsonSuccess({
+          ...mapUnitRow(data),
+          schedule: unitSchedule,
+        });
       }
 
       const { data, error } = await supabase
@@ -131,7 +181,23 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
-      return jsonSuccess(mapUnitRow(data));
+      // Fetch class times for this unit
+      const { data: classTimesData } = await supabase
+        .from('class_times')
+        .select('*')
+        .eq('unit_id', id);
+
+      const unitSchedule = (classTimesData ?? []).map((ct: Record<string, unknown>) => ({
+        id: String(ct.id),
+        day: String(ct.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+        startTime: String(ct.start_time),
+        endTime: String(ct.end_time),
+      }));
+
+      return jsonSuccess({
+        ...mapUnitRow(data),
+        schedule: unitSchedule,
+      });
     } catch (error) {
       console.error('Error updating unit:', error);
       return jsonError('Failed to update unit', 500, ERROR_CODES.INTERNAL_ERROR);
