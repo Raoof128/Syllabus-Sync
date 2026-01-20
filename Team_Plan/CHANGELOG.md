@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-20 - Map Visual Connection Fix
+
+### Fixed
+- **Route Visual Gap:** Fixed issue where the navigation path (blue dotted line) was not visually connecting to the destination building marker (red pin). The routing service snaps to the nearest walkable path, which can leave a gap from the building center.
+- **Solution:** Manually appended the building's exact CRS.Simple pixel coordinates to the end of `routeCoords` in `CampusMap.tsx`, forcing the polyline to draw a final segment connecting the last path node directly to the destination marker.
+
+### Verification
+- Code review confirmed proper coordinate handling.
+- `npm run lint` (pass for Map component)
+
 Raouf: 2026-01-20 - Map Directions & Navigation Polish
 
 ### Fixed

@@ -773,6 +773,11 @@ export default function CampusMap({
         .filter((p): p is { lat: number; lng: number } => p !== null)
         .map((p) => [p.lat, p.lng] as [number, number]);
 
+      // FIX: Manually append the destination building's exact position to close the visual gap
+      // between the routing graph (nearest path) and the actual building marker (red pin).
+      const destLatLng = getBuildingLatLng(selectedBuilding);
+      pixelCoords.push([destLatLng.lat, destLatLng.lng]);
+
       setRouteCoords(pixelCoords);
       setPreview(routeData);
     } else {
@@ -849,6 +854,11 @@ export default function CampusMap({
           .map((c) => gpsToPixelLatLng(c[0], c[1]))
           .filter((p): p is { lat: number; lng: number } => p !== null)
           .map((p) => [p.lat, p.lng] as [number, number]);
+
+        // FIX: Manually append the destination building's exact position to close the visual gap
+        // between the routing graph (nearest path) and the actual building marker (red pin).
+        const destLatLng = getBuildingLatLng(selectedBuilding);
+        pixelCoords.push([destLatLng.lat, destLatLng.lng]);
 
         setRouteCoords(pixelCoords);
         setPreview(routeData);
@@ -984,9 +994,11 @@ export default function CampusMap({
           {overlaysReady && routeCoords.length > 0 && (
             <reactLeafletModule.Polyline
               positions={routeCoords}
-              color="var(--mq-primary, blue)"
-              weight={5}
-              opacity={0.7}
+              color="#4285F4" // Google Maps walking style (Blue)
+              weight={6}
+              opacity={0.9}
+              dashArray="1, 12" // Dotted line effect
+              lineCap="round"
             />
           )}
 

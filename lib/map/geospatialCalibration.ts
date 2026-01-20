@@ -114,7 +114,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
   {
     id: 'GCP_18WW',
     name: "18 Wally's Walk (Central Hub)",
-    gps: { lat: -33.7741501, lng: 151.1127909 },
+    gps: { lat: -33.7734389, lng: 151.1134919 },
     pixel: [2282, 1881], // From buildings.ts - 18WW position
     source: 'google_maps',
     verifiedDate: '2026-01-20',
