@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-20 - Map Calibration & Navigation Fixes
+
+### Fixed
+- **Geospatial Calibration:** Implemented GCP-optimized linear bounds to fix ~150m GPS offset errors across the campus map.
+- **Coordinate Accuracy:** Verified and corrected GPS coordinates for 30+ buildings using Google Maps ground truth data.
+- **Library Precision:** Updated Waranara Library and 16 Macquarie Walk coordinates to user-verified precision.
+- **Navigation Routing:** Forced navigation to use Google Maps (prioritized over Apple Maps) to ensure reliable routing to corrected coordinates.
+
+### Verification
+- `npm run check` (pass)
+- Calibration debug script confirms RMSE improvement (142px -> 72px)
+
 Raouf: 2026-01-19 - Remove "Mark as completed" from Add Exam form + lint/build fixes
 
 ### Changed

@@ -152,7 +152,6 @@ export const useEventsStore = create<EventsState>()(
           events: state.events.map((e) => (e.id === id ? optimisticUpdate : e)),
         }));
 
-
         try {
           const updatePayload: Record<string, unknown> = {};
           if (updates.title !== undefined) updatePayload.title = updates.title;
@@ -195,7 +194,6 @@ export const useEventsStore = create<EventsState>()(
 
       removeEvent: async (id) => {
         const eventToRestore = get().events.find((e) => e.id === id);
-
 
         // Optimistic delete
         set((state) => ({

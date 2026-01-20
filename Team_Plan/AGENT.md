@@ -153,6 +153,17 @@ Macquarie University Administration - February 2025
 
 ### Recent Work Log
 
+Raouf: 2026-01-20 (Australia/Sydney)
+Scope: Map Calibration and Navigation Fixes
+Summary:
+  - Implemented GCP-optimized linear bounds for geospatial calibration, fixing ~150m offset errors.
+  - Verified and corrected GPS coordinates for 30+ buildings using Google Maps ground truth.
+  - Updated Library coordinates to user-verified precision.
+  - Forced navigation to use Google Maps (prioritized over Apple Maps) for reliable routing.
+Files: lib/map/geospatialCalibration.ts; lib/map/buildings.ts; lib/map/navigationHelpers.ts; app/map/CampusMap.tsx; scripts/debug-calibration.ts.
+Verification: `npm run check` (pass); Visual verification of debug script (RMSE improved 142px -> 72px).
+Follow-ups: Monitor user feedback on navigation accuracy.
+
 Raouf: 2026-01-19 (Australia/Sydney)
 Scope: Notifications dropdown and map cleanup
 Summary:

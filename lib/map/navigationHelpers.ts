@@ -39,8 +39,9 @@ export function openBestNavApp(
   origin: { lat: number; lng: number } | null,
   dest: { lat: number; lng: number },
 ) {
-  const ua = navigator.userAgent.toLowerCase();
-  const isApple = /iphone|ipad|macintosh/.test(ua);
-  if (isApple) return openAppleMaps(origin, dest);
+  // User preference: Always use Google Maps instead of Apple Maps
+  // const ua = navigator.userAgent.toLowerCase();
+  // const isApple = /iphone|ipad|macintosh/.test(ua);
+  // if (isApple) return openAppleMaps(origin, dest);
   return openGoogleMaps(origin, dest);
 }

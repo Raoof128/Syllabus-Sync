@@ -4,6 +4,11 @@ import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Badge } from '@/components/ui/mq/badge';
 import { Building, BUILDING_CATEGORY_LABELS, getBuildingGps } from '@/lib/map/buildings';
 import {
+  gpsToCrsSimple,
+  getCalibrationDiagnostics,
+  compareTransformMethods,
+} from '@/lib/map/geospatialCalibration';
+import {
   RoutePreview,
   formatDistance,
   formatDuration,
@@ -70,12 +75,21 @@ const OVERLAY_PATHS: Record<MapOverlayId, string> = {
   exam: '/maps/overlays/Exam-Map-S22024.png',
 };
 
+/** Location tracking status */
+export type LocationStatus = 'idle' | 'searching' | 'found' | 'denied' | 'error';
+
 interface CampusMapProps {
   selectedBuilding?: Building;
   activeOverlays?: MapOverlayId[];
+  /** Callback when location status changes */
+  onLocationStatusChange?: (status: LocationStatus) => void;
 }
 
-export default function CampusMap({ selectedBuilding, activeOverlays = [] }: CampusMapProps) {
+export default function CampusMap({
+  selectedBuilding,
+  activeOverlays = [],
+  onLocationStatusChange,
+}: CampusMapProps) {
   const { t } = useTranslation();
 
   // ============================================
@@ -98,14 +112,17 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
 
-  // Location Status State
-  const [locationStatus, setLocationStatus] = useState<'searching' | 'found' | 'denied' | 'error'>(
-    'searching',
-  );
+  // Location Status State - starts as 'idle' until geolocation actually begins
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
 
   const userMarkerRef = useRef<import('leaflet').Marker | null>(null);
   const accuracyCircleRef = useRef<import('leaflet').Circle | null>(null);
   const hasSetFallbackOrigin = useRef(false);
+
+  // Notify parent when location status changes
+  useEffect(() => {
+    onLocationStatusChange?.(locationStatus);
+  }, [locationStatus, onLocationStatusChange]);
 
   // Reset overlays on mount/unmount
   useEffect(() => {
@@ -143,35 +160,35 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
     [pixelToLatLng],
   );
 
-  // Convert real GPS coordinates to approximate pixel position on map
-  // Used ONLY for showing user's geolocation on the map
-  // This is approximate since the map is not georeferenced
+  // Convert real GPS coordinates to CRS.Simple coordinates using GCP-calibrated affine transformation
+  // This replaces the old linear interpolation for more accurate positioning
   const gpsToPixelLatLng = useCallback(
     (gpsLat: number, gpsLng: number): { lat: number; lng: number } | null => {
-      const { south, north, west, east } = GPS_CAMPUS_BOUNDS;
+      // Use the new GCP-calibrated affine transformation
+      const result = gpsToCrsSimple(gpsLat, gpsLng);
 
-      // Check if position is within campus bounds (with some margin)
-      const margin = 0.002; // ~200m margin
-      if (
-        gpsLat < south - margin ||
-        gpsLat > north + margin ||
-        gpsLng < west - margin ||
-        gpsLng > east + margin
-      ) {
-        return null; // Outside campus area
+      if (!result) {
+        // Outside calibrated campus bounds
+        return null;
       }
 
-      // Linear interpolation from GPS to pixel coordinates
-      const xNorm = (gpsLng - west) / (east - west);
-      const yNorm = (north - gpsLat) / (north - south); // Note: lat decreases as image Y increases
+      // Log calibration comparison in development
+      if (process.env.NODE_ENV === 'development') {
+        const comparison = compareTransformMethods(gpsLat, gpsLng);
+        if (comparison.offsetPixels > 20) {
+          mapLog.log('Calibration offset detected:', {
+            gps: { lat: gpsLat, lng: gpsLng },
+            linearPixel: comparison.linear,
+            gcpOptimizedPixel: comparison.gcpOptimized,
+            offsetPixels: comparison.offsetPixels.toFixed(1),
+            offsetMeters: comparison.offsetMeters.toFixed(1),
+          });
+        }
+      }
 
-      const pixelX = xNorm * MAP_DIMS.width;
-      const pixelY = yNorm * MAP_DIMS.height;
-
-      // Convert to CRS.Simple coordinates
-      return pixelToLatLng(pixelX, pixelY);
+      return result;
     },
-    [pixelToLatLng],
+    [],
   );
 
   const isMapReady = useCallback(
@@ -254,6 +271,19 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
         e.preventDefault();
         setGcpDebugMode((prev) => !prev);
         mapLog.log('GCP debug mode:', !gcpDebugMode);
+        // Log calibration diagnostics when enabling GCP debug mode
+        if (!gcpDebugMode) {
+          const diagnostics = getCalibrationDiagnostics();
+          mapLog.log('GCP Calibration Diagnostics:', {
+            gcpCount: diagnostics.gcpCount,
+            rmsePixels: diagnostics.rmsePixels.toFixed(2),
+            rmseMeters: `${diagnostics.rmseMeters.toFixed(2)}m`,
+            residuals: diagnostics.gcpResiduals.map((r) => ({
+              id: r.id,
+              error: `${r.error.toFixed(1)}px`,
+            })),
+          });
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -653,17 +683,28 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
     mapLog.log('centerOnUser called', { status: locationStatus, origin });
 
     if (locationStatus === 'denied') {
-      toastUtils.error(t('locationAccessDenied'), t('locationDeniedDesc'));
+      // Offer to retry - user needs to enable in browser settings
+      const enableMsg = t('enableLocationInBrowser' as TranslationKey) || '';
+      const deniedDesc =
+        t('locationDeniedDesc') ||
+        'Please enable location access in your browser settings and refresh the page.';
+      toastUtils.error(
+        t('locationAccessDenied'),
+        enableMsg ? `${deniedDesc} ${enableMsg}` : deniedDesc,
+      );
       return;
     }
 
-    if (locationStatus === 'searching') {
+    if (locationStatus === 'idle' || locationStatus === 'searching') {
       toastUtils.info(t('locating'), t('requestingPosition'));
       return;
     }
 
     if (locationStatus === 'error') {
-      toastUtils.error(t('locationError'), t('positionUnavailableDesc'));
+      // Offer to retry
+      const retryMsg = t('tapToRetry' as TranslationKey) || '';
+      const errorDesc = t('positionUnavailableDesc') || 'Tap to try again.';
+      toastUtils.warning(t('locationError'), retryMsg ? `${errorDesc} ${retryMsg}` : errorDesc);
       return;
     }
 
@@ -1088,9 +1129,13 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
         onClick={centerOnUser}
         aria-label={t('liveLocation')}
         className={`absolute bottom-6 right-4 z-[1000] p-3 rounded-full shadow-lg transition-all active:scale-95 ${
-          locationStatus === 'denied' || locationStatus === 'error'
-            ? 'bg-mq-background-secondary text-mq-content-tertiary cursor-not-allowed'
-            : 'bg-mq-card-background text-mq-primary hover:bg-mq-hover-background'
+          locationStatus === 'denied'
+            ? 'bg-mq-background-secondary text-mq-content-tertiary'
+            : locationStatus === 'error'
+              ? 'bg-mq-warning/10 text-mq-warning hover:bg-mq-warning/20'
+              : locationStatus === 'found'
+                ? 'bg-mq-success/10 text-mq-success hover:bg-mq-success/20'
+                : 'bg-mq-card-background text-mq-primary hover:bg-mq-hover-background'
         }`}
       >
         <svg
@@ -1103,7 +1148,9 @@ export default function CampusMap({ selectedBuilding, activeOverlays = [] }: Cam
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={locationStatus === 'searching' ? 'animate-pulse' : ''}
+          className={
+            locationStatus === 'searching' || locationStatus === 'idle' ? 'animate-pulse' : ''
+          }
           aria-hidden="true"
         >
           {locationStatus === 'denied' ? (

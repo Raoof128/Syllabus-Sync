@@ -64,12 +64,12 @@ export const MAP_CONFIG = {
   height: 3307,
   // GPS bounds kept for approximate geolocation conversion only
   // NOT used for marker placement (CRS.Simple uses pixels directly)
-  // Updated 2026-01-10: Bounds verified using Google Maps geocoding
+  // Updated 2026-01-20: Optimized bounds from GCP calibration
   bounds: {
-    south: -33.78,
-    north: -33.766,
-    west: 151.105,
-    east: 151.122,
+    north: -33.769571,
+    south: -33.778124,
+    east: 151.122172,
+    west: 151.103934,
   },
 } as const;
 
@@ -230,7 +230,7 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'academic',
-    location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps verified
+    location: { lat: -33.775621, lng: 151.113441, osmId: 141281549 }, // User verified 2026-01-20
     levels: 8,
   },
   {
@@ -260,7 +260,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25B Wally's Walk",
     category: 'academic',
-    location: { lat: -33.7747756, lng: 151.1108317 }, // Google Maps geocoded 2026-01-10
+    location: { lat: -33.7745332, lng: 151.1112771 }, // Google Maps verified 2026-01-20
   },
   {
     id: '17WW',
@@ -456,7 +456,7 @@ export const buildings: Building[] = [
     gridRef: 'N27',
     address: "1 Wally's Walk",
     category: 'academic',
-    location: { lat: -33.774218, lng: 151.118133, osmId: 1303624871 },
+    location: { lat: -33.7743803, lng: 151.1174832, osmId: 1303624871 }, // Google Maps verified 2026-01-20
   },
 
   // MQ HEALTH
@@ -485,7 +485,7 @@ export const buildings: Building[] = [
     gridRef: 'K26',
     address: '2 Technology Place',
     category: 'health',
-    location: { lat: -33.7715098, lng: 151.1096592 }, // Google Maps verified (NextSense)
+    location: { lat: -33.7730453, lng: 151.1176713 }, // Google Maps verified 2026-01-20
     wheelchair: true,
   },
   {
@@ -521,7 +521,7 @@ export const buildings: Building[] = [
   {
     id: 'FIELDS',
     name: 'Sports Fields & Tennis',
-    position: [1696, 65], // Calibrated: between sport centre and theatres
+    position: [2140, 1752], // Calibrated: south of Sport & Aquatic Centre
     description: 'Outdoor sports fields and tennis centre.',
     tags: ['sports', 'recreation', 'outdoor'],
     translationKey: 'building_FIELDS_name',
@@ -529,7 +529,7 @@ export const buildings: Building[] = [
     gridRef: 'K16',
     address: '15-17 Gymnasium Road',
     category: 'sports',
-    location: { lat: -33.7732885, lng: 151.1127885 }, // Google Maps geocoded 2026-01-10
+    location: { lat: -33.7734239, lng: 151.1127799 }, // Google Maps verified
   },
 
   // FOOD & RETAIL
@@ -557,7 +557,7 @@ export const buildings: Building[] = [
     gridRef: 'O13',
     address: "25B Wally's Walk",
     category: 'food',
-    location: { lat: -33.7747756, lng: 151.1108317 }, // Same as 25BWW - Google Maps geocoded 2026-01-10
+    location: { lat: -33.7745332, lng: 151.1112771 }, // Same as 25BWW - Google Maps verified 2026-01-20
   },
   {
     id: 'LACH',
@@ -626,7 +626,7 @@ export const buildings: Building[] = [
     gridRef: 'H20',
     address: '19 Eastern Road',
     category: 'services',
-    location: { lat: -33.772253, lng: 151.115065, osmId: 205588364 }, // Google Maps verified (Art Gallery)
+    location: { lat: -33.7723959, lng: 151.1148585, osmId: 205588364 }, // Google Maps verified 2026-01-20
   },
   {
     id: 'OBS',
@@ -652,7 +652,7 @@ export const buildings: Building[] = [
     gridRef: 'S8',
     address: '8 Hadenfeld Avenue',
     category: 'services',
-    location: { lat: -33.7763444, lng: 151.1090529, osmId: 1107882877 }, // Google Maps verified
+    location: { lat: -33.7761456, lng: 151.1090549, osmId: 1107882877 }, // Google Maps verified 2026-01-20
   },
   {
     id: 'CHAP',
@@ -665,7 +665,7 @@ export const buildings: Building[] = [
     gridRef: 'R6',
     address: '10 Hadenfeld Avenue',
     category: 'services',
-    location: { lat: -33.778778, lng: 151.1139656, osmId: 100955278 }, // Google Maps verified (Macquarie Baptist Church area)
+    location: { lat: -33.7760151, lng: 151.1080508, osmId: 100955278 }, // Google Maps verified 2026-01-20
     levels: 3,
   },
   {
@@ -733,7 +733,7 @@ export const buildings: Building[] = [
     gridRef: 'W17',
     address: '11 University Avenue',
     category: 'services',
-    location: { lat: -33.7779215, lng: 151.1131466 }, // Google Maps verified (Waratah Cottage)
+    location: { lat: -33.77713, lng: 151.11174, osmId: 23716716 }, // Google Maps verified 2026-01-20
   },
 
   // NEXTSENSE & SPECIALIST SERVICES
@@ -774,7 +774,7 @@ export const buildings: Building[] = [
     gridRef: 'K24',
     address: '3 Science Road',
     category: 'services',
-    location: { lat: -33.773313, lng: 151.116659, osmId: 23716725 },
+    location: { lat: -33.7733742, lng: 151.1167229, osmId: 23716725 }, // Google Maps verified 2026-01-20
   },
 
   // ADDITIONAL CAFES
@@ -830,7 +830,7 @@ export const buildings: Building[] = [
     gridRef: 'V26',
     address: '136 Herring Road',
     category: 'residential',
-    location: { lat: -33.7776104, lng: 151.1166667 }, // Google Maps geocoded 2026-01-10
+    location: { lat: -33.77729, lng: 151.1168364 }, // Google Maps verified 2026-01-20
   },
   {
     id: 'MQV',
@@ -886,7 +886,7 @@ export const buildings: Building[] = [
     gridRef: 'N22',
     address: "11 Wally's Walk",
     category: 'academic',
-    location: { lat: -33.774641, lng: 151.115085, osmId: 23716716 },
+    location: { lat: -33.7746267, lng: 151.1151193, osmId: 23716716 }, // Google Maps verified 2026-01-20
     levels: 4,
   },
   {
@@ -900,7 +900,7 @@ export const buildings: Building[] = [
     gridRef: 'M26',
     address: '13 Research Park Drive, Macquarie Park, NSW',
     category: 'research',
-    location: { lat: -33.77325, lng: 151.117162, osmId: 23716723 },
+    location: { lat: -33.7732317, lng: 151.1171794, osmId: 23716723 }, // Google Maps verified 2026-01-20
   },
   {
     id: '6ER',
@@ -993,7 +993,7 @@ export const buildings: Building[] = [
     gridRef: 'M23',
     address: '6 Science Road, Macquarie Park, NSW',
     category: 'academic',
-    location: { lat: -33.773641, lng: 151.116131, osmId: 157975717 },
+    location: { lat: -33.7736165, lng: 151.1159258, osmId: 157975717 },
   },
   // Additional buildings from MQ Location Guide
   {
@@ -1083,7 +1083,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_3SR_desc',
     address: '3 Science Road Macquarie Park NSW',
     category: 'academic',
-    location: { lat: -33.773295, lng: 151.116613, osmId: 23716725 },
+    location: { lat: -33.7733742, lng: 151.1167229, osmId: 23716725 },
   },
   {
     id: '6FW',
@@ -1144,7 +1144,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_5MD_desc',
     address: '5 Management Drive',
     category: 'academic',
-    location: { lat: -33.772023, lng: 151.116669, osmId: 148387969 },
+    location: { lat: -33.7720139, lng: 151.1157984, osmId: 148387969 },
   },
   {
     id: '1EXR',
@@ -1194,7 +1194,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_2LR_desc',
     address: '2 Link Road',
     category: 'academic',
-    location: { lat: -33.775009, lng: 151.105921, osmId: 148390207 },
+    location: { lat: -33.7748578, lng: 151.1058082, osmId: 148390207 },
   },
   {
     id: '6LR',
@@ -1206,7 +1206,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_6LR_desc',
     address: '6 Link Road',
     category: 'academic',
-    location: { lat: -33.775009, lng: 151.106411, osmId: 148390210 },
+    location: { lat: -33.7746607, lng: 151.1066688, osmId: 148390210 },
   },
   {
     id: '4LR',
@@ -1230,7 +1230,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_DESTINATIO_desc',
     address: '112-118 Talavera Road Macquarie Park',
     category: 'residential',
-    location: { lat: -33.773576, lng: 151.11963, osmId: 286832282 },
+    location: { lat: -33.7738573, lng: 151.120262, osmId: 286832282 },
     levels: 28,
   },
   {
@@ -1285,14 +1285,14 @@ export const buildings: Building[] = [
   {
     id: 'VILLAS',
     name: 'The Villas',
-    position: [1014, 807],
+    position: [2358, 3280], // Calibrated: south-east corner (Herring Rd)
     description: 'Residential villas.',
     tags: ['residential'],
     translationKey: 'building_VILLAS_name',
     descriptionKey: 'building_VILLAS_desc',
     address: '116-118 Herring Road Macquarie Park NSW',
     category: 'residential',
-    location: { lat: -33.779518, lng: 151.11289, osmId: 967533744 },
+    location: { lat: -33.7793912, lng: 151.1132109, osmId: 967533744 }, // Google Maps verified
   },
 
   {
@@ -1329,7 +1329,7 @@ export const buildings: Building[] = [
     descriptionKey: 'building_12MW_desc',
     address: '12 Macquarie Walk Macquarie Park NSW',
     category: 'academic',
-    location: { lat: -33.775158, lng: 151.114124, osmId: 1192234871 },
+    location: { lat: -33.7759467, lng: 151.1151423, osmId: 1192234871 },
   },
   {
     id: '18ER',
@@ -1377,7 +1377,7 @@ export const buildings: Building[] = [
     translationKey: 'building_SIEMENS_name',
     descriptionKey: 'building_SIEMENS_desc',
     category: 'other',
-    location: { lat: -33.7789863, lng: 151.1227068, osmId: 6784971 }, // Google Maps verified (Siemens Healthcare)
+    location: { lat: -33.774873, lng: 151.119825, osmId: 6784971 }, // Google Maps verified (Siemens)
     levels: 1,
   },
 
@@ -1402,7 +1402,7 @@ export const buildings: Building[] = [
     translationKey: 'building_16MW_name',
     descriptionKey: 'building_16MW_desc',
     category: 'academic',
-    location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps verified
+    location: { lat: -33.775621, lng: 151.113441, osmId: 141281549 }, // User verified 2026-01-20
     levels: 8,
   },
   {
@@ -1426,7 +1426,7 @@ export const buildings: Building[] = [
     translationKey: 'building_8LR_name',
     descriptionKey: 'building_8LR_desc',
     category: 'services',
-    location: { lat: -33.7787595, lng: 151.11432 }, // Google Maps verified (Morling College)
+    location: { lat: -33.7751467, lng: 151.1090168 }, // Google Maps verified 2026-01-20
     levels: 1,
   },
   {
@@ -1450,7 +1450,7 @@ export const buildings: Building[] = [
     translationKey: 'building_11GR_name',
     descriptionKey: 'building_11GR_desc',
     category: 'venue',
-    location: { lat: -33.7722453, lng: 151.1080147 }, // Google Maps verified (NextSense Preschool area)
+    location: { lat: -33.7718686, lng: 151.1114894 }, // Google Maps verified 2026-01-20
     levels: 1,
   },
   {
@@ -1579,25 +1579,25 @@ export const buildings: Building[] = [
   {
     id: '205A',
     name: '205A Culloden Road',
-    position: [1736, 79],
+    position: [1879, 746], // Calibrated: north-west (Culloden Rd)
     description: '205A Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205A_name',
     descriptionKey: 'building_205A_desc',
     category: 'residential',
-    location: { lat: -33.769196, lng: 151.111763, osmId: 1065030401 },
+    location: { lat: -33.769159, lng: 151.111826, osmId: 1065030401 }, // Google Maps verified
     levels: 1,
   },
   {
     id: '205B',
     name: '205B Culloden Road',
-    position: [1730, 99],
+    position: [1821, 836], // Calibrated: north-west (Culloden Rd)
     description: '205B Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205B_name',
     descriptionKey: 'building_205B_desc',
     category: 'residential',
-    location: { lat: -33.769541, lng: 151.111623, osmId: 1065030402 },
+    location: { lat: -33.769541, lng: 151.111623, osmId: 1065030402 }, // Google Maps verified
     levels: 1,
   },
   {
@@ -1732,14 +1732,14 @@ export const buildings: Building[] = [
   {
     id: 'VILLAS2',
     name: 'Villas (Building 2)',
-    position: [997, 799],
+    position: [2363, 3300], // Calibrated: south-east corner (Herring Rd)
     description: 'Residential villas - second building.',
     tags: ['residential'],
     translationKey: 'building_VILLAS2_name',
     descriptionKey: 'building_VILLAS2_desc',
     address: '116-118 Herring Road, Macquarie Park NSW',
     category: 'residential',
-    location: { lat: -33.779176, lng: 151.12716, osmId: 967533745 },
+    location: { lat: -33.78005, lng: 151.11359, osmId: 967533745 }, // Google Maps verified
   },
 
   // --- BUILDINGS FROM MQ LOCATION GUIDE CSV (2026-01-10) ---

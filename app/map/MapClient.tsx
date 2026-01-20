@@ -33,6 +33,9 @@ import {
   ChevronUp,
   LayoutGrid,
   List as ListIcon,
+  AlertTriangle,
+  Loader2,
+  XCircle,
 } from 'lucide-react';
 import { MapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
@@ -97,6 +100,9 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
 // Dynamically import the entire map component
 const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 
+// Import LocationStatus type
+import type { LocationStatus } from './CampusMap';
+
 export default function MapClient() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -104,6 +110,9 @@ export default function MapClient() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Location status from CampusMap
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
@@ -377,6 +386,7 @@ export default function MapClient() {
                       <CampusMap
                         selectedBuilding={selectedBuilding}
                         activeOverlays={activeOverlays}
+                        onLocationStatusChange={setLocationStatus}
                       />
                     </MapErrorBoundary>
                   ) : (
@@ -732,30 +742,117 @@ export default function MapClient() {
             </div>
           </MagicCard>
 
-          {/* Live Location - ACTIVE */}
+          {/* Live Location - Dynamic Status */}
           <MagicCard isLiquidEnhanced>
             <div className="mq-magic-card-content p-0 h-full">
               <Card className="border-0 shadow-none bg-transparent h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-mq-info" />
+                    <MapPin
+                      className={`h-5 w-5 ${
+                        locationStatus === 'found'
+                          ? 'text-mq-success'
+                          : locationStatus === 'denied'
+                            ? 'text-mq-error'
+                            : locationStatus === 'error'
+                              ? 'text-mq-warning'
+                              : 'text-mq-info'
+                      }`}
+                    />
                     {t('liveLocation')}
-                    <Badge className="ml-auto bg-mq-info/10 text-mq-info border-mq-info/20">
-                      {t('active')}
+                    <Badge
+                      className={`ml-auto ${
+                        locationStatus === 'found'
+                          ? 'bg-mq-success/10 text-mq-success border-mq-success/20'
+                          : locationStatus === 'denied'
+                            ? 'bg-mq-error/10 text-mq-error border-mq-error/20'
+                            : locationStatus === 'error'
+                              ? 'bg-mq-warning/10 text-mq-warning border-mq-warning/20'
+                              : locationStatus === 'searching'
+                                ? 'bg-mq-info/10 text-mq-info border-mq-info/20'
+                                : 'bg-mq-content-tertiary/10 text-mq-content-tertiary border-mq-content-tertiary/20'
+                      }`}
+                    >
+                      {locationStatus === 'found'
+                        ? t('active')
+                        : locationStatus === 'denied'
+                          ? t('denied' as TranslationKey) || 'Denied'
+                          : locationStatus === 'error'
+                            ? t('error')
+                            : locationStatus === 'searching'
+                              ? t('searching' as TranslationKey) || 'Searching...'
+                              : t('waiting' as TranslationKey) || 'Waiting'}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="p-3 bg-mq-info/5 rounded-mq-lg border border-mq-info/20">
+                    <div
+                      className={`p-3 rounded-mq-lg border ${
+                        locationStatus === 'found'
+                          ? 'bg-mq-success/5 border-mq-success/20'
+                          : locationStatus === 'denied'
+                            ? 'bg-mq-error/5 border-mq-error/20'
+                            : locationStatus === 'error'
+                              ? 'bg-mq-warning/5 border-mq-warning/20'
+                              : 'bg-mq-info/5 border-mq-info/20'
+                      }`}
+                    >
                       <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
                       <p className="text-mq-sm text-mq-content-secondary mt-1">
-                        {t('realTimeTrackingDesc')}
+                        {locationStatus === 'denied'
+                          ? t('locationDeniedDesc' as TranslationKey) ||
+                            'Location access was denied. Enable in browser settings.'
+                          : locationStatus === 'error'
+                            ? t('positionUnavailableDesc' as TranslationKey) ||
+                              'Could not determine your location.'
+                            : t('realTimeTrackingDesc')}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 text-mq-sm text-mq-info">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>{t('locationTrackingEnabled')}</span>
+                    <div
+                      className={`flex items-center gap-2 text-mq-sm ${
+                        locationStatus === 'found'
+                          ? 'text-mq-success'
+                          : locationStatus === 'denied'
+                            ? 'text-mq-error'
+                            : locationStatus === 'error'
+                              ? 'text-mq-warning'
+                              : locationStatus === 'searching'
+                                ? 'text-mq-info'
+                                : 'text-mq-content-tertiary'
+                      }`}
+                    >
+                      {locationStatus === 'found' ? (
+                        <>
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span>{t('locationTrackingEnabled')}</span>
+                        </>
+                      ) : locationStatus === 'denied' ? (
+                        <>
+                          <XCircle className="h-4 w-4" />
+                          <span>
+                            {t('locationAccessDenied' as TranslationKey) ||
+                              'Location access denied'}
+                          </span>
+                        </>
+                      ) : locationStatus === 'error' ? (
+                        <>
+                          <AlertTriangle className="h-4 w-4" />
+                          <span>{t('locationError' as TranslationKey) || 'Location error'}</span>
+                        </>
+                      ) : locationStatus === 'searching' ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>{t('locating' as TranslationKey) || 'Locating...'}</span>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="h-4 w-4" />
+                          <span>
+                            {t('waitingForLocation' as TranslationKey) || 'Waiting for map to load'}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>
