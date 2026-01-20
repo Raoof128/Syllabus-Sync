@@ -82,16 +82,23 @@ export function createMarkerIcon(
 }
 
 /**
- * Creates a user location indicator icon (pulsing dot)
+ * Creates a user location indicator icon (pulsing dot with directional flash)
  *
  * @param L - The Leaflet module
  * @returns A Leaflet DivIcon instance
  */
 export function createUserLocationIcon(L: typeof import('leaflet')): import('leaflet').DivIcon {
   return L.divIcon({
-    className: 'user-location-dot',
-    html: '<div class="pulse"></div>',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+    className: 'user-location-wrapper',
+    // Structure: Container -> Flash (stationary) + Dot (stationary) + Arrow (moving)
+    html: `
+      <div class="user-location-container">
+        <div class="user-heading-flash"></div>
+        <div class="user-location-dot"></div>
+        <div class="user-motion-arrow"></div>
+      </div>
+    `,
+    iconSize: [48, 48], // Larger area to accommodate the beam
+    iconAnchor: [24, 24], // Center point
   });
 }

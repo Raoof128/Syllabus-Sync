@@ -61,7 +61,7 @@ const WeatherWidget = memo(() => {
       try {
         // Using Open-Meteo API (free, no API key required)
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${SYDNEY_COORDS.lat}&longitude=${SYDNEY_COORDS.lon}&current=temperature_2m,weather_code&timezone=Australia%2FSydney`
+          `https://api.open-meteo.com/v1/forecast?latitude=${SYDNEY_COORDS.lat}&longitude=${SYDNEY_COORDS.lon}&current=temperature_2m,weather_code&timezone=Australia%2FSydney`,
         );
 
         if (!response.ok) {

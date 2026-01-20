@@ -8,7 +8,15 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Clock, AlertCircle, ExternalLink, CalendarDays, CheckCircle2, Circle, MapPin } from 'lucide-react';
+import {
+  Clock,
+  AlertCircle,
+  ExternalLink,
+  CalendarDays,
+  CheckCircle2,
+  Circle,
+  MapPin,
+} from 'lucide-react';
 import { formatDistanceToNow, format, isValid, isPast, isFuture } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
@@ -168,7 +176,9 @@ const UpcomingDeadlines = memo(() => {
                                 toggleComplete(deadline.id);
                               }}
                               className="flex-shrink-0 p-0.5 hover:bg-mq-hover-background rounded"
-                              aria-label={deadline.completed ? t('markIncomplete') : t('markAsCompleted')}
+                              aria-label={
+                                deadline.completed ? t('markIncomplete') : t('markAsCompleted')
+                              }
                             >
                               {deadline.completed ? (
                                 <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -176,10 +186,12 @@ const UpcomingDeadlines = memo(() => {
                                 <Circle className="h-4 w-4 text-mq-content-tertiary hover:text-mq-primary" />
                               )}
                             </button>
-                            <h4 className={cn(
-                              'font-medium text-sm line-clamp-1',
-                              deadline.completed && 'line-through text-mq-content-tertiary'
-                            )}>
+                            <h4
+                              className={cn(
+                                'font-medium text-sm line-clamp-1',
+                                deadline.completed && 'line-through text-mq-content-tertiary',
+                              )}
+                            >
                               {deadline.title}
                             </h4>
                           </div>
@@ -212,7 +224,9 @@ const UpcomingDeadlines = memo(() => {
                               }}
                               className="p-1 hover:bg-mq-hover-background rounded text-mq-content-tertiary hover:text-mq-primary"
                               title={`${unit.location.building} ${unit.location.room ? `Room ${unit.location.room}` : ''}`}
-                              aria-label={t('navigateToBuildingAria', { building: unit.location.building })}
+                              aria-label={t('navigateToBuildingAria', {
+                                building: unit.location.building,
+                              })}
                             >
                               <MapPin className="h-3.5 w-3.5" />
                             </button>

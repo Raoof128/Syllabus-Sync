@@ -5,7 +5,17 @@ import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle, Pencil, Trash2 } from 'lucide-react';
+import {
+  BookOpen,
+  FileText,
+  Clock,
+  MapPin,
+  CheckCircle2,
+  Circle,
+  AlertCircle,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';

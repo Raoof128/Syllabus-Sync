@@ -150,7 +150,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
         const unitSchedule = (classTimesData ?? []).map((ct: Record<string, unknown>) => ({
           id: String(ct.id),
-          day: String(ct.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+          day: String(ct.day) as
+            | 'Monday'
+            | 'Tuesday'
+            | 'Wednesday'
+            | 'Thursday'
+            | 'Friday'
+            | 'Saturday'
+            | 'Sunday',
           startTime: String(ct.start_time),
           endTime: String(ct.end_time),
         }));
@@ -189,7 +196,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       const unitSchedule = (classTimesData ?? []).map((ct: Record<string, unknown>) => ({
         id: String(ct.id),
-        day: String(ct.day) as 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday',
+        day: String(ct.day) as
+          | 'Monday'
+          | 'Tuesday'
+          | 'Wednesday'
+          | 'Thursday'
+          | 'Friday'
+          | 'Saturday'
+          | 'Sunday',
         startTime: String(ct.start_time),
         endTime: String(ct.end_time),
       }));

@@ -300,11 +300,17 @@ export async function POST(request: NextRequest) {
         ],
         instructions: true,
       }),
+      // Add explicit timeout signal to avoid hanging
+      signal: AbortSignal.timeout(10000), // 10s timeout
     });
 
     if (!orsResponse.ok) {
       const errText = await orsResponse.text();
-      console.error('ORS Upstream Error:', orsResponse.status, errText);
+      console.error('ORS Upstream Error:', {
+        status: orsResponse.status,
+        statusText: orsResponse.statusText,
+        body: errText.substring(0, 200), // Log first 200 chars
+      });
       return jsonError(
         `Navigation service temporarily unavailable`,
         orsResponse.status >= 500 ? 502 : orsResponse.status,
@@ -321,8 +327,21 @@ export async function POST(request: NextRequest) {
     response.headers.set('X-Cache', 'MISS');
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;
-  } catch (error) {
-    console.error('Navigate Proxy error:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error('Navigate Proxy error:', {
+      message: errorMessage,
+      stack: errorStack,
+      clientIP: clientIP !== 'unknown' ? clientIP : undefined, // Log IP if available for debugging abuse
+    });
+
+    // Distinguish timeout vs other errors
+    if (errorMessage.includes('timeout') || errorMessage.includes('abort')) {
+      return jsonError('Navigation request timed out', 504, ERROR_CODES.TIMEOUT);
+    }
+
     return jsonError('Internal Server Error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

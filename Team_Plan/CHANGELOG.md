@@ -7,7 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-Raouf: 2026-01-20 - Map Visual Connection Fix
+Raouf: 2026-01-20 - Map Navigation Stability & UX Refinements
+
+### Improved
+- **User Location:** Lowered movement threshold (0.5m/s -> 0.2m/s) and added manual speed calculation fallback to ensure "Arrow" mode activates reliably even on devices with poor speed reporting.
+- **Navigation API:** Added explicit timeouts (10s) and specific error handling for `POST /api/navigate` to prevent 500 errors during upstream delays.
+
+### Verification
+- `npm run check` (pass)
+- Verified `CampusMap.tsx` speed logic.
+
+Raouf: 2026-01-20 - Map User Location "Dot to Arrow" Transition
+
+### Added
+- **Dynamic Location Marker:** Implemented logic to switch the user location indicator from a "pulsing dot" to a "directional arrow" when the user starts walking.
+- **Movement Detection:** Uses `navigator.geolocation` speed (threshold > 0.5 m/s) to trigger the "moving" state.
+- **Arrow Rotation:** Applies real-time rotation to the `.user-motion-arrow` element based on device heading, correcting for the default CSS orientation.
+
+### Verification
+- `npm run lint` (pass)
+- Manual code review of `CampusMap.tsx` logic.
+
+Raouf: 2026-01-20 - Map Live Direction Indicator "Flash"
+00011| 
+00012| ### Added
+00013| - **Live Direction Flash:** Replaced the simple user location circle with a directional "flash" (beam) indicator that rotates based on the device's heading/compass.
+00014| - **Visuals:** Implemented a conical gradient beam (`.user-heading-flash`) in `leaflet.css` that projects a 40-degree field of view.
+00015| - **Logic:** Updated `CampusMap.tsx` to capture `heading` from `navigator.geolocation` and apply real-time rotation to the flash element.
+00016| 
+00017| ### Verification
+00018| - `npm run check` (pass)
+00019| - Code review of `mapUtils.ts` and `leaflet.css` for visual correctness.
+00020| 
+00021| Raouf: 2026-01-20 - Map Visual Connection Fix
 
 ### Fixed
 - **Route Visual Gap:** Fixed issue where the navigation path (blue dotted line) was not visually connecting to the destination building marker (red pin). The routing service snaps to the nearest walkable path, which can leave a gap from the building center.

@@ -57,9 +57,12 @@ const AssignmentForm = dynamic(() => import('@/components/assignments/Assignment
   loading: () => null,
 });
 
-const AssignmentDetailPanel = dynamic(() => import('@/components/assignments/AssignmentDetailPanel'), {
-  loading: () => null,
-});
+const AssignmentDetailPanel = dynamic(
+  () => import('@/components/assignments/AssignmentDetailPanel'),
+  {
+    loading: () => null,
+  },
+);
 
 const ExamForm = dynamic(() => import('@/components/exams/ExamForm'), {
   loading: () => null,
@@ -351,7 +354,10 @@ export default function CalendarClient() {
   }, [highlightedUnitId, units]);
 
   // Highlighted deadline derived from URL query parameter
-  const highlightedDeadlineId = useMemo(() => searchParams.get('highlightDeadline'), [searchParams]);
+  const highlightedDeadlineId = useMemo(
+    () => searchParams.get('highlightDeadline'),
+    [searchParams],
+  );
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
   const deadlineRefs = useRef<Map<string, HTMLElement>>(new Map());
 
@@ -662,7 +668,6 @@ export default function CalendarClient() {
     // Navigate to feed page and highlight the event for viewing
     router.push(`/feed?highlight=${event.id}`);
   };
-
 
   // Unit handlers
   const openAddUnit = () => {
@@ -1276,7 +1281,8 @@ export default function CalendarClient() {
 
                             if (!posInfo || hours < START_HOUR) {
                               // Show at top if outside visible hours
-                              const isHighlighted = deadlineHighlightActive && highlightedDeadlineId === deadline.id;
+                              const isHighlighted =
+                                deadlineHighlightActive && highlightedDeadlineId === deadline.id;
                               return (
                                 <button
                                   key={deadline.id}
@@ -1288,7 +1294,8 @@ export default function CalendarClient() {
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                     deadline.completed && 'opacity-50 line-through',
-                                    isHighlighted && 'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
+                                    isHighlighted &&
+                                      'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
                                   )}
                                   style={{
                                     top: 4 + idx * 24,
@@ -1319,7 +1326,8 @@ export default function CalendarClient() {
                             };
                             const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
                             const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-                            const isHighlightedDeadline = deadlineHighlightActive && highlightedDeadlineId === deadline.id;
+                            const isHighlightedDeadline =
+                              deadlineHighlightActive && highlightedDeadlineId === deadline.id;
 
                             return (
                               <button
@@ -1332,7 +1340,8 @@ export default function CalendarClient() {
                                 className={cn(
                                   'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                   deadline.completed && 'opacity-50 line-through',
-                                  isHighlightedDeadline && 'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
+                                  isHighlightedDeadline &&
+                                    'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
                                 )}
                                 style={{
                                   top: posInfo.top,
@@ -1832,7 +1841,8 @@ export default function CalendarClient() {
           <MagicCard
             isLiquidEnhanced
             className={
-              highlightedDeadlineId && deadlines.find(d => d.id === highlightedDeadlineId)?.type === 'Assignment'
+              highlightedDeadlineId &&
+              deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment'
                 ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
                 : ''
             }
@@ -1876,7 +1886,8 @@ export default function CalendarClient() {
                         .map((assignment) => {
                           const due = dayjs(assignment.dueDate);
                           const isOverdue = !assignment.completed && due.isBefore(dayjs());
-                          const isHighlighted = deadlineHighlightActive && highlightedDeadlineId === assignment.id;
+                          const isHighlighted =
+                            deadlineHighlightActive && highlightedDeadlineId === assignment.id;
                           return (
                             <div
                               key={assignment.id}
@@ -1896,7 +1907,8 @@ export default function CalendarClient() {
                                   : isOverdue
                                     ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
                                     : 'border-mq-border hover:border-blue-300',
-                                isHighlighted && 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/20 animate-pulse',
+                                isHighlighted &&
+                                  'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/20 animate-pulse',
                               )}
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1936,7 +1948,10 @@ export default function CalendarClient() {
                                       {assignment.title}
                                     </h4>
                                     <Badge
-                                      className={cn(PRIORITY_COLORS[assignment.priority], 'flex-shrink-0')}
+                                      className={cn(
+                                        PRIORITY_COLORS[assignment.priority],
+                                        'flex-shrink-0',
+                                      )}
                                       variant="neutral"
                                     >
                                       {t(`priority_${assignment.priority}` as TranslationKey)}
@@ -2072,7 +2087,13 @@ export default function CalendarClient() {
                                     >
                                       {exam.title}
                                     </h4>
-                                    <Badge className={cn(PRIORITY_COLORS[exam.priority], 'flex-shrink-0')} variant="neutral">
+                                    <Badge
+                                      className={cn(
+                                        PRIORITY_COLORS[exam.priority],
+                                        'flex-shrink-0',
+                                      )}
+                                      variant="neutral"
+                                    >
                                       {t(`priority_${exam.priority}` as TranslationKey)}
                                     </Badge>
                                   </div>
@@ -2344,7 +2365,6 @@ export default function CalendarClient() {
         </ScrollReveal>
       </div>
 
-
       {/* Deadline Form Dialog */}
       <DeadlineForm
         open={deadlineDialogOpen}
@@ -2435,13 +2455,16 @@ export default function CalendarClient() {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteAssignmentConfirm' as TranslationKey) || 'Delete Assignment?'}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {assignmentToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteAssignmentConfirm' as TranslationKey) || 'Delete Assignment?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{assignmentToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteAssignmentConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this assignment?'}</p>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteAssignmentConfirmDesc' as TranslationKey) ||
+                'This action cannot be undone. Are you sure you want to delete this assignment?'}
+            </p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -2473,13 +2496,16 @@ export default function CalendarClient() {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteExamConfirm' as TranslationKey) || 'Delete Exam?'}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {examToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteExamConfirm' as TranslationKey) || 'Delete Exam?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{examToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteExamConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this exam?'}</p>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteExamConfirmDesc' as TranslationKey) ||
+                'This action cannot be undone. Are you sure you want to delete this exam?'}
+            </p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -2511,13 +2537,16 @@ export default function CalendarClient() {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteDeadlineConfirm' as TranslationKey) || 'Delete Deadline?'}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {deadlineToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteDeadlineConfirm' as TranslationKey) || 'Delete Deadline?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{deadlineToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteDeadlineConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this deadline?'}</p>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteDeadlineConfirmDesc' as TranslationKey) ||
+                'This action cannot be undone. Are you sure you want to delete this deadline?'}
+            </p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -2540,7 +2569,6 @@ export default function CalendarClient() {
         </div>
       )}
 
-
       {/* Delete Confirmation Modal for Events */}
       {eventDeleteConfirmOpen && eventToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -2550,13 +2578,16 @@ export default function CalendarClient() {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm' as TranslationKey) || 'Delete Event?'}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {eventToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteEventConfirm' as TranslationKey) || 'Delete Event?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteEventConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this event?'}</p>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteEventConfirmDesc' as TranslationKey) ||
+                'This action cannot be undone. Are you sure you want to delete this event?'}
+            </p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"

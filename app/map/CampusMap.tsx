@@ -118,6 +118,7 @@ export default function CampusMap({
   const userMarkerRef = useRef<import('leaflet').Marker | null>(null);
   const accuracyCircleRef = useRef<import('leaflet').Circle | null>(null);
   const hasSetFallbackOrigin = useRef(false);
+  const lastPositionRef = useRef<{ lat: number; lng: number; time: number } | null>(null);
 
   // Notify parent when location status changes
   useEffect(() => {
@@ -513,11 +514,53 @@ export default function CampusMap({
 
         const gpsLat = pos.coords.latitude;
         const gpsLng = pos.coords.longitude;
+        const gpsHeading = pos.coords.heading; // Direction of travel (0-360)
+        let gpsSpeed = pos.coords.speed; // Speed in m/s
+
+        // Calculate manual speed if GPS speed is null or 0 (common on some devices/browsers)
+        const currentTime = pos.timestamp || Date.now();
+        if ((gpsSpeed === null || gpsSpeed === 0) && lastPositionRef.current) {
+          const lastPos = lastPositionRef.current;
+          const timeDiff = (currentTime - lastPos.time) / 1000; // seconds
+
+          if (timeDiff > 0.5) {
+            // Only calculate if enough time passed to avoid noise
+            const R = 6371e3; // Earth radius in meters
+            const φ1 = (lastPos.lat * Math.PI) / 180;
+            const φ2 = (gpsLat * Math.PI) / 180;
+            const Δφ = ((gpsLat - lastPos.lat) * Math.PI) / 180;
+            const Δλ = ((gpsLng - lastPos.lng) * Math.PI) / 180;
+
+            const a =
+              Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const dist = R * c;
+
+            const calculatedSpeed = dist / timeDiff;
+            // Use calculated speed if it looks reasonable (walking speed < 10m/s ~ 36km/h)
+            if (calculatedSpeed < 10) {
+              gpsSpeed = calculatedSpeed;
+            }
+          }
+        }
+
+        // Update last position reference
+        lastPositionRef.current = { lat: gpsLat, lng: gpsLng, time: currentTime };
+
+        // Debug: Check if coordinates match known landmarks exactly (mock detection)
+        const isLibraryMock =
+          Math.abs(gpsLat - -33.7756994) < 0.000001 && Math.abs(gpsLng - 151.1131306) < 0.000001;
 
         mapLog.log('GPS position received:', {
           lat: gpsLat,
           lng: gpsLng,
+          heading: gpsHeading,
+          speed: gpsSpeed, // Log the potentially calculated speed
+          originalSpeed: pos.coords.speed,
           accuracy: pos.coords.accuracy,
+          isLibraryMock,
+          timestamp: new Date(pos.timestamp).toLocaleTimeString(),
         });
 
         setLocationStatus('found');
@@ -554,6 +597,48 @@ export default function CampusMap({
                 .addTo(mapInstance);
             } else if (userMarkerRef.current) {
               userMarkerRef.current.setLatLng([pixelPos.lat, pixelPos.lng]);
+            }
+
+            // Update heading/orientation flash and motion arrow
+            if (userMarkerRef.current) {
+              const iconElement = userMarkerRef.current.getElement();
+              if (iconElement) {
+                // Lower threshold to 0.2 m/s (~0.72 km/h) to catch slow walking
+                // Some browsers report null speed; if so, we can't show the arrow reliably unless we calculate it ourselves
+                const isMoving = gpsSpeed !== null && gpsSpeed > 0.2;
+
+                // Handle Motion Arrow (Moving state)
+                if (isMoving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+                  iconElement.classList.add('is-moving');
+                  const arrowElement = iconElement.querySelector(
+                    '.user-motion-arrow',
+                  ) as HTMLElement;
+                  if (arrowElement) {
+                    // Default CSS rotation is -45deg to point North
+                    // Add heading to this base rotation
+                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${gpsHeading - 45}deg)`;
+                  }
+                } else {
+                  iconElement.classList.remove('is-moving');
+                }
+
+                // Handle Heading Flash (Still state)
+                const flashElement = iconElement.querySelector(
+                  '.user-heading-flash',
+                ) as HTMLElement;
+                if (flashElement) {
+                  if (typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+                    // Apply rotation (map is North-up, so direct mapping works)
+                    flashElement.style.transform = `rotate(${gpsHeading}deg)`;
+                    // Opacity is controlled by CSS based on .is-moving class
+                    // We set base opacity here for when it IS visible
+                    flashElement.style.opacity = '1';
+                  } else {
+                    // Hide flash if heading is unavailable
+                    flashElement.style.opacity = '0';
+                  }
+                }
+              }
             }
 
             // Accuracy circle - convert meters to pixels (approximate)

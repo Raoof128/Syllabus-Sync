@@ -107,7 +107,11 @@ const NextDeadline = memo(() => {
               </div>
             ) : (
               <Link
-                href={calendarDate ? `/calendar?date=${calendarDate}&highlightDeadline=${encodeURIComponent(nextDeadline.id)}` : '/calendar'}
+                href={
+                  calendarDate
+                    ? `/calendar?date=${calendarDate}&highlightDeadline=${encodeURIComponent(nextDeadline.id)}`
+                    : '/calendar'
+                }
                 className="block focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:rounded-lg"
                 aria-label={t('viewDeadlineDetails', { title: nextDeadline.title })}
               >

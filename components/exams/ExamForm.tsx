@@ -316,8 +316,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-room">
-                  {t('room' as TranslationKey) || 'Room'}{' '}
-                  <span className="text-mq-error">*</span>
+                  {t('room' as TranslationKey) || 'Room'} <span className="text-mq-error">*</span>
                 </Label>
                 <Input
                   id="exam-room"

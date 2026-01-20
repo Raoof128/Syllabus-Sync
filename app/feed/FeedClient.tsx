@@ -794,14 +794,15 @@ const FeedClient = memo(() => {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm') || 'Delete Event?'}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {eventToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteEventConfirm') || 'Delete Event?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteEventConfirmDesc') || 'This action cannot be undone. Are you sure you want to delete this event?'}
+              {t('deleteEventConfirmDesc') ||
+                'This action cannot be undone. Are you sure you want to delete this event?'}
             </p>
             <div className="flex justify-end gap-3">
               <Button
@@ -820,7 +821,10 @@ const FeedClient = memo(() => {
                     removeEvent(eventToDelete.id);
                     setDeleteConfirmOpen(false);
                     setEventToDelete(null);
-                    toastUtils.success(t('eventDeleted' as TranslationKey) || 'Event deleted', t('eventDeletedDesc' as TranslationKey) || 'The event has been removed.');
+                    toastUtils.success(
+                      t('eventDeleted' as TranslationKey) || 'Event deleted',
+                      t('eventDeletedDesc' as TranslationKey) || 'The event has been removed.',
+                    );
                   }
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white"
