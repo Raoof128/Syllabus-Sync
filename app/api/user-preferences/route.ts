@@ -16,7 +16,6 @@ import { z } from 'zod';
 const UpdatePreferencesSchema = z.object({
   notifications_enabled: z.boolean().optional(),
   email_notifications: z.boolean().optional(),
-  push_notifications: z.boolean().optional(),
 });
 
 export async function GET() {

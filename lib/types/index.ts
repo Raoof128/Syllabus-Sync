@@ -49,8 +49,8 @@ export type Event = {
   userId?: string | null; // null for public/campus events, user ID for personal events
   title: string;
   description: string;
-  building: string; // Building code (e.g., "C5C") - required for map navigation
-  room: string; // Room number (e.g., "204")
+  building?: string; // Building code (e.g., "C5C") - optional for map navigation
+  room?: string; // Room number (e.g., "204") - optional
   location?: string; // Legacy: combined "Building Room" string for backward compatibility
   category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   color?: string; // Optional custom color (hex value like "#A6192E")

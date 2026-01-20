@@ -534,7 +534,7 @@ const FeedClient = memo(() => {
                                         >[0],
                                       ),
                                       event.startAt,
-                                      event.location,
+                                      event.location || '',
                                     )
                                   }
                                   disabled={isLoading}
@@ -551,17 +551,19 @@ const FeedClient = memo(() => {
                                   )}
                                   {isReminded ? t('reminderTimingUpdated') : t('remindMe')}
                                 </Button>
-                                <Button asChild variant="secondary" size="sm">
-                                  <Link
-                                    href={`/map?building=${event.building}`}
-                                    aria-label={t('navigateToBuildingAria', {
-                                      building: event.location,
-                                    })}
-                                  >
-                                    <Navigation className="h-4 w-4 mr-1.5" aria-hidden="true" />
-                                    {t('navigate')}
-                                  </Link>
-                                </Button>
+                                {event.building && (
+                                  <Button asChild variant="secondary" size="sm">
+                                    <Link
+                                      href={`/map?building=${encodeURIComponent(event.building)}`}
+                                      aria-label={t('navigateToBuildingAria', {
+                                        building: event.building,
+                                      })}
+                                    >
+                                      <Navigation className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                      {t('navigate')}
+                                    </Link>
+                                  </Button>
+                                )}
                                 {/* Edit button */}
                                 <Button
                                   variant="secondary"

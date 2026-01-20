@@ -18,7 +18,9 @@ import {
   Trash2,
   AlertTriangle,
   MapPin,
+  Navigation,
 } from 'lucide-react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -1979,25 +1981,24 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                              <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                                 {getDeadlineBuilding(assignment) && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigateToMap(getDeadlineBuilding(assignment));
-                                    }}
-                                    className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                  <Link
+                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}`}
+                                    onClick={(e) => e.stopPropagation()}
                                     aria-label={t('navigateToBuildingAria', {
                                       building: getDeadlineBuilding(assignment) || '',
                                     })}
-                                    title={t('viewOnMap' as 'title') || 'View on Map'}
                                   >
-                                    <MapPin
-                                      className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
-                                      aria-hidden="true"
-                                    />
-                                  </button>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      className="gap-1.5 h-10 sm:h-8 px-3 text-[length:var(--fs-small)] min-h-[44px] sm:min-h-0"
+                                    >
+                                      <Navigation className="h-4 w-4" aria-hidden="true" />
+                                      {t('navigate')}
+                                    </Button>
+                                  </Link>
                                 )}
                                 <button
                                   type="button"
@@ -2139,25 +2140,24 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                              <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                                 {getDeadlineBuilding(exam) && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigateToMap(getDeadlineBuilding(exam));
-                                    }}
-                                    className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                  <Link
+                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}`}
+                                    onClick={(e) => e.stopPropagation()}
                                     aria-label={t('navigateToBuildingAria', {
                                       building: getDeadlineBuilding(exam) || '',
                                     })}
-                                    title={t('viewOnMap' as 'title') || 'View on Map'}
                                   >
-                                    <MapPin
-                                      className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
-                                      aria-hidden="true"
-                                    />
-                                  </button>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      className="gap-1.5 h-10 sm:h-8 px-3 text-[length:var(--fs-small)] min-h-[44px] sm:min-h-0"
+                                    >
+                                      <Navigation className="h-4 w-4" aria-hidden="true" />
+                                      {t('navigate')}
+                                    </Button>
+                                  </Link>
                                 )}
                                 <button
                                   type="button"
@@ -2269,25 +2269,24 @@ export default function CalendarClient() {
                               {unit.name}
                             </p>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2">
                             {unit.location?.building && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigateToMap(unit.location.building);
-                                }}
-                                className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                title={`${unit.location.building}${unit.location.room ? ` ${unit.location.room}` : ''}`}
+                              <Link
+                                href={`/map?building=${encodeURIComponent(unit.location.building)}`}
+                                onClick={(e) => e.stopPropagation()}
                                 aria-label={t('navigateToBuildingAria', {
                                   building: unit.location.building,
                                 })}
                               >
-                                <MapPin
-                                  className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
-                                  aria-hidden="true"
-                                />
-                              </button>
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="gap-1.5 h-10 sm:h-8 px-3 text-[length:var(--fs-small)] min-h-[44px] sm:min-h-0"
+                                >
+                                  <Navigation className="h-4 w-4" aria-hidden="true" />
+                                  {t('navigate')}
+                                </Button>
+                              </Link>
                             )}
                             <button
                               type="button"
@@ -2395,25 +2394,24 @@ export default function CalendarClient() {
                                 {event.time} • {event.location}
                               </p>
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-2">
                               {event.building && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigateToMap(event.building);
-                                  }}
-                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                <Link
+                                  href={`/map?building=${encodeURIComponent(event.building)}`}
+                                  onClick={(e) => e.stopPropagation()}
                                   aria-label={t('navigateToBuildingAria', {
                                     building: event.building,
                                   })}
-                                  title={t('viewOnMap' as 'title') || 'View on Map'}
                                 >
-                                  <MapPin
-                                    className="h-4 w-4 text-mq-content-secondary hover:text-mq-primary"
-                                    aria-hidden="true"
-                                  />
-                                </button>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="gap-1.5 h-10 sm:h-8 px-3 text-[length:var(--fs-small)] min-h-[44px] sm:min-h-0"
+                                  >
+                                    <Navigation className="h-4 w-4" aria-hidden="true" />
+                                    {t('navigate')}
+                                  </Button>
+                                </Link>
                               )}
                               <button
                                 type="button"

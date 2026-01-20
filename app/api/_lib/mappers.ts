@@ -69,6 +69,7 @@ export const mapEventRow = (row: Row): Event => {
     description: String(row.description ?? ''),
     location: String(row.location ?? ''),
     building: row.building ? String(row.building) : undefined,
+    room: row.room ? String(row.room) : undefined,
     category: row.category as Event['category'],
     imageUrl: row.image_url ? String(row.image_url) : undefined,
     // Primary time fields

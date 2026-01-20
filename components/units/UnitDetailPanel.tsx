@@ -5,17 +5,8 @@ import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import {
-  BookOpen,
-  FileText,
-  Clock,
-  MapPin,
-  CheckCircle2,
-  Circle,
-  AlertCircle,
-  Pencil,
-  Trash2,
-} from 'lucide-react';
+import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle, Pencil, Trash2, Navigation } from 'lucide-react';
+import Link from 'next/link';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -194,6 +185,20 @@ export default function UnitDetailPanel({
               <p className="text-sm text-mq-content-secondary">{unit.name}</p>
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <Link
+                href={`/map?building=${unit.location.building.toLowerCase()}`}
+                aria-label={t('navigateToBuildingAria', { building: unit.location.building }) || `Navigate to ${unit.location.building} on campus map`}
+              >
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="gap-1.5 h-8"
+                  title={t('navigate') || 'Navigate'}
+                >
+                  <Navigation className="h-4 w-4" aria-hidden="true" />
+                  {t('navigate')}
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"

@@ -34,7 +34,6 @@ interface DbUserPreferences {
   user_id: string;
   notifications_enabled: boolean | null;
   email_notifications: boolean | null;
-  push_notifications: boolean | null;
 }
 
 /**
@@ -206,7 +205,8 @@ function mapDbPreferencesToClient(
   return {
     notifications: dbPreferences.notifications_enabled ?? true,
     emailReminders: dbPreferences.email_notifications ?? false,
-    pushNotifications: dbPreferences.push_notifications ?? true,
+    // pushNotifications is local-only, preserve existing value
+    pushNotifications: existing?.pushNotifications ?? true,
   };
 }
 
@@ -214,7 +214,7 @@ function mapClientPreferencesToDb(preferences: UserProfile['preferences']) {
   return {
     notifications_enabled: preferences.notifications,
     email_notifications: preferences.emailReminders,
-    push_notifications: preferences.pushNotifications,
+    // pushNotifications is local-only, not synced to database
   };
 }
 
