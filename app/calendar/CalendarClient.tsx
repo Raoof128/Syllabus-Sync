@@ -57,6 +57,10 @@ const AssignmentForm = dynamic(() => import('@/components/assignments/Assignment
   loading: () => null,
 });
 
+const AssignmentDetailPanel = dynamic(() => import('@/components/assignments/AssignmentDetailPanel'), {
+  loading: () => null,
+});
+
 const ExamForm = dynamic(() => import('@/components/exams/ExamForm'), {
   loading: () => null,
 });
@@ -283,7 +287,9 @@ export default function CalendarClient() {
   const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
+  const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
   const userEvents = useEventsStore((state) => state.events);
+  const removeEvent = useEventsStore((state) => state.removeEvent);
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
 
@@ -314,7 +320,28 @@ export default function CalendarClient() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
 
+  // Delete confirmation state for assignments
+  const [assignmentDeleteConfirmOpen, setAssignmentDeleteConfirmOpen] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<Deadline | null>(null);
+
+  // Delete confirmation state for exams
+  const [examDeleteConfirmOpen, setExamDeleteConfirmOpen] = useState(false);
+  const [examToDelete, setExamToDelete] = useState<Deadline | null>(null);
+
+  // Delete confirmation state for deadlines
+  const [deadlineDeleteConfirmOpen, setDeadlineDeleteConfirmOpen] = useState(false);
+  const [deadlineToDelete, setDeadlineToDelete] = useState<Deadline | null>(null);
+
+  // Delete confirmation state for events
+  const [eventDeleteConfirmOpen, setEventDeleteConfirmOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
+  // Assignment detail panel state
+  const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<Deadline | null>(null);
+
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
+  const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
 
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
@@ -323,6 +350,54 @@ export default function CalendarClient() {
     return units.find((unit) => unit.id === highlightedUnitId) ?? null;
   }, [highlightedUnitId, units]);
 
+  // Highlighted deadline derived from URL query parameter
+  const highlightedDeadlineId = useMemo(() => searchParams.get('highlightDeadline'), [searchParams]);
+  const deadlineHighlightActive = Boolean(highlightedDeadlineId);
+  const deadlineRefs = useRef<Map<string, HTMLElement>>(new Map());
+
+  // Handle highlighted deadline side effects (scroll + highlight + auto-clear URL + show detail panel)
+  useEffect(() => {
+    if (!highlightedDeadlineId) {
+      return;
+    }
+
+    // Find the highlighted deadline
+    const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
+
+    // Scroll to assignments widget and open detail panel
+    const scrollTimer = window.setTimeout(() => {
+      // First scroll to the assignments widget
+      if (assignmentsWidgetRef.current) {
+        assignmentsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Then scroll to the specific deadline item if it exists in calendar view
+      const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
+      if (deadlineElement) {
+        setTimeout(() => {
+          deadlineElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 400);
+      }
+
+      // Open the assignment detail panel
+      if (highlightedDeadline) {
+        setSelectedAssignment(highlightedDeadline);
+        setAssignmentDetailOpen(true);
+      }
+    }, 300);
+
+    // Clear highlight and URL parameter after 5 seconds
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightDeadline');
+      window.history.replaceState({}, '', url.toString());
+    }, 5000);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [highlightedDeadlineId, deadlines]);
   const effectiveSelectedUnit = highlightedUnit ?? selectedUnit;
   const effectiveUnitDetailOpen = unitDetailOpen || Boolean(highlightedUnit);
 
@@ -565,6 +640,12 @@ export default function CalendarClient() {
     setAssignmentDialogOpen(true);
   };
 
+  // Assignment detail panel handler
+  const openAssignmentDetail = (assignment: Deadline) => {
+    setSelectedAssignment(assignment);
+    setAssignmentDetailOpen(true);
+  };
+
   // Exam handlers
   const openAddExam = () => {
     setEditExam(null);
@@ -576,17 +657,12 @@ export default function CalendarClient() {
     setExamDialogOpen(true);
   };
 
-  // Event handlers - open edit dialog for user's events or navigate to feed with highlight
+  // Event handlers - navigate to feed with highlight to view event details
   const handleEventClick = (event: Event) => {
-    // All events are user-owned now, so open edit dialog
-    setEditEvent(event);
-    setEventDialogOpen(true);
-  };
-
-  // Navigate to feed with event highlighted
-  const handleViewEventInFeed = (event: Event) => {
+    // Navigate to feed page and highlight the event for viewing
     router.push(`/feed?highlight=${event.id}`);
   };
+
 
   // Unit handlers
   const openAddUnit = () => {
@@ -610,6 +686,68 @@ export default function CalendarClient() {
       setDeleteConfirmOpen(false);
       setUnitToDelete(null);
     }
+  };
+
+  // Assignment delete handlers
+  const handleDeleteAssignment = (assignment: Deadline) => {
+    setAssignmentToDelete(assignment);
+    setAssignmentDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteAssignment = () => {
+    if (assignmentToDelete) {
+      removeDeadline(assignmentToDelete.id);
+      setAssignmentDeleteConfirmOpen(false);
+      setAssignmentToDelete(null);
+    }
+  };
+
+  // Exam delete handlers
+  const handleDeleteExam = (exam: Deadline) => {
+    setExamToDelete(exam);
+    setExamDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteExam = () => {
+    if (examToDelete) {
+      removeDeadline(examToDelete.id);
+      setExamDeleteConfirmOpen(false);
+      setExamToDelete(null);
+    }
+  };
+
+  // Deadline delete handlers
+  const handleDeleteDeadline = (deadline: Deadline) => {
+    setDeadlineToDelete(deadline);
+    setDeadlineDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteDeadline = () => {
+    if (deadlineToDelete) {
+      removeDeadline(deadlineToDelete.id);
+      setDeadlineDeleteConfirmOpen(false);
+      setDeadlineToDelete(null);
+    }
+  };
+
+  // Event delete handlers
+  const handleDeleteEvent = (event: Event) => {
+    setEventToDelete(event);
+    setEventDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (eventToDelete) {
+      removeEvent(eventToDelete.id);
+      setEventDeleteConfirmOpen(false);
+      setEventToDelete(null);
+    }
+  };
+
+  // Event edit handler
+  const openEditEvent = (event: Event) => {
+    setEditEvent(event);
+    setEventDialogOpen(true);
   };
 
   // Open unit detail panel
@@ -1138,14 +1276,19 @@ export default function CalendarClient() {
 
                             if (!posInfo || hours < START_HOUR) {
                               // Show at top if outside visible hours
+                              const isHighlighted = deadlineHighlightActive && highlightedDeadlineId === deadline.id;
                               return (
                                 <button
                                   key={deadline.id}
                                   type="button"
+                                  ref={(el) => {
+                                    if (el) deadlineRefs.current.set(deadline.id, el);
+                                  }}
                                   onClick={() => openEditDeadline(deadline)}
                                   className={cn(
                                     'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                     deadline.completed && 'opacity-50 line-through',
+                                    isHighlighted && 'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
                                   )}
                                   style={{
                                     top: 4 + idx * 24,
@@ -1176,15 +1319,20 @@ export default function CalendarClient() {
                             };
                             const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
                             const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+                            const isHighlightedDeadline = deadlineHighlightActive && highlightedDeadlineId === deadline.id;
 
                             return (
                               <button
                                 key={deadline.id}
                                 type="button"
+                                ref={(el) => {
+                                  if (el) deadlineRefs.current.set(deadline.id, el);
+                                }}
                                 onClick={() => openEditDeadline(deadline)}
                                 className={cn(
                                   'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
                                   deadline.completed && 'opacity-50 line-through',
+                                  isHighlightedDeadline && 'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
                                 )}
                                 style={{
                                   top: posInfo.top,
@@ -1681,8 +1829,15 @@ export default function CalendarClient() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Assignments Widget */}
         <ScrollReveal delay={0.2}>
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0">
+          <MagicCard
+            isLiquidEnhanced
+            className={
+              highlightedDeadlineId && deadlines.find(d => d.id === highlightedDeadlineId)?.type === 'Assignment'
+                ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+                : ''
+            }
+          >
+            <div className="mq-magic-card-content p-0" ref={assignmentsWidgetRef}>
               <Card className="border-0 shadow-none bg-transparent">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -1721,28 +1876,42 @@ export default function CalendarClient() {
                         .map((assignment) => {
                           const due = dayjs(assignment.dueDate);
                           const isOverdue = !assignment.completed && due.isBefore(dayjs());
+                          const isHighlighted = deadlineHighlightActive && highlightedDeadlineId === assignment.id;
                           return (
                             <div
                               key={assignment.id}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => openAssignmentDetail(assignment)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  openAssignmentDetail(assignment);
+                                }
+                              }}
                               className={cn(
-                                'flex items-center justify-between p-3 rounded-lg border transition-all',
+                                'flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer',
                                 assignment.completed
                                   ? 'opacity-60 border-mq-border'
                                   : isOverdue
                                     ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
                                     : 'border-mq-border hover:border-blue-300',
+                                isHighlighted && 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/20 animate-pulse',
                               )}
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
                                   type="button"
-                                  onClick={() => toggleComplete(assignment.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleComplete(assignment.id);
+                                  }}
                                   aria-label={
                                     assignment.completed
                                       ? t('markIncomplete')
                                       : t('markAsCompleted')
                                   }
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
                                 >
                                   {assignment.completed ? (
                                     <CheckCircle2
@@ -1756,35 +1925,54 @@ export default function CalendarClient() {
                                     />
                                   )}
                                 </button>
-                                <div>
-                                  <h4
-                                    className={cn(
-                                      'font-medium text-sm',
-                                      assignment.completed && 'line-through',
-                                    )}
-                                  >
-                                    {assignment.title}
-                                  </h4>
-                                  <p className="text-xs text-mq-content-secondary">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <h4
+                                      className={cn(
+                                        'font-medium text-sm truncate',
+                                        assignment.completed && 'line-through',
+                                      )}
+                                    >
+                                      {assignment.title}
+                                    </h4>
+                                    <Badge
+                                      className={cn(PRIORITY_COLORS[assignment.priority], 'flex-shrink-0')}
+                                      variant="neutral"
+                                    >
+                                      {t(`priority_${assignment.priority}` as TranslationKey)}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xs text-mq-content-secondary truncate">
                                     {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Badge
-                                  className={PRIORITY_COLORS[assignment.priority]}
-                                  variant="neutral"
-                                >
-                                  {t(`priority_${assignment.priority}` as TranslationKey)}
-                                </Badge>
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                                 <button
                                   type="button"
-                                  onClick={() => openEditAssignment(assignment)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openEditAssignment(assignment);
+                                  }}
                                   className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                   aria-label={t('calendarEditItem', { title: assignment.title })}
                                 >
                                   <Edit2
                                     className="h-4 w-4 text-mq-content-secondary"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteAssignment(assignment);
+                                  }}
+                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                  aria-label={t('calendarDeleteItem', { title: assignment.title })}
+                                >
+                                  <Trash2
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -1853,14 +2041,14 @@ export default function CalendarClient() {
                                     : 'border-mq-border hover:border-red-300',
                               )}
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => toggleComplete(exam.id)}
                                   aria-label={
                                     exam.completed ? t('markIncomplete') : t('markAsCompleted')
                                   }
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
                                 >
                                   {exam.completed ? (
                                     <CheckCircle2
@@ -1874,25 +2062,27 @@ export default function CalendarClient() {
                                     />
                                   )}
                                 </button>
-                                <div>
-                                  <h4
-                                    className={cn(
-                                      'font-medium text-sm',
-                                      exam.completed && 'line-through',
-                                    )}
-                                  >
-                                    {exam.title}
-                                  </h4>
-                                  <p className="text-xs text-mq-content-secondary">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <h4
+                                      className={cn(
+                                        'font-medium text-sm truncate',
+                                        exam.completed && 'line-through',
+                                      )}
+                                    >
+                                      {exam.title}
+                                    </h4>
+                                    <Badge className={cn(PRIORITY_COLORS[exam.priority], 'flex-shrink-0')} variant="neutral">
+                                      {t(`priority_${exam.priority}` as TranslationKey)}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xs text-mq-content-secondary truncate">
                                     {exam.unitCode} • {examTypeLabel} •{' '}
                                     {formatMonthDayTime(due.toDate())}
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <Badge className={PRIORITY_COLORS[exam.priority]} variant="neutral">
-                                  {t(`priority_${exam.priority}` as TranslationKey)}
-                                </Badge>
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                                 <button
                                   type="button"
                                   onClick={() => openEditExam(exam)}
@@ -1901,6 +2091,17 @@ export default function CalendarClient() {
                                 >
                                   <Edit2
                                     className="h-4 w-4 text-mq-content-secondary"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteExam(exam)}
+                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                  aria-label={t('calendarDeleteItem', { title: exam.title })}
+                                >
+                                  <Trash2
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2077,10 +2278,18 @@ export default function CalendarClient() {
                       {allEvents.slice(0, 5).map((event) => {
                         const eventTitle = getEventTitle(event);
                         return (
-                          <button
+                          <div
                             key={event.id}
+                            className="flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-mq-success/40 transition-all cursor-pointer"
                             onClick={() => handleEventClick(event)}
-                            className="w-full flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-mq-success/40 transition-all text-left"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleEventClick(event);
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
                           >
                             <div className="w-3 h-3 rounded-full flex-shrink-0 bg-mq-success" />
                             <div className="flex-1 min-w-0">
@@ -2091,7 +2300,39 @@ export default function CalendarClient() {
                                 {event.time} • {event.location}
                               </p>
                             </div>
-                          </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openEditEvent(event);
+                                }}
+                                className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                title={t('calendarEditItem', { title: eventTitle })}
+                                aria-label={t('calendarEditItem', { title: eventTitle })}
+                              >
+                                <Edit2
+                                  className="h-4 w-4 text-mq-content-secondary"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteEvent(event);
+                                }}
+                                className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                title={t('calendarDeleteItem', { title: eventTitle })}
+                                aria-label={t('calendarDeleteItem', { title: eventTitle })}
+                              >
+                                <Trash2
+                                  className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
@@ -2182,17 +2423,30 @@ export default function CalendarClient() {
                                   {formatWeekdayMonthDayTime(due.toDate())}
                                 </p>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => openEditDeadline(deadline)}
-                                className="p-1 hover:bg-mq-hover-background rounded ml-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                aria-label={t('calendarEditItem', { title: deadline.title })}
-                              >
-                                <Edit2
-                                  className="h-4 w-4 text-mq-content-secondary"
-                                  aria-hidden="true"
-                                />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => openEditDeadline(deadline)}
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  aria-label={t('calendarEditItem', { title: deadline.title })}
+                                >
+                                  <Edit2
+                                    className="h-4 w-4 text-mq-content-secondary"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteDeadline(deadline)}
+                                  className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                  aria-label={t('calendarDeleteItem', { title: deadline.title })}
+                                >
+                                  <Trash2
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         );
@@ -2236,7 +2490,7 @@ export default function CalendarClient() {
         onEditDeadline={handleEditDeadlineFromPanel}
       />
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal for Units */}
       {deleteConfirmOpen && unitToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
@@ -2273,6 +2527,170 @@ export default function CalendarClient() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal for Assignments */}
+      {assignmentDeleteConfirmOpen && assignmentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteAssignmentConfirm' as TranslationKey) || 'Delete Assignment?'}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {assignmentToDelete.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteAssignmentConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this assignment?'}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setAssignmentDeleteConfirmOpen(false);
+                  setAssignmentToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDeleteAssignment}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal for Exams */}
+      {examDeleteConfirmOpen && examToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteExamConfirm' as TranslationKey) || 'Delete Exam?'}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {examToDelete.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteExamConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this exam?'}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setExamDeleteConfirmOpen(false);
+                  setExamToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDeleteExam}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal for Deadlines */}
+      {deadlineDeleteConfirmOpen && deadlineToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteDeadlineConfirm' as TranslationKey) || 'Delete Deadline?'}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {deadlineToDelete.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteDeadlineConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this deadline?'}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeadlineDeleteConfirmOpen(false);
+                  setDeadlineToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDeleteDeadline}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Delete Confirmation Modal for Events */}
+      {eventDeleteConfirmOpen && eventToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm' as TranslationKey) || 'Delete Event?'}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {eventToDelete.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteEventConfirmDesc' as TranslationKey) || 'This action cannot be undone. Are you sure you want to delete this event?'}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEventDeleteConfirmOpen(false);
+                  setEventToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDeleteEvent}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Detail Panel */}
+      <AssignmentDetailPanel
+        assignment={selectedAssignment}
+        open={assignmentDetailOpen}
+        onOpenChange={setAssignmentDetailOpen}
+        onEdit={(assignment) => {
+          setAssignmentDetailOpen(false);
+          openEditAssignment(assignment);
+        }}
+      />
     </div>
   );
 }

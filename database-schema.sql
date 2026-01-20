@@ -99,8 +99,7 @@ CREATE TABLE public.units (
   name text NOT NULL,
   color text NOT NULL DEFAULT '#3B82F6',
   description text,
-  building text,
-  room text,
+  location jsonb, -- JSONB structure: {"building": "C5C", "room": "204"}
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   deleted_at timestamp with time zone, -- Soft delete support

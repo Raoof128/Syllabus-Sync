@@ -1,7 +1,7 @@
 // components/events/EventForm.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -84,6 +84,23 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
   // Reset form when editEvent changes - use key prop pattern instead of useEffect
   const formKey = editEvent?.id ?? 'new';
+
+  // Effect to reset form when dialog opens or editEvent changes
+  useEffect(() => {
+    if (open) {
+      const values = getInitialValues(editEvent);
+      setTitle(values.title);
+      setDescription(values.description);
+      setDate(values.date);
+      setTime(values.time);
+      setLocation(values.location);
+      setBuilding(values.building);
+      setCategory(values.category);
+      setColor(values.color);
+      setErrors({});
+      setShowDeleteConfirm(false);
+    }
+  }, [open, editEvent]);
 
   const resetForm = () => {
     const values = getInitialValues(editEvent);

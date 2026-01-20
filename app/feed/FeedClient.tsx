@@ -20,6 +20,8 @@ import {
   Bell,
   Check,
   Plus,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 // Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -74,12 +76,17 @@ const FeedClient = memo(() => {
   const [eventFormOpen, setEventFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
+  // Delete confirmation state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
   // Ref for scrolling to highlighted event
   const eventRefs = useRef<Map<string, HTMLElement>>(new Map());
   const highlightAttemptsRef = useRef(0);
 
   // Events store - get all events from Supabase
   const storeEvents = useEventsStore((state) => state.events);
+  const removeEvent = useEventsStore((state) => state.removeEvent);
 
   // Gamification store - use individual selectors to prevent re-renders
   const isDemo = useGamificationStore((state) => state.isDemo);
@@ -555,6 +562,33 @@ const FeedClient = memo(() => {
                                     {t('navigate')}
                                   </Link>
                                 </Button>
+                                {/* Edit button */}
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEditingEvent(event);
+                                    setEventFormOpen(true);
+                                  }}
+                                  aria-label={t('edit') || 'Edit'}
+                                >
+                                  <Pencil className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                  {t('edit') || 'Edit'}
+                                </Button>
+                                {/* Delete button */}
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => {
+                                    setEventToDelete(event);
+                                    setDeleteConfirmOpen(true);
+                                  }}
+                                  aria-label={t('delete') || 'Delete'}
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                                  {t('delete') || 'Delete'}
+                                </Button>
                               </div>
                             </article>
                           );
@@ -750,6 +784,53 @@ const FeedClient = memo(() => {
 
       {/* Event Form Dialog */}
       <EventForm open={eventFormOpen} onOpenChange={setEventFormOpen} editEvent={editingEvent} />
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmOpen && eventToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm') || 'Delete Event?'}</h3>
+                <p className="text-sm text-mq-content-secondary">
+                  {eventToDelete.title}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteEventConfirmDesc') || 'This action cannot be undone. Are you sure you want to delete this event?'}
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setEventToDelete(null);
+                }}
+              >
+                {t('cancelAction') || 'Cancel'}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (eventToDelete) {
+                    removeEvent(eventToDelete.id);
+                    setDeleteConfirmOpen(false);
+                    setEventToDelete(null);
+                    toastUtils.success(t('eventDeleted' as TranslationKey) || 'Event deleted', t('eventDeletedDesc' as TranslationKey) || 'The event has been removed.');
+                  }
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete') || 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

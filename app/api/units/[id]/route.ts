@@ -79,10 +79,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...rest,
       };
 
-      // Map location object to flat columns
+      // Map location object to JSONB column (not flat columns)
       if (location) {
-        updatePayload.building = location.building;
-        updatePayload.room = location.room;
+        updatePayload.location = {
+          building: location.building ?? '',
+          room: location.room ?? '',
+        };
       }
 
       // Map createdAt to created_at

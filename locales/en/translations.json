@@ -1302,6 +1302,14 @@
   "nextDay": "Next day",
   "deleteUnitConfirm": "Delete Unit",
   "deleteUnitConfirmDesc": "Are you sure you want to delete this unit? This action cannot be undone.",
+  "deleteAssignmentConfirm": "Delete Assignment",
+  "deleteAssignmentConfirmDesc": "Are you sure you want to delete this assignment? This action cannot be undone.",
+  "deleteExamConfirm": "Delete Exam",
+  "deleteExamConfirmDesc": "Are you sure you want to delete this exam? This action cannot be undone.",
+  "deleteDeadlineConfirm": "Delete Deadline",
+  "deleteDeadlineConfirmDesc": "Are you sure you want to delete this deadline? This action cannot be undone.",
+  "deleteEventConfirm": "Delete Event",
+  "deleteEventConfirmDesc": "Are you sure you want to delete this event? This action cannot be undone.",
   "confirmDelete": "Yes, Delete",
   "cancelAction": "Cancel",
   "copyLink": "Copy Link",
@@ -1335,5 +1343,7 @@
   "backToLogin": "Back to Login",
   "emailRequired": "Please enter your email address",
   "profileDeleted": "Profile Deleted",
-  "profileDeletedMsg": "The profile has been successfully deleted."
+  "profileDeletedMsg": "The profile has been successfully deleted.",
+  "eventDeleted": "Event Deleted",
+  "eventDeletedDesc": "The event has been removed."
 }

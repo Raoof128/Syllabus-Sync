@@ -5,17 +5,20 @@ import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle, Pencil, Trash2 } from 'lucide-react';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
+import { Button } from '@/components/ui/mq/button';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEditDeadline?: (deadline: Deadline) => void;
+  onEditUnit?: () => void;
+  onDeleteUnit?: () => void;
 }
 
 export default function UnitDetailPanel({
@@ -23,6 +26,8 @@ export default function UnitDetailPanel({
   open,
   onOpenChange,
   onEditDeadline,
+  onEditUnit,
+  onDeleteUnit,
 }: UnitDetailPanelProps) {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
@@ -178,11 +183,31 @@ export default function UnitDetailPanel({
               <DialogTitle className="text-xl">{unit.code}</DialogTitle>
               <p className="text-sm text-mq-content-secondary">{unit.name}</p>
             </div>
-            <div
-              className="ml-auto w-6 h-6 rounded-full border-2"
-              style={{ backgroundColor: unit.color, borderColor: unit.color }}
-              title="Unit Color"
-            />
+            <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEditUnit}
+                className="h-8 w-8 text-muted-foreground hover:text-primary"
+                title={t('edit') || 'Edit Unit'}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onDeleteUnit}
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                title={t('delete') || 'Delete Unit'}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <div
+                className="w-6 h-6 rounded-full border-2 ml-2"
+                style={{ backgroundColor: unit.color, borderColor: unit.color }}
+                title="Unit Color"
+              />
+            </div>
           </div>
         </DialogHeader>
 
