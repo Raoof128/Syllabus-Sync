@@ -194,7 +194,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     hasSeededRef.current = true;
   }, [addDeadline, addUnit, hasHydrated, seedDisabled]);
 
-  // Listen for custom events from child components and keyboard shortcuts
+  // Listen for custom events from child components
   useEffect(() => {
     const handleAddUnitEvent = () => {
       // Navigate to calendar page where units can be managed
@@ -206,34 +206,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
       router.push('/calendar');
     };
 
-    // Keyboard shortcuts for power users
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only trigger shortcuts when not typing in an input/textarea
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-
-      // Ctrl/Cmd + U for Add Unit - navigate to calendar
-      if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-        e.preventDefault();
-        handleAddUnitEvent();
-      }
-
-      // Ctrl/Cmd + D for Add Deadline - navigate to calendar
-      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-        e.preventDefault();
-        handleAddDeadlineEvent();
-      }
-    };
-
     window.addEventListener('add-unit', handleAddUnitEvent);
     window.addEventListener('add-deadline', handleAddDeadlineEvent);
-    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('add-unit', handleAddUnitEvent);
       window.removeEventListener('add-deadline', handleAddDeadlineEvent);
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [router]);
 
@@ -355,6 +333,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     High: '😰',
   };
 
+  const stressLabels = {
+    Low: t('stressLow'),
+    Busy: t('stressBusy'),
+    High: t('stressHigh'),
+  };
+
   // Get aria-label for stress level
   const getStressAriaLabel = (level: 'Low' | 'Busy' | 'High') => {
     const labels = {
@@ -394,7 +378,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                       aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                       title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                     >
-                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span> {stressLevel}
+                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span>{' '}
+                      {stressLabels[stressLevel]}
                     </Badge>
                   </div>
                 </>

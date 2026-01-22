@@ -3,11 +3,7 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Badge } from '@/components/ui/mq/badge';
 import { Building, BUILDING_CATEGORY_LABELS, getBuildingGps } from '@/lib/map/buildings';
-import {
-  gpsToCrsSimple,
-  getCalibrationDiagnostics,
-  compareTransformMethods,
-} from '@/lib/map/geospatialCalibration';
+import { gpsToCrsSimple, compareTransformMethods } from '@/lib/map/geospatialCalibration';
 import {
   RoutePreview,
   formatDistance,
@@ -328,42 +324,9 @@ export default function CampusMap({
   const activeOverlayRefs = useRef<Map<MapOverlayId, import('leaflet').ImageOverlay>>(new Map());
   const debugRectRef = useRef<import('leaflet').Rectangle | null>(null);
 
-  // Debug mode for bounds calibration (Ctrl+Shift+D to toggle)
-  const [debugMode, setDebugMode] = useState(false);
-
-  // GCP debug mode for calibration visualization (Ctrl+Shift+G to toggle)
-  const [gcpDebugMode, setGcpDebugMode] = useState(false);
-
-  // Debug keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault();
-        setDebugMode((prev) => !prev);
-        mapLog.log('Debug mode:', !debugMode);
-      }
-      if (e.ctrlKey && e.shiftKey && e.key === 'G') {
-        e.preventDefault();
-        setGcpDebugMode((prev) => !prev);
-        mapLog.log('GCP debug mode:', !gcpDebugMode);
-        // Log calibration diagnostics when enabling GCP debug mode
-        if (!gcpDebugMode) {
-          const diagnostics = getCalibrationDiagnostics();
-          mapLog.log('GCP Calibration Diagnostics:', {
-            gcpCount: diagnostics.gcpCount,
-            rmsePixels: diagnostics.rmsePixels.toFixed(2),
-            rmseMeters: `${diagnostics.rmseMeters.toFixed(2)}m`,
-            residuals: diagnostics.gcpResiduals.map((r) => ({
-              id: r.id,
-              error: `${r.error.toFixed(1)}px`,
-            })),
-          });
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [debugMode, gcpDebugMode]);
+  // Debug toggles disabled (keyboard shortcuts removed); remain false by default
+  const debugMode = false;
+  const gcpDebugMode = false;
 
   // Campus base image overlay
   useEffect(() => {

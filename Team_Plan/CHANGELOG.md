@@ -18,6 +18,27 @@ Raouf: 2026-01-22 - Map Error Messaging & Off-Campus UX
 
 ---
 
+Raouf: 2026-01-22 - Remove Global Keyboard Shortcuts
+
+### Changed
+- Removed Home dashboard Ctrl/Cmd hotkeys and map debug key combos so only standard keyboard navigation remains.
+- Limited the position editor keyboard handling to navigation keys (arrows/Escape), dropping the reset hotkey.
+
+### Verification
+- `npm run check`
+
+---
+
+Raouf: 2026-01-22 - Map Building Cards Uniform Sizing
+
+### Changed
+- Standardized map building grid cards to full-height flex layouts with bottom-aligned badges so all cards render at a consistent size.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ### Changed

@@ -24,6 +24,18 @@
 - **Files Updated:** `app/map/CampusMap.tsx`, `locales/en/translations.json`.
 - **Verification:** `npm run check`
 
+### Raouf: 2026-01-22 (Australia/Sydney) - Remove Global Keyboard Shortcuts
+- **Status:** ✅ Complete - Removed power-user hotkeys while keeping standard keyboard navigation.
+- **Logic/UI:** Dropped Home dashboard Ctrl/Cmd shortcuts, disabled map debug hotkeys, and limited the position editor to navigation keys only (arrows/Escape).
+- **Files Updated:** `app/home/HomeClient.tsx`, `app/map/CampusMap.tsx`, `app/map/position-editor/PositionEditorClient.tsx`.
+- **Verification:** `npm run check`
+
+### Raouf: 2026-01-22 (Australia/Sydney) - Map Building Cards Uniform Sizing
+- **Status:** ✅ Complete - Building grid cards now share a consistent height/width.
+- **Logic/UI:** Made grid cards flex to full height with bottom-aligned badges to stop variable heights in the building list.
+- **Files Updated:** `app/map/MapClient.tsx`.
+- **Verification:** `npm run check`
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
 - **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
 - **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.

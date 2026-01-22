@@ -345,9 +345,11 @@ export default function MapClient() {
                         >
                           <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
                           <div className="min-w-0 flex-1">
-                            <p className="text-mq-sm font-medium truncate">{overlay.name}</p>
+                            <p className="text-mq-sm font-medium truncate">
+                              {t(('overlay_' + overlay.id + '_name') as TranslationKey)}
+                            </p>
                             <p className="text-mq-xs text-mq-content-secondary truncate">
-                              {overlay.description}
+                              {t(('overlay_' + overlay.id + '_desc') as TranslationKey)}
                             </p>
                           </div>
                           {isActive && (
@@ -612,7 +614,7 @@ export default function MapClient() {
                                   aria-current={isSelected ? 'page' : undefined}
                                   role="button"
                                   tabIndex={0}
-                                  className={`group block p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
+                                  className={`group block h-full p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 flex flex-col gap-2 ${
                                     isSelected
                                       ? 'bg-mq-success/10 border-2 border-mq-success'
                                       : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.08)]'
@@ -637,7 +639,7 @@ export default function MapClient() {
                                   <p className="text-mq-sm text-mq-content-secondary line-clamp-2">
                                     {t(building.translationKey)}
                                   </p>
-                                  <div className="flex items-center gap-1 mt-2">
+                                  <div className="flex items-center gap-1 mt-auto min-h-[22px]">
                                     {building.category && (
                                       <Badge
                                         variant="secondary"
@@ -788,12 +790,12 @@ export default function MapClient() {
                       {locationStatus === 'found'
                         ? t('active')
                         : locationStatus === 'denied'
-                          ? t('denied' as TranslationKey) || 'Denied'
+                          ? t('denied')
                           : locationStatus === 'error'
                             ? t('error')
                             : locationStatus === 'searching'
-                              ? t('searching' as TranslationKey) || 'Searching...'
-                              : t('waiting' as TranslationKey) || 'Waiting'}
+                              ? t('searching')
+                              : t('waiting')}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
@@ -813,11 +815,9 @@ export default function MapClient() {
                       <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
                       <p className="text-mq-sm text-mq-content-secondary mt-1">
                         {locationStatus === 'denied'
-                          ? t('locationDeniedDesc' as TranslationKey) ||
-                            'Location access was denied. Enable in browser settings.'
+                          ? t('locationDeniedDesc')
                           : locationStatus === 'error'
-                            ? t('positionUnavailableDesc' as TranslationKey) ||
-                              'Could not determine your location.'
+                            ? t('positionUnavailableDesc')
                             : t('realTimeTrackingDesc')}
                       </p>
                     </div>
@@ -842,27 +842,22 @@ export default function MapClient() {
                       ) : locationStatus === 'denied' ? (
                         <>
                           <XCircle className="h-4 w-4" />
-                          <span>
-                            {t('locationAccessDenied' as TranslationKey) ||
-                              'Location access denied'}
-                          </span>
+                          <span>{t('locationAccessDenied')}</span>
                         </>
                       ) : locationStatus === 'error' ? (
                         <>
                           <AlertTriangle className="h-4 w-4" />
-                          <span>{t('locationError' as TranslationKey) || 'Location error'}</span>
+                          <span>{t('locationError')}</span>
                         </>
                       ) : locationStatus === 'searching' ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          <span>{t('locating' as TranslationKey) || 'Locating...'}</span>
+                          <span>{t('locating')}</span>
                         </>
                       ) : (
                         <>
                           <MapPin className="h-4 w-4" />
-                          <span>
-                            {t('waitingForLocation' as TranslationKey) || 'Waiting for map to load'}
-                          </span>
+                          <span>{t('waitingForLocation')}</span>
                         </>
                       )}
                     </div>

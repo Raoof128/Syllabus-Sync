@@ -427,11 +427,6 @@ export default function PositionEditorClient() {
         case 'Escape':
           setSelectedBuilding(null);
           break;
-        case 'r':
-          if (selectedBuilding) {
-            resetBuilding(selectedBuilding.id);
-          }
-          break;
       }
     };
 
