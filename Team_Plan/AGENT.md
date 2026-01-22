@@ -2,6 +2,16 @@
 
 ## Current Session (Jan 22, 2026) - Real-time Navigation Enhancement
 
+### Calendar Page Fixes
+- **Status:** ✅ Complete - Removed unused code, added missing translation keys
+- **Issues Fixed:**
+  - Removed unused `_openAddDeadline` function (never called)
+  - Removed unused `_handleDeleteDeadline` function (unused handler)
+  - Added missing translation keys: `calendarPreviousDay`, `calendarNextDay`
+  - Keys added to all 17 locale files
+
+---
+
 ### Haptic Feedback for Navigation Implementation
 - **Status:** ✅ Complete - All lint/typecheck passing, tests passing (290 tests)
 - **New File Created:** `lib/utils/haptics.ts` (314 lines)

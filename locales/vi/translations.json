@@ -1158,5 +1158,7 @@
   "calendarEventAriaLabelShort": "Event {{title}} at {{time}}",
   "calendarEventTitle": "Event: {{title}} @ {{time}}",
   "calendarEditItem": "Edit {{title}}",
-  "calendarDeleteItem": "Delete {{title}}"
+  "calendarDeleteItem": "Delete {{title}}",
+  "calendarPreviousDay": "Previous Day",
+  "calendarNextDay": "Next Day"
 }

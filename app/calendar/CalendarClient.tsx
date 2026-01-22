@@ -627,13 +627,6 @@ export default function CalendarClient() {
   };
 
   // Deadline handlers
-  // openAddDeadline - available for future FAB menu integration
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _openAddDeadline = () => {
-    setEditDeadline(null);
-    setDeadlineDialogOpen(true);
-  };
-
   const openEditDeadline = (deadline: Deadline) => {
     setEditDeadline(deadline);
     setDeadlineDialogOpen(true);
@@ -726,13 +719,6 @@ export default function CalendarClient() {
   };
 
   // Deadline delete handlers
-  // handleDeleteDeadline - available for future inline delete functionality
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _handleDeleteDeadline = (deadline: Deadline) => {
-    setDeadlineToDelete(deadline);
-    setDeadlineDeleteConfirmOpen(true);
-  };
-
   const confirmDeleteDeadline = () => {
     if (deadlineToDelete) {
       removeDeadline(deadlineToDelete.id);

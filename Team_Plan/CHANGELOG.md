@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - Calendar Page Fixes
+
+### Fixed
+- **Unused Code Removal:** Removed unused `_openAddDeadline` and `_handleDeleteDeadline` functions from CalendarClient.tsx to reduce code complexity.
+- **Missing Translation Keys:** Added `calendarPreviousDay` and `calendarNextDay` to all locale files for mobile navigation buttons.
+
+### Verification
+- `npm run check` (pass)
+- Translation keys added to 17 locale files
+
+---
+
 Raouf: 2026-01-22 - Haptic Feedback for Navigation
 
 ### Added

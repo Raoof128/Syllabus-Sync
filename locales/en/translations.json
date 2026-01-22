@@ -269,6 +269,8 @@
   "feedback": "Feedback",
   "feedbackDesc": "Help us improve by sharing your feedback.",
   "sendFeedback": "Send Feedback",
+  "calendarPreviousDay": "Previous Day",
+  "calendarNextDay": "Next Day",
   "feedbackPreparing": "\ud83d\udcdd Preparing feedback form...",
   "feedbackThankYou": "Thank you!",
   "feedbackMsg": "\ud83d\udc8c Feedback system will be available soon. We appreciate your input!",
