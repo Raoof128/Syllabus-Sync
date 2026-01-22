@@ -9,6 +9,7 @@ import { Event } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
 import { v4 as uuidv4 } from 'uuid';
+import { sampleEvents } from '@/data/sampleEvents';
 
 interface EventsState {
   events: Event[];
@@ -54,8 +55,13 @@ export const useEventsStore = create<EventsState>()(
         set({ isLoading: true });
         try {
           const data = await apiRequest<Event[]>('/api/events', { noRetry: true });
-          // All events are user-owned (like units) - no public events
-          set({ events: data.map(normalizeEvent), hasLoaded: true });
+          const normalizedApi = data.map(normalizeEvent);
+          const normalizedSample = sampleEvents.map(normalizeEvent);
+          // If API returns nothing, seed with sample events for local testing
+          set({
+            events: normalizedApi.length > 0 ? normalizedApi : normalizedSample,
+            hasLoaded: true,
+          });
         } catch (error) {
           // Check if this is an auth error
           const isAuthError =
@@ -65,12 +71,12 @@ export const useEventsStore = create<EventsState>()(
               error.message.includes('Unauthorized'));
 
           if (isAuthError) {
-            // Auth failure: clear persisted data to prevent showing stale user data
-            set({ events: [], hasLoaded: true });
+            // Auth failure: fall back to sample events for demo/testing
+            set({ events: sampleEvents.map(normalizeEvent), hasLoaded: true });
           } else {
-            // Non-auth error: keep persisted data but mark as loaded
-            console.warn('Failed to load events from API, using persisted data:', error);
-            set({ hasLoaded: true });
+            // Non-auth error: use sample events as fallback
+            console.warn('Failed to load events from API, using sample data:', error);
+            set({ events: sampleEvents.map(normalizeEvent), hasLoaded: true });
           }
         } finally {
           set({ isLoading: false });

@@ -235,18 +235,20 @@ export default function AssignmentDetailPanel({
                   Associated Unit
                 </div>
                 {unit.location?.building && (
-                  <Link href={`/map?building=${unit.location.building.toLowerCase()}`}>
+                  <Link href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}>
                     <Button
-                      variant="secondary"
-                      size="sm"
-                      className="gap-1.5 h-8"
+                      variant="ghost"
+                      size="icon"
+                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                       aria-label={
                         t('navigateToBuildingAria', { building: unit.location.building }) ||
                         `Navigate to ${unit.location.building} on campus map`
                       }
                     >
-                      <Navigation className="h-4 w-4" aria-hidden="true" />
-                      {t('navigate')}
+                      <Navigation
+                        className="h-4 w-4 text-mq-content-secondary"
+                        aria-hidden="true"
+                      />
                     </Button>
                   </Link>
                 )}

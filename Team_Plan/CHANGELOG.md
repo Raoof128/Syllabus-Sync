@@ -26,6 +26,7 @@ Raouf: 2026-01-22 - Notification System Reliability
 - Pending reminders now persist minimal metadata and re-schedule on init; reminder queues clear when push is disabled.
 - Notifications service prefers Service Worker `showNotification` when available for better delivery when tabs are hidden.
 - Social buttons now open natively (no JS interception) and blur after click so hover/focus states don’t stick; links source from config where available.
+- Navigation buttons updated to the compact ghost/icon style and auto-navigate query flag now scrolls the map and highlights building on arrival; sample events seeded with real buildings for map navigation testing.
 
 ### Verification
 - `npm run check`

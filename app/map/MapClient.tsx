@@ -120,6 +120,7 @@ export default function MapClient() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showAllBuildings, setShowAllBuildings] = useState(false);
   const buildingSearchRef = useRef<HTMLInputElement>(null);
+  const hasAutoNavigatedRef = useRef(false);
 
   // Use map store for overlay persistence
   const {
@@ -133,6 +134,7 @@ export default function MapClient() {
 
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
+  const autoNavigate = searchParams.get('autonav') === 'true';
 
   // Sync overlays from URL on mount
   useEffect(() => {
@@ -162,6 +164,16 @@ export default function MapClient() {
       window.history.replaceState({}, '', newUrl);
     }
   }, [activeOverlays, searchParams]);
+
+  // Auto-scroll and notify when arriving with a building + autonav flag
+  useEffect(() => {
+    if (!autoNavigate || !selectedBuilding || hasAutoNavigatedRef.current) return;
+    hasAutoNavigatedRef.current = true;
+    if (mapContainerRef.current) {
+      mapContainerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    toastUtils.success(t('routeReady'), t('selectBuildingToNavigate'));
+  }, [autoNavigate, selectedBuilding, t]);
 
   // Copy shareable URL
   const copyShareableURL = useCallback(async () => {

@@ -197,20 +197,20 @@ export default function UnitDetailPanel({
             </div>
             <div className="ml-auto flex items-center gap-2">
               <Link
-                href={`/map?building=${unit.location.building.toLowerCase()}`}
+                href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
                 aria-label={
                   t('navigateToBuildingAria', { building: unit.location.building }) ||
                   `Navigate to ${unit.location.building} on campus map`
                 }
               >
                 <Button
-                  variant="secondary"
-                  size="sm"
-                  className="gap-1.5 h-8"
+                  variant="ghost"
+                  size="icon"
+                  className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                   title={t('navigate') || 'Navigate'}
+                  aria-label={t('navigate') || 'Navigate'}
                 >
-                  <Navigation className="h-4 w-4" aria-hidden="true" />
-                  {t('navigate')}
+                  <Navigation className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
                 </Button>
               </Link>
               <Button
