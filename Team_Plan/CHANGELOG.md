@@ -8216,3 +8216,19 @@ Raouf: 2026-01-22 (i18n Audit & Fix)
   - Created `lib/utils/gamification.ts` for translating dynamic level titles.
   - Fixed `PrivacySettings` confirmation logic to support localized keywords.
 - **Verification**: `node scripts/check-i18n-completeness.cjs` passed (19/19 complete).
+
+---
+
+Raouf: 2026-01-22 - Cybersecurity Audit & Hardening
+
+### Added
+- **Global Security Middleware:** Created root-level `middleware.ts` to enforce security headers (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) and centralized API authorization.
+- **CSP Hashes:** Implemented SHA-256 hash-based validation for inline theme and RTL scripts, eliminating `'unsafe-inline'`.
+
+### Fixed
+- **Account Enumeration:** Standardized `/api/auth/signup` response to return a generic success message regardless of account existence.
+- **XSS Prevention:** Hardened Zod schemas for all text-input APIs to reject `<` and `>` characters.
+- **JSON-LD Security:** Added `safeJsonLd` helper to escape potential script-breaking tags in calendar structured data.
+
+### Verification
+- `npm run check`

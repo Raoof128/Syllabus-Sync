@@ -101,7 +101,7 @@ graph TD
 | **Frontend** | React 19, Next.js 16 (Turbopack), Zustand, Framer Motion   |
 | **Backend**  | Supabase (Auth/DB/Storage), Node.js API Routes             |
 | **Styling**  | Tailwind CSS, Radix UI Primitives, Lucide Icons            |
-| **Security** | Upstash Redis (Rate Limiting), CSRF Validation, CSP Nonces |
+| **Security** | Upstash Redis (Rate Limiting), CSRF Validation, CSP Hashes |
 | **Testing**  | Vitest (Unit/Store), Playwright (E2E/Accessibility)        |
 | **i18n**     | Custom JSON-based 19-language translation engine           |
 

@@ -117,6 +117,11 @@ function CalendarSkeleton() {
   );
 }
 
+// Helper to safely stringify JSON for script tags (prevents XSS via </script>)
+function safeJsonLd(data: unknown) {
+  return JSON.stringify(data).replace(/<\/script>/g, '<\\/script>');
+}
+
 export default function CalendarPage() {
   const eventDates = getUpcomingEventDates();
 
@@ -127,7 +132,7 @@ export default function CalendarPage() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+            __html: safeJsonLd({
               '@context': 'https://schema.org',
               '@type': 'EventCalendar',
               name: translate('calendarJsonLdName', {
@@ -143,7 +148,7 @@ export default function CalendarPage() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
+            __html: safeJsonLd([
               {
                 '@context': 'https://schema.org',
                 '@type': 'Event',

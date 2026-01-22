@@ -333,4 +333,12 @@ Raouf: 2026-01-22 (i18n Audit & Fix)
   - Replaced hardcoded aria-labels, alt text, and placeholders in `Sidebar`, `Header`, `Map`, `Login`, and Forms.
   - Created `lib/utils/gamification.ts` for translating dynamic level titles.
   - Fixed `PrivacySettings` confirmation logic to support localized keywords.
-- **Verification**: `node scripts/check-i18n-completeness.cjs` passed (19/19 complete).
+- **Verification**: node scripts/check-i18n-completeness.cjs passed (19/19 complete).
+
+### Raouf: 2026-01-22 (Australia/Sydney) - Cybersecurity Audit & Hardening
+- **Status:** ✅ Complete - Hardened repository against XSS, account enumeration, and missing browser protections.
+- **Logic:** Implemented a root-level `middleware.ts` using `@supabase/ssr` to enforce global security headers (HSTS, X-Frame-Options, No-Sniff) and pre-computed SHA-256 hash-based CSP (Content Security Policy) for inline scripts. Centralized API authorization in middleware to prevent unauthorized access to non-public `/api/*` routes.
+- **Security:** Standardized signup success messages to prevent email enumeration. Refined Zod schemas for units, events, and deadlines to reject HTML-like characters (`<`, `>`) at the boundary. Hardened JSON-LD injection in `app/calendar/page.tsx` with a `safeJsonLd` helper to escape closing script tags.
+- **Docs:** Updated `SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/api.md`, `DEPLOYMENT-CHECKLIST.md`, and `README.md` to reflect the new security posture.
+- **Files Updated:** `middleware.ts` (NEW), `app/api/auth/signup/route.ts`, `app/api/units/route.ts`, `app/api/events/route.ts`, `app/api/deadlines/route.ts`, `app/calendar/page.tsx`, `SECURITY.md`, `docs/ARCHITECTURE.md`, `docs/api.md`, `DEPLOYMENT-CHECKLIST.md`, `README.md`.
+- **Verification:** `npm run check`

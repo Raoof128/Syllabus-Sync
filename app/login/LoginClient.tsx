@@ -245,7 +245,9 @@ export default function LoginClient() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-bold text-mq-content">{t('resetPasswordSent')}</h3>
-                  <p className="text-sm text-mq-content font-medium">{t('resetPasswordSentDesc')}</p>
+                  <p className="text-sm text-mq-content font-medium">
+                    {t('resetPasswordSentDesc')}
+                  </p>
                   <Button
                     variant="outline"
                     className="w-full font-bold"
@@ -280,7 +282,11 @@ export default function LoginClient() {
                       className="h-12 rounded-xl text-mq-content font-medium"
                     />
                   </div>
-                  <Button type="submit" className="w-full h-12 rounded-full font-bold" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full h-12 rounded-full font-bold"
+                    disabled={isLoading}
+                  >
                     {isLoading ? '...' : t('sendResetLink')}
                   </Button>
                   <Button

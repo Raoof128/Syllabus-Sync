@@ -40,17 +40,34 @@ const unitSchema = z.object({
     .string()
     .min(1, 'Unit code is required')
     .max(20, 'Unit code must be 20 characters or less')
+    .regex(/^[^<>]*$/, 'Unit code contains invalid characters') // XSS prevention
     .transform((val) => val.trim().toUpperCase()), // Normalize: trim and uppercase
-  name: z.string().min(1, 'Unit name is required').max(200),
+  name: z
+    .string()
+    .min(1, 'Unit name is required')
+    .max(200)
+    .regex(/^[^<>]*$/, 'Unit name contains invalid characters'), // XSS prevention
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
     .default('#3B82F6'),
-  description: z.string().max(500).optional(),
+  description: z
+    .string()
+    .max(500)
+    .regex(/^[^<>]*$/, 'Description contains invalid characters') // XSS prevention
+    .optional(),
   location: z
     .object({
-      building: z.string().max(100).default(''),
-      room: z.string().max(50).default(''),
+      building: z
+        .string()
+        .max(100)
+        .regex(/^[^<>]*$/, 'Building contains invalid characters')
+        .default(''),
+      room: z
+        .string()
+        .max(50)
+        .regex(/^[^<>]*$/, 'Room contains invalid characters')
+        .default(''),
     })
     .optional()
     .default({ building: '', room: '' }),

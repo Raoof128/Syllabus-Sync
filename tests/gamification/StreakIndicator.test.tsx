@@ -68,7 +68,7 @@ describe('StreakIndicator', () => {
   it('shows day streak label when showLabel is true', () => {
     render(<StreakIndicator showLabel />);
 
-    expect(screen.getByText('day streak')).toBeInTheDocument();
+    expect(screen.getByText('5 day streak')).toBeInTheDocument();
   });
 
   it('applies small size classes', () => {
@@ -102,7 +102,10 @@ describe('StreakIndicator', () => {
     const { container } = render(<StreakIndicator />);
 
     const indicator = container.firstChild;
-    expect(indicator).toHaveAttribute('title', '5 day streak (longest: 10)');
+    expect(indicator).toHaveAttribute(
+      'title',
+      '5 day streak! Complete tasks daily to keep it going. Your longest streak: 10 days.',
+    );
   });
 
   it('applies orange color when streak is active', () => {

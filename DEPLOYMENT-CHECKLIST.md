@@ -108,6 +108,15 @@ npm run start
 - [ ] Notifications system works
 - [ ] All CRUD operations functional
 
+### **Security Verification**
+
+- [ ] `middleware.ts` is present in root and correctly configured
+- [ ] **Content Security Policy**: Verify `script-src` uses hashes and no `unsafe-inline`
+- [ ] **HSTS**: Verify `Strict-Transport-Security` header is set in production
+- [ ] **Enumeration**: Verify `/api/auth/signup` returns generic message for existing emails
+- [ ] **XSS**: Verify API rejects inputs containing `<` or `>` characters
+- [ ] **CSRF**: Verify mutation methods reject requests with invalid `Origin` headers
+
 ---
 
 ## 🛠️ **TROUBLESHOOTING**

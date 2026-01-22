@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
 
     // SECURITY: Always return success-like message to prevent account enumeration
     const response = jsonSuccess({
-      message: data.session ? 'Signup successful' : GENERIC_SIGNUP_SUCCESS,
+      message: GENERIC_SIGNUP_SUCCESS,
     });
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;

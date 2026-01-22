@@ -340,14 +340,16 @@ const Sidebar = memo(() => {
               aria-label={t('gamificationProgress', {
                 level: profile.level,
                 title: t(getLevelTitleKey(profile.level)),
-                xp: profile.xp.toLocaleString()
+                xp: profile.xp.toLocaleString(),
               })}
             >
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mq-primary text-white text-xs font-bold">
                 {profile.level}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-mq-content truncate">{t(getLevelTitleKey(profile.level))}</p>
+                <p className="text-xs font-medium text-mq-content truncate">
+                  {t(getLevelTitleKey(profile.level))}
+                </p>
                 <div className="flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-mq-primary" aria-hidden="true" />
                   <span className="text-[10px] text-mq-content-secondary">

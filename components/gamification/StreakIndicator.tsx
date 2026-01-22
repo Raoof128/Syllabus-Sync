@@ -104,7 +104,9 @@ export function StreakIndicator({
         <span className={cn(config.text, 'font-bold')}>
           {days}
           {showLabel && (
-            <span className="font-normal text-mq-content-secondary ml-1">{t('day', { count: days })} {t('streak')}</span> // "day streak" part handled by composition or better key
+            <span className="font-normal text-mq-content-secondary ml-1">
+              {t('streakDay', { count: days })}
+            </span>
           )}
         </span>
       )}
@@ -193,7 +195,9 @@ export function StreakCard({ className }: StreakCardProps) {
         {/* Longest Streak */}
         <div className="text-right">
           <div className="text-sm text-mq-content-tertiary">{t('streakBest')}</div>
-          <div className="text-lg font-semibold text-mq-content">{longest} {t('days')}</div>
+          <div className="text-lg font-semibold text-mq-content">
+            {longest} {t('days')}
+          </div>
         </div>
       </div>
 

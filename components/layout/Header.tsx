@@ -435,7 +435,11 @@ const Header = memo(() => {
                   {currentProfile?.avatar ? (
                     <Image
                       src={currentProfile.avatar}
-                      alt={currentProfile.name ? t('userAvatar', { name: currentProfile.name }) : t('profileAvatar')}
+                      alt={
+                        currentProfile.name
+                          ? t('userAvatar', { name: currentProfile.name })
+                          : t('profileAvatar')
+                      }
                       width={32}
                       height={32}
                       className="w-full h-full object-cover"

@@ -8,10 +8,14 @@ import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
   id: z.string().min(1).optional(),
-  title: z.string().min(1, 'Title is required'),
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .regex(/^[^<>]*$/, 'Title contains invalid characters'),
   unitCode: z
     .string()
     .min(1, 'Unit code is required')
+    .regex(/^[^<>]*$/, 'Unit code contains invalid characters')
     .transform((val) => val.trim().toUpperCase()),
   unitId: z.string().optional(),
   dueDate: dateSchema,

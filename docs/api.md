@@ -12,7 +12,15 @@ All API endpoints require a valid Supabase JWT token in the `Authorization` head
 Authorization: Bearer <jwt_token>
 ```
 
-## Response Format
+**Security Note:** Authentication is enforced both at the global `middleware.ts` level and within specific route handlers for defense-in-depth.
+
+## Input Validation & Security
+
+All inputs are validated via Zod. To prevent XSS, text fields strictly reject characters such as `<` and `>`. If these characters are detected, the API will return a `VALIDATION_ERROR`.
+
+### Auth Enumeration Prevention
+
+The `/api/auth/signup` endpoint always returns a generic success message regardless of whether the user account already exists. This prevents attackers from verifying the existence of specific user emails.
 
 All API responses follow a consistent format:
 

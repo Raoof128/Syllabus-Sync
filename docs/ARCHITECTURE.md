@@ -31,14 +31,14 @@ Syllabus Sync is a full-stack Next.js application designed for scalability, secu
 
 ### 2. Backend: Secure API Layer
 
-- **API Routes**: Standardized response format (`jsonSuccess`, `jsonError`) with built-in request ID tracking
-- **Middleware Stack**:
-  - Global Rate Limiting (Upstash Redis)
-  - CSRF Origin Validation
-  - Security Headers (CSP, HSTS, X-Frame-Options)
-  - Auth Session Validation
-  - Body Size Limits (DoS prevention)
-  - Request Logging
+- **API Routes**: Standardized response format (`jsonSuccess`, `jsonError`) with built-in request ID tracking.
+- **Middleware Stack (Global)**:
+  - **Auth Session Refresh**: Ensures Supabase session cookies are refreshed on every request for SSR support.
+  - **Centralized API Auth**: A global check in `middleware.ts` denies non-public `/api/*` access to unauthenticated users.
+  - **Security Headers**: Enforces CSP (with script hashes), HSTS, X-Frame-Options, and Referrer-Policy.
+  - **Rate Limiting**: IP-based and user-based throttling using Upstash Redis.
+  - **CSRF Protection**: Origin validation for mutation methods.
+  - **Body Size limits**: 100KB for standard routes, 10KB for auth routes.
 
 ### 3. Data Layer: Supabase & Redis
 

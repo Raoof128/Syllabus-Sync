@@ -142,7 +142,7 @@ describe('GamificationStats - Full Variant', () => {
     render(<GamificationStats variant="full" />);
 
     expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('days')).toBeInTheDocument();
+    expect(screen.getByText('day')).toBeInTheDocument();
   });
 
   it('hides progress bar when showProgress is false', () => {
@@ -203,7 +203,7 @@ describe('GamificationStats - Card Variant', () => {
   it('shows streak count with fire emoji', () => {
     render(<GamificationStats variant="card" />);
 
-    const streakEmoji = screen.getByRole('img', { name: 'streak' });
+    const streakEmoji = screen.getByRole('img', { name: /5 day streak/i });
     expect(streakEmoji).toBeInTheDocument();
     expect(screen.getByText('day streak')).toBeInTheDocument();
   });
@@ -303,7 +303,7 @@ describe('XPIndicator', () => {
     const streakText = screen.getByLabelText(/5 day streak/i);
     expect(streakText).toHaveAttribute(
       'title',
-      '5 day streak! Complete tasks daily to keep it going. Longest: 10 days.',
+      '5 day streak! Complete tasks daily to keep it going. Your longest streak: 10 days.',
     );
   });
 

@@ -199,9 +199,7 @@ export function GamificationStats({
 
         {/* Demo indicator */}
         {isDemo && (
-          <p className="text-xs text-mq-content-tertiary text-center">
-            {t('signInToTrack')}
-          </p>
+          <p className="text-xs text-mq-content-tertiary text-center">{t('signInToTrack')}</p>
         )}
       </div>
     );
@@ -232,7 +230,9 @@ export function GamificationStats({
                 </span>
                 <span className="text-2xl font-bold text-mq-content">{days}</span>
               </div>
-              <span className="text-xs text-mq-content-secondary">{t('streakDay', { count: 1 }).replace('1 ', '')}</span>
+              <span className="text-xs text-mq-content-secondary">
+                {t('streakDay', { count: 1 }).replace('1 ', '')}
+              </span>
             </div>
           )}
         </div>
@@ -273,9 +273,7 @@ export function XPIndicator({ className }: { className?: string }) {
   const xp = profile?.xp ?? 0;
   const levelTooltip = t('levelTooltip', { level, xp: xp.toLocaleString() });
   const streakTooltip =
-    days > 0
-      ? t('streakDayTooltip', { count: days, longest })
-      : t('startStreak');
+    days > 0 ? t('streakDayTooltip', { count: days, longest }) : t('startStreak');
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
