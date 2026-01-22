@@ -40,6 +40,17 @@ Raouf: 2026-01-22 - Haptic Feedback for Navigation
 
 ---
 
+Raouf: 2026-01-22 - Events Feed accessibility fixes
+
+### Fixed
+- **Screen Reader Accessibility:** Replaced `🍕` emoji in FeedClient.tsx (line 665) with accessible text "Meals & Snacks"
+
+### Verification
+- `npm run check` (pass)
+- All translation keys exist and are properly used
+
+---
+
 Raouf: 2026-01-20 - Map Navigation Stability & UX Refinements
 
 ### Improved
