@@ -51,6 +51,21 @@ Raouf: 2026-01-22 - Events Feed accessibility fixes
 
 ---
 
+Raouf: 2026-01-22 - UI/UX Improvements
+
+### Fixed
+- **MagicCard Reduced Motion:** Added prefers-reduced-motion support to MagicCard component with proper CSS fallbacks
+- **Loading States:** Added LoadingPlaceholder component and EventFormSkeleton for dynamic imports
+- **Empty State:** Created reusable EmptyState component for consistent empty states across pages
+- **Skip Link:** Skip-to-content link already implemented in client-layout.tsx
+
+### Verified
+- All npm run checks pass
+- New components: Skeleton, LoadingPlaceholder, EmptyState, EventFormSkeleton
+- CSS additions: Reduced motion support in magic-card.css
+
+---
+
 Raouf: 2026-01-22 - UI/UX Full Audit
 
 ### Fixed

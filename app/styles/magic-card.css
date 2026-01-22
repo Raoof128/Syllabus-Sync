@@ -448,3 +448,59 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
     transparent 50%
   );
 }
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-magic-card {
+    transition: none;
+    animation: none;
+  }
+
+  .mq-magic-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .mq-magic-card.reduce-motion,
+  .mq-magic-card.reduce-motion:hover {
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+    animation: none;
+  }
+
+  .mq-magic-card.reduce-motion::before,
+  .mq-magic-card.reduce-motion::after {
+    display: none;
+  }
+
+  .mouse-glow-card.reduce-motion,
+  .mouse-glow-card.reduce-motion:hover {
+    background: transparent;
+    animation: none;
+  }
+
+  .mouse-glow-card.reduce-motion::before,
+  .mouse-glow-card.reduce-motion::after {
+    display: none;
+  }
+
+  .mouse-glow-content.reduce-motion {
+    transform: none;
+    transition: none;
+  }
+
+  .mouse-glow-subcard.reduce-motion,
+  .mouse-glow-subcard.reduce-motion:hover {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .mouse-glow-subcard.reduce-motion::before {
+    display: none;
+  }
+}

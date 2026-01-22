@@ -40,8 +40,10 @@ import { Event } from '@/lib/types';
 import dynamic from 'next/dynamic';
 
 // Dynamically import EventForm for code splitting
+import LoadingPlaceholder from '@/components/ui/LoadingPlaceholder';
+
 const EventForm = dynamic(() => import('@/components/events/EventForm'), {
-  loading: () => null,
+  loading: () => <LoadingPlaceholder />,
 });
 
 const categoryColors: Record<string, string> = {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useSyncExternalStore } from 'react';
 import { cn } from '@/lib/utils';
 
 interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,6 +10,22 @@ interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   isLiquidEnhanced?: boolean;
 }
+
+// ============================================================================
+// REDUCED MOTION DETECTION
+// ============================================================================
+
+const subscribeToReducedMotion = (callback: () => void) => {
+  if (typeof window === 'undefined') return () => {};
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+};
+
+const getReducedMotionSnapshot = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const getReducedMotionServerSnapshot = () => false;
 
 /**
  * MagicCard Component
@@ -22,6 +38,7 @@ interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
  * - Red border glow that follows the cursor
  * - Subtle surface spotlight effect
  * - Compatible with "Liquid Glass" system via isLiquidEnhanced prop
+ * - Respects prefers-reduced-motion for accessibility
  */
 export const MagicCard = ({
   children,
@@ -35,9 +52,17 @@ export const MagicCard = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
+
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return;
+      // Skip mouse tracking if user prefers reduced motion
+      if (prefersReducedMotion || !cardRef.current) return;
 
       const rect = cardRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -49,17 +74,20 @@ export const MagicCard = ({
       // Call parent handler if provided
       onMouseMove?.(e);
     },
-    [onMouseMove],
+    [onMouseMove, prefersReducedMotion],
   );
 
   const handleMouseLeave = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      setOpacity(0);
-
-      // Call parent handler if provided
+      // Still call parent handler even in reduced motion
       onMouseLeave?.(e);
+
+      // Skip opacity animation if user prefers reduced motion
+      if (prefersReducedMotion) return;
+
+      setOpacity(0);
     },
-    [onMouseLeave],
+    [onMouseLeave, prefersReducedMotion],
   );
 
   return (
@@ -71,21 +99,28 @@ export const MagicCard = ({
       className={cn(
         'mq-magic-card mouse-glow-card relative group',
         isLiquidEnhanced && 'mq-liquid-enhanced',
+        // Disable mouse glow in reduced motion
+        prefersReducedMotion && 'reduce-motion',
         className,
       )}
       style={
-        {
-          '--mouse-x': `${position.x}px`,
-          '--mouse-y': `${position.y}px`,
-          '--glow-opacity': opacity,
-        } as React.CSSProperties
+        prefersReducedMotion
+          ? undefined
+          : ({
+              '--mouse-x': `${position.x}px`,
+              '--mouse-y': `${position.y}px`,
+              '--glow-opacity': opacity,
+            } as React.CSSProperties)
       }
       {...props}
+      aria-hidden={prefersReducedMotion ? 'false' : undefined}
     >
       {/* 
         Note: The glow effect is handled via CSS in magic-card.css
         using the ::before and ::after pseudo-elements on .mouse-glow-card
         which consume the --mouse-x and --mouse-y variables.
+        
+        In reduced motion mode, the glow effect is disabled via CSS.
       */}
       {children}
     </div>
