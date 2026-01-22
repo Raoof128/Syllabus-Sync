@@ -242,7 +242,8 @@ export function getOptimizedBounds(): OptimizedBounds {
  */
 function computeRMSE(bounds: OptimizedBounds, gcps: GroundControlPoint[]): number {
   let sumSqError = 0;
-  const { width, height } = MAP_CONFIG;
+  // MAP_CONFIG dimensions available for potential future use in weighted RMSE
+  // const { width, height } = MAP_CONFIG;
 
   for (const gcp of gcps) {
     const predicted = gpsToPixelWithBounds(gcp.gps.lat, gcp.gps.lng, bounds);

@@ -98,10 +98,13 @@ export async function POST(request: Request) {
             }),
       };
 
-      console.log(
-        'Creating event with serialized payload:',
-        JSON.stringify(serializeEvent(eventData), null, 2),
-      );
+      // Log event creation (development debugging)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(
+          'Creating event with serialized payload:',
+          JSON.stringify(serializeEvent(eventData), null, 2),
+        );
+      }
 
       const { data, error } = await supabase
         .from('events')

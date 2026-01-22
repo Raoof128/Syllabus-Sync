@@ -872,7 +872,7 @@ export default function CampusMap({
     }
 
     setIsLoadingRoute(false);
-  }, [selectedBuilding, origin, t, gpsToPixelLatLng]);
+  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng]);
 
   // ============================================
   // ROUTING LOGIC
@@ -957,7 +957,7 @@ export default function CampusMap({
 
     const timer = setTimeout(updateRoute, 100);
     return () => clearTimeout(timer);
-  }, [selectedBuilding, origin, t, gpsToPixelLatLng]);
+  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng]);
 
   // ============================================
   // MAP CONTROLLER COMPONENT (defined inside to access hooks)

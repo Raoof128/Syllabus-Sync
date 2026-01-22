@@ -1,7 +1,7 @@
 // components/events/EventForm.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useReducer, useCallback } from 'react';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -37,8 +37,35 @@ interface EventFormProps {
 
 const EVENT_CATEGORIES: Event['category'][] = ['Academic', 'Career', 'Social', 'Free Food'];
 
+// Form state type
+interface FormState {
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  building: string;
+  room: string;
+  category: Event['category'];
+  color: string;
+  errors: { [key: string]: string };
+  showDeleteConfirm: boolean;
+}
+
+// Form actions
+type FormAction =
+  | {
+      type: 'SET_FIELD';
+      field: keyof Omit<FormState, 'errors' | 'showDeleteConfirm'>;
+      value: string | Event['category'];
+    }
+  | { type: 'SET_ERRORS'; errors: { [key: string]: string } }
+  | { type: 'SET_DELETE_CONFIRM'; value: boolean }
+  | { type: 'RESET'; values: Omit<FormState, 'errors' | 'showDeleteConfirm'> };
+
 // Helper to get initial form values
-function getInitialValues(editEvent?: Event | null) {
+function getInitialValues(
+  editEvent?: Event | null,
+): Omit<FormState, 'errors' | 'showDeleteConfirm'> {
   if (editEvent) {
     const parsedDate = new Date(editEvent.startAt);
     return {
@@ -64,57 +91,102 @@ function getInitialValues(editEvent?: Event | null) {
   };
 }
 
+// Form reducer to batch state updates and avoid cascading renders
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.errors };
+    case 'SET_DELETE_CONFIRM':
+      return { ...state, showDeleteConfirm: action.value };
+    case 'RESET':
+      return { ...action.values, errors: {}, showDeleteConfirm: false };
+    default:
+      return state;
+  }
+}
+
 export default function EventForm({ open, onOpenChange, editEvent }: EventFormProps) {
   const { t } = useTranslation();
   const { addEvent, updateEvent, removeEvent } = useEventsStore();
 
-  // Initialize form with values based on editEvent
-  const initialValues = getInitialValues(editEvent);
+  // Use reducer to batch form state updates and avoid cascading renders
+  const [formState, dispatch] = useReducer(formReducer, {
+    ...getInitialValues(editEvent),
+    errors: {},
+    showDeleteConfirm: false,
+  });
 
-  const [title, setTitle] = useState(initialValues.title);
-  const [description, setDescription] = useState(initialValues.description);
-  const [date, setDate] = useState(initialValues.date);
-  const [time, setTime] = useState(initialValues.time);
-  const [building, setBuilding] = useState(initialValues.building);
-  const [room, setRoom] = useState(initialValues.room);
-  const [category, setCategory] = useState<Event['category']>(initialValues.category);
-  const [color, setColor] = useState(initialValues.color);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const {
+    title,
+    description,
+    date,
+    time,
+    building,
+    room,
+    category,
+    color,
+    errors,
+    showDeleteConfirm,
+  } = formState;
 
   // Reset form when editEvent changes - use key prop pattern instead of useEffect
   const formKey = editEvent?.id ?? 'new';
 
   // Effect to reset form when dialog opens or editEvent changes
+  // Using dispatch with RESET action batches all updates into a single render
   useEffect(() => {
     if (open) {
-      const values = getInitialValues(editEvent);
-      setTitle(values.title);
-      setDescription(values.description);
-      setDate(values.date);
-      setTime(values.time);
-      setBuilding(values.building);
-      setRoom(values.room);
-      setCategory(values.category);
-      setColor(values.color);
-      setErrors({});
-      setShowDeleteConfirm(false);
+      dispatch({ type: 'RESET', values: getInitialValues(editEvent) });
     }
   }, [open, editEvent]);
 
-  const resetForm = () => {
-    const values = getInitialValues(editEvent);
-    setTitle(values.title);
-    setDescription(values.description);
-    setDate(values.date);
-    setTime(values.time);
-    setBuilding(values.building);
-    setRoom(values.room);
-    setCategory(values.category);
-    setColor(values.color);
-    setErrors({});
-    setShowDeleteConfirm(false);
-  };
+  // Field setters using dispatch
+  const setTitle = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'title', value }),
+    [],
+  );
+  const setDescription = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'description', value }),
+    [],
+  );
+  const setDate = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'date', value }),
+    [],
+  );
+  const setTime = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'time', value }),
+    [],
+  );
+  const setBuilding = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'building', value }),
+    [],
+  );
+  const setRoom = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'room', value }),
+    [],
+  );
+  const setCategory = useCallback(
+    (value: Event['category']) => dispatch({ type: 'SET_FIELD', field: 'category', value }),
+    [],
+  );
+  const setColor = useCallback(
+    (value: string) => dispatch({ type: 'SET_FIELD', field: 'color', value }),
+    [],
+  );
+  const setErrors = useCallback(
+    (errors: { [key: string]: string }) => dispatch({ type: 'SET_ERRORS', errors }),
+    [],
+  );
+  const setShowDeleteConfirm = useCallback(
+    (value: boolean) => dispatch({ type: 'SET_DELETE_CONFIRM', value }),
+    [],
+  );
+
+  const resetForm = useCallback(() => {
+    dispatch({ type: 'RESET', values: getInitialValues(editEvent) });
+  }, [editEvent]);
 
   const validateForm = (): boolean => {
     const formErrors: { [key: string]: string } = {};

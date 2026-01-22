@@ -17,7 +17,7 @@ import {
   Circle,
   MapPin,
 } from 'lucide-react';
-import { formatDistanceToNow, format, isValid, isPast, isFuture } from 'date-fns';
+import { format, isValid, isPast } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
@@ -56,7 +56,6 @@ const UpcomingDeadlines = memo(() => {
 
   // Get upcoming deadlines sorted by date, limited to 6
   const upcomingDeadlines = useMemo(() => {
-    const now = new Date();
     return deadlines
       .filter((deadline) => {
         if (deadline.completed) return false;

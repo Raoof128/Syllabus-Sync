@@ -5,6 +5,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ## Development commands
 
 ### Environment & setup
+
 - Node.js **22+** is required (enforced via `engines` in `package.json`).
 - Install dependencies:
   - `npm install` (local development)
@@ -17,6 +18,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - Additional DB helpers live under `scripts/` (for example `scripts/setup-database.js`).
 
 ### Running the app
+
 - Start dev server (Next.js 16 + Turbopack):
   - `npm run dev`
 - Dev server without Turbopack (fallback if tooling struggles):
@@ -26,6 +28,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - `npm start`
 
 ### Linting, formatting, and type checking
+
 - ESLint across `app/`, `components/`, `lib/`, `data/`:
   - `npm run lint`
 - TypeScript type checking:
@@ -41,6 +44,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - `npm run check` (secrets → format check → typecheck → lint → tests → build)
 
 ### Tests (Vitest, Testing Library)
+
 - Run the full unit/component test suite once (jsdom):
   - `npm run test`
 - Watch mode while developing tests:
@@ -53,6 +57,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - `npm run test -- tests/UnitCard.test.tsx -t "renders unit details"`
 
 ### End‑to‑end, accessibility, and Lighthouse
+
 - Playwright E2E + accessibility suite (uses `playwright.config.ts`):
   - `npm run test:e2e` (targets `tests/e2e.spec.ts` and `tests/accessibility.spec.ts`)
 - Accessibility-only run via grep:
@@ -64,6 +69,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - Local collection helper: `npm run lighthouse:local` (manages dev server/ports automatically)
 
 ### CI/CD reference
+
 - GitHub Actions pipelines in `.github/workflows/` run, in various jobs:
   - `npm run typecheck`
   - `npm run lint`
@@ -79,6 +85,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ## High‑level architecture
 
 ### System overview
+
 - Full‑stack **Next.js 16 (App Router)** application with **React 19** on the frontend.
 - Backend logic implemented as **Next.js API routes** under `app/api/`, talking to **Supabase PostgreSQL** (with strict Row Level Security) and **Upstash Redis** for distributed rate limiting.
 - Offline‑aware, PWA‑style UX with service‑worker driven notifications and offline state via persisted Zustand stores.
@@ -87,6 +94,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑level overview in `README.md`.
 
 ### Routing and UI composition (`app/` + `components/`)
+
 - **Route structure (`app/`)**
   - Each major feature has its own route segment, typically with a server‑driven `page.tsx` and a client‑side `*Client.tsx` container:
     - `app/home/` – main dashboard
@@ -102,6 +110,7 @@ For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑lev
   - Cross‑cutting UX elements live in `components/ui` (e.g. `LiquidGlassCard`, `MeshGradient`, `OfflineIndicator`, `KeyboardShortcuts`), and should be reused rather than re‑implementing visual behavior.
 
 ### State management & domain logic (`lib/`)
+
 - **Zustand stores (`lib/store/`)**
   - Each core domain (units, deadlines, events, notifications, profiles, map, gamification, theme, language) has a dedicated store file, following a consistent pattern:
     - typed state shape
@@ -125,6 +134,7 @@ For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑lev
   - Python/Node scripts in `scripts/` (e.g. `mq_maps_download.py`, `osm_mq_buildings.py`, `process_buildings.cjs`) are used to regenerate these assets and are tightly coupled to `lib/map`.
 
 ### API design and backend patterns (`app/api/`)
+
 - All backend endpoints live under `app/api/`, grouped by domain (`auth`, `units`, `deadlines`, `notifications`, `events`, `gamification`, `navigate`, etc.).
 - **Shared API toolkit (`app/api/_lib/`)** – **always** use these helpers when touching API routes:
   - `middleware.ts`
@@ -148,6 +158,7 @@ For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑lev
   - Respect RLS and per‑user scoping; ensure `user_id` is set when serializing user‑owned entities.
 
 ### Internationalization, notifications, and gamification
+
 - **i18n**
   - Centralized in `lib/i18n/translations.ts` and locale JSON files; supports 19 languages including RTL.
   - `useTranslation` hook in `lib/hooks/useTranslation.ts` (and related helpers) provide the standard way to access translations in React components.
@@ -161,6 +172,7 @@ For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑lev
   - Server‑side tamper protection is implemented in the DB schema/RLS and reflected in the mapping/serialization code.
 
 ### Testing layout
+
 - **Vitest**
   - Configured via `vitest.config.ts` with `jsdom` environment and `tests/setup.ts`.
   - Unit/component tests live under `tests/**/*.{test,spec}.{ts,tsx}`; E2E/accessibility specs (`tests/e2e.spec.ts`, `tests/accessibility.spec.ts`) are excluded from Vitest and run via Playwright.
@@ -169,6 +181,7 @@ For deeper diagrams and rationale, see `docs/ARCHITECTURE.md` and the high‑lev
 - The test suite covers stores, API utilities, UI components, and key accessibility flows; new tests should follow the existing patterns in `tests/` rather than introducing new test harnesses.
 
 ## Project documentation
+
 - `README.md` – high‑level product overview, setup instructions, and feature list.
 - `docs/ARCHITECTURE.md` – detailed architecture, security model, and testing strategy (primary reference for system‑wide design decisions).
 - `docs/api.md` – API contract (auth, response format, error codes, major resource endpoints, versioning).

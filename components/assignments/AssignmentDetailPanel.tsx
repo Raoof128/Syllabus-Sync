@@ -6,7 +6,17 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import { FileText, Clock, CheckCircle2, Circle, AlertCircle, Pencil, CalendarDays, BookOpen, Navigation } from 'lucide-react';
+import {
+  FileText,
+  Clock,
+  CheckCircle2,
+  Circle,
+  AlertCircle,
+  Pencil,
+  CalendarDays,
+  BookOpen,
+  Navigation,
+} from 'lucide-react';
 import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -126,12 +136,18 @@ export default function AssignmentDetailPanel({
                 ) : (
                   <Circle className="h-6 w-6 text-mq-content-secondary" />
                 )}
-                <span className={cn(
-                  'text-sm font-medium',
-                  assignment.completed && 'text-green-600',
-                  status === 'overdue' && !assignment.completed && 'text-red-600'
-                )}>
-                  {assignment.completed ? t('completed' as TranslationKey) : status === 'overdue' ? 'Overdue' : 'Mark complete'}
+                <span
+                  className={cn(
+                    'text-sm font-medium',
+                    assignment.completed && 'text-green-600',
+                    status === 'overdue' && !assignment.completed && 'text-red-600',
+                  )}
+                >
+                  {assignment.completed
+                    ? t('completed' as TranslationKey)
+                    : status === 'overdue'
+                      ? 'Overdue'
+                      : 'Mark complete'}
                 </span>
               </button>
             </div>
@@ -182,25 +198,29 @@ export default function AssignmentDetailPanel({
             </div>
 
             {/* Time Remaining */}
-            <div className={cn(
-              'p-3 rounded-lg border',
-              status === 'overdue' && 'bg-red-50 dark:bg-red-950/20 border-red-200',
-              status === 'urgent' && 'bg-amber-50 dark:bg-amber-950/20 border-amber-200',
-              status === 'soon' && 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200',
-              status === 'completed' && 'bg-green-50 dark:bg-green-950/20 border-green-200',
-              status === 'upcoming' && 'bg-mq-background-secondary border-mq-border',
-            )}>
+            <div
+              className={cn(
+                'p-3 rounded-lg border',
+                status === 'overdue' && 'bg-red-50 dark:bg-red-950/20 border-red-200',
+                status === 'urgent' && 'bg-amber-50 dark:bg-amber-950/20 border-amber-200',
+                status === 'soon' && 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200',
+                status === 'completed' && 'bg-green-50 dark:bg-green-950/20 border-green-200',
+                status === 'upcoming' && 'bg-mq-background-secondary border-mq-border',
+              )}
+            >
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Clock className="h-3.5 w-3.5" />
                 Status
               </div>
-              <p className={cn(
-                'font-medium text-sm',
-                status === 'overdue' && 'text-red-600',
-                status === 'urgent' && 'text-amber-600',
-                status === 'soon' && 'text-yellow-600',
-                status === 'completed' && 'text-green-600',
-              )}>
+              <p
+                className={cn(
+                  'font-medium text-sm',
+                  status === 'overdue' && 'text-red-600',
+                  status === 'urgent' && 'text-amber-600',
+                  status === 'soon' && 'text-yellow-600',
+                  status === 'completed' && 'text-green-600',
+                )}
+              >
                 {getTimeRemaining()}
               </p>
             </div>
@@ -220,7 +240,10 @@ export default function AssignmentDetailPanel({
                       variant="secondary"
                       size="sm"
                       className="gap-1.5 h-8"
-                      aria-label={t('navigateToBuildingAria', { building: unit.location.building }) || `Navigate to ${unit.location.building} on campus map`}
+                      aria-label={
+                        t('navigateToBuildingAria', { building: unit.location.building }) ||
+                        `Navigate to ${unit.location.building} on campus map`
+                      }
                     >
                       <Navigation className="h-4 w-4" aria-hidden="true" />
                       {t('navigate')}

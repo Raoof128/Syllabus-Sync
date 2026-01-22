@@ -7,7 +7,6 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import {
   CheckCircle2,
   Circle,
-  CalendarDays,
   Edit2,
   Plus,
   BookOpen,
@@ -17,7 +16,6 @@ import {
   PartyPopper,
   Trash2,
   AlertTriangle,
-  MapPin,
   Navigation,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -521,14 +519,15 @@ export default function CalendarClient() {
   const formatWeekdayShort = (date: Date) => formatLocalized(date, { weekday: 'short' });
   const formatTimeShort = (date: Date) =>
     formatLocalized(date, { hour: 'numeric', minute: '2-digit' });
-  const formatWeekdayMonthDayTime = (date: Date) =>
-    formatLocalized(date, {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
+  // formatWeekdayMonthDayTime - available for future use
+  // const formatWeekdayMonthDayTime = (date: Date) =>
+  //   formatLocalized(date, {
+  //     weekday: 'short',
+  //     month: 'short',
+  //     day: 'numeric',
+  //     hour: 'numeric',
+  //     minute: '2-digit',
+  //   });
   const formatMonthDayTime = (date: Date) =>
     formatLocalized(date, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -628,7 +627,9 @@ export default function CalendarClient() {
   };
 
   // Deadline handlers
-  const openAddDeadline = () => {
+  // openAddDeadline - available for future FAB menu integration
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _openAddDeadline = () => {
     setEditDeadline(null);
     setDeadlineDialogOpen(true);
   };
@@ -725,7 +726,9 @@ export default function CalendarClient() {
   };
 
   // Deadline delete handlers
-  const handleDeleteDeadline = (deadline: Deadline) => {
+  // handleDeleteDeadline - available for future inline delete functionality
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _handleDeleteDeadline = (deadline: Deadline) => {
     setDeadlineToDelete(deadline);
     setDeadlineDeleteConfirmOpen(true);
   };
@@ -753,6 +756,7 @@ export default function CalendarClient() {
   };
 
   // Navigate to map with building highlighted
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigateToMap = (building: string | undefined) => {
     if (building) {
       router.push(`/map?building=${encodeURIComponent(building)}`);
