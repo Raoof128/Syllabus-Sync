@@ -36,6 +36,12 @@
 - **Files Updated:** `app/map/MapClient.tsx`.
 - **Verification:** `npm run check`
 
+### Raouf: 2026-01-22 (Australia/Sydney) - Login Background Image
+- **Status:** ✅ Complete - Added campus photo background to the login page with a gradient overlay.
+- **Logic/UI:** Uses `/images/login-bg.png` as a cover image behind the glass login card while maintaining readability.
+- **Files Updated:** `app/login/LoginClient.tsx`, `public/images/login-bg.png`.
+- **Verification:** `npm run check`
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
 - **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
 - **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.

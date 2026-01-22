@@ -177,8 +177,17 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="login-page min-h-screen flex items-center justify-center bg-mq-background p-4">
-      <Card className="w-full max-w-md mq-liquid-glass-elevated">
+    <div className="login-page min-h-screen flex items-center justify-center bg-mq-background p-4 relative overflow-hidden">
+      <Image
+        src="/images/login-bg.png"
+        alt="Macquarie University campus signpost at Wally’s Walk"
+        fill
+        priority
+        className="object-cover"
+        sizes="100vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-mq-background/90" />
+      <Card className="w-full max-w-md mq-liquid-glass-elevated relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-6">
             <div className="relative w-65 h-65 flex items-center justify-center">

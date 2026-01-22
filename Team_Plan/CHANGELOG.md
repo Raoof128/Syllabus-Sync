@@ -39,6 +39,16 @@ Raouf: 2026-01-22 - Map Building Cards Uniform Sizing
 
 ---
 
+Raouf: 2026-01-22 - Login Background Image
+
+### Changed
+- Added a Macquarie campus photo background with a soft gradient overlay behind the login card for improved visual context.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ### Changed
