@@ -19,6 +19,18 @@ Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ---
 
+Raouf: 2026-01-22 - Notification System Reliability
+
+### Changed
+- Notifications are no longer persisted across users (store is in-memory with 1-minute revalidation) and re-fetch on focus using `loadNotifications({ force: true })`.
+- Pending reminders now persist minimal metadata and re-schedule on init; reminder queues clear when push is disabled.
+- Notifications service prefers Service Worker `showNotification` when available for better delivery when tabs are hidden.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (Open-Meteo Reliability)
 
 ### Changed

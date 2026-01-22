@@ -27,6 +27,16 @@ export interface NotificationPreferences {
 
   // Scheduled reminder IDs (to prevent duplicates)
   scheduledReminders: Record<string, number>; // id -> setTimeout handle
+
+  // Pending reminder metadata for re-scheduling across reloads
+  pendingReminders: Record<
+    string,
+    {
+      type: 'deadline' | 'class' | 'event';
+      payload: Record<string, string | number>;
+      triggerAt: number;
+    }
+  >;
 }
 
 interface NotificationPreferencesState extends NotificationPreferences {
@@ -40,6 +50,7 @@ interface NotificationPreferencesState extends NotificationPreferences {
   setDeadlineReminderTiming: (minutes: number) => void;
   setClassReminderTiming: (minutes: number) => void;
   setEventReminderTiming: (minutes: number) => void;
+  reschedulePending: () => void;
   scheduleDeadlineReminder: (
     deadlineId: string,
     title: string,
@@ -76,6 +87,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       eventReminderTiming: 60, // 1 hour
       pushEnabled: true,
       scheduledReminders: {},
+      pendingReminders: {},
 
       initialize: async () => {
         const status = notificationService.getPermissionStatus();
@@ -87,6 +99,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const eventsEnabled = notificationService.isNotificationTypeEnabled('events');
 
         set({ deadlinesEnabled, classesEnabled, eventsEnabled });
+
+        // Reschedule any pending reminders that survived persistence
+        get().reschedulePending();
       },
 
       requestPermission: async () => {
@@ -151,6 +166,21 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
         // Only schedule if reminder time is in the future
         if (delay > 0) {
+          set((s) => ({
+            pendingReminders: {
+              ...s.pendingReminders,
+              [deadlineId]: {
+                type: 'deadline',
+                payload: {
+                  title,
+                  unitCode,
+                  dueDate: dueDate.getTime(),
+                },
+                triggerAt: reminderTime.getTime(),
+              },
+            },
+          }));
+
           const timeoutId = window.setTimeout(() => {
             notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
             // Remove from scheduled after sending
@@ -167,6 +197,11 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         } else if (delay > -state.deadlineReminderTiming * 60 * 1000) {
           // If we're past the reminder time but before the due date, send immediately
           notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
+          set((s) => {
+            const { [deadlineId]: _removed, ...rest } = s.pendingReminders;
+            void _removed;
+            return { pendingReminders: rest };
+          });
         }
       },
 
@@ -193,6 +228,23 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const delay = reminderTime.getTime() - now.getTime();
 
         if (delay > 0) {
+          set((s) => ({
+            pendingReminders: {
+              ...s.pendingReminders,
+              [reminderId]: {
+                type: 'class',
+                payload: {
+                  unitCode,
+                  unitName,
+                  building,
+                  room,
+                  classTime: classTime.getTime(),
+                },
+                triggerAt: reminderTime.getTime(),
+              },
+            },
+          }));
+
           const timeoutId = window.setTimeout(() => {
             const timeStr = classTime.toLocaleTimeString([], {
               hour: '2-digit',
@@ -202,7 +254,12 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
             set((s) => {
               const { [reminderId]: _removed, ...rest } = s.scheduledReminders;
               void _removed; // Silence unused variable warning
-              return { scheduledReminders: rest };
+              return {
+                scheduledReminders: rest,
+                pendingReminders: Object.fromEntries(
+                  Object.entries(s.pendingReminders).filter(([key]) => key !== reminderId),
+                ),
+              };
             });
           }, delay);
 
@@ -232,6 +289,21 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const delay = reminderTime.getTime() - now.getTime();
 
         if (delay > 0) {
+          set((s) => ({
+            pendingReminders: {
+              ...s.pendingReminders,
+              [eventId]: {
+                type: 'event',
+                payload: {
+                  title,
+                  location,
+                  eventTime: eventTime.getTime(),
+                },
+                triggerAt: reminderTime.getTime(),
+              },
+            },
+          }));
+
           const timeoutId = window.setTimeout(() => {
             const timeStr = eventTime.toLocaleTimeString([], {
               hour: '2-digit',
@@ -241,7 +313,12 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
             set((s) => {
               const { [eventId]: _removed, ...rest } = s.scheduledReminders;
               void _removed; // Silence unused variable warning
-              return { scheduledReminders: rest };
+              return {
+                scheduledReminders: rest,
+                pendingReminders: Object.fromEntries(
+                  Object.entries(s.pendingReminders).filter(([key]) => key !== eventId),
+                ),
+              };
             });
           }, delay);
 
@@ -258,7 +335,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           set((s) => {
             const { [id]: _removed, ...rest } = s.scheduledReminders;
             void _removed; // Silence unused variable warning
-            return { scheduledReminders: rest };
+            const { [id]: _removedPending, ...restPending } = s.pendingReminders;
+            void _removedPending;
+            return { scheduledReminders: rest, pendingReminders: restPending };
           });
         }
       },
@@ -268,7 +347,78 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         Object.values(state.scheduledReminders).forEach((timeoutId) => {
           clearTimeout(timeoutId);
         });
-        set({ scheduledReminders: {} });
+        set({ scheduledReminders: {}, pendingReminders: {} });
+      },
+
+      reschedulePending: () => {
+        const state = get();
+        if (!state.pushEnabled || state.permissionStatus !== 'granted') return;
+
+        const now = Date.now();
+        Object.entries(state.pendingReminders).forEach(([id, reminder]) => {
+          const delay = reminder.triggerAt - now;
+          if (delay <= 0) {
+            // Skip expired reminders
+            set((s) => {
+              const { [id]: _removed, ...rest } = s.pendingReminders;
+              void _removed;
+              return { pendingReminders: rest };
+            });
+            return;
+          }
+
+          if (state.scheduledReminders[id]) {
+            clearTimeout(state.scheduledReminders[id]);
+          }
+
+          const timeoutId = window.setTimeout(() => {
+            if (reminder.type === 'deadline') {
+              notificationService.sendDeadlineReminder(
+                reminder.payload.title as string,
+                reminder.payload.unitCode as string,
+                new Date(reminder.payload.dueDate as number),
+                id,
+              );
+            } else if (reminder.type === 'class') {
+              const classTime = new Date(reminder.payload.classTime as number);
+              const timeStr = classTime.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+              notificationService.sendClassReminder(
+                reminder.payload.unitCode as string,
+                reminder.payload.unitName as string,
+                reminder.payload.building as string,
+                reminder.payload.room as string,
+                timeStr,
+              );
+            } else if (reminder.type === 'event') {
+              const eventTime = new Date(reminder.payload.eventTime as number);
+              const timeStr = eventTime.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+              notificationService.sendEventReminder(
+                reminder.payload.title as string,
+                reminder.payload.location as string,
+                timeStr,
+                id,
+              );
+            }
+
+            set((s) => {
+              const { [id]: _removed, ...rest } = s.pendingReminders;
+              void _removed;
+              const { [id]: _timeout, ...restTimeouts } = s.scheduledReminders;
+              void _timeout;
+              return { pendingReminders: rest, scheduledReminders: restTimeouts };
+            });
+          }, delay);
+
+          set((s) => ({
+            scheduledReminders: { ...s.scheduledReminders, [id]: timeoutId },
+          }));
+        });
       },
     }),
     {
@@ -282,7 +432,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         classReminderTiming: state.classReminderTiming,
         eventReminderTiming: state.eventReminderTiming,
         pushEnabled: state.pushEnabled,
-        // Don't persist scheduledReminders - they're runtime only
+        pendingReminders: state.pendingReminders,
       }),
     },
   ),

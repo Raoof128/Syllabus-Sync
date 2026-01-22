@@ -11,6 +11,12 @@
 - **Verification:** Manual Open-Meteo call returns 200 with local time and `is_day` set correctly.
 - **Verification Command:** `npm run check` (preferred full suite: secrets → format → typecheck → lint → tests → build).
 
+### Raouf: 2026-01-22 (Australia/Sydney) - Notification System Reliability
+- **Status:** ⚙️ In Progress - Hardened client notification UX and data isolation.
+- **Logic:** Notifications store now revalidates on focus and on demand (1m TTL), drops persistence to avoid cross-user leaks, and refreshes via `loadNotifications({ force: true })`. Pending reminders persist metadata and reschedule on init; service-worker-backed `showNotification` is used when available.
+- **UI/UX:** Settings unchanged; reminders now survive reloads when permission is granted.
+- **Files Updated:** `lib/store/notificationsStore.ts`, `lib/store/notificationPreferencesStore.ts`, `lib/services/notificationService.ts`, `components/layout/Header.tsx`.
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
 - **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
 - **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.

@@ -93,6 +93,20 @@ class NotificationService {
     }
 
     try {
+      // Prefer service worker notifications if available (more resilient when tab is hidden)
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration?.showNotification) {
+          await registration.showNotification(options.title, {
+            body: options.body,
+            icon: options.icon || '/MQ_Logo_Final.png',
+            tag: options.tag,
+            data: options.data,
+          });
+          return true;
+        }
+      }
+
       const notification = new Notification(options.title, {
         body: options.body,
         icon: options.icon || '/MQ_Logo_Final.png',
@@ -100,7 +114,6 @@ class NotificationService {
         data: options.data,
       });
 
-      // Store click handler if provided
       if (options.onClick && options.tag) {
         this.notificationClickHandlers.set(options.tag, options.onClick);
       }

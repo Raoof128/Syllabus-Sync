@@ -91,7 +91,7 @@ const Header = memo(() => {
   // Load notifications on mount
   useEffect(() => {
     if (isClient) {
-      loadNotifications();
+      loadNotifications({ force: true });
     }
   }, [isClient, loadNotifications]);
 
@@ -120,6 +120,7 @@ const Header = memo(() => {
 
     const handleFocus = () => {
       void getUser();
+      loadNotifications({ force: true });
     };
 
     window.addEventListener('focus', handleFocus);
@@ -128,7 +129,7 @@ const Header = memo(() => {
       isActive = false;
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [loadNotifications]);
 
   // Handle notifications seeding (only if authenticated)
   useEffect(() => {
