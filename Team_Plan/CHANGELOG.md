@@ -59,6 +59,17 @@ Raouf: 2026-01-22 - Login Glass Transparency Tune
 
 ---
 
+Raouf: 2026-01-22 - Login Hero Copy Cleanup
+
+### Changed
+- Removed map-specific language from the login hero and adjusted left-panel text contrast for readability.
+- Updated login hero translation strings across locales to reflect generic schedule messaging.
+
+### Verification
+- `npm run lint -- app/login/LoginClient.tsx`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ### Changed

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { AlertTriangle, Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTranslation();
@@ -457,48 +457,18 @@ export default function LoginClient() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/88 via-[#0a2f3c]/82 to-[#0f172a]/90" />
           <div className="relative z-10 h-full w-full p-8 lg:p-12 flex flex-col justify-between text-white">
             <div className="space-y-4 max-w-xl">
-              <p className="uppercase tracking-[0.2em] text-xs text-white/70">{t('campusNavigation')}</p>
-              <h2 className="text-3xl lg:text-4xl font-bold leading-tight">
+              <p className="uppercase tracking-[0.2em] text-xs text-[color:var(--alabaster)]">
+                {t('campusNavigation')}
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-bold leading-tight text-[color:var(--alabaster)]">
                 {t('loginHeroTitle')}
               </h2>
-              <p className="text-white text-sm lg:text-base max-w-xl">
+              <p className="text-sm lg:text-base max-w-xl text-[color:var(--alabaster)]">
                 {t('loginHeroDescription')}
               </p>
-              <button className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-mq-primary transition-colors">
-                {t('exploreMap')}
-                <ArrowRight className="h-4 w-4" />
-              </button>
             </div>
 
-            <div className="relative flex-1 w-full mt-10 lg:mt-0">
-              <div className="absolute left-6 top-6 bg-white/15 backdrop-blur-lg rounded-2xl w-16 h-16 flex items-center justify-center shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
-                <svg
-                  className="h-8 w-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l7 19-7-4-7 4 7-19z" />
-                </svg>
-              </div>
-
-              <div className="absolute right-6 bottom-6 bg-white/12 backdrop-blur-xl border border-white/20 rounded-2xl w-[260px] p-4 shadow-[0_14px_48px_rgba(0,0,0,0.3)] space-y-2">
-                <p className="text-sm font-semibold text-white">{t('todaysClassesDemo')}</p>
-                <div className="flex items-center justify-between text-xs text-white/80">
-                  <span>COMP2310</span>
-                  <span>10:00 AM</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-white/80">
-                  <span>Room 4RPD</span>
-                  <span>Macquarie Walk</span>
-                </div>
-                <div className="h-px bg-white/20" />
-                <div className="text-xs text-white/70">
-                  {t('navigateNextClassDemo')}
-                </div>
-              </div>
-            </div>
+            <div className="relative flex-1 w-full mt-10 lg:mt-0" />
           </div>
         </div>
       </div>

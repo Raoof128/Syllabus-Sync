@@ -48,6 +48,12 @@
 - **Files Updated:** `app/login/LoginClient.tsx`.
 - **Verification:** `npm run check`
 
+### Raouf: 2026-01-22 (Australia/Sydney) - Login Hero Copy Cleanup
+- **Status:** ✅ Complete - Removed map-specific messaging from the login hero and improved text contrast in the white panel.
+- **Logic/UI:** Updated hero copy to generic schedule language, removed the map CTA, strengthened left-panel text colors, and aligned translation keys across locales.
+- **Files Updated:** `app/login/LoginClient.tsx`, `locales/*/translations.json`.
+- **Verification:** `npm run lint -- app/login/LoginClient.tsx`
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
 - **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
 - **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.

@@ -1423,5 +1423,19 @@
   "mqSignpostAltGeneric": "Señalización del campus de la Universidad Macquarie",
   "searchBuildingsPlaceholder": "Buscar edificios...",
   "exampleTime": "ej., 2:00 PM - 4:00 PM",
-  "clearConfirm": "BORRAR"
+  "clearConfirm": "BORRAR",
+  "loginErrorMissingFields": "Please enter email and password",
+  "loginErrorInvalidCredentials": "Invalid email or password",
+  "loginErrorEmailNotConfirmed": "Please check your email to confirm your account",
+  "loginErrorTooManyRequests": "Too many login attempts. Please wait a few minutes.",
+  "loginErrorFailed": "Login failed. Please try again.",
+  "rememberMe": "Remember me",
+  "loginHeroTitle": "Your schedule. Your goals. Synced.",
+  "loginHeroDescription": "Stay on top of classes, deadlines, and student life with one dashboard.",
+  "campusNavigation": "STUDENT HUB",
+  "exploreMap": "Explore Syllabus Sync",
+  "loginWithGoogle": "Google",
+  "loginWithFacebook": "Facebook",
+  "featureComingSoon": "Feature coming soon",
+  "oauthComingSoon": "{{provider}} sign-in will be available soon."
 }
