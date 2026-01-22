@@ -46,7 +46,7 @@ const unitSyncSchema = z.object({
  * Uses Postgres RPC for full transaction safety
  */
 export async function POST(request: Request) {
-  return requireAuthWithRateLimit(request, async (_userId) => {
+  return requireAuthWithRateLimit(request, async () => {
     return validateRequest(unitSyncSchema)(request, async (validatedData) => {
       try {
         const supabase = await createServerClient();

@@ -632,8 +632,8 @@ export default function CampusMap({
           mapLog.log('GPS smoothing applied:', {
             raw: { lat: gpsLat.toFixed(6), lng: gpsLng.toFixed(6) },
             smoothed: { lat: displayLat.toFixed(6), lng: displayLng.toFixed(6) },
-            confidence: smoothed.confidence.toFixed(2),
-            calculatedSpeed: positionSmootherRef.current.calculateSpeed().toFixed(2) + ' m/s',
+          confidence: smoothed.confidence.toFixed(2),
+          calculatedSpeed: `${positionSmootherRef.current.calculateSpeed().toFixed(2)} m/s`,
           });
         }
 
@@ -848,7 +848,7 @@ export default function CampusMap({
         mapLog.log('Marker cleanup error (likely already removed):', error);
       }
     };
-  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng, t]);
+  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng, t, isNavigating]);
 
   // ============================================
   // CENTER ON USER ACTION
@@ -989,7 +989,7 @@ export default function CampusMap({
     // Recalculate if user went off-route or needs rerouting
     if (navState.status === 'off-route' || navState.status === 'recalculating') {
       mapLog.log('Off-route detected, recalculating...', {
-        distanceFromRoute: navState.distanceFromRoute.toFixed(1) + 'm',
+        distanceFromRoute: `${navState.distanceFromRoute.toFixed(1)}m`,
         status: navState.status,
       });
       recalculateRoute();
@@ -1129,7 +1129,7 @@ export default function CampusMap({
 
     const timer = setTimeout(updateRoute, 100);
     return () => clearTimeout(timer);
-  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng]);
+  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng, isNavigating, stopNavigation]);
 
   // ============================================
   // MAP CONTROLLER COMPONENT (defined inside to access hooks)

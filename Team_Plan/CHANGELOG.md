@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - VibeCast Weather Widget (Open-Meteo Reliability)
+
+### Changed
+- **Weather Source:** Switched `useWeather` to Open-Meteo `current_weather` (no API key required) with timezone-aware formatting and vibe mapping.
+- **Fallback Handling:** Added graceful default (Sydney) fetch when geolocation is denied or unsupported; resilient schema guards for API responses and cache validation.
+- **Caching:** Keeps a 10-minute client cache to reduce repeated prompts and API calls.
+- **CSP:** Allowed `https://api.open-meteo.com` in `connect-src` for both dev and prod.
+- **UI:** Day/night-aware coloring (yellow day / purple night), icon glow, noise + highlight overlays, condensed typography, emoji microcopy, and a 6-point sparkline mini-forecast in the widget.
+
+### Verification
+- Manual fetch to Open-Meteo: 200 response with `is_day` and temperature populated.
+
+---
+
+Raouf: 2026-01-22 - VibeCast Weather Widget (Header)
+
+### Added
+- **Weather Hook:** New `useWeather` hook with geolocation lookup, OpenWeather fetch, and vibe mapping.
+- **API Config:** Documented `NEXT_PUBLIC_OPENWEATHER_API_KEY` in `.env.example`.
+
+### Changed
+- **Header Widget:** Replaced the minimal weather indicator with the VibeCast pill UI sized for the top bar.
+
+### Verification
+- `npm run lint -- components/layout/WeatherWidget.tsx lib/hooks/useWeather.ts` (warnings pre-existing)
+
+---
+
 Raouf: 2026-01-22 - Atomic Unit Sync Architecture
 
 ### Fixed

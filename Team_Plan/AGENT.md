@@ -2,6 +2,22 @@
 
 ## Current Session (Jan 22, 2026) - Atomic Unit Sync Architecture
 
+### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Open-Meteo Reliability & Glam Pass)
+- **Status:** ⚙️ In Progress - Swapped to Open-Meteo, hardened parsing, and added fallback behavior.
+- **Logic:** Uses Open-Meteo `current_weather` with timezone-aware display, vibe mapping, 10-minute caching, and Sydney fallback when geolocation is blocked or unsupported.
+- **UI:** Day/night-aware colors (yellow for day, purple for night), icon glow, noise overlay, inner highlight, sparkline mini-forecast, emoji microcopy, and refined typography.
+- **Config:** CSP now allows `https://api.open-meteo.com`; no API key required.
+- **Files Updated:** `lib/hooks/useWeather.ts`, `lib/security/csp.ts`, `components/layout/WeatherWidget.tsx`.
+- **Verification:** Manual Open-Meteo call returns 200 with local time and `is_day` set correctly.
+
+### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
+- **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
+- **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.
+- **UI:** Styled compact pill to fit header height with gradients, shimmer overlay, and hover location badge.
+- **Config:** Documented `NEXT_PUBLIC_OPENWEATHER_API_KEY` in `.env.example`.
+- **Files Updated:** `components/layout/WeatherWidget.tsx`, `lib/hooks/useWeather.ts`, `.env.example`.
+- **Verification:** `npm run lint -- components/layout/WeatherWidget.tsx lib/hooks/useWeather.ts` (warnings pre-existing).
+
 ### Atomic Sync Implementation - Quality Score: 10/10 ✅
 - **Status:** ✅ Complete - Migration created, API endpoint added, Store updated.
 - **Problem:** Users experienced 500 errors (RLS violations) and 404 errors during unit updates due to race conditions and out-of-sync local state.

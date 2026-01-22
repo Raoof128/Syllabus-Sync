@@ -1,129 +1,144 @@
 // components/layout/WeatherWidget.tsx
 'use client';
 
-import { useState, useEffect, memo } from 'react';
-import { Sun, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, Wind } from 'lucide-react';
-
-interface WeatherData {
-  temperature: number;
-  condition: 'sunny' | 'cloudy' | 'rainy' | 'snowy' | 'stormy' | 'foggy' | 'windy';
-  description: string;
-}
-
-// Weather icons mapping
-const weatherIcons = {
-  sunny: Sun,
-  cloudy: Cloud,
-  rainy: CloudRain,
-  snowy: CloudSnow,
-  stormy: CloudLightning,
-  foggy: CloudFog,
-  windy: Wind,
-};
-
-// Weather icon colors
-const weatherColors = {
-  sunny: 'text-yellow-500',
-  cloudy: 'text-gray-400',
-  rainy: 'text-blue-400',
-  snowy: 'text-blue-200',
-  stormy: 'text-purple-500',
-  foggy: 'text-gray-300',
-  windy: 'text-teal-400',
-};
-
-// Sydney coordinates (Macquarie University area)
-const SYDNEY_COORDS = {
-  lat: -33.7738,
-  lon: 151.1126,
-};
-
-// Map Open-Meteo weather codes to our conditions
-function mapWeatherCode(code: number): WeatherData['condition'] {
-  if (code === 0 || code === 1) return 'sunny';
-  if (code >= 2 && code <= 3) return 'cloudy';
-  if (code >= 45 && code <= 48) return 'foggy';
-  if (code >= 51 && code <= 67) return 'rainy';
-  if (code >= 71 && code <= 77) return 'snowy';
-  if (code >= 80 && code <= 82) return 'rainy';
-  if (code >= 85 && code <= 86) return 'snowy';
-  if (code >= 95 && code <= 99) return 'stormy';
-  return 'cloudy';
-}
+import { memo } from 'react';
+import { Sun, Moon, Wind, CloudRain, MapPin, AlertCircle } from 'lucide-react';
+import { useWeather } from '@/lib/hooks/useWeather';
 
 const WeatherWidget = memo(() => {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { weatherData, loading, error } = useWeather();
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        // Using Open-Meteo API (free, no API key required)
-        const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${SYDNEY_COORDS.lat}&longitude=${SYDNEY_COORDS.lon}&current=temperature_2m,weather_code&timezone=Australia%2FSydney`,
-        );
+  const styles = {
+    hot: {
+      gradient: 'from-amber-400 via-orange-500 to-rose-500',
+      icon: <Sun className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.45)]" />,
+      textColor: 'text-white',
+    },
+    cool: {
+      gradient: 'from-indigo-900 via-violet-800 to-slate-800',
+      icon: <Moon className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
+      textColor: 'text-white',
+    },
+    windy: {
+      gradient: 'from-sky-300 via-violet-400 to-pink-400',
+      icon: <Wind className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
+      textColor: 'text-white',
+    },
+    rain: {
+      gradient: 'from-blue-600 via-cyan-500 to-sky-500',
+      icon: <CloudRain className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
+      textColor: 'text-white',
+    },
+  };
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch weather');
-        }
-
-        const data = await response.json();
-        const temp = Math.round(data.current.temperature_2m);
-        const condition = mapWeatherCode(data.current.weather_code);
-
-        setWeather({
-          temperature: temp,
-          condition,
-          description: condition.charAt(0).toUpperCase() + condition.slice(1),
-        });
-        setError(null);
-      } catch (err) {
-        console.warn('Weather fetch failed:', err);
-        // Fallback to a default weather state
-        setWeather({
-          temperature: 22,
-          condition: 'sunny',
-          description: 'Sunny',
-        });
-        setError(null); // Don't show error to user, just use fallback
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchWeather();
-
-    // Refresh weather every 30 minutes
-    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="flex items-center gap-1.5 text-mq-content-secondary animate-pulse">
-        <div className="w-4 h-4 bg-mq-background-secondary rounded" />
-        <div className="w-8 h-4 bg-mq-background-secondary rounded" />
+      <div className="w-64 h-12 rounded-full bg-mq-background-secondary animate-pulse flex items-center justify-center shadow-inner">
+        <span className="text-mq-content-tertiary font-semibold tracking-[0.2em] text-[10px]">
+          LOADING VIBES...
+        </span>
       </div>
     );
   }
 
-  if (error || !weather) {
-    return null; // Don't show anything if there's an error
+  if (error || !weatherData) {
+    return (
+      <div className="w-64 h-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center gap-2 shadow-sm px-4">
+        <AlertCircle className="text-red-400 w-4 h-4" aria-hidden="true" />
+        <span className="text-red-400 text-[10px] font-bold text-center leading-tight line-clamp-2">
+          {error || 'Weather unavailable.'}
+        </span>
+      </div>
+    );
   }
 
-  const WeatherIcon = weatherIcons[weather.condition];
-  const iconColor = weatherColors[weather.condition];
+  const currentStyle = styles[weatherData.vibe] ?? styles.cool;
+  const dayNightStyle = weatherData.isDay
+    ? { gradient: 'from-amber-100 via-yellow-200 to-orange-200', textColor: 'text-slate-900' }
+    : { gradient: 'from-violet-950 via-purple-900 to-indigo-950', textColor: 'text-white' };
+
+  const icon =
+    weatherData.vibe === 'cool'
+      ? weatherData.isDay
+        ? <Sun className="w-6 h-6 text-slate-900 drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />
+        : <Moon className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />
+      : currentStyle.icon;
 
   return (
     <div
-      className="flex items-center gap-1.5 text-mq-content-secondary"
-      title={`${weather.description}, ${weather.temperature}°C`}
-      aria-label={`Current weather: ${weather.description}, ${weather.temperature} degrees Celsius`}
+      className={`
+        relative overflow-hidden
+        flex items-center justify-between
+        w-64 h-14 rounded-full shadow-xl
+        bg-gradient-to-r ${dayNightStyle.gradient}
+        px-5 transition-all duration-500 hover:scale-[1.02]
+        group
+      `}
+      title={`${weatherData.condition} · ${weatherData.temp}°C · ${weatherData.location} · ${weatherData.date}`}
+      aria-label={`Current weather in ${weatherData.location}: ${weatherData.condition}, ${weatherData.temp} degrees Celsius`}
     >
-      <WeatherIcon className={`w-4 h-4 ${iconColor}`} aria-hidden="true" />
-      <span className="text-mq-sm font-medium tabular-nums">{weather.temperature}°C</span>
+      <div className="relative z-10 flex items-center gap-3">
+        <div className="relative">
+          <div className="absolute inset-0 blur-xl bg-white/20 opacity-60" aria-hidden="true" />
+          <div className="relative">{icon}</div>
+        </div>
+        <div className={`text-left z-10 ${dayNightStyle.textColor}`}>
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] opacity-80">
+            <span>{weatherData.condition}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-3xl font-black tracking-tight leading-none tabular-nums drop-shadow-sm">
+              {weatherData.temp}°
+            </span>
+            <div className="flex items-center gap-2 text-[10px] opacity-80">
+              {weatherData.hourlyTemps.length > 0 ? (
+                <svg viewBox="0 0 60 22" className="h-6 w-14">
+                  {(() => {
+                    const temps = weatherData.hourlyTemps.slice(0, 6);
+                    const min = Math.min(...temps);
+                    const max = Math.max(...temps);
+                    const range = max - min || 1;
+                    const points = temps
+                      .map((t, idx) => {
+                        const x = (idx / Math.max(temps.length - 1, 1)) * 60;
+                        const y = 20 - ((t - min) / range) * 16;
+                        return `${x},${y}`;
+                      })
+                      .join(' ');
+                    return (
+                      <>
+                        <polyline
+                          points={points}
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="opacity-70"
+                        />
+                        {temps.map((t, idx) => {
+                          const x = (idx / Math.max(temps.length - 1, 1)) * 60;
+                          const y = 20 - ((t - min) / range) * 16;
+                          return <circle key={idx} cx={x} cy={y} r="2" className="opacity-80" />;
+                        })}
+                      </>
+                    );
+                  })()}
+                </svg>
+              ) : (
+                <span className="uppercase tracking-[0.12em]">Calm air</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.12)_1px,transparent_0)] bg-[length:12px_12px] opacity-30 pointer-events-none" />
+      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 translate-y-6 group-hover:translate-y-0 transition-transform duration-300">
+        <div className="flex items-center gap-1 bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full shadow-inner">
+          <MapPin className="w-3 h-3 text-white" aria-hidden="true" />
+          <span className="text-[9px] text-white font-bold">{weatherData.location}</span>
+        </div>
+      </div>
     </div>
   );
 });

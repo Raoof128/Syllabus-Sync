@@ -89,7 +89,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "font-src 'self' data:",
 
     // Connect: API endpoints, Supabase, routing services
-    `connect-src 'self' https://*.supabase.co https://*.openrouteservice.org wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
+    `connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
 
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
@@ -133,7 +133,7 @@ export function buildDevCSP(): string {
     // Fonts
     "font-src 'self' data:",
     // Connect: API endpoints, Supabase, HMR websockets
-    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
+    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
     // Frame ancestors
     "frame-ancestors 'self'",
     // Base URI
