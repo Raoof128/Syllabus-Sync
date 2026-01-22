@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-type Vibe = 'hot' | 'cool' | 'windy' | 'rain';
+type Vibe = 'sunny' | 'cloudy' | 'rainy' | 'thunder' | 'snowy' | 'windy' | 'night';
 
 interface WeatherData {
   temp: number;
@@ -12,34 +12,31 @@ interface WeatherData {
   hourlyTemps: number[];
 }
 
-const determineVibe = (temp: number, condition: string, isDay: boolean): Vibe => {
-  const mainCondition = condition.toLowerCase();
+const VALID_VIBES: Vibe[] = ['sunny', 'cloudy', 'rainy', 'thunder', 'snowy', 'windy', 'night'];
 
-  if (mainCondition.includes('rain') || mainCondition.includes('drizzle') || mainCondition.includes('thunder')) {
-    return 'rain';
-  }
-  if (mainCondition.includes('cloud') && temp < 20) {
-    return 'windy';
-  }
-  if (!isDay) {
-    return 'cool';
-  }
-  if (temp >= 25) {
-    return 'hot';
-  }
-  return 'cool';
+const determineVibe = (weatherCode: number, isDay: boolean): Vibe => {
+  if (!isDay) return 'night';
+  if (weatherCode === 0) return 'sunny';
+  if ([1, 2, 3].includes(weatherCode)) return 'cloudy';
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weatherCode)) return 'rainy';
+  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return 'snowy';
+  if ([95, 96, 99].includes(weatherCode)) return 'thunder';
+  return 'windy';
 };
 
 const mapWeatherCode = (code: number): string => {
-  if (code === 0) return 'Clear';
-  if ([1, 2, 3].includes(code)) return 'Cloudy';
-  if ([45, 48].includes(code)) return 'Fog';
-  if ([51, 53, 55, 56, 57].includes(code)) return 'Drizzle';
-  if ([61, 63, 65, 66, 67].includes(code)) return 'Rain';
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow';
-  if ([80, 81, 82].includes(code)) return 'Showers';
-  if ([95, 96, 99].includes(code)) return 'Thunder';
-  return 'Clear';
+  if (code === 0) return 'Clear sky';
+  if ([1, 2, 3].includes(code)) return 'Partly cloudy';
+  if ([45, 48].includes(code)) return 'Foggy';
+  if ([51, 53, 55].includes(code)) return 'Drizzle';
+  if ([56, 57].includes(code)) return 'Freezing drizzle';
+  if ([61, 63, 65].includes(code)) return 'Rain';
+  if ([66, 67].includes(code)) return 'Freezing rain';
+  if ([71, 73, 75, 77].includes(code)) return 'Snow';
+  if ([80, 81, 82].includes(code)) return 'Rain showers';
+  if ([85, 86].includes(code)) return 'Snow showers';
+  if ([95, 96, 99].includes(code)) return 'Thunderstorm';
+  return 'Windy';
 };
 
 export const useWeather = () => {
@@ -59,9 +56,11 @@ export const useWeather = () => {
         typeof data.condition === 'string' &&
         typeof data.location === 'string' &&
         typeof data.vibe === 'string' &&
+        VALID_VIBES.includes(data.vibe as Vibe) &&
         typeof data.date === 'string' &&
         typeof data.isDay === 'boolean' &&
-        Array.isArray(data.hourlyTemps)
+        Array.isArray(data.hourlyTemps) &&
+        data.hourlyTemps.every((v) => typeof v === 'number')
       );
     };
 
@@ -114,7 +113,11 @@ export const useWeather = () => {
       const hourlyTimes = data?.hourly?.time as string[] | undefined;
       const hourlyTempsRaw = data?.hourly?.temperature_2m as number[] | undefined;
 
-      if (typeof tempValue !== 'number' || typeof weatherCode !== 'number' || (isDayValue !== 0 && isDayValue !== 1)) {
+      if (
+        typeof tempValue !== 'number' ||
+        typeof weatherCode !== 'number' ||
+        (isDayValue !== 0 && isDayValue !== 1)
+      ) {
         throw new Error('Weather data unavailable.');
       }
 
@@ -129,7 +132,7 @@ export const useWeather = () => {
       })();
 
       const condition = mapWeatherCode(weatherCode);
-      const vibe = determineVibe(tempValue, condition, isDayValue === 1);
+      const vibe = determineVibe(weatherCode, isDayValue === 1);
 
       const nextData: WeatherData = {
         temp: Math.round(tempValue),
@@ -163,7 +166,11 @@ export const useWeather = () => {
     if (!navigator.geolocation) {
       (async () => {
         try {
-          await fetchWeather(fallbackCoords.latitude, fallbackCoords.longitude, fallbackCoords.label);
+          await fetchWeather(
+            fallbackCoords.latitude,
+            fallbackCoords.longitude,
+            fallbackCoords.label,
+          );
           setError('Geolocation not supported. Showing default location.');
         } catch {
           setError('Geolocation not supported by this browser.');

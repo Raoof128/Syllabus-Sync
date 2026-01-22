@@ -2,34 +2,71 @@
 'use client';
 
 import { memo } from 'react';
-import { Sun, Moon, Wind, CloudRain, MapPin, AlertCircle } from 'lucide-react';
+import {
+  Sun,
+  Moon,
+  Wind,
+  CloudRain,
+  Cloud,
+  CloudLightning,
+  Snowflake,
+  MapPin,
+  AlertCircle,
+} from 'lucide-react';
 import { useWeather } from '@/lib/hooks/useWeather';
 
 const WeatherWidget = memo(() => {
   const { weatherData, loading, error } = useWeather();
 
   const styles = {
-    hot: {
-      gradient: 'from-amber-400 via-orange-500 to-rose-500',
-      icon: <Sun className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.45)]" />,
+    sunny: {
+      gradient: 'from-amber-400 via-orange-400 to-yellow-500',
+      icon: <Sun className="w-10 h-10 text-white drop-shadow-lg" />,
+      label: 'Golden Hour',
       textColor: 'text-white',
     },
-    cool: {
-      gradient: 'from-indigo-900 via-violet-800 to-slate-800',
-      icon: <Moon className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
+    cloudy: {
+      gradient: 'from-slate-400 via-gray-400 to-zinc-500',
+      icon: <Cloud className="w-10 h-10 text-white drop-shadow-md" />,
+      label: 'Overcast',
       textColor: 'text-white',
+    },
+    rainy: {
+      gradient: 'from-blue-600 via-indigo-600 to-cyan-600',
+      icon: <CloudRain className="w-10 h-10 text-white drop-shadow-md" />,
+      label: 'Rainy Vibe',
+      textColor: 'text-white',
+    },
+    thunder: {
+      gradient: 'from-purple-900 via-slate-900 to-indigo-950',
+      icon: (
+        <CloudLightning className="w-10 h-10 text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]" />
+      ),
+      label: 'Storm Mode',
+      textColor: 'text-white',
+    },
+    snowy: {
+      gradient: 'from-blue-100 via-slate-100 to-indigo-200',
+      icon: <Snowflake className="w-10 h-10 text-blue-500" />,
+      label: 'Chill Zone',
+      textColor: 'text-slate-900',
     },
     windy: {
-      gradient: 'from-sky-300 via-violet-400 to-pink-400',
-      icon: <Wind className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
+      gradient: 'from-teal-400 via-emerald-400 to-cyan-500',
+      icon: <Wind className="w-10 h-10 text-white" />,
+      label: 'Breezy',
       textColor: 'text-white',
     },
-    rain: {
-      gradient: 'from-blue-600 via-cyan-500 to-sky-500',
-      icon: <CloudRain className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />,
-      textColor: 'text-white',
+    night: {
+      gradient: 'from-[#0a0f2d] via-purple-950 to-black',
+      icon: (
+        <Moon className="w-10 h-10 text-indigo-200 drop-shadow-[0_0_10px_rgba(199,210,254,0.5)]" />
+      ),
+      label: 'Lunar',
+      textColor: 'text-indigo-100',
     },
   };
+  type StyleKey = keyof typeof styles;
 
   if (loading) {
     return (
@@ -52,25 +89,18 @@ const WeatherWidget = memo(() => {
     );
   }
 
-  const currentStyle = styles[weatherData.vibe] ?? styles.cool;
-  const dayNightStyle = weatherData.isDay
-    ? { gradient: 'from-amber-100 via-yellow-200 to-orange-200', textColor: 'text-slate-900' }
-    : { gradient: 'from-violet-950 via-purple-900 to-indigo-950', textColor: 'text-white' };
-
-  const icon =
-    weatherData.vibe === 'cool'
-      ? weatherData.isDay
-        ? <Sun className="w-6 h-6 text-slate-900 drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />
-        : <Moon className="w-6 h-6 text-white drop-shadow-[0_4px_12px_rgba(255,255,255,0.35)]" />
-      : currentStyle.icon;
+  const currentStyle = styles[weatherData.vibe as StyleKey] ?? styles.sunny;
+  const textColor = currentStyle.textColor ?? 'text-white';
+  const label = currentStyle.label ?? weatherData.condition;
+  const icon = currentStyle.icon;
 
   return (
     <div
       className={`
         relative overflow-hidden
         flex items-center justify-between
-        w-64 h-14 rounded-full shadow-xl
-        bg-gradient-to-r ${dayNightStyle.gradient}
+        w-64 h-14 rounded-full shadow-xl mq-liquid-glass
+        bg-gradient-to-r ${currentStyle.gradient}
         px-5 transition-all duration-500 hover:scale-[1.02]
         group
       `}
@@ -82,9 +112,9 @@ const WeatherWidget = memo(() => {
           <div className="absolute inset-0 blur-xl bg-white/20 opacity-60" aria-hidden="true" />
           <div className="relative">{icon}</div>
         </div>
-        <div className={`text-left z-10 ${dayNightStyle.textColor}`}>
+        <div className={`text-left z-10 ${textColor}`}>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] opacity-80">
-            <span>{weatherData.condition}</span>
+            <span>{label}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-3xl font-black tracking-tight leading-none tabular-nums drop-shadow-sm">

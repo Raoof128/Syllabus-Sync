@@ -632,8 +632,8 @@ export default function CampusMap({
           mapLog.log('GPS smoothing applied:', {
             raw: { lat: gpsLat.toFixed(6), lng: gpsLng.toFixed(6) },
             smoothed: { lat: displayLat.toFixed(6), lng: displayLng.toFixed(6) },
-          confidence: smoothed.confidence.toFixed(2),
-          calculatedSpeed: `${positionSmootherRef.current.calculateSpeed().toFixed(2)} m/s`,
+            confidence: smoothed.confidence.toFixed(2),
+            calculatedSpeed: `${positionSmootherRef.current.calculateSpeed().toFixed(2)} m/s`,
           });
         }
 
@@ -1129,7 +1129,15 @@ export default function CampusMap({
 
     const timer = setTimeout(updateRoute, 100);
     return () => clearTimeout(timer);
-  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng, isNavigating, stopNavigation]);
+  }, [
+    selectedBuilding,
+    origin,
+    t,
+    gpsToPixelLatLng,
+    getBuildingLatLng,
+    isNavigating,
+    stopNavigation,
+  ]);
 
   // ============================================
   // MAP CONTROLLER COMPONENT (defined inside to access hooks)

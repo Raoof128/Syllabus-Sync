@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
+
+### Changed
+- Expanded VibeCast palette to 7 WMO-mapped states (sunny, cloudy, rainy, thunder, snowy, windy, night) with premium gradients and icon treatments.
+- Updated vibe determination to use WMO weather codes and validated cached data against the new spectrum; kept sparkline-ready hourly temps.
+
+### Verification
+- `npm run lint`
+- Preferred verification command: `npm run check` (secrets → format → typecheck → lint → tests → build)
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (Open-Meteo Reliability)
 
 ### Changed
