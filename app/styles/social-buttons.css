@@ -187,10 +187,9 @@
 /* Text Animation */
 .social-buttons li .social-title {
   position: absolute;
-  left: 56px;
-  /* position to the right of the 48px circle so it's hidden when collapsed */
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%) translateX(-6px) scale(0.98);
+  transform: translate(-50%, -50%) scale(0.98);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 600;
@@ -205,7 +204,7 @@
   z-index: 10;
   white-space: nowrap;
   pointer-events: none;
-  max-width: calc(100% - 72px);
+  max-width: calc(100% - 36px);
   /* match reduced pill size */
   overflow: hidden;
   text-overflow: clip;
@@ -216,9 +215,7 @@
 .social-buttons li:focus-within .social-title {
   opacity: 1;
   left: 50%;
-  /* centre horizontally inside the expanded pill */
-  /* small fixed nudge left to account for the icon */
-  transform: translate(calc(-50% - 4px), -50%) scale(1);
+  transform: translate(-50%, -50%) scale(1);
   transition-delay: 0.04s;
   overflow: visible;
   max-width: 72%;

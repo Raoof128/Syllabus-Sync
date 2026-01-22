@@ -3,6 +3,7 @@
 
 import { memo } from 'react';
 import { Linkedin } from 'lucide-react';
+import { SOCIAL_LINKS } from '@/lib/config';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -60,19 +61,19 @@ const socialLinks: SocialLink[] = [
   {
     name: 'Facebook',
     icon: FacebookIcon,
-    href: 'https://www.facebook.com/macquarieuniversity/',
+    href: SOCIAL_LINKS.facebook ?? 'https://www.facebook.com/macquarieuniversity/',
     label: 'Facebook',
   },
   {
     name: 'Instagram',
     icon: InstagramIcon,
-    href: 'https://www.instagram.com/macquarieuni/',
+    href: SOCIAL_LINKS.instagram ?? 'https://www.instagram.com/macquarieuni/',
     label: 'Instagram',
   },
   {
     name: 'LinkedIn',
     icon: Linkedin,
-    href: 'https://www.linkedin.com/school/macquarie-university/',
+    href: SOCIAL_LINKS.linkedin ?? 'https://www.linkedin.com/school/macquarie-university/',
     label: 'LinkedIn',
   },
   {
@@ -90,7 +91,7 @@ const socialLinks: SocialLink[] = [
   {
     name: 'X',
     icon: XIcon,
-    href: 'https://x.com/Macquarie_Uni',
+    href: SOCIAL_LINKS.twitter ?? 'https://x.com/Macquarie_Uni',
     label: 'X',
   },
 ];
@@ -108,15 +109,15 @@ const SocialButtons = memo(() => {
               rel="noopener noreferrer"
               aria-label={`Follow Macquarie University on ${link.label} (opens in new tab)`}
               title={`Follow Macquarie University on ${link.label} (opens in new tab)`}
-              onClick={(e) => {
-                // Ensure it opens in new tab and doesn't interfere with navigation
-                e.preventDefault();
-                window.open(link.href, '_blank', 'noopener,noreferrer');
+              onMouseUp={(e) => {
+                // Remove mouse focus so the expanded state doesn't stick after opening a new tab
+                if (e.detail > 0) {
+                  e.currentTarget.blur();
+                }
               }}
             >
               <Icon className="social-icon h-5 w-5" aria-hidden="true" />
               <span className="social-title">{link.label}</span>
-              <span className="sr-only">(opens in new tab)</span>
             </a>
           </li>
         );

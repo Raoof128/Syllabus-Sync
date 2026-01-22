@@ -112,11 +112,11 @@ const WeatherWidget = memo(() => {
           <div className="absolute inset-0 blur-xl bg-white/20 opacity-60" aria-hidden="true" />
           <div className="relative">{icon}</div>
         </div>
-        <div className={`text-left z-10 ${textColor}`}>
+        <div className={`text-center z-10 ${textColor}`}>
           <div className="text-xs font-semibold uppercase tracking-[0.18em] opacity-80">
             <span>{label}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-3xl font-black tracking-tight leading-none tabular-nums drop-shadow-sm">
               {weatherData.temp}°
             </span>
