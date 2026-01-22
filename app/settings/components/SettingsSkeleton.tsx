@@ -15,6 +15,7 @@ const SKELETON_COUNTS = {
   security: 2,
   quickActions: 5,
   gamification: 5,
+  map: 1,
 } as const;
 
 const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
@@ -214,6 +215,37 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
                     <div>
                       <div className="h-5 w-40 bg-mq-hover-background rounded animate-pulse mb-1" />
                       <div className="h-3 w-56 bg-mq-hover-background rounded animate-pulse" />
+                    </div>
+                    <div className="h-6 w-11 bg-mq-hover-background rounded-full animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Map Navigation Settings Skeleton */}
+        <div className="mq-magic-card mq-liquid-enhanced">
+          <Card className="mq-magic-card-content">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-5 bg-mq-card-background rounded animate-pulse" />
+                <div className="h-6 w-32 bg-mq-card-background rounded-mq-lg animate-pulse" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Array.from({ length: SKELETON_COUNTS.map }).map((_, i) => (
+                <div
+                  key={`map-${i}`}
+                  className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="h-4 w-4 bg-mq-hover-background rounded animate-pulse" />
+                      <div className="flex-1">
+                        <div className="h-5 w-40 bg-mq-hover-background rounded animate-pulse mb-1" />
+                        <div className="h-3 w-56 bg-mq-hover-background rounded animate-pulse" />
+                      </div>
                     </div>
                     <div className="h-6 w-11 bg-mq-hover-background rounded-full animate-pulse" />
                   </div>

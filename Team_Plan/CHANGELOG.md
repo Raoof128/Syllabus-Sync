@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - Haptic Feedback for Navigation
+
+### Added
+- **Haptic Feedback System:** Implemented comprehensive vibration feedback for mobile navigation using the Web Vibration API.
+- **Haptic Patterns:** Created 8 distinct patterns (tap, doubleTap, turnLeft, turnRight, arrival, offRoute, recalculating, error) with 3 intensity levels (light, medium, strong).
+- **Navigation Triggers:** Wired haptics to navigation events - turn instructions, arrival, off-route warning, waypoint proximity, and route recalculation.
+- **Settings UI:** Added Map Settings card with haptic feedback toggle in the Settings page.
+- **State Persistence:** Integrated haptic preference with Zustand mapStore for seamless state sync and localStorage persistence.
+- **Mobile Detection:** Added automatic mobile device detection to only trigger haptics on supported devices.
+
+### Improved
+- **User Experience:** Enhanced navigation feedback through tactile responses for key navigation events.
+- **Settings Page:** Added Map Navigation section with haptic feedback controls.
+
+### Verification
+- `npm run lint` (pass)
+- `npm run typecheck` (pass)
+- Manual haptic pattern testing (all patterns trigger correctly)
+
+---
+
 Raouf: 2026-01-20 - Map Navigation Stability & UX Refinements
 
 ### Improved

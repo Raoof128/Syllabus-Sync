@@ -2,6 +2,59 @@
 
 ## Current Session (Jan 22, 2026) - Real-time Navigation Enhancement
 
+### Haptic Feedback for Navigation Implementation
+- **Status:** ✅ Complete - All lint/typecheck passing, tests passing (290 tests)
+- **New File Created:** `lib/utils/haptics.ts` (314 lines)
+- **New Component Created:** `app/settings/components/MapSettings.tsx` (Map Navigation settings card)
+
+**Core Features:**
+1. **Haptic Patterns & Intensities:**
+   - 8 distinct patterns: tap, doubleTap, turnLeft, turnRight, arrival, offRoute, recalculating, error
+   - 3 intensity levels: light (0.5x), medium (1.0x), strong (1.5x)
+   - Vibration patterns: Short pulses for taps, complex sequences for turns/arrivals
+
+2. **Navigation Event Integration:**
+   - Turn instructions (left/right/slight-left/slight-right/u-turn/straight)
+   - Arrival at destination (celebratory pattern)
+   - Off-route warning (strong warning pulses)
+   - Waypoint proximity (double tap when within 15m of next instruction)
+   - Route recalculation (thinking pattern)
+
+3. **Mobile Detection:**
+   - Touch capability detection (`ontouchstart` in window or `maxTouchPoints > 0`)
+   - User agent mobile detection (Android, iOS, etc.)
+   - Vibration API support detection
+   - Only triggers haptics on mobile devices with vibration support
+
+4. **Settings UI & State Management:**
+   - Map Settings card in Settings page with haptic feedback toggle
+   - Zustand mapStore integration: `hapticFeedbackEnabled` state (default: true)
+   - `toggleHapticFeedback()` action for user control
+   - `setHapticEnabledGetter()` for sync between store and haptics module
+   - localStorage persistence for user preference
+
+5. **Safety Features:**
+   - 300ms debounce to prevent rapid haptic spam
+   - External getter pattern for Zustand state sync
+   - Graceful fallback when Vibration API not supported
+
+**Files Modified:**
+- `lib/utils/haptics.ts` - NEW: Complete haptic feedback utility
+- `app/settings/components/MapSettings.tsx` - NEW: Map navigation settings UI
+- `app/settings/components/SettingsSkeleton.tsx` - Added Map navigation skeleton
+- `app/settings/components/index.ts` - Exported MapSettings component
+- `app/settings/page.tsx` - Integrated MapSettings into settings grid
+- `app/map/CampusMap.tsx` - Added haptic state sync (removed unused imports)
+- `lib/map/realtimeNavigation.ts` - Wired haptic calls to navigation events
+- `lib/store/mapStore.ts` - Haptic state already existed, now connected
+- `locales/en/translations.json` - Added mapNavigation, hapticFeedback translations
+
+**Test Coverage:**
+- Manual haptic pattern testing (all 8 patterns trigger correctly)
+- Store integration test (toggle + persistence)
+- Flow test (navigation events → haptic triggers)
+- Complete flow test (store → haptics → localStorage)
+
 ### Real-time Navigation Engine Implementation
 - **Status:** ✅ Complete - All 39 map tests passing, build successful
 - **New File Created:** `lib/map/realtimeNavigation.ts` (650+ lines)

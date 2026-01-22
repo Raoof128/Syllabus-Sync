@@ -25,6 +25,7 @@ import {
   generateNavigationText,
   formatETA,
 } from '@/lib/map/realtimeNavigation';
+import { setHapticEnabledGetter } from '@/lib/utils/haptics';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useLeafletLoader } from '@/lib/hooks/useLeafletLoader';
@@ -32,6 +33,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { devLog } from '@/lib/utils/devLog';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import type { MapOverlayId } from '@/lib/map/mapOverlays';
+import { useMapStore } from '@/lib/store/mapStore';
 
 // Map-specific logger
 const mapLog = devLog.map;
@@ -100,6 +102,12 @@ export default function CampusMap({
   onLocationStatusChange,
 }: CampusMapProps) {
   const { t } = useTranslation();
+  const { hapticFeedbackEnabled } = useMapStore();
+
+  // Sync haptic state with store
+  useEffect(() => {
+    setHapticEnabledGetter(() => hapticFeedbackEnabled);
+  }, [hapticFeedbackEnabled]);
 
   // ============================================
   // LEAFLET MODULE - Loaded dynamically via custom hook

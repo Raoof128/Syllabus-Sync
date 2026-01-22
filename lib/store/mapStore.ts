@@ -28,9 +28,16 @@ export interface MapState {
   // Last viewed position (for restoring map state)
   lastPosition: { lat: number; lng: number; zoom: number } | null;
   setLastPosition: (pos: { lat: number; lng: number; zoom: number } | null) => void;
+  // Haptic feedback for navigation (mobile)
+  hapticFeedbackEnabled: boolean;
+  setHapticFeedbackEnabled: (enabled: boolean) => void;
+  toggleHapticFeedback: () => void;
 }
 
-type MapPersistedState = Pick<MapState, 'activeOverlays' | 'showOverlayPanel' | 'lastPosition'>;
+type MapPersistedState = Pick<
+  MapState,
+  'activeOverlays' | 'showOverlayPanel' | 'lastPosition' | 'hapticFeedbackEnabled'
+>;
 
 export const useMapStore = create<MapState>()(
   persist(
@@ -61,6 +68,14 @@ export const useMapStore = create<MapState>()(
       lastPosition: null,
 
       setLastPosition: (pos) => set({ lastPosition: pos }),
+
+      // Haptic feedback settings (default enabled on mobile)
+      hapticFeedbackEnabled: true,
+
+      setHapticFeedbackEnabled: (enabled) => set({ hapticFeedbackEnabled: enabled }),
+
+      toggleHapticFeedback: () =>
+        set((state) => ({ hapticFeedbackEnabled: !state.hapticFeedbackEnabled })),
     }),
     {
       name: 'map-storage',
@@ -70,6 +85,7 @@ export const useMapStore = create<MapState>()(
         activeOverlays: state.activeOverlays,
         showOverlayPanel: state.showOverlayPanel,
         lastPosition: state.lastPosition,
+        hapticFeedbackEnabled: state.hapticFeedbackEnabled,
       }),
       migrate: (persistedState) => {
         const state = persistedState as Partial<MapPersistedState>;
@@ -77,6 +93,7 @@ export const useMapStore = create<MapState>()(
           activeOverlays: state?.activeOverlays ?? [],
           showOverlayPanel: state?.showOverlayPanel ?? false,
           lastPosition: state?.lastPosition ?? null,
+          hapticFeedbackEnabled: state?.hapticFeedbackEnabled ?? true,
         };
       },
     },

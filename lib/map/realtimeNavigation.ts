@@ -13,6 +13,13 @@
  */
 
 import { calculateDistance, formatDistance } from './navigationHelpers';
+import {
+  hapticForTurn,
+  hapticForArrival,
+  hapticForOffRoute,
+  hapticForRecalculating,
+  hapticForWaypoint,
+} from '@/lib/utils/haptics';
 
 // ============================================
 // TYPES & INTERFACES
@@ -719,6 +726,8 @@ export class NavigationStateManager {
 
     if (this.state.isOffRoute && !wasOffRoute) {
       this.state.status = 'off-route';
+      // Haptic feedback for off-route warning
+      hapticForOffRoute();
       this.onOffRoute?.();
     } else if (!this.state.isOffRoute && wasOffRoute) {
       this.state.status = 'navigating';
@@ -734,11 +743,14 @@ export class NavigationStateManager {
     // Check for arrival
     if (this.state.remainingDistance < ARRIVAL_THRESHOLD) {
       this.state.status = 'arrived';
+      // Haptic feedback for arrival
+      hapticForArrival();
       this.notifyStateChange();
       return;
     }
 
     // Update current instruction
+    const previousInstructionIndex = this.state.currentInstructionIndex;
     const currentInst = getCurrentInstruction(
       instructions,
       position.smoothedLat,
@@ -748,6 +760,23 @@ export class NavigationStateManager {
 
     if (currentInst) {
       this.state.currentInstructionIndex = currentInst.index;
+
+      // Trigger haptic feedback when advancing to a new instruction (turn)
+      if (currentInst.index > previousInstructionIndex) {
+        const instruction = instructions[currentInst.index];
+        if (instruction) {
+          // Trigger turn-specific haptic pattern
+          hapticForTurn(instruction.type as Parameters<typeof hapticForTurn>[0]);
+        }
+      }
+
+      // Trigger waypoint haptic when close to next instruction
+      if (
+        currentInst.distanceToNext <= INSTRUCTION_ADVANCE_THRESHOLD &&
+        currentInst.distanceToNext > 5
+      ) {
+        hapticForWaypoint();
+      }
     }
 
     // Update ETA
@@ -757,6 +786,8 @@ export class NavigationStateManager {
     // Check if we should trigger recalculation
     if (this.shouldRecalculate(position)) {
       this.state.status = 'recalculating';
+      // Haptic feedback for recalculation
+      hapticForRecalculating();
     }
 
     this.notifyStateChange();

@@ -7,3 +7,4 @@ export { default as HelpSupport } from './HelpSupport';
 export { default as SettingsSkeleton } from './SettingsSkeleton';
 export { default as GamificationSettings } from './GamificationSettings';
 export { default as AccountSettings } from './AccountSettings';
+export { default as MapSettings } from './MapSettings';

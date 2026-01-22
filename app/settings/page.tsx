@@ -28,6 +28,7 @@ import {
   HelpSupport,
   SettingsSkeleton,
   GamificationSettings,
+  MapSettings,
 } from './components';
 
 // Helper to get device label
@@ -129,6 +130,9 @@ function SettingsContent() {
 
         {/* Gamification Settings */}
         <GamificationSettings t={t} />
+
+        {/* Map Navigation Settings */}
+        <MapSettings t={t} />
       </div>
 
       {/* Help & Support Section */}
