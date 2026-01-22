@@ -16,6 +16,15 @@ import {
 } from '@/lib/map/navigationHelpers';
 import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
 import { fetchORSRoute } from '@/lib/services/ors';
+import {
+  GpsPositionSmoother,
+  NavigationStateManager,
+  NavigationState,
+  SmoothedPosition,
+  parseRouteInstructions,
+  generateNavigationText,
+  formatETA,
+} from '@/lib/map/realtimeNavigation';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useLeafletLoader } from '@/lib/hooks/useLeafletLoader';
@@ -115,10 +124,43 @@ export default function CampusMap({
   // Location Status State - starts as 'idle' until geolocation actually begins
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
 
+  // Real-time Navigation State
+  const [navState, setNavState] = useState<NavigationState | null>(null);
+  const [smoothedPosition, setSmoothedPosition] = useState<SmoothedPosition | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const navManagerRef = useRef<NavigationStateManager | null>(null);
+  const positionSmootherRef = useRef<GpsPositionSmoother | null>(null);
+  const lastRouteRecalcRef = useRef<number>(0);
+
   const userMarkerRef = useRef<import('leaflet').Marker | null>(null);
   const accuracyCircleRef = useRef<import('leaflet').Circle | null>(null);
   const hasSetFallbackOrigin = useRef(false);
   const lastPositionRef = useRef<{ lat: number; lng: number; time: number } | null>(null);
+
+  // Initialize position smoother on mount
+  useEffect(() => {
+    positionSmootherRef.current = new GpsPositionSmoother();
+    navManagerRef.current = new NavigationStateManager();
+
+    // Set up navigation state change handler
+    navManagerRef.current.setOnStateChange((state) => {
+      setNavState(state);
+    });
+
+    // Set up off-route handler
+    navManagerRef.current.setOnOffRoute(() => {
+      mapLog.log('User went off-route, triggering recalculation');
+      // Will trigger route recalculation
+    });
+
+    return () => {
+      positionSmootherRef.current = null;
+      if (navManagerRef.current) {
+        navManagerRef.current.stopNavigation();
+        navManagerRef.current = null;
+      }
+    };
+  }, []);
 
   // Notify parent when location status changes
   useEffect(() => {
@@ -548,6 +590,45 @@ export default function CampusMap({
         // Update last position reference
         lastPositionRef.current = { lat: gpsLat, lng: gpsLng, time: currentTime };
 
+        // Apply Kalman filter for GPS smoothing (reduces jitter/noise)
+        let displayLat = gpsLat;
+        let displayLng = gpsLng;
+
+        if (positionSmootherRef.current) {
+          const smoothed = positionSmootherRef.current.update({
+            lat: gpsLat,
+            lng: gpsLng,
+            accuracy: pos.coords.accuracy,
+            heading: gpsHeading,
+            speed: gpsSpeed,
+            timestamp: currentTime,
+          });
+
+          // Use smoothed position for display (reduces jitter while walking)
+          displayLat = smoothed.smoothedLat;
+          displayLng = smoothed.smoothedLng;
+          setSmoothedPosition(smoothed);
+
+          // Update navigation manager if actively navigating
+          if (isNavigating && navManagerRef.current) {
+            navManagerRef.current.updatePosition({
+              lat: gpsLat,
+              lng: gpsLng,
+              accuracy: pos.coords.accuracy,
+              heading: gpsHeading,
+              speed: gpsSpeed,
+              timestamp: currentTime,
+            });
+          }
+
+          mapLog.log('GPS smoothing applied:', {
+            raw: { lat: gpsLat.toFixed(6), lng: gpsLng.toFixed(6) },
+            smoothed: { lat: displayLat.toFixed(6), lng: displayLng.toFixed(6) },
+            confidence: smoothed.confidence.toFixed(2),
+            calculatedSpeed: positionSmootherRef.current.calculateSpeed().toFixed(2) + ' m/s',
+          });
+        }
+
         // Debug: Check if coordinates match known landmarks exactly (mock detection)
         const isLibraryMock =
           Math.abs(gpsLat - -33.7756994) < 0.000001 && Math.abs(gpsLng - 151.1131306) < 0.000001;
@@ -875,6 +956,85 @@ export default function CampusMap({
   }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng]);
 
   // ============================================
+  // REAL-TIME ROUTE RECALCULATION
+  // Automatically recalculates route when user moves significantly or goes off-route
+  // ============================================
+  const recalculateRoute = useCallback(async () => {
+    if (!selectedBuilding || !origin) return;
+
+    const now = Date.now();
+    // Debounce: Don't recalculate more than once every 5 seconds
+    if (now - lastRouteRecalcRef.current < 5000) {
+      mapLog.log('Route recalculation skipped (debounce)');
+      return;
+    }
+    lastRouteRecalcRef.current = now;
+
+    mapLog.log('Real-time route recalculation triggered');
+    await retryRoute();
+  }, [selectedBuilding, origin, retryRoute]);
+
+  // Effect to handle real-time route updates when navigating
+  useEffect(() => {
+    if (!isNavigating || !navState) return;
+
+    // Recalculate if user went off-route or needs rerouting
+    if (navState.status === 'off-route' || navState.status === 'recalculating') {
+      mapLog.log('Off-route detected, recalculating...', {
+        distanceFromRoute: navState.distanceFromRoute.toFixed(1) + 'm',
+        status: navState.status,
+      });
+      recalculateRoute();
+    }
+
+    // Check if user arrived
+    if (navState.status === 'arrived') {
+      mapLog.log('User arrived at destination!');
+      toastUtils.success(
+        t('arrived' as TranslationKey) || 'Arrived!',
+        selectedBuilding?.name || '',
+      );
+      setIsNavigating(false);
+    }
+  }, [navState, isNavigating, recalculateRoute, selectedBuilding, t]);
+
+  // Start/stop navigation when route is available
+  const startNavigation = useCallback(() => {
+    if (!routeCoords.length || !preview || !navManagerRef.current) {
+      toastUtils.warning(t('noRouteAvailable' as TranslationKey) || 'No route available');
+      return;
+    }
+
+    // Convert pixel coords back to [lng, lat] format for navigation manager
+    const navCoords = routeCoords.map(([lat, lng]) => [lng, lat] as [number, number]);
+
+    // Parse instructions from ORS response (stored in preview)
+    const instructions = parseRouteInstructions({ features: [] }); // TODO: Store full ORS response
+
+    navManagerRef.current.startNavigation(navCoords, instructions, preview.distanceMeters);
+    setIsNavigating(true);
+
+    mapLog.log('Navigation started', {
+      totalDistance: preview.distanceMeters,
+      estimatedTime: preview.durationSeconds,
+    });
+
+    toastUtils.success(
+      t('navigationStarted' as TranslationKey) || 'Navigation started',
+      `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
+    );
+  }, [routeCoords, preview, t]);
+
+  const stopNavigation = useCallback(() => {
+    if (navManagerRef.current) {
+      navManagerRef.current.stopNavigation();
+    }
+    setIsNavigating(false);
+    setNavState(null);
+    mapLog.log('Navigation stopped');
+  }, []);
+
+  // ============================================
   // ROUTING LOGIC
   // ============================================
   useEffect(() => {
@@ -882,6 +1042,10 @@ export default function CampusMap({
       if (!selectedBuilding || !origin) {
         setPreview(null);
         setRouteCoords([]);
+        // Stop navigation if building is deselected
+        if (isNavigating) {
+          stopNavigation();
+        }
         return;
       }
 
@@ -1427,6 +1591,93 @@ export default function CampusMap({
                     )}
 
                     {/* Turn-by-turn Steps */}
+                    {/* Real-time Navigation Panel - Shows when actively navigating */}
+                    {isNavigating && navState && (
+                      <div className="mt-3 rounded-lg bg-gradient-to-r from-green-500/20 to-blue-500/20 p-3 border border-green-500/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-xs font-semibold text-green-400 uppercase tracking-wide">
+                              {navState.status === 'navigating' && 'Navigating'}
+                              {navState.status === 'off-route' && '⚠️ Off Route'}
+                              {navState.status === 'recalculating' && '🔄 Recalculating...'}
+                              {navState.status === 'arrived' && '🎉 Arrived!'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={stopNavigation}
+                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                            aria-label="Stop navigation"
+                          >
+                            Stop
+                          </button>
+                        </div>
+
+                        {/* Current instruction */}
+                        {navState.currentInstructionIndex < navState.instructions.length && (
+                          <div className="mb-2 p-2 rounded bg-white/10">
+                            <p className="text-sm font-medium text-white">
+                              {generateNavigationText(
+                                navState.instructions[navState.currentInstructionIndex],
+                                navState.distanceFromRoute,
+                                true,
+                              )}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Stats row */}
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-3">
+                            <span className="text-white/80">
+                              📍 {formatDistance(navState.remainingDistance)} left
+                            </span>
+                            <span className="text-white/80">⏱️ {formatETA(navState.eta)}</span>
+                          </div>
+                          {navState.isOffRoute && (
+                            <span className="text-yellow-400">
+                              {navState.distanceFromRoute.toFixed(0)}m off route
+                            </span>
+                          )}
+                        </div>
+
+                        {/* GPS accuracy indicator */}
+                        {smoothedPosition && (
+                          <div className="mt-2 flex items-center gap-2 text-xs text-white/60">
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                smoothedPosition.confidence > 0.7
+                                  ? 'bg-green-500'
+                                  : smoothedPosition.confidence > 0.4
+                                    ? 'bg-yellow-500'
+                                    : 'bg-red-500'
+                              }`}
+                            />
+                            <span>
+                              GPS: ±{smoothedPosition.accuracy?.toFixed(0) || '?'}m
+                              {smoothedPosition.confidence > 0.7
+                                ? ' (Good)'
+                                : smoothedPosition.confidence > 0.4
+                                  ? ' (Fair)'
+                                  : ' (Poor)'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Start Navigation Button - Shows when route is available but not navigating */}
+                    {preview && !isNavigating && origin && (
+                      <button
+                        onClick={startNavigation}
+                        className="mt-3 w-full py-2 px-4 rounded-lg bg-gradient-to-r from-green-500 to-blue-500 text-white font-medium text-sm hover:from-green-600 hover:to-blue-600 transition-all duration-200 flex items-center justify-center gap-2"
+                        aria-label="Start turn-by-turn navigation"
+                      >
+                        <span>🧭</span>
+                        <span>Start Navigation</span>
+                      </button>
+                    )}
+
                     {preview && preview.steps.length > 0 && (
                       <div className="pt-2 border-t border-mq-border">
                         <h4 className="text-xs font-semibold uppercase tracking-wider mb-3 text-mq-content-tertiary">
