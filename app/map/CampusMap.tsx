@@ -102,6 +102,28 @@ export default function CampusMap({
   onLocationStatusChange,
 }: CampusMapProps) {
   const { t } = useTranslation();
+  const safeT = useCallback(
+    (key: TranslationKey, fallback: string): string => {
+      const value = t(key);
+      return value === key ? fallback : value;
+    },
+    [t],
+  );
+  const normalizeErrorMessage = useCallback((value: unknown, fallback: string): string => {
+    if (!value) return fallback;
+    if (typeof value === 'string') {
+      return value.trim() || fallback;
+    }
+    if (value instanceof Error) {
+      return value.message || fallback;
+    }
+    try {
+      const stringified = String(value);
+      return stringified.trim() || fallback;
+    } catch {
+      return fallback;
+    }
+  }, []);
   const { hapticFeedbackEnabled } = useMapStore();
 
   // Sync haptic state with store
@@ -128,6 +150,8 @@ export default function CampusMap({
   const [preview, setPreview] = useState<RoutePreview | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  const [isOffCampus, setIsOffCampus] = useState(false);
+  const offCampusToastShown = useRef(false);
 
   // Location Status State - starts as 'idle' until geolocation actually begins
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
@@ -659,6 +683,19 @@ export default function CampusMap({
         // Check if user is within campus bounds using GPS
         const { south, north, west, east } = GPS_CAMPUS_BOUNDS;
         const isInBounds = gpsLat >= south && gpsLat <= north && gpsLng >= west && gpsLng <= east;
+        setIsOffCampus(!isInBounds);
+        if (!isInBounds && !offCampusToastShown.current) {
+          offCampusToastShown.current = true;
+          toastUtils.warning(
+            safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
+            safeT(
+              'locationOutsideCampusMessage',
+              'You appear to be outside campus bounds. Navigation is disabled until you return to campus.',
+            ),
+          );
+        } else if (isInBounds) {
+          offCampusToastShown.current = false;
+        }
 
         // Calculate approximate distance from campus center
         const latDiff = gpsLat - CAMPUS_CENTRE_GPS.lat;
@@ -848,7 +885,7 @@ export default function CampusMap({
         mapLog.log('Marker cleanup error (likely already removed):', error);
       }
     };
-  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng, t, isNavigating]);
+  }, [mapInstance, leafletModule, userIcon, isMapReady, gpsToPixelLatLng, t, isNavigating, safeT]);
 
   // ============================================
   // CENTER ON USER ACTION
@@ -955,13 +992,15 @@ export default function CampusMap({
       setRouteCoords(pixelCoords);
       setPreview(routeData);
     } else {
-      setRouteError(error || t('unknownError'));
+      setRouteError(
+        normalizeErrorMessage(error, safeT('unknownError', 'Something went wrong while routing.')),
+      );
       setRouteCoords([]);
       setPreview(null);
     }
 
     setIsLoadingRoute(false);
-  }, [selectedBuilding, origin, t, gpsToPixelLatLng, getBuildingLatLng]);
+  }, [selectedBuilding, origin, gpsToPixelLatLng, getBuildingLatLng, safeT, normalizeErrorMessage]);
 
   // ============================================
   // REAL-TIME ROUTE RECALCULATION
@@ -1008,6 +1047,16 @@ export default function CampusMap({
 
   // Start/stop navigation when route is available
   const startNavigation = useCallback(() => {
+    if (isOffCampus) {
+      toastUtils.warning(
+        safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
+        safeT(
+          'locationOutsideCampusMessage',
+          'Navigation is disabled while you are outside campus. Return to campus to enable routes.',
+        ),
+      );
+      return;
+    }
     if (!routeCoords.length || !preview || !navManagerRef.current) {
       toastUtils.warning(t('noRouteAvailable' as TranslationKey) || 'No route available');
       return;
@@ -1031,7 +1080,7 @@ export default function CampusMap({
       t('navigationStarted' as TranslationKey) || 'Navigation started',
       `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
     );
-  }, [routeCoords, preview, t]);
+  }, [isOffCampus, routeCoords, preview, t, safeT]);
 
   const stopNavigation = useCallback(() => {
     if (navManagerRef.current) {
@@ -1120,7 +1169,9 @@ export default function CampusMap({
         setRouteCoords(pixelCoords);
         setPreview(routeData);
       } else {
-        setRouteError(error || t('unknownError'));
+        setRouteError(
+          normalizeErrorMessage(error, safeT('unknownError', 'Unable to calculate this route.')),
+        );
         setRouteCoords([]);
         setPreview(null);
       }
@@ -1132,11 +1183,12 @@ export default function CampusMap({
   }, [
     selectedBuilding,
     origin,
-    t,
     gpsToPixelLatLng,
     getBuildingLatLng,
     isNavigating,
     stopNavigation,
+    safeT,
+    normalizeErrorMessage,
   ]);
 
   // ============================================
@@ -1237,6 +1289,19 @@ export default function CampusMap({
       role="application"
       aria-label={t('interactiveCampusMap')}
     >
+      {isOffCampus && (
+        <div className="absolute top-3 left-3 right-3 md:right-auto z-[1200] px-4 py-3 rounded-mq-lg bg-mq-warning text-white text-sm shadow flex items-start gap-2">
+          <span className="font-semibold">
+            {safeT('locationOutsideCampusTitle', 'Outside campus boundary')}
+          </span>
+          <span className="text-white/90">
+            {safeT(
+              'locationOutsideCampusMessage',
+              'You appear to be outside campus bounds. Navigation is disabled until you return.',
+            )}
+          </span>
+        </div>
+      )}
       {/* Only render MapContainer after client-side modules are loaded */}
       {isClientReady && reactLeafletModule && leafletModule && MapController ? (
         <reactLeafletModule.MapContainer

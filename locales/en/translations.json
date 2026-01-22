@@ -412,6 +412,8 @@
   "locationFound": "Location Found",
   "centeredOnPosition": "Centered on your position.",
   "outsideCampus": "Outside Campus",
+  "locationOutsideCampusTitle": "Outside campus boundary",
+  "locationOutsideCampusMessage": "You’re currently outside campus. Navigation is disabled until you return to campus.",
   "outsideCampusDistance": "You are approximately {{distance}}m from campus center",
   "unknownError": "Unknown error occurred.",
   "campusFeed": "Feed",

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - Map Error Messaging & Off-Campus UX
+
+### Changed
+- Added safe translation fallbacks for off-campus warnings and banner copy, and normalized route errors so users see clear messages instead of raw keys/classes.
+- Hardened map navigation UX to keep navigation blocked with explicit guidance when the user is outside campus bounds.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ### Changed
@@ -27,6 +38,7 @@ Raouf: 2026-01-22 - Notification System Reliability
 - Notifications service prefers Service Worker `showNotification` when available for better delivery when tabs are hidden.
 - Social buttons now open natively (no JS interception) and blur after click so hover/focus states don’t stick; links source from config where available.
 - Navigation buttons updated to the compact ghost/icon style and auto-navigate query flag now scrolls the map and highlights building on arrival; sample events seeded with real buildings for map navigation testing.
+- Map now detects off-campus location, shows a warning banner, and blocks navigation when outside bounds to avoid bad routes.
 
 ### Verification
 - `npm run check`
