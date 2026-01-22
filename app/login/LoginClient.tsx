@@ -186,8 +186,8 @@ export default function LoginClient() {
         className="object-cover"
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-mq-background/90" />
-      <Card className="w-full max-w-md mq-liquid-glass-elevated relative z-10">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/10 to-mq-background/60" />
+      <Card className="w-full max-w-md mq-liquid-glass-elevated relative z-10 bg-white/3 border border-white/10 backdrop-blur-3xl shadow-[0_16px_64px_rgba(0,0,0,0.2)]">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-6">
             <div className="relative w-65 h-65 flex items-center justify-center">

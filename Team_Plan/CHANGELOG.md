@@ -49,6 +49,16 @@ Raouf: 2026-01-22 - Login Background Image
 
 ---
 
+Raouf: 2026-01-22 - Login Glass Transparency Tune
+
+### Changed
+- Increased transparency of the login glass card and overlay (lighter border, background, and shadow) to reveal more of the wallpaper while staying readable.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-22 - VibeCast Weather Widget (7-Color Spectrum)
 
 ### Changed

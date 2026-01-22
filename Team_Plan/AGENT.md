@@ -42,6 +42,12 @@
 - **Files Updated:** `app/login/LoginClient.tsx`, `public/images/login-bg.png`.
 - **Verification:** `npm run check`
 
+### Raouf: 2026-01-22 (Australia/Sydney) - Login Glass Transparency Tune
+- **Status:** ✅ Complete - Increased glass transparency on the login card to showcase the wallpaper while retaining readability.
+- **Logic/UI:** Lightened overlay and card (bg-white/3, border-white/10, blur-3xl, softer shadow).
+- **Files Updated:** `app/login/LoginClient.tsx`.
+- **Verification:** `npm run check`
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Header)
 - **Status:** ✅ Complete - Replaced top-bar weather widget with the VibeCast pill UI.
 - **Logic:** Added `useWeather` hook with geolocation, OpenWeather fetch, and vibe mapping.
