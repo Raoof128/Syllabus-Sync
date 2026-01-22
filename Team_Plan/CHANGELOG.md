@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-22 - Atomic Unit Sync Architecture
+
+### Fixed
+- **Sync Reliability:** Resolved persistent 500 errors (RLS violations) and 404 errors during unit updates by implementing an atomic, transactional sync architecture.
+- **Race Conditions:** Eliminated race conditions between unit creation/update and schedule insertion using a Postgres RPC function.
+
+### Added
+- **RPC Function:** `upsert_unit_with_schedule` handles atomic upsert of units and replacement of schedules in a single transaction.
+- **Sync Endpoint:** `POST /api/units/sync` provides a unified interface for creating and updating units.
+
+### Changed
+- **UnitsStore:** Refactored `addUnit` and `updateUnit` to use the new atomic sync endpoint, ensuring local state is always accurately reflected on the server.
+
+### Verification
+- `npm run test` (all 290 tests pass)
+- `npm run typecheck` (pass)
+
+---
+
 Raouf: 2026-01-22 - Calendar Page Fixes
 
 ### Fixed

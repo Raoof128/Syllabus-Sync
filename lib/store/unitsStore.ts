@@ -84,11 +84,10 @@ export const useUnitsStore = create<UnitsState>()(
         });
 
         try {
-          const apiPayload: Partial<Unit> = { ...normalized };
-          // API will set createdAt; remove to avoid date serialization issues
-          delete apiPayload.createdAt;
+          // Use Atomic Sync Endpoint
+          const apiPayload = { ...normalized };
 
-          const created = await apiRequest<Unit>('/api/units', {
+          const created = await apiRequest<Unit>('/api/units/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(apiPayload),
@@ -149,11 +148,14 @@ export const useUnitsStore = create<UnitsState>()(
         }));
 
         try {
-          const updated = await apiRequest<Unit>(`/api/units/${id}`, {
-            method: 'PUT',
+          // Use Atomic Sync Endpoint for robust updates
+          // This handles both creation (if missing) and update in one transaction
+          const updated = await apiRequest<Unit>('/api/units/sync', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedUnit),
+            body: JSON.stringify(optimisticUpdate),
           });
+
           const normalized = normalizeUnit(updated);
           set((state) => ({
             units: state.units.map((u) => (u.id === id ? normalized : u)),

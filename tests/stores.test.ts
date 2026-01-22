@@ -39,6 +39,17 @@ describe('unitsStore', () => {
         unitState.push(created);
         return created;
       }
+      // Handle Atomic Sync Endpoint
+      if (url.endsWith('/api/units/sync') && method === 'POST') {
+        const payload = JSON.parse(String(init?.body));
+        const index = unitState.findIndex((unit) => unit.id === payload.id);
+        if (index >= 0) {
+          unitState[index] = { ...unitState[index], ...payload };
+          return unitState[index];
+        }
+        unitState.push(payload);
+        return payload;
+      }
       if (url.includes('/api/units/') && method === 'PUT') {
         const id = url.split('/').pop() as string;
         const updates = JSON.parse(String(init?.body));

@@ -4,6 +4,19 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 
+// Helper to generate UUID v4 - with fallback for environments where crypto.randomUUID() is not available
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback implementation
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 // More permissive UUID validation - accepts any valid UUID format
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -31,7 +44,7 @@ const classTimeSchema = z.object({
   startTime: z.string().min(1),
   endTime: z.string().min(1),
 });
-const dateSchema = z.preprocess((value) => value, z.coerce.date());
+// Note: createdAt is intentionally NOT included in update schema - it should not be updated
 const unitUpdateSchema = z.object({
   code: z.string().min(1).optional(),
   name: z.string().min(1).optional(),
@@ -44,14 +57,15 @@ const unitUpdateSchema = z.object({
     })
     .optional(),
   schedule: z.array(classTimeSchema).optional(),
-  createdAt: dateSchema.optional(),
 });
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   // SECURITY: Use rate-limited auth for mutation endpoint
   return requireAuthWithRateLimit(request, async (userId) => {
+    let id: string | undefined;
     try {
-      const { id } = await params;
+      const { id: paramId } = await params;
+      id = paramId;
 
       // Validate ID format
       if (!isValidId(id)) {
@@ -72,8 +86,26 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       const supabase = await createServerClient();
 
+      // SECURITY: Verify ownership BEFORE any mutations
+      // This ensures we don't attempt to modify class_times for non-existent/unauthorized units
+      // which would cause RLS violations during INSERT
+      const { data: existingUnit, error: checkError } = await supabase
+        .from('units')
+        .select('id')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+
+      if (checkError || !existingUnit) {
+        if (checkError?.code === 'PGRST116' || !existingUnit) {
+          return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
+        }
+        console.error('Error verifying unit ownership:', checkError);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+      }
+
       // Destructure to handle special fields - schedule is stored in class_times table, not units
-      const { location, schedule, createdAt, ...rest } = parsed.data;
+      const { location, schedule, ...rest } = parsed.data;
 
       const updatePayload: Record<string, unknown> = {
         ...rest,
@@ -87,11 +119,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         };
       }
 
-      // Map createdAt to created_at
-      if (createdAt) {
-        updatePayload.created_at = createdAt.toISOString();
-      }
-
       // Handle schedule updates (stored in separate class_times table)
       if (schedule && schedule.length >= 0) {
         // Delete existing class times for this unit
@@ -101,14 +128,25 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           .eq('unit_id', id);
 
         if (deleteError) {
-          console.error('Error deleting class times:', deleteError.code, deleteError.message);
-          return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+          console.error('Error deleting class times:', {
+            code: deleteError.code,
+            message: deleteError.message,
+            details: deleteError.details,
+            hint: deleteError.hint,
+            unitId: id,
+            userId: userId,
+          });
+          return jsonError(
+            'Database operation failed: unable to update class schedule',
+            500,
+            ERROR_CODES.DATABASE_ERROR,
+          );
         }
 
         // Insert new class times if any
         if (schedule.length > 0) {
           const classTimesPayload = schedule.map((ct) => ({
-            id: ct.id && UUID_REGEX.test(ct.id) ? ct.id : crypto.randomUUID(),
+            id: ct.id && UUID_REGEX.test(ct.id) ? ct.id : generateUUID(),
             unit_id: id,
             day: ct.day,
             start_time: ct.startTime,
@@ -120,8 +158,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             .insert(classTimesPayload);
 
           if (insertError) {
-            console.error('Error inserting class times:', insertError.code, insertError.message);
-            return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+            console.error('Error inserting class times:', {
+              code: insertError.code,
+              message: insertError.message,
+              details: insertError.details,
+              hint: insertError.hint,
+              unitId: id,
+              userId: userId,
+              payload: classTimesPayload,
+            });
+            return jsonError(
+              'Database operation failed: unable to save class schedule',
+              500,
+              ERROR_CODES.DATABASE_ERROR,
+            );
           }
         }
       }
@@ -139,7 +189,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           if (error.code === 'PGRST116') {
             return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
           }
-          return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+          console.error('Database error fetching unit after update:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            unitId: id,
+            userId: userId,
+          });
+          return jsonError(
+            'Database operation failed: unable to retrieve updated unit',
+            500,
+            ERROR_CODES.DATABASE_ERROR,
+          );
         }
 
         // Fetch class times for this unit
@@ -178,14 +240,26 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
-        console.error('Database error updating unit:', error.code, error.message);
+        console.error('Database error updating unit:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          unitId: id,
+          userId: userId,
+          payload: updatePayload,
+        });
         if (error.code === 'PGRST116') {
           return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
         }
         if (error.code === '23505') {
           return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
         }
-        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+        return jsonError(
+          'Database operation failed: unable to update unit',
+          500,
+          ERROR_CODES.DATABASE_ERROR,
+        );
       }
 
       // Fetch class times for this unit
@@ -213,7 +287,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         schedule: unitSchedule,
       });
     } catch (error) {
-      console.error('Error updating unit:', error);
+      console.error('Error updating unit:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        unitId: id,
+        userId: userId,
+      });
       return jsonError('Failed to update unit', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
