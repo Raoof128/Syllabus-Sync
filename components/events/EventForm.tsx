@@ -319,12 +319,12 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="event-description">{t('description' as 'title')}</Label>
+            <Label htmlFor="event-description">{t('description')}</Label>
             <Input
               id="event-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('enterEventDescription' as 'title')}
+              placeholder={t('enterEventDescription')}
             />
           </div>
 
@@ -332,7 +332,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="event-date">
-                {t('date' as 'title')} <span className="text-mq-error">*</span>
+                {t('date')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-date"
@@ -352,14 +352,14 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-time">
-                {t('time' as 'title')} <span className="text-mq-error">*</span>
+                {t('time')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-time"
                 type="text"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                placeholder="e.g., 2:00 PM - 4:00 PM"
+                placeholder={t('exampleTime')}
                 aria-invalid={Boolean(errors.time)}
                 aria-required="true"
                 aria-describedby={errors.time ? 'event-time-error' : undefined}
@@ -377,13 +377,13 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="event-building">
-                {t('building' as 'title')} <span className="text-mq-error">*</span>
+                {t('building')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-building"
                 value={building}
                 onChange={(e) => setBuilding(e.target.value.toUpperCase())}
-                placeholder="e.g., C5C"
+                placeholder={t('buildingPlaceholder')}
                 aria-invalid={Boolean(errors.building)}
                 aria-required="true"
                 aria-describedby={errors.building ? 'event-building-error' : undefined}
@@ -397,13 +397,13 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-room">
-                {t('room' as 'title')} <span className="text-mq-error">*</span>
+                {t('room')} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-room"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                placeholder="e.g., 204"
+                placeholder={t('roomPlaceholder')}
                 aria-invalid={Boolean(errors.room)}
                 aria-required="true"
                 aria-describedby={errors.room ? 'event-room-error' : undefined}
@@ -419,7 +419,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="event-category">{t('category' as 'title')}</Label>
+            <Label htmlFor="event-category">{t('category')}</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as Event['category'])}>
               <SelectTrigger id="event-category">
                 <SelectValue placeholder={t('selectCategory')} />
@@ -427,7 +427,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <SelectContent>
                 {EVENT_CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {t(`category_${cat.replace(/ /g, '')}` as 'category_Academic')}
+                    {t(`category_${cat.replace(/ /g, '')}` as TranslationKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -436,10 +436,10 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
           {/* Color Selection */}
           <div className="space-y-2">
-            <Label htmlFor="event-color">{t('color' as TranslationKey) || 'Color'}</Label>
+            <Label htmlFor="event-color">{t('color')}</Label>
             <Select value={color} onValueChange={setColor}>
               <SelectTrigger id="event-color">
-                <SelectValue placeholder={t('selectColor' as TranslationKey) || 'Select a color'} />
+                <SelectValue placeholder={t('selectColor')} />
               </SelectTrigger>
               <SelectContent>
                 {UNIT_COLORS.map((colorOption) => (

@@ -43,3 +43,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Login Page Readability Fixes */
+.login-page input::placeholder {
+  color: var(--c-content-secondary, #2b2b2b) !important;
+  opacity: 1 !important;
+}
+
+.dark .login-page input::placeholder {
+  color: var(--c-content-tertiary, #a8aaa3) !important;
+}

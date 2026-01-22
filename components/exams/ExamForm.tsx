@@ -300,7 +300,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 </Label>
                 <Input
                   id="exam-building"
-                  placeholder="e.g., C5C"
+                  placeholder={t('buildingPlaceholder')}
                   value={building}
                   onChange={(e) => setBuilding(e.target.value.toUpperCase())}
                   aria-invalid={Boolean(errors.building)}
@@ -320,7 +320,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 </Label>
                 <Input
                   id="exam-room"
-                  placeholder="e.g., 204"
+                  placeholder={t('roomPlaceholder')}
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
                   aria-invalid={Boolean(errors.room)}

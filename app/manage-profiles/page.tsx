@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
 import { apiRequest } from '@/lib/utils/api';
@@ -39,23 +40,23 @@ import {
 
 // Academic year options
 const ACADEMIC_YEARS = [
-  { value: '1st Year', label: '1st Year' },
-  { value: '2nd Year', label: '2nd Year' },
-  { value: '3rd Year', label: '3rd Year' },
-  { value: '4th Year', label: '4th Year' },
-  { value: '5th Year', label: '5th Year' },
-  { value: 'Postgraduate', label: 'Postgraduate' },
-  { value: 'PhD', label: 'PhD' },
+  { value: '1st Year', labelKey: 'academicYear_1' },
+  { value: '2nd Year', labelKey: 'academicYear_2' },
+  { value: '3rd Year', labelKey: 'academicYear_3' },
+  { value: '4th Year', labelKey: 'academicYear_4' },
+  { value: '5th Year', labelKey: 'academicYear_5' },
+  { value: 'Postgraduate', labelKey: 'academicYear_postgrad' },
+  { value: 'PhD', labelKey: 'academicYear_phd' },
 ];
 
 // Reminder timing options (in minutes)
 const REMINDER_TIMINGS = [
-  { value: 15, label: '15 minutes before' },
-  { value: 30, label: '30 minutes before' },
-  { value: 60, label: '1 hour before' },
-  { value: 120, label: '2 hours before' },
-  { value: 1440, label: '1 day before' },
-  { value: 2880, label: '2 days before' },
+  { value: 15, labelKey: 'timing15min' },
+  { value: 30, labelKey: 'timing30min' },
+  { value: 60, labelKey: 'timing1hour' },
+  { value: 120, labelKey: 'timing2hours' },
+  { value: 1440, labelKey: 'timing1day' },
+  { value: 2880, labelKey: 'timing2days' },
 ];
 
 export default function ManageProfilesPage() {
@@ -172,10 +173,7 @@ export default function ManageProfilesPage() {
         setIsSaving(true);
         try {
           await updateProfile(currentProfile.id, { avatar: result });
-          toastUtils.success(
-            t('profileUpdated'),
-            t('avatarUpdated' as 'title') || 'Avatar updated successfully',
-          );
+          toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
         } catch {
           toastUtils.error(t('error'), t('failedToUpdateProfile'));
         } finally {
@@ -424,7 +422,7 @@ export default function ManageProfilesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                {t('personalInfo' as 'title') || 'Personal Information'}
+                {t('personalInfo')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -467,8 +465,7 @@ export default function ManageProfilesPage() {
                 />
                 {currentProfile.studentId && (
                   <p className="text-mq-xs text-mq-content-tertiary">
-                    {t('studentIdCannotBeChanged' as 'title') ||
-                      'Student ID cannot be changed once set.'}
+                    {t('studentIdCannotBeChanged')}
                   </p>
                 )}
               </div>
@@ -484,7 +481,7 @@ export default function ManageProfilesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5" />
-                {t('academicInfo' as 'title') || 'Academic Information'}
+                {t('academicInfo')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -514,7 +511,7 @@ export default function ManageProfilesPage() {
                   <SelectContent>
                     {ACADEMIC_YEARS.map((year) => (
                       <SelectItem key={year.value} value={year.value}>
-                        {year.label}
+                        {t(year.labelKey as TranslationKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -532,7 +529,7 @@ export default function ManageProfilesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                {t('notificationPreferences' as 'title') || 'Notification Preferences'}
+                {t('notificationPreferences')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -542,10 +539,7 @@ export default function ManageProfilesPage() {
                   <Bell className="h-5 w-5 text-mq-content-secondary" />
                   <div>
                     <p className="text-sm font-medium text-mq-content">{t('pushNotifications')}</p>
-                    <p className="text-xs text-mq-content-tertiary">
-                      {t('pushNotificationsDesc' as 'title') ||
-                        'Receive push notifications on this device'}
-                    </p>
+                    <p className="text-xs text-mq-content-tertiary">{t('pushNotificationsDesc')}</p>
                   </div>
                 </div>
                 <ToggleSwitch
@@ -562,8 +556,7 @@ export default function ManageProfilesPage() {
                   <div>
                     <p className="text-sm font-medium text-mq-content">{t('emailNotifications')}</p>
                     <p className="text-xs text-mq-content-tertiary">
-                      {t('emailNotificationsDesc' as 'title') ||
-                        'Receive important updates via email'}
+                      {t('emailNotificationsDesc')}
                     </p>
                   </div>
                 </div>
@@ -581,10 +574,7 @@ export default function ManageProfilesPage() {
                   <Calendar className="h-5 w-5 text-mq-content-secondary" />
                   <div>
                     <p className="text-sm font-medium text-mq-content">{t('emailReminders')}</p>
-                    <p className="text-xs text-mq-content-tertiary">
-                      {t('emailRemindersDesc' as 'title') ||
-                        'Get email reminders for upcoming deadlines'}
-                    </p>
+                    <p className="text-xs text-mq-content-tertiary">{t('emailRemindersDesc')}</p>
                   </div>
                 </div>
                 <ToggleSwitch
@@ -606,7 +596,7 @@ export default function ManageProfilesPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                {t('reminderSettings' as 'title') || 'Reminder Settings'}
+                {t('reminderSettings')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -617,11 +607,10 @@ export default function ManageProfilesPage() {
                     <BookOpen className="h-5 w-5 text-blue-500" />
                     <div>
                       <p className="text-sm font-medium text-mq-content">
-                        {t('deadlineReminders' as 'title') || 'Deadline Reminders'}
+                        {t('deadlineReminders')}
                       </p>
                       <p className="text-xs text-mq-content-tertiary">
-                        {t('deadlineRemindersDesc' as 'title') ||
-                          'Get reminded before assignments are due'}
+                        {t('deadlineRemindersDesc')}
                       </p>
                     </div>
                   </div>
@@ -642,7 +631,7 @@ export default function ManageProfilesPage() {
                     <SelectContent>
                       {REMINDER_TIMINGS.map((timing) => (
                         <SelectItem key={timing.value} value={timing.value.toString()}>
-                          {timing.label}
+                          {t(timing.labelKey as TranslationKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -656,12 +645,8 @@ export default function ManageProfilesPage() {
                   <div className="flex items-center gap-3">
                     <GraduationCap className="h-5 w-5 text-purple-500" />
                     <div>
-                      <p className="text-sm font-medium text-mq-content">
-                        {t('classReminders' as 'title') || 'Class Reminders'}
-                      </p>
-                      <p className="text-xs text-mq-content-tertiary">
-                        {t('classRemindersDesc' as 'title') || 'Get reminded before classes start'}
-                      </p>
+                      <p className="text-sm font-medium text-mq-content">{t('classReminders')}</p>
+                      <p className="text-xs text-mq-content-tertiary">{t('classRemindersDesc')}</p>
                     </div>
                   </div>
                   <ToggleSwitch
@@ -681,7 +666,7 @@ export default function ManageProfilesPage() {
                     <SelectContent>
                       {REMINDER_TIMINGS.filter((t) => t.value <= 120).map((timing) => (
                         <SelectItem key={timing.value} value={timing.value.toString()}>
-                          {timing.label}
+                          {t(timing.labelKey as TranslationKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -695,12 +680,8 @@ export default function ManageProfilesPage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-green-500" />
                     <div>
-                      <p className="text-sm font-medium text-mq-content">
-                        {t('eventReminders' as 'title') || 'Event Reminders'}
-                      </p>
-                      <p className="text-xs text-mq-content-tertiary">
-                        {t('eventRemindersDesc' as 'title') || 'Get reminded before campus events'}
-                      </p>
+                      <p className="text-sm font-medium text-mq-content">{t('eventReminders')}</p>
+                      <p className="text-xs text-mq-content-tertiary">{t('eventRemindersDesc')}</p>
                     </div>
                   </div>
                   <ToggleSwitch
@@ -720,7 +701,7 @@ export default function ManageProfilesPage() {
                     <SelectContent>
                       {REMINDER_TIMINGS.map((timing) => (
                         <SelectItem key={timing.value} value={timing.value.toString()}>
-                          {timing.label}
+                          {t(timing.labelKey as TranslationKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -742,7 +723,7 @@ export default function ManageProfilesPage() {
             className="shadow-lg flex items-center gap-2"
           >
             {isSaving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
-            {isSaving ? t('saving') : t('saveChanges' as 'title') || 'Save Changes'}
+            {isSaving ? t('saving') : t('saveChanges')}
           </Button>
         </div>
       )}

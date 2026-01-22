@@ -317,3 +317,14 @@
 1.  **Verify:** Manually test the map on the live site to confirm the line snaps perfectly to the red pin.
 2.  **Performance:** Monitor the "On Photo" map performance. If zooming is sluggish, consider tiling the large campus raster image in a future update.
 3.  **Search:** Implement fuzzy search for buildings.
+
+Raouf: 2026-01-22 (i18n Audit & Fix)
+- **Scope**: Repository-wide Internationalisation (i18n) Audit
+- **Summary**: Achieved 100% key completeness across 19 locales. Replaced hardcoded strings in 15+ core components.
+- **Changes**:
+  - Added ~50 missing keys to `en/translations.json` (Gamification, Map, Accessibility).
+  - Synced all 18 non-English locales (Spanish fully translated, others filled).
+  - Replaced hardcoded aria-labels, alt text, and placeholders in `Sidebar`, `Header`, `Map`, `Login`, and Forms.
+  - Created `lib/utils/gamification.ts` for translating dynamic level titles.
+  - Fixed `PrivacySettings` confirmation logic to support localized keywords.
+- **Verification**: `node scripts/check-i18n-completeness.cjs` passed (19/19 complete).

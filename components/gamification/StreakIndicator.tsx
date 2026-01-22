@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useStreak } from '@/lib/store/gamificationStore';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 interface StreakIndicatorProps {
   /** Size variant */
@@ -25,6 +26,7 @@ export function StreakIndicator({
   showLabel = false,
   className,
 }: StreakIndicatorProps) {
+  const { t } = useTranslation();
   const { loadProfile, hasLoaded, isLoading } = useGamificationStore();
   const { days, longest, emoji, isActive } = useStreak();
 
@@ -68,11 +70,11 @@ export function StreakIndicator({
   if (days === 0) {
     return (
       <div className={cn('flex items-center', config.container, 'opacity-50', className)}>
-        <span className={config.icon} role="img" aria-label="No streak">
+        <span className={config.icon} role="img" aria-label={t('noStreak')}>
           🔥
         </span>
         {showCount && (
-          <span className={cn(config.text, 'text-mq-content-tertiary')}>Start a streak!</span>
+          <span className={cn(config.text, 'text-mq-content-tertiary')}>{t('startStreak')}</span>
         )}
       </div>
     );
@@ -86,13 +88,13 @@ export function StreakIndicator({
         isActive ? 'text-orange-500' : 'text-mq-content-tertiary',
         className,
       )}
-      title={`${days} day streak (longest: ${longest})`}
+      title={t('streakDayTooltip', { count: days, longest })}
     >
       {/* Fire Icon with optional milestone emoji */}
       <span
         className={cn(config.icon, 'transition-transform', isActive && 'animate-pulse')}
         role="img"
-        aria-label={`${days} day streak`}
+        aria-label={t('streakDay', { count: days })}
       >
         {emoji || ''}
       </span>
@@ -102,7 +104,7 @@ export function StreakIndicator({
         <span className={cn(config.text, 'font-bold')}>
           {days}
           {showLabel && (
-            <span className="font-normal text-mq-content-secondary ml-1">day streak</span>
+            <span className="font-normal text-mq-content-secondary ml-1">{t('day', { count: days })} {t('streak')}</span> // "day streak" part handled by composition or better key
           )}
         </span>
       )}
@@ -118,11 +120,12 @@ interface StreakBadgeProps {
  * Compact streak badge for profile headers
  */
 export function StreakBadge({ className }: StreakBadgeProps) {
+  const { t } = useTranslation();
   const { days, isActive, longest } = useStreak();
 
   if (days === 0) return null;
 
-  const streakTooltip = `${days} day streak! Complete tasks daily to keep it going. Your longest streak: ${longest} days.`;
+  const streakTooltip = t('streakDayTooltip', { count: days, longest });
 
   return (
     <span
@@ -152,6 +155,7 @@ interface StreakCardProps {
  * Full streak card with more details
  */
 export function StreakCard({ className }: StreakCardProps) {
+  const { t } = useTranslation();
   const { loadProfile, hasLoaded } = useGamificationStore();
   const { days, longest, isActive } = useStreak();
 
@@ -173,30 +177,30 @@ export function StreakCard({ className }: StreakCardProps) {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-3xl" role="img" aria-label="streak">
+          <span className="text-3xl" role="img" aria-label={t('streakDay', { count: days })}>
             🔥
           </span>
           <div>
             <div className="text-2xl font-bold text-mq-content">
-              {days} {days === 1 ? 'Day' : 'Days'}
+              {days} {days === 1 ? t('streakCardTitle_one') : t('streakCardTitle_other')}
             </div>
             <div className="text-sm text-mq-content-secondary">
-              {isActive ? 'Current Streak' : 'Streak Inactive'}
+              {isActive ? t('streakActive') : t('streakInactive')}
             </div>
           </div>
         </div>
 
         {/* Longest Streak */}
         <div className="text-right">
-          <div className="text-sm text-mq-content-tertiary">Best</div>
-          <div className="text-lg font-semibold text-mq-content">{longest} days</div>
+          <div className="text-sm text-mq-content-tertiary">{t('streakBest')}</div>
+          <div className="text-lg font-semibold text-mq-content">{longest} {t('days')}</div>
         </div>
       </div>
 
       {/* Motivation Message */}
       {!isActive && days > 0 && (
         <div className="mt-3 p-2 rounded-lg bg-mq-background-secondary text-sm text-mq-content-secondary">
-          Complete a task to continue your streak!
+          {t('streakMotivation')}
         </div>
       )}
     </div>

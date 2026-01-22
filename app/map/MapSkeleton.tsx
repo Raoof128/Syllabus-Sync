@@ -2,12 +2,14 @@
 
 import { LazyMotion, m, domAnimation } from 'framer-motion';
 import { MapPin } from 'lucide-react';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 /**
  * MapLoadingSkeleton - Animated skeleton loader for map component
  * Shows a pulsing map placeholder with animated "dropping" pins
  */
 export function MapLoadingSkeleton() {
+  const { t } = useTranslation();
   // Animated pin positions (relative percentages)
   const pinPositions = [
     { x: 25, y: 30, delay: 0 },
@@ -23,7 +25,7 @@ export function MapLoadingSkeleton() {
       <div
         className="relative w-full h-full bg-mq-background-secondary overflow-hidden"
         role="status"
-        aria-label="Loading map..."
+        aria-label={t('loadingMap')}
       >
         {/* Pulsing background gradient */}
         <m.div
@@ -131,9 +133,10 @@ export function MapLoadingSkeleton() {
  * Used when filtering/searching buildings
  */
 export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
+  const { t } = useTranslation();
   return (
     <LazyMotion features={domAnimation}>
-      <div className="space-y-3" role="status" aria-label="Loading buildings...">
+      <div className="space-y-3" role="status" aria-label={t('loadingBuildings')}>
         {Array.from({ length: count }).map((_, index) => (
           <m.div
             key={index}
@@ -182,12 +185,13 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
  * CategoryFilterSkeleton - Skeleton for category filter pills
  */
 export function CategoryFilterSkeleton() {
+  const { t } = useTranslation();
   // Pre-computed widths for deterministic rendering
   const widths = [70, 85, 65, 90, 75, 80, 72, 88, 68];
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="flex flex-wrap gap-2" role="status" aria-label="Loading filters...">
+      <div className="flex flex-wrap gap-2" role="status" aria-label={t('loadingFilters')}>
         {widths.map((width, index) => (
           <m.div
             key={index}

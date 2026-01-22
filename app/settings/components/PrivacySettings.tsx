@@ -297,7 +297,7 @@ const PrivacySettings = memo(
     }, []);
 
     const handleClearAllData = useCallback(async () => {
-      if (clearDataConfirmation !== 'CLEAR') {
+      if (clearDataConfirmation !== t('clearConfirm')) {
         toastUtils.error(t('settingsError'), t('clearDataConfirmRequired'));
         return;
       }
@@ -761,7 +761,7 @@ const PrivacySettings = memo(
                 value={clearDataConfirmation}
                 onChange={(e) => setClearDataConfirmation(e.target.value.toUpperCase())}
                 className="w-full px-3 py-2 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-error"
-                placeholder="CLEAR"
+                placeholder={t('clearConfirm')}
                 autoComplete="off"
                 data-testid="clear-data-confirm-input"
               />
@@ -778,7 +778,7 @@ const PrivacySettings = memo(
               <Button
                 variant="destructive"
                 onClick={handleClearAllData}
-                disabled={isClearingData || clearDataConfirmation !== 'CLEAR'}
+                disabled={isClearingData || clearDataConfirmation !== t('clearConfirm')}
                 data-testid="confirm-clear-data-button"
               >
                 {isClearingData ? (

@@ -1651,7 +1651,7 @@ export default function CampusMap({
                           <button
                             onClick={stopNavigation}
                             className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                            aria-label="Stop navigation"
+                            aria-label={t('stopNavigation')}
                           >
                             Stop
                           </button>
@@ -1715,7 +1715,7 @@ export default function CampusMap({
                       <button
                         onClick={startNavigation}
                         className="mt-3 w-full py-2 px-4 rounded-lg bg-gradient-to-r from-green-500 to-blue-500 text-white font-medium text-sm hover:from-green-600 hover:to-blue-600 transition-all duration-200 flex items-center justify-center gap-2"
-                        aria-label="Start turn-by-turn navigation"
+                        aria-label={t('startTurnByTurn')}
                       >
                         <span>🧭</span>
                         <span>Start Navigation</span>

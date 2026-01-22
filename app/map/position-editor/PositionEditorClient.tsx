@@ -25,6 +25,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 
 import { buildings, type Building, MAP_CONFIG } from '@/lib/map/buildings';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 // ============================================================================
 // Types
@@ -179,6 +180,7 @@ function DraggableMarker({
 // ============================================================================
 
 export default function PositionEditorClient() {
+  const { t } = useTranslation();
   // State
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
   const [positionChanges, setPositionChanges] = useState<Map<string, PositionChange>>(new Map());
@@ -455,7 +457,7 @@ export default function PositionEditorClient() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search buildings..."
+              placeholder={t('searchBuildingsPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"

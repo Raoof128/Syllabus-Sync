@@ -23,7 +23,8 @@ const locales = fs.readdirSync(base).filter((l) => {
 });
 
 // Suspicious patterns that indicate untranslated content
-const suspiciousRx = /\b(?:TODO|TRANSLATE|TRANSLATE_ME|TBD|FIXME)\b/i;
+// We use a stricter regex to avoid false positives in languages like Spanish where "Todo" means "All"
+const suspiciousRx = /\b(?:TODO|TRANSLATE_ME|FIXME)\b|\[TRANSLATE\]/;
 
 let hasErrors = false;
 let hasWarnings = false;

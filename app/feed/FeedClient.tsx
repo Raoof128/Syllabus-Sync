@@ -581,10 +581,10 @@ const FeedClient = memo(() => {
                                     setEditingEvent(event);
                                     setEventFormOpen(true);
                                   }}
-                                  aria-label={t('edit') || 'Edit'}
+                                  aria-label={t('edit')}
                                 >
                                   <Pencil className="h-4 w-4 mr-1.5" aria-hidden="true" />
-                                  {t('edit') || 'Edit'}
+                                  {t('edit')}
                                 </Button>
                                 {/* Delete button */}
                                 <Button
@@ -594,11 +594,11 @@ const FeedClient = memo(() => {
                                     setEventToDelete(event);
                                     setDeleteConfirmOpen(true);
                                   }}
-                                  aria-label={t('delete') || 'Delete'}
+                                  aria-label={t('delete')}
                                   className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                                 >
                                   <Trash2 className="h-4 w-4 mr-1.5" aria-hidden="true" />
-                                  {t('delete') || 'Delete'}
+                                  {t('delete')}
                                 </Button>
                               </div>
                             </article>
@@ -627,7 +627,7 @@ const FeedClient = memo(() => {
         </div>
 
         {/* Sidebar - 1 column */}
-        <aside className="space-y-6" aria-label="Event statistics and announcements">
+        <aside className="space-y-6" aria-label={t('eventStatistics')}>
           {/* Quick Stats */}
           <ScrollReveal delay={0.25}>
             <MagicCard isLiquidEnhanced>
@@ -805,16 +805,11 @@ const FeedClient = memo(() => {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteEventConfirm') || 'Delete Event?'}
-                </h3>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm')}</h3>
                 <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteEventConfirmDesc') ||
-                'This action cannot be undone. Are you sure you want to delete this event?'}
-            </p>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteEventConfirmDesc')}</p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -823,7 +818,7 @@ const FeedClient = memo(() => {
                   setEventToDelete(null);
                 }}
               >
-                {t('cancelAction') || 'Cancel'}
+                {t('cancelAction')}
               </Button>
               <Button
                 variant="destructive"
@@ -832,15 +827,12 @@ const FeedClient = memo(() => {
                     removeEvent(eventToDelete.id);
                     setDeleteConfirmOpen(false);
                     setEventToDelete(null);
-                    toastUtils.success(
-                      t('eventDeleted' as TranslationKey) || 'Event deleted',
-                      t('eventDeletedDesc' as TranslationKey) || 'The event has been removed.',
-                    );
+                    toastUtils.success(t('eventDeleted'), t('eventDeletedDesc'));
                   }
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white"
               >
-                {t('confirmDelete') || 'Delete'}
+                {t('confirmDelete')}
               </Button>
             </div>
           </div>

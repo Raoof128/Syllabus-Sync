@@ -352,7 +352,7 @@ const Header = memo(() => {
                               {!notification.read && (
                                 <div
                                   className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
-                                  aria-label="Unread"
+                                  aria-label={t('unread')}
                                 />
                               )}
                             </div>
@@ -435,7 +435,7 @@ const Header = memo(() => {
                   {currentProfile?.avatar ? (
                     <Image
                       src={currentProfile.avatar}
-                      alt={currentProfile.name ? `${currentProfile.name} avatar` : 'Profile avatar'}
+                      alt={currentProfile.name ? t('userAvatar', { name: currentProfile.name }) : t('profileAvatar')}
                       width={32}
                       height={32}
                       className="w-full h-full object-cover"

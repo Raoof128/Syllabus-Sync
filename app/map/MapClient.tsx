@@ -346,10 +346,10 @@ export default function MapClient() {
                           <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
                           <div className="min-w-0 flex-1">
                             <p className="text-mq-sm font-medium truncate">
-                              {t(('overlay_' + overlay.id + '_name') as TranslationKey)}
+                              {t(`overlay_${overlay.id}_name` as TranslationKey)}
                             </p>
                             <p className="text-mq-xs text-mq-content-secondary truncate">
-                              {t(('overlay_' + overlay.id + '_desc') as TranslationKey)}
+                              {t(`overlay_${overlay.id}_desc` as TranslationKey)}
                             </p>
                           </div>
                           {isActive && (
@@ -435,7 +435,7 @@ export default function MapClient() {
                             ? 'bg-mq-card-background text-mq-primary shadow-sm'
                             : 'text-mq-content-tertiary hover:text-mq-content'
                         }`}
-                        aria-label="Grid view"
+                        aria-label={t('gridView')}
                       >
                         <LayoutGrid className="h-4 w-4" />
                       </button>
@@ -446,7 +446,7 @@ export default function MapClient() {
                             ? 'bg-mq-card-background text-mq-primary shadow-sm'
                             : 'text-mq-content-tertiary hover:text-mq-content'
                         }`}
-                        aria-label="List view"
+                        aria-label={t('listView')}
                       >
                         <ListIcon className="h-4 w-4" />
                       </button>
@@ -573,7 +573,7 @@ export default function MapClient() {
                                         {building.wheelchair && (
                                           <Accessibility
                                             className="h-3 w-3 text-mq-success"
-                                            aria-label="Wheelchair accessible"
+                                            aria-label={t('wheelchairAccessible')}
                                           />
                                         )}
                                         {isSelected && (
@@ -651,7 +651,7 @@ export default function MapClient() {
                                     {building.wheelchair && (
                                       <span
                                         className="inline-flex items-center text-[10px] text-mq-success"
-                                        aria-label="Wheelchair accessible"
+                                        aria-label={t('wheelchairAccessible')}
                                       >
                                         <Accessibility className="h-3 w-3" aria-hidden="true" />
                                       </span>

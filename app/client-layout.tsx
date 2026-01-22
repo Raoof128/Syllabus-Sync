@@ -234,15 +234,15 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
                 id="main-content"
                 className="flex-1 overflow-y-auto pt-16 md:pt-0"
                 role="main"
-                aria-label="Main content"
+                aria-label={t('mainContent')}
               >
                 <ErrorBoundary>{children}</ErrorBoundary>
               </main>
             </div>
           </div>
           {/* Footer landmark for accessibility - screen reader only */}
-          <footer role="contentinfo" className="sr-only" aria-label="Footer">
-            <p>&copy; {new Date().getFullYear()} Syllabus Sync - Macquarie University</p>
+          <footer role="contentinfo" className="sr-only" aria-label={t('footer')}>
+            <p>{t('copyright', { year: new Date().getFullYear() })}</p>
           </footer>
         </div>
         <Toaster />

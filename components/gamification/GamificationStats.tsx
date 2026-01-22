@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useXPProgress, useStreak } from '@/lib/store/gamificationStore';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import { LevelBadge } from './LevelBadge';
 import { XPProgressBar } from './XPProgressBar';
 import { StreakBadge } from './StreakIndicator';
@@ -99,6 +100,7 @@ export function GamificationStats({
   showStreak = true,
   className,
 }: GamificationStatsProps) {
+  const { t } = useTranslation();
   const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
   const { currentXP, level, xpToNext, progress } = useXPProgress();
   const { days } = useStreak();
@@ -125,9 +127,9 @@ export function GamificationStats({
     const rawProgress = Math.min(100, Math.max(0, Math.round((progress ?? 0) * 100)));
     // Ensure a visible sliver for low progress without exceeding 100%
     const progressPercent = rawProgress <= 0 ? 0 : Math.min(100, Math.max(rawProgress, 18));
-    const levelAriaLabel = `Level ${level}, ${currentXP} XP, ${xpToNext} XP to next level`;
+    const levelAriaLabel = t('levelBadgeAria', { level, currentXP, xpToNext });
     const levelColors = getLevelColors(level);
-    const levelTooltip = `Level ${level} • ${currentXP.toLocaleString()} XP earned. Complete tasks to earn XP and level up!`;
+    const levelTooltip = t('levelTooltip', { level, xp: currentXP.toLocaleString() });
 
     return (
       <div className={cn('flex items-center gap-3', className)}>
@@ -144,7 +146,7 @@ export function GamificationStats({
           title={levelTooltip}
           data-testid="level-badge"
         >
-          Level {level}
+          {t('level')} {level}
           <span
             className={cn('h-2 w-12 rounded-full overflow-hidden shadow-inner border')}
             style={{
@@ -168,7 +170,7 @@ export function GamificationStats({
         {showStreak && days > 0 && <StreakBadge />}
         {isDemo && (
           <span className="text-xs text-mq-content-tertiary bg-mq-background-secondary px-1.5 py-0.5 rounded">
-            Demo
+            {t('demo')}
           </span>
         )}
       </div>
@@ -183,11 +185,11 @@ export function GamificationStats({
           <LevelBadge size="md" showTitle />
           {showStreak && days > 0 && (
             <div className="flex items-center gap-1 text-orange-500">
-              <span role="img" aria-label="streak">
+              <span role="img" aria-label={t('streakDay', { count: days })}>
                 🔥
               </span>
               <span className="font-bold">{days}</span>
-              <span className="text-sm text-mq-content-secondary">day{days !== 1 ? 's' : ''}</span>
+              <span className="text-sm text-mq-content-secondary">{t('day', { count: days })}</span>
             </div>
           )}
         </div>
@@ -198,7 +200,7 @@ export function GamificationStats({
         {/* Demo indicator */}
         {isDemo && (
           <p className="text-xs text-mq-content-tertiary text-center">
-            Sign in to track your real progress
+            {t('signInToTrack')}
           </p>
         )}
       </div>
@@ -211,10 +213,10 @@ export function GamificationStats({
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-mq-content">Your Progress</h3>
+          <h3 className="font-semibold text-mq-content">{t('yourProgress')}</h3>
           {isDemo && (
             <span className="text-xs text-mq-content-tertiary bg-mq-background-secondary px-2 py-1 rounded">
-              Demo Mode
+              {t('demoMode')}
             </span>
           )}
         </div>
@@ -225,12 +227,12 @@ export function GamificationStats({
           {showStreak && (
             <div className="text-right">
               <div className="flex items-center justify-end gap-1">
-                <span className="text-2xl" role="img" aria-label="streak">
+                <span className="text-2xl" role="img" aria-label={t('streakDay', { count: days })}>
                   🔥
                 </span>
                 <span className="text-2xl font-bold text-mq-content">{days}</span>
               </div>
-              <span className="text-xs text-mq-content-secondary">day streak</span>
+              <span className="text-xs text-mq-content-secondary">{t('streakDay', { count: 1 }).replace('1 ', '')}</span>
             </div>
           )}
         </div>
@@ -239,12 +241,12 @@ export function GamificationStats({
         {showProgress && (
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-mq-content-secondary">XP Progress</span>
+              <span className="text-mq-content-secondary">{t('xpProgress')}</span>
               <span className="text-mq-content font-medium">{currentXP.toLocaleString()} XP</span>
             </div>
             <XPProgressBar size="lg" showNumbers={false} />
             <p className="text-xs text-mq-content-tertiary mt-1 text-right">
-              {xpToNext.toLocaleString()} XP to Level {level + 1}
+              {t('xpToNextLevel', { xp: xpToNext.toLocaleString(), nextLevel: level + 1 })}
             </p>
           </div>
         )}
@@ -257,6 +259,7 @@ export function GamificationStats({
  * Minimal XP indicator for navbar/headers
  */
 export function XPIndicator({ className }: { className?: string }) {
+  const { t } = useTranslation();
   const { profile, loadProfile, hasLoaded } = useGamificationStore();
   const { days, longest } = useStreak();
 
@@ -268,11 +271,11 @@ export function XPIndicator({ className }: { className?: string }) {
 
   const level = profile?.level ?? 1;
   const xp = profile?.xp ?? 0;
-  const levelTooltip = `Level ${level} • ${xp.toLocaleString()} XP earned. Complete tasks to earn XP and level up!`;
+  const levelTooltip = t('levelTooltip', { level, xp: xp.toLocaleString() });
   const streakTooltip =
     days > 0
-      ? `${days} day streak! Complete tasks daily to keep it going. Longest: ${longest} days.`
-      : 'Start a streak by completing tasks daily!';
+      ? t('streakDayTooltip', { count: days, longest })
+      : t('startStreak');
 
   return (
     <div className={cn('flex items-center gap-2', className)}>

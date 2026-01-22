@@ -363,7 +363,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label htmlFor="deadline-color">{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label htmlFor="deadline-color">{t('color')}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
@@ -373,7 +373,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-mq-content">
-                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                    {useCustomColor ? t('customColor') : t('inheritsUnitColor')}
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
@@ -384,8 +384,8 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                           )
                         : color
                       : selectedUnit
-                        ? `From ${selectedUnit.code}`
-                        : 'Select a unit first'}
+                        ? t('fromUnit', { unit: selectedUnit.code })
+                        : t('selectUnitFirst')}
                   </p>
                 </div>
                 <button
@@ -399,7 +399,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
                   }}
                   className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                  {useCustomColor ? t('useUnitColor') : t('customize')}
                 </button>
               </div>
 
@@ -407,9 +407,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               {useCustomColor && (
                 <Select value={color} onValueChange={setColor}>
                   <SelectTrigger id="deadline-color">
-                    <SelectValue
-                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
-                    />
+                    <SelectValue placeholder={t('selectColor')} />
                   </SelectTrigger>
                   <SelectContent>
                     {UNIT_COLORS.map((c) => (

@@ -3,7 +3,8 @@
 
 import { memo } from 'react';
 import { Linkedin } from 'lucide-react';
-import { SOCIAL_LINKS } from '@/lib/config';
+import { SOCIAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -97,18 +98,25 @@ const socialLinks: SocialLink[] = [
 ];
 
 const SocialButtons = memo(() => {
+  const { t } = useTranslation();
+
   return (
     <ul className="social-buttons">
       {socialLinks.map((link) => {
         const Icon = link.icon;
+        const labelText = t('followOnSocial', {
+          uniName: UNIVERSITY_CONFIG.name,
+          platform: link.label,
+        });
+
         return (
           <li key={link.name}>
             <a
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Follow Macquarie University on ${link.label} (opens in new tab)`}
-              title={`Follow Macquarie University on ${link.label} (opens in new tab)`}
+              aria-label={labelText}
+              title={labelText}
               onMouseUp={(e) => {
                 // Remove mouse focus so the expanded state doesn't stick after opening a new tab
                 if (e.detail > 0) {
