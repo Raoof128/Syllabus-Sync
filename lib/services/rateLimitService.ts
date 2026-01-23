@@ -184,7 +184,12 @@ function getStore(): RateLimitStore {
 
   // SECURITY: In production, require Redis - don't fall back to memory store
   // Memory store is useless in serverless environments (each instance has its own memory)
-  if (process.env.NODE_ENV === 'production') {
+  // Use VERCEL_ENV for more reliable production detection
+  const isRealProduction =
+    process.env.VERCEL_ENV === 'production' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+
+  if (isRealProduction) {
     console.error(
       '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
         'In-memory rate limiting does NOT work across serverless instances.\n' +
@@ -224,7 +229,10 @@ export async function checkRateLimit(
     ? `ratelimit:${config.prefix}:${identifier}`
     : `ratelimit:${identifier}`;
   const now = Date.now();
-  const isProduction = process.env.NODE_ENV === 'production';
+  // SECURITY: Use VERCEL_ENV for reliable production detection
+  const isProduction =
+    process.env.VERCEL_ENV === 'production' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
   const isMemoryStore = store instanceof MemoryStore;
 
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints

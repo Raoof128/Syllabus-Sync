@@ -10,6 +10,7 @@ type SettingsSkeletonProps = {
 
 const SKELETON_COUNTS = {
   notifications: 3,
+  account: 1,
   appearance: 2,
   privacy: 4,
   security: 2,
@@ -62,6 +63,34 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
                       </div>
                     </div>
                     <div className="h-8 w-20 bg-mq-hover-background rounded animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Account Settings Skeleton */}
+        <div className="mq-magic-card mq-liquid-enhanced">
+          <Card className="mq-magic-card-content">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-5 bg-mq-card-background rounded animate-pulse" />
+                <div className="h-6 w-28 bg-mq-card-background rounded-mq-lg animate-pulse" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Array.from({ length: SKELETON_COUNTS.account }).map((_, i) => (
+                <div
+                  key={`account-${i}`}
+                  className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 bg-mq-hover-background rounded-full animate-pulse" />
+                    <div className="flex-1">
+                      <div className="h-4 w-32 bg-mq-hover-background rounded animate-pulse mb-1" />
+                      <div className="h-3 w-48 bg-mq-hover-background rounded animate-pulse" />
+                    </div>
                   </div>
                 </div>
               ))}

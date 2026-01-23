@@ -80,6 +80,9 @@ jobs:
       - name: Check for secrets in code
         run: node scripts/check-no-secret-prints.js
 
+      - name: Run production security checks
+        run: node scripts/check-production-security.cjs
+
       - name: Check i18n translation completeness
         run: npm run check:i18n
 

@@ -102,6 +102,23 @@ export async function POST(request: NextRequest) {
 
     // For event_attended, check if XP was already awarded for this event
     if (eventType === 'event_attended' && referenceId) {
+      // SECURITY: First verify the event actually exists in the events table
+      // This prevents users from claiming XP for non-existent events
+      const { data: eventExists, error: eventCheckError } = await supabase
+        .from('events')
+        .select('id')
+        .eq('id', referenceId)
+        .single();
+
+      if (eventCheckError || !eventExists) {
+        console.warn('XP award attempted for non-existent event:', {
+          userId,
+          referenceId,
+          error: eventCheckError?.message,
+        });
+        return jsonError('Event not found', 404, ERROR_CODES.NOT_FOUND);
+      }
+
       const { data: existingEvent } = await supabase
         .from('xp_events')
         .select('id')

@@ -2,6 +2,39 @@
 
 ## Current Session (Jan 22, 2026) - Atomic Unit Sync Architecture
 
+### Raouf: 2026-01-23 (Australia/Sydney) - Passkey Status & Test Harness Cleanup
+- **Status:** ✅ Complete - Added passkey availability status on login, documented passkey APIs, and removed test warnings.
+- **UI/Auth:** Login now surfaces passkey availability by email and checks `/api/auth/passkey/status` with debounced requests.
+- **Tests:** Wrapped session dialog assertions to avoid act warnings and neutralized jsdom navigation in test setup.
+- **Docs:** Added passkey endpoint notes to `docs/api.md`.
+- **Files Updated:** `app/login/LoginClient.tsx`, `app/api/auth/passkey/status/route.ts`, `tests/settings/PrivacySettings.test.tsx`, `tests/setup.ts`, `docs/api.md`.
+- **Verification:** `npm run check` (pass)
+
+### Raouf: 2026-01-23 (Australia/Sydney) - Passkey Login & Settings Wiring
+- **Status:** ✅ Complete - Added passkey registration/login flows and tightened settings session management.
+- **Auth/Passkeys:** Implemented passkey registration and login endpoints, storing credential metadata server-side and issuing sessions via magiclink verification on successful WebAuthn auth.
+- **UI:** Added passkey login button on the login page and wired biometric enrollment to server-issued options.
+- **Tests:** Added API tests for biometric/session endpoints.
+- **Files Updated:** `app/login/LoginClient.tsx`, `app/settings/components/SecuritySettings.tsx`, `app/api/auth/passkey/_lib.ts`, `app/api/auth/passkey/options/route.ts`, `app/api/auth/passkey/register/route.ts`, `app/api/auth/passkey/register-options/route.ts`, `app/api/auth/passkey/verify/route.ts`, `app/api/auth/biometric/route.ts`, `tests/api/auth/biometric.test.ts`, `tests/api/auth/sessions.test.ts`, `package.json`, `package-lock.json`.
+- **Verification:** `npm run check` (pass; note test stderr warnings from jsdom navigation + act hints).
+
+### Raouf: 2026-01-23 (Australia/Sydney) - Settings Page Audit Fixes
+- **Status:** ✅ Complete - Wired up settings actions with server-backed session handling and WebAuthn enrollment, and surfaced account settings in the UI.
+- **Logic/UI:** Added Account Settings card to the Settings grid, updated skeletons, and refactored session management to use `/api/auth/sessions` instead of localStorage.
+- **Security/UX:** Implemented biometric enable/disable via WebAuthn registration with server-stored metadata; added API route for biometric status.
+- **API:** Added `app/api/auth/sessions/route.ts` and `app/api/auth/biometric/route.ts` for session management and biometric state persistence.
+- **Tests:** Updated privacy settings tests to mock server sessions.
+- **Files Updated:** `app/settings/page.tsx`, `app/settings/components/PrivacySettings.tsx`, `app/settings/components/SecuritySettings.tsx`, `app/settings/components/SettingsSkeleton.tsx`, `app/api/auth/sessions/route.ts`, `app/api/auth/biometric/route.ts`, `tests/settings/PrivacySettings.test.tsx`.
+- **Verification:** `npm run lint -- app/settings app/api/auth tests/settings/PrivacySettings.test.tsx`
+
+### Raouf: 2026-01-23 (Australia/Sydney) - Login Page Audit Fixes
+- **Status:** ✅ Complete - Addressed UX, accessibility, and error-handling issues from the login page audit.
+- **Logic/UI:** Wired Sign Up CTAs to `/signup`, restored mobile scrollability with `100dvh` and overflow handling, added `aria-pressed` to the password toggle, and localized the reset loading label.
+- **Security/UX:** Replaced raw auth error messages with user-safe copy for login and reset flows.
+- **Performance:** Reduced `priority` usage by removing it from the logo image.
+- **Files Updated:** `app/login/LoginClient.tsx`.
+- **Verification:** `npm run lint -- app/login/LoginClient.tsx`
+
 ### Raouf: 2026-01-22 (Australia/Sydney) - VibeCast Weather Widget (Open-Meteo Reliability & Glam Pass)
 - **Status:** ⚙️ In Progress - Swapped to Open-Meteo, hardened parsing, and added fallback behavior.
 - **Logic:** Uses Open-Meteo `current_weather` with timezone-aware display, 7-state WMO vibe spectrum (sunny/cloudy/rainy/thunder/snowy/windy/night), 10-minute caching, and Sydney fallback when geolocation is blocked or unsupported.

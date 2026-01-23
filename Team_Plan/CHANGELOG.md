@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-23 - Passkey Status & Test Harness Cleanup
+
+### Added
+- Passkey availability status endpoint for login checks.
+
+### Changed
+- Login page now shows passkey availability status by email and passkey API notes in docs.
+- Privacy settings tests wait for session fetch to avoid act warnings; test setup disables jsdom navigation.
+
+### Verification
+- `npm run check`
+
+---
+
+Raouf: 2026-01-23 - Passkey Login & Settings Wiring
+
+### Added
+- Passkey registration/login API routes with WebAuthn verification and session issuance via magiclink OTP.
+- API tests for biometric and session endpoints.
+
+### Changed
+- Login page now offers passkey sign-in, and biometric enrollment uses server-generated options.
+- Biometric metadata storage now includes public key and counters for WebAuthn verification.
+
+### Verification
+- `npm run check` (pass; tests emitted jsdom navigation + act warnings)
+
+---
+
+Raouf: 2026-01-23 - Settings Page Audit Fixes
+
+### Fixed
+- Added server-backed session management and biometric persistence endpoints; settings UI now uses API-driven sessions instead of localStorage.
+- Wired biometric enable/disable to WebAuthn registration and server metadata, and surfaced Account Settings in the Settings grid with updated skeleton coverage.
+- Updated privacy settings tests to align with session API behavior.
+
+### Verification
+- `npm run lint -- app/settings app/api/auth tests/settings/PrivacySettings.test.tsx`
+
+---
+
+Raouf: 2026-01-23 - Login Page Audit Fixes
+
+### Fixed
+- Wired the Sign Up CTAs to the signup route, restored scrollability on small screens, and added `aria-pressed` for the password toggle.
+- Replaced raw Supabase error strings with user-safe messages for login and reset flows.
+- Localized the reset-loading label and reduced `priority` usage to a single hero image.
+
+### Verification
+- `npm run lint -- app/login/LoginClient.tsx`
+
+---
+
 Raouf: 2026-01-22 - Map Error Messaging & Off-Campus UX
 
 ### Changed

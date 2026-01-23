@@ -130,11 +130,17 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
   });
 
   // Don't expose internal database errors to clients
+  // SECURITY: Use VERCEL_ENV for reliable production detection
+  // This prevents error detail exposure even if NODE_ENV is misconfigured
+  const isRealProduction =
+    process.env.VERCEL_ENV === 'production' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+
   return jsonError(
     'A database error occurred',
     500,
     ERROR_CODES.DATABASE_ERROR,
-    process.env.NODE_ENV === 'development'
+    !isRealProduction
       ? { originalError: error instanceof Error ? error.message : String(error) }
       : undefined,
   );

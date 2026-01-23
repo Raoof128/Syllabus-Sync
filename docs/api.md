@@ -14,6 +14,49 @@ Authorization: Bearer <jwt_token>
 
 **Security Note:** Authentication is enforced both at the global `middleware.ts` level and within specific route handlers for defense-in-depth.
 
+### Passkey (WebAuthn) Auth
+
+The passkey flow uses WebAuthn registration/authentication plus a server-issued session via magiclink OTP.
+
+#### POST /api/auth/passkey/status
+
+Check whether a passkey exists for an email address (rate limited).
+
+**Request Body:**
+
+```json
+{
+  "email": "student@example.edu"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "available": true
+  }
+}
+```
+
+#### POST /api/auth/passkey/register-options
+
+Create WebAuthn registration options for the currently authenticated user.
+
+#### POST /api/auth/passkey/register
+
+Verify the WebAuthn registration response and store credential metadata.
+
+#### POST /api/auth/passkey/options
+
+Create WebAuthn authentication options for a given email address.
+
+#### POST /api/auth/passkey/verify
+
+Verify the WebAuthn assertion response and issue a session via magiclink OTP.
+
 ## Input Validation & Security
 
 All inputs are validated via Zod. To prevent XSS, text fields strictly reject characters such as `<` and `>`. If these characters are detected, the API will return a `VALIDATION_ERROR`.

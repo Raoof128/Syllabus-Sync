@@ -1252,6 +1252,26 @@ export default function CampusMap({
       role="application"
       aria-label={t('interactiveCampusMap')}
     >
+      {/* A11Y: Screen reader announcements for navigation status */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {preview && selectedBuilding && (
+          <span>
+            {t('navigatingTo')}: {t(selectedBuilding.translationKey)}.{' '}
+            {formatDistance(preview.distanceMeters)}, {formatDuration(preview.durationSeconds)}.
+          </span>
+        )}
+        {isNavigating && navState && (
+          <span>
+            Remaining: {formatDistance(navState.remainingDistance)}. Arrival:{' '}
+            {formatETA(navState.eta)}.
+          </span>
+        )}
+        {navState?.status === 'arrived' && <span>You have arrived at your destination.</span>}
+        {isOffCampus && (
+          <span>{safeT('locationOutsideCampusTitle', 'Outside campus boundary')}</span>
+        )}
+      </div>
+
       {isOffCampus && (
         <div className="absolute top-3 left-3 right-3 md:right-auto z-[1200] px-4 py-3 rounded-mq-lg bg-mq-warning text-white text-sm shadow flex items-start gap-2">
           <span className="font-semibold">

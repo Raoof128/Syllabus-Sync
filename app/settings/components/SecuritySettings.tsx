@@ -48,6 +48,28 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
   const [showEnableDialog, setShowEnableDialog] = useState(false);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isStatusLoading, setIsStatusLoading] = useState(true);
+
+  const base64UrlToUint8Array = useCallback((value: string) => {
+    const padded = value.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = padded.padEnd(Math.ceil(padded.length / 4) * 4, '=');
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }, []);
+
+  const bufferToBase64Url = useCallback((buffer: ArrayBuffer) => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    const base64 = window.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }, []);
 
   // Check biometric availability on mount
   useEffect(() => {
@@ -56,10 +78,17 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
       const platformAuth = await isPlatformAuthenticatorAvailable();
       setPlatformAuthAvailable(platformAuth);
 
-      // Load saved preference from localStorage
-      const saved = localStorage.getItem('biometric-auth-enabled');
-      if (saved === 'true' && platformAuth) {
-        setBiometricEnabled(true);
+      try {
+        const response = await fetch('/api/auth/biometric');
+        const result = await response.json();
+
+        if (response.ok && result?.data) {
+          setBiometricEnabled(Boolean(result.data.enabled) && platformAuth);
+        }
+      } catch (error) {
+        errorHandler.logError(error as Error, 'Biometric status', 'low');
+      } finally {
+        setIsStatusLoading(false);
       }
     };
 
@@ -69,14 +98,74 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
   const handleEnableBiometric = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Simulate biometric setup - in production this would:
-      // 1. Call navigator.credentials.create() with appropriate options
-      // 2. Send the credential to the server for registration
-      // 3. Store credential ID for future authentication
+      if (!platformAuthAvailable || typeof window === 'undefined') {
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
+        return;
+      }
 
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate setup time
+      const optionsResponse = await fetch('/api/auth/passkey/register-options', {
+        method: 'POST',
+      });
+      const optionsResult = await optionsResponse.json();
+      const options = optionsResult?.data?.options;
 
-      localStorage.setItem('biometric-auth-enabled', 'true');
+      if (!optionsResponse.ok || !options) {
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
+        return;
+      }
+
+      const publicKey: PublicKeyCredentialCreationOptions = {
+        ...options,
+        challenge: base64UrlToUint8Array(options.challenge),
+        user: {
+          ...options.user,
+          id: base64UrlToUint8Array(options.user.id),
+        },
+        excludeCredentials: (options.excludeCredentials || []).map(
+          (credential: { id: string; type: PublicKeyCredentialType }) => ({
+            ...credential,
+            id: base64UrlToUint8Array(credential.id),
+          }),
+        ),
+      };
+
+      const credential = (await navigator.credentials.create({
+        publicKey,
+      })) as PublicKeyCredential | null;
+
+      if (!credential) {
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
+        return;
+      }
+
+      const attestation = credential.response as AuthenticatorAttestationResponse;
+      const transports = attestation.getTransports?.() ?? [];
+
+      const credentialPayload = {
+        id: credential.id,
+        rawId: bufferToBase64Url(credential.rawId),
+        type: credential.type,
+        response: {
+          clientDataJSON: bufferToBase64Url(attestation.clientDataJSON),
+          attestationObject: bufferToBase64Url(attestation.attestationObject),
+          transports,
+        },
+        clientExtensionResults: credential.getClientExtensionResults(),
+      };
+
+      const saveResponse = await fetch('/api/auth/passkey/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          credential: credentialPayload,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
+        return;
+      }
+
       setBiometricEnabled(true);
       setShowEnableDialog(false);
       toastUtils.success(t('biometricEnabled'), t('biometricEnabledMsg'));
@@ -86,15 +175,26 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [base64UrlToUint8Array, bufferToBase64Url, platformAuthAvailable, t]);
 
   const handleDisableBiometric = useCallback(async () => {
     setIsLoading(true);
     try {
-      // In production, this would also remove the credential from the server
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API call
+      const response = await fetch('/api/auth/biometric', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: false }),
+      });
 
-      localStorage.removeItem('biometric-auth-enabled');
+      if (!response.ok) {
+        toastUtils.error(t('error'), t('tryAgainLater'));
+        return;
+      }
+
+      if (navigator.credentials?.preventSilentAccess) {
+        await navigator.credentials.preventSilentAccess();
+      }
+
       setBiometricEnabled(false);
       setShowDisableDialog(false);
       toastUtils.success(t('biometricDisabled'), t('biometricDisabledMsg'));
@@ -161,7 +261,9 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
                   onClick={() =>
                     biometricEnabled ? setShowDisableDialog(true) : setShowEnableDialog(true)
                   }
-                  disabled={!biometricAvailable || !platformAuthAvailable}
+                  disabled={
+                    !biometricAvailable || !platformAuthAvailable || isLoading || isStatusLoading
+                  }
                   className={`px-3 py-1 text-xs ${
                     biometricEnabled
                       ? 'text-red-500 hover:bg-red-500/10'

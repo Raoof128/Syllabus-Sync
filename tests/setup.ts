@@ -97,3 +97,25 @@ if (typeof globalThis.matchMedia === 'undefined') {
       dispatchEvent: () => true,
     }) as MediaQueryList;
 }
+
+if (typeof HTMLAnchorElement !== 'undefined') {
+  HTMLAnchorElement.prototype.click = function () {};
+}
+
+if (typeof window !== 'undefined') {
+  const currentLocation = window.location;
+  const safeLocation = {
+    ...currentLocation,
+    assign: () => {},
+    replace: () => {},
+    reload: () => {},
+    get href() {
+      return currentLocation.href;
+    },
+    set href(_value: string) {},
+  };
+  Object.defineProperty(window, 'location', {
+    configurable: true,
+    value: safeLocation,
+  });
+}

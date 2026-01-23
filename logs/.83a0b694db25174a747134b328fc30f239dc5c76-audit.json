@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json",
+    "files": [
+        {
+            "date": 1769157589426,
+            "name": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/mcp-puppeteer-2026-01-23.log",
+            "hash": "66e31ff970dc6dc7c26aa188460f8297f3fbb5a9f12312084686a9a2ebd3fcdd"
+        }
+    ],
+    "hashType": "sha256"
+}

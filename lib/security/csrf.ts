@@ -220,8 +220,12 @@ export function withCSRFProtection<T>(
 
     // SECURITY: Full CSRF token validation (double-submit cookie pattern)
     // This provides defense-in-depth on top of Supabase's SameSite=Lax cookies
-    // Can be disabled by setting CSRF_VALIDATION_ENABLED=false in production if needed
-    const csrfEnabled = process.env.CSRF_VALIDATION_ENABLED !== 'false';
+    // SECURITY FIX: CSRF can ONLY be disabled in development, never in production
+    // This prevents attackers from disabling CSRF protection via environment variables
+    const isRealProduction =
+      process.env.VERCEL_ENV === 'production' ||
+      (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+    const csrfEnabled = isRealProduction || process.env.CSRF_VALIDATION_ENABLED !== 'false';
     
     if (csrfEnabled) {
       const csrfResult = validateCSRFToken(request);

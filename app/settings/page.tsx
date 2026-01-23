@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 const useIsClient = () =>
   useSyncExternalStore(
@@ -13,14 +13,11 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
-import { STORAGE_KEYS } from '@/lib/constants';
-import { errorHandler } from '@/lib/utils/errorHandling';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import type { SessionInfo } from '@/lib/types';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
 import {
   NotificationSettings,
+  AccountSettings,
   AppearanceSettings,
   PrivacySettings,
   SecuritySettings,
@@ -31,48 +28,6 @@ import {
   MapSettings,
 } from './components';
 
-// Helper to get device label
-const getDeviceLabel = (t: (key: TranslationKey) => string) => {
-  if (typeof window === 'undefined') return t('deviceUnknown');
-  const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } })
-    ?.userAgentData;
-  const platform = uaData?.platform || navigator.platform || t('deviceThis');
-  const ua = navigator.userAgent;
-  const browserMatch = ua.match(/(Firefox|Edg|Chrome|Safari)/);
-  const browser = browserMatch ? browserMatch[0] : t('deviceBrowser');
-  return `${platform} · ${browser}`;
-};
-
-// Helper to initialize sessions from localStorage
-const initializeSessions = (t: (key: TranslationKey) => string): SessionInfo[] => {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.SESSIONS);
-    const parsed = stored ? (JSON.parse(stored) as SessionInfo[]) : [];
-    const currentId = 'current-device';
-    const now = new Date().toISOString();
-    const currentSession: SessionInfo = {
-      id: currentId,
-      device: getDeviceLabel(t),
-      lastActive: now,
-      current: true,
-    };
-
-    const existingIndex = parsed.findIndex((s) => s.id === currentId);
-    const nextSessions =
-      existingIndex >= 0
-        ? parsed.map((s, idx) => (idx === existingIndex ? currentSession : s))
-        : [...parsed, currentSession];
-
-    window.localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(nextSessions));
-    return nextSessions;
-  } catch (error) {
-    errorHandler.logError(error as Error, 'Sessions bootstrap', 'low');
-    return [];
-  }
-};
-
 function SettingsContent() {
   const isClient = useIsClient();
 
@@ -81,9 +36,6 @@ function SettingsContent() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const { theme, resolvedTheme, setTheme } = useThemeStore();
   const { t, language, setLanguage } = useTranslation();
-
-  // Local state - initialized lazily
-  const [sessions, setSessions] = useState<SessionInfo[]>(() => initializeSessions(t));
 
   // Show skeleton on the server / before hydration
   if (!isClient) {
@@ -101,6 +53,9 @@ function SettingsContent() {
         {/* Notification Settings */}
         <NotificationSettings t={t} />
 
+        {/* Account Settings */}
+        <AccountSettings t={t} />
+
         {/* Appearance Settings */}
         <AppearanceSettings
           theme={theme}
@@ -114,8 +69,6 @@ function SettingsContent() {
         {/* Privacy & Security Settings */}
         <PrivacySettings
           t={t}
-          sessions={sessions}
-          setSessions={setSessions}
           units={units}
           deadlines={deadlines}
           theme={theme}

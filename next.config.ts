@@ -11,6 +11,10 @@ const sentryEnabled = isProduction && Boolean(process.env.SENTRY_AUTH_TOKEN);
 
 const nextConfig: NextConfig = {
   /* config options here */
+
+  // SECURITY: Disable X-Powered-By header to reduce information disclosure
+  poweredByHeader: false,
+
   // Enable experimental features for better performance
   experimental: {
     optimizePackageImports: [

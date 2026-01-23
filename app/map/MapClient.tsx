@@ -175,6 +175,18 @@ export default function MapClient() {
     toastUtils.success(t('routeReady'), t('selectBuildingToNavigate'));
   }, [autoNavigate, selectedBuilding, t]);
 
+  // PERF: Prefetch overlay images when user opens the overlay panel
+  // This improves perceived performance when toggling layers
+  useEffect(() => {
+    if (!showOverlayPanel) return;
+
+    // Prefetch all overlay images in the background
+    mapOverlays.forEach((overlay) => {
+      const img = new Image();
+      img.src = overlay.imagePath;
+    });
+  }, [showOverlayPanel]);
+
   // Copy shareable URL
   const copyShareableURL = useCallback(async () => {
     const url = new URL(window.location.href);

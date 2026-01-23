@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { FingerprintButton } from '@/components/auth/FingerprintButton';
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { AlertTriangle, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint } from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTranslation();
@@ -22,23 +23,67 @@ export default function LoginClient() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+  const [passkeyStatus, setPasskeyStatus] = useState<
+    'idle' | 'checking' | 'available' | 'unavailable' | 'unsupported'
+  >('idle');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Validate redirect URL to prevent open redirect attacks
+  // SECURITY: Validate redirect URL to prevent open redirect attacks
+  // Enhanced validation with whitelist and dangerous scheme blocking
   const isValidRedirect = useCallback((url: string | null): boolean => {
     if (!url) return false;
     try {
-      const decodedUrl = decodeURIComponent(url);
+      // SECURITY: Decode multiple times to prevent double-encoding attacks
+      let decodedUrl = url;
+      let prevDecoded = '';
+      let decodeAttempts = 0;
+      const maxDecodeAttempts = 3;
+
+      while (decodedUrl !== prevDecoded && decodeAttempts < maxDecodeAttempts) {
+        prevDecoded = decodedUrl;
+        decodedUrl = decodeURIComponent(decodedUrl);
+        decodeAttempts++;
+      }
+
+      // Must start with a single forward slash (relative path)
       if (!decodedUrl.startsWith('/')) return false;
+
+      // Block protocol-relative URLs (//example.com)
       if (decodedUrl.startsWith('//')) return false;
+
+      // Block dangerous URL schemes that could be injected
+      const dangerousSchemes = ['javascript', 'data', 'vbscript', 'file'].map(
+        (scheme) => `${scheme}:`,
+      );
+      const lowerUrl = decodedUrl.toLowerCase();
+      if (dangerousSchemes.some((scheme) => lowerUrl.includes(scheme))) return false;
+
+      // Parse as URL and verify origin matches
       const parsed = new URL(decodedUrl, window.location.origin);
       if (parsed.origin !== window.location.origin) return false;
       if (!parsed.pathname.startsWith('/')) return false;
-      return true;
+
+      // SECURITY: Whitelist of allowed path prefixes
+      const allowedPaths = [
+        '/home',
+        '/dashboard',
+        '/profile',
+        '/settings',
+        '/events',
+        '/courses',
+        '/map',
+        '/study',
+      ];
+      const isAllowedPath =
+        allowedPaths.some((prefix) => parsed.pathname.startsWith(prefix)) ||
+        parsed.pathname === '/';
+
+      return isAllowedPath;
     } catch {
       return false;
     }
@@ -108,7 +153,7 @@ export default function LoginClient() {
         } else if (authError.message.includes('Too many requests')) {
           setError(t('loginErrorTooManyRequests'));
         } else {
-          setError(authError.message);
+          setError(t('loginErrorFailed'));
         }
 
         setIsLoading(false);
@@ -145,6 +190,165 @@ export default function LoginClient() {
     }
   }, [isError]);
 
+  const base64UrlToUint8Array = useCallback((value: string) => {
+    const padded = value.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = padded.padEnd(Math.ceil(padded.length / 4) * 4, '=');
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }, []);
+
+  const bufferToBase64Url = useCallback((buffer: ArrayBuffer) => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+    const base64 = window.btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }, []);
+
+  const handlePasskeyLogin = useCallback(async () => {
+    if (isPasskeyLoading || isLoading || isSuccess) return;
+
+    if (!email) {
+      setError(t('emailRequired'));
+      return;
+    }
+
+    if (typeof window === 'undefined' || !window.PublicKeyCredential) {
+      toastUtils.error(t('featureComingSoon'), t('biometricSetupFailedMsg'));
+      return;
+    }
+
+    setIsPasskeyLoading(true);
+    setError(null);
+
+    try {
+      const optionsResponse = await fetch('/api/auth/passkey/options', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const optionsResult = await optionsResponse.json();
+      const options = optionsResult?.data?.options;
+
+      if (!optionsResponse.ok || !options) {
+        setError(t('loginErrorFailed'));
+        setIsPasskeyLoading(false);
+        return;
+      }
+
+      const publicKey: PublicKeyCredentialRequestOptions = {
+        ...options,
+        challenge: base64UrlToUint8Array(options.challenge),
+        allowCredentials: (options.allowCredentials || []).map(
+          (credential: { id: string; type: PublicKeyCredentialType }) => ({
+            ...credential,
+            id: base64UrlToUint8Array(credential.id),
+          }),
+        ),
+      };
+
+      const assertion = (await navigator.credentials.get({
+        publicKey,
+      })) as PublicKeyCredential | null;
+
+      if (!assertion) {
+        setError(t('loginErrorFailed'));
+        setIsPasskeyLoading(false);
+        return;
+      }
+
+      const response = assertion.response as AuthenticatorAssertionResponse;
+      const credentialPayload = {
+        id: assertion.id,
+        rawId: bufferToBase64Url(assertion.rawId),
+        type: assertion.type,
+        response: {
+          clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+          authenticatorData: bufferToBase64Url(response.authenticatorData),
+          signature: bufferToBase64Url(response.signature),
+          userHandle: response.userHandle ? bufferToBase64Url(response.userHandle) : null,
+        },
+        clientExtensionResults: assertion.getClientExtensionResults(),
+      };
+
+      const verifyResponse = await fetch('/api/auth/passkey/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialPayload }),
+      });
+
+      if (!verifyResponse.ok) {
+        setError(t('loginErrorFailed'));
+        setIsPasskeyLoading(false);
+        return;
+      }
+
+      toastUtils.success(t('welcomeBack'), t('loginSuccess'));
+      router.push(redirectTo);
+    } catch {
+      setError(t('unexpectedError'));
+    } finally {
+      setIsPasskeyLoading(false);
+    }
+  }, [
+    isPasskeyLoading,
+    isLoading,
+    isSuccess,
+    email,
+    t,
+    base64UrlToUint8Array,
+    bufferToBase64Url,
+    router,
+    redirectTo,
+  ]);
+
+  useEffect(() => {
+    if (!email) {
+      setPasskeyStatus('idle');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setPasskeyStatus('idle');
+      return;
+    }
+
+    if (typeof window === 'undefined' || !window.PublicKeyCredential) {
+      setPasskeyStatus('unsupported');
+      return;
+    }
+
+    let active = true;
+    const timer = setTimeout(async () => {
+      setPasskeyStatus('checking');
+      try {
+        const response = await fetch('/api/auth/passkey/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+        const result = await response.json();
+        if (!active) return;
+        setPasskeyStatus(result?.data?.available ? 'available' : 'unavailable');
+      } catch {
+        if (active) {
+          setPasskeyStatus('unavailable');
+        }
+      }
+    }, 400);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [email]);
+
   // Handle OAuth login (Placeholder)
   const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
     // For now, show a "coming soon" message as these require backend setup
@@ -172,7 +376,11 @@ export default function LoginClient() {
       });
 
       if (resetError) {
-        setError(resetError.message);
+        if (resetError.message.includes('Too many requests')) {
+          setError(t('loginErrorTooManyRequests'));
+        } else {
+          setError(t('unexpectedError'));
+        }
       } else {
         setResetEmailSent(true);
         toastUtils.success(t('resetPasswordSent'), t('resetPasswordSentDesc'));
@@ -185,10 +393,10 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="login-page min-h-screen flex items-center justify-center bg-mq-background p-0 relative overflow-hidden">
+    <div className="login-page min-h-[100dvh] flex items-start lg:items-center justify-center bg-mq-background p-0 relative overflow-y-auto">
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/32 to-mq-background/85" />
 
-      <div className="relative z-10 w-full max-w-none min-h-[calc(100vh)] h-[calc(100vh)] overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">
+      <div className="relative z-10 w-full max-w-none min-h-[100dvh] h-auto lg:h-[100dvh] overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">
         {/* Left Panel */}
         <div className="w-full lg:w-5/12 bg-mq-background text-mq-content backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-mq-border px-8 lg:px-12 py-12 flex flex-col">
           <div className="flex items-center justify-center mb-8">
@@ -198,7 +406,6 @@ export default function LoginClient() {
                 alt={t('mqLogoAlt')}
                 fill
                 className="object-contain drop-shadow-xl"
-                priority
               />
             </div>
           </div>
@@ -212,9 +419,9 @@ export default function LoginClient() {
             </p>
             <p className="text-sm text-mq-content font-medium">
               {t('noAccount')}{' '}
-              <button type="button" className="text-mq-primary hover:underline font-bold">
+              <Link href="/signup" className="text-mq-primary hover:underline font-bold">
                 {t('signUp')}
-              </button>
+              </Link>
             </p>
           </div>
 
@@ -287,7 +494,7 @@ export default function LoginClient() {
                     className="w-full h-12 rounded-full font-bold"
                     disabled={isLoading}
                   >
-                    {isLoading ? '...' : t('sendResetLink')}
+                    {isLoading ? t('loading') : t('sendResetLink')}
                   </Button>
                   <Button
                     type="button"
@@ -343,6 +550,7 @@ export default function LoginClient() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content hover:text-mq-primary transition-colors"
                     aria-label={showPassword ? t('hidePassword') : t('showPassword')}
+                    aria-pressed={showPassword}
                     disabled={isLoading || isSuccess}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -380,11 +588,32 @@ export default function LoginClient() {
               <div className="text-center text-sm text-mq-content font-medium">
                 <p>
                   {t('noAccount')}{' '}
-                  <button type="button" className="text-mq-primary hover:underline font-bold">
+                  <Link href="/signup" className="text-mq-primary hover:underline font-bold">
                     {t('signUp')}
-                  </button>
+                  </Link>
                 </p>
               </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 rounded-full flex items-center justify-center gap-2 font-bold"
+                onClick={handlePasskeyLogin}
+                disabled={isLoading || isSuccess || isPasskeyLoading}
+              >
+                <Fingerprint className="h-4 w-4" aria-hidden="true" />
+                {isPasskeyLoading ? t('loading') : t('biometricLogin')}
+              </Button>
+              <p className="text-xs text-mq-content-secondary text-center">
+                {t('biometricLogin')}:{' '}
+                {passkeyStatus === 'checking'
+                  ? t('loading')
+                  : passkeyStatus === 'available'
+                    ? t('enabled')
+                    : passkeyStatus === 'unsupported'
+                      ? t('notSupported')
+                      : t('disabled')}
+              </p>
 
               <div className="flex items-center gap-3 text-xs text-mq-content font-semibold pt-2">
                 <div className="h-px flex-1 bg-mq-border" />
