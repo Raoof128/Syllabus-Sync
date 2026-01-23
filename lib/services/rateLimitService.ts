@@ -163,7 +163,7 @@ class UpstashRedisStore implements RateLimitStore {
 // ============================================================================
 
 /**
- * Get the appropriate store based on environment configuration
+ * Get appropriate store based on environment configuration
  */
 function getStore(): RateLimitStore {
   // Try Upstash Redis first
@@ -182,6 +182,10 @@ function getStore(): RateLimitStore {
     return new UpstashRedisStore(kvUrl, kvToken);
   }
 
+  // SECURITY: Check for explicit override to allow memory store in production
+  // This should only be used for testing/demo deployments
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+
   // SECURITY: In production, require Redis - don't fall back to memory store
   // Memory store is useless in serverless environments (each instance has its own memory)
   // Use VERCEL_ENV for more reliable production detection
@@ -189,17 +193,26 @@ function getStore(): RateLimitStore {
     process.env.VERCEL_ENV === 'production' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
 
-  if (isRealProduction) {
+  if (isRealProduction && !allowMemoryStore) {
     console.error(
       '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
         'In-memory rate limiting does NOT work across serverless instances.\n' +
         'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for proper rate limiting.\n' +
-        'Security-critical endpoints (login, signup, password reset) will fail-closed.',
+        'Security-critical endpoints (login, signup, password reset) will fail-closed.\n' +
+        'For testing/demo only, set ALLOW_MEMORY_RATE_LIMIT=true to bypass this check.',
     );
   }
 
-  // Fall back to memory store only in development (with warning)
-  console.warn('⚠️ DEV MODE: Using in-memory rate limiting. This is fine for local development.');
+  // Fall back to memory store with clear warnings
+  if (isRealProduction && allowMemoryStore) {
+    console.warn(
+      '⚠️ PRODUCTION WARNING: Using in-memory rate limiting by explicit override.\n' +
+        'This provides NO real protection in serverless environments. Use only for testing.',
+    );
+  } else {
+    console.warn('⚠️ DEV MODE: Using in-memory rate limiting. This is fine for local development.');
+  }
+
   return new MemoryStore();
 }
 

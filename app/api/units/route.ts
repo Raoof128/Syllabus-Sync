@@ -10,6 +10,7 @@ import {
 } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
+import { withCSRFProtection } from '@/lib/security/csrf';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -277,106 +278,110 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
-  // SECURITY: Use rate-limited auth for mutation endpoint
-  return requireAuthWithRateLimit(request, async (userId) => {
-    return validateRequest(unitSchema)(request, async (validatedData) => {
-      try {
-        const supabase = await createServerClient();
-        const { schedule, location, ...unitData } = validatedData;
+  // SECURITY: Use rate-limited auth for mutation endpoint with full CSRF protection
+  return withCSRFProtection(async (_request) => {
+    return requireAuthWithRateLimit(request, async (userId) => {
+      return validateRequest(unitSchema)(request, async (validatedData) => {
+        try {
+          const supabase = await createServerClient();
+          const { schedule, location, ...unitData } = validatedData;
 
-        // 1. Insert Unit
-        const unitId = unitData.id || crypto.randomUUID();
-        const unitPayload = {
-          id: unitId,
-          user_id: userId,
-          code: unitData.code,
-          name: unitData.name,
-          color: unitData.color,
-          location: location
-            ? { building: location.building || '', room: location.room || '' }
-            : null,
-          description: unitData.description || null,
-          created_at: unitData.createdAt
-            ? unitData.createdAt.toISOString()
-            : new Date().toISOString(),
-        };
+          // 1. Insert Unit
+          const unitId = unitData.id || crypto.randomUUID();
+          const unitPayload = {
+            id: unitId,
+            user_id: userId,
+            code: unitData.code,
+            name: unitData.name,
+            color: unitData.color,
+            location: location
+              ? { building: location.building || '', room: location.room || '' }
+              : null,
+            description: unitData.description || null,
+            created_at: unitData.createdAt
+              ? unitData.createdAt.toISOString()
+              : new Date().toISOString(),
+          };
 
-        console.warn('Creating unit for user:', userId);
-        console.warn('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
+          console.warn('Creating unit for user:', userId);
+          console.warn('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
 
-        const { data: unit, error: unitError } = await supabase
-          .from('units')
-          .insert(unitPayload)
-          .select()
-          .single();
+          const { data: unit, error: unitError } = await supabase
+            .from('units')
+            .insert(unitPayload)
+            .select()
+            .single();
 
-        if (unitError) {
+          if (unitError) {
+            console.error(
+              'Unit insert error:',
+              unitError.code,
+              unitError.message,
+              unitError.details,
+              unitError.hint,
+            );
+            if (unitError.code === '23505') {
+              // Unique constraint violation
+              return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
+            }
+            return handleDatabaseError(unitError);
+          }
+
+          type ClassTimeRow = {
+            id: string;
+            day: string;
+            start_time: string;
+            end_time: string;
+          };
+
+          // 2. Insert Class Times (if any)
+          let insertedSchedule: ClassTimeRow[] = [];
+          if (schedule && schedule.length > 0) {
+            const classTimesPayload = schedule.map((ct) => ({
+              id: ct.id || crypto.randomUUID(),
+              unit_id: unitId,
+              day: ct.day,
+              start_time: ct.startTime,
+              end_time: ct.endTime,
+            }));
+
+            const { data: classTimesRaw, error: scheduleError } = await supabase
+              .from('class_times')
+              .insert(classTimesPayload)
+              .select();
+
+            if (scheduleError) {
+              // Rollback: Delete the unit if schedule insertion fails
+              // This mimics the atomic transaction of the RPC
+              await supabase.from('units').delete().eq('id', unitId);
+              return handleDatabaseError(scheduleError);
+            }
+
+            insertedSchedule = ((classTimesRaw ?? []) as unknown[]).map(
+              (row) => row as ClassTimeRow,
+            );
+          }
+
+          // 3. Construct Response
+          const responseData = {
+            ...mapUnitRow(unit),
+            schedule: insertedSchedule.map((ct) => ({
+              id: ct.id,
+              day: ct.day,
+              startTime: ct.start_time,
+              endTime: ct.end_time,
+            })),
+          };
+
+          return jsonSuccess(responseData, 201);
+        } catch (error) {
           console.error(
-            'Unit insert error:',
-            unitError.code,
-            unitError.message,
-            unitError.details,
-            unitError.hint,
+            'POST /api/units error:',
+            error instanceof Error ? error.message : 'Unknown error',
           );
-          if (unitError.code === '23505') {
-            // Unique constraint violation
-            return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
-          }
-          return handleDatabaseError(unitError);
+          return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
         }
-
-        type ClassTimeRow = {
-          id: string;
-          day: string;
-          start_time: string;
-          end_time: string;
-        };
-
-        // 2. Insert Class Times (if any)
-        let insertedSchedule: ClassTimeRow[] = [];
-        if (schedule && schedule.length > 0) {
-          const classTimesPayload = schedule.map((ct) => ({
-            id: ct.id || crypto.randomUUID(),
-            unit_id: unitId,
-            day: ct.day,
-            start_time: ct.startTime,
-            end_time: ct.endTime,
-          }));
-
-          const { data: classTimesRaw, error: scheduleError } = await supabase
-            .from('class_times')
-            .insert(classTimesPayload)
-            .select();
-
-          if (scheduleError) {
-            // Rollback: Delete the unit if schedule insertion fails
-            // This mimics the atomic transaction of the RPC
-            await supabase.from('units').delete().eq('id', unitId);
-            return handleDatabaseError(scheduleError);
-          }
-
-          insertedSchedule = ((classTimesRaw ?? []) as unknown[]).map((row) => row as ClassTimeRow);
-        }
-
-        // 3. Construct Response
-        const responseData = {
-          ...mapUnitRow(unit),
-          schedule: insertedSchedule.map((ct) => ({
-            id: ct.id,
-            day: ct.day,
-            startTime: ct.start_time,
-            endTime: ct.end_time,
-          })),
-        };
-
-        return jsonSuccess(responseData, 201);
-      } catch (error) {
-        console.error(
-          'POST /api/units error:',
-          error instanceof Error ? error.message : 'Unknown error',
-        );
-        return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
-      }
+      });
     });
   });
 }

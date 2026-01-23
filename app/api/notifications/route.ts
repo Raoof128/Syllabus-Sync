@@ -10,6 +10,7 @@ import {
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
+import { withCSRFProtection } from '@/lib/security/csrf';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -118,45 +119,47 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
-  return requireAuth(request, async (userId) => {
-    return validateRequest(notificationSchema)(request, async (validatedData) => {
-      try {
-        const supabase = await createServerClient();
-        const payload = {
-          ...validatedData,
-          id: validatedData.id ?? crypto.randomUUID(),
-          createdAt: validatedData.createdAt ?? new Date(),
-        };
+  return withCSRFProtection(async (_request) => {
+    return requireAuth(request, async (userId) => {
+      return validateRequest(notificationSchema)(request, async (validatedData) => {
+        try {
+          const supabase = await createServerClient();
+          const payload = {
+            ...validatedData,
+            id: validatedData.id ?? crypto.randomUUID(),
+            createdAt: validatedData.createdAt ?? new Date(),
+          };
 
-        const { data, error } = await supabase
-          .from('notifications')
-          .insert({
-            id: payload.id,
-            user_id: userId,
-            title: payload.title,
-            message: payload.message,
-            type: payload.type,
-            read: payload.read,
-            link: payload.link,
-            related_id: payload.relatedId,
-            created_at: payload.createdAt.toISOString(),
-          })
-          .select('*')
-          .single();
+          const { data, error } = await supabase
+            .from('notifications')
+            .insert({
+              id: payload.id,
+              user_id: userId,
+              title: payload.title,
+              message: payload.message,
+              type: payload.type,
+              read: payload.read,
+              link: payload.link,
+              related_id: payload.relatedId,
+              created_at: payload.createdAt.toISOString(),
+            })
+            .select('*')
+            .single();
 
-        if (error) {
-          if (error.code === '23505') {
-            // Unique constraint violation
-            return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
+          if (error) {
+            if (error.code === '23505') {
+              // Unique constraint violation
+              return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
+            }
+            return handleDatabaseError(error);
           }
-          return handleDatabaseError(error);
-        }
 
-        return jsonSuccess(mapNotificationRow(data), 201);
-      } catch (error) {
-        console.error('POST /api/notifications error:', error);
-        return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
-      }
+          return jsonSuccess(mapNotificationRow(data), 201);
+        } catch (error) {
+          console.error('POST /api/notifications error:', error);
+          return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
+        }
+      });
     });
   });
 }

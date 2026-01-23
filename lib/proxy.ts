@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getCSP } from '@/lib/security/csp';
+import { setCSRFCookie } from '@/lib/security/csrf';
 
 /**
  * Next.js 16 Proxy handler (formerly Middleware)
@@ -30,6 +31,11 @@ export async function proxy(request: NextRequest) {
   };
 
   setSecurityHeaders(response.headers);
+
+  // Set CSRF cookie for all requests if not already present
+  if (!request.cookies.get('__Host-csrf')?.value) {
+    setCSRFCookie(response);
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

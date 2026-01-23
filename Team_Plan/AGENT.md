@@ -2,6 +2,13 @@
 
 ## Current Session (Jan 22, 2026) - Atomic Unit Sync Architecture
 
+### Raouf: 2026-01-24 (Australia/Sydney) - Next.js 16 Proxy Conflict Resolution
+- **Status:** ✅ Complete - Resolved middleware.ts and proxy.ts conflict preventing development server startup.
+- **Infrastructure:** Removed conflicting `middleware.ts` file from root directory as Next.js 16 requires only `proxy.ts` for middleware functionality.
+- **Error Fixed:** "Both middleware file "./middleware.ts" and proxy file "./proxy.ts" are detected" error resolved by deleting the obsolete middleware file.
+- **Files Updated:** Removed `middleware.ts` (kept `proxy.ts` which imports from `@/lib/proxy`).
+- **Verification:** Development server now starts successfully on available port.
+
 ### Raouf: 2026-01-23 (Australia/Sydney) - Passkey Status & Test Harness Cleanup
 - **Status:** ✅ Complete - Added passkey availability status on login, documented passkey APIs, and removed test warnings.
 - **UI/Auth:** Login now surfaces passkey availability by email and checks `/api/auth/passkey/status` with debounced requests.

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth, optionalAuth } from '@/app/api/_lib/middleware';
+import { withCSRFProtection } from '@/lib/security/csrf';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 
@@ -265,65 +266,67 @@ export async function GET(request: NextRequest) {
  * This is called when the user performs certain actions to update their streak
  */
 export async function POST(request: NextRequest) {
-  // SECURITY: Apply rate limiting (stricter for mutations)
-  const clientIP = getClientIP(request);
-  const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
-  if (!allowed) {
-    return jsonError(
-      'Rate limit exceeded. Please try again later.',
-      429,
-      ERROR_CODES.RATE_LIMITED,
-      { retryAfter: resetIn },
-    );
-  }
-
-  return requireAuth(request, async (userId) => {
-    const supabase = await createServerClient();
-
-    // Call the update_streak function (which also awards daily XP)
-    const { error } = await supabase.rpc('update_streak', { p_user_id: userId });
-
-    if (error) {
-      console.error('Failed to update streak:', error);
-      return jsonError('Failed to record activity', 500, ERROR_CODES.INTERNAL_ERROR);
-    }
-
-    // Fetch updated profile
-    const { data: profileData, error: profileError } = await supabase
-      .from('gamification_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (profileError) {
-      console.error('Failed to fetch updated profile:', profileError);
+  // SECURITY: Apply CSRF protection and rate limiting (stricter for mutations)
+  return withCSRFProtection(async (_request) => {
+    const clientIP = getClientIP(request);
+    const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
+    if (!allowed) {
       return jsonError(
-        'Activity recorded but failed to fetch profile',
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
+        'Rate limit exceeded. Please try again later.',
+        429,
+        ERROR_CODES.RATE_LIMITED,
+        { retryAfter: resetIn },
       );
     }
 
-    const xp = profileData?.xp ?? 0;
-    const level = calculateLevel(xp);
-    const currentLevelXp = xpForLevel(level);
-    const nextLevelXp = xpForLevel(level + 1);
-    const xpInCurrentLevel = xp - currentLevelXp;
-    const xpNeededForLevel = nextLevelXp - currentLevelXp;
+    return requireAuth(request, async (userId) => {
+      const supabase = await createServerClient();
 
-    return jsonSuccess({
-      message: 'Activity recorded',
-      profile: {
-        xp,
-        level,
-        streakDays: profileData?.streak_days ?? 0,
-        longestStreak: profileData?.longest_streak ?? 0,
-        lastActivityDate: profileData?.last_activity_date ?? null,
-        xpToNextLevel: nextLevelXp - xp,
-        xpForCurrentLevel: currentLevelXp,
-        levelProgress:
-          xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
-      },
+      // Call the update_streak function (which also awards daily XP)
+      const { error } = await supabase.rpc('update_streak', { p_user_id: userId });
+
+      if (error) {
+        console.error('Failed to update streak:', error);
+        return jsonError('Failed to record activity', 500, ERROR_CODES.INTERNAL_ERROR);
+      }
+
+      // Fetch updated profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('gamification_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (profileError) {
+        console.error('Failed to fetch updated profile:', profileError);
+        return jsonError(
+          'Activity recorded but failed to fetch profile',
+          500,
+          ERROR_CODES.INTERNAL_ERROR,
+        );
+      }
+
+      const xp = profileData?.xp ?? 0;
+      const level = calculateLevel(xp);
+      const currentLevelXp = xpForLevel(level);
+      const nextLevelXp = xpForLevel(level + 1);
+      const xpInCurrentLevel = xp - currentLevelXp;
+      const xpNeededForLevel = nextLevelXp - currentLevelXp;
+
+      return jsonSuccess({
+        message: 'Activity recorded',
+        profile: {
+          xp,
+          level,
+          streakDays: profileData?.streak_days ?? 0,
+          longestStreak: profileData?.longest_streak ?? 0,
+          lastActivityDate: profileData?.last_activity_date ?? null,
+          xpToNextLevel: nextLevelXp - xp,
+          xpForCurrentLevel: currentLevelXp,
+          levelProgress:
+            xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
+        },
+      });
     });
   });
 }

@@ -33,6 +33,9 @@
 # misc
 .DS_Store
 **/.DS_Store
+.npm-cache/
+.ruff_cache/
+.playwright-mcp/
 *.pem
 .eslintcache
 .cache

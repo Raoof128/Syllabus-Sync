@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-24 - Next.js 16 Proxy Conflict Resolution
+
+### Fixed
+- **Development Server:** Resolved "Both middleware file "./middleware.ts" and proxy file "./proxy.ts" are detected" error preventing Next.js 16 development server startup.
+- **Next.js 16 Compliance:** Removed conflicting `middleware.ts` file as Next.js 16 requires only `proxy.ts` for middleware functionality.
+
+### Verification
+- `npm run check`
+
+---
+
 Raouf: 2026-01-23 - Passkey Status & Test Harness Cleanup
 
 ### Added

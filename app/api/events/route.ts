@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow, serializeEvent } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
+import { withCSRFProtection } from '@/lib/security/csrf';
 import type { Event } from '@/lib/types';
 
 // Schema matching the database: start_at, end_at, all_day
@@ -66,82 +67,84 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // SECURITY: Use rate-limited auth for mutation endpoint
-  return requireAuthWithRateLimit(request, async (userId) => {
-    try {
-      // SECURITY: Parse with size limit protection
-      const bodyResult = await parseJsonBody(request);
-      if (!bodyResult.success) {
-        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
-      }
-      const parsed = eventSchema.safeParse(bodyResult.data);
+  // SECURITY: Use rate-limited auth for mutation endpoint with full CSRF protection
+  return withCSRFProtection(async (_request) => {
+    return requireAuthWithRateLimit(request, async (userId) => {
+      try {
+        // SECURITY: Parse with size limit protection
+        const bodyResult = await parseJsonBody(request);
+        if (!bodyResult.success) {
+          return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+        }
+        const parsed = eventSchema.safeParse(bodyResult.data);
 
-      if (!parsed.success) {
-        console.error('Event validation failed:', JSON.stringify(parsed.error.issues, null, 2));
-        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
-        return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
-          errors: parsed.error.issues,
-        });
-      }
+        if (!parsed.success) {
+          console.error('Event validation failed:', JSON.stringify(parsed.error.issues, null, 2));
+          console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
+          return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
+            errors: parsed.error.issues,
+          });
+        }
 
-      const supabase = await createServerClient();
+        const supabase = await createServerClient();
 
-      // Create Event object for serialization
-      const eventData: Event & { user_id: string } = {
-        id: parsed.data.id ?? crypto.randomUUID(),
-        user_id: userId, // Security: Associate event with current user
-        title: parsed.data.title,
-        description: parsed.data.description,
-        location: parsed.data.location,
-        building: parsed.data.building,
-        category: parsed.data.category,
-        imageUrl: parsed.data.imageUrl,
-        startAt: parsed.data.startAt,
-        endAt: parsed.data.endAt,
-        allDay: parsed.data.allDay,
-        // Computed fields for backward compatibility
-        date: parsed.data.startAt,
-        time: parsed.data.allDay
-          ? ''
-          : parsed.data.startAt.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true,
-            }),
-      };
+        // Create Event object for serialization
+        const eventData: Event & { user_id: string } = {
+          id: parsed.data.id ?? crypto.randomUUID(),
+          user_id: userId, // Security: Associate event with current user
+          title: parsed.data.title,
+          description: parsed.data.description,
+          location: parsed.data.location,
+          building: parsed.data.building,
+          category: parsed.data.category,
+          imageUrl: parsed.data.imageUrl,
+          startAt: parsed.data.startAt,
+          endAt: parsed.data.endAt,
+          allDay: parsed.data.allDay,
+          // Computed fields for backward compatibility
+          date: parsed.data.startAt,
+          time: parsed.data.allDay
+            ? ''
+            : parsed.data.startAt.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              }),
+        };
 
-      // Log event creation (development debugging)
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          'Creating event with serialized payload:',
-          JSON.stringify(serializeEvent(eventData), null, 2),
+        // Log event creation (development debugging)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            'Creating event with serialized payload:',
+            JSON.stringify(serializeEvent(eventData), null, 2),
+          );
+        }
+
+        const { data, error } = await supabase
+          .from('events')
+          .insert(serializeEvent(eventData))
+          .select('*')
+          .single();
+
+        if (error) {
+          // SECURITY: Don't expose internal database error messages to clients
+          console.error('Database error creating event:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
+          return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+        }
+
+        return jsonSuccess(mapEventRow(data), 201);
+      } catch (error) {
+        console.error(
+          'Error creating event:',
+          error instanceof Error ? error.message : 'Unknown error',
         );
+        return jsonError('Failed to create event', 500, ERROR_CODES.INTERNAL_ERROR);
       }
-
-      const { data, error } = await supabase
-        .from('events')
-        .insert(serializeEvent(eventData))
-        .select('*')
-        .single();
-
-      if (error) {
-        // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error creating event:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
-        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
-      }
-
-      return jsonSuccess(mapEventRow(data), 201);
-    } catch (error) {
-      console.error(
-        'Error creating event:',
-        error instanceof Error ? error.message : 'Unknown error',
-      );
-      return jsonError('Failed to create event', 500, ERROR_CODES.INTERNAL_ERROR);
-    }
+    });
   });
 }
