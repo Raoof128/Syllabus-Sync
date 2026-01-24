@@ -93,6 +93,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         if (error.code === 'PGRST116') {
           return jsonError('Todo not found', 404, ERROR_CODES.NOT_FOUND);
         }
+        // Check if the error is related to missing table
+        if (error.message?.includes('schema cache') || error.code === '42P01') {
+          console.error('Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql');
+          return jsonError(
+            'The todos table is not set up. Please run database migrations.',
+            500,
+            ERROR_CODES.DATABASE_ERROR,
+            { hint: 'Run: npx supabase db push' }
+          );
+        }
         return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
       }
 
@@ -118,6 +128,16 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       const { error } = await supabase.from('todos').delete().eq('id', id).eq('user_id', userId);
 
       if (error) {
+        // Check if the error is related to missing table
+        if (error.message?.includes('schema cache') || error.code === '42P01') {
+          console.error('Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql');
+          return jsonError(
+            'The todos table is not set up. Please run database migrations.',
+            500,
+            ERROR_CODES.DATABASE_ERROR,
+            { hint: 'Run: npx supabase db push' }
+          );
+        }
         return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
       }
 

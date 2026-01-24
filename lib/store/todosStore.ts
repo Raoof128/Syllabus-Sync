@@ -74,15 +74,26 @@ export const useTodosStore = create<TodosState>()(
 
           set({ todos: validData, hasLoaded: true });
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           const isAuthError =
-            error instanceof Error &&
-            (error.message.includes('401') ||
-              error.message.includes('authentication') ||
-              error.message.includes('Unauthorized'));
+            errorMessage.includes('401') ||
+            errorMessage.includes('authentication') ||
+            errorMessage.includes('Unauthorized');
+
+          const isTableMissing =
+            errorMessage.includes('schema cache') ||
+            errorMessage.includes('todos table') ||
+            errorMessage.includes('42P01');
 
           if (isAuthError) {
             // Auth failure: clear persisted data to prevent showing stale user data
             set({ todos: [], hasLoaded: true });
+          } else if (isTableMissing) {
+            // Table missing: log helpful message but continue with local data
+            console.warn(
+              'Todos table not found in database. To enable cloud sync, run: npx supabase db push'
+            );
+            set({ hasLoaded: true });
           } else {
             console.warn('Failed to load todos from API:', error);
             set({ hasLoaded: true });
@@ -123,7 +134,7 @@ export const useTodosStore = create<TodosState>()(
           return serverNormalized;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          // Silently handle auth errors, CSRF errors, and network issues - local-first approach
+          // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
           const isExpectedError =
             errorMessage.includes('authentication') ||
             errorMessage.includes('unauthorized') ||
@@ -131,7 +142,10 @@ export const useTodosStore = create<TodosState>()(
             errorMessage.includes('403') ||
             errorMessage.includes('401') ||
             errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch');
+            errorMessage.includes('Failed to fetch') ||
+            errorMessage.includes('schema cache') ||
+            errorMessage.includes('table') ||
+            errorMessage.includes('500');
 
           if (!isExpectedError) {
             errorHandler.logError(
@@ -168,7 +182,7 @@ export const useTodosStore = create<TodosState>()(
           await apiRequest<{ id: string }>(`/api/todos/${id}`, { method: 'DELETE' });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          // Silently handle auth errors, CSRF errors, and network issues - local-first approach
+          // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
           const isExpectedError =
             errorMessage.includes('authentication') ||
             errorMessage.includes('unauthorized') ||
@@ -177,7 +191,10 @@ export const useTodosStore = create<TodosState>()(
             errorMessage.includes('401') ||
             errorMessage.includes('404') || // Already deleted on server
             errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch');
+            errorMessage.includes('Failed to fetch') ||
+            errorMessage.includes('schema cache') ||
+            errorMessage.includes('table') ||
+            errorMessage.includes('500');
 
           if (!isExpectedError) {
             // Only restore if it's an unexpected error
@@ -237,7 +254,7 @@ export const useTodosStore = create<TodosState>()(
             return get().addTodo(fullTodo);
           }
 
-          // Silently handle auth errors, CSRF errors, and network issues - local-first approach
+          // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
           const isExpectedError =
             errorMessage.includes('authentication') ||
             errorMessage.includes('unauthorized') ||
@@ -245,7 +262,10 @@ export const useTodosStore = create<TodosState>()(
             errorMessage.includes('403') ||
             errorMessage.includes('401') ||
             errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch');
+            errorMessage.includes('Failed to fetch') ||
+            errorMessage.includes('schema cache') ||
+            errorMessage.includes('table') ||
+            errorMessage.includes('500');
 
           if (!isExpectedError) {
             set((state) => ({
