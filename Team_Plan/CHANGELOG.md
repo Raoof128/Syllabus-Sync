@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-24 - Map Component Refactoring & Stabilization
+
+### Refactored
+- **CampusMap.tsx:** Massive cleanup, reducing file size by ~65% by extracting logic into hooks.
+- **Geolocation:** Moved to `hooks/useMapLocation.ts` (handles GPS smoothing, markers, off-campus checks).
+- **Navigation:** Moved to `hooks/useMapNavigation.ts` (handles routing, instructions, state).
+- **Overlays:** Extracted to `components/MapOverlays.tsx` for cleaner layer management.
+
+### Fixed
+- **Navigation Logic:** Fixed a critical bug where navigation instructions were comparing GPS user location against Pixel route coordinates. Now correctly passes GPS coordinates to the navigation engine while using Pixel coordinates for visual display.
+
+### Verification
+- `npm run check` passed (format, lint, typecheck, tests, build).
+
+---
+
+Raouf: 2026-01-24 - Map UI/UX Polish
+
+### Changed
+- **Mobile Experience:** Map container now uses responsive height (`50vh` on mobile), and navigation panel behaves as a bottom sheet.
+- **UI Cleanup:** Removed redundant status cards (Turn-by-Turn, Live Location, Advanced Search) to reduce clutter.
+- **Styling:** Updated category filters to use consistent MQ design tokens.
+- **Accessibility:** Corrected semantic roles for building links and added keyboard navigation hints.
+
+### Verification
+- `npm run lint` and `npm run typecheck` passed.
+
+---
+
+Raouf: 2026-01-24 - Map GPS Coordinate Audit & Performance Tuning
+
+### Fixed
+- **GPS Accuracy:** Corrected building coordinates for 18 Wally's Walk (-33.7734389, 151.1134919), Waranara Library (-33.7756994, 151.1131306), and Dunmore Lang College (-33.7782967, 151.1165648) using Google Maps MCP geocoding verification.
+
+### Changed
+- **Navigation Performance:** Reduced Kalman filter process noise Q value from 3 to 2 for smoother position tracking during campus walking.
+- **Map Rendering:** Reduced overlay initialization delay from 200ms to 100ms for faster map startup.
+
+### Verification
+- `npm run lint` and `npm run typecheck` passed.
+
+---
+
+Raouf: 2026-01-24 - Auth Refresh Token Noise Reduction
+
+### Fixed
+- **Authentication:** Silenced "Invalid Refresh Token: Refresh Token Not Found" console errors occurring during session expiration.
+- **Proxy Middleware:** Improved session refresh robustness in the Next.js 16 `proxy.ts` by handling AuthApiErrors quietly and correctly propagating cookies.
+
+### Verification
+- `npm run check` (partial: lint + typecheck)
+
+---
+
 Raouf: 2026-01-24 - Next.js 16 Proxy Conflict Resolution
 
 ### Fixed

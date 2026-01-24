@@ -40,6 +40,15 @@ export const requireAuth = async (
     } = await supabase.auth.getUser();
 
     if (error || !user) {
+      // SILENT: Do not log refresh token failures as they are expected when sessions expire
+      const isRefreshError =
+        error?.message?.includes('Refresh Token Not Found') ||
+        error?.code === 'refresh_token_not_found' ||
+        error?.status === 400;
+
+      if (error && !isRefreshError) {
+        console.warn('API auth error:', error.message);
+      }
       return jsonUnauthorized('Valid authentication token required');
     }
 
@@ -64,14 +73,30 @@ export const optionalAuth = async (
     const supabase = await createServerClient();
     const {
       data: { user },
+      error,
     } = await supabase.auth.getUser();
+
+    if (error) {
+      const isRefreshError =
+        error.message?.includes('Refresh Token Not Found') ||
+        error.code === 'refresh_token_not_found' ||
+        error.status === 400;
+
+      if (!isRefreshError) {
+        console.warn('Optional auth status:', error.message);
+      }
+    }
 
     return await handler(user?.id);
   } catch (error) {
-    console.error(
-      'Optional auth middleware error:',
-      error instanceof Error ? error.message : 'Unknown error',
-    );
+    const isRefreshError =
+      error instanceof Error && error.message.includes('Refresh Token Not Found');
+    if (!isRefreshError) {
+      console.error(
+        'Optional auth middleware error:',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
+    }
     // Continue without authentication
     return await handler(undefined);
   }
@@ -112,6 +137,15 @@ export const requireAuthWithRateLimit = async (
     } = await supabase.auth.getUser();
 
     if (error || !user) {
+      // SILENT: Do not log refresh token failures as they are expected when sessions expire
+      const isRefreshError =
+        error?.message?.includes('Refresh Token Not Found') ||
+        error?.code === 'refresh_token_not_found' ||
+        error?.status === 400;
+
+      if (error && !isRefreshError) {
+        console.warn('API auth error:', error.message);
+      }
       return jsonUnauthorized('Valid authentication token required');
     }
 

@@ -66,16 +66,20 @@ export async function proxy(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
+        // Update request cookies for downstream middleware/routes
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
+
+        // Re-create the response to include the new cookies
         response = NextResponse.next({
-          request: {
-            headers: request.headers,
-          },
+          request,
         });
-        // Re-add security headers after response recreation
+
+        // Re-apply security headers to the new response
         setSecurityHeaders(response.headers);
+
+        // Apply the cookies to the actual response
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -86,21 +90,40 @@ export async function proxy(request: NextRequest) {
   // 3. Refresh Session
   let user = null;
   try {
+    // SECURITY: getUser() is the safest way to verify the user as it checks with the server
     const {
       data: { user: authUser },
       error,
     } = await supabase.auth.getUser();
-    if (!error) {
+
+    if (authUser) {
       user = authUser;
-    } else if (
-      error.message?.includes('Refresh Token Not Found') ||
-      error.code === 'refresh_token_not_found'
-    ) {
-      // Clear invalid session data
-      await supabase.auth.signOut();
+    } else if (error) {
+      // SILENT: Handle common refresh token failures without logging to console.
+      // These occur when a session is expired, revoked, or the token is no longer valid.
+      const isRefreshTokenError =
+        error.message?.includes('Refresh Token Not Found') ||
+        error.code === 'refresh_token_not_found' ||
+        error.status === 400;
+
+      if (!isRefreshTokenError) {
+        // Only log unexpected auth errors
+        console.warn('Proxy auth status:', error.message);
+      } else {
+        // Quietly clear invalid session data to prevent repeated errors
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch {
+          // Ignore signout errors during refresh failure
+        }
+      }
     }
   } catch (err) {
-    console.error('Proxy auth error (handled):', err);
+    // Only log unexpected catastrophic errors, not common refresh failures
+    const isRefreshError = err instanceof Error && err.message.includes('Refresh Token Not Found');
+    if (!isRefreshError) {
+      console.error('Proxy auth exception:', err);
+    }
   }
 
   // 4. Route Protection

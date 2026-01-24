@@ -3,6 +3,41 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-24 (Australia/Sydney) - Map Component Refactoring & Stabilization
+- **Status:** ✅ Complete - Massive architecture cleanup of `CampusMap.tsx` (reduced from ~1700 to ~600 lines).
+- **Architecture:** Extracted complex logic into custom hooks (`useMapLocation`, `useMapNavigation`) and components (`MapOverlays`).
+- **Hooks:** 
+  - `useMapLocation`: Encapsulates geolocation, Kalman filtering, off-campus detection, and marker updates.
+  - `useMapNavigation`: Manages ORS routing state, navigation instructions, and start/stop logic.
+- **Components:** `MapOverlays` handles declarative overlay layers via native Leaflet to avoid React lifecycle issues.
+- **Bug Fix:** Fixed critical navigation bug where pixel coordinates were being passed to the navigation manager instead of GPS coordinates (causing immediate "off-route" errors).
+- **Performance:** Reduced component complexity and re-renders by isolating state.
+- **Verification:** `npm run check` (Lint + Typecheck) passed.
+
+### Raouf: 2026-01-24 (Australia/Sydney) - Map UI/UX Polish
+- **Status:** ✅ Complete - Enhanced mobile responsiveness, decluttered UI, and improved accessibility.
+- **Mobile UX:** Made map height responsive (`h-[50vh]` on mobile), converted navigation panel to a bottom sheet, and optimized building grid layout (1-col to 4-col responsive).
+- **Declutter:** Removed redundant "Active Map Features" cards (Turn-by-Turn, Live Location, Advanced Search) to simplify the interface.
+- **Styling:** Standardized colors using MQ design tokens instead of hardcoded Tailwind values.
+- **Accessibility:** Removed incorrect `role="button"` from Link elements and added keyboard navigation help text.
+- **Files Updated:** `app/map/MapClient.tsx`, `app/map/CampusMap.tsx`.
+- **Verification:** `npm run lint` and `npm run typecheck` passed.
+
+### Raouf: 2026-01-24 (Australia/Sydney) - Map GPS Coordinate Audit & Performance Tuning
+- **Status:** ✅ Complete - Verified and corrected building GPS coordinates using Google Maps MCP, tuned navigation performance.
+- **GPS Fixes:** Corrected coordinates for 18 Wally's Walk, Waranara Library, and Dunmore Lang College using Google Maps geocoding API verification.
+- **Performance:** Reduced Kalman filter process noise (Q: 3→2) for smoother campus walking tracking; reduced overlay initialization delay (200ms→100ms) for faster map rendering.
+- **Verified Accurate:** Hospital, 4 Eastern Road, Sport Centre, Central Courtyard, Observatory - no changes needed.
+- **Files Updated:** `lib/map/buildings.ts`, `lib/map/realtimeNavigation.ts`, `app/map/CampusMap.tsx`.
+- **Verification:** `npm run lint` and `npm run typecheck` passed.
+
+### Raouf: 2026-01-24 (Australia/Sydney) - Auth Refresh Token Noise Reduction
+- **Status:** ✅ Complete - Silenced persistent AuthApiError: Refresh Token Not Found logs during session expiration.
+- **Logic:** Updated `lib/proxy.ts` and `app/api/_lib/middleware.ts` to identify and silently handle `refresh_token_not_found` errors (status 400).
+- **Hardening:** Improved `setAll` cookie synchronization in the Next.js 16 proxy to use the full `request` object and ensured security headers are re-applied correctly after session refresh.
+- **Files Updated:** `lib/proxy.ts`, `app/api/_lib/middleware.ts`.
+- **Verification:** `npm run lint` and `npm run typecheck` passed.
+
 ### Raouf: 2026-01-24 (Australia/Sydney) - Next.js 16 Proxy Conflict Resolution
 - **Status:** ✅ Complete - Resolved middleware.ts and proxy.ts conflict preventing development server startup.
 - **Infrastructure:** Removed conflicting `middleware.ts` file from root directory as Next.js 16 requires only `proxy.ts` for middleware functionality.

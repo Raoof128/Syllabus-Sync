@@ -101,7 +101,7 @@ export const RECALCULATION_THRESHOLD = 50;
 export const ARRIVAL_THRESHOLD = 10;
 
 /** Kalman filter process noise */
-const KALMAN_Q = 3; // Process noise (m²)
+const KALMAN_Q = 2; // Process noise (m²) - tuned for smoother campus walking
 
 /** Kalman filter measurement noise base */
 const KALMAN_R_BASE = 10; // Base measurement noise (m²)

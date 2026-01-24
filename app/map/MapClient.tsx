@@ -7,14 +7,11 @@ import { LazyMotion, m, domAnimation, AnimatePresence } from 'framer-motion';
 import '@/app/styles/leaflet.css';
 import {
   Search,
-  MapPin,
   Navigation,
   Building2,
   X,
   CheckCircle2,
-  Filter as FilterIcon,
   Accessibility,
-  Coffee,
   BookOpen,
   Dumbbell,
   Briefcase,
@@ -33,9 +30,6 @@ import {
   ChevronUp,
   LayoutGrid,
   List as ListIcon,
-  AlertTriangle,
-  Loader2,
-  XCircle,
 } from 'lucide-react';
 import { MapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
@@ -59,16 +53,6 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 
-// Filter categories for Advanced Search
-const FILTER_CATEGORIES = [
-  { id: 'academic', icon: BookOpen, label: 'academic' as TranslationKey },
-  { id: 'services', icon: Briefcase, label: 'services' as TranslationKey },
-  { id: 'sports', icon: Dumbbell, label: 'sports' as TranslationKey },
-  { id: 'study', icon: Coffee, label: 'study' as TranslationKey },
-  { id: 'labs', icon: FlaskConical, label: 'labs' as TranslationKey },
-  { id: 'accessibility', icon: Accessibility, label: 'accessibility' as TranslationKey },
-] as const;
-
 // Category filter buttons for buildings sidebar
 const CATEGORY_FILTERS: {
   id: BuildingCategory | 'all';
@@ -77,15 +61,15 @@ const CATEGORY_FILTERS: {
   color: string;
 }[] = [
   { id: 'all', icon: LayoutGrid, labelKey: 'categoryAll', color: 'text-mq-content' },
-  { id: 'academic', icon: BookOpen, labelKey: 'categoryTeaching', color: 'text-blue-500' },
-  { id: 'food', icon: Utensils, labelKey: 'categoryFood', color: 'text-orange-500' },
-  { id: 'services', icon: Briefcase, labelKey: 'categoryServices', color: 'text-purple-500' },
-  { id: 'health', icon: Stethoscope, labelKey: 'categoryHealth', color: 'text-red-500' },
-  { id: 'sports', icon: Dumbbell, labelKey: 'categorySports', color: 'text-green-500' },
-  { id: 'venue', icon: Theater, labelKey: 'categoryVenues', color: 'text-pink-500' },
-  { id: 'research', icon: FlaskConical, labelKey: 'categoryResearch', color: 'text-cyan-500' },
-  { id: 'residential', icon: Home, labelKey: 'categoryHousing', color: 'text-amber-500' },
-  { id: 'other', icon: Building2, labelKey: 'categoryOther', color: 'text-gray-500' },
+  { id: 'academic', icon: BookOpen, labelKey: 'categoryTeaching', color: 'text-mq-info' },
+  { id: 'food', icon: Utensils, labelKey: 'categoryFood', color: 'text-mq-warning' },
+  { id: 'services', icon: Briefcase, labelKey: 'categoryServices', color: 'text-mq-primary' },
+  { id: 'health', icon: Stethoscope, labelKey: 'categoryHealth', color: 'text-mq-error' },
+  { id: 'sports', icon: Dumbbell, labelKey: 'categorySports', color: 'text-mq-success' },
+  { id: 'venue', icon: Theater, labelKey: 'categoryVenues', color: 'text-mq-secondary' },
+  { id: 'research', icon: FlaskConical, labelKey: 'categoryResearch', color: 'text-mq-info' },
+  { id: 'residential', icon: Home, labelKey: 'categoryHousing', color: 'text-mq-warning' },
+  { id: 'other', icon: Building2, labelKey: 'categoryOther', color: 'text-mq-content-tertiary' },
 ];
 
 // Map overlay icons
@@ -107,12 +91,10 @@ export default function MapClient() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Location status from CampusMap
-  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
+  const [, setLocationStatus] = useState<LocationStatus>('idle');
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
@@ -227,18 +209,6 @@ export default function MapClient() {
       }
     });
     return counts;
-  }, []);
-
-  // Toggle a filter
-  const toggleFilter = useCallback((filterId: string) => {
-    setActiveFilters((prev) =>
-      prev.includes(filterId) ? prev.filter((f) => f !== filterId) : [...prev, filterId],
-    );
-  }, []);
-
-  // Clear all filters
-  const clearFilters = useCallback(() => {
-    setActiveFilters([]);
   }, []);
 
   // Ensure a non-empty document title for accessibility scanners
@@ -400,12 +370,17 @@ export default function MapClient() {
           <div className="mq-magic-card-content p-0">
             <Card className="border-0 shadow-none bg-transparent">
               <CardHeader>
-                <CardTitle>{t('interactiveCampusMap')}</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>{t('interactiveCampusMap')}</CardTitle>
+                  <p className="text-xs text-mq-content-tertiary hidden md:block">
+                    Use arrow keys to pan, +/- to zoom
+                  </p>
+                </div>
               </CardHeader>
               <CardContent>
                 <div
                   ref={mapContainerRef}
-                  className="h-96 md:h-[500px] rounded-mq-lg overflow-hidden border border-mq-border"
+                  className="h-[50vh] md:h-[500px] lg:h-[600px] rounded-mq-lg overflow-hidden border border-mq-border"
                 >
                   {shouldRenderMap ? (
                     <MapErrorBoundary>
@@ -530,7 +505,7 @@ export default function MapClient() {
                       layout
                       className={
                         viewMode === 'grid'
-                          ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
+                          ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
                           : 'space-y-2'
                       }
                     >
@@ -559,8 +534,6 @@ export default function MapClient() {
                                   <Link
                                     href={`/map?building=${building.id}`}
                                     aria-current={isSelected ? 'page' : undefined}
-                                    role="button"
-                                    tabIndex={0}
                                     className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
                                       isSelected
                                         ? 'bg-mq-success/10 border-mq-success'
@@ -624,8 +597,6 @@ export default function MapClient() {
                                 <Link
                                   href={`/map?building=${building.id}`}
                                   aria-current={isSelected ? 'page' : undefined}
-                                  role="button"
-                                  tabIndex={0}
                                   className={`group block h-full p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 flex flex-col gap-2 ${
                                     isSelected
                                       ? 'bg-mq-success/10 border-2 border-mq-success'
@@ -732,235 +703,6 @@ export default function MapClient() {
             </Card>
           </div>
         </MagicCard>
-
-        {/* Active Map Features */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Turn-by-Turn Navigation - ACTIVE */}
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0 h-full">
-              <Card className="border-0 shadow-none bg-transparent h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Navigation className="h-5 w-5 text-mq-success" />
-                    {t('turnByTurn')}
-                    <Badge className="ml-auto bg-mq-success/10 text-mq-success border-mq-success/20">
-                      {t('active')}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-mq-success/5 rounded-mq-lg border border-mq-success/20">
-                      <h4 className="font-semibold text-mq-content">{t('walkingDirections')}</h4>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">
-                        {t('walkingDirectionsDesc')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-mq-sm text-mq-success">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>
-                        {selectedBuilding ? t('routeReady') : t('selectBuildingToNavigate')}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </MagicCard>
-
-          {/* Live Location - Dynamic Status */}
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0 h-full">
-              <Card className="border-0 shadow-none bg-transparent h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin
-                      className={`h-5 w-5 ${
-                        locationStatus === 'found'
-                          ? 'text-mq-success'
-                          : locationStatus === 'denied'
-                            ? 'text-mq-error'
-                            : locationStatus === 'error'
-                              ? 'text-mq-warning'
-                              : 'text-mq-info'
-                      }`}
-                    />
-                    {t('liveLocation')}
-                    <Badge
-                      className={`ml-auto ${
-                        locationStatus === 'found'
-                          ? 'bg-mq-success/10 text-mq-success border-mq-success/20'
-                          : locationStatus === 'denied'
-                            ? 'bg-mq-error/10 text-mq-error border-mq-error/20'
-                            : locationStatus === 'error'
-                              ? 'bg-mq-warning/10 text-mq-warning border-mq-warning/20'
-                              : locationStatus === 'searching'
-                                ? 'bg-mq-info/10 text-mq-info border-mq-info/20'
-                                : 'bg-mq-content-tertiary/10 text-mq-content-tertiary border-mq-content-tertiary/20'
-                      }`}
-                    >
-                      {locationStatus === 'found'
-                        ? t('active')
-                        : locationStatus === 'denied'
-                          ? t('denied')
-                          : locationStatus === 'error'
-                            ? t('error')
-                            : locationStatus === 'searching'
-                              ? t('searching')
-                              : t('waiting')}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div
-                      className={`p-3 rounded-mq-lg border ${
-                        locationStatus === 'found'
-                          ? 'bg-mq-success/5 border-mq-success/20'
-                          : locationStatus === 'denied'
-                            ? 'bg-mq-error/5 border-mq-error/20'
-                            : locationStatus === 'error'
-                              ? 'bg-mq-warning/5 border-mq-warning/20'
-                              : 'bg-mq-info/5 border-mq-info/20'
-                      }`}
-                    >
-                      <h4 className="font-semibold text-mq-content">{t('realTimeTracking')}</h4>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">
-                        {locationStatus === 'denied'
-                          ? t('locationDeniedDesc')
-                          : locationStatus === 'error'
-                            ? t('positionUnavailableDesc')
-                            : t('realTimeTrackingDesc')}
-                      </p>
-                    </div>
-                    <div
-                      className={`flex items-center gap-2 text-mq-sm ${
-                        locationStatus === 'found'
-                          ? 'text-mq-success'
-                          : locationStatus === 'denied'
-                            ? 'text-mq-error'
-                            : locationStatus === 'error'
-                              ? 'text-mq-warning'
-                              : locationStatus === 'searching'
-                                ? 'text-mq-info'
-                                : 'text-mq-content-tertiary'
-                      }`}
-                    >
-                      {locationStatus === 'found' ? (
-                        <>
-                          <CheckCircle2 className="h-4 w-4" />
-                          <span>{t('locationTrackingEnabled')}</span>
-                        </>
-                      ) : locationStatus === 'denied' ? (
-                        <>
-                          <XCircle className="h-4 w-4" />
-                          <span>{t('locationAccessDenied')}</span>
-                        </>
-                      ) : locationStatus === 'error' ? (
-                        <>
-                          <AlertTriangle className="h-4 w-4" />
-                          <span>{t('locationError')}</span>
-                        </>
-                      ) : locationStatus === 'searching' ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          <span>{t('locating')}</span>
-                        </>
-                      ) : (
-                        <>
-                          <MapPin className="h-4 w-4" />
-                          <span>{t('waitingForLocation')}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </MagicCard>
-
-          {/* Advanced Search - ACTIVE */}
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0 h-full">
-              <Card className="border-0 shadow-none bg-transparent h-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FilterIcon className="h-5 w-5 text-mq-primary" />
-                    {t('advancedSearch')}
-                    <Badge className="ml-auto bg-mq-primary/10 text-mq-primary border-mq-primary/20">
-                      {t('active')}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-mq-primary/5 rounded-mq-lg border border-mq-primary/20">
-                      <h4 className="font-semibold text-mq-content">{t('filterAndFind')}</h4>
-                      <p className="text-mq-sm text-mq-content-secondary mt-1">
-                        {t('filterAndFindDesc')}
-                      </p>
-                    </div>
-                    {/* Filter toggle and chips */}
-                    <div className="space-y-2">
-                      <Button
-                        variant={showFilters ? 'primary' : 'secondary'}
-                        size="sm"
-                        onClick={() => setShowFilters(!showFilters)}
-                        className="w-full gap-2"
-                      >
-                        <FilterIcon className="h-4 w-4" />
-                        {showFilters ? t('hideFilters') : t('showFilters')}
-                        {activeFilters.length > 0 && (
-                          <Badge className="ml-1 bg-white/20 text-current">
-                            {activeFilters.length}
-                          </Badge>
-                        )}
-                      </Button>
-                      {showFilters && (
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          {FILTER_CATEGORIES.map((category) => {
-                            const Icon = category.icon;
-                            const isActive = activeFilters.includes(category.id);
-                            const categoryLabel = t(category.label as TranslationKey);
-                            return (
-                              <button
-                                key={category.id}
-                                onClick={() => toggleFilter(category.id)}
-                                aria-label={
-                                  isActive
-                                    ? t('removeFilter', { filter: categoryLabel })
-                                    : t('addFilter', { filter: categoryLabel })
-                                }
-                                aria-pressed={isActive}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-mq-xs font-medium transition-colors ${
-                                  isActive
-                                    ? 'bg-mq-primary text-white'
-                                    : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background'
-                                }`}
-                              >
-                                <Icon className="h-3 w-3" aria-hidden="true" />
-                                {categoryLabel}
-                              </button>
-                            );
-                          })}
-                          {activeFilters.length > 0 && (
-                            <button
-                              onClick={clearFilters}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-mq-xs font-medium text-mq-error hover:bg-mq-error/10 transition-colors"
-                            >
-                              <X className="h-3 w-3" />
-                              {t('clearAll')}
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </MagicCard>
-        </div>
       </div>
     </LazyMotion>
   );

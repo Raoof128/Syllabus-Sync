@@ -215,7 +215,7 @@ export const buildings: Building[] = [
     gridRef: 'N16',
     address: "18 Wally's Walk",
     category: 'services',
-    location: { lat: -33.7741501, lng: 151.1127909 }, // Google Maps geocoded 2026-01-10
+    location: { lat: -33.7734389, lng: 151.1134919 }, // Google Maps MCP verified 2026-01-24
     levels: 4,
   },
   {
@@ -230,7 +230,7 @@ export const buildings: Building[] = [
     gridRef: 'Q17',
     address: '16 Macquarie Walk',
     category: 'academic',
-    location: { lat: -33.775621, lng: 151.113441, osmId: 141281549 }, // User verified 2026-01-20
+    location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps MCP verified 2026-01-24
     levels: 8,
   },
   {
@@ -817,7 +817,7 @@ export const buildings: Building[] = [
     gridRef: 'W25',
     address: '130 Herring Road',
     category: 'residential',
-    location: { lat: -33.7783819, lng: 151.1165762, osmId: 488128858 }, // Google Maps verified
+    location: { lat: -33.7782967, lng: 151.1165648, osmId: 488128858 }, // Google Maps MCP verified 2026-01-24
   },
   {
     id: 'RMC',
