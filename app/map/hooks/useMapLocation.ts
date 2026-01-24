@@ -91,6 +91,44 @@ export function useMapLocation({
     };
   }, [mapInstance, leafletModule]);
 
+  // Motion Detection (Sensor Fusion)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.DeviceMotionEvent) return;
+
+    let motionTimeout: NodeJS.Timeout;
+
+    const handleMotion = (event: DeviceMotionEvent) => {
+      const { acceleration } = event;
+      if (!acceleration || acceleration.x === null) return;
+
+      const mag = Math.sqrt(
+        (acceleration.x || 0) ** 2 + (acceleration.y || 0) ** 2 + (acceleration.z || 0) ** 2,
+      );
+
+      // Threshold for significant movement (walking vibration)
+      if (mag > 0.3) {
+        if (navManagerRef.current) {
+          navManagerRef.current.setMotionState(true);
+        }
+        clearTimeout(motionTimeout);
+        motionTimeout = setTimeout(() => {
+          if (navManagerRef.current) {
+            navManagerRef.current.setMotionState(false);
+          }
+        }, 3000); // 3 seconds of stillness to consider "stopped"
+      }
+    };
+
+    // Passive listener, no permission request needed unless on iOS 13+
+    // If permission is needed, this will just stay silent until granted elsewhere.
+    window.addEventListener('devicemotion', handleMotion);
+
+    return () => {
+      window.removeEventListener('devicemotion', handleMotion);
+      clearTimeout(motionTimeout);
+    };
+  }, [navManagerRef]);
+
   // Geolocation Effect
   useEffect(() => {
     if (!mapInstance || !isMapReady(mapInstance) || !leafletModule || !navigator.geolocation) {

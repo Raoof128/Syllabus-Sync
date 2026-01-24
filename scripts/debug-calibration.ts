@@ -10,9 +10,9 @@ import {
   getCalibrationDiagnostics,
   GROUND_CONTROL_POINTS,
 } from '../lib/map/geospatialCalibration';
-import { MAP_CONFIG, gpsToPixel, pixelToCrsSimple } from '../lib/map/buildings';
+import { MAP_CONFIG } from '../lib/map/buildings';
 
-// Your live location coordinates
+// Your live location coordinates (Library)
 const LIVE_LOCATION = {
   lat: -33.775621,
   lng: 151.113441,
@@ -20,7 +20,7 @@ const LIVE_LOCATION = {
 };
 
 console.log('='.repeat(70));
-console.log('GCP CALIBRATION DEBUG REPORT');
+console.log('GCP CALIBRATION DEBUG REPORT (AFFINE)');
 console.log('='.repeat(70));
 console.log(`\nTest Location: ${LIVE_LOCATION.description}`);
 console.log(`GPS: ${LIVE_LOCATION.lat}, ${LIVE_LOCATION.lng}\n`);
@@ -32,19 +32,10 @@ console.log('-'.repeat(70));
 
 const diagnostics = getCalibrationDiagnostics();
 console.log(`GCP Count: ${diagnostics.gcpCount}`);
+console.log(`Method:  ${diagnostics.method}`);
 console.log(
-  `RMSE: ${diagnostics.rmsePixels.toFixed(2)} pixels (~${diagnostics.rmseMeters.toFixed(2)}m)`,
+  `RMSE:    ${diagnostics.rmsePixels.toFixed(2)} pixels (~${diagnostics.rmseMeters.toFixed(2)}m)`,
 );
-console.log('\nOptimized GPS Bounds:');
-console.log(`  North: ${diagnostics.optimizedBounds.north.toFixed(6)}`);
-console.log(`  South: ${diagnostics.optimizedBounds.south.toFixed(6)}`);
-console.log(`  East:  ${diagnostics.optimizedBounds.east.toFixed(6)}`);
-console.log(`  West:  ${diagnostics.optimizedBounds.west.toFixed(6)}`);
-console.log('\nOriginal GPS Bounds (MAP_CONFIG):');
-console.log(`  North: ${diagnostics.originalBounds.north}`);
-console.log(`  South: ${diagnostics.originalBounds.south}`);
-console.log(`  East:  ${diagnostics.originalBounds.east}`);
-console.log(`  West:  ${diagnostics.originalBounds.west}`);
 
 console.log('\nGCP Residuals (error per control point):');
 diagnostics.gcpResiduals.forEach((r) => {
@@ -61,13 +52,13 @@ console.log('-'.repeat(70));
 
 const comparison = compareTransformMethods(LIVE_LOCATION.lat, LIVE_LOCATION.lng);
 console.log(
-  `\nLinear Interpolation (OLD): pixel [${comparison.linear[0]}, ${comparison.linear[1]}]`,
+  `\nNaive Linear (Bound-based): pixel [${comparison.linear[0]}, ${comparison.linear[1]}]`,
 );
 console.log(
-  `GCP-Optimized (NEW): pixel [${comparison.gcpOptimized[0]}, ${comparison.gcpOptimized[1]}]`,
+  `Affine (GCP-Optimized):     pixel [${comparison.gcpOptimized[0]}, ${comparison.gcpOptimized[1]}]`,
 );
 console.log(
-  `\nOffset: ${comparison.offsetPixels.toFixed(1)} pixels (~${comparison.offsetMeters.toFixed(1)}m)`,
+  `\nOffset/Correction: ${comparison.offsetPixels.toFixed(1)} pixels (~${comparison.offsetMeters.toFixed(1)}m)`,
 );
 
 // 3. Calibrated result
@@ -100,53 +91,15 @@ console.log(
   `  Distance: ${distFromLibrary.toFixed(1)} pixels (~${(distFromLibrary * metersPerPixel).toFixed(1)}m)`,
 );
 
-// Google Maps says you're at the Library
-console.log(`\nGoogle Maps verification:`);
-console.log(`  Library GPS: ${libraryGcp.gps.lat}, ${libraryGcp.gps.lng}`);
-console.log(`  Your GPS:    ${LIVE_LOCATION.lat}, ${LIVE_LOCATION.lng}`);
-const gpsDistLat = (LIVE_LOCATION.lat - libraryGcp.gps.lat) * 111000; // rough m/deg
-const gpsDistLng =
-  (LIVE_LOCATION.lng - libraryGcp.gps.lng) * 111000 * Math.cos((LIVE_LOCATION.lat * Math.PI) / 180);
-const realDistance = Math.sqrt(gpsDistLat * gpsDistLat + gpsDistLng * gpsDistLng);
-console.log(`  Real-world distance: ~${realDistance.toFixed(1)}m`);
-
-// 5. Check if offset correction is working
+// 5. Recommendations
 console.log('\n' + '-'.repeat(70));
-console.log('5. OFFSET ANALYSIS');
+console.log('5. STATUS');
 console.log('-'.repeat(70));
 
-if (comparison.offsetPixels > 20) {
-  console.log(`\n⚠️  SIGNIFICANT OFFSET DETECTED: ${comparison.offsetPixels.toFixed(1)} pixels`);
-  console.log(
-    `   The affine transformation is correcting a ${comparison.offsetMeters.toFixed(1)}m offset.`,
-  );
+if (diagnostics.rmsePixels < 50) {
+  console.log('\n✅ Calibration is HEALTHY and ACCURATE.');
 } else {
-  console.log(`\n✓ Offset is minimal (${comparison.offsetPixels.toFixed(1)} pixels).`);
-  console.log(`  Linear and affine methods give similar results for this location.`);
-}
-
-// 6. Suggest GCP improvements if needed
-console.log('\n' + '-'.repeat(70));
-console.log('6. RECOMMENDATIONS');
-console.log('-'.repeat(70));
-
-const maxResidual = Math.max(...diagnostics.gcpResiduals.map((r) => r.error));
-const avgResidual =
-  diagnostics.gcpResiduals.reduce((sum, r) => sum + r.error, 0) / diagnostics.gcpResiduals.length;
-
-if (diagnostics.rmsePixels > 50) {
-  console.log(`\n⚠️  High RMSE (${diagnostics.rmsePixels.toFixed(1)}px). Consider:`);
-  console.log(`   - Verifying GCP pixel positions on the map image`);
-  console.log(`   - Adding more GCPs in different areas of campus`);
-  console.log(`   - Checking for outlier GCPs with high residuals`);
-} else if (maxResidual > 100) {
-  const outlier = diagnostics.gcpResiduals.find((r) => r.error === maxResidual);
-  console.log(`\n⚠️  Outlier GCP detected: ${outlier?.id} (${maxResidual.toFixed(1)}px error)`);
-  console.log(`   Consider re-verifying this GCP's pixel position.`);
-} else {
-  console.log(
-    `\n✓ Calibration quality is good (RMSE: ${diagnostics.rmsePixels.toFixed(1)}px, avg: ${avgResidual.toFixed(1)}px)`,
-  );
+  console.log('\n⚠️  Calibration RMSE is high. Check for outlier GCPs.');
 }
 
 console.log('\n' + '='.repeat(70));

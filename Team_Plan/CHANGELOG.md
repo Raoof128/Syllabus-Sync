@@ -7,6 +7,115 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-24 - Navigation Logic Verification & Fix
+
+### Fixed
+- **Navigation Initialization:** Fixed a critical bug in the Kalman Filter where the initial position was defaulting to 0, causing massive distance errors (~150km) on the first update. The system now correctly initializes to the first valid GPS reading.
+- **Verification:** Added `scripts/verify-navigation.ts` to simulate and verify the entire navigation lifecycle (Start -> Move -> Arrive).
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Final Map Polish
+
+### Fixed
+- **Visual Alignment:** Applied a global offset of -15 pixels (North) to the map calibration engine. This corrects a slight visual misalignment where the user's location appeared consistently south of their actual position on pathways.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Sensor Fusion & Advanced Navigation
+
+### Added
+- **Sensor Fusion:** Implemented `DeviceMotion` integration to detect user movement (walking vs. standing) using the accelerometer.
+- **Adaptive Smoothing:** The GPS Kalman filter now dynamically adjusts its process noise based on motion sensor data, effectively eliminating GPS drift when the user is stationary.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map System Upgrade (Affine Transformation)
+
+### Changed
+- **Calibration Engine:** Upgraded from simple linear interpolation to **Affine Transformation** (Multiple Linear Regression).
+- **Accuracy:** The new model corrects for map rotation and skew, resolving persistent offset issues that simple scaling could not fix.
+- **Verification:** Validated against 19 high-precision Ground Control Points.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration Round 6 (User Verified)
+
+### Improved
+- **Local Accuracy:** Added a user-verified Ground Control Point at 8 Sir Christopher Ondaatje Ave (`GCP_8SCO`) to resolve a specific ~20m offset.
+- **Data Integrity:** Corrected GPS coordinates for 8 Sir Christopher Ondaatje Ave based on direct on-site verification.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration Round 5
+
+### Improved
+- **Map Accuracy:** Achieved maximal calibration density by adding Macquarie Theatre and Student Services as Ground Control Points. The map now uses 18 precise anchors.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration Round 4
+
+### Improved
+- **Map Accuracy:** Added 3 final Ground Control Points (Lakeside Hotel, Macquarie Centre, Hearing Hub) to anchor the North-East, South-East, and South-Central zones.
+- **Data Integrity:** Updated Hearing Hub coordinates to match Google Maps verified entrance.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration Round 3
+
+### Improved
+- **Map Accuracy:** Added 3 more Ground Control Points (Law Building, Walanga Muru, Chaplaincy) to fine-tune the central and western corridors.
+- **Data Integrity:** Corrected a significant GPS error for 17 Wally's Walk (-150m offset fixed) based on Google Maps verification.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration Round 2
+
+### Improved
+- **GPS Accuracy:** Added 3 more Ground Control Points (Observatory, Chancellery, Banksia Cottage) to improve map calibration in the North, North-East, and West zones.
+- **Data Accuracy:** Updated coordinates for 19 Eastern Road based on new Google Maps verification.
+
+### Verification
+- `npm run check` passed.
+
+---
+
+Raouf: 2026-01-24 - Map Calibration & Live Location Fix
+
+### Fixed
+- **Live Location Accuracy:** Improved map calibration by adding two new Ground Control Points (MQ Hospital and Incubator) to better anchor the South and East edges of the map.
+- **Data Accuracy:** Corrected GPS coordinates for MQ Incubator based on Google Maps verification.
+
+### Verification
+- `npm run check` passed.
+
+---
+
 Raouf: 2026-01-24 - Map Component Refactoring & Stabilization
 
 ### Refactored

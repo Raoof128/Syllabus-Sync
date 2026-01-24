@@ -131,6 +131,7 @@ interface KalmanState {
 class KalmanFilter1D {
   private state: KalmanState;
   private lastTimestamp: number = 0;
+  private initialized: boolean = false;
 
   constructor(initialPosition: number = 0) {
     this.state = {
@@ -139,34 +140,45 @@ class KalmanFilter1D {
       p: 1000, // High initial uncertainty
       pv: 1000,
     };
+    if (initialPosition !== 0) this.initialized = true;
   }
 
   /**
    * Update filter with new measurement
-   * @param measurement - Raw GPS coordinate
-   * @param accuracy - GPS accuracy in meters
-   * @param timestamp - Measurement timestamp
-   * @returns Filtered position and velocity
    */
   update(
     measurement: number,
     accuracy: number,
     timestamp: number,
+    qMultiplier: number = 1.0,
   ): { position: number; velocity: number } {
+    if (!this.initialized) {
+      this.state.x = measurement;
+      this.state.v = 0;
+      this.state.p = accuracy * accuracy; // Trust the first measurement's accuracy
+      this.lastTimestamp = timestamp;
+      this.initialized = true;
+      return { position: this.state.x, velocity: 0 };
+    }
+
     const dt = this.lastTimestamp > 0 ? (timestamp - this.lastTimestamp) / 1000 : 0.1;
     this.lastTimestamp = timestamp;
 
     // Clamp dt to reasonable bounds
     const clampedDt = Math.max(0.01, Math.min(dt, 5));
 
+    // Dynamic Process Noise
+    const Q = KALMAN_Q * qMultiplier * clampedDt;
+
     // Predict step
     const predictedX = this.state.x + this.state.v * clampedDt;
-    const predictedP = this.state.p + this.state.pv * clampedDt * clampedDt + KALMAN_Q * clampedDt;
+    const predictedP = this.state.p + this.state.pv * clampedDt * clampedDt + Q;
 
-    // Measurement noise based on GPS accuracy
-    const R = KALMAN_R_BASE + accuracy * accuracy * 0.0001; // Scale accuracy to degrees²
+    // Measurement noise
+    const stationaryPenalty = qMultiplier < 0.1 ? 5.0 : 1.0;
+    const R = (KALMAN_R_BASE + accuracy * accuracy * 0.0001) * stationaryPenalty;
 
-    // Update step (Kalman gain)
+    // Update step
     const K = predictedP / (predictedP + R);
 
     // Update state
@@ -174,10 +186,9 @@ class KalmanFilter1D {
     this.state.x = predictedX + K * innovation;
     this.state.v = this.state.v + (K * innovation) / clampedDt;
     this.state.p = (1 - K) * predictedP;
-    this.state.pv = this.state.pv * 0.99; // Slow decay of velocity uncertainty
+    this.state.pv = this.state.pv * 0.99;
 
-    // Clamp velocity to reasonable walking speeds (converted to degrees/second approximately)
-    const maxVelocityDegrees = MAX_WALKING_SPEED / 111000; // ~111km per degree
+    const maxVelocityDegrees = MAX_WALKING_SPEED / 111000;
     this.state.v = Math.max(-maxVelocityDegrees, Math.min(maxVelocityDegrees, this.state.v));
 
     return {
@@ -195,6 +206,7 @@ class KalmanFilter1D {
       pv: 1000,
     };
     this.lastTimestamp = 0;
+    this.initialized = initialPosition !== 0;
   }
 
   /** Get current confidence (inverse of variance, normalized) */
@@ -211,10 +223,19 @@ export class GpsPositionSmoother {
   private latFilter: KalmanFilter1D;
   private lngFilter: KalmanFilter1D;
   private positionHistory: GpsPosition[] = [];
+  private isMoving: boolean = true; // Default to moving if no sensor data
 
   constructor() {
     this.latFilter = new KalmanFilter1D();
     this.lngFilter = new KalmanFilter1D();
+  }
+
+  /**
+   * Update motion state from sensors (pedometer/accelerometer)
+   * @param isMoving - true if user is physically moving
+   */
+  setMotionState(isMoving: boolean) {
+    this.isMoving = isMoving;
   }
 
   /**
@@ -227,9 +248,22 @@ export class GpsPositionSmoother {
       this.positionHistory.shift();
     }
 
-    // Apply Kalman filter
-    const latResult = this.latFilter.update(position.lat, position.accuracy, position.timestamp);
-    const lngResult = this.lngFilter.update(position.lng, position.accuracy, position.timestamp);
+    // Apply Kalman filter with motion-aware tuning
+    // If stationary, we trust the model (velocity=0) heavily and reject measurement noise
+    const qMultiplier = this.isMoving ? 1.0 : 0.01;
+
+    const latResult = this.latFilter.update(
+      position.lat,
+      position.accuracy,
+      position.timestamp,
+      qMultiplier,
+    );
+    const lngResult = this.lngFilter.update(
+      position.lng,
+      position.accuracy,
+      position.timestamp,
+      qMultiplier,
+    );
 
     // Calculate confidence based on accuracy and filter state
     const accuracyConfidence = Math.max(0, 1 - position.accuracy / 100);
@@ -673,6 +707,11 @@ export class NavigationStateManager {
   /** Set callback for off-route detection */
   setOnOffRoute(callback: () => void): void {
     this.onOffRoute = callback;
+  }
+
+  /** Update motion state (for smoothing) */
+  setMotionState(isMoving: boolean): void {
+    this.positionSmoother.setMotionState(isMoving);
   }
 
   /** Start navigation with a route */

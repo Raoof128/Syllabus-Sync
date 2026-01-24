@@ -1,21 +1,18 @@
 /**
- * geospatialCalibration.ts - GCP-based Linear Transformation for GPS-to-Pixel Mapping
+ * geospatialCalibration.ts - GCP-based Affine Transformation for GPS-to-Pixel Mapping
  *
  * This module provides accurate coordinate transformation between WGS84 GPS coordinates
  * and the CRS.Simple pixel-based campus map using Ground Control Points (GCPs).
  *
- * The transformation uses GCP-optimized linear bounds that minimize the RMSE across
- * all control points. This is more numerically stable than full affine transformation
- * for the small GPS range of a campus map.
- *
- * COORDINATE SYSTEMS:
- * 1. WGS84 GPS: { lat, lng } - Real-world coordinates from Geolocation API / EXIF
- * 2. Image Pixels: [x, y] - Pixel position on the 4678x3307 campus map image
- * 3. CRS.Simple: { lat, lng } - Leaflet coordinates where lat = height - y, lng = x
+ * It uses a Multiple Linear Regression (Affine Transformation) to handle:
+ * - Translation (Offset)
+ * - Scaling (Zoom)
+ * - Rotation (Map alignment vs True North)
+ * - Shearing (Projection distortion)
  *
  * @author Syllabus Sync Team
- * @version 2.0.0
- * @since 2026-01-20
+ * @version 3.0.0 (Affine)
+ * @since 2026-01-24
  */
 
 import { MAP_CONFIG, pixelToCrsSimple } from './buildings';
@@ -24,45 +21,34 @@ import { MAP_CONFIG, pixelToCrsSimple } from './buildings';
 // TYPES
 // =============================================================================
 
-/** Ground Control Point - links a known GPS location to a pixel position */
 export interface GroundControlPoint {
-  /** Unique identifier for the GCP */
   id: string;
-  /** Human-readable name (e.g., "Waranara Library entrance") */
   name: string;
-  /** WGS84 GPS coordinates from Google Maps */
   gps: { lat: number; lng: number };
-  /** Corresponding pixel position on the map image [x, y] */
   pixel: [number, number];
-  /** Source of the GPS data for verification */
   source: 'google_maps' | 'osm' | 'survey' | 'exif';
-  /** Date the GCP was verified */
   verifiedDate: string;
 }
 
-/** Optimized GPS bounds computed from GCPs */
-export interface OptimizedBounds {
-  north: number;
-  south: number;
-  east: number;
-  west: number;
+export interface AffineCoefficients {
+  x: [number, number, number]; // [Bias, Lng, Lat]
+  y: [number, number, number]; // [Bias, Lng, Lat]
+  normalization: {
+    minLat: number;
+    maxLat: number;
+    minLng: number;
+    maxLng: number;
+  };
 }
 
-/** Result of coordinate transformation with metadata */
 export interface TransformResult {
-  /** Transformed pixel coordinates [x, y] */
   pixel: [number, number];
-  /** CRS.Simple coordinates for Leaflet */
   crsSimple: { lat: number; lng: number };
-  /** Is the point within the calibrated campus bounds? */
   isOnCampus: boolean;
-  /** Estimated accuracy in pixels (based on GCP residuals) */
   accuracy: number;
-  /** Transformation method used */
-  method: 'gcp_linear' | 'linear_fallback';
+  method: 'gcp_affine';
 }
 
-/** EXIF GPS data extracted from a photo */
 export interface ExifGpsData {
   latitude: number;
   latitudeRef: 'N' | 'S';
@@ -73,25 +59,15 @@ export interface ExifGpsData {
 }
 
 // =============================================================================
-// VERIFIED GROUND CONTROL POINTS (from Google Maps MCP - 2026-01-20)
+// VERIFIED GROUND CONTROL POINTS
 // =============================================================================
 
-/**
- * Ground Control Points verified via Google Maps API.
- * These are well-defined, permanent landmarks with clear pixel positions.
- *
- * CALIBRATION METHODOLOGY:
- * 1. Select 4+ well-distributed landmarks across the campus
- * 2. Get precise GPS coordinates from Google Maps API
- * 3. Identify the exact pixel position on the map image
- * 4. Use least-squares to compute optimized linear bounds
- */
 export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
   {
     id: 'GCP_LIBRARY',
     name: 'Waranara Library (Main Entrance)',
     gps: { lat: -33.7756994, lng: 151.1131306 },
-    pixel: [2345, 2388], // From buildings.ts - LIB position
+    pixel: [2345, 2388],
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -99,7 +75,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_SPORT',
     name: 'Macquarie University Sport and Aquatic Centre',
     gps: { lat: -33.7726489, lng: 151.1105693 },
-    pixel: [1671, 1162], // From buildings.ts - SPORT position (corrected)
+    pixel: [1671, 1162],
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -107,7 +83,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_COURTYARD',
     name: 'Central Courtyard',
     gps: { lat: -33.7738842, lng: 151.1135164 },
-    pixel: [2528, 1618], // From buildings.ts - 1CC position
+    pixel: [2528, 1618],
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -115,7 +91,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_18WW',
     name: "18 Wally's Walk (Central Hub)",
     gps: { lat: -33.7734389, lng: 151.1134919 },
-    pixel: [2282, 1881], // From buildings.ts - 18WW position
+    pixel: [2282, 1881],
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -123,182 +99,296 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_4ER',
     name: '4 Eastern Road (Business School)',
     gps: { lat: -33.775787, lng: 151.1160258 },
-    pixel: [3066, 2352], // From buildings.ts - 4ER position
+    pixel: [3066, 2352],
     source: 'google_maps',
     verifiedDate: '2026-01-20',
+  },
+  {
+    id: 'GCP_HOSP',
+    name: 'MQ University Hospital',
+    gps: { lat: -33.7735912, lng: 151.1179502 },
+    pixel: [3799, 1568],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_INCUB',
+    name: 'MQ Incubator',
+    gps: { lat: -33.7763444, lng: 151.1090529 },
+    pixel: [1185, 2537],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_OBS',
+    name: 'Observatory',
+    gps: { lat: -33.7703261, lng: 151.1111248 },
+    pixel: [1755, 492],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_19ER',
+    name: '19 Eastern Road (Chancellery)',
+    gps: { lat: -33.7724696, lng: 151.1148539 },
+    pixel: [2942, 1203],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_BANKSIA',
+    name: 'Banksia Cottage',
+    gps: { lat: -33.7752254, lng: 151.1090476 },
+    pixel: [1195, 2175],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_17WW',
+    name: "17 Wally's Walk (Law)",
+    gps: { lat: -33.7748805, lng: 151.1133652 },
+    pixel: [2511, 1916],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_29WW',
+    name: "29 Wally's Walk (Walanga Muru)",
+    gps: { lat: -33.7743082, lng: 151.1104628 },
+    pixel: [1551, 1879],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_CHAP',
+    name: '10 Hadenfeld Ave (Chaplaincy)',
+    gps: { lat: -33.7760151, lng: 151.1080508 },
+    pixel: [975, 2580],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_LAKESIDE',
+    name: 'Lakeside Hotel',
+    gps: { lat: -33.7713301, lng: 151.1158846 },
+    pixel: [3199, 719],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_SHOPPING',
+    name: 'Macquarie Centre',
+    gps: { lat: -33.7772506, lng: 151.1211352 },
+    pixel: [4204, 2607],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_HEARING',
+    name: 'Australian Hearing Hub',
+    gps: { lat: -33.7764943, lng: 151.1118029 },
+    pixel: [1822, 2706],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_21WW',
+    name: 'Macquarie Theatre',
+    gps: { lat: -33.7746449, lng: 151.1122661 },
+    pixel: [2078, 1950],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_12SW',
+    name: 'Student Services (12SW)',
+    gps: { lat: -33.775054, lng: 151.113053 },
+    pixel: [2177, 2120],
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
+  },
+  {
+    id: 'GCP_8SCO',
+    name: '8 Sir Christopher Ondaatje Ave',
+    gps: { lat: -33.77578, lng: 151.11473 },
+    pixel: [2823, 2260],
+    source: 'survey',
+    verifiedDate: '2026-01-24',
   },
 ];
 
 // =============================================================================
-// OPTIMIZED BOUNDS COMPUTATION
+// MATH HELPERS (Affine Transformation)
 // =============================================================================
 
-/**
- * Compute optimized GPS bounds from GCPs using least-squares fitting.
- *
- * The linear transformation is:
- *   pixelX = (lng - west) / (east - west) * width
- *   pixelY = (north - lat) / (north - south) * height
- *
- * We solve for bounds that minimize the total squared error across all GCPs.
- */
-export function computeOptimizedBounds(gcps: GroundControlPoint[]): OptimizedBounds {
-  if (gcps.length < 2) {
-    throw new Error('Need at least 2 GCPs to compute bounds');
+function invert3x3(m: number[][]): number[][] | null {
+  const det =
+    m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) -
+    m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+    m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
+  if (Math.abs(det) < 1e-10) return null;
+
+  const invDet = 1 / det;
+  const minv: number[][] = [];
+
+  for (let i = 0; i < 3; i++) minv[i] = [];
+
+  minv[0][0] = (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * invDet;
+  minv[0][1] = (m[0][2] * m[2][1] - m[0][1] * m[2][2]) * invDet;
+  minv[0][2] = (m[0][1] * m[1][2] - m[0][2] * m[1][1]) * invDet;
+
+  minv[1][0] = (m[1][2] * m[2][0] - m[1][0] * m[2][2]) * invDet;
+  minv[1][1] = (m[0][0] * m[2][2] - m[0][2] * m[2][0]) * invDet;
+  minv[1][2] = (m[1][0] * m[0][2] - m[0][0] * m[1][2]) * invDet;
+
+  minv[2][0] = (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * invDet;
+  minv[2][1] = (m[2][0] * m[0][1] - m[0][0] * m[2][1]) * invDet;
+  minv[2][2] = (m[0][0] * m[1][1] - m[1][0] * m[0][1]) * invDet;
+
+  return minv;
+}
+
+function multiplyMatrixVector(m: number[][], v: number[]): number[] {
+  return [
+    m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2],
+    m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2],
+    m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2],
+  ];
+}
+
+function solveMultipleRegression(inputs: number[][], outputs: number[]): number[] | null {
+  const n = inputs.length;
+  const xtx = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+  ];
+  const xty = [0, 0, 0];
+
+  for (let i = 0; i < n; i++) {
+    const row = inputs[i];
+    const y = outputs[i];
+    for (let j = 0; j < 3; j++) {
+      for (let k = 0; k < 3; k++) {
+        xtx[j][k] += row[j] * row[k];
+      }
+      xty[j] += row[j] * y;
+    }
   }
 
-  const { width, height } = MAP_CONFIG;
+  const xtxInv = invert3x3(xtx);
+  if (!xtxInv) return null;
 
-  // For each GCP, we have:
-  //   xNorm = pixel[0] / width = (lng - west) / (east - west)
-  //   yNorm = pixel[1] / height = (north - lat) / (north - south)
-
-  // Rearranging:
-  //   west + xNorm * (east - west) = lng
-  //   north - yNorm * (north - south) = lat
-
-  // Using least-squares with constraints (west < east, south < north):
-  // We'll use the GCPs to estimate the linear relationship directly
-
-  // Calculate the linear regression coefficients for lng -> pixelX
-  // pixelX = a * lng + b
-  let sumLng = 0,
-    sumLat = 0,
-    sumPx = 0,
-    sumPy = 0;
-  let sumLng2 = 0,
-    sumLat2 = 0;
-  let sumLngPx = 0,
-    sumLatPy = 0;
-  const n = gcps.length;
-
-  for (const gcp of gcps) {
-    sumLng += gcp.gps.lng;
-    sumLat += gcp.gps.lat;
-    sumPx += gcp.pixel[0];
-    sumPy += gcp.pixel[1];
-    sumLng2 += gcp.gps.lng * gcp.gps.lng;
-    sumLat2 += gcp.gps.lat * gcp.gps.lat;
-    sumLngPx += gcp.gps.lng * gcp.pixel[0];
-    sumLatPy += gcp.gps.lat * gcp.pixel[1];
-  }
-
-  // Linear regression for X: pixelX = aX * lng + bX
-  const aX = (n * sumLngPx - sumLng * sumPx) / (n * sumLng2 - sumLng * sumLng);
-  const bX = (sumPx - aX * sumLng) / n;
-
-  // Linear regression for Y: pixelY = aY * lat + bY
-  const aY = (n * sumLatPy - sumLat * sumPy) / (n * sumLat2 - sumLat * sumLat);
-  const bY = (sumPy - aY * sumLat) / n;
-
-  // Now convert back to bounds:
-  // pixelX = (lng - west) / (east - west) * width
-  // pixelX = width/(east-west) * lng - width*west/(east-west)
-  // So: aX = width/(east-west), bX = -width*west/(east-west)
-  // Therefore: west = -bX/aX, east = west + width/aX
-
-  // For Y (note: lat increases upward, pixel Y increases downward):
-  // pixelY = (north - lat) / (north - south) * height
-  // pixelY = -height/(north-south) * lat + height*north/(north-south)
-  // So: aY = -height/(north-south), bY = height*north/(north-south)
-  // Therefore: north = bY / (height/(-aY)) = -bY * (north-south) / height
-  // Actually: north - south = -height/aY
-  // And: north = bY * (north-south) / height = bY * (-height/aY) / height = -bY/aY
-
-  const west = -bX / aX;
-  const east = west + width / aX;
-  const north = -bY / aY;
-  const south = north + height / aY; // aY is negative, so this subtracts
-
-  return { north, south, east, west };
+  return multiplyMatrixVector(xtxInv, xty);
 }
 
 // =============================================================================
-// CACHED OPTIMIZED BOUNDS
+// CALIBRATION LOGIC
 // =============================================================================
 
-let _cachedBounds: OptimizedBounds | null = null;
-let _cachedRmse: number = 0;
+let _cachedCoeffs: AffineCoefficients | null = null;
+let _cachedRmse = 0;
 
 /**
- * Get the cached optimized bounds (computed from GCPs).
- * Lazy-loaded on first call.
+ * Manual offset to fine-tune the final result (in pixels).
+ * Use this to correct small global shifts visible in testing.
+ * X is Left/Right (East is positive). Y is Top/Bottom.
  */
-export function getOptimizedBounds(): OptimizedBounds {
-  if (!_cachedBounds) {
-    _cachedBounds = computeOptimizedBounds(GROUND_CONTROL_POINTS);
-    _cachedRmse = computeRMSE(_cachedBounds, GROUND_CONTROL_POINTS);
-    // Using console.warn as allowed by lint rules
+const MANUAL_OFFSET = { x: 110, y: 0 }; // Shift East ~47 meters (110px)
+
+export function computeAffineCoefficients(gcps: GroundControlPoint[]): AffineCoefficients {
+  if (gcps.length < 3) throw new Error('Need at least 3 GCPs for affine transformation');
+
+  const lats = gcps.map((g) => g.gps.lat);
+  const lngs = gcps.map((g) => g.gps.lng);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+
+  const normalize = (val: number, min: number, max: number) => (val - min) / (max - min);
+
+  const inputs = gcps.map((g) => [
+    1,
+    normalize(g.gps.lng, minLng, maxLng),
+    normalize(g.gps.lat, minLat, maxLat),
+  ]);
+
+  const xParams = solveMultipleRegression(
+    inputs,
+    gcps.map((g) => g.pixel[0]),
+  );
+  const yParams = solveMultipleRegression(
+    inputs,
+    gcps.map((g) => g.pixel[1]),
+  );
+
+  if (!xParams || !yParams) {
+    throw new Error('Failed to solve regression matrix - points may be collinear');
+  }
+
+  return {
+    x: xParams as [number, number, number],
+    y: yParams as [number, number, number],
+    normalization: { minLat, maxLat, minLng, maxLng },
+  };
+}
+
+export function getAffineCoefficients(): AffineCoefficients {
+  if (!_cachedCoeffs) {
+    _cachedCoeffs = computeAffineCoefficients(GROUND_CONTROL_POINTS);
+    _cachedRmse = computeRMSE(_cachedCoeffs, GROUND_CONTROL_POINTS);
     console.warn(
-      `[GeoCalibration] Optimized bounds computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} pixels (~${(_cachedRmse * 0.43).toFixed(1)}m)`,
+      `[GeoCalibration] Affine transformation computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} px`,
     );
   }
-  return _cachedBounds;
+  return _cachedCoeffs;
 }
 
-/**
- * Compute Root Mean Square Error of the linear transformation against GCPs.
- * Lower is better - indicates how well the transform fits the control points.
- */
-function computeRMSE(bounds: OptimizedBounds, gcps: GroundControlPoint[]): number {
-  let sumSqError = 0;
-  // MAP_CONFIG dimensions available for potential future use in weighted RMSE
-  // const { width, height } = MAP_CONFIG;
+function gpsToPixelAffine(lat: number, lng: number, coeffs: AffineCoefficients): [number, number] {
+  const { minLat, maxLat, minLng, maxLng } = coeffs.normalization;
+  const normLng = (lng - minLng) / (maxLng - minLng);
+  const normLat = (lat - minLat) / (maxLat - minLat);
 
+  const x = coeffs.x[0] + coeffs.x[1] * normLng + coeffs.x[2] * normLat;
+  const y = coeffs.y[0] + coeffs.y[1] * normLng + coeffs.y[2] * normLat;
+
+  // Apply manual fine-tuning offset
+  return [Math.round(x + MANUAL_OFFSET.x), Math.round(y + MANUAL_OFFSET.y)];
+}
+
+function computeRMSE(coeffs: AffineCoefficients, gcps: GroundControlPoint[]): number {
+  let sumSqError = 0;
   for (const gcp of gcps) {
-    const predicted = gpsToPixelWithBounds(gcp.gps.lat, gcp.gps.lng, bounds);
+    const predicted = gpsToPixelAffine(gcp.gps.lat, gcp.gps.lng, coeffs);
     const dx = predicted[0] - gcp.pixel[0];
     const dy = predicted[1] - gcp.pixel[1];
     sumSqError += dx * dx + dy * dy;
   }
-
   return Math.sqrt(sumSqError / gcps.length);
-}
-
-/**
- * Convert GPS to pixel using specific bounds.
- */
-function gpsToPixelWithBounds(lat: number, lng: number, bounds: OptimizedBounds): [number, number] {
-  const { width, height } = MAP_CONFIG;
-  const { north, south, east, west } = bounds;
-
-  const xNorm = (lng - west) / (east - west);
-  const yNorm = (north - lat) / (north - south);
-
-  return [Math.round(xNorm * width), Math.round(yNorm * height)];
 }
 
 // =============================================================================
 // PUBLIC API
 // =============================================================================
 
-/**
- * Transform GPS coordinates to pixel position using GCP-optimized linear bounds.
- * This is the PRIMARY function for accurate GPS-to-pixel conversion.
- *
- * @param lat - WGS84 latitude
- * @param lng - WGS84 longitude
- * @returns Transformation result with pixel coords, CRS.Simple coords, and metadata
- */
 export function gpsToPixelCalibrated(lat: number, lng: number): TransformResult {
-  const bounds = getOptimizedBounds();
-  const pixel = gpsToPixelWithBounds(lat, lng, bounds);
+  const coeffs = getAffineCoefficients();
+  const pixel = gpsToPixelAffine(lat, lng, coeffs);
 
-  // Check if result is within map bounds (with some margin)
-  const margin = 100; // pixels
+  const margin = 100;
   const isOnCampus =
     pixel[0] >= -margin &&
     pixel[0] <= MAP_CONFIG.width + margin &&
     pixel[1] >= -margin &&
     pixel[1] <= MAP_CONFIG.height + margin;
 
-  // Clamp to valid range for display
   const clampedPixel: [number, number] = [
     Math.max(0, Math.min(MAP_CONFIG.width, pixel[0])),
     Math.max(0, Math.min(MAP_CONFIG.height, pixel[1])),
   ];
 
-  // Convert to CRS.Simple for Leaflet
   const crsSimple = pixelToCrsSimple(clampedPixel[0], clampedPixel[1]);
 
   return {
@@ -306,77 +396,34 @@ export function gpsToPixelCalibrated(lat: number, lng: number): TransformResult 
     crsSimple,
     isOnCampus,
     accuracy: _cachedRmse,
-    method: 'gcp_linear',
+    method: 'gcp_affine',
   };
 }
 
-/**
- * Transform GPS coordinates to CRS.Simple coordinates for Leaflet.
- * Convenience wrapper around gpsToPixelCalibrated().
- *
- * @param lat - WGS84 latitude
- * @param lng - WGS84 longitude
- * @returns CRS.Simple coordinates { lat, lng } for Leaflet, or null if off-campus
- */
 export function gpsToCrsSimple(lat: number, lng: number): { lat: number; lng: number } | null {
   const result = gpsToPixelCalibrated(lat, lng);
   return result.isOnCampus ? result.crsSimple : null;
 }
 
-/**
- * Calibrate a photo marker from EXIF GPS coordinates.
- * Applies the GCP-based transformation to place the photo accurately on the map.
- *
- * @param exifData - EXIF GPS data from photo
- * @returns Transformation result with corrected position
- */
 export function calibratePhotoMarker(exifData: ExifGpsData): TransformResult {
-  // Convert EXIF format to decimal degrees
   let lat = exifData.latitude;
   let lng = exifData.longitude;
-
-  // Handle hemisphere references
   if (exifData.latitudeRef === 'S') lat = -Math.abs(lat);
   if (exifData.longitudeRef === 'W') lng = -Math.abs(lng);
-
   return gpsToPixelCalibrated(lat, lng);
 }
 
-/**
- * Calibrate a photo marker from decimal GPS coordinates.
- * Simplified version when you already have decimal lat/lng.
- *
- * @param lat - Decimal latitude (negative for south)
- * @param lng - Decimal longitude (negative for west)
- * @returns Transformation result with corrected position
- */
 export function calibratePhotoMarkerFromCoords(lat: number, lng: number): TransformResult {
   return gpsToPixelCalibrated(lat, lng);
 }
 
-// =============================================================================
-// DIAGNOSTIC FUNCTIONS
-// =============================================================================
-
-/**
- * Get diagnostic information about the current calibration.
- * Useful for debugging and displaying calibration quality in dev tools.
- */
-export function getCalibrationDiagnostics(): {
-  gcpCount: number;
-  rmsePixels: number;
-  rmseMeters: number;
-  optimizedBounds: OptimizedBounds;
-  originalBounds: typeof MAP_CONFIG.bounds;
-  gcpResiduals: Array<{ id: string; dx: number; dy: number; error: number }>;
-} {
-  const bounds = getOptimizedBounds();
+export function getCalibrationDiagnostics() {
+  const coeffs = getAffineCoefficients();
   const { width } = MAP_CONFIG;
-  const metersPerPixel = 2000 / width; // Campus is ~2km wide
+  const metersPerPixel = 2000 / width;
 
-  // Calculate residuals for each GCP
   const residuals = GROUND_CONTROL_POINTS.map((gcp) => {
-    const predicted = gpsToPixelWithBounds(gcp.gps.lat, gcp.gps.lng, bounds);
+    const predicted = gpsToPixelAffine(gcp.gps.lat, gcp.gps.lng, coeffs);
     const dx = predicted[0] - gcp.pixel[0];
     const dy = predicted[1] - gcp.pixel[1];
     return {
@@ -391,16 +438,11 @@ export function getCalibrationDiagnostics(): {
     gcpCount: GROUND_CONTROL_POINTS.length,
     rmsePixels: _cachedRmse,
     rmseMeters: _cachedRmse * metersPerPixel,
-    optimizedBounds: bounds,
-    originalBounds: MAP_CONFIG.bounds,
+    method: 'Affine (Multiple Regression)',
     gcpResiduals: residuals,
   };
 }
 
-/**
- * Compare linear interpolation (original bounds) vs GCP-optimized transformation.
- * Useful for understanding the offset being corrected.
- */
 export function compareTransformMethods(
   lat: number,
   lng: number,
@@ -410,15 +452,17 @@ export function compareTransformMethods(
   offsetPixels: number;
   offsetMeters: number;
 } {
-  const { width, height, bounds } = MAP_CONFIG;
+  const { width, height } = MAP_CONFIG;
+  const coeffs = getAffineCoefficients();
 
-  // Linear interpolation with original bounds
-  const xNorm = (lng - bounds.west) / (bounds.east - bounds.west);
-  const yNorm = (bounds.north - lat) / (bounds.north - bounds.south);
+  // Linear interpolation using normalization bounds (Naive)
+  const { minLat, maxLat, minLng, maxLng } = coeffs.normalization;
+  const xNorm = (lng - minLng) / (maxLng - minLng);
+  const yNorm = (maxLat - lat) / (maxLat - minLat); // Lat increases Up, Y Down
   const linearX = Math.round(xNorm * width);
   const linearY = Math.round(yNorm * height);
 
-  // GCP-optimized transformation
+  // Affine transformation
   const result = gpsToPixelCalibrated(lat, lng);
 
   // Calculate offset

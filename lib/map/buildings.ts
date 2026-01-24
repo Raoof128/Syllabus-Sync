@@ -273,7 +273,7 @@ export const buildings: Building[] = [
     gridRef: 'O19',
     address: "17 Wally's Walk, Macquarie Park, NSW",
     category: 'academic',
-    location: { lat: -33.7732885, lng: 151.1127885 }, // Google Maps geocoded 2026-01-10
+    location: { lat: -33.7748805, lng: 151.1133652, osmId: 205588360 }, // Google Maps verified 2026-01-24
     levels: 3,
   },
 
@@ -586,7 +586,7 @@ export const buildings: Building[] = [
     gridRef: 'P20',
     address: '8 Sir Christopher Ondaatje Ave, Macquarie Park, NSW',
     category: 'services',
-    location: { lat: -33.77557, lng: 151.114936, osmId: 23716703 },
+    location: { lat: -33.77578, lng: 151.11473, osmId: 23716703 }, // User verified 2026-01-24
     levels: 4,
   },
   {
@@ -626,7 +626,7 @@ export const buildings: Building[] = [
     gridRef: 'H20',
     address: '19 Eastern Road',
     category: 'services',
-    location: { lat: -33.7723959, lng: 151.1148585, osmId: 205588364 }, // Google Maps verified 2026-01-20
+    location: { lat: -33.7724696, lng: 151.1148539, osmId: 205588364 }, // Google Maps verified 2026-01-24
   },
   {
     id: 'OBS',
@@ -652,7 +652,7 @@ export const buildings: Building[] = [
     gridRef: 'S8',
     address: '8 Hadenfeld Avenue',
     category: 'services',
-    location: { lat: -33.7761456, lng: 151.1090549, osmId: 1107882877 }, // Google Maps verified 2026-01-20
+    location: { lat: -33.7763444, lng: 151.1090529, osmId: 1107882877 }, // Google Maps verified 2026-01-24
   },
   {
     id: 'CHAP',
@@ -1699,7 +1699,7 @@ export const buildings: Building[] = [
     translationKey: 'building_16UAAUSTRA_name',
     descriptionKey: 'building_16UAAUSTRA_desc',
     category: 'health',
-    location: { lat: -33.7776706, lng: 151.1123676 }, // Google Maps verified (Gumnut)
+    location: { lat: -33.7764943, lng: 151.1118029, osmId: 455246543 }, // Google Maps verified 2026-01-24
     levels: 1,
   },
   // --- NEW BUILDINGS FROM MQ_Full.geojson (2026-01-09) ---
