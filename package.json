@@ -1,11 +1,13 @@
 {
+  "$schema": "https://json.schemastore.org/schemas/2021-06-18",
+  "version": "1.0.0",
   "name": "syllabus-sync",
-  "version": "1.0.0-rc.8",
+  "description": "Enterprise-Grade Campus Management Platform for Macquarie University",
   "private": true,
-  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },
+  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "dev:safe": "next dev --no-turbopack",
@@ -27,7 +29,10 @@
     "check": "npm run check:secrets && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "check:i18n": "node scripts/check-i18n-completeness.cjs",
     "lighthouse": "lhci autorun",
-    "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json"
+    "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json",
+    "docker:dev": "docker-compose -f docker/docker-compose.yml up --build",
+    "docker:prod": "docker-compose -f docker/docker-compose.prod.yml up -d",
+    "docker:down": "docker-compose -f docker/docker-compose.yml down"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -91,5 +96,36 @@
     "typescript": "^5",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^4.0.16"
+  },
+  "keywords": [
+    "react",
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "supabase",
+    "macquarie-university",
+    "campus-management",
+    "academic-calendar",
+    "student-productivity",
+    "gamification",
+    "webauthn",
+    "passkey-authentication",
+    "educational-platform"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrpouyaalavi/syllabus-sync"
+  },
+  "bugs": {
+    "url": "https://github.com/mrpouyaalavi/syllabus-sync/issues",
+    "email": "issues@syllabus-sync.dev"
+  },
+  "homepage": "https://syllabus-sync.dev",
+  "author": "Pouya Alavi <pouya@syllabus-sync.dev>",
+  "license": "MIT",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

@@ -1,0 +1,11 @@
+# Kubernetes Namespace Configuration
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: syllabus-sync
+  labels:
+    name: syllabus-sync
+    environment: production
+  annotations:
+    description: 'Syllabus Sync application namespace for resource isolation'

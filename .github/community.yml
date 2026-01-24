@@ -1,0 +1,133 @@
+blank_issues_enabled: false
+bug_labels: ['bug', 'needs-triage', 'triage']
+feature_labels: ['enhancement', 'needs-design', 'backlog']
+security_labels: ['security', 'urgent', 'private', 'security-team']
+
+repository:
+  name: syllabus-sync
+  description: 'Enterprise-Grade Campus Management Platform'
+  homepage: 'https://github.com/mrpouyaalavi/syllabus-sync'
+  private: false
+
+projects:
+  - name: 'Backlog'
+    description: 'Feature requests and improvements for future consideration'
+    columns: ['To Do', 'In Progress', 'In Review', 'Done']
+
+  - name: 'Bug Fixes'
+    description: 'Current bugs and issues requiring resolution'
+    columns: ['New', 'Investigating', 'In Progress', 'Testing', 'Resolved']
+
+  - name: 'Security'
+    description: 'Security vulnerabilities and remediation tracking'
+    columns: ['Reported', 'Triaged', 'In Progress', 'Fixed', 'Disclosed']
+
+collaborators:
+  - username: mrpouyaalavi
+    permission: admin
+    name: 'Pouya Alavi'
+    role: 'Frontend Lead'
+
+  - username: raouf-mq
+    permission: write
+    name: 'Raouf'
+    role: 'Backend Engineer'
+
+teams:
+  - name: 'Core Team'
+    description: 'Project maintainers and core contributors'
+    members: [mrpouyaalavi, raouf-mq]
+    privacy: closed
+
+  - name: 'Contributors'
+    description: 'Community contributors and reviewers'
+    members: []
+    privacy: closed
+
+  - name: 'Security Team'
+    description: 'Security vulnerability reviewers and responders'
+    members: [mrpouyaalavi, raouf-mq]
+    privacy: secret
+
+milestones:
+  - title: 'v1.0.0 Release'
+    description: 'Production-ready release with full feature set'
+    state: open
+    due_on: '2026-02-15'
+
+  - title: 'v1.1.0 Planning'
+    description: 'Feature enhancements and improvements'
+    state: open
+    due_on: '2026-03-15'
+
+labels:
+  - name: 'bug'
+    color: 'd73a4a'
+    description: "Something isn't working"
+
+  - name: 'enhancement'
+    color: 'a2eeef'
+    description: 'New feature or improvement'
+
+  - name: 'documentation'
+    color: '0075ca'
+    description: 'Improvements to documentation'
+
+  - name: 'security'
+    color: 'ee0701'
+    description: 'Security vulnerability or issue'
+
+  - name: 'good first issue'
+    color: '7057ff'
+    description: 'Good for newcomers'
+
+  - name: 'help wanted'
+    color: '008672'
+    description: 'Community help requested'
+
+  - name: 'priority/urgent'
+    color: 'e11d21'
+    description: 'Urgent priority'
+
+  - name: 'priority/high'
+    color: 'eb6420'
+    description: 'High priority'
+
+  - name: 'priority/medium'
+    color: 'fbca04'
+    description: 'Medium priority'
+
+  - name: 'priority/low'
+    color: '84b6fb'
+    description: 'Low priority'
+
+branches:
+  - name: 'main'
+    protection:
+      required_status_checks:
+        strict: true
+        contexts: []
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      restrictions:
+        users: []
+        teams: ['Core Team']
+      enforce_admins: true
+      required_linear_history: true
+
+  - name: 'develop'
+    protection:
+      required_status_checks:
+        strict: true
+        contexts: []
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: false
+      restrictions:
+        users: []
+        teams: ['Core Team']
+      enforce_admins: true
+      required_linear_history: true

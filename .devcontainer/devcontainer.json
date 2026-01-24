@@ -1,0 +1,113 @@
+{
+  "name": "Syllabus Sync Development",
+  // Or use an existing Docker image from Docker Hub
+  // "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:0-22",
+
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-playwright.playwright",
+        "ms-vscode.vscode-json",
+        "ms-vscode.vscode-typescript-next",
+        "github.vscode-pull-request-github"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "emmet.includeLanguages": ["typescript", "typescriptreact"],
+        "files.associations": {
+          "*.css": "tailwindcss"
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "debug.node.autoAttach": "on",
+        "debug.javascript.terminal": "integrated"
+      }
+    },
+    "zsh": {
+      "profile": ".oh-my-zsh"
+    }
+  },
+
+  "forwardPorts": [3000, 8080, 8081],
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "PgAdmin",
+      "onAutoForward": "silent"
+    },
+    "8081": {
+      "label": "Redis Commander",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "npm install",
+  "postAttachCommand": {
+    "server": "npm run dev"
+  },
+
+  "remoteUser": "node",
+  "remoteEnv": {
+    "NODE_ENV": "${containerEnv:NODE_ENV:-development}",
+    "APP_PORT": "${containerEnv:APP_PORT:-3000}",
+    "DB_HOST": "localhost",
+    "DB_PORT": "5432",
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/syllabus_sync",
+    "REDIS_HOST": "localhost",
+    "REDIS_PORT": "6379",
+    "REDIS_URL": "redis://localhost:6379"
+  },
+
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/node/.ssh,type=bind"
+  ],
+
+  "workspaceFolder": "/workspace",
+
+  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+
+  // Uncomment for GPU support (needed for some AI/ML tools)
+  // "hostRequirements": {
+  //   "gpu": "true"
+  // },
+
+  "customizations.vscode.lifecycle": {
+    "onFinalCreateSetup": [
+      {
+        "command": "npm run post:create",
+        "args": ["vscode"]
+      }
+    ],
+    "onAfterCreate": [
+      {
+        "command": "npm run post:start",
+        "args": ["vscode"]
+      }
+    ]
+  }
+}
