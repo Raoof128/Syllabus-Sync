@@ -107,9 +107,11 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       }
 
       const supabase = await createServerClient();
+
+      // SOFT DELETE: Set deleted_at instead of hard delete
       const { error } = await supabase
         .from('deadlines')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
         .eq('user_id', userId);
 

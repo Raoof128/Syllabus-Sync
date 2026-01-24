@@ -54,11 +54,11 @@ const ProfileCard = React.memo(
             isCurrent ? 'bg-mq-primary/5' : '',
           )}
         >
-          <CardHeader className="flex flex-row items-start justify-between">
-            <div className="flex items-center gap-3">
+          <CardHeader className="flex flex-col sm:flex-row items-start justify-between gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="relative group cursor-pointer">
                 <label className="cursor-pointer">
-                  <div className="w-16 h-16 rounded-full bg-mq-primary flex items-center justify-center text-white font-bold text-mq-large overflow-hidden">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-mq-primary flex items-center justify-center text-white font-bold text-mq-large overflow-hidden">
                     {profile.avatar ? (
                       <Image
                         src={profile.avatar}
@@ -69,7 +69,7 @@ const ProfileCard = React.memo(
                         unoptimized
                       />
                     ) : (
-                      <User className="w-8 h-8" />
+                      <User className="w-6 h-6 sm:w-8 sm:h-8" />
                     )}
                   </div>
                   <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -92,8 +92,8 @@ const ProfileCard = React.memo(
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-mq-content">{profile.name}</h3>
-                <p className="text-sm text-mq-content-secondary">{profile.email}</p>
+                <h3 className="font-semibold text-sm sm:text-base text-mq-content">{profile.name}</h3>
+                <p className="text-xs sm:text-sm text-mq-content-secondary">{profile.email}</p>
                 <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
                   <span>
                     {t('idPrefix')}
@@ -107,7 +107,7 @@ const ProfileCard = React.memo(
               </div>
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex gap-1 self-end sm:self-auto">
               {!isCurrent && (
                 <Button
                   variant="ghost"

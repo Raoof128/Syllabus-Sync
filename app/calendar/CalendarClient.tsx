@@ -1992,7 +1992,7 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-0 flex-shrink-0 ml-auto pl-2">
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
                                 {getDeadlineBuilding(assignment) && (
                                   <Link
                                     href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}&autonav=true`}
@@ -2004,7 +2004,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                      className="p-2 inline-flex items-center justify-center hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                       aria-label={
                                         t('navigateToBuildingAria', {
                                           building: getDeadlineBuilding(assignment) || '',
@@ -2012,7 +2012,7 @@ export default function CalendarClient() {
                                       }
                                     >
                                       <Navigation
-                                        className="h-4 w-4 text-mq-content-secondary"
+                                        className="h-5 w-5 text-mq-content-secondary"
                                         aria-hidden="true"
                                       />
                                     </Button>
@@ -2024,11 +2024,11 @@ export default function CalendarClient() {
                                     e.stopPropagation();
                                     openEditAssignment(assignment);
                                   }}
-                                  className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-2 hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: assignment.title })}
                                 >
                                   <Edit2
-                                    className="h-4 w-4 text-mq-content-secondary"
+                                    className="h-5 w-5 text-mq-content-secondary"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2038,11 +2038,11 @@ export default function CalendarClient() {
                                     e.stopPropagation();
                                     handleDeleteAssignment(assignment);
                                   }}
-                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: assignment.title })}
                                 >
                                   <Trash2
-                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
+                                    className="h-5 w-5 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2158,7 +2158,7 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-0 flex-shrink-0 ml-auto pl-2">
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
                                 {getDeadlineBuilding(exam) && (
                                   <Link
                                     href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}&autonav=true`}
@@ -2170,7 +2170,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                      className="p-2 inline-flex items-center justify-center hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                       aria-label={
                                         t('navigateToBuildingAria', {
                                           building: getDeadlineBuilding(exam) || '',
@@ -2178,7 +2178,7 @@ export default function CalendarClient() {
                                       }
                                     >
                                       <Navigation
-                                        className="h-4 w-4 text-mq-content-secondary"
+                                        className="h-5 w-5 text-mq-content-secondary"
                                         aria-hidden="true"
                                       />
                                     </Button>
@@ -2187,22 +2187,22 @@ export default function CalendarClient() {
                                 <button
                                   type="button"
                                   onClick={() => openEditExam(exam)}
-                                  className="p-2 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-2 hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: exam.title })}
                                 >
                                   <Edit2
-                                    className="h-4 w-4 text-mq-content-secondary"
+                                    className="h-5 w-5 text-mq-content-secondary"
                                     aria-hidden="true"
                                   />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteExam(exam)}
-                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: exam.title })}
                                 >
                                   <Trash2
-                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
+                                    className="h-5 w-5 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2429,7 +2429,7 @@ export default function CalendarClient() {
                             <div className="flex items-center gap-2">
                               {event.building && (
                                 <Link
-                                  href={`/map?building=${encodeURIComponent(event.building)}`}
+                                  href={`/map?building=${encodeURIComponent(event.building)}&autonav=true`}
                                   onClick={(e) => e.stopPropagation()}
                                   aria-label={t('navigateToBuildingAria', {
                                     building: event.building,
@@ -2438,14 +2438,14 @@ export default function CalendarClient() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                    className="p-2 inline-flex items-center justify-center hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                     aria-label={
                                       t('navigateToBuildingAria', { building: event.building }) ||
                                       t('navigate')
                                     }
                                   >
                                     <Navigation
-                                      className="h-4 w-4 text-mq-content-secondary"
+                                      className="h-5 w-5 text-mq-content-secondary"
                                       aria-hidden="true"
                                     />
                                   </Button>
@@ -2457,12 +2457,12 @@ export default function CalendarClient() {
                                   e.stopPropagation();
                                   openEditEvent(event);
                                 }}
-                                className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                className="p-2 hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                                 title={t('calendarEditItem', { title: eventTitle })}
                                 aria-label={t('calendarEditItem', { title: eventTitle })}
                               >
                                 <Edit2
-                                  className="h-4 w-4 text-mq-content-secondary"
+                                  className="h-5 w-5 text-mq-content-secondary"
                                   aria-hidden="true"
                                 />
                               </button>
@@ -2472,7 +2472,7 @@ export default function CalendarClient() {
                                   e.stopPropagation();
                                   handleDeleteEvent(event);
                                 }}
-                                className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
+                                className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
                                 title={t('calendarDeleteItem', { title: eventTitle })}
                                 aria-label={t('calendarDeleteItem', { title: eventTitle })}
                               >
@@ -2533,24 +2533,24 @@ export default function CalendarClient() {
                       setNewTodoPriority('Medium');
                     }
                   }}
-                  className="flex flex-col sm:flex-row gap-2 mb-4"
+                  className="flex flex-col sm:flex-row gap-4 mb-6"
                 >
                   <input
                     type="text"
                     value={newTodoTitle}
                     onChange={(e) => setNewTodoTitle(e.target.value)}
                     placeholder={t('addTodoPlaceholder' as TranslationKey) || 'Add a new task...'}
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-mq-content-tertiary"
+                    className="flex-1 px-4 py-3 text-base rounded-xl border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content placeholder:text-mq-content-secondary/60"
                     aria-label={t('addTodoPlaceholder' as TranslationKey) || 'Add a new task'}
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <select
                       value={newTodoPriority}
                       onChange={(e) =>
                         setNewTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')
                       }
                       className={cn(
-                        'px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
+                        'px-4 py-3 text-base rounded-xl border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-[120px]',
                         newTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
                         newTodoPriority === 'Medium' && 'text-yellow-600 dark:text-yellow-400',
                         newTodoPriority === 'Low' && 'text-blue-600 dark:text-blue-400',
@@ -2567,58 +2567,59 @@ export default function CalendarClient() {
                       type="submit"
                       size="sm"
                       disabled={!newTodoTitle.trim()}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-4"
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 h-auto text-base"
                       aria-label={t('addTodo' as TranslationKey) || 'Add todo'}
                     >
-                      <Plus className="h-4 w-4" aria-hidden="true" />
+                      <Plus className="h-5 w-5" aria-hidden="true" />
                     </Button>
                   </div>
                 </form>
 
                 {/* Todo List */}
                 {todos.length === 0 ? (
-                  <div className="text-center py-8">
-                    <SquareCheckBig className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
-                    <p className="text-mq-content-secondary text-sm">
+                  <div className="text-center py-12 bg-mq-background-secondary/30 rounded-xl">
+                    <SquareCheckBig className="h-12 w-12 text-mq-content-tertiary/30 mx-auto mb-6" />
+                    <p className="text-base font-medium text-mq-content-secondary">
                       {t('noTodosYet' as TranslationKey) || 'No tasks yet'}
                     </p>
-                    <p className="text-mq-content-tertiary text-xs mt-1">
+                    <p className="text-sm text-mq-content-tertiary mt-2">
                       {t('noTodosYetDesc' as TranslationKey) ||
                         'Add your first task above to get started!'}
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                     {/* Pending Tasks */}
                     <div>
-                      <h4 className="text-sm font-semibold text-mq-content-secondary mb-4 uppercase tracking-wide">
+                      <h4 className="text-base font-semibold text-mq-content mb-5 uppercase tracking-wide flex items-center gap-2">
+                        <Circle className="h-4 w-4 text-mq-content-secondary" />
                         {t('pendingTasks' as TranslationKey) || 'Pending'}
                       </h4>
-                      <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
                         {getPendingTodos().length === 0 ? (
-                          <p className="text-sm text-mq-content-tertiary py-6 text-center">
+                          <p className="text-base text-mq-content-secondary py-8 text-center bg-mq-background-secondary/30 rounded-xl">
                             {t('allTasksComplete' as TranslationKey) || 'All tasks complete!'}
                           </p>
                         ) : (
                           getPendingTodos().map((todo) => (
                             <div
                               key={todo.id}
-                              className="group flex items-center justify-between p-4 rounded-xl border border-mq-border hover:border-emerald-300 hover:shadow-md transition-all bg-mq-surface/50"
+                              className="group flex items-center justify-between p-5 rounded-xl border border-mq-border hover:border-emerald-300 hover:shadow-md transition-all bg-mq-surface/50"
                             >
                               <div className="flex items-center gap-4 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => toggleTodoComplete(todo.id)}
                                   aria-label={t('markAsCompleted')}
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg min-h-[48px] min-w-[48px] flex items-center justify-center flex-shrink-0 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
                                 >
                                   <Circle
-                                    className="h-6 w-6 text-mq-content-secondary hover:text-emerald-500 transition-colors"
+                                    className="h-7 w-7 text-mq-content-secondary hover:text-emerald-500 transition-colors"
                                     aria-hidden="true"
                                   />
                                 </button>
-                                <div className="flex-1 min-w-0 space-y-1.5">
-                                  <p className="text-base font-medium leading-relaxed break-words whitespace-normal tracking-normal">
+                                <div className="flex-1 min-w-0 space-y-2">
+                                  <p className="text-lg font-medium leading-relaxed break-words whitespace-normal tracking-normal text-mq-content">
                                     {todo.title}
                                   </p>
                                   {todo.description && (
@@ -2628,10 +2629,10 @@ export default function CalendarClient() {
                                   )}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 ml-auto pl-3 flex-shrink-0">
+                              <div className="flex items-center gap-2 ml-auto pl-4 flex-shrink-0">
                                 <Badge
                                   className={cn(
-                                    'text-xs px-2 py-1',
+                                    'text-xs px-2.5 py-1 font-medium',
                                     todo.priority === 'High' &&
                                       'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
                                     todo.priority === 'Medium' &&
@@ -2650,7 +2651,7 @@ export default function CalendarClient() {
                                     setEditTodoTitle(todo.title);
                                     setEditTodoPriority(todo.priority);
                                   }}
-                                  className="p-2 hover:bg-mq-hover-background rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="p-2.5 hover:bg-mq-hover-background rounded-lg min-h-[48px] min-w-[48px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                   aria-label={t('calendarEditItem', { title: todo.title })}
                                 >
                                   <Edit2
@@ -2664,7 +2665,7 @@ export default function CalendarClient() {
                                     setTodoToDelete({ id: todo.id, title: todo.title });
                                     setTodoDeleteConfirmOpen(true);
                                   }}
-                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity -mr-2"
+                                  className="p-2.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg min-h-[48px] min-w-[48px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                   aria-label={t('calendarDeleteItem', { title: todo.title })}
                                 >
                                   <Trash2
@@ -2681,33 +2682,40 @@ export default function CalendarClient() {
 
                     {/* Completed Today */}
                     <div>
-                      <h4 className="text-sm font-semibold text-mq-content-secondary mb-4 uppercase tracking-wide">
+                      <h4 className="text-base font-semibold text-mq-content mb-5 uppercase tracking-wide flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                         {t('completedToday' as TranslationKey) || 'Completed Today'}
                       </h4>
-                      <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+                      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
                         {getCompletedToday().length === 0 ? (
-                          <p className="text-sm text-mq-content-tertiary py-6 text-center">
-                            {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
-                          </p>
+                          <div className="text-center py-12 bg-mq-background-secondary/30 rounded-xl">
+                            <CheckCircle2 className="h-12 w-12 text-emerald-500/30 mx-auto mb-4" />
+                            <p className="text-base font-medium text-mq-content-secondary">
+                              {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
+                            </p>
+                            <p className="text-sm text-mq-content-tertiary mt-2">
+                              Complete tasks to see them here
+                            </p>
+                          </div>
                         ) : (
                           getCompletedToday().map((todo) => (
                             <div
                               key={todo.id}
-                              className="group flex items-center justify-between p-4 rounded-xl border border-mq-border bg-emerald-50/50 dark:bg-emerald-950/10"
+                              className="group flex items-center justify-between p-5 rounded-xl border border-mq-border bg-emerald-50/50 dark:bg-emerald-950/10"
                             >
                               <div className="flex items-center gap-4 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => toggleTodoComplete(todo.id)}
                                   aria-label={t('markIncomplete')}
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg min-h-[48px] min-w-[48px] flex items-center justify-center flex-shrink-0 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
                                 >
                                   <CheckCircle2
-                                    className="h-6 w-6 text-emerald-500"
+                                    className="h-7 w-7 text-emerald-500"
                                     aria-hidden="true"
                                   />
                                 </button>
-                                <p className="text-base line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal">
+                                <p className="text-lg line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal">
                                   {todo.title}
                                 </p>
                               </div>
@@ -2717,7 +2725,7 @@ export default function CalendarClient() {
                                   setTodoToDelete({ id: todo.id, title: todo.title });
                                   setTodoDeleteConfirmOpen(true);
                                 }}
-                                className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center ml-auto pl-3 -mr-2"
+                                className="p-2.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity min-h-[48px] min-w-[48px] flex items-center justify-center ml-auto pl-4"
                                 aria-label={t('calendarDeleteItem', { title: todo.title })}
                               >
                                 <Trash2

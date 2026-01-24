@@ -87,22 +87,27 @@ const UpcomingDeadlines = memo(() => {
       <div className="mq-magic-card-content">
         <Card className="h-full border-0 shadow-none bg-transparent">
           <CardHeader
-            className="flex flex-row items-center justify-between pb-4"
+            className="flex flex-row items-center justify-between pb-5"
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
           >
-            <CardTitle className="flex items-center gap-3 text-xl font-bold">
-              <CalendarDays className="h-6 w-6" />
+            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-bold">
+              <CalendarDays className="h-6 w-6 sm:h-7 sm:w-7" />
               {t('upcomingDeadlines')}
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {isHydrated && pendingCount > 0 && (
-                <Badge variant="neutral">
+                <Badge variant="neutral" className="text-sm sm:text-base px-2 sm:px-3 py-1">
                   {pendingCount} {t('pending')}
                 </Badge>
               )}
-              <Button size="sm" variant="outline" className="gap-1" asChild>
+              <Button
+                size="default"
+                variant="outline"
+                className="gap-2 text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2"
+                asChild
+              >
                 <Link href="/calendar" aria-label={`${t('viewAll')} ${t('upcomingDeadlines')}`}>
-                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
                   <span>{t('viewAll')}</span>
                 </Link>
               </Button>
@@ -110,9 +115,9 @@ const UpcomingDeadlines = memo(() => {
           </CardHeader>
           <CardContent>
             {!isHydrated ? (
-              <div className="h-40 flex items-center justify-center">
+              <div className="h-48 flex items-center justify-center">
                 <p
-                  className="text-base text-mq-content alabaster-readable"
+                  className="text-lg text-mq-content alabaster-readable"
                   style={{
                     color: 'var(--mq-content)',
                     WebkitTextFillColor: 'var(--mq-content)',
@@ -125,7 +130,7 @@ const UpcomingDeadlines = memo(() => {
               </div>
             ) : upcomingDeadlines.length === 0 ? (
               <div
-                className="text-center py-12 alabaster-readable"
+                className="text-center py-16 alabaster-readable"
                 style={{
                   color: 'var(--mq-content)',
                   WebkitTextFillColor: 'var(--mq-content)',
@@ -133,14 +138,14 @@ const UpcomingDeadlines = memo(() => {
                   mixBlendMode: 'normal',
                 }}
               >
-                <Clock className="h-14 w-14 text-mq-content-tertiary mx-auto mb-5" />
-                <h3 className="text-xl font-semibold text-mq-content mb-3">
+                <Clock className="h-12 w-12 sm:h-16 sm:w-16 text-mq-content-tertiary mx-auto mb-6" />
+                <h3 className="text-xl sm:text-2xl font-semibold text-mq-content mb-4">
                   {t('noUpcomingDeadlines')}
                 </h3>
-                <p className="text-base text-mq-content mb-4">{t('noDeadlinesDesc')}</p>
+                <p className="text-base sm:text-lg text-mq-content-secondary">{t('noDeadlinesDesc')}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {upcomingDeadlines.map((deadline) => {
                   const dueDate = new Date(deadline.dueDate);
                   const isOverdue = isPast(dueDate);
@@ -151,7 +156,7 @@ const UpcomingDeadlines = memo(() => {
                     <div
                       key={deadline.id}
                       className={cn(
-                        'p-5 rounded-xl border-l-4 bg-mq-background-secondary/50 hover:bg-mq-background-secondary transition-all cursor-pointer shadow-sm hover:shadow-lg',
+                        'p-4 sm:p-6 rounded-xl border-l-4 bg-mq-background-secondary/50 hover:bg-mq-background-secondary transition-all cursor-pointer shadow-sm hover:shadow-lg',
                         colors.border,
                         isOverdue && 'bg-red-50/50 dark:bg-red-950/20',
                       )}
@@ -165,53 +170,56 @@ const UpcomingDeadlines = memo(() => {
                         }
                       }}
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start justify-between gap-3 sm:gap-4 md:gap-5">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-3">
+                          <div className="flex items-center gap-4 mb-3 sm:mb-4">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleComplete(deadline.id);
                               }}
-                              className="flex-shrink-0 p-1.5 hover:bg-mq-hover-background rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+                              className="flex-shrink-0 p-2 hover:bg-mq-hover-background rounded-xl min-h-[44px] min-w-[44px] sm:min-h-[52px] sm:min-w-[52px] flex items-center justify-center transition-colors"
                               aria-label={
                                 deadline.completed ? t('markIncomplete') : t('markAsCompleted')
                               }
                             >
                               {deadline.completed ? (
-                                <CheckCircle2 className="h-6 w-6 text-green-500" />
+                                <CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7 text-green-500" />
                               ) : (
-                                <Circle className="h-6 w-6 text-mq-content-tertiary hover:text-mq-primary" />
+                                <Circle className="h-6 w-6 sm:h-7 sm:w-7 text-mq-content-tertiary hover:text-mq-primary" />
                               )}
                             </button>
                             <h4
                               className={cn(
-                                'font-semibold text-lg leading-snug line-clamp-2',
+                                'font-semibold text-lg sm:text-xl leading-snug line-clamp-2',
                                 deadline.completed && 'line-through text-mq-content-tertiary',
                               )}
                             >
                               {deadline.title}
                             </h4>
                           </div>
-                          <p className="text-base text-mq-content-secondary mb-2 pl-1">
+                          <p className="text-sm sm:text-base text-mq-content-secondary mb-3 pl-2">
                             {deadline.unitCode} • {getDeadlineTypeLabel(deadline.type)}
                           </p>
                           <p
                             className={cn(
-                              'text-base mt-3 flex items-center gap-2 pl-1',
+                              'text-sm sm:text-base mt-4 flex items-center gap-3 pl-2',
                               isOverdue
                                 ? 'text-red-600 font-semibold'
                                 : 'text-mq-content-secondary',
                             )}
                           >
-                            {isOverdue && <AlertCircle className="h-5 w-5 inline" />}
+                            {isOverdue && <AlertCircle className="h-5 w-5 inline flex-shrink-0" />}
                             {formatDueDate(dueDate)}
                           </p>
                         </div>
-                        <div className="flex flex-col items-end gap-3">
+                        <div className="flex flex-col items-end gap-4">
                           <Badge
-                            className={cn(PRIORITY_COLORS[deadline.priority], 'text-sm px-3 py-1.5 font-medium')}
+                            className={cn(
+                              PRIORITY_COLORS[deadline.priority],
+                              'text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 font-medium',
+                            )}
                             variant="neutral"
                           >
                             {t(`priority_${deadline.priority}` as TranslationKey)}
@@ -221,15 +229,17 @@ const UpcomingDeadlines = memo(() => {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/map?building=${unit.location.building}`);
+                                router.push(
+                                  `/map?building=${encodeURIComponent(unit.location.building)}&autonav=true`,
+                                );
                               }}
-                              className="p-3 hover:bg-mq-hover-background rounded-xl text-mq-content-secondary hover:text-mq-primary min-h-[48px] min-w-[48px] flex items-center justify-center transition-all hover:shadow-md border border-transparent hover:border-mq-border"
-                              title={`${unit.location.building} ${unit.location.room ? `Room ${unit.location.room}` : ''}`}
+                              className="p-4 hover:bg-mq-hover-background rounded-xl text-mq-content-secondary hover:text-mq-primary min-h-[44px] min-w-[44px] sm:min-h-[52px] sm:min-w-[52px] flex items-center justify-center transition-all hover:shadow-md border border-mq-border/50 hover:border-mq-border bg-mq-background/50"
+                              title={`Navigate to ${unit.location.building} ${unit.location.room ? `Room ${unit.location.room}` : ''}`}
                               aria-label={t('navigateToBuildingAria', {
                                 building: unit.location.building,
                               })}
                             >
-                              <MapPin className="h-6 w-6" />
+                              <MapPin className="h-6 w-6 sm:h-7 sm:w-7" />
                             </button>
                           )}
                         </div>

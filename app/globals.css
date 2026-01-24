@@ -53,3 +53,24 @@
 .dark .login-page input::placeholder {
   color: var(--c-content-tertiary, #a8aaa3) !important;
 }
+
+/* ============================================
+   CUSTOM SCROLLBAR STYLES
+   ============================================ */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mq-border) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--mq-border);
+  border-radius: 3px;
+}
