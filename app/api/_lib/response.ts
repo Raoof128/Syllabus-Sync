@@ -58,17 +58,24 @@ export const jsonSuccess = <T = unknown>(
   status: number = 200,
   meta?: Partial<ApiResponse['meta']>,
 ): NextResponse<ApiResponse<T>> => {
-  return NextResponse.json(
-    {
-      success: true,
-      data,
-      meta: {
-        timestamp: new Date().toISOString(),
-        ...meta,
+  try {
+    return NextResponse.json(
+      {
+        success: true,
+        data,
+        meta: {
+          timestamp: new Date().toISOString(),
+          ...meta,
+        },
       },
-    },
-    { status },
-  );
+      { status },
+    );
+  } catch (error) {
+    // SECURITY: If data contains circular references, JSON.stringify (used by NextResponse.json) will fail.
+    // Return a generic internal error instead of letting it crash the process.
+    console.error('Response serialization error:', error);
+    return jsonError('Response serialization failed', 500, ERROR_CODES.INTERNAL_ERROR);
+  }
 };
 
 /**

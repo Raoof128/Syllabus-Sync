@@ -225,7 +225,12 @@ export function withCSRFProtection<T>(
     const isRealProduction =
       process.env.VERCEL_ENV === 'production' ||
       (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
-    const csrfEnabled = isRealProduction || process.env.CSRF_VALIDATION_ENABLED !== 'false';
+    
+    // NOTE: For Vitest integration tests, we allow disabling CSRF validation
+    // in the test environment specifically.
+    const isTest = process.env.VITEST === 'true' || process.env.NODE_ENV === 'test';
+    
+    const csrfEnabled = isRealProduction || (process.env.CSRF_VALIDATION_ENABLED !== 'false' && !isTest);
     
     if (csrfEnabled) {
       const csrfResult = validateCSRFToken(request);

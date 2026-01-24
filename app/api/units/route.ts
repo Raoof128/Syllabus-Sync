@@ -1,4 +1,5 @@
 // import { NextRequest } from 'next/server';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import {
@@ -277,11 +278,13 @@ export async function GET(request: Request) {
  *   ]
  * }
  */
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   // SECURITY: Use rate-limited auth for mutation endpoint with full CSRF protection
-  return withCSRFProtection(async (_request) => {
-    return requireAuthWithRateLimit(request, async (userId) => {
-      return validateRequest(unitSchema)(request, async (validatedData) => {
+  // Note: We cast the return of withCSRFProtection to any to bypass strict RouteHandlerConfig validation
+  // in Next.js 16 when using higher-order functions that wrap Request handlers.
+  return withCSRFProtection(async (req) => {
+    return requireAuthWithRateLimit(req, async (userId) => {
+      return validateRequest(unitSchema)(req, async (validatedData) => {
         try {
           const supabase = await createServerClient();
           const { schedule, location, ...unitData } = validatedData;
@@ -382,6 +385,6 @@ export async function POST(request: Request) {
           return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
         }
       });
-    });
-  });
+    }) as any;
+  })(_request as any) as any;
 }

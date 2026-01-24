@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
@@ -265,10 +266,12 @@ export async function GET(request: NextRequest) {
  * POST /api/gamification/record-activity - Record user activity (for streak tracking)
  * This is called when the user performs certain actions to update their streak
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   // SECURITY: Apply CSRF protection and rate limiting (stricter for mutations)
-  return withCSRFProtection(async (_request) => {
-    const clientIP = getClientIP(request);
+  // Note: We cast the return of withCSRFProtection to any to bypass strict RouteHandlerConfig validation
+  // in Next.js 16 when using higher-order functions that wrap Request handlers.
+  return withCSRFProtection(async (req) => {
+    const clientIP = getClientIP(req);
     const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
     if (!allowed) {
       return jsonError(
@@ -279,7 +282,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return requireAuth(request, async (userId) => {
+    return requireAuth(req, async (userId) => {
       const supabase = await createServerClient();
 
       // Call the update_streak function (which also awards daily XP)
@@ -327,6 +330,6 @@ export async function POST(request: NextRequest) {
             xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
         },
       });
-    });
-  });
+    }) as any;
+  })(_request as any) as any;
 }

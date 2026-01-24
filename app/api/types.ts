@@ -1,223 +1,287 @@
-# API Route Type Definitions
+// API Route Type Definitions for Next.js 16
+// Centralized type definitions for consistent API responses and requests
 
-**Centralized Type Definitions for Next.js 16 API Routes**
-
-## 🎯 Overview
-
-This file centralizes all type definitions used across our API routes to ensure consistency and reduce duplication. These types are imported and used throughout the API layer for type safety and developer experience.
-
-## 📋 Core Type System
-
-### **Request Types**
-```typescript
-// Standard Next.js request with our app-specific extensions
-interface NextRequest {
-  url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  headers: Headers;
-  body?: any;
-  query?: URLSearchParams;
-  cookies?: any;
-}
-
-// Enhanced request with authentication context
-interface AuthenticatedRequest extends NextRequest {
-  userId: string;
-  user: User;
-  sessionId: string;
-}
-
-// Public request (no authentication required)
-interface PublicRequest extends Omit<NextRequest, 'userId' | 'sessionId'> {}
-```
-
-### **Response Types**
-```typescript
-// Base response wrapper
-interface BaseApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApiError;
-  meta: ResponseMeta;
+  message?: string;
+  meta?: ResponseMeta;
 }
 
-// Success response with data
-interface SuccessResponse<T> extends BaseApiResponse<T> {
-  success: true;
-  data: T;
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
 }
 
-// Error response
-interface ErrorResponse extends BaseApiResponse<null> {
-  success: false;
-  error: ApiError;
-}
-
-// Paginated response
-interface PaginatedResponse<T> extends SuccessResponse<T[]> {
-  meta: ResponseMeta & {
-    pagination: PaginationMeta;
+export interface ResponseMeta {
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
   };
+  timestamp: string;
+  requestId: string;
 }
-```
 
-### **Entity Types**
-```typescript
-// Common base entity
-interface BaseEntity {
+// Profile types
+export interface UserProfile {
   id: string;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-// User entity
-interface User extends BaseEntity {
   email: string;
-  fullName: string;
-  studentId?: string;
-  avatarUrl?: string;
-  preferences?: UserPreferences;
+  full_name?: string;
+  student_id?: string;
+  course?: string;
+  year?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-// Unit entity
-interface Unit extends BaseEntity {
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  notifications_enabled: boolean;
+  email_notifications: boolean;
+  push_notifications: boolean;
+}
+
+// Academic types
+export interface Unit {
+  id: string;
+  user_id: string;
   code: string;
   name: string;
   color: string;
-  credits: number;
-  lecturer?: Lecturer;
-  schedule?: Schedule[];
-  location?: Location;
-  isActive: boolean;
-}
-
-// Deadline entity
-interface Deadline extends BaseEntity {
-  title: string;
-  description: string;
-  unitCode: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  type: 'assignment' | 'exam' | 'project';
-  completed: boolean;
-  userId: string;
-}
-
-// Event entity
-interface Event extends BaseEntity {
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  location?: Location;
-  isAllDay: boolean;
-  userId: string;
-}
-
-// Notification entity
-interface Notification extends BaseEntity {
-  type: 'deadline' | 'event' | 'system' | 'class';
-  title: string;
-  message: string;
-  read: boolean;
-  userId: string;
-  metadata?: Record<string, any>;
-}
-
-// Supporting entities
-interface Lecturer extends BaseEntity {
-  name: string;
-  email: string;
-  department?: string;
-}
-
-interface Location {
-  building: string;
-  room?: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
+  description?: string;
+  location?: {
+    building: string;
+    room: string;
   };
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
 }
 
-interface Schedule {
+export interface ClassTime {
   id: string;
-  day: string;
-  startTime: string;
-  endTime: string;
-  unitId: string;
+  unit_id: string;
+  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  start_time: string; // "09:00" format
+  end_time: string; // "11:00" format
+  created_at: string;
 }
 
-interface UserPreferences {
-  theme: 'light' | 'dark';
-  notifications: NotificationPreferences;
-  language: string;
+export interface Deadline {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string;
+  unit_code: string;
+  unit_id?: string;
+  due_date: string; // ISO string
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
 }
 
-interface NotificationPreferences {
-  email: boolean;
-  push: boolean;
-  deadlines: boolean;
-  events: boolean;
-  class: boolean;
-  system: boolean;
+export interface Event {
+  id: string;
+  user_id?: string; // null for public events
+  title: string;
+  description: string;
+  start_at: string; // ISO string
+  end_at?: string; // ISO string
+  all_day: boolean;
+  location: string;
+  building?: string;
+  category: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  image_url?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
 }
-```
 
-### **Error Types**
-```typescript
-// Standardized error format
-interface ApiError {
-  code: string;
+// Gamification types
+export interface GamificationProfile {
+  id: string;
+  user_id: string;
+  xp: number;
+  streak_days: number;
+  longest_streak: number;
+  last_activity_date?: string; // ISO date string
+  created_at: string;
+  updated_at: string;
+}
+
+export interface XPEvent {
+  id: string;
+  user_id: string;
+  event_type:
+    | 'deadline_completed'
+    | 'deadline_early'
+    | 'daily_login'
+    | 'streak_bonus'
+    | 'unit_added'
+    | 'event_attended'
+    | 'profile_completed'
+    | 'first_deadline'
+    | 'weekly_goal'
+    | 'level_up_bonus';
+  xp_amount: number;
+  reference_id?: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface LeaderboardEntry {
+  user_id: string;
+  full_name?: string;
+  avatar_url?: string;
+  xp: number;
+  streak_days: number;
+  level: number;
+  rank: number;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
   message: string;
-  details?: Record<string, any>;
+  type: 'deadline' | 'event' | 'class' | 'system';
+  read: boolean;
+  link?: string;
+  related_id?: string;
+  created_at: string;
+  deleted_at?: string;
 }
 
-// Response metadata
-interface ResponseMeta {
-  timestamp: string;
-  requestId: string;
-  version?: string;
-  pagination?: PaginationMeta;
-}
-
-interface PaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-```
-
-### **Configuration Types**
-```typescript
-// Configuration for route handlers
-interface RouteHandlerConfig {
-  authentication?: {
-    required?: boolean;
-    roles?: string[];
-  };
-  validation?: {
-    schema?: ZodSchema;
-  };
-  rateLimit?: {
-    windowMs?: number;
-    maxRequests?: number;
-    skipSuccessfulRequests?: boolean;
-  };
-  cors?: {
-    origins?: string[];
-    credentials?: boolean;
-  };
-  logging?: {
-    enabled?: boolean;
-    level?: 'debug' | 'info' | 'warn' | 'error';
+// Request types for different operations
+export interface CreateUnitRequest {
+  code: string;
+  name: string;
+  color?: string;
+  description?: string;
+  location?: {
+    building: string;
+    room: string;
   };
 }
-```
 
----
+export interface UpdateUnitRequest {
+  code?: string;
+  name?: string;
+  color?: string;
+  description?: string;
+  location?: {
+    building: string;
+    room: string;
+  };
+}
 
-**Centralized Type System** 🔧
+export interface CreateDeadlineRequest {
+  title: string;
+  description?: string;
+  unit_code: string;
+  unit_id?: string;
+  due_date: string; // ISO string
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
+  type?: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+}
 
-*Import these types in all API route files to ensure consistency across your entire API layer.*
+export interface UpdateDeadlineRequest {
+  title?: string;
+  description?: string;
+  unit_code?: string;
+  unit_id?: string;
+  due_date?: string; // ISO string
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
+  type?: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+  completed?: boolean;
+}
+
+export interface CreateEventRequest {
+  title: string;
+  description: string;
+  start_at: string; // ISO string
+  end_at?: string; // ISO string
+  all_day?: boolean;
+  location: string;
+  building?: string;
+  category?: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  image_url?: string;
+}
+
+export interface UpdateEventRequest {
+  title?: string;
+  description?: string;
+  start_at?: string; // ISO string
+  end_at?: string; // ISO string
+  all_day?: boolean;
+  location?: string;
+  building?: string;
+  category?: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  image_url?: string;
+}
+
+// Query parameters and pagination
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface FilterParams {
+  search?: string;
+  category?: string;
+  status?: string;
+  priority?: string;
+  type?: string;
+  date_from?: string;
+  date_to?: string;
+}
+
+export interface SortParams {
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
+}
+
+// Combined query parameters
+export interface ApiQueryParams extends PaginationParams, FilterParams, SortParams {}
+
+// Validation error types
+export interface ValidationError {
+  field: string;
+  message: string;
+  code: string;
+}
+
+export interface FormErrorResponse {
+  success: false;
+  errors: ValidationError[];
+  message: string;
+}
+
+// Analytics types
+export interface DeadlineAnalytics {
+  user_id: string;
+  total_deadlines: number;
+  completed_count: number;
+  pending_count: number;
+  overdue_count: number;
+  next_deadline_date?: string;
+}
+
+export interface UserActivitySummary {
+  user_id: string;
+  last_activity_date?: string;
+  streak_days: number;
+  longest_streak: number;
+  total_actions: number;
+  last_action_at?: string;
+}

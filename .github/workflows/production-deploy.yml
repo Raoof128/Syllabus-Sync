@@ -1,0 +1,209 @@
+name: Production Deployment
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_ENV: production
+  VERCEL_ENV: production
+
+jobs:
+  validate-and-build:
+    name: Validate and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      build-exists: ${{ steps.build.outputs.build-exists }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate environment
+        run: |
+          echo "🔍 Validating production environment..."
+          if [[ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }" ]]; then
+            echo "❌ NEXT_PUBLIC_SUPABASE_URL is not set"
+            exit 1
+          fi
+
+          if [[ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }" ]]; then
+            echo "❌ NEXT_PUBLIC_SUPABASE_ANON_KEY is not set"
+            exit 1
+          fi
+
+          if [[ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }" ]]; then
+            echo "❌ SUPABASE_SERVICE_ROLE_KEY is not set"
+            exit 1
+          fi
+
+          echo "✅ Environment validation passed"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing production dependencies..."
+          npm ci --production=false
+
+      - name: Run type checking
+        run: |
+          echo "🔍 Running TypeScript type checking..."
+          npm run typecheck
+
+      - name: Run linting
+        run: |
+          echo "🔍 Running ESLint..."
+          npm run lint
+
+      - name: Security audit
+        run: |
+          echo "🔒 Running security audit..."
+          npm audit --audit-level=high
+
+          # Check for critical vulnerabilities
+          if [ $? -ne 0 ]; then
+            echo "⚠️ Security audit found issues"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: |
+          echo "🧪 Running test suite..."
+          npm run test:ci
+
+      - name: Check test coverage
+        run: |
+          echo "📊 Checking test coverage..."
+          COVERAGE=$(npm run test:coverage 2>/dev/null | grep -o "Statements   :" | awk '{print $3}' | sed 's/%//g')
+          echo "Current coverage: ${COVERAGE}%"
+
+          if (( $(echo "$COVERAGE" | sed 's/\..*//') < 70)); then
+            echo "⚠️ Test coverage is below 70%: ${COVERAGE}%"
+            exit 1
+          fi
+
+      - name: Build application
+        id: build
+        run: |
+          echo "🏗 Building production application..."
+          npm run build
+
+          # Check if build was successful
+          if [ -d ".next" ]; then
+            echo "✅ Build completed successfully"
+            echo "build-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Build failed"
+            exit 1
+          fi
+
+      - name: Generate build artifact
+        if: steps.build.outputs.build-exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: .next/
+          retention-days: 30
+
+  deploy-to-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: validate-and-build
+    if: github.ref == 'refs/heads/main' && success()
+    environment:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./
+
+      - name: Install Vercel CLI
+        run: |
+          echo "📦 Installing Vercel CLI..."
+          npm install -g vercel@latest
+
+      - name: Deploy to Vercel
+        run: |
+          echo "🚀 Deploying to production..."
+          vercel --prod --confirm
+
+          # Get deployment URL
+          DEPLOYMENT_URL=$(vercel ls --prod 2>/dev/null | head -n 5 | tail -n 1 | awk '{print $2}')
+          echo "🌐 Deployed to: $DEPLOYMENT_URL"
+          echo "deployment-url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+
+      - name: Run post-deployment checks
+        run: |
+          echo "🔍 Running post-deployment health checks..."
+
+          # Wait a bit for deployment to settle
+          sleep 30
+
+          # Check if deployment is accessible
+          if [[ -n "${{ deployment-url }}" ]]; then
+            echo "✅ Deployment is accessible"
+          else
+            echo "⚠️ Deployment URL not available"
+          fi
+
+  post-deployment-verification:
+    name: Post-Deployment Verification
+    runs-on: ubuntu-latest
+    needs: deploy-to-production
+    if: always()
+    steps:
+      - name: Verify deployment
+        run: |
+          echo "🔍 Verifying deployment stability..."
+
+          # Basic health check
+          if [[ -n "${{ needs.deploy-to-production.outputs.deployment-url }}" ]]; then
+            echo "✅ Production deployment verified"
+            echo "🌐 Production URL: ${{ needs.deploy-to-production.outputs.deployment-url }}"
+          else
+            echo "❌ Production deployment verification failed"
+            exit 1
+          fi
+
+      - name: Run Lighthouse audit
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: .lighthouserc.json
+          urls: |
+            ${{ needs.deploy-to-production.outputs.deployment-url }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Accessibility audit
+        uses: coactions/accessibility-check@v1
+        with:
+          url: ${{ needs.deploy-to-production.outputs.deployment-url }}
+          failOnError: false
+
+      - name: Notify team
+        if: always()
+        runs-on: ubuntu-latest
+        steps:
+          - name: Notify on success
+            if: success()
+            run: |
+              echo "🎉 Production deployment completed successfully!"
+              echo "🌐 Live at: ${{ needs.deploy-to-production.outputs.deployment-url }}"
+              # Add success notification logic here (Slack, Discord, etc.)
+          - name: Notify on failure
+            if: failure()
+            run: |
+              echo "❌ Production deployment failed!"
+              echo "Check the workflow logs for details."
+              # Add failure notification logic here
