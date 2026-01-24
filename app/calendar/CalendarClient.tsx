@@ -1992,7 +1992,7 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
+                              <div className="flex items-center gap-1 flex-shrink-0">
                                 {getDeadlineBuilding(assignment) && (
                                   <Link
                                     href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}&autonav=true`}
@@ -2004,7 +2004,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="p-2 inline-flex items-center justify-center hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                       aria-label={
                                         t('navigateToBuildingAria', {
                                           building: getDeadlineBuilding(assignment) || '',
@@ -2012,7 +2012,7 @@ export default function CalendarClient() {
                                       }
                                     >
                                       <Navigation
-                                        className="h-5 w-5 text-mq-content-secondary"
+                                        className="h-4 w-4 text-mq-content-secondary"
                                         aria-hidden="true"
                                       />
                                     </Button>
@@ -2024,11 +2024,11 @@ export default function CalendarClient() {
                                     e.stopPropagation();
                                     openEditAssignment(assignment);
                                   }}
-                                  className="p-2 hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: assignment.title })}
                                 >
                                   <Edit2
-                                    className="h-5 w-5 text-mq-content-secondary"
+                                    className="h-4 w-4 text-mq-content-secondary"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2038,11 +2038,11 @@ export default function CalendarClient() {
                                     e.stopPropagation();
                                     handleDeleteAssignment(assignment);
                                   }}
-                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: assignment.title })}
                                 >
                                   <Trash2
-                                    className="h-5 w-5 text-mq-content-secondary hover:text-red-500"
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2158,7 +2158,7 @@ export default function CalendarClient() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
+                              <div className="flex items-center gap-1 flex-shrink-0">
                                 {getDeadlineBuilding(exam) && (
                                   <Link
                                     href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}&autonav=true`}
@@ -2170,7 +2170,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="p-2 inline-flex items-center justify-center hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
                                       aria-label={
                                         t('navigateToBuildingAria', {
                                           building: getDeadlineBuilding(exam) || '',
@@ -2178,7 +2178,7 @@ export default function CalendarClient() {
                                       }
                                     >
                                       <Navigation
-                                        className="h-5 w-5 text-mq-content-secondary"
+                                        className="h-4 w-4 text-mq-content-secondary"
                                         aria-hidden="true"
                                       />
                                     </Button>
@@ -2187,22 +2187,22 @@ export default function CalendarClient() {
                                 <button
                                   type="button"
                                   onClick={() => openEditExam(exam)}
-                                  className="p-2 hover:bg-mq-hover-background rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-1 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: exam.title })}
                                 >
                                   <Edit2
-                                    className="h-5 w-5 text-mq-content-secondary"
+                                    className="h-4 w-4 text-mq-content-secondary"
                                     aria-hidden="true"
                                   />
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteExam(exam)}
-                                  className="p-2 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: exam.title })}
                                 >
                                   <Trash2
-                                    className="h-5 w-5 text-mq-content-secondary hover:text-red-500"
+                                    className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2565,9 +2565,9 @@ export default function CalendarClient() {
                     </select>
                     <Button
                       type="submit"
-                      size="sm"
                       disabled={!newTodoTitle.trim()}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 h-auto text-base"
+                      size="default"
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[48px]"
                       aria-label={t('addTodo' as TranslationKey) || 'Add todo'}
                     >
                       <Plus className="h-5 w-5" aria-hidden="true" />
@@ -2619,11 +2619,17 @@ export default function CalendarClient() {
                                   />
                                 </button>
                                 <div className="flex-1 min-w-0 space-y-2">
-                                  <p className="text-lg font-medium leading-relaxed break-words whitespace-normal tracking-normal text-mq-content">
+                                  <p
+                                    className="text-lg font-medium text-mq-content break-words"
+                                    style={{ wordSpacing: 'normal' }}
+                                  >
                                     {todo.title}
                                   </p>
                                   {todo.description && (
-                                    <p className="text-sm text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal">
+                                    <p
+                                      className="text-sm text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal"
+                                      style={{ wordSpacing: 'normal' }}
+                                    >
                                       {todo.description}
                                     </p>
                                   )}
@@ -2715,7 +2721,10 @@ export default function CalendarClient() {
                                     aria-hidden="true"
                                   />
                                 </button>
-                                <p className="text-lg line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal">
+                                <p
+                                  className="text-lg line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal tracking-normal"
+                                  style={{ wordSpacing: 'normal' }}
+                                >
                                   {todo.title}
                                 </p>
                               </div>

@@ -4,19 +4,10 @@
 import React, { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import {
-  Clock,
-  AlertCircle,
-  ExternalLink,
-  CalendarDays,
-  CheckCircle2,
-  Circle,
-  MapPin,
-} from 'lucide-react';
+import { Clock, AlertCircle, ExternalLink, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
 import { format, isValid, isPast } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
@@ -40,7 +31,6 @@ const UpcomingDeadlines = memo(() => {
   const router = useRouter();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
-  const units = useUnitsStore((state) => state.units);
   const { t, language } = useTranslation();
 
   const currentLocale = useMemo(() => {
@@ -75,11 +65,6 @@ const UpcomingDeadlines = memo(() => {
   const formatDueDate = (date: Date) => {
     const d = new Date(date);
     return format(d, 'EEE, MMM d • h:mm a', { locale: currentLocale });
-  };
-
-  // Get unit for a deadline to access building info
-  const getUnitForDeadline = (unitCode: string) => {
-    return units.find((u) => u.code === unitCode);
   };
 
   return (
@@ -142,7 +127,9 @@ const UpcomingDeadlines = memo(() => {
                 <h3 className="text-xl sm:text-2xl font-semibold text-mq-content mb-4">
                   {t('noUpcomingDeadlines')}
                 </h3>
-                <p className="text-base sm:text-lg text-mq-content-secondary">{t('noDeadlinesDesc')}</p>
+                <p className="text-base sm:text-lg text-mq-content-secondary">
+                  {t('noDeadlinesDesc')}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -150,7 +137,6 @@ const UpcomingDeadlines = memo(() => {
                   const dueDate = new Date(deadline.dueDate);
                   const isOverdue = isPast(dueDate);
                   const colors = TYPE_COLORS[deadline.type];
-                  const unit = getUnitForDeadline(deadline.unitCode);
 
                   return (
                     <div
@@ -224,24 +210,6 @@ const UpcomingDeadlines = memo(() => {
                           >
                             {t(`priority_${deadline.priority}` as TranslationKey)}
                           </Badge>
-                          {unit?.location?.building && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(
-                                  `/map?building=${encodeURIComponent(unit.location.building)}&autonav=true`,
-                                );
-                              }}
-                              className="p-4 hover:bg-mq-hover-background rounded-xl text-mq-content-secondary hover:text-mq-primary min-h-[44px] min-w-[44px] sm:min-h-[52px] sm:min-w-[52px] flex items-center justify-center transition-all hover:shadow-md border border-mq-border/50 hover:border-mq-border bg-mq-background/50"
-                              title={`Navigate to ${unit.location.building} ${unit.location.room ? `Room ${unit.location.room}` : ''}`}
-                              aria-label={t('navigateToBuildingAria', {
-                                building: unit.location.building,
-                              })}
-                            >
-                              <MapPin className="h-6 w-6 sm:h-7 sm:w-7" />
-                            </button>
-                          )}
                         </div>
                       </div>
                     </div>
