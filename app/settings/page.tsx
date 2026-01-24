@@ -43,10 +43,15 @@ function SettingsContent() {
   }
 
   return (
-    <div className="settings-page container mx-auto p-6 max-w-7xl" data-testid="settings-page">
-      <header className="mb-8">
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('settingsTitle')}</h1>
-        <p className="text-mq-content-secondary">{t('settingsSubtitle')}</p>
+    <div
+      className="settings-page container mx-auto px-4 py-4 sm:p-6 max-w-7xl"
+      data-testid="settings-page"
+    >
+      <header className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-mq-3xl font-bold text-mq-content mb-1 sm:mb-2">
+          {t('settingsTitle')}
+        </h1>
+        <p className="text-sm sm:text-base text-mq-content-secondary">{t('settingsSubtitle')}</p>
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
@@ -89,7 +94,7 @@ function SettingsContent() {
       </div>
 
       {/* Help & Support Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-4 sm:mt-6">
         <HelpSupport t={t} />
       </div>
     </div>

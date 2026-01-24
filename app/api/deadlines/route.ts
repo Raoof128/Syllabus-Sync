@@ -20,6 +20,9 @@ const deadlineSchema = z.object({
     .regex(/^[^<>]*$/, 'Unit code contains invalid characters')
     .transform((val) => val.trim().toUpperCase()),
   unitId: z.string().optional(),
+  building: z.string().optional(), // For exams: building code
+  room: z.string().optional(), // For exams: room number
+  color: z.string().optional(), // Custom color override
   dueDate: dateSchema,
   priority: z.enum(['Low', 'Medium', 'High', 'Urgent']).default('Medium'),
   type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']).default('Assignment'),

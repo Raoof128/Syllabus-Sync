@@ -45,6 +45,9 @@ export const mapDeadlineRow = (row: Row): Deadline => ({
   title: String(row.title ?? ''),
   unitCode: String(row.unit_code ?? row.unitCode ?? ''),
   unitId: row.unit_id ? String(row.unit_id) : undefined,
+  building: row.building ? String(row.building) : undefined,
+  room: row.room ? String(row.room) : undefined,
+  color: row.color ? String(row.color) : undefined,
   dueDate: parseDate(row.due_date ?? row.dueDate),
   priority: row.priority as Deadline['priority'],
   type: row.type as Deadline['type'],
@@ -109,6 +112,9 @@ export const serializeDeadline = (deadline: Deadline & { user_id?: string }) => 
   title: deadline.title,
   unit_code: deadline.unitCode,
   unit_id: deadline.unitId, // Optional: FK to units table
+  building: deadline.building, // For exams: building code
+  room: deadline.room, // For exams: room number
+  color: deadline.color, // Custom color override
   due_date: deadline.dueDate.toISOString(),
   priority: deadline.priority,
   type: deadline.type,

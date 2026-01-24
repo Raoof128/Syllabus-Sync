@@ -1759,7 +1759,8 @@ export const buildings: Building[] = [
 ];
 
 export const getBuildingById = (id: string): Building | undefined => {
-  return buildings.find((building) => building.id === id);
+  const normalizedId = id.toUpperCase();
+  return buildings.find((building) => building.id.toUpperCase() === normalizedId);
 };
 
 export const searchBuildings = (query: string): Building[] => {

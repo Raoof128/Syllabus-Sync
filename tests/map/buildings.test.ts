@@ -63,9 +63,10 @@ describe('getBuildingById', () => {
     expect(building).toBeUndefined();
   });
 
-  it('should be case-sensitive', () => {
+  it('should be case-insensitive', () => {
     const building = getBuildingById('lib');
-    expect(building).toBeUndefined();
+    expect(building).toBeDefined();
+    expect(building?.id).toBe('LIB');
   });
 });
 

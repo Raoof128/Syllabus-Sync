@@ -17,6 +17,8 @@ import {
   Trash2,
   AlertTriangle,
   Navigation,
+  ListTodo,
+  SquareCheckBig,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -25,8 +27,9 @@ import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useTodosStore } from '@/lib/store/todosStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
-import { Deadline, Event, Unit } from '@/lib/types';
+import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -297,6 +300,15 @@ export default function CalendarClient() {
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
 
+  // Todos store
+  const todos = useTodosStore((state) => state.todos);
+  const addTodo = useTodosStore((state) => state.addTodo);
+  const toggleTodoComplete = useTodosStore((state) => state.toggleComplete);
+  const removeTodo = useTodosStore((state) => state.removeTodo);
+  const updateTodo = useTodosStore((state) => state.updateTodo);
+  const getPendingTodos = useTodosStore((state) => state.getPendingTodos);
+  const getCompletedToday = useTodosStore((state) => state.getCompletedToday);
+
   const hasHydrated = useHydration();
   const { language, t } = useTranslation();
 
@@ -339,6 +351,15 @@ export default function CalendarClient() {
   // Delete confirmation state for events
   const [eventDeleteConfirmOpen, setEventDeleteConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+
+  // Todo input state
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+  const [newTodoPriority, setNewTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [todoDeleteConfirmOpen, setTodoDeleteConfirmOpen] = useState(false);
+  const [todoToDelete, setTodoToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [editTodoTitle, setEditTodoTitle] = useState('');
+  const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
 
   // Assignment detail panel state
   const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
@@ -2473,6 +2494,248 @@ export default function CalendarClient() {
         </ScrollReveal>
       </div>
 
+      {/* To-Do List Widget - Full Width at Bottom */}
+      <ScrollReveal delay={0.4}>
+        <MagicCard isLiquidEnhanced className="mt-6">
+          <div className="mq-magic-card-content p-0">
+            <Card className="border-0 shadow-none bg-transparent">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <ListTodo className="h-5 w-5 text-emerald-500" />
+                    {t('todoList' as TranslationKey) || 'To-Do List'}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="neutral"
+                      className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    >
+                      {getCompletedToday().length}{' '}
+                      {t('completedToday' as TranslationKey) || 'completed today'}
+                    </Badge>
+                    <Badge variant="neutral">
+                      {getPendingTodos().length} {t('pending')}
+                    </Badge>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Quick Add Todo Input with Priority */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (newTodoTitle.trim()) {
+                      addTodo({
+                        title: newTodoTitle.trim(),
+                        priority: newTodoPriority,
+                      });
+                      setNewTodoTitle('');
+                      setNewTodoPriority('Medium');
+                    }
+                  }}
+                  className="flex flex-col sm:flex-row gap-2 mb-4"
+                >
+                  <input
+                    type="text"
+                    value={newTodoTitle}
+                    onChange={(e) => setNewTodoTitle(e.target.value)}
+                    placeholder={t('addTodoPlaceholder' as TranslationKey) || 'Add a new task...'}
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder:text-mq-content-tertiary"
+                    aria-label={t('addTodoPlaceholder' as TranslationKey) || 'Add a new task'}
+                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={newTodoPriority}
+                      onChange={(e) =>
+                        setNewTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')
+                      }
+                      className={cn(
+                        'px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
+                        newTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
+                        newTodoPriority === 'Medium' && 'text-yellow-600 dark:text-yellow-400',
+                        newTodoPriority === 'Low' && 'text-blue-600 dark:text-blue-400',
+                      )}
+                      aria-label={t('selectPriority' as TranslationKey) || 'Select priority'}
+                    >
+                      <option value="High">{t('priorityHigh' as TranslationKey) || 'High'}</option>
+                      <option value="Medium">
+                        {t('priorityMedium' as TranslationKey) || 'Medium'}
+                      </option>
+                      <option value="Low">{t('priorityLow' as TranslationKey) || 'Low'}</option>
+                    </select>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={!newTodoTitle.trim()}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-4"
+                      aria-label={t('addTodo' as TranslationKey) || 'Add todo'}
+                    >
+                      <Plus className="h-4 w-4" aria-hidden="true" />
+                    </Button>
+                  </div>
+                </form>
+
+                {/* Todo List */}
+                {todos.length === 0 ? (
+                  <div className="text-center py-8">
+                    <SquareCheckBig className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
+                    <p className="text-mq-content-secondary text-sm">
+                      {t('noTodosYet' as TranslationKey) || 'No tasks yet'}
+                    </p>
+                    <p className="text-mq-content-tertiary text-xs mt-1">
+                      {t('noTodosYetDesc' as TranslationKey) ||
+                        'Add your first task above to get started!'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Pending Tasks */}
+                    <div>
+                      <h4 className="text-xs font-medium text-mq-content-secondary mb-3 uppercase tracking-wide">
+                        {t('pendingTasks' as TranslationKey) || 'Pending'}
+                      </h4>
+                      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        {getPendingTodos().length === 0 ? (
+                          <p className="text-xs text-mq-content-tertiary py-4 text-center">
+                            {t('allTasksComplete' as TranslationKey) || 'All tasks complete!'}
+                          </p>
+                        ) : (
+                          getPendingTodos().map((todo) => (
+                            <div
+                              key={todo.id}
+                              className="group flex items-center justify-between p-3 rounded-lg border border-mq-border hover:border-emerald-300 hover:shadow-sm transition-all bg-mq-surface/50"
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleTodoComplete(todo.id)}
+                                  aria-label={t('markAsCompleted')}
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
+                                >
+                                  <Circle
+                                    className="h-5 w-5 text-mq-content-secondary hover:text-emerald-500 transition-colors"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">{todo.title}</p>
+                                  {todo.description && (
+                                    <p className="text-xs text-mq-content-secondary truncate mt-0.5">
+                                      {todo.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Badge
+                                  className={cn(
+                                    'text-[10px]',
+                                    todo.priority === 'High' &&
+                                      'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+                                    todo.priority === 'Medium' &&
+                                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400',
+                                    todo.priority === 'Low' &&
+                                      'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+                                  )}
+                                  variant="neutral"
+                                >
+                                  {todo.priority}
+                                </Badge>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingTodo(todo);
+                                    setEditTodoTitle(todo.title);
+                                    setEditTodoPriority(todo.priority);
+                                  }}
+                                  className="p-1.5 hover:bg-mq-hover-background rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  aria-label={t('calendarEditItem', { title: todo.title })}
+                                >
+                                  <Edit2
+                                    className="h-4 w-4 text-mq-content-tertiary hover:text-emerald-500"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTodoToDelete({ id: todo.id, title: todo.title });
+                                    setTodoDeleteConfirmOpen(true);
+                                  }}
+                                  className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                  aria-label={t('calendarDeleteItem', { title: todo.title })}
+                                >
+                                  <Trash2
+                                    className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Completed Today */}
+                    <div>
+                      <h4 className="text-xs font-medium text-mq-content-secondary mb-3 uppercase tracking-wide">
+                        {t('completedToday' as TranslationKey) || 'Completed Today'}
+                      </h4>
+                      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        {getCompletedToday().length === 0 ? (
+                          <p className="text-xs text-mq-content-tertiary py-4 text-center">
+                            {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
+                          </p>
+                        ) : (
+                          getCompletedToday().map((todo) => (
+                            <div
+                              key={todo.id}
+                              className="group flex items-center justify-between p-3 rounded-lg border border-mq-border bg-emerald-50/50 dark:bg-emerald-950/10"
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <button
+                                  type="button"
+                                  onClick={() => toggleTodoComplete(todo.id)}
+                                  aria-label={t('markIncomplete')}
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
+                                >
+                                  <CheckCircle2
+                                    className="h-5 w-5 text-emerald-500"
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                <p className="text-sm line-through text-mq-content-secondary truncate">
+                                  {todo.title}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTodoToDelete({ id: todo.id, title: todo.title });
+                                  setTodoDeleteConfirmOpen(true);
+                                }}
+                                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                aria-label={t('calendarDeleteItem', { title: todo.title })}
+                              >
+                                <Trash2
+                                  className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
+      </ScrollReveal>
+
       {/* Deadline Form Dialog */}
       <DeadlineForm
         open={deadlineDialogOpen}
@@ -2714,6 +2977,149 @@ export default function CalendarClient() {
                 {t('confirmDelete')}
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal for Todos */}
+      {todoDeleteConfirmOpen && todoToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('deleteTodoConfirm' as TranslationKey) || 'Delete Task?'}
+                </h3>
+                <p className="text-sm text-mq-content-secondary">{todoToDelete.title}</p>
+              </div>
+            </div>
+            <p className="text-sm text-mq-content-secondary mb-6">
+              {t('deleteTodoConfirmDesc' as TranslationKey) ||
+                'This action cannot be undone. Are you sure you want to delete this task?'}
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setTodoDeleteConfirmOpen(false);
+                  setTodoToDelete(null);
+                }}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (todoToDelete) {
+                    removeTodo(todoToDelete.id);
+                    setTodoDeleteConfirmOpen(false);
+                    setTodoToDelete(null);
+                  }
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {t('confirmDelete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Todo Modal */}
+      {editingTodo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
+                <Edit2 className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-mq-content">
+                  {t('editTodo' as TranslationKey) || 'Edit Task'}
+                </h3>
+              </div>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (editTodoTitle.trim() && editingTodo) {
+                  updateTodo(editingTodo.id, {
+                    title: editTodoTitle.trim(),
+                    priority: editTodoPriority,
+                  });
+                  setEditingTodo(null);
+                  setEditTodoTitle('');
+                  setEditTodoPriority('Medium');
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label
+                  htmlFor="edit-todo-title"
+                  className="block text-sm font-medium text-mq-content mb-1"
+                >
+                  {t('taskTitle' as TranslationKey) || 'Task Title'}
+                </label>
+                <input
+                  id="edit-todo-title"
+                  type="text"
+                  value={editTodoTitle}
+                  onChange={(e) => setEditTodoTitle(e.target.value)}
+                  placeholder={t('enterTaskTitle' as TranslationKey) || 'Enter task title...'}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="edit-todo-priority"
+                  className="block text-sm font-medium text-mq-content mb-1"
+                >
+                  {t('priority' as TranslationKey) || 'Priority'}
+                </label>
+                <select
+                  id="edit-todo-priority"
+                  value={editTodoPriority}
+                  onChange={(e) => setEditTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')}
+                  className={cn(
+                    'w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
+                    editTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
+                    editTodoPriority === 'Medium' && 'text-yellow-600 dark:text-yellow-400',
+                    editTodoPriority === 'Low' && 'text-blue-600 dark:text-blue-400',
+                  )}
+                >
+                  <option value="High">{t('priorityHigh' as TranslationKey) || 'High'}</option>
+                  <option value="Medium">
+                    {t('priorityMedium' as TranslationKey) || 'Medium'}
+                  </option>
+                  <option value="Low">{t('priorityLow' as TranslationKey) || 'Low'}</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingTodo(null);
+                    setEditTodoTitle('');
+                    setEditTodoPriority('Medium');
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!editTodoTitle.trim()}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                >
+                  {t('saveChanges' as TranslationKey) || 'Save Changes'}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

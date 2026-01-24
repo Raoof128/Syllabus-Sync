@@ -330,11 +330,11 @@ export default function ManageProfilesPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto px-4 py-4 sm:p-6 max-w-4xl">
       {/* Profile Header with Avatar */}
-      <MagicCard isLiquidEnhanced className="mb-6">
+      <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
         <div className="mq-magic-card-content">
-          <div className="flex flex-col sm:flex-row items-center gap-6 p-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-6">
             {/* Avatar Section */}
             <div className="relative group">
               <label className="cursor-pointer block">
@@ -416,7 +416,7 @@ export default function ManageProfilesPage() {
       </MagicCard>
 
       {/* Personal Information */}
-      <MagicCard isLiquidEnhanced className="mb-6">
+      <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -475,7 +475,7 @@ export default function ManageProfilesPage() {
       </MagicCard>
 
       {/* Academic Information */}
-      <MagicCard isLiquidEnhanced className="mb-6">
+      <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -523,7 +523,7 @@ export default function ManageProfilesPage() {
       </MagicCard>
 
       {/* Notification Preferences */}
-      <MagicCard isLiquidEnhanced className="mb-6">
+      <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>
@@ -590,7 +590,7 @@ export default function ManageProfilesPage() {
       </MagicCard>
 
       {/* Reminder Settings */}
-      <MagicCard isLiquidEnhanced className="mb-6">
+      <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
         <div className="mq-magic-card-content p-0">
           <Card className="border-0 shadow-none bg-transparent">
             <CardHeader>

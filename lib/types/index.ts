@@ -79,6 +79,20 @@ export type Notification = {
 
 export type StressLevel = 'Low' | 'Busy' | 'High';
 
+// To-Do List types
+export type TodoPriority = 'Low' | 'Medium' | 'High';
+
+export type Todo = {
+  id: string;
+  title: string;
+  description?: string;
+  priority: TodoPriority;
+  completed: boolean;
+  dueDate?: Date; // Optional due date
+  createdAt: Date;
+  completedAt?: Date; // When the task was completed
+};
+
 // Error handling types
 export type AppError = {
   code: string;

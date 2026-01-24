@@ -20,6 +20,9 @@ const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineUpdateSchema = z.object({
   title: z.string().min(1).optional(),
   unitCode: z.string().min(1).optional(),
+  building: z.string().optional(), // For exams: building code
+  room: z.string().optional(), // For exams: room number
+  color: z.string().optional(), // Custom color override
   dueDate: dateSchema.optional(),
   priority: z.enum(['Low', 'Medium', 'High', 'Urgent']).optional(),
   type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']).optional(),

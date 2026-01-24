@@ -77,11 +77,35 @@ CREATE TABLE IF NOT EXISTS public.deadlines (
   priority TEXT NOT NULL DEFAULT 'Medium',
   type TEXT NOT NULL DEFAULT 'Assignment',
   completed BOOLEAN NOT NULL DEFAULT FALSE,
+  building TEXT,              -- For exams: building code (e.g., "C5C")
+  room TEXT,                  -- For exams: room number (e.g., "204")
+  color TEXT,                 -- Custom color override for display
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   
   CONSTRAINT deadlines_pkey PRIMARY KEY (id),
   CONSTRAINT deadlines_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+
+-- ============================================================================
+-- TODOS TABLE
+-- ============================================================================
+-- User to-do items - SECURITY: user_id scoped
+CREATE TABLE IF NOT EXISTS public.todos (
+  id UUID NOT NULL DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  priority TEXT NOT NULL DEFAULT 'Medium',
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  due_date TIMESTAMPTZ,           -- Optional due date
+  completed_at TIMESTAMPTZ,       -- When the task was completed
+  deleted_at TIMESTAMPTZ,         -- Soft delete timestamp
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  CONSTRAINT todos_pkey PRIMARY KEY (id),
+  CONSTRAINT todos_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
 -- ============================================================================
@@ -210,6 +234,11 @@ CREATE INDEX IF NOT EXISTS idx_deadlines_unit_code ON public.deadlines(unit_code
 CREATE INDEX IF NOT EXISTS idx_deadlines_completed ON public.deadlines(completed);
 CREATE INDEX IF NOT EXISTS idx_deadlines_user_id ON public.deadlines(user_id);
 
+-- Todos indexes
+CREATE INDEX IF NOT EXISTS idx_todos_user_id ON public.todos(user_id);
+CREATE INDEX IF NOT EXISTS idx_todos_completed ON public.todos(completed);
+CREATE INDEX IF NOT EXISTS idx_todos_created_at ON public.todos(created_at);
+
 -- Notifications indexes
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON public.notifications(read);
@@ -234,6 +263,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.units ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.class_times ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deadlines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.todos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
@@ -248,6 +278,7 @@ REVOKE ALL ON public.profiles FROM anon;
 REVOKE ALL ON public.units FROM anon;
 REVOKE ALL ON public.class_times FROM anon;
 REVOKE ALL ON public.deadlines FROM anon;
+REVOKE ALL ON public.todos FROM anon;
 REVOKE ALL ON public.events FROM anon;
 REVOKE ALL ON public.notifications FROM anon;
 REVOKE ALL ON public.user_preferences FROM anon;
@@ -258,6 +289,7 @@ REVOKE ALL ON public.xp_events FROM anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.units TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.class_times TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.deadlines TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.todos TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.events TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.notifications TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.user_preferences TO authenticated;
@@ -361,6 +393,31 @@ CREATE POLICY "Users can update their own deadlines"
 
 CREATE POLICY "Users can delete their own deadlines"
   ON public.deadlines FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- ============================================================================
+-- TODOS RLS POLICIES
+-- SECURITY: Users can only access their own todos
+-- ============================================================================
+
+CREATE POLICY "Users can view their own todos"
+  ON public.todos FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own todos"
+  ON public.todos FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own todos"
+  ON public.todos FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own todos"
+  ON public.todos FOR DELETE
   TO authenticated
   USING (auth.uid() = user_id);
 

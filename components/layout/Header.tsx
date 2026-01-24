@@ -189,24 +189,24 @@ const Header = memo(() => {
     : null;
 
   return (
-    <header className="h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between px-4 sm:px-6 relative z-10">
+    <header className="h-14 sm:h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between px-3 sm:px-4 md:px-6 relative z-10">
       {/* Left side - Logo and title (far left) */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-        <Link href="/" className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 min-w-0">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
           <Image
             src="/MQ_Logo_Final.png"
             alt={t('mqLogoAlt')}
             width={80}
             height={80}
             priority
-            className="h-[72px] w-auto sm:h-20"
+            className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto flex-shrink-0"
             style={{ width: 'auto' }}
           />
-          <div className="hidden sm:block">
-            <span className="text-mq-lg font-semibold text-mq-content block">
+          <div className="hidden sm:block min-w-0">
+            <span className="text-sm md:text-mq-lg font-semibold text-mq-content block truncate">
               {APP_CONFIG.name}
             </span>
-            <span className="text-mq-xs text-mq-content-secondary block">
+            <span className="text-[10px] md:text-mq-xs text-mq-content-secondary block truncate">
               {UNIVERSITY_CONFIG.shortName}
             </span>
           </div>
@@ -214,8 +214,8 @@ const Header = memo(() => {
 
         {/* Date and Weather display - next to logo/title */}
         {isClient && (
-          <div className="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
-            <span className="text-mq-sm font-medium text-mq-content-secondary">
+          <div className="hidden lg:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
+            <span className="text-mq-sm font-medium text-mq-content-secondary whitespace-nowrap">
               {new Date().toLocaleDateString(getLocaleString(language), {
                 weekday: 'long',
                 day: 'numeric',
@@ -230,13 +230,13 @@ const Header = memo(() => {
       </div>
 
       {/* Right side - Actions (far right) */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
         {/* Notifications - wrapped in isClient to prevent hydration mismatch with Radix UI IDs */}
         {isClient && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`group p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
+                className={`group p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
                 aria-label={
                   unreadCount > 0
                     ? t('viewUnreadNotifications', { count: unreadCount })
@@ -246,12 +246,12 @@ const Header = memo(() => {
                 title={unreadCount > 0 ? t('notificationsBellHint') : t('notifications')}
               >
                 <Bell
-                  className={`w-5 h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
                   aria-hidden="true"
                 />
                 {unreadCount > 0 && (
                   <span
-                    className="absolute top-1 right-1 w-4 h-4 bg-mq-error rounded-full text-[10px] text-white flex items-center justify-center font-medium animate-bounce-subtle"
+                    className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-mq-error rounded-full text-[9px] sm:text-[10px] text-white flex items-center justify-center font-medium animate-bounce-subtle"
                     aria-hidden="true"
                   >
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -397,17 +397,17 @@ const Header = memo(() => {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="group relative p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[44px] min-w-[44px]"
+            className="group relative p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px]"
             aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
             aria-pressed={resolvedTheme === 'dark'}
             title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
           >
-            <div className="relative w-5 h-5">
+            <div className="relative w-4 h-4 sm:w-5 sm:h-5">
               <Sun
-                className={`absolute inset-0 w-5 h-5 text-mq-warning transition-all duration-500 group-hover:rotate-45 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
+                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-warning transition-all duration-500 group-hover:rotate-45 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
               />
               <Moon
-                className={`absolute inset-0 w-5 h-5 text-mq-info transition-all duration-500 group-hover:-rotate-12 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
+                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-info transition-all duration-500 group-hover:-rotate-12 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
                 style={
                   resolvedTheme === 'dark'
                     ? { transform: 'translate(0.5px, 0.5px) scale(1) rotate(0deg)' }
@@ -423,11 +423,11 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="group flex items-center gap-2 p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] btn-premium"
+                className="group flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[40px] sm:min-h-[44px] hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] btn-premium"
                 aria-label={t('openProfileMenu')}
               >
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-mq-sm group-hover:shadow-mq"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-mq-sm group-hover:shadow-mq flex-shrink-0"
                   style={{
                     backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary,
                   }}
@@ -445,15 +445,15 @@ const Header = memo(() => {
                       className="w-full h-full object-cover"
                     />
                   ) : displayName ? (
-                    <span className="text-white font-bold text-sm">
+                    <span className="text-white font-bold text-xs sm:text-sm">
                       {displayName.charAt(0).toUpperCase()}
                     </span>
                   ) : (
-                    <User className="w-5 h-5 text-white" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                   )}
                 </div>
                 <div
-                  className="text-sm font-medium text-mq-content-secondary hidden sm:inline max-w-[120px] truncate"
+                  className="text-xs sm:text-sm font-medium text-mq-content-secondary hidden md:inline max-w-[80px] lg:max-w-[120px] truncate"
                   title={displayName || t('guest')}
                 >
                   {displayName || t('guest')}
