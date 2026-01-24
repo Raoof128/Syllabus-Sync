@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-24 - Navigation Suite Fix
+
+### Fixed
+- **Instruction Guidance:** Fixed a bug where turn-by-turn guidance was announcing total remaining distance instead of distance to the specific next turn.
+- **Verification:** Verified all navigation features (Turn advancement, ETA, Voice guidance, Arrival) using a comprehensive simulation suite.
+
+---
+
+Raouf: 2026-01-24 - Advanced Navigation Verification
+
+### Added
+- **Navigation Testing:** Added `scripts/verify-navigation-advanced.ts` to stress-test the navigation engine against complex scenarios (cornering, drift, and recovery).
+- **Hardening:** Confirmed that the Kalman Filter physics model correctly rejects unrealistic movement (teleportation bugs) while accurately tracking valid walking paths.
+
+### Verification
+- `npm run check` passed.
+
+---
+
 Raouf: 2026-01-24 - Navigation Logic Verification & Fix
 
 ### Fixed

@@ -70,6 +70,8 @@ export interface NavigationState {
   instructions: RouteInstruction[];
   /** Current instruction index */
   currentInstructionIndex: number;
+  /** Distance to the NEXT instruction (turn) in meters */
+  distanceToNextInstruction: number;
   /** Total route distance in meters */
   totalDistance: number;
   /** Remaining distance in meters */
@@ -690,6 +692,7 @@ export class NavigationStateManager {
       routeCoordinates: [],
       instructions: [],
       currentInstructionIndex: 0,
+      distanceToNextInstruction: 0,
       totalDistance: 0,
       remainingDistance: 0,
       eta: new Date(),
@@ -724,6 +727,7 @@ export class NavigationStateManager {
       routeCoordinates,
       instructions,
       currentInstructionIndex: 0,
+      distanceToNextInstruction: 0,
       totalDistance,
       remainingDistance: totalDistance,
       eta: calculateETA(totalDistance, 1.4),
@@ -799,6 +803,7 @@ export class NavigationStateManager {
 
     if (currentInst) {
       this.state.currentInstructionIndex = currentInst.index;
+      this.state.distanceToNextInstruction = currentInst.distanceToNext;
 
       // Trigger haptic feedback when advancing to a new instruction (turn)
       if (currentInst.index > previousInstructionIndex) {
@@ -872,7 +877,7 @@ export class NavigationStateManager {
 
     return {
       instruction,
-      distanceToNext: this.state.remainingDistance,
+      distanceToNext: this.state.distanceToNextInstruction,
     };
   }
 
