@@ -3,6 +3,12 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-24 (Australia/Sydney) - Visual Simulation UI
+- **Status:** ✅ Complete - Added on-screen developer tools for simulating navigation.
+- **Feature:** `DebugControls` component (toggleable via settings icon on map) allows simulating a route walk without leaving the desk.
+- **Logic:** `useMapLocation` now exposes `simulatePosition`, which injects fake GPS data into the Kalman Filter and Navigation Manager, updating the blue dot and instruction panel in real-time.
+- **Verification:** `npm run check` passed. Simulation verified visually.
+
 ### Raouf: 2026-01-24 (Australia/Sydney) - Navigation Suite Fix & Final Verification
 - **Status:** ✅ Complete - Fixed distance-to-instruction bug and verified the entire navigation suite.
 - **Bug Fixed:** `getCurrentInstruction()` was returning total remaining distance instead of distance to the specific next turn. Added `distanceToNextInstruction` to the state and updated the tracker to populate it correctly.

@@ -26,7 +26,7 @@ interface UseMapLocationProps {
   mapInstance: LeafletMap | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   leafletModule: any;
-  isMapReady: (map: LeafletMap) => boolean;
+  isMapReady: (map: LeafletMap | null) => boolean;
   userIcon: Icon | null;
   isNavigating: boolean;
   navManagerRef: React.MutableRefObject<NavigationStateManager | null>;
@@ -370,13 +370,105 @@ export function useMapLocation({
     }
   };
 
+  /**
+   * Simulate a GPS position update (for testing/demo)
+   */
+  const simulatePosition = useCallback(
+    (lat: number, lng: number, heading: number = 0, speed: number = 1.4) => {
+      if (!isMapReady(mapInstance) || !leafletModule) return;
+
+      const timestamp = Date.now();
+
+      // Update refs
+      lastPositionRef.current = { lat, lng, time: timestamp };
+
+      // Smoother update
+      if (positionSmootherRef.current) {
+        // Force motion state for simulation
+        positionSmootherRef.current.setMotionState(true);
+
+        const smoothed = positionSmootherRef.current.update({
+          lat,
+          lng,
+          accuracy: 5, // Good accuracy for simulation
+          heading,
+          speed,
+          timestamp,
+        });
+
+        setSmoothedPosition(smoothed);
+
+        if (navManagerRef.current) {
+          navManagerRef.current.updatePosition({
+            lat,
+            lng,
+            accuracy: 5,
+            heading,
+            speed,
+            timestamp,
+          });
+        }
+      }
+
+      setLocationStatus('found');
+      setOrigin({ lat, lng });
+
+      // Update Markers
+      try {
+        const crsPos = gpsToCrsSimple(lat, lng);
+        if (crsPos) {
+          // User Marker
+          if (!userMarkerRef.current && userIcon) {
+            userMarkerRef.current = leafletModule
+              .marker([crsPos.lat, crsPos.lng], {
+                icon: userIcon,
+                zIndexOffset: 1000,
+              })
+              .addTo(mapInstance);
+          } else if (userMarkerRef.current) {
+            userMarkerRef.current.setLatLng([crsPos.lat, crsPos.lng]);
+
+            // Force "moving" visual state
+            const iconElement = userMarkerRef.current.getElement();
+            if (iconElement) {
+              iconElement.classList.add('is-moving');
+              const arrowElement = iconElement.querySelector('.user-motion-arrow') as HTMLElement;
+              if (arrowElement) {
+                arrowElement.style.transform = `translate(-50%, -50%) rotate(${heading - 45}deg)`;
+              }
+            }
+          }
+
+          // Accuracy Circle
+          if (!accuracyCircleRef.current) {
+            accuracyCircleRef.current = leafletModule
+              .circle([crsPos.lat, crsPos.lng], {
+                radius: 10, // Small radius for sim
+                color: 'var(--mq-primary, #1a73e8)',
+                weight: 1,
+                opacity: 0.4,
+                fillOpacity: 0.1,
+              })
+              .addTo(mapInstance);
+          } else {
+            accuracyCircleRef.current.setLatLng([crsPos.lat, crsPos.lng]);
+          }
+        }
+      } catch (error) {
+        console.error('Simulation error:', error);
+      }
+    },
+    [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef],
+  );
+
   return {
     locationStatus,
-    setLocationStatus, // Exposed for manual updates if needed
+    setLocationStatus,
     smoothedPosition,
     origin,
     isOffCampus,
     centerOnUser,
     userMarkerRef,
+    simulatePosition,
   };
 }

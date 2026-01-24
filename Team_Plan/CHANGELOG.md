@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-24 - Visual Simulation UI
+
+### Added
+- **Developer Tools:** Added a "Debug Mode" overlay to the map (visible in development) that allows simulating route navigation.
+- **Simulation:** Implemented a visual simulation loop that moves the user location marker along the calculated route path, testing turn-by-turn updates and arrival logic in real-time.
+
+### Verification
+- `npm run check` passed.
+
+---
+
 Raouf: 2026-01-24 - Navigation Suite Fix
 
 ### Fixed
