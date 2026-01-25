@@ -261,7 +261,7 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg z-50 max-h-96 overflow-hidden"
+              className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg max-h-96"
               role="menu"
               aria-label={t('notifications')}
             >
