@@ -189,7 +189,7 @@ const Header = memo(() => {
     : null;
 
   return (
-    <header className="h-14 sm:h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between px-3 sm:px-4 md:px-6 relative z-10">
+    <header className="h-14 sm:h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-16 pr-3 sm:px-4 md:px-6 sticky top-0 z-40">
       {/* Left side - Logo and title (far left) */}
       <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 min-w-0">
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">

@@ -23,8 +23,174 @@
  */
 
 /* ============================================
-   CSS IMPORTS - Must come BEFORE @tailwind
+   TAILWIND CSS v4 - Single Import
    ============================================ */
+@import "tailwindcss";
+
+/* ============================================
+   TAILWIND CSS v4 THEME CONFIGURATION
+   ============================================ */
+@theme {
+  /* Dark mode via class */
+  --dark-mode: class;
+
+  /* Colors - Background */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  /* Colors - Card */
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  /* Colors - Popover */
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  /* Colors - Primary */
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  /* Colors - Secondary */
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  /* Colors - Muted */
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  /* Colors - Accent */
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  /* Colors - Destructive */
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  /* Colors - Border/Input/Ring */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* Colors - Chart */
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  /* Colors - Macquarie University Design Tokens */
+  --color-mq-primary: var(--c-red);
+  --color-mq-secondary: var(--c-sand-200);
+  --color-mq-red: var(--c-red);
+  --color-mq-red-bright: var(--c-bright-red);
+  --color-mq-red-deep: var(--c-deep-red);
+  --color-mq-magenta: var(--c-magenta);
+  --color-mq-purple: var(--c-purple);
+  --color-mq-alabaster: var(--alabaster);
+  --color-mq-alabaster-dark: var(--alabaster-dark);
+  --color-mq-alabaster-light: var(--alabaster-light);
+  --color-mq-background: var(--c-background);
+  --color-mq-background-secondary: var(--c-background-secondary);
+  --color-mq-background-tertiary: var(--c-background-tertiary);
+  --color-mq-background-invert: var(--c-background-invert);
+  --color-mq-content: var(--c-content);
+  --color-mq-content-secondary: var(--c-content-secondary);
+  --color-mq-content-tertiary: var(--c-content-tertiary);
+  --color-mq-content-faded: var(--c-content-faded);
+  --color-mq-border: var(--c-border);
+  --color-mq-border-secondary: var(--c-border-secondary);
+  --color-mq-focus: var(--c-focus);
+  --color-mq-success: var(--c-success);
+  --color-mq-warning: var(--c-warning);
+  --color-mq-error: var(--c-error);
+  --color-mq-info: var(--c-info);
+  --color-mq-card-background: var(--c-card-background);
+  --color-mq-input-background: var(--c-input-background);
+  --color-mq-button-secondary: var(--c-button-secondary);
+  --color-mq-hover-background: var(--c-hover-background);
+  --color-mq-subcard-hover: var(--c-subcard-hover);
+  --color-mq-subcard-active: var(--c-subcard-active);
+
+  /* Charcoal palette */
+  --color-mq-charcoal-600: var(--c-charcoal-600);
+  --color-mq-charcoal-700: var(--c-charcoal-700);
+  --color-mq-charcoal-800: var(--c-charcoal-800);
+  --color-mq-charcoal-900: var(--c-charcoal-900);
+
+  /* Sand palette */
+  --color-mq-sand-100: var(--c-sand-100);
+  --color-mq-sand-200: var(--c-sand-200);
+  --color-mq-sand-300: var(--c-sand-300);
+  --color-mq-sand-400: var(--c-sand-400);
+  --color-mq-sand-500: var(--c-sand-500);
+
+  /* Navy palette */
+  --color-mq-navy-600: var(--c-navy-600);
+  --color-mq-navy-700: var(--c-navy-700);
+  --color-mq-navy-800: var(--c-navy-800);
+  --color-mq-navy-900: var(--c-navy-900);
+
+  /* Slate palette */
+  --color-mq-slate-100: var(--c-slate-100);
+  --color-mq-slate-200: var(--c-slate-200);
+  --color-mq-slate-300: var(--c-slate-300);
+  --color-mq-slate-400: var(--c-slate-400);
+  --color-mq-slate-500: var(--c-slate-500);
+
+  /* Macquarie University Brand Colors (legacy) */
+  --color-macquarie-red: #A6192E;
+  --color-macquarie-blue: #002A45;
+  --color-macquarie-gold: #FFB81C;
+
+  /* Font Family */
+  --font-sans: var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
+  --font-mq: var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui, sans-serif;
+  --font-mq-serif: var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
+
+  /* Font Size - MQ tokens */
+  --font-size-mq-small: var(--fs-small);
+  --font-size-mq-regular: var(--fs-regular);
+  --font-size-mq-medium: var(--fs-medium);
+  --font-size-mq-large: var(--fs-large);
+  --font-size-mq-xl: var(--fs-xl);
+  --font-size-mq-2xl: var(--fs-2xl);
+  --font-size-mq-3xl: var(--fs-3xl);
+  --font-size-mq-4xl: var(--fs-4xl);
+  --font-size-mq-x-mega: var(--fs-x-mega);
+
+  /* Spacing - MQ tokens */
+  --spacing-mq-1: var(--c-space-1);
+  --spacing-mq-2: var(--c-space-2);
+  --spacing-mq-3: var(--c-space-3);
+  --spacing-mq-4: var(--c-space-4);
+
+  /* Border Radius */
+  --radius-mq-sm: var(--c-radius-sm);
+  --radius-mq: var(--c-radius);
+  --radius-mq-lg: var(--c-radius-lg);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Box Shadow - MQ tokens */
+  --shadow-mq-sm: var(--c-shadow-sm);
+  --shadow-mq: var(--c-shadow);
+
+  /* Transition Timing */
+  --ease-mq-ease: cubic-bezier(0.5, 0.5, 0, 1);
+  --ease-mq-snap: cubic-bezier(0, 0, 0, 1);
+
+  /* Transition Duration */
+  --duration-mq-fast: 0.15s;
+  --duration-mq-slow: 0.6s;
+  --duration-mq-mid: 0.3s;
+}
+
+/* ============================================
+   CSS IMPORTS - Custom styles after Tailwind
+   ============================================ */
+@import './mq-tokens.css';
 @import './styles/tokens.css';
 @import './styles/animations.css';
 @import './styles/dark-mode.css';
@@ -37,12 +203,6 @@
 @import './styles/alabaster-contrast.css';
 @import './styles/liquid-glass.css';
 
-/* ============================================
-   TAILWIND CSS LAYERS
-   ============================================ */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Login Page Readability Fixes */
 .login-page input::placeholder {

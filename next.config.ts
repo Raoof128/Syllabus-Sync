@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-label',
       '@radix-ui/react-slot',
       'date-fns',
+      'lucide-react',
+      'framer-motion',
     ],
   },
   modularizeImports: {
