@@ -74,12 +74,36 @@
 /* ----------------------------------------------------------------------------
    SIDEBAR SHELL - Main Container
    The outer wrapper that detects :hover state for all child animations.
+   On desktop (md+), this must be position: fixed so the hover area
+   stays aligned with the viewport when the user scrolls.
    ---------------------------------------------------------------------------- */
 .sidebar-shell {
   position: relative;
   height: 100vh;
   height: 100dvh; /* Dynamic viewport height for mobile browsers */
   z-index: 40;
+}
+
+/* Desktop: Fix sidebar shell to viewport so hover works after scroll */
+@media (min-width: 768px) {
+  .sidebar-shell {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 48px; /* w-12 = 3rem = 48px - the trigger strip width */
+    height: 100vh;
+    height: 100dvh;
+    /* Expand width on hover to cover the full panel for continuous hover detection */
+    transition: width 0ms 280ms; /* Delay shrink to match panel close animation */
+  }
+
+  /* Expand shell to full panel width on hover for proper hover detection */
+  .sidebar-shell:hover,
+  .sidebar-shell[data-keyboard-open='true'],
+  .sidebar-shell[data-pinned='true'] {
+    width: 14rem; /* w-56 = 14rem = 224px - match the panel width */
+    transition: width 0ms; /* Instant expand */
+  }
 }
 
 /* ============================================================================
@@ -118,13 +142,13 @@
      The always-visible 48px strip with hamburger icon.
      Acts as hover target and visual affordance.
      Has permanent shadow for depth.
+     Now positioned absolutely within the fixed sidebar-shell.
      -------------------------------------------------------------------------- */
   .sidebar-trigger {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     pointer-events: auto; /* Always clickable/hoverable */
     cursor: pointer;
     /* Permanent shadow on trigger strip */

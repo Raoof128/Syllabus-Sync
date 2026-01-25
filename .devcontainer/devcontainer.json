@@ -35,7 +35,10 @@
           "source.fixAll.eslint": "explicit"
         },
         "typescript.preferences.importModuleSpecifier": "relative",
-        "emmet.includeLanguages": ["typescript", "typescriptreact"],
+        "emmet.includeLanguages": {
+          "typescript": "html",
+          "typescriptreact": "html"
+        },
         "files.associations": {
           "*.css": "tailwindcss"
         },
@@ -43,9 +46,6 @@
         "debug.node.autoAttach": "on",
         "debug.javascript.terminal": "integrated"
       }
-    },
-    "zsh": {
-      "profile": ".oh-my-zsh"
     }
   },
 
@@ -89,25 +89,10 @@
 
   "workspaceFolder": "/workspace",
 
-  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+  "runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"]
 
   // Uncomment for GPU support (needed for some AI/ML tools)
   // "hostRequirements": {
   //   "gpu": "true"
-  // },
-
-  "customizations.vscode.lifecycle": {
-    "onFinalCreateSetup": [
-      {
-        "command": "npm run post:create",
-        "args": ["vscode"]
-      }
-    ],
-    "onAfterCreate": [
-      {
-        "command": "npm run post:start",
-        "args": ["vscode"]
-      }
-    ]
-  }
+  // }
 }

@@ -34,7 +34,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         className={cn(
           // Position fixed is critical for proper scroll behavior - ensures menu stays anchored to trigger
-          'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-mq p-1',
+          'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-mq p-1',
           // Light mode: alabaster bg + dark text, Dark mode: charcoal bg + light text
           'bg-[#edeade] text-[#1a1a1a] border border-[#a0a29c]',
           'dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]',
@@ -65,7 +65,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-mq-hover-background focus:text-mq-content data-[variant=destructive]:text-mq-error data-[variant=destructive]:focus:bg-mq-error/10 data-[variant=destructive]:focus:text-mq-error data-[variant=destructive]:*:[svg]:!text-mq-error [&_svg:not([class*='text-'])]:text-mq-content-tertiary relative flex cursor-default items-center gap-2 rounded-mq-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-mq-hover-background focus:text-mq-content data-[variant=destructive]:text-mq-error data-[variant=destructive]:focus:bg-mq-error/10 data-[variant=destructive]:focus:text-mq-error data-[variant=destructive]:*:[svg]:text-mq-error! [&_svg:not([class*='text-'])]:text-mq-content-tertiary relative flex cursor-default items-center gap-2 rounded-mq-sm px-2 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -83,7 +83,7 @@ function DropdownMenuCheckboxItem({
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
-        "focus:bg-mq-hover-background focus:text-mq-content relative flex cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-mq-hover-background focus:text-mq-content relative flex cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       checked={checked}
@@ -114,7 +114,7 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        "focus:bg-mq-hover-background focus:text-mq-content relative flex cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-mq-hover-background focus:text-mq-content relative flex cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -140,7 +140,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn('px-2 py-1.5 text-sm font-medium data-[inset]:pl-8', className)}
+      className={cn('px-2 py-1.5 text-sm font-medium data-inset:pl-8', className)}
       {...props}
     />
   );
@@ -186,7 +186,7 @@ function DropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        "focus:bg-mq-hover-background focus:text-mq-content data-[state=open]:bg-mq-hover-background data-[state=open]:text-mq-content [&_svg:not([class*='text-'])]:text-mq-content-tertiary flex cursor-default items-center gap-2 rounded-mq-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-mq-hover-background focus:text-mq-content data-[state=open]:bg-mq-hover-background data-[state=open]:text-mq-content [&_svg:not([class*='text-'])]:text-mq-content-tertiary flex cursor-default items-center gap-2 rounded-mq-sm px-2 py-1.5 text-sm outline-hidden select-none data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -206,7 +206,7 @@ function DropdownMenuSubContent({
       data-slot="dropdown-menu-sub-content"
       className={cn(
         // Position fixed for proper scroll behavior
-        'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-mq p-1',
+        'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-mq p-1',
         // Light mode: alabaster bg + dark text, Dark mode: charcoal bg + light text
         'bg-[#edeade] text-[#1a1a1a] border border-[#a0a29c]',
         'dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]',

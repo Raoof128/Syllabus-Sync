@@ -258,7 +258,7 @@ const Sidebar = memo(() => {
           ======================================================================== */}
       <aside
         ref={sidebarShellRef}
-        className="relative group/sidebar md:block md:fixed md:left-0 md:top-0 md:h-screen md:w-12 sidebar-shell"
+        className="hidden md:block sidebar-shell"
         data-keyboard-open={keyboardOpen ? 'true' : undefined}
         data-pinned={pinnedOpen ? 'true' : undefined}
         onMouseLeave={() => {
