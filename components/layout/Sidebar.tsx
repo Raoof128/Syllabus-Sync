@@ -33,7 +33,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { Home, MapPin, Calendar, MessageSquare, Settings, Menu, X, Sparkles } from 'lucide-react';
+import { Home, MapPin, Calendar, MessageSquare, Menu, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
@@ -52,7 +52,6 @@ const navigation: {
   { name: 'calendar', href: '/calendar', icon: Calendar },
   { name: 'map', href: '/map', icon: MapPin },
   { name: 'feed', href: '/feed', icon: MessageSquare },
-  { name: 'settings', href: '/settings', icon: Settings },
 ];
 
 /**
@@ -242,7 +241,7 @@ const Sidebar = memo(() => {
           ======================================================================== */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-mq-content/60 z-40"
+          className="md:hidden fixed inset-0 bg-black/50 dark:bg-black/60 z-40"
           onClick={handleOverlayClick}
           role="presentation"
           aria-hidden="true"

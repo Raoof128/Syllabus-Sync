@@ -31,7 +31,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-mq-content/80',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm',
         className,
       )}
       {...props}
@@ -53,7 +53,7 @@ const DialogContent = React.forwardRef<
         ref={ref}
         data-slot="dialog-content"
         className={cn(
-          'text-mq-content shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-mq-lg border border-mq-border !bg-[#edeade] dark:!bg-[#373a36] opacity-100 p-6 duration-200 outline-none sm:max-w-lg',
+          'text-mq-content shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[90vh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-mq-lg border border-mq-border bg-mq-background dark:bg-mq-card-background opacity-100 p-6 duration-200 outline-none sm:max-w-lg',
           className,
         )}
         style={{

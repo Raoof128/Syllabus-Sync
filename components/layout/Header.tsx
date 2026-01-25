@@ -34,7 +34,6 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import {
   Bell,
   Check,
-  Settings,
   User,
   Clock,
   Calendar,
@@ -56,7 +55,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import WeatherWidget from './WeatherWidget';
@@ -82,8 +80,7 @@ const Header = memo(() => {
   const notifications = useNotificationsStore((state) => state.notifications);
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
   const removeNotification = useNotificationsStore((state) => state.removeNotification);
-  const clearAll = useNotificationsStore((state) => state.clearAll);
-  const getUnreadCount = useNotificationsStore((state) => state.getUnreadCount);
+  const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -161,8 +158,9 @@ const Header = memo(() => {
     setIsClient(true);
   }, []);
 
-  // Only calculate unread count on client to avoid hydration mismatch
-  const unreadCount = isClient ? getUnreadCount() : 0;
+  // Only calculate unread notifications on client to avoid hydration mismatch
+  const unreadNotifications = isClient ? notifications.filter((n) => !n.read) : [];
+  const unreadCount = unreadNotifications.length;
 
   // Get display name: prioritize profile name, then Supabase user metadata full_name/name, then extract from email
   // Extract a proper name from the email prefix (capitalize first letter)
@@ -189,7 +187,7 @@ const Header = memo(() => {
     : null;
 
   return (
-    <header className="h-14 sm:h-16 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-16 pr-3 sm:px-4 md:px-6 sticky top-0 z-40">
+    <header className="h-14 sm:h-16 w-full flex-shrink-0 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40">
       {/* Left side - Logo and title (far left) */}
       <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 min-w-0">
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
@@ -261,7 +259,11 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg max-h-96"
+              sideOffset={8}
+              side="bottom"
+              collisionPadding={24}
+              alignOffset={-4}
+              className="w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg"
               role="menu"
               aria-label={t('notifications')}
             >
@@ -272,15 +274,15 @@ const Header = memo(() => {
                   onSelect={(event) => {
                     event.preventDefault();
                     if (unreadCount === 0) return;
-                    clearAll();
+                    markAllAsRead();
                   }}
                   className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent data-[disabled]:opacity-60"
                 >
                   {t('markAllRead')}
                 </DropdownMenuItem>
               </div>
-              <div className="max-h-72 overflow-y-auto">
-                {notifications.length === 0 ? (
+              <div className="max-h-[min(20rem,calc(100vh-10rem))] overflow-y-auto">
+                {unreadNotifications.length === 0 ? (
                   <div className="p-4 text-center">
                     <p className="text-mq-content-tertiary text-sm font-medium">
                       {t('noNotificationsYet')}
@@ -290,10 +292,7 @@ const Header = memo(() => {
                     </p>
                   </div>
                 ) : (
-                  notifications
-                    .filter((n) => !n.read)
-                    .slice(0, 10)
-                    .map((notification) => {
+                  unreadNotifications.slice(0, 10).map((notification) => {
                       const Icon = notificationIcons[notification.type];
                       return (
                         <DropdownMenuItem
@@ -453,20 +452,20 @@ const Header = memo(() => {
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 border-mq-border shadow-mq-lg">
+            <DropdownMenuContent
+              align="end"
+              sideOffset={8}
+              side="bottom"
+              collisionPadding={24}
+              alignOffset={-4}
+              className="w-48 max-w-[calc(100vw-1rem)] border-mq-border shadow-mq-lg"
+            >
               <DropdownMenuItem asChild>
                 <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">
                   <User className="w-4 h-4" />
                   {t('manageProfiles')}
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="flex items-center gap-2 text-mq-content">
-                  <Settings className="w-4 h-4" />
-                  {t('settings')}
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={async () => {
                   try {

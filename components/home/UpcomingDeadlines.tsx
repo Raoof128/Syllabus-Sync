@@ -165,38 +165,38 @@ const UpcomingDeadlines = memo(() => {
                                 e.stopPropagation();
                                 toggleComplete(deadline.id);
                               }}
-                              className="flex-shrink-0 p-2 hover:bg-mq-hover-background rounded-xl min-h-[44px] min-w-[44px] sm:min-h-[52px] sm:min-w-[52px] flex items-center justify-center transition-colors"
+                              className="flex-shrink-0 p-1.5 hover:bg-mq-hover-background rounded-xl min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center transition-colors"
                               aria-label={
                                 deadline.completed ? t('markIncomplete') : t('markAsCompleted')
                               }
                             >
                               {deadline.completed ? (
-                                <CheckCircle2 className="h-6 w-6 sm:h-7 sm:w-7 text-green-500" />
+                                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
                               ) : (
-                                <Circle className="h-6 w-6 sm:h-7 sm:w-7 text-mq-content-tertiary hover:text-mq-primary" />
+                                <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-mq-content-tertiary hover:text-mq-primary" />
                               )}
                             </button>
                             <h4
                               className={cn(
-                                'font-semibold text-lg sm:text-xl leading-snug line-clamp-2',
+                                'font-semibold text-base sm:text-lg leading-snug line-clamp-2',
                                 deadline.completed && 'line-through text-mq-content-tertiary',
                               )}
                             >
                               {deadline.title}
                             </h4>
                           </div>
-                          <p className="text-sm sm:text-base text-mq-content-secondary mb-3 pl-2">
+                          <p className="text-xs sm:text-sm text-mq-content-secondary mb-2 pl-2">
                             {deadline.unitCode} • {getDeadlineTypeLabel(deadline.type)}
                           </p>
                           <p
                             className={cn(
-                              'text-sm sm:text-base mt-4 flex items-center gap-3 pl-2',
+                              'text-xs sm:text-sm mt-2 flex items-center gap-2.5 pl-2',
                               isOverdue
                                 ? 'text-red-600 font-semibold'
                                 : 'text-mq-content-secondary',
                             )}
                           >
-                            {isOverdue && <AlertCircle className="h-5 w-5 inline flex-shrink-0" />}
+                            {isOverdue && <AlertCircle className="h-4 w-4 inline flex-shrink-0" />}
                             {formatDueDate(dueDate)}
                           </p>
                         </div>
@@ -204,7 +204,7 @@ const UpcomingDeadlines = memo(() => {
                           <Badge
                             className={cn(
                               PRIORITY_COLORS[deadline.priority],
-                              'text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2 font-medium',
+                              'text-xs sm:text-sm px-2.5 sm:px-3 py-1 sm:py-1.5 font-medium',
                             )}
                             variant="neutral"
                           >
