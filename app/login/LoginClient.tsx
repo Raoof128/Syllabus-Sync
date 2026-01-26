@@ -14,6 +14,7 @@ import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint } from 'lucide-react';
+import TestWeather from '../../test-weather';
 
 export default function LoginClient() {
   const { t } = useTranslation();
@@ -394,6 +395,9 @@ export default function LoginClient() {
 
   return (
     <div className="login-page min-h-[100dvh] flex items-start lg:items-center justify-center bg-mq-background p-0 relative overflow-y-auto">
+      <div className="absolute top-0 left-0 p-4">
+        <TestWeather />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/32 to-mq-background/85" />
 
       <div className="relative z-10 w-full max-w-none min-h-[100dvh] h-auto lg:h-[100dvh] overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">

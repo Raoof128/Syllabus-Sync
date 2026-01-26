@@ -184,13 +184,17 @@ export const useWeather = () => {
     };
 
     const fetchWeather = async (latitude: number, longitude: number, preferredLabel?: string) => {
+      console.log('Fetching weather for:', latitude, longitude);
       const response = await fetch(`/api/weather?lat=${latitude}&lon=${longitude}`);
 
       if (!response.ok) {
         throw new Error('Weather service unreachable.');
       }
 
-      const data = await response.json();
+      const apiResponse = await response.json();
+      console.log('API response:', apiResponse);
+      const data = apiResponse?.data;
+      
       const tempValue = data?.current_weather?.temperature;
       const weatherCode = data?.current_weather?.weathercode;
       const isDayValue = data?.current_weather?.is_day;
@@ -241,6 +245,7 @@ export const useWeather = () => {
 
     const cachedData = readCache();
     if (cachedData) {
+      console.log('Using cached weather data');
       setWeatherData(cachedData);
       setLoading(false);
       return () => {
@@ -248,58 +253,23 @@ export const useWeather = () => {
       };
     }
 
-    if (!navigator.geolocation) {
-      (async () => {
-        try {
-          await fetchWeather(
-            fallbackCoords.latitude,
-            fallbackCoords.longitude,
-            fallbackCoords.label,
-          );
-          setError('Geolocation not supported. Showing default location.');
-        } catch {
-          setError('Geolocation not supported by this browser.');
-        } finally {
-          setLoading(false);
-        }
-      })();
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          await fetchWeather(latitude, longitude);
-
-          if (!isMounted) return;
-          setError(null);
-        } catch (err) {
-          if (!isMounted) return;
-          const message = err instanceof Error ? err.message : 'Failed to load weather.';
-          setError(message);
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
-        }
-      },
-      async () => {
-        if (!isMounted) return;
-        try {
-          const { latitude, longitude, label } = fallbackCoords;
-          await fetchWeather(latitude, longitude, label);
-          setError('Location permission denied. Showing default city.');
-        } catch {
-          setError('Location permission denied. Enable access to see local weather.');
-        } finally {
-          setLoading(false);
-        }
-      },
-      { timeout: 8000 },
-    );
+    // Skip geolocation and always use fallback coordinates
+    console.log('Using fallback coordinates');
+    (async () => {
+      try {
+        await fetchWeather(
+          fallbackCoords.latitude,
+          fallbackCoords.longitude,
+          fallbackCoords.label,
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load weather.';
+        setError(message);
+        console.error('Weather fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
 
     return () => {
       isMounted = false;

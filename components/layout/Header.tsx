@@ -212,7 +212,7 @@ const Header = memo(() => {
 
         {/* Date and Weather display - next to logo/title */}
         {isClient && (
-          <div className="hidden lg:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
+          <div className="flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
             <span className="text-mq-sm font-medium text-mq-content-secondary whitespace-nowrap">
               {new Date().toLocaleDateString(getLocaleString(language), {
                 weekday: 'long',

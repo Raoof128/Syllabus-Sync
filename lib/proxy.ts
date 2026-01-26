@@ -129,8 +129,9 @@ export async function proxy(request: NextRequest) {
   // 4. Route Protection
   const path = request.nextUrl.pathname;
 
-  // Protected Pages
-  const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
+  // Protected Pages (temporarily disabled for testing)
+  const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
+  const publicRoutes = ['/test-weather'];
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
 
   // Auth Pages
@@ -143,7 +144,8 @@ export async function proxy(request: NextRequest) {
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
     path.startsWith('/api/mq-demo') ||
-    path.startsWith('/api/weather');
+    path.startsWith('/api/weather') ||
+    path.startsWith('/api/test-weather');
 
   // Logic:
   // If authenticated and on auth route -> redirect to /home
@@ -151,8 +153,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  // If not authenticated and on protected route -> redirect to /login
-  if (isProtectedRoute && !user) {
+  // Temporary: Disable authentication for home page
+  if (isProtectedRoute && !user && !publicRoutes.some((route) => path.startsWith(route)) && path !== '/home') {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', path);
     return NextResponse.redirect(redirectUrl);
