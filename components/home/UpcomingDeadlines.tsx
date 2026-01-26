@@ -18,14 +18,6 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { cn } from '@/lib/utils';
 
-// Type colors for deadlines
-const TYPE_COLORS = {
-  Assignment: { bg: 'bg-mq-info', border: 'border-mq-info', text: 'text-white' },
-  Exam: { bg: 'bg-mq-error', border: 'border-mq-error', text: 'text-white' },
-  Presentation: { bg: 'bg-mq-purple', border: 'border-mq-purple', text: 'text-white' },
-  Quiz: { bg: 'bg-mq-warning', border: 'border-mq-warning', text: 'text-black' },
-};
-
 const UpcomingDeadlines = memo(() => {
   const isHydrated = useHydration();
   const router = useRouter();
@@ -69,8 +61,8 @@ const UpcomingDeadlines = memo(() => {
 
   return (
     <MagicCard isLiquidEnhanced className="h-full">
-      <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
+      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+        <Card className="h-full border border-mq-border bg-mq-card-background flex flex-col">
           <CardHeader
             className="flex flex-row items-center justify-between pb-5"
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
@@ -123,7 +115,7 @@ const UpcomingDeadlines = memo(() => {
                   mixBlendMode: 'normal',
                 }}
               >
-                <Clock className="h-12 w-12 sm:h-16 sm:w-16 text-mq-content-tertiary mx-auto mb-6" />
+                <Clock className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-6" />
                 <h3 className="text-xl sm:text-2xl font-medium text-mq-content mb-4">
                   {t('noUpcomingDeadlines')}
                 </h3>
@@ -136,15 +128,11 @@ const UpcomingDeadlines = memo(() => {
                 {upcomingDeadlines.map((deadline) => {
                   const dueDate = new Date(deadline.dueDate);
                   const isOverdue = isPast(dueDate);
-                  const colors = TYPE_COLORS[deadline.type];
-
                   return (
                     <div
                       key={deadline.id}
                       className={cn(
-                        'p-4 sm:p-6 rounded-xl border-l-4 bg-mq-background-secondary/50 hover:bg-mq-background-secondary transition-all cursor-pointer shadow-sm hover:shadow-lg',
-                        colors.border,
-                        isOverdue && 'bg-red-50/50 dark:bg-red-950/20',
+                        'p-4 sm:p-6 rounded-xl border-l-4 border-mq-border bg-mq-background-secondary hover:bg-mq-hover-background transition-all cursor-pointer shadow-sm hover:shadow-lg',
                       )}
                       onClick={() => router.push(`/calendar?highlightDeadline=${deadline.id}`)}
                       role="button"
@@ -171,9 +159,9 @@ const UpcomingDeadlines = memo(() => {
                               }
                             >
                               {deadline.completed ? (
-                                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+                                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
                               ) : (
-                                <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-mq-content-tertiary hover:text-mq-primary" />
+                                <Circle className="h-5 w-5 sm:h-6 sm:w-6" />
                               )}
                             </button>
                             <h4

@@ -26,7 +26,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
 
   return (
     <MagicCard data-testid="help-support">
-      <Card className="mq-magic-card-content">
+      <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5" aria-hidden="true" />

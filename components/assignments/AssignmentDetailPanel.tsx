@@ -130,9 +130,9 @@ export default function AssignmentDetailPanel({
                 aria-label={assignment.completed ? t('markIncomplete') : t('markAsCompleted')}
               >
                 {assignment.completed ? (
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  <CheckCircle2 className="h-6 w-6" />
                 ) : status === 'overdue' ? (
-                  <AlertCircle className="h-6 w-6 text-red-500" />
+                  <AlertCircle className="h-6 w-6" />
                 ) : (
                   <Circle className="h-6 w-6 text-mq-content-secondary" />
                 )}
@@ -199,14 +199,7 @@ export default function AssignmentDetailPanel({
 
             {/* Time Remaining */}
             <div
-              className={cn(
-                'p-3 rounded-lg border',
-                status === 'overdue' && 'bg-red-50 dark:bg-red-950/20 border-red-200',
-                status === 'urgent' && 'bg-amber-50 dark:bg-amber-950/20 border-amber-200',
-                status === 'soon' && 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200',
-                status === 'completed' && 'bg-green-50 dark:bg-green-950/20 border-green-200',
-                status === 'upcoming' && 'bg-mq-background-secondary border-mq-border',
-              )}
+              className={cn('p-3 rounded-lg border bg-mq-background-secondary border-mq-border')}
             >
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Clock className="h-3.5 w-3.5" />

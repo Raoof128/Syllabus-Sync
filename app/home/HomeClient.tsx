@@ -425,8 +425,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         <ScrollReveal delay={0.3} staggerChildren={0.1}>
           <section aria-labelledby="units-section-heading" className="mb-6">
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content">
-                <Card className="border-0 shadow-none bg-transparent">
+              <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+                <Card className="border border-mq-border bg-mq-card-background">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle id="units-section-heading" className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5" aria-hidden="true" />
@@ -462,7 +462,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                       </div>
                     ) : units.length === 0 ? (
                       <div className="text-center py-12">
-                        <BookOpen className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                        <BookOpen className="h-12 w-12 mx-auto mb-4" />
                         <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                           {t('noUnitsYet')}
                         </h3>

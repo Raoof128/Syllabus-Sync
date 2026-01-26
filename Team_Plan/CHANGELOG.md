@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Map building toggle + toast palette.
+Summary: Made building cards toggle selection off when clicked again and normalized toast surfaces to the standard card background/border with current text color.
+Files: app/map/MapClient.tsx; components/ui/toast.tsx.
+Verification: `npm run check` (pass; tests emit expected circular JSON warning in response-critical tests and in-memory rate-limit warning).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Card palette normalization across pages.
+Summary: Added solid card backgrounds/borders to empty states and calendar skeletons, normalized calendar list items and unit/assignment panels to theme card backgrounds, and moved icon color handling to inherit current text color.
+Files: app/calendar/CalendarClient.tsx; app/calendar/page.tsx; components/ui/EmptyState.tsx; components/units/UnitDetailPanel.tsx; components/assignments/AssignmentDetailPanel.tsx; app/manage-profiles/page.tsx; components/layout/WeatherWidget.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
 Scope: UI - Calendar card palette override.
 Summary: Overrode dark-mode calendar card background/border variables to use core theme tokens and removed remaining hue-specific SVG classes in calendar UI.
 Files: app/calendar/CalendarClient.tsx; app/styles/dark-mode.css; app/styles/liquid-glass.css.

@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EventFormSkeleton() {
   return (
-    <Card className="border-0 shadow-none bg-transparent">
+    <Card className="border border-mq-border bg-mq-card-background">
       <CardHeader>
         <Skeleton className="h-6 w-32" />
       </CardHeader>

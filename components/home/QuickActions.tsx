@@ -11,7 +11,7 @@ export default function QuickActions() {
   const { t } = useTranslation();
   return (
     <MagicCard isLiquidEnhanced className="h-auto">
-      <div className="mq-magic-card-content p-4 items-center justify-center">
+      <div className="mq-magic-card-content p-4 items-center justify-center bg-mq-card-background border border-mq-border">
         <div className="flex flex-col gap-3 w-full">
           <Button
             asChild

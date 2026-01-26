@@ -60,8 +60,8 @@ const NextDeadline = memo(() => {
 
   return (
     <MagicCard isLiquidEnhanced>
-      <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent">
+      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+        <Card className="h-full border border-mq-border bg-mq-card-background">
           <CardHeader
             className="flex flex-row items-center justify-between"
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
@@ -99,7 +99,7 @@ const NextDeadline = memo(() => {
                   mixBlendMode: 'normal',
                 }}
               >
-                <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <Clock className="h-12 w-12 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-mq-content mb-2">
                   {t('noUpcomingDeadlines')}
                 </h3>
@@ -116,7 +116,7 @@ const NextDeadline = memo(() => {
                 aria-label={t('viewDeadlineDetails', { title: nextDeadline.title })}
               >
                 <div
-                  className="space-y-3 p-3 -m-3 rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300 alabaster-readable"
+                  className="space-y-3 p-3 -m-3 rounded-lg border border-mq-border hover:bg-mq-hover-background hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300 alabaster-readable"
                   style={{
                     color: 'var(--mq-content)',
                     WebkitTextFillColor: 'var(--mq-content)',
@@ -164,9 +164,9 @@ const NextDeadline = memo(() => {
                   {/* Time warning */}
                   <div className="flex items-center gap-2 text-sm">
                     {nextDeadline.priority === 'Urgent' ? (
-                      <AlertCircle className="h-4 w-4 text-mq-error" />
+                      <AlertCircle className="h-4 w-4" />
                     ) : (
-                      <Clock className="h-4 w-4 text-mq-content-tertiary" />
+                      <Clock className="h-4 w-4" />
                     )}
                     <span
                       className={

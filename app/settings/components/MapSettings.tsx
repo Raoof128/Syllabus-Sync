@@ -50,7 +50,7 @@ const MapSettings = memo(({ t }: MapSettingsProps) => {
 
   return (
     <MagicCard data-testid="map-settings">
-      <Card className="mq-magic-card-content">
+      <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Map className="h-5 w-5" aria-hidden="true" />
@@ -59,15 +59,12 @@ const MapSettings = memo(({ t }: MapSettingsProps) => {
         </CardHeader>
         <CardContent className="space-y-4" role="region" aria-labelledby="map-settings-heading">
           <div
-            className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
+            className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
             data-testid="haptic-feedback-item"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1">
-                <Navigation
-                  className="h-4 w-4 text-mq-content-tertiary flex-shrink-0"
-                  aria-hidden="true"
-                />
+                <Navigation className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 <div className="flex-1 min-w-0">
                   <p className="text-mq-sm font-medium text-mq-content">{t('hapticFeedback')}</p>
                   <p className="text-mq-xs text-mq-content-secondary mt-0.5">

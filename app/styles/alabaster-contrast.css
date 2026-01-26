@@ -73,8 +73,8 @@ html:not(.dark) .home-page .mq-magic-card-content,
 html:not(.dark) .settings-page .mq-magic-card-content,
 html:not(.dark) .login-page .mq-magic-card-content,
 html:not(.dark) .signup-page .mq-magic-card-content {
-  background-color: var(--calendar-card-bg, var(--alabaster, #edeade)) !important;
-  border-color: var(--calendar-card-border, rgba(0, 0, 0, 0.18)) !important;
+  background-color: var(--c-card-background) !important;
+  border-color: var(--c-border) !important;
 }
 
 html:not(.dark) .feed-page .btn-premium,

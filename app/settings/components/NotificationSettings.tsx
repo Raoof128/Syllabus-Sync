@@ -192,7 +192,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
 
   return (
     <MagicCard data-testid="notification-settings">
-      <Card className="mq-magic-card-content">
+      <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -203,23 +203,17 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
           {/* Push Notification Permission Banner */}
           {isClient && (
             <div
-              className={`p-3 rounded-mq-lg border-2 ${
-                permissionStatus === 'granted'
-                  ? 'bg-mq-success/15 border-mq-success/40'
-                  : permissionStatus === 'denied'
-                    ? 'bg-mq-error/15 border-mq-error/40'
-                    : 'bg-mq-warning/15 border-mq-warning/40'
-              }`}
+              className="p-3 rounded-mq-lg border border-mq-border bg-mq-background-secondary"
               data-testid="push-notification-banner"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {permissionStatus === 'granted' ? (
-                    <Bell className="h-5 w-5 text-mq-success" aria-hidden="true" />
+                    <Bell className="h-5 w-5" aria-hidden="true" />
                   ) : permissionStatus === 'denied' ? (
-                    <BellOff className="h-5 w-5 text-mq-error" aria-hidden="true" />
+                    <BellOff className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <AlertTriangle className="h-5 w-5 text-mq-warning" aria-hidden="true" />
+                    <AlertTriangle className="h-5 w-5" aria-hidden="true" />
                   )}
                   <div>
                     <p className="text-mq-sm font-medium text-mq-content">
@@ -269,15 +263,12 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
           {notificationItems.map(({ key, icon: Icon, label, desc, timing, setTiming }) => (
             <div
               key={key}
-              className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
+              className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
               data-testid={`notification-item-${key}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
-                  <Icon
-                    className="h-4 w-4 text-mq-content-tertiary flex-shrink-0"
-                    aria-hidden="true"
-                  />
+                  <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
                     <p className="text-mq-sm font-medium text-mq-content">{label}</p>
                     <p className="text-mq-xs text-mq-content-secondary mt-0.5">{desc}</p>
@@ -298,9 +289,9 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
 
               {/* Reminder Timing Selector - only show when enabled */}
               {currentNotifications[key] && permissionStatus === 'granted' && (
-                <div className="mt-3 pt-3 border-t border-mq-border/50">
+                <div className="mt-3 pt-3 border-t border-mq-border">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-3 w-3 text-mq-content-tertiary" aria-hidden="true" />
+                    <Clock className="h-3 w-3" aria-hidden="true" />
                     <label
                       htmlFor={`timing-${key}`}
                       className="text-mq-xs text-mq-content-secondary"

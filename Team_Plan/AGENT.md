@@ -3,6 +3,22 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-26 (Australia/Sydney) - Map building toggle + toast palette
+- **Status:** ✅ Complete - Building card reselect clears selection and toasts use standard card palette.
+- **Scope:** UI - Map building toggle + toast palette.
+- **Summary:** Made building cards toggle selection off when clicked again and normalized toast surfaces to the standard card background/border with current text color.
+- **Files:** app/map/MapClient.tsx; components/ui/toast.tsx.
+- **Verification:** `npm run check` (pass; tests emit expected circular JSON warning in response-critical tests and in-memory rate-limit warning).
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-26 (Australia/Sydney) - Card palette normalization across pages
+- **Status:** ✅ Complete - Cards use standard backgrounds/borders and icons inherit current text color.
+- **Scope:** UI - Card palette normalization across pages.
+- **Summary:** Added solid card backgrounds/borders to empty states and calendar skeletons, normalized calendar list items and unit/assignment panels to theme card backgrounds, and moved icon color handling to inherit current text color.
+- **Files:** app/calendar/CalendarClient.tsx; app/calendar/page.tsx; components/ui/EmptyState.tsx; components/units/UnitDetailPanel.tsx; components/assignments/AssignmentDetailPanel.tsx; app/manage-profiles/page.tsx; components/layout/WeatherWidget.tsx.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-26 (Australia/Sydney) - Calendar card palette override (dark mode)
 - **Status:** ✅ Complete - Calendar cards now render with solid card backgrounds and standard borders in dark mode.
 - **Scope:** UI - Calendar card palette override.

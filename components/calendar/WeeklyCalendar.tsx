@@ -167,7 +167,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                 key={day.toISOString()}
                 className={cn(
                   'p-2 text-center border-r border-mq-border last:border-r-0',
-                  isToday(day) && 'bg-mq-primary/5',
+                  isToday(day) && 'bg-mq-primary/10',
                 )}
               >
                 <div className="text-xs text-mq-content-secondary uppercase">
@@ -222,7 +222,7 @@ export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: Weekly
                   key={day.toISOString()}
                   className={cn(
                     'relative border-r border-mq-border last:border-r-0',
-                    isToday(day) && 'bg-mq-primary/5',
+                    isToday(day) && 'bg-mq-primary/10',
                   )}
                 >
                   {/* Hour lines */}

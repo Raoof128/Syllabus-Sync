@@ -69,7 +69,7 @@ const AppearanceSettings = memo(
 
     return (
       <MagicCard data-testid="appearance-settings">
-        <Card className="mq-magic-card-content">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Palette className="h-5 w-5" aria-hidden="true" />
@@ -78,7 +78,7 @@ const AppearanceSettings = memo(
           </CardHeader>
           <CardContent className="space-y-3" role="region" aria-labelledby="appearance-heading">
             {/* Theme Selection */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('darkMode')}</h3>
@@ -112,7 +112,7 @@ const AppearanceSettings = memo(
             </div>
 
             {/* Language Selection */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>

@@ -23,7 +23,7 @@ const quickActionLinks: { href: string; labelKey: TranslationKey; icon: typeof H
 const QuickActions = memo(({ t }: QuickActionsProps) => {
   return (
     <MagicCard data-testid="quick-actions">
-      <Card className="mq-magic-card-content">
+      <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle id="quick-actions-heading">{t('quickActions')}</CardTitle>
         </CardHeader>

@@ -7,7 +7,6 @@ import { Trophy, Flame, Star, RotateCcw } from 'lucide-react';
 import { toastUtils } from '@/lib/utils/toast';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
-import { getLevelTier } from '@/lib/types';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
@@ -77,22 +76,13 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
     toastUtils.success(t('progressReset'), t('progressResetMsg'));
   }, [t, resetProgress]);
 
-  const levelTier = profile ? getLevelTier(profile.level) : 'bronze';
-  const tierColors: Record<string, string> = {
-    bronze: 'text-amber-600',
-    silver: 'text-gray-400',
-    gold: 'text-yellow-500',
-    platinum: 'text-cyan-400',
-    diamond: 'text-purple-400',
-  };
-
   return (
     <>
       <MagicCard data-testid="gamification-settings">
-        <Card className="mq-magic-card-content">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-mq-primary" aria-hidden="true" />
+              <Trophy className="h-5 w-5" aria-hidden="true" />
               <span id="gamification-heading">{t('gamification')}</span>
             </CardTitle>
           </CardHeader>
@@ -102,7 +92,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
               <h3 className="font-semibold text-mq-content mb-3">{t('yourProgress')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-2">
-                  <Star className={`h-4 w-4 ${tierColors[levelTier]}`} aria-hidden="true" />
+                  <Star className="h-4 w-4" aria-hidden="true" />
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('level')}</p>
                     <p className="font-semibold text-mq-content">
@@ -111,14 +101,14 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-mq-primary" aria-hidden="true" />
+                  <Trophy className="h-4 w-4" aria-hidden="true" />
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('totalXP')}</p>
                     <p className="font-semibold text-mq-content">{profile?.xp ?? 0} XP</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-orange-500" aria-hidden="true" />
+                  <Flame className="h-4 w-4" aria-hidden="true" />
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('currentStreak')}</p>
                     <p className="font-semibold text-mq-content">
@@ -128,7 +118,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-yellow-500" aria-hidden="true" />
+                  <Flame className="h-4 w-4" aria-hidden="true" />
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('longestStreak')}</p>
                     <p className="font-semibold text-mq-content">
@@ -141,7 +131,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* XP Notifications Toggle */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('showXPNotifications')}</h3>

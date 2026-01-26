@@ -56,7 +56,9 @@ export function EmptyState({
   if (isMagicCard) {
     return (
       <MagicCard isLiquidEnhanced className="w-full">
-        <div className="mq-magic-card-content">{content}</div>
+        <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+          {content}
+        </div>
       </MagicCard>
     );
   }

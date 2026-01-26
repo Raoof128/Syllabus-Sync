@@ -371,7 +371,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
     <>
       {/* Security Shield Liquid Glass Variant */}
       <MagicCard data-testid="privacy-settings" isLiquidEnhanced>
-        <Card className="mq-magic-card-content mq-liquid-glass mq-liquid-glass-security">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 security-indicator" aria-hidden="true" />
@@ -384,7 +384,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
             aria-labelledby="privacy-security-heading"
           >
             {/* Change Password */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
@@ -403,7 +403,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
             </div>
 
             {/* Manage Sessions */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
@@ -422,7 +422,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
             </div>
 
             {/* Privacy Policy */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('privacyPolicy')}</h3>
@@ -443,7 +443,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
             </div>
 
             {/* Export Data */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('exportData')}</h3>
@@ -561,10 +561,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
 
           {/* Warning about sensitive data */}
           <div className="flex items-start gap-3 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
-            <AlertTriangle
-              className="h-5 w-5 text-mq-warning flex-shrink-0 mt-0.5"
-              aria-hidden="true"
-            />
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <p className="text-mq-sm text-mq-content-secondary">{t('exportWarning')}</p>
           </div>
 
@@ -770,10 +767,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
 
           {/* Warning about data loss */}
           <div className="flex items-start gap-3 p-3 bg-mq-error/10 border border-mq-error/20 rounded-mq-lg">
-            <AlertTriangle
-              className="h-5 w-5 text-mq-error flex-shrink-0 mt-0.5"
-              aria-hidden="true"
-            />
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="space-y-1">
               <p className="text-mq-sm font-medium text-mq-error">{t('warning')}</p>
               <p className="text-mq-sm text-mq-content-secondary">

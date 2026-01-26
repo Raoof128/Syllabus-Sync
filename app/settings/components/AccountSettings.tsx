@@ -123,7 +123,7 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
   if (!isClient || (isLoading && !hasLoaded)) {
     return (
       <MagicCard data-testid="account-settings">
-        <Card className="mq-magic-card-content">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" aria-hidden="true" />
@@ -132,7 +132,7 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-mq-primary" />
+              <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           </CardContent>
         </Card>
@@ -144,7 +144,7 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
   if (!currentProfile) {
     return (
       <MagicCard data-testid="account-settings">
-        <Card className="mq-magic-card-content">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" aria-hidden="true" />
@@ -153,7 +153,7 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
           </CardHeader>
           <CardContent>
             <div className="text-center py-6">
-              <User className="h-12 w-12 text-mq-content-tertiary mx-auto mb-3" />
+              <User className="h-12 w-12 mx-auto mb-3" />
               <p className="text-mq-content-secondary text-sm">{t('signInToManageProfile')}</p>
               <Button
                 variant="primary"
@@ -171,7 +171,7 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
 
   return (
     <MagicCard data-testid="account-settings">
-      <Card className="mq-magic-card-content">
+      <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">

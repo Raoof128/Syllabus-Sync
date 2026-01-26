@@ -2,7 +2,7 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const cardVariants = cva('rounded-mq-lg transition-all duration-mq-mid ease-mq-ease', {
+const cardVariants = cva('mq-card rounded-mq-lg transition-all duration-mq-mid ease-mq-ease', {
   variants: {
     variant: {
       default: 'border border-mq-border bg-mq-card-background shadow-mq-sm',

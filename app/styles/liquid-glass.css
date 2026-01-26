@@ -1188,6 +1188,11 @@ body {
     0 0 20px rgba(166, 25, 46, 0.08);
 }
 
+.mq-card svg,
+.mq-magic-card-content svg {
+  color: currentColor !important;
+}
+
 /* ============================================================================
    9. SIDEBAR LIQUID GLASS INTEGRATION
    ============================================================================

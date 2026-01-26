@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 function LoadingPlaceholder() {
   return (
     <div className="animate-pulse">
-      <Card className="border-0 shadow-none bg-transparent">
+      <Card className="border border-mq-border bg-mq-card-background">
         <CardHeader>
           <div className="h-6 w-32 bg-mq-background-tertiary rounded" />
         </CardHeader>

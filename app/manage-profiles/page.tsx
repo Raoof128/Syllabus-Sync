@@ -312,9 +312,11 @@ export default function ManageProfilesPage() {
     return (
       <div className="container mx-auto p-6 max-w-4xl">
         <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content">
+          <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
             <div className="text-center py-12">
-              <User className="h-16 w-16 text-mq-content-tertiary mx-auto mb-4" />
+              <div className="text-mq-content-tertiary">
+                <User className="h-16 w-16 mx-auto mb-4" />
+              </div>
               <h2 className="text-mq-xl font-semibold text-mq-content mb-2">
                 {t('noProfilesYet')}
               </h2>
@@ -333,7 +335,7 @@ export default function ManageProfilesPage() {
     <div className="container mx-auto px-4 py-4 sm:p-6 max-w-4xl">
       {/* Profile Header with Avatar */}
       <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-        <div className="mq-magic-card-content">
+        <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-6">
             {/* Avatar Section */}
             <div className="relative group">
@@ -417,8 +419,8 @@ export default function ManageProfilesPage() {
 
       {/* Personal Information */}
       <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-        <div className="mq-magic-card-content p-0">
-          <Card className="border-0 shadow-none bg-transparent">
+        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+          <Card className="border border-mq-border bg-mq-card-background">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -476,8 +478,8 @@ export default function ManageProfilesPage() {
 
       {/* Academic Information */}
       <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-        <div className="mq-magic-card-content p-0">
-          <Card className="border-0 shadow-none bg-transparent">
+        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+          <Card className="border border-mq-border bg-mq-card-background">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5" />
@@ -524,8 +526,8 @@ export default function ManageProfilesPage() {
 
       {/* Notification Preferences */}
       <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-        <div className="mq-magic-card-content p-0">
-          <Card className="border-0 shadow-none bg-transparent">
+        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+          <Card className="border border-mq-border bg-mq-card-background">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
@@ -591,8 +593,8 @@ export default function ManageProfilesPage() {
 
       {/* Reminder Settings */}
       <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-        <div className="mq-magic-card-content p-0">
-          <Card className="border-0 shadow-none bg-transparent">
+        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+          <Card className="border border-mq-border bg-mq-card-background">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
@@ -604,7 +606,7 @@ export default function ManageProfilesPage() {
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <BookOpen className="h-5 w-5 text-blue-500" />
+                    <BookOpen className="h-5 w-5" />
                     <div>
                       <p className="text-sm font-medium text-mq-content">
                         {t('deadlineReminders')}
@@ -643,7 +645,7 @@ export default function ManageProfilesPage() {
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <GraduationCap className="h-5 w-5 text-purple-500" />
+                    <GraduationCap className="h-5 w-5" />
                     <div>
                       <p className="text-sm font-medium text-mq-content">{t('classReminders')}</p>
                       <p className="text-xs text-mq-content-tertiary">{t('classRemindersDesc')}</p>
@@ -678,7 +680,7 @@ export default function ManageProfilesPage() {
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5 text-green-500" />
+                    <Calendar className="h-5 w-5" />
                     <div>
                       <p className="text-sm font-medium text-mq-content">{t('eventReminders')}</p>
                       <p className="text-xs text-mq-content-tertiary">{t('eventRemindersDesc')}</p>

@@ -70,7 +70,7 @@ const UnitCard = React.memo(
     return (
       <MagicCard isLiquidEnhanced className="h-full">
         <Card
-          className={`mq-magic-card-content h-full border-0 shadow-none bg-transparent flex flex-col p-0 ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''} ${isHighlighted ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background' : ''}`}
+          className={`mq-magic-card-content h-full border border-mq-border bg-mq-card-background flex flex-col p-0 ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''} ${isHighlighted ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background' : ''}`}
           onClick={handleCardClick}
           role={onClick ? 'button' : undefined}
           tabIndex={onClick ? 0 : undefined}
@@ -180,7 +180,7 @@ const UnitCard = React.memo(
 
             {/* Location */}
             <div className="flex items-center gap-2 text-mq-sm">
-              <MapPin className="w-4 h-4 text-mq-content-tertiary" />
+              <MapPin className="w-4 h-4" />
               <span className="font-medium text-mq-content">{unit.location.building}</span>
               <span className="text-mq-content-tertiary">
                 {unit.location.room.toLowerCase().startsWith('room')

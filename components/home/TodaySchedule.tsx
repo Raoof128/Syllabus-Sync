@@ -174,8 +174,8 @@ const TodaySchedule = memo(() => {
 
   return (
     <MagicCard isLiquidEnhanced className="h-full">
-      <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
+      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+        <Card className="h-full border border-mq-border bg-mq-card-background flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
               <CardTitle className="flex items-center gap-2">{t('todaysClasses')}</CardTitle>
@@ -221,10 +221,7 @@ const TodaySchedule = memo(() => {
               </div>
             ) : classesWithStatus.length === 0 ? (
               <div className="text-center py-8">
-                <Clock
-                  className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
-                  aria-hidden="true"
-                />
+                <Clock className="h-12 w-12 mx-auto mb-4" aria-hidden="true" />
                 <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
                 <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
               </div>
@@ -234,22 +231,22 @@ const TodaySchedule = memo(() => {
                   <Link
                     key={`${cls.id}-${cls.code}-${cls.startTime}`}
                     href={`/calendar?date=${todayDate}&highlightUnit=${encodeURIComponent(cls.id)}`}
-                    className={`group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${
+                    className={`group relative flex items-start gap-3 p-3 rounded-lg border border-mq-border transition-all duration-300 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${
                       cls.status === 'now'
-                        ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 shadow-sm'
+                        ? 'bg-mq-primary/10 shadow-sm'
                         : cls.status === 'next'
-                          ? 'bg-mq-primary/5 border-mq-primary/20 shadow-sm'
+                          ? 'bg-mq-primary/10 shadow-sm'
                           : cls.status === 'done'
-                            ? 'bg-mq-background-secondary border-mq-border/50 opacity-60'
-                            : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                            ? 'bg-mq-background-secondary opacity-60'
+                            : 'bg-mq-background-secondary hover:bg-mq-hover-background'
                     }`}
                     aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}, ${cls.status}`}
                   >
                     {/* Progress bar for "now" status */}
                     {cls.status === 'now' && cls.progressPercent !== undefined && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-green-100 dark:bg-green-900/30 rounded-b-lg overflow-hidden">
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-mq-background-secondary rounded-b-lg overflow-hidden">
                         <div
-                          className="h-full bg-green-500 transition-all duration-1000"
+                          className="h-full bg-mq-primary/10 transition-all duration-1000"
                           style={{ width: `${cls.progressPercent}%` }}
                         />
                       </div>

@@ -66,11 +66,9 @@ const WeatherWidget = memo(() => {
 
   if (error || !weatherData) {
     return (
-      <div className="h-6 px-2 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-1 shadow-sm">
-        <AlertCircle className="text-red-400 w-3 h-3" aria-hidden="true" />
-        <span className="text-red-500 dark:text-red-400 text-[9px] font-medium">
-          {error || 'Weather unavailable'}
-        </span>
+      <div className="h-6 px-2 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-1 shadow-sm text-red-500 dark:text-red-400">
+        <AlertCircle className="w-3 h-3" aria-hidden="true" />
+        <span className="text-[9px] font-medium">{error || 'Weather unavailable'}</span>
       </div>
     );
   }

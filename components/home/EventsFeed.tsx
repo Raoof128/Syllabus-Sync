@@ -41,8 +41,8 @@ const EventsFeed = memo(() => {
 
   return (
     <MagicCard isLiquidEnhanced>
-      <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent">
+      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+        <Card className="h-full border border-mq-border bg-mq-card-background">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{t('eventsToday')}</CardTitle>
             <Button
@@ -59,7 +59,7 @@ const EventsFeed = memo(() => {
           <CardContent>
             {todayEvents.length === 0 ? (
               <div className="text-center py-8">
-                <Calendar className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" />
+                <Calendar className="h-12 w-12 mx-auto mb-4" />
                 <p className="text-mq-content-tertiary">{t('noEventsToday')}</p>
               </div>
             ) : (
@@ -89,7 +89,7 @@ const EventsFeed = memo(() => {
                   );
 
                   const baseClassName =
-                    'group block p-3 bg-mq-background-secondary rounded-lg border border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]';
+                    'group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]';
 
                   return (
                     <button

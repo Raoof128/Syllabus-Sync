@@ -101,7 +101,7 @@ function CalendarSkeleton() {
 
       {/* Calendar card skeleton */}
       <div className="mq-magic-card">
-        <div className="mq-magic-card-content p-6">
+        <div className="mq-magic-card-content p-6 bg-mq-card-background border border-mq-border">
           <div className="h-8 bg-mq-background-secondary rounded-mq w-56 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (

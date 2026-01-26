@@ -1882,7 +1882,7 @@ export default function CalendarClient() {
             }
           >
             <div
-              className="mq-magic-card-content p-0 bg-mq-card-background"
+              className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
               ref={assignmentsWidgetRef}
             >
               <Card
@@ -1913,7 +1913,9 @@ export default function CalendarClient() {
                 <CardContent>
                   {assignments.length === 0 ? (
                     <div className="text-center py-8">
-                      <FileText className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
+                      <div className="text-mq-content-tertiary">
+                        <FileText className="h-10 w-10 mx-auto mb-3" />
+                      </div>
                       <p className="text-mq-content-secondary text-sm">{t('noAssignmentsYet')}</p>
                       <p className="text-mq-content-tertiary text-xs mt-1">
                         {t('noAssignmentsYetDesc')}
@@ -1941,12 +1943,10 @@ export default function CalendarClient() {
                                 }
                               }}
                               className={cn(
-                                'flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer w-full',
-                                assignment.completed
-                                  ? 'opacity-60 border-mq-border'
-                                  : isOverdue
-                                    ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
-                                    : 'border-mq-border hover:border-blue-300',
+                                'flex items-center gap-3 p-3 rounded-lg border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary',
+                                assignment.completed && 'opacity-60',
+                                isOverdue && 'bg-mq-primary/10',
+                                !isOverdue && 'hover:bg-mq-primary/10',
                                 isHighlighted &&
                                   'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/20 animate-pulse',
                               )}
@@ -2060,7 +2060,7 @@ export default function CalendarClient() {
         {/* Exams Widget */}
         <ScrollReveal delay={0.25}>
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0 bg-mq-card-background">
+            <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
               <Card
                 variant="glass"
                 className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -2089,7 +2089,9 @@ export default function CalendarClient() {
                 <CardContent>
                   {exams.length === 0 ? (
                     <div className="text-center py-8">
-                      <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
+                      <div className="text-mq-content-tertiary">
+                        <BookOpen className="h-10 w-10 mx-auto mb-3" />
+                      </div>
                       <p className="text-mq-content-secondary text-sm">{t('noExamsYet')}</p>
                       <p className="text-mq-content-tertiary text-xs mt-1">{t('noExamsYetDesc')}</p>
                     </div>
@@ -2105,12 +2107,10 @@ export default function CalendarClient() {
                             <div
                               key={exam.id}
                               className={cn(
-                                'flex items-center gap-3 p-3 rounded-lg border transition-all w-full',
-                                exam.completed
-                                  ? 'opacity-60 border-mq-border'
-                                  : isOverdue
-                                    ? 'border-red-300 bg-red-50 dark:bg-red-950/20'
-                                    : 'border-mq-border hover:border-red-300',
+                                'flex items-center gap-3 p-3 rounded-lg border border-mq-border transition-all w-full bg-mq-background-secondary',
+                                exam.completed && 'opacity-60',
+                                isOverdue && 'bg-mq-primary/10',
+                                !isOverdue && 'hover:bg-mq-primary/10',
                               )}
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -2222,7 +2222,10 @@ export default function CalendarClient() {
                 : ''
             }
           >
-            <div className="mq-magic-card-content p-0 bg-mq-card-background" ref={unitsWidgetRef}>
+            <div
+              className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+              ref={unitsWidgetRef}
+            >
               <Card
                 variant="glass"
                 className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -2251,7 +2254,9 @@ export default function CalendarClient() {
                 <CardContent>
                   {units.length === 0 ? (
                     <div className="text-center py-8">
-                      <BookOpen className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
+                      <div className="text-mq-content-tertiary">
+                        <BookOpen className="h-10 w-10 mx-auto mb-3" />
+                      </div>
                       <p className="text-mq-content-secondary text-sm">{t('noUnitsYet')}</p>
                       <p className="text-mq-content-tertiary text-xs mt-1">{t('noUnitsYetDesc')}</p>
                     </div>
@@ -2260,10 +2265,10 @@ export default function CalendarClient() {
                       {units.map((unit) => (
                         <div
                           key={unit.id}
-                          className={`flex items-center gap-3 p-2 rounded-lg border transition-all cursor-pointer ${
+                          className={`flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-background-secondary transition-all cursor-pointer ${
                             highlightedUnitId === unit.id
-                              ? 'border-mq-primary ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-[inset_0_0_0_1px_rgba(var(--c-primary-rgb),0.2)]'
-                              : 'border-mq-border hover:border-mq-primary/20 hover:bg-mq-hover-background'
+                              ? 'border-mq-primary ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-[inset_0_0_0_1px_rgba(var(--c-primary-rgb),0.2)] bg-mq-primary/10'
+                              : 'hover:bg-mq-primary/10'
                           }`}
                           onClick={() => openUnitDetail(unit)}
                           onKeyDown={(e) => {
@@ -2349,7 +2354,7 @@ export default function CalendarClient() {
         {/* Add Event Widget */}
         <ScrollReveal delay={0.35}>
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0 bg-mq-card-background">
+            <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
               <Card
                 variant="glass"
                 className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -2381,7 +2386,9 @@ export default function CalendarClient() {
                 <CardContent>
                   {allEvents.length === 0 ? (
                     <div className="text-center py-8">
-                      <PartyPopper className="h-10 w-10 text-mq-content-tertiary mx-auto mb-3" />
+                      <div className="text-mq-content-tertiary">
+                        <PartyPopper className="h-10 w-10 mx-auto mb-3" />
+                      </div>
                       <p className="text-mq-content-secondary text-sm">{t('noEventsYet')}</p>
                       <p className="text-mq-content-tertiary text-xs mt-1">
                         {t('noEventsYetDesc')}
@@ -2394,7 +2401,7 @@ export default function CalendarClient() {
                         return (
                           <div
                             key={event.id}
-                            className="flex items-center gap-3 p-2 rounded-lg border border-mq-border hover:border-mq-success/40 transition-all cursor-pointer"
+                            className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-background-secondary hover:bg-mq-primary/10 transition-all cursor-pointer"
                             onClick={() => handleEventClick(event)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' || e.key === ' ') {
@@ -2476,7 +2483,7 @@ export default function CalendarClient() {
       {/* To-Do List Widget - Full Width at Bottom */}
       <ScrollReveal delay={0.4}>
         <MagicCard isLiquidEnhanced className="mt-6">
-          <div className="mq-magic-card-content p-0 bg-mq-card-background">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
             <Card
               variant="glass"
               className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -2557,7 +2564,9 @@ export default function CalendarClient() {
                 {/* Todo List */}
                 {todos.length === 0 ? (
                   <div className="text-center py-12 bg-mq-background-secondary rounded-xl">
-                    <SquareCheckBig className="h-12 w-12 text-mq-content-tertiary/30 mx-auto mb-6" />
+                    <div className="text-mq-content-tertiary/30">
+                      <SquareCheckBig className="h-12 w-12 mx-auto mb-6" />
+                    </div>
                     <p className="text-base font-medium text-mq-content-secondary">
                       {tOr('noTodosYet', 'No tasks yet')}
                     </p>

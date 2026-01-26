@@ -255,9 +255,9 @@ export default function MapClient() {
         {/* Selected Building Banner */}
         {selectedBuilding && (
           <MagicCard isLiquidEnhanced className="mb-4">
-            <div className="mq-magic-card-content p-4 flex flex-row items-center justify-between">
+            <div className="mq-magic-card-content p-4 flex flex-row items-center justify-between bg-mq-card-background border border-mq-border">
               <div className="flex items-center gap-3">
-                <Navigation className="h-5 w-5 text-mq-success" />
+                <Navigation className="h-5 w-5" />
                 <div>
                   <p className="text-mq-sm font-medium text-mq-success">
                     {t('navigatingTo')}: <strong>{t(selectedBuilding.translationKey)}</strong>
@@ -280,10 +280,10 @@ export default function MapClient() {
         {/* Map Overlay Layers */}
         <div className="mb-4">
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-4">
+            <div className="mq-magic-card-content p-4 bg-mq-card-background border border-mq-border">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <Layers className="h-5 w-5 text-mq-primary" />
+                  <Layers className="h-5 w-5" />
                   <div>
                     <p className="text-mq-sm font-medium text-mq-content">{t('mapLayers')}</p>
                     <p className="text-mq-xs text-mq-content-secondary">{t('mapLayersDesc')}</p>
@@ -334,9 +334,7 @@ export default function MapClient() {
                               {t(`overlay_${overlay.id}_desc` as TranslationKey)}
                             </p>
                           </div>
-                          {isActive && (
-                            <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-mq-success" />
-                          )}
+                          {isActive && <CheckCircle2 className="h-4 w-4 flex-shrink-0" />}
                         </button>
                       );
                     })}
@@ -367,8 +365,8 @@ export default function MapClient() {
 
         {/* Map */}
         <MagicCard isLiquidEnhanced className="mb-6">
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card className="border border-mq-border bg-mq-card-background">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('interactiveCampusMap')}</CardTitle>
@@ -401,8 +399,8 @@ export default function MapClient() {
 
         {/* Campus Buildings Quick Reference - Enhanced with Search & Filter */}
         <MagicCard isLiquidEnhanced className="mb-6">
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card className="border border-mq-border bg-mq-card-background">
               <CardHeader className="pb-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CardTitle className="flex items-center gap-2">
@@ -532,7 +530,7 @@ export default function MapClient() {
                                   }}
                                 >
                                   <Link
-                                    href={`/map?building=${building.id}`}
+                                    href={isSelected ? '/map' : `/map?building=${building.id}`}
                                     aria-current={isSelected ? 'page' : undefined}
                                     className={`flex items-center gap-3 p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ${
                                       isSelected
@@ -557,7 +555,7 @@ export default function MapClient() {
                                         </span>
                                         {building.wheelchair && (
                                           <Accessibility
-                                            className="h-3 w-3 text-mq-success"
+                                            className="h-3 w-3"
                                             aria-label={t('wheelchairAccessible')}
                                           />
                                         )}
@@ -595,7 +593,7 @@ export default function MapClient() {
                                 }}
                               >
                                 <Link
-                                  href={`/map?building=${building.id}`}
+                                  href={isSelected ? '/map' : `/map?building=${building.id}`}
                                   aria-current={isSelected ? 'page' : undefined}
                                   className={`group block h-full p-3 rounded-mq-lg transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-mq-primary/50 flex flex-col gap-2 ${
                                     isSelected

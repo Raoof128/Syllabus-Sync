@@ -230,20 +230,20 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
   return (
     <>
       <MagicCard data-testid="security-settings">
-        <Card className="mq-magic-card-content">
+        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-mq-primary" aria-hidden="true" />
+              <Shield className="h-5 w-5" aria-hidden="true" />
               <span id="security-heading">{t('security')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3" role="region" aria-labelledby="security-heading">
             {/* Biometric Authentication Section */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-mq-primary/10 rounded-full">
-                    <Fingerprint className="h-5 w-5 text-mq-primary" aria-hidden="true" />
+                    <Fingerprint className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -282,7 +282,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
                   <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
                     <Smartphone className="h-4 w-4" aria-hidden="true" />
                     <span>{t('biometricDeviceReady')}</span>
-                    <CheckCircle className="h-4 w-4 text-mq-success" aria-hidden="true" />
+                    <CheckCircle className="h-4 w-4" aria-hidden="true" />
                   </div>
                 </div>
               )}
@@ -302,7 +302,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-mq-info/10 rounded-full">
-                  <Info className="h-5 w-5 text-mq-info" aria-hidden="true" />
+                  <Info className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-mq-content">{t('moreSecurityFeatures')}</h3>
@@ -322,14 +322,14 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Fingerprint className="h-5 w-5 text-mq-primary" />
+              <Fingerprint className="h-5 w-5" />
               {t('enableBiometric')}
             </DialogTitle>
             <DialogDescription>{t('enableBiometricDesc')}</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-start gap-3 p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
-              <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" />
+              <Info className="h-5 w-5 flex-shrink-0 mt-0.5" />
               <p className="text-mq-sm text-mq-content-secondary">{t('biometricPrivacyNote')}</p>
             </div>
           </div>
@@ -356,7 +356,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-mq-warning" />
+              <AlertTriangle className="h-5 w-5" />
               {t('disableBiometric')}
             </DialogTitle>
             <DialogDescription>{t('disableBiometricDesc')}</DialogDescription>

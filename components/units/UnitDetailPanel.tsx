@@ -106,11 +106,9 @@ export default function UnitDetailPanel({
         role="button"
         tabIndex={0}
         className={cn(
-          'flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer hover:border-opacity-80',
-          status === 'completed' && 'opacity-60 border-mq-border',
-          status === 'overdue' && 'border-red-300 bg-red-50 dark:bg-red-950/20',
-          status === 'urgent' && 'border-amber-300 bg-amber-50 dark:bg-amber-950/20',
-          status === 'upcoming' && 'border-mq-border hover:border-mq-primary/30',
+          'flex items-center gap-3 p-3 rounded-lg border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:border-opacity-80',
+          status === 'completed' && 'opacity-60',
+          status === 'upcoming' && 'hover:border-mq-primary/30',
         )}
         style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
         onClick={() => onEditDeadline?.(deadline)}
@@ -129,9 +127,9 @@ export default function UnitDetailPanel({
           className="flex-shrink-0"
         >
           {deadline.completed ? (
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
+            <CheckCircle2 className="h-5 w-5" />
           ) : status === 'overdue' ? (
-            <AlertCircle className="h-5 w-5 text-red-500" />
+            <AlertCircle className="h-5 w-5" />
           ) : (
             <Circle className="h-5 w-5 text-mq-content-secondary hover:text-mq-primary" />
           )}
@@ -262,15 +260,15 @@ export default function UnitDetailPanel({
             </div>
             <div className="text-xs text-mq-content-secondary">Total</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-950/20">
+          <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
             <div className="text-xs text-mq-content-secondary">Completed</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+          <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-blue-600">{stats.upcoming}</div>
             <div className="text-xs text-mq-content-secondary">Upcoming</div>
           </div>
-          <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-950/20">
+          <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
             <div className="text-xs text-mq-content-secondary">Overdue</div>
           </div>
@@ -280,7 +278,9 @@ export default function UnitDetailPanel({
         <div className="flex-1 overflow-y-auto space-y-4 py-2">
           {unitDeadlines.all.length === 0 ? (
             <div className="text-center py-8">
-              <FileText className="h-12 w-12 text-mq-content-tertiary mx-auto mb-3" />
+              <div className="text-mq-content-tertiary">
+                <FileText className="h-12 w-12 mx-auto mb-3" />
+              </div>
               <p className="text-mq-content-secondary">{t('noUnitsForDeadline')}</p>
               <p className="text-xs text-mq-content-tertiary mt-1">{t('noUnitsForDeadlineDesc')}</p>
             </div>
@@ -290,7 +290,7 @@ export default function UnitDetailPanel({
               {unitDeadlines.assignments.length > 0 && (
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
-                    <FileText className="h-4 w-4 text-blue-500" />
+                    <FileText className="h-4 w-4" />
                     {t('assignments')} ({unitDeadlines.assignments.length})
                   </h3>
                   <div className="space-y-2">
@@ -305,7 +305,7 @@ export default function UnitDetailPanel({
               {unitDeadlines.exams.length > 0 && (
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
-                    <BookOpen className="h-4 w-4 text-red-500" />
+                    <BookOpen className="h-4 w-4" />
                     {t('exams')} ({unitDeadlines.exams.length})
                   </h3>
                   <div className="space-y-2">
@@ -335,7 +335,7 @@ export default function UnitDetailPanel({
               {unitDeadlines.presentations.length > 0 && (
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
-                    <Clock className="h-4 w-4 text-purple-500" />
+                    <Clock className="h-4 w-4" />
                     {t('presentations')} ({unitDeadlines.presentations.length})
                   </h3>
                   <div className="space-y-2">

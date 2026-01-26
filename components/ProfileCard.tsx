@@ -50,8 +50,8 @@ const ProfileCard = React.memo(
       <LiquidGlassCard liquidGlass className={cn(isCurrent && 'ring-2 ring-mq-primary')}>
         <Card
           className={cn(
-            'relative transition-all duration-300 border-0 shadow-none bg-transparent',
-            isCurrent ? 'bg-mq-primary/5' : '',
+            'relative transition-all duration-300 border border-mq-border bg-mq-card-background',
+            isCurrent ? 'bg-mq-primary/10' : '',
           )}
         >
           <CardHeader className="flex flex-col sm:flex-row items-start justify-between gap-3">
@@ -148,7 +148,7 @@ const ProfileCard = React.memo(
             <div className="space-y-2">
               <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-mq-content-tertiary" />
+                  <Mail className="h-4 w-4" />
                   <span className="text-sm text-mq-content-secondary">
                     {t('emailNotifications')}
                   </span>
@@ -174,7 +174,7 @@ const ProfileCard = React.memo(
               </SubCard>
               <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-mq-content-tertiary" />
+                  <Calendar className="h-4 w-4" />
                   <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
                 </div>
                 <button
@@ -198,7 +198,7 @@ const ProfileCard = React.memo(
               </SubCard>
               <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-mq-content-tertiary" />
+                  <Settings className="h-4 w-4" />
                   <span className="text-sm text-mq-content-secondary">
                     {t('pushNotifications')}
                   </span>
