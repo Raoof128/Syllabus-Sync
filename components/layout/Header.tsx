@@ -75,12 +75,10 @@ const Header = memo(() => {
     email?: string;
     user_metadata?: { full_name?: string; name?: string };
   } | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoading, setIsLoading] = useState(true);
 
   const notifications = useNotificationsStore((state) => state.notifications);
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
-  const removeNotification = useNotificationsStore((state) => state.removeNotification);
+  const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
 
   const [hasSeeded, setHasSeeded] = useState(false);
@@ -121,7 +119,7 @@ const Header = memo(() => {
         setUser(null);
       } finally {
         if (isActive) {
-          setIsLoading(false);
+          // Loading complete
         }
       }
     };
@@ -171,9 +169,11 @@ const Header = memo(() => {
     setIsClient(true);
   }, []);
 
-  // Only calculate unread notifications on client to avoid hydration mismatch
+  // Only calculate notifications on client to avoid hydration mismatch
   const unreadNotifications = isClient ? notifications.filter((n) => !n.read) : [];
   const unreadCount = unreadNotifications.length;
+  // Show all recent notifications in dropdown (both read and unread)
+  const recentNotifications = isClient ? notifications.slice(0, 10) : [];
 
   // Get display name: prioritize profile name, then Supabase user metadata full_name/name, then extract from email
   // Extract a proper name from the email prefix (capitalize first letter)
@@ -202,10 +202,10 @@ const Header = memo(() => {
   return (
     <header
       ref={headerRef}
-      className="h-14 sm:h-16 w-full flex-shrink-0 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
+      className="h-14 sm:h-16 w-full shrink-0 mq-liquid-glass border-b border-mq-border/50 flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
     >
       {/* Left side - Logo and title (far left) */}
-      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0">
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
           <Image
             src="/MQ_Logo_Final.png"
@@ -213,14 +213,14 @@ const Header = memo(() => {
             width={80}
             height={80}
             priority
-            className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto flex-shrink-0"
+            className="h-10 sm:h-12 md:h-14 w-auto shrink-0"
             style={{ width: 'auto' }}
           />
           <div className="hidden sm:block min-w-0">
-            <span className="text-sm md:text-mq-lg font-semibold text-mq-content block truncate">
+            <span className="text-sm md:text-base lg:text-lg font-semibold text-mq-content block truncate leading-tight">
               {APP_CONFIG.name}
             </span>
-            <span className="text-[10px] md:text-mq-xs text-mq-content-secondary block truncate">
+            <span className="text-[10px] md:text-xs text-mq-content-secondary block truncate">
               {UNIVERSITY_CONFIG.shortName}
             </span>
           </div>
@@ -228,29 +228,32 @@ const Header = memo(() => {
 
         {/* Date and Weather display - next to logo/title */}
         {isClient && (
-          <div className="flex items-center gap-3 ml-4 pl-4 border-l border-mq-border">
-            <span className="text-mq-sm font-medium text-mq-content-secondary whitespace-nowrap">
+          <div className="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border/50">
+            <time
+              className="text-sm font-medium text-mq-content whitespace-nowrap"
+              dateTime={new Date().toISOString().split('T')[0]}
+            >
               {new Date().toLocaleDateString(getLocaleString(language), {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
               })}
-            </span>
-            <div className="w-px h-4 bg-mq-border" />
+            </time>
+            <div className="w-px h-5 bg-mq-border/50" aria-hidden="true" />
             <WeatherWidget />
           </div>
         )}
       </div>
 
       {/* Right side - Actions (far right) */}
-      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
         {/* Notifications - wrapped in isClient to prevent hydration mismatch with Radix UI IDs */}
         {isClient && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`group p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background btn-premium ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
+                className={`group p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
                 aria-label={
                   unreadCount > 0
                     ? t('viewUnreadNotifications', { count: unreadCount })
@@ -293,13 +296,13 @@ const Header = memo(() => {
                     if (unreadCount === 0) return;
                     markAllAsRead();
                   }}
-                  className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent data-[disabled]:opacity-60"
+                  className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent disabled:opacity-50 cursor-pointer"
                 >
                   {t('markAllRead')}
                 </DropdownMenuItem>
               </div>
               <div className="max-h-[min(20rem,calc(100vh-10rem))] overflow-y-auto">
-                {unreadNotifications.length === 0 ? (
+                {recentNotifications.length === 0 ? (
                   <div className="p-4 text-center">
                     <p className="text-mq-content-tertiary text-sm font-medium">
                       {t('noNotificationsYet')}
@@ -309,7 +312,7 @@ const Header = memo(() => {
                     </p>
                   </div>
                 ) : (
-                  unreadNotifications.slice(0, 10).map((notification) => {
+                  recentNotifications.map((notification) => {
                     const Icon = notificationIcons[notification.type];
                     return (
                       <DropdownMenuItem
@@ -323,14 +326,14 @@ const Header = memo(() => {
                             href={notification.link || '#'}
                             onClick={() => {
                               if (!notification.read) {
-                                removeNotification(notification.id);
+                                markAsRead(notification.id);
                               }
                             }}
                             className="block flex-1 min-w-0 p-3 hover:bg-mq-background-secondary focus-visible:outline-none"
                           >
                             <div className="flex gap-3">
                               <div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                                   notification.type === 'deadline'
                                     ? 'bg-mq-warning/20'
                                     : notification.type === 'event'
@@ -370,7 +373,7 @@ const Header = memo(() => {
                               </div>
                               {!notification.read && (
                                 <div
-                                  className="w-2 h-2 bg-mq-info rounded-full flex-shrink-0 mt-2"
+                                  className="w-2 h-2 bg-mq-info rounded-full shrink-0 mt-2"
                                   aria-label={t('unread')}
                                 />
                               )}
@@ -382,7 +385,7 @@ const Header = memo(() => {
                               onClick={(event) => {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                removeNotification(notification.id);
+                                markAsRead(notification.id);
                               }}
                               className="mr-2 mt-3 flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                               aria-label={t('markAsRead')}
@@ -406,7 +409,7 @@ const Header = memo(() => {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="group relative p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px]"
+            className="group relative p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11"
             aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
             aria-pressed={resolvedTheme === 'dark'}
             title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
@@ -432,11 +435,11 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="group flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-mq transition-all duration-mq-mid ease-mq-ease focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[40px] sm:min-h-[44px] hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-mq active:scale-[0.98] btn-premium"
+                className="group flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-10 sm:min-h-11 hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
                 aria-label={t('openProfileMenu')}
               >
                 <div
-                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-mq-sm group-hover:shadow-mq flex-shrink-0"
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-sm group-hover:shadow-md shrink-0"
                   style={{
                     backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary,
                   }}

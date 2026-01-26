@@ -29,6 +29,8 @@ const ZUSTAND_STORAGE_KEYS = [
   'notifications-storage', // lib/store/notificationsStore.ts
   'profiles-storage', // lib/store/profilesStore.ts
   'syllabus-sync-gamification', // lib/store/gamificationStore.ts
+  'todos-storage', // lib/store/todosStore.ts
+  'notification-preferences-storage', // lib/store/notificationPreferencesStore.ts
 ] as const;
 
 /**
@@ -148,12 +150,18 @@ export async function resetAllStores(): Promise<void> {
       { useEventsStore },
       { useProfilesStore },
       { useNotificationsStore },
+      { useGamificationStore },
+      { useTodosStore },
+      { useNotificationPreferencesStore },
     ] = await Promise.all([
       import('@/lib/store/unitsStore'),
       import('@/lib/store/deadlinesStore'),
       import('@/lib/store/eventsStore'),
       import('@/lib/store/profilesStore'),
       import('@/lib/store/notificationsStore'),
+      import('@/lib/store/gamificationStore'),
+      import('@/lib/store/todosStore'),
+      import('@/lib/store/notificationPreferencesStore'),
     ]);
 
     // Clear each store's state and reset hasLoaded flag
@@ -162,6 +170,9 @@ export async function resetAllStores(): Promise<void> {
     useEventsStore.getState().clearEvents();
     useProfilesStore.getState().clearProfiles();
     useNotificationsStore.getState().clearNotifications();
+    useGamificationStore.getState().resetProgress();
+    useTodosStore.getState().clearTodos();
+    useNotificationPreferencesStore.getState().clearAllReminders();
 
     devLog.auth.info('All stores reset on logout');
   } catch (error) {

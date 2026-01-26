@@ -143,11 +143,13 @@ export function WelcomeHeader({
 
   return (
     <div className={`flex-1 min-w-0 ${className}`}>
-      <div className="flex items-center gap-3 mb-2">
-        <h1 className="text-mq-3xl font-bold text-mq-content">{greeting}</h1>
+      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-mq-content leading-tight">
+          {greeting}
+        </h1>
         {showGamification && <GamificationStats variant="compact" />}
       </div>
-      <p className="text-mq-content-secondary">{message}</p>
+      <p className="text-mq-content-secondary text-sm sm:text-base">{message}</p>
     </div>
   );
 }

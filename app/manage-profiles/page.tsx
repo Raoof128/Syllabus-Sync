@@ -209,15 +209,12 @@ export default function ManageProfilesPage() {
 
       const updates: Partial<UserProfile> = {
         name: formData.name,
+        studentId: formData.studentId,
         course: formData.course,
         year: formData.year,
         preferences: currentProfile.preferences,
       };
 
-      // Only send studentId if it wasn't previously set
-      if (!currentProfile.studentId && formData.studentId) {
-        updates.studentId = formData.studentId;
-      }
 
       const result = await updateProfile(currentProfile.id, updates);
 

@@ -322,9 +322,9 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   }
 
   const stressColors = {
-    Low: 'bg-mq-success/10 text-mq-success border border-mq-success/20',
-    Busy: 'bg-mq-warning/10 text-mq-warning border border-mq-warning/20',
-    High: 'bg-mq-error/10 text-mq-error border border-mq-error/20',
+    Low: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50',
+    Busy: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50',
+    High: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700/50',
   };
 
   const stressEmoji = {
@@ -360,25 +360,25 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               {/* Stress Level Indicator */}
               {hasHydrated && deadlines.length > 0 && (
                 <>
-                  <div className="flex sm:hidden items-center gap-1 px-2 py-1 bg-mq-background rounded-mq border border-mq-border">
-                    <TrendingUp className="h-3 w-3 text-mq-content-secondary" aria-hidden="true" />
+                  <div className="flex sm:hidden items-center gap-1.5 px-2.5 py-1.5 mq-liquid-glass rounded-full shadow-md">
+                    <TrendingUp className="h-3.5 w-3.5 text-mq-content-secondary" aria-hidden="true" />
                     <Badge
-                      className={`${stressColors[stressLevel]} text-mq-xs px-1.5 py-0.5`}
+                      className={`${stressColors[stressLevel]} text-xs px-2 py-0.5 rounded-full font-medium`}
                       aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                       title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                     >
                       <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
                     </Badge>
                   </div>
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-mq-background rounded-mq-lg border border-mq-border">
+                  <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 mq-liquid-glass rounded-full shadow-md">
                     <TrendingUp className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                    <span className="text-mq-sm text-mq-content">{t('workload')}</span>
+                    <span className="text-sm font-medium text-mq-content">{t('workload')}</span>
                     <Badge
-                      className={stressColors[stressLevel]}
+                      className={`${stressColors[stressLevel]} text-xs px-2.5 py-1 rounded-full font-semibold`}
                       aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                       title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                     >
-                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span>{' '}
+                      <span aria-hidden="true" className="mr-1">{stressEmoji[stressLevel]}</span>
                       {stressLabels[stressLevel]}
                     </Badge>
                   </div>
@@ -395,7 +395,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3"
               aria-labelledby="get-started-heading"
             >
-              <Info className="h-5 w-5 text-mq-info flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <Info className="h-5 w-5 text-mq-info shrink-0 mt-0.5" aria-hidden="true" />
               <div className="flex-1">
                 <h2 id="get-started-heading" className="sr-only">
                   {t('gettingStartedGuide')}

@@ -15,66 +15,79 @@ type LevelColors = {
   trackBgStyle: string;
   trackBorderStyle: string;
   fillGradientStyle: string;
+  textClass: string;
 };
 
 function getLevelColors(level: number): LevelColors {
+  // Bronze tier (1-5)
   if (level <= 5) {
     return {
       pillGradientStyle: 'linear-gradient(90deg, #f59e0b, #b45309)',
       ringClass: 'ring-amber-500/60',
       ringColor: '#f59e0b',
-      trackBgStyle: 'rgba(245, 158, 11, 0.18)',
-      trackBorderStyle: 'rgba(245, 158, 11, 0.35)',
+      trackBgStyle: 'rgba(245, 158, 11, 0.2)',
+      trackBorderStyle: 'rgba(245, 158, 11, 0.4)',
       fillGradientStyle: 'linear-gradient(90deg, #fff7ed, #fef3c7, #fff7ed)',
+      textClass: 'text-white',
     };
   }
+  // Silver tier (6-10)
   if (level <= 10) {
     return {
-      pillGradientStyle: 'linear-gradient(90deg, #cbd5e1, #475569)',
+      pillGradientStyle: 'linear-gradient(90deg, #94a3b8, #475569)',
       ringClass: 'ring-slate-400/60',
-      ringColor: '#cbd5e1',
-      trackBgStyle: 'rgba(203, 213, 225, 0.18)',
-      trackBorderStyle: 'rgba(203, 213, 225, 0.35)',
-      fillGradientStyle: 'linear-gradient(90deg, #ffffff, #f8fafc, #ffffff)',
+      ringColor: '#94a3b8',
+      trackBgStyle: 'rgba(148, 163, 184, 0.2)',
+      trackBorderStyle: 'rgba(148, 163, 184, 0.4)',
+      fillGradientStyle: 'linear-gradient(90deg, #ffffff, #f1f5f9, #ffffff)',
+      textClass: 'text-white',
     };
   }
+  // Gold tier (11-20)
   if (level <= 20) {
     return {
-      pillGradientStyle: 'linear-gradient(90deg, #facc15, #d97706)',
+      pillGradientStyle: 'linear-gradient(90deg, #fbbf24, #b45309)',
       ringClass: 'ring-amber-400/60',
-      ringColor: '#facc15',
-      trackBgStyle: 'rgba(250, 204, 21, 0.18)',
-      trackBorderStyle: 'rgba(250, 204, 21, 0.35)',
+      ringColor: '#fbbf24',
+      trackBgStyle: 'rgba(251, 191, 36, 0.2)',
+      trackBorderStyle: 'rgba(251, 191, 36, 0.4)',
       fillGradientStyle: 'linear-gradient(90deg, #fefce8, #fef3c7, #fefce8)',
+      textClass: 'text-amber-950',
     };
   }
+  // Platinum tier (21-35)
   if (level <= 35) {
     return {
-      pillGradientStyle: 'linear-gradient(90deg, #22d3ee, #2563eb)',
+      pillGradientStyle: 'linear-gradient(90deg, #22d3ee, #0284c7)',
       ringClass: 'ring-cyan-400/60',
       ringColor: '#22d3ee',
-      trackBgStyle: 'rgba(34, 211, 238, 0.16)',
-      trackBorderStyle: 'rgba(34, 211, 238, 0.3)',
-      fillGradientStyle: 'linear-gradient(90deg, #f8fdff, #ecfeff, #f8fdff)',
+      trackBgStyle: 'rgba(34, 211, 238, 0.2)',
+      trackBorderStyle: 'rgba(34, 211, 238, 0.35)',
+      fillGradientStyle: 'linear-gradient(90deg, #ecfeff, #cffafe, #ecfeff)',
+      textClass: 'text-white',
     };
   }
+  // Diamond tier (36-50)
   if (level <= 50) {
     return {
-      pillGradientStyle: 'linear-gradient(90deg, #c084fc, #4f46e5)',
+      pillGradientStyle: 'linear-gradient(90deg, #a855f7, #6366f1)',
       ringClass: 'ring-purple-400/60',
-      ringColor: '#c084fc',
-      trackBgStyle: 'rgba(192, 132, 252, 0.16)',
-      trackBorderStyle: 'rgba(192, 132, 252, 0.3)',
-      fillGradientStyle: 'linear-gradient(90deg, #fbf7ff, #f5f3ff, #fbf7ff)',
+      ringColor: '#a855f7',
+      trackBgStyle: 'rgba(168, 85, 247, 0.2)',
+      trackBorderStyle: 'rgba(168, 85, 247, 0.35)',
+      fillGradientStyle: 'linear-gradient(90deg, #faf5ff, #f3e8ff, #faf5ff)',
+      textClass: 'text-white',
     };
   }
+  // Master tier (51+)
   return {
-    pillGradientStyle: 'linear-gradient(90deg, #f43f5e, #b91c1c)',
+    pillGradientStyle: 'linear-gradient(90deg, #e11d48, #be123c)',
     ringClass: 'ring-rose-500/60',
-    ringColor: '#f43f5e',
-    trackBgStyle: 'rgba(244, 63, 94, 0.16)',
-    trackBorderStyle: 'rgba(244, 63, 94, 0.3)',
-    fillGradientStyle: 'linear-gradient(90deg, #fff5f7, #ffe4e6, #fff5f7)',
+    ringColor: '#e11d48',
+    trackBgStyle: 'rgba(225, 29, 72, 0.2)',
+    trackBorderStyle: 'rgba(225, 29, 72, 0.35)',
+    fillGradientStyle: 'linear-gradient(90deg, #fff1f2, #ffe4e6, #fff1f2)',
+    textClass: 'text-white',
   };
 }
 
@@ -135,12 +148,13 @@ export function GamificationStats({
       <div className={cn('flex items-center gap-3', className)}>
         <span
           className={cn(
-            'relative inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-white shadow-md ring-2',
+            'relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg ring-2',
             levelColors.ringClass,
+            levelColors.textClass,
           )}
           style={{
             background: levelColors.pillGradientStyle,
-            boxShadow: `0 0 0 2px ${levelColors.ringColor}`,
+            boxShadow: `0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 2px ${levelColors.ringColor}`,
           }}
           aria-label={levelAriaLabel}
           title={levelTooltip}
@@ -148,7 +162,7 @@ export function GamificationStats({
         >
           {t('level')} {level}
           <span
-            className={cn('h-2 w-12 rounded-full overflow-hidden shadow-inner border')}
+            className={cn('h-2.5 w-14 rounded-full overflow-hidden shadow-inner border')}
             style={{
               background: levelColors.trackBgStyle,
               borderColor: levelColors.trackBorderStyle,

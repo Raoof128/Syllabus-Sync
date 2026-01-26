@@ -132,19 +132,19 @@ export function StreakBadge({ className }: StreakBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
+        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold shadow-md',
         isActive
-          ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+          ? 'bg-linear-to-r from-orange-400 to-amber-500 text-white'
           : 'bg-mq-background-secondary text-mq-content-tertiary',
         className,
       )}
       title={streakTooltip}
       aria-label={streakTooltip}
     >
-      <span role="img" aria-hidden="true">
+      <span role="img" aria-hidden="true" className="text-sm">
         🔥
       </span>
-      {days}
+      <span className="tabular-nums">{days}</span>
     </span>
   );
 }
