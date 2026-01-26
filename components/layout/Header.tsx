@@ -42,6 +42,7 @@ import {
   LogOut,
   Moon,
   Sun,
+  X,
 } from 'lucide-react';
 import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
@@ -80,6 +81,7 @@ const Header = memo(() => {
   const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
+  const removeNotification = useNotificationsStore((state) => state.removeNotification);
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -379,21 +381,39 @@ const Header = memo(() => {
                               )}
                             </div>
                           </Link>
-                          {!notification.read && (
+                          {/* Action buttons */}
+                          <div className="flex flex-col gap-1 mr-2 mt-2">
+                            {/* Mark as read button - only for unread notifications */}
+                            {!notification.read && (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  markAsRead(notification.id);
+                                }}
+                                className="flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                                aria-label={t('markAsRead')}
+                                title={t('markAsRead')}
+                              >
+                                <Check className="h-4 w-4" aria-hidden="true" />
+                              </button>
+                            )}
+                            {/* Delete button - for all notifications */}
                             <button
                               type="button"
                               onClick={(event) => {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                markAsRead(notification.id);
+                                removeNotification(notification.id);
                               }}
-                              className="mr-2 mt-3 flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                              aria-label={t('markAsRead')}
-                              title={t('markAsRead')}
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                              aria-label={t('deleteNotification')}
+                              title={t('deleteNotification')}
                             >
-                              <Check className="h-4 w-4" aria-hidden="true" />
+                              <X className="h-4 w-4" aria-hidden="true" />
                             </button>
-                          )}
+                          </div>
                         </div>
                       </DropdownMenuItem>
                     );

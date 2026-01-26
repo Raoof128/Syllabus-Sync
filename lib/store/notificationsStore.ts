@@ -132,10 +132,23 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
       }));
       return serverNormalized;
     } catch (error) {
+      // Handle 409 Conflict (notification already exists) gracefully
+      const is409 = error instanceof Error && error.message.includes('409');
+      if (is409) {
+        // Remove the optimistic notification since it already exists
+        set((state) => ({
+          notifications: state.notifications.filter((n) => n.id !== tempId),
+        }));
+        // Reload notifications to get the existing one
+        get().loadNotifications({ force: true });
+        return null;
+      }
+
+      // For other errors, log and keep the local notification
       errorHandler.logError(
         error instanceof Error ? error : new Error('Failed to add notification'),
         'NotificationsStore.addNotification',
-        'high',
+        'medium',
       );
       return normalized;
     }

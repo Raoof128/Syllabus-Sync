@@ -667,6 +667,7 @@
   "mainNavigation": "메인 내비게이션",
   "markAsRead": "Mark as read",
   "markAllRead": "모두 읽음으로 표시",
+  "deleteNotification": "Delete notification",
   "signOut": "로그아웃",
   "switchToLight": "라이트 모드로 전환",
   "switchToDark": "다크 모드로 전환",
