@@ -1,4 +1,3 @@
-
 'use client';
 
 import TestWeather from '@/test-weather';

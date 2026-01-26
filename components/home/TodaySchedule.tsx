@@ -173,12 +173,12 @@ const TodaySchedule = memo(() => {
   };
 
   return (
-    <MagicCard isLiquidEnhanced>
+    <MagicCard isLiquidEnhanced className="h-full">
       <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent">
+        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <CardTitle>{t('todaysClasses')}</CardTitle>
+              <CardTitle className="flex items-center gap-2">{t('todaysClasses')}</CardTitle>
               {/* Smart indicator - remaining classes */}
               {isHydrated && classesWithStatus.length > 0 && (
                 <Badge
@@ -201,7 +201,7 @@ const TodaySchedule = memo(() => {
               </Link>
             </Button>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 flex-1">
             {!isHydrated ? (
               <div className="space-y-4 p-2">
                 <div className="animate-pulse">

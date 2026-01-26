@@ -154,7 +154,12 @@ export async function proxy(request: NextRequest) {
   }
 
   // Temporary: Disable authentication for home page
-  if (isProtectedRoute && !user && !publicRoutes.some((route) => path.startsWith(route)) && path !== '/home') {
+  if (
+    isProtectedRoute &&
+    !user &&
+    !publicRoutes.some((route) => path.startsWith(route)) &&
+    path !== '/home'
+  ) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', path);
     return NextResponse.redirect(redirectUrl);

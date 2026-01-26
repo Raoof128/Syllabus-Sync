@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from 'react';
 
 export default function TestWeatherClient() {
-  const [weatherData, setWeatherData] = useState<any>(null);
+  const [weatherData, setWeatherData] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,8 +10,7 @@ export default function TestWeatherClient() {
       try {
         const response = await fetch('/api/test-weather');
         const data = await response.json();
-        console.log('Test weather data:', data);
-        
+
         if (data.success) {
           setWeatherData(data.data);
         } else {

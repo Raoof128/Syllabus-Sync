@@ -20,49 +20,38 @@ const WeatherWidget = memo(() => {
   const styles = {
     sunny: {
       gradient: 'from-amber-400 via-orange-400 to-yellow-500',
-      icon: <Sun className="w-3.5 h-3.5 text-white drop-shadow-sm" />,
+      icon: <Sun className="w-3.5 h-3.5 drop-shadow-sm" />,
       label: 'Sunny',
-      textColor: 'text-white',
     },
     cloudy: {
       gradient: 'from-slate-400 via-gray-400 to-zinc-500',
-      icon: <Cloud className="w-3.5 h-3.5 text-white drop-shadow-sm" />,
+      icon: <Cloud className="w-3.5 h-3.5 drop-shadow-sm" />,
       label: 'Cloudy',
-      textColor: 'text-white',
     },
     rainy: {
       gradient: 'from-blue-600 via-indigo-600 to-cyan-600',
-      icon: <CloudRain className="w-3.5 h-3.5 text-white drop-shadow-sm" />,
+      icon: <CloudRain className="w-3.5 h-3.5 drop-shadow-sm" />,
       label: 'Rainy',
-      textColor: 'text-white',
     },
     thunder: {
       gradient: 'from-purple-900 via-slate-900 to-indigo-950',
-      icon: (
-        <CloudLightning className="w-3.5 h-3.5 text-yellow-300 drop-shadow-[0_0_4px_rgba(253,224,71,0.6)]" />
-      ),
+      icon: <CloudLightning className="w-3.5 h-3.5 drop-shadow-[0_0_4px_rgba(253,224,71,0.6)]" />,
       label: 'Stormy',
-      textColor: 'text-white',
     },
     snowy: {
       gradient: 'from-blue-100 via-slate-100 to-indigo-200',
-      icon: <Snowflake className="w-3.5 h-3.5 text-blue-500" />,
+      icon: <Snowflake className="w-3.5 h-3.5" />,
       label: 'Snowy',
-      textColor: 'text-slate-900',
     },
     windy: {
       gradient: 'from-teal-400 via-emerald-400 to-cyan-500',
-      icon: <Wind className="w-3.5 h-3.5 text-white" />,
+      icon: <Wind className="w-3.5 h-3.5" />,
       label: 'Windy',
-      textColor: 'text-white',
     },
     night: {
       gradient: 'from-[#0a0f2d] via-purple-950 to-black',
-      icon: (
-        <Moon className="w-3.5 h-3.5 text-indigo-200 drop-shadow-[0_0_6px_rgba(199,210,254,0.4)]" />
-      ),
+      icon: <Moon className="w-3.5 h-3.5 drop-shadow-[0_0_6px_rgba(199,210,254,0.4)]" />,
       label: 'Night',
-      textColor: 'text-indigo-100',
     },
   };
   type StyleKey = keyof typeof styles;
@@ -87,12 +76,13 @@ const WeatherWidget = memo(() => {
   }
 
   const currentStyle = styles[weatherData.vibe as StyleKey] ?? styles.sunny;
-  const textColor = currentStyle.textColor ?? 'text-white';
+  const textStyle = { color: 'var(--mq-content)' } as const;
   const label = currentStyle.label ?? weatherData.condition;
   const icon = currentStyle.icon;
 
   return (
     <div
+      data-slot="weather-widget"
       className={`
         relative overflow-hidden
         flex items-center gap-1.5
@@ -104,10 +94,12 @@ const WeatherWidget = memo(() => {
       aria-label={`Current weather in ${weatherData.location}: ${weatherData.condition}, ${weatherData.temp} degrees Celsius`}
     >
       {/* Icon */}
-      <div className="relative flex-shrink-0">{icon}</div>
+      <div className="relative flex-shrink-0" style={textStyle}>
+        {icon}
+      </div>
 
       {/* Temperature and condition */}
-      <div className={`flex items-center gap-1 ${textColor}`}>
+      <div className="flex items-center gap-1" style={textStyle}>
         <span className="text-xs font-bold tabular-nums leading-none">{weatherData.temp}°</span>
         <span className="text-[9px] font-medium opacity-80 hidden xl:inline">{label}</span>
       </div>

@@ -68,14 +68,14 @@ const UpcomingDeadlines = memo(() => {
   };
 
   return (
-    <MagicCard isLiquidEnhanced>
+    <MagicCard isLiquidEnhanced className="h-full">
       <div className="mq-magic-card-content">
-        <Card className="h-full border-0 shadow-none bg-transparent">
+        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
           <CardHeader
             className="flex flex-row items-center justify-between pb-5"
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
           >
-            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl font-bold">
+            <CardTitle className="flex items-center gap-3">
               <CalendarDays className="h-6 w-6 sm:h-7 sm:w-7" />
               {t('upcomingDeadlines')}
             </CardTitle>
@@ -98,7 +98,7 @@ const UpcomingDeadlines = memo(() => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1">
             {!isHydrated ? (
               <div className="h-48 flex items-center justify-center">
                 <p
@@ -124,10 +124,10 @@ const UpcomingDeadlines = memo(() => {
                 }}
               >
                 <Clock className="h-12 w-12 sm:h-16 sm:w-16 text-mq-content-tertiary mx-auto mb-6" />
-                <h3 className="text-xl sm:text-2xl font-semibold text-mq-content mb-4">
+                <h3 className="text-xl sm:text-2xl font-medium text-mq-content mb-4">
                   {t('noUpcomingDeadlines')}
                 </h3>
-                <p className="text-base sm:text-lg text-mq-content-secondary">
+                <p className="text-base sm:text-lg font-normal text-mq-content-secondary">
                   {t('noDeadlinesDesc')}
                 </p>
               </div>

@@ -1468,3 +1468,25 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.06);
 }
+
+[data-slot='weather-widget'],
+[data-slot='weather-widget'] svg {
+  color: var(--c-content) !important;
+}
+
+.calendar-page .mq-magic-card-content {
+  background: var(--c-card-background) !important;
+  border-color: var(--c-border) !important;
+}
+
+.calendar-page .calendar-main-panel {
+  background: var(--c-card-background) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: var(--c-radius-lg, 0.75rem);
+  box-shadow: var(--liquid-glass-shadow-outer);
+}
+
+.calendar-page .calendar-glass-solid {
+  background: var(--c-card-background) !important;
+  border-color: var(--c-border) !important;
+}

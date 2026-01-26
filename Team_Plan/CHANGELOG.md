@@ -8,6 +8,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Calendar card palette override.
+Summary: Overrode dark-mode calendar card background/border variables to use core theme tokens and removed remaining hue-specific SVG classes in calendar UI.
+Files: app/calendar/CalendarClient.tsx; app/styles/dark-mode.css; app/styles/liquid-glass.css.
+Verification: Chrome DevTools MCP: calendar main panel and cards now compute `background-color` as `rgb(55, 58, 54)` with `border-color` `rgb(113, 115, 107)`; `svg` stroke inherits current text color.
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Calendar card palette normalization.
+Summary: Normalized calendar card backgrounds to mq tokens, aligned borders to `border-mq-border`, and removed hue-specific SVG classes so icons inherit text color.
+Files: app/calendar/CalendarClient.tsx.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Calendar main panel background.
+Summary: Added a solid background wrapper for the weekly calendar panel to match the header bar in dark mode.
+Files: app/calendar/CalendarClient.tsx; app/styles/liquid-glass.css.
+Verification: `npm run check` (pass; tests emitted a circular JSON warning in response-critical output and an in-memory rate limit warning).
+Follow-ups: Visual verification in an authenticated calendar session.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Calendar dark mode card opacity.
+Summary: Forced calendar card surfaces to use the same solid dark background as the header bar.
+Files: app/calendar/CalendarClient.tsx; app/styles/liquid-glass.css.
+Verification: `npm run check` (pass; tests emitted a circular JSON warning in response-critical output).
+Follow-ups: Visual verification in authenticated dark mode.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Weather widget contrast + calendar glass cards.
+Summary: Forced weather widget text/icon to use theme content color and applied glass card variant to calendar widgets to match header tone.
+Files: components/layout/WeatherWidget.tsx; app/styles/liquid-glass.css; app/calendar/CalendarClient.tsx.
+Verification: `npm run check` (pass; tests emitted a circular JSON warning in response-critical output).
+Follow-ups: Calendar visual verification requires authenticated session.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Header parity for calendar cards and text sizing.
+Summary: Unified Upcoming Deadlines/Todays Classes header sizing, forced light-mode weather widget text to black, and applied header glass styling to calendar cards.
+Files: components/layout/WeatherWidget.tsx; components/home/UpcomingDeadlines.tsx; components/home/TodaySchedule.tsx; app/calendar/CalendarClient.tsx.
+Verification: `npm run check` (pass; tests emitted a circular JSON warning in response-critical output).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI + i18n - Card typography parity and todo keys.
+Summary: Normalized Upcoming Deadlines empty-state text weight, added missing todo translation keys, and removed debug logs/type warnings in weather test utilities.
+Files: components/home/UpcomingDeadlines.tsx; locales/en/translations.json; app/api/test-weather/client.tsx; app/api/test-weather/route.ts; app/weather-test/page.tsx; lib/hooks/useWeather.ts.
+Verification: `npm run check` (pass; tests emitted a circular JSON warning in response-critical test output).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: UI - Weather widget + dashboard card parity.
+Summary: Forced light-mode weather widget text to render in black and aligned dashboard cards to share height and header typography.
+Files: components/layout/WeatherWidget.tsx; components/home/UpcomingDeadlines.tsx; components/home/TodaySchedule.tsx.
+Verification: `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, lib/hooks/useWeather.ts).
+Follow-ups: None.
+
+Raouf: 2026-01-26 (Australia/Sydney)
 Scope: Fix - Dropdown menu bounds (translate full width).
 Summary: Forced end-aligned dropdowns to translate left by full width and neutralized align offsets to keep menus within viewport edges.
 Files: components/ui/dropdown-menu.tsx; components/layout/Header.tsx.

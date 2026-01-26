@@ -35,7 +35,8 @@ const determineVibe = (weatherCode, isDay) => {
   if (weatherCode === WeatherCode.CLEAR_SKY) return 'sunny';
   if ([WeatherCode.PARTLY_CLOUDY, WeatherCode.CLOUDY, WeatherCode.OVERCAST].includes(weatherCode))
     return 'cloudy';
-  if ([
+  if (
+    [
       WeatherCode.LIGHT_DRIZZLE,
       WeatherCode.MODERATE_DRIZZLE,
       WeatherCode.DENSE_DRIZZLE,
@@ -52,7 +53,8 @@ const determineVibe = (weatherCode, isDay) => {
     ].includes(weatherCode)
   )
     return 'rainy';
-  if ([
+  if (
+    [
       WeatherCode.SLIGHT_SNOW,
       WeatherCode.MODERATE_SNOW,
       WeatherCode.HEAVY_SNOW,
@@ -62,7 +64,8 @@ const determineVibe = (weatherCode, isDay) => {
     ].includes(weatherCode)
   )
     return 'snowy';
-  if ([
+  if (
+    [
       WeatherCode.THUNDERSTORM,
       WeatherCode.THUNDERSTORM_WITH_HAIL,
       WeatherCode.THUNDERSTORM_WITH_HEAVY_HAIL,
@@ -74,14 +77,14 @@ const determineVibe = (weatherCode, isDay) => {
 
 // Test all weather codes for both day and night
 console.log('=== Daytime Vibes ===');
-Object.keys(WeatherCode).forEach(key => {
+Object.keys(WeatherCode).forEach((key) => {
   const code = WeatherCode[key];
   const vibe = determineVibe(code, true);
   console.log(`${key} (${code}): ${vibe}`);
 });
 
 console.log('\n=== Nighttime Vibes ===');
-Object.keys(WeatherCode).forEach(key => {
+Object.keys(WeatherCode).forEach((key) => {
   const code = WeatherCode[key];
   const vibe = determineVibe(code, false);
   console.log(`${key} (${code}): ${vibe}`);

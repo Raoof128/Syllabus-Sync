@@ -831,7 +831,7 @@ export default function CalendarClient() {
       {/* Apple/Google Calendar Style Weekly View */}
       <ScrollReveal delay={0.1} className="mt-6">
         <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0">
+          <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border">
             {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
             <div className="flex items-center justify-between p-4 border-b border-mq-border">
               {/* Desktop week navigation */}
@@ -890,7 +890,7 @@ export default function CalendarClient() {
             </div>
 
             {/* Mobile: Week day quick picker */}
-            <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary/50">
+            <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary">
               {weekDays.map((day, index) => {
                 const isSelected = index === mobileSelectedDayIndex;
                 const isTodayPill = dayjs(day).isSame(dayjs(), 'day');
@@ -956,7 +956,7 @@ export default function CalendarClient() {
                         key={day.toISOString()}
                         className={cn(
                           'p-2 text-center border-r border-mq-border last:border-r-0',
-                          isTodayCell && 'bg-mq-primary/5',
+                          isTodayCell && 'bg-mq-primary/10',
                         )}
                         role="columnheader"
                         aria-label={
@@ -1032,7 +1032,7 @@ export default function CalendarClient() {
 
                   return (
                     <div
-                      className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary/50"
+                      className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary"
                       role="row"
                     >
                       {/* Label column */}
@@ -1050,8 +1050,8 @@ export default function CalendarClient() {
                           <div
                             key={`fullday-${day.toISOString()}`}
                             className={cn(
-                              'min-h-[48px] p-1 border-r border-mq-border/80 last:border-r-0 flex flex-col gap-1',
-                              isTodayCell && 'bg-mq-primary/5',
+                              'min-h-[48px] p-1 border-r border-mq-border last:border-r-0 flex flex-col gap-1',
+                              isTodayCell && 'bg-mq-primary/10',
                             )}
                           >
                             {dayMQDates.map((mqDate) => {
@@ -1115,9 +1115,9 @@ export default function CalendarClient() {
                         <div
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
-                            'calendar-grid-cell border-t border-mq-border/90 border-r border-mq-border/80 last:border-r-0',
-                            dayIndex === 0 && 'border-l border-mq-border/80',
-                            dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.03]',
+                            'calendar-grid-cell border-t border-mq-border border-r border-mq-border last:border-r-0',
+                            dayIndex === 0 && 'border-l border-mq-border',
+                            dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
                           )}
                           style={{ height: HOUR_HEIGHT }}
                           role="gridcell"
@@ -1211,7 +1211,7 @@ export default function CalendarClient() {
                       return (
                         <div
                           key={day.toISOString()}
-                          className="calendar-day-column relative border-r border-mq-border/60 last:border-r-0"
+                          className="calendar-day-column relative border-r border-mq-border last:border-r-0"
                         >
                           {/* Units - filled time block with unit color */}
                           {dayUnits.map((unitData) => {
@@ -1250,7 +1250,7 @@ export default function CalendarClient() {
                               <button
                                 key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
                                 type="button"
-                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur"
+                                className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur"
                                 style={{
                                   top: posInfo.top,
                                   height: Math.max(posInfo.height, 44),
@@ -1549,7 +1549,7 @@ export default function CalendarClient() {
                   <div
                     className={cn(
                       'p-3 border-b border-mq-border',
-                      isTodayCell && 'bg-mq-primary/5',
+                      isTodayCell && 'bg-mq-primary/10',
                     )}
                   >
                     {/* MQ Key Dates for mobile */}
@@ -1607,8 +1607,8 @@ export default function CalendarClient() {
                     {/* Hour line */}
                     <div
                       className={cn(
-                        'flex-1 border-t border-mq-border/90',
-                        dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && 'bg-mq-primary/[0.03]',
+                        'flex-1 border-t border-mq-border',
+                        dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
                       )}
                       style={{ height: HOUR_HEIGHT }}
                     />
@@ -1727,7 +1727,7 @@ export default function CalendarClient() {
                             <button
                               key={`mobile-${unitData.id}-${schedule.day}-${schedule.startTime}`}
                               type="button"
-                              className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background/90 backdrop-blur p-2"
+                              className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur p-2"
                               style={{
                                 top: posInfo.top,
                                 height: Math.max(posInfo.height, 44),
@@ -1881,12 +1881,18 @@ export default function CalendarClient() {
                 : ''
             }
           >
-            <div className="mq-magic-card-content p-0" ref={assignmentsWidgetRef}>
-              <Card className="border-0 shadow-none bg-transparent">
+            <div
+              className="mq-magic-card-content p-0 bg-mq-card-background"
+              ref={assignmentsWidgetRef}
+            >
+              <Card
+                variant="glass"
+                className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-blue-500" />
+                      <FileText className="h-5 w-5" />
                       {t('assignments')}
                     </span>
                     <div className="flex items-center gap-2">
@@ -1960,10 +1966,7 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {assignment.completed ? (
-                                    <CheckCircle2
-                                      className="h-4 w-4 text-green-500"
-                                      aria-hidden="true"
-                                    />
+                                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2016,10 +2019,7 @@ export default function CalendarClient() {
                                         }) || t('navigate')
                                       }
                                     >
-                                      <Navigation
-                                        className="h-4 w-4 text-mq-content-tertiary hover:text-mq-info"
-                                        aria-hidden="true"
-                                      />
+                                      <Navigation className="h-4 w-4" aria-hidden="true" />
                                     </Button>
                                   </Link>
                                 )}
@@ -2032,10 +2032,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: assignment.title })}
                                 >
-                                  <Edit2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-mq-primary"
-                                    aria-hidden="true"
-                                  />
+                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                                 <button
                                   type="button"
@@ -2046,10 +2043,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: assignment.title })}
                                 >
-                                  <Trash2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
-                                    aria-hidden="true"
-                                  />
+                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                               </div>
                             </div>
@@ -2066,12 +2060,15 @@ export default function CalendarClient() {
         {/* Exams Widget */}
         <ScrollReveal delay={0.25}>
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0">
-              <Card className="border-0 shadow-none bg-transparent">
+            <div className="mq-magic-card-content p-0 bg-mq-card-background">
+              <Card
+                variant="glass"
+                className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-red-500" />
+                      <BookOpen className="h-5 w-5" />
                       {t('exams')}
                     </span>
                     <div className="flex items-center gap-2">
@@ -2126,10 +2123,7 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {exam.completed ? (
-                                    <CheckCircle2
-                                      className="h-4 w-4 text-green-500"
-                                      aria-hidden="true"
-                                    />
+                                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2183,10 +2177,7 @@ export default function CalendarClient() {
                                         }) || t('navigate')
                                       }
                                     >
-                                      <Navigation
-                                        className="h-4 w-4 text-mq-content-tertiary hover:text-mq-info"
-                                        aria-hidden="true"
-                                      />
+                                      <Navigation className="h-4 w-4" aria-hidden="true" />
                                     </Button>
                                   </Link>
                                 )}
@@ -2196,10 +2187,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: exam.title })}
                                 >
-                                  <Edit2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-mq-primary"
-                                    aria-hidden="true"
-                                  />
+                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                                 <button
                                   type="button"
@@ -2207,10 +2195,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: exam.title })}
                                 >
-                                  <Trash2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
-                                    aria-hidden="true"
-                                  />
+                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                               </div>
                             </div>
@@ -2237,12 +2222,15 @@ export default function CalendarClient() {
                 : ''
             }
           >
-            <div className="mq-magic-card-content p-0" ref={unitsWidgetRef}>
-              <Card className="border-0 shadow-none bg-transparent">
+            <div className="mq-magic-card-content p-0 bg-mq-card-background" ref={unitsWidgetRef}>
+              <Card
+                variant="glass"
+                className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-purple-500" />
+                      <BookOpen className="h-5 w-5" />
                       {t('myUnits')}
                     </span>
                     <div className="flex items-center gap-2">
@@ -2319,10 +2307,7 @@ export default function CalendarClient() {
                                     }) || t('navigate')
                                   }
                                 >
-                                  <Navigation
-                                    className="h-4 w-4 text-mq-content-secondary"
-                                    aria-hidden="true"
-                                  />
+                                  <Navigation className="h-4 w-4" aria-hidden="true" />
                                 </Button>
                               </Link>
                             )}
@@ -2336,10 +2321,7 @@ export default function CalendarClient() {
                               title={t('calendarEditItem', { title: unit.code })}
                               aria-label={t('calendarEditItem', { title: unit.code })}
                             >
-                              <Edit2
-                                className="h-4 w-4 text-mq-content-secondary"
-                                aria-hidden="true"
-                              />
+                              <Edit2 className="h-4 w-4" aria-hidden="true" />
                             </button>
                             <button
                               type="button"
@@ -2351,10 +2333,7 @@ export default function CalendarClient() {
                               title={t('calendarDeleteItem', { title: unit.code })}
                               aria-label={t('calendarDeleteItem', { title: unit.code })}
                             >
-                              <Trash2
-                                className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
-                                aria-hidden="true"
-                              />
+                              <Trash2 className="h-4 w-4" aria-hidden="true" />
                             </button>
                           </div>
                         </div>
@@ -2370,12 +2349,15 @@ export default function CalendarClient() {
         {/* Add Event Widget */}
         <ScrollReveal delay={0.35}>
           <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-0">
-              <Card className="border-0 shadow-none bg-transparent">
+            <div className="mq-magic-card-content p-0 bg-mq-card-background">
+              <Card
+                variant="glass"
+                className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <PartyPopper className="h-5 w-5 text-green-500" />
+                      <PartyPopper className="h-5 w-5" />
                       {t('events')}
                     </span>
                     <div className="flex items-center gap-2">
@@ -2450,10 +2432,7 @@ export default function CalendarClient() {
                                       t('navigate')
                                     }
                                   >
-                                    <Navigation
-                                      className="h-4 w-4 text-mq-content-secondary"
-                                      aria-hidden="true"
-                                    />
+                                    <Navigation className="h-4 w-4" aria-hidden="true" />
                                   </Button>
                                 </Link>
                               )}
@@ -2467,10 +2446,7 @@ export default function CalendarClient() {
                                 title={t('calendarEditItem', { title: eventTitle })}
                                 aria-label={t('calendarEditItem', { title: eventTitle })}
                               >
-                                <Edit2
-                                  className="h-4 w-4 text-mq-content-secondary"
-                                  aria-hidden="true"
-                                />
+                                <Edit2 className="h-4 w-4" aria-hidden="true" />
                               </button>
                               <button
                                 type="button"
@@ -2482,10 +2458,7 @@ export default function CalendarClient() {
                                 title={t('calendarDeleteItem', { title: eventTitle })}
                                 aria-label={t('calendarDeleteItem', { title: eventTitle })}
                               >
-                                <Trash2
-                                  className="h-4 w-4 text-mq-content-secondary hover:text-red-500"
-                                  aria-hidden="true"
-                                />
+                                <Trash2 className="h-4 w-4" aria-hidden="true" />
                               </button>
                             </div>
                           </div>
@@ -2503,12 +2476,15 @@ export default function CalendarClient() {
       {/* To-Do List Widget - Full Width at Bottom */}
       <ScrollReveal delay={0.4}>
         <MagicCard isLiquidEnhanced className="mt-6">
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background">
+            <Card
+              variant="glass"
+              className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+            >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <ListTodo className="h-5 w-5 text-emerald-500" />
+                    <ListTodo className="h-5 w-5" />
                     {tOr('todoList', 'To-Do List')}
                   </span>
                   <div className="flex items-center gap-2">
@@ -2580,7 +2556,7 @@ export default function CalendarClient() {
 
                 {/* Todo List */}
                 {todos.length === 0 ? (
-                  <div className="text-center py-12 bg-mq-background-secondary/30 rounded-xl">
+                  <div className="text-center py-12 bg-mq-background-secondary rounded-xl">
                     <SquareCheckBig className="h-12 w-12 text-mq-content-tertiary/30 mx-auto mb-6" />
                     <p className="text-base font-medium text-mq-content-secondary">
                       {tOr('noTodosYet', 'No tasks yet')}
@@ -2599,24 +2575,24 @@ export default function CalendarClient() {
                       </h4>
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
                         {getPendingTodos().length === 0 ? (
-                          <p className="text-base text-mq-content-secondary py-8 text-center bg-mq-background-secondary/30 rounded-xl">
+                          <p className="text-base text-mq-content-secondary py-8 text-center bg-mq-background-secondary rounded-xl">
                             {tOr('allTasksComplete', 'All tasks complete!')}
                           </p>
                         ) : (
                           getPendingTodos().map((todo) => (
                             <div
                               key={todo.id}
-                              className="group flex items-center justify-between p-3 sm:p-4 rounded-lg border border-mq-border hover:border-emerald-300 hover:shadow-md transition-all bg-mq-card-background/50"
+                              className="group flex items-center justify-between p-3 sm:p-4 rounded-lg border border-mq-border hover:border-emerald-300 hover:shadow-md transition-all bg-mq-card-background"
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => toggleTodoComplete(todo.id)}
                                   aria-label={t('markAsCompleted')}
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-colors"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                 >
                                   <Circle
-                                    className="h-5 w-5 text-mq-content-secondary hover:text-emerald-500 transition-colors"
+                                    className="h-5 w-5 text-mq-content-secondary transition-colors"
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2663,10 +2639,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                                   aria-label={t('calendarEditItem', { title: todo.title })}
                                 >
-                                  <Edit2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-emerald-500"
-                                    aria-hidden="true"
-                                  />
+                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                                 <button
                                   type="button"
@@ -2677,10 +2650,7 @@ export default function CalendarClient() {
                                   className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                                   aria-label={t('calendarDeleteItem', { title: todo.title })}
                                 >
-                                  <Trash2
-                                    className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
-                                    aria-hidden="true"
-                                  />
+                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                                 </button>
                               </div>
                             </div>
@@ -2692,13 +2662,13 @@ export default function CalendarClient() {
                     {/* Completed Today */}
                     <div>
                       <h4 className="text-base font-semibold text-mq-content mb-5 uppercase tracking-wide flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        <CheckCircle2 className="h-4 w-4" />
                         {t('completedToday' as TranslationKey) || 'Completed Today'}
                       </h4>
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
                         {getCompletedToday().length === 0 ? (
-                          <div className="text-center py-12 bg-mq-background-secondary/30 rounded-xl">
-                            <CheckCircle2 className="h-12 w-12 text-emerald-500/30 mx-auto mb-4" />
+                          <div className="text-center py-12 bg-mq-background-secondary rounded-xl">
+                            <CheckCircle2 className="h-12 w-12 mx-auto mb-4" />
                             <p className="text-base font-medium text-mq-content-secondary">
                               {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
                             </p>
@@ -2710,19 +2680,16 @@ export default function CalendarClient() {
                           getCompletedToday().map((todo) => (
                             <div
                               key={todo.id}
-                              className="group flex items-center justify-between p-3 sm:p-4 rounded-lg border border-mq-border bg-emerald-50/50 dark:bg-emerald-950/10"
+                              className="group flex items-center justify-between p-3 sm:p-4 rounded-lg border border-mq-border bg-mq-card-background"
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => toggleTodoComplete(todo.id)}
                                   aria-label={t('markIncomplete')}
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-emerald-100 dark:hover:bg-emerald-950/30 transition-colors"
+                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                 >
-                                  <CheckCircle2
-                                    className="h-5 w-5 text-emerald-500"
-                                    aria-hidden="true"
-                                  />
+                                  <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
                                 </button>
                                 <p
                                   className="text-sm sm:text-base line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal"
@@ -2740,10 +2707,7 @@ export default function CalendarClient() {
                                 className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-center justify-center ml-2"
                                 aria-label={t('calendarDeleteItem', { title: todo.title })}
                               >
-                                <Trash2
-                                  className="h-4 w-4 text-mq-content-tertiary hover:text-red-500"
-                                  aria-hidden="true"
-                                />
+                                <Trash2 className="h-4 w-4" aria-hidden="true" />
                               </button>
                             </div>
                           ))
@@ -2807,7 +2771,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+                <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">{t('deleteUnitConfirm')}</h3>
@@ -2845,7 +2809,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2886,7 +2850,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2927,7 +2891,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2968,7 +2932,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -3009,7 +2973,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+                <Trash2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -3058,7 +3022,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
-                <Edit2 className="h-5 w-5 text-emerald-500" />
+                <Edit2 className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">

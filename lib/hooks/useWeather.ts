@@ -184,7 +184,6 @@ export const useWeather = () => {
     };
 
     const fetchWeather = async (latitude: number, longitude: number, preferredLabel?: string) => {
-      console.log('Fetching weather for:', latitude, longitude);
       const response = await fetch(`/api/weather?lat=${latitude}&lon=${longitude}`);
 
       if (!response.ok) {
@@ -192,9 +191,8 @@ export const useWeather = () => {
       }
 
       const apiResponse = await response.json();
-      console.log('API response:', apiResponse);
       const data = apiResponse?.data;
-      
+
       const tempValue = data?.current_weather?.temperature;
       const weatherCode = data?.current_weather?.weathercode;
       const isDayValue = data?.current_weather?.is_day;
@@ -245,7 +243,6 @@ export const useWeather = () => {
 
     const cachedData = readCache();
     if (cachedData) {
-      console.log('Using cached weather data');
       setWeatherData(cachedData);
       setLoading(false);
       return () => {
@@ -254,14 +251,9 @@ export const useWeather = () => {
     }
 
     // Skip geolocation and always use fallback coordinates
-    console.log('Using fallback coordinates');
     (async () => {
       try {
-        await fetchWeather(
-          fallbackCoords.latitude,
-          fallbackCoords.longitude,
-          fallbackCoords.label,
-        );
+        await fetchWeather(fallbackCoords.latitude, fallbackCoords.longitude, fallbackCoords.label);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load weather.';
         setError(message);

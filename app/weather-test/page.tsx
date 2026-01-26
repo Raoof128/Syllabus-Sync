@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -23,8 +22,7 @@ export default function WeatherTestPage() {
       try {
         const response = await fetch('/api/test-weather');
         const result = await response.json();
-        console.log('Weather API response:', result);
-        
+
         if (result.success) {
           setWeatherData(result.data.data);
         } else {
