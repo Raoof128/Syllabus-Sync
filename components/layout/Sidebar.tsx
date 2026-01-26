@@ -33,7 +33,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { Home, MapPin, Calendar, MessageSquare, Menu, X, Sparkles } from 'lucide-react';
+import { Home, MapPin, Calendar, MessageSquare, Menu, X, Sparkles, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
@@ -48,10 +48,11 @@ const navigation: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { name: 'home', href: '/home', icon: Home },
+  { name: 'home', href: '/', icon: Home },
   { name: 'calendar', href: '/calendar', icon: Calendar },
   { name: 'map', href: '/map', icon: MapPin },
   { name: 'feed', href: '/feed', icon: MessageSquare },
+  { name: 'settings', href: '/settings', icon: Settings },
 ];
 
 /**
@@ -313,7 +314,7 @@ const Sidebar = memo(() => {
           {/* Logo - bounces in with slight overshoot */}
           <div className="mb-4 sidebar-logo">
             <Link
-              href="/home"
+              href="/"
               className="flex items-center gap-2"
               ref={firstFocusableRef}
               onClick={() => setMobileMenuOpen(false)}
@@ -325,6 +326,11 @@ const Sidebar = memo(() => {
                 height={128}
                 priority
                 style={{ objectFit: 'contain', borderRadius: '8px' }}
+                onError={(e) => {
+                  // Fallback for logo image
+                  (e.target as HTMLImageElement).src =
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjN0EwQTIxIi8+Cjx0ZXh0IHg9IjY0IiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPk1RCjwvdGV4dD4KPC9zdmc+';
+                }}
               />
             </Link>
           </div>
@@ -362,8 +368,7 @@ const Sidebar = memo(() => {
           {/* Navigation Links - staggered slide-in animation */}
           <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
             {navigation.map((item) => {
-              const isActive =
-                pathname === item.href || (pathname === '/' && item.href === '/home');
+              const isActive = pathname === item.href;
               const Icon = item.icon;
 
               return (

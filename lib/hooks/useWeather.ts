@@ -1,5 +1,37 @@
 import { useEffect, useState } from 'react';
 
+// Weather code type definitions for consistency
+export enum WeatherCode {
+  CLEAR_SKY = 0,
+  PARTLY_CLOUDY = 1,
+  CLOUDY = 2,
+  OVERCAST = 3,
+  FOGGY = 45,
+  RIME_FOG = 48,
+  LIGHT_DRIZZLE = 51,
+  MODERATE_DRIZZLE = 53,
+  DENSE_DRIZZLE = 55,
+  LIGHT_FREEZING_DRIZZLE = 56,
+  DENSE_FREEZING_DRIZZLE = 57,
+  SLIGHT_RAIN = 61,
+  MODERATE_RAIN = 63,
+  HEAVY_RAIN = 65,
+  LIGHT_FREEZING_RAIN = 66,
+  HEAVY_FREEZING_RAIN = 67,
+  SLIGHT_SNOW = 71,
+  MODERATE_SNOW = 73,
+  HEAVY_SNOW = 75,
+  SNOW_GRAINS = 77,
+  SLIGHT_RAIN_SHOWERS = 80,
+  MODERATE_RAIN_SHOWERS = 81,
+  VIOLENT_RAIN_SHOWERS = 82,
+  SLIGHT_SNOW_SHOWERS = 85,
+  HEAVY_SNOW_SHOWERS = 86,
+  THUNDERSTORM = 95,
+  THUNDERSTORM_WITH_HAIL = 96,
+  THUNDERSTORM_WITH_HEAVY_HAIL = 99,
+}
+
 type Vibe = 'sunny' | 'cloudy' | 'rainy' | 'thunder' | 'snowy' | 'windy' | 'night';
 
 interface WeatherData {
@@ -14,29 +46,84 @@ interface WeatherData {
 
 const VALID_VIBES: Vibe[] = ['sunny', 'cloudy', 'rainy', 'thunder', 'snowy', 'windy', 'night'];
 
+const WEATHER_CODE_LABELS: Record<number, string> = {
+  [WeatherCode.CLEAR_SKY]: 'Clear sky',
+  [WeatherCode.PARTLY_CLOUDY]: 'Partly cloudy',
+  [WeatherCode.CLOUDY]: 'Cloudy',
+  [WeatherCode.OVERCAST]: 'Overcast',
+  [WeatherCode.FOGGY]: 'Foggy',
+  [WeatherCode.RIME_FOG]: 'Rime fog',
+  [WeatherCode.LIGHT_DRIZZLE]: 'Light drizzle',
+  [WeatherCode.MODERATE_DRIZZLE]: 'Moderate drizzle',
+  [WeatherCode.DENSE_DRIZZLE]: 'Dense drizzle',
+  [WeatherCode.LIGHT_FREEZING_DRIZZLE]: 'Light freezing drizzle',
+  [WeatherCode.DENSE_FREEZING_DRIZZLE]: 'Dense freezing drizzle',
+  [WeatherCode.SLIGHT_RAIN]: 'Slight rain',
+  [WeatherCode.MODERATE_RAIN]: 'Moderate rain',
+  [WeatherCode.HEAVY_RAIN]: 'Heavy rain',
+  [WeatherCode.LIGHT_FREEZING_RAIN]: 'Light freezing rain',
+  [WeatherCode.HEAVY_FREEZING_RAIN]: 'Heavy freezing rain',
+  [WeatherCode.SLIGHT_SNOW]: 'Slight snow',
+  [WeatherCode.MODERATE_SNOW]: 'Moderate snow',
+  [WeatherCode.HEAVY_SNOW]: 'Heavy snow',
+  [WeatherCode.SNOW_GRAINS]: 'Snow grains',
+  [WeatherCode.SLIGHT_RAIN_SHOWERS]: 'Slight rain showers',
+  [WeatherCode.MODERATE_RAIN_SHOWERS]: 'Moderate rain showers',
+  [WeatherCode.VIOLENT_RAIN_SHOWERS]: 'Violent rain showers',
+  [WeatherCode.SLIGHT_SNOW_SHOWERS]: 'Slight snow showers',
+  [WeatherCode.HEAVY_SNOW_SHOWERS]: 'Heavy snow showers',
+  [WeatherCode.THUNDERSTORM]: 'Thunderstorm',
+  [WeatherCode.THUNDERSTORM_WITH_HAIL]: 'Thunderstorm with hail',
+  [WeatherCode.THUNDERSTORM_WITH_HEAVY_HAIL]: 'Thunderstorm with heavy hail',
+};
+
 const determineVibe = (weatherCode: number, isDay: boolean): Vibe => {
   if (!isDay) return 'night';
-  if (weatherCode === 0) return 'sunny';
-  if ([1, 2, 3].includes(weatherCode)) return 'cloudy';
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weatherCode)) return 'rainy';
-  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return 'snowy';
-  if ([95, 96, 99].includes(weatherCode)) return 'thunder';
+  if (weatherCode === WeatherCode.CLEAR_SKY) return 'sunny';
+  if ([WeatherCode.PARTLY_CLOUDY, WeatherCode.CLOUDY, WeatherCode.OVERCAST].includes(weatherCode))
+    return 'cloudy';
+  if (
+    [
+      WeatherCode.LIGHT_DRIZZLE,
+      WeatherCode.MODERATE_DRIZZLE,
+      WeatherCode.DENSE_DRIZZLE,
+      WeatherCode.LIGHT_FREEZING_DRIZZLE,
+      WeatherCode.DENSE_FREEZING_DRIZZLE,
+      WeatherCode.SLIGHT_RAIN,
+      WeatherCode.MODERATE_RAIN,
+      WeatherCode.HEAVY_RAIN,
+      WeatherCode.LIGHT_FREEZING_RAIN,
+      WeatherCode.HEAVY_FREEZING_RAIN,
+      WeatherCode.SLIGHT_RAIN_SHOWERS,
+      WeatherCode.MODERATE_RAIN_SHOWERS,
+      WeatherCode.VIOLENT_RAIN_SHOWERS,
+    ].includes(weatherCode)
+  )
+    return 'rainy';
+  if (
+    [
+      WeatherCode.SLIGHT_SNOW,
+      WeatherCode.MODERATE_SNOW,
+      WeatherCode.HEAVY_SNOW,
+      WeatherCode.SNOW_GRAINS,
+      WeatherCode.SLIGHT_SNOW_SHOWERS,
+      WeatherCode.HEAVY_SNOW_SHOWERS,
+    ].includes(weatherCode)
+  )
+    return 'snowy';
+  if (
+    [
+      WeatherCode.THUNDERSTORM,
+      WeatherCode.THUNDERSTORM_WITH_HAIL,
+      WeatherCode.THUNDERSTORM_WITH_HEAVY_HAIL,
+    ].includes(weatherCode)
+  )
+    return 'thunder';
   return 'windy';
 };
 
 const mapWeatherCode = (code: number): string => {
-  if (code === 0) return 'Clear sky';
-  if ([1, 2, 3].includes(code)) return 'Partly cloudy';
-  if ([45, 48].includes(code)) return 'Foggy';
-  if ([51, 53, 55].includes(code)) return 'Drizzle';
-  if ([56, 57].includes(code)) return 'Freezing drizzle';
-  if ([61, 63, 65].includes(code)) return 'Rain';
-  if ([66, 67].includes(code)) return 'Freezing rain';
-  if ([71, 73, 75, 77].includes(code)) return 'Snow';
-  if ([80, 81, 82].includes(code)) return 'Rain showers';
-  if ([85, 86].includes(code)) return 'Snow showers';
-  if ([95, 96, 99].includes(code)) return 'Thunderstorm';
-  return 'Windy';
+  return WEATHER_CODE_LABELS[code] || 'Windy';
 };
 
 export const useWeather = () => {
@@ -97,9 +184,7 @@ export const useWeather = () => {
     };
 
     const fetchWeather = async (latitude: number, longitude: number, preferredLabel?: string) => {
-      const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m&timezone=auto`,
-      );
+      const response = await fetch(`/api/weather?lat=${latitude}&lon=${longitude}`);
 
       if (!response.ok) {
         throw new Error('Weather service unreachable.');

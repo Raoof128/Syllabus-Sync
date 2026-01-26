@@ -21,6 +21,27 @@ Raouf: 2026-01-25 - Crawl4AI Integration Test
 
 ---
 
+Raouf: 2026-01-26 - Weather Widget and Sidebar Fixes
+
+### Fixed
+- **Weather API Endpoint:** Updated `/api/weather` endpoint to use Open-Meteo API instead of OpenWeather (no API key required)
+- **Weather Hook:** Modified `useWeather.ts` to use the local API endpoint with proper error handling and WMO weather code mapping
+- **Weather Widget:** Improved error messaging to display specific error text instead of generic "Unavailable"
+- **Navigation Route Mismatch:** Changed sidebar home route from `/home` to `/` to match actual home page
+- **Settings Navigation:** Added Settings page to sidebar navigation with Settings icon
+- **Logo Error Handling:** Added onError handler to sidebar logo with base64 fallback image
+
+### Changed
+- **Weather Code System:** Implemented complete WMO weather code enum with 20+ weather conditions for consistent mapping
+- **Navigation Configuration:** Updated sidebar navigation array to include settings page
+
+### Verification
+- `npm run format:check` passed after running Prettier
+- `npm run check:secrets` passed - no sensitive data exposed
+- Development server running successfully on http://localhost:3000
+
+---
+
 Raouf: 2026-01-24 - Visual Simulation UI
 
 ### Added

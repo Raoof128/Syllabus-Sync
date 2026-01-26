@@ -2564,9 +2564,7 @@ export default function CalendarClient() {
                       aria-label={tOr('selectPriority', 'Select priority')}
                     >
                       <option value="High">{tOr('priorityHigh', 'High')}</option>
-                      <option value="Medium">
-                        {tOr('priorityMedium', 'Medium')}
-                      </option>
+                      <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
                       <option value="Low">{tOr('priorityLow', 'Low')}</option>
                     </select>
                     <Button
@@ -3119,9 +3117,7 @@ export default function CalendarClient() {
                   )}
                 >
                   <option value="High">{tOr('priorityHigh', 'High')}</option>
-                  <option value="Medium">
-                    {tOr('priorityMedium', 'Medium')}
-                  </option>
+                  <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
                   <option value="Low">{tOr('priorityLow', 'Low')}</option>
                 </select>
               </div>

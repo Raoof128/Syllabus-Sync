@@ -6,15 +6,12 @@ import { getClientIP } from '@/lib/security/ip';
 /**
  * Weather API Proxy Endpoint
  *
- * SECURITY: This endpoint proxies requests to OpenWeather API, keeping the API key
- * server-side and never exposing it to the client. This prevents:
- * - API key theft from client-side code
- * - Unauthorized usage of our API quota
- * - Man-in-the-middle attacks on API credentials
+ * SECURITY: This endpoint proxies requests to Open-Meteo API, keeping the API
+ * communication server-side to prevent CORS issues and provide consistent
+ * data formatting.
  */
 
-const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
-const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+const OPENMETEO_BASE_URL = 'https://api.open-meteo.com/v1';
 
 // Cache weather data for 10 minutes to reduce API calls
 const weatherCache = new Map<string, { data: unknown; timestamp: number }>();
@@ -34,20 +31,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Check if API key is configured
-  if (!OPENWEATHER_API_KEY) {
-    console.error('Weather API: OPENWEATHER_API_KEY not configured');
-    return jsonError(
-      'Weather service temporarily unavailable',
-      503,
-      ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-    );
-  }
-
   const searchParams = request.nextUrl.searchParams;
   const lat = searchParams.get('lat');
   const lon = searchParams.get('lon');
-  const units = searchParams.get('units') || 'metric';
 
   // Validate required parameters
   if (!lat || !lon) {
@@ -70,16 +56,10 @@ export async function GET(request: NextRequest) {
     return jsonError('Coordinates out of range', 400, ERROR_CODES.VALIDATION_ERROR);
   }
 
-  // SECURITY: Validate units parameter to prevent injection
-  const validUnits = ['metric', 'imperial', 'standard'];
-  if (!validUnits.includes(units)) {
-    return jsonError('Invalid units parameter', 400, ERROR_CODES.VALIDATION_ERROR);
-  }
-
   // Create cache key (rounded to 2 decimal places to improve cache hit rate)
   const roundedLat = Math.round(latitude * 100) / 100;
   const roundedLon = Math.round(longitude * 100) / 100;
-  const cacheKey = `${roundedLat},${roundedLon},${units}`;
+  const cacheKey = `${roundedLat},${roundedLon}`;
 
   // Check cache
   const cached = weatherCache.get(cacheKey);
@@ -88,12 +68,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch weather data from OpenWeather API
-    const weatherUrl = new URL(`${OPENWEATHER_BASE_URL}/weather`);
-    weatherUrl.searchParams.set('lat', latitude.toString());
-    weatherUrl.searchParams.set('lon', longitude.toString());
-    weatherUrl.searchParams.set('units', units);
-    weatherUrl.searchParams.set('appid', OPENWEATHER_API_KEY);
+    // Fetch weather data from Open-Meteo API
+    const weatherUrl = new URL(`${OPENMETEO_BASE_URL}/forecast`);
+    weatherUrl.searchParams.set('latitude', latitude.toString());
+    weatherUrl.searchParams.set('longitude', longitude.toString());
+    weatherUrl.searchParams.set('current_weather', 'true');
+    weatherUrl.searchParams.set('hourly', 'temperature_2m');
+    weatherUrl.searchParams.set('timezone', 'auto');
 
     const response = await fetch(weatherUrl.toString(), {
       headers: {
@@ -104,18 +85,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('OpenWeather API error:', {
+      console.error('Open-Meteo API error:', {
         status: response.status,
         statusText: response.statusText,
       });
-
-      if (response.status === 401) {
-        return jsonError(
-          'Weather service authentication failed',
-          503,
-          ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-        );
-      }
 
       return jsonError(
         'Weather service temporarily unavailable',
@@ -127,28 +100,17 @@ export async function GET(request: NextRequest) {
     const weatherData = await response.json();
 
     // SECURITY: Only return safe, sanitized data to the client
-    // Don't expose raw API response which might contain sensitive info
     const sanitizedData = {
-      weather: weatherData.weather?.[0] || null,
-      main: {
-        temp: weatherData.main?.temp,
-        feels_like: weatherData.main?.feels_like,
-        humidity: weatherData.main?.humidity,
-        pressure: weatherData.main?.pressure,
+      current_weather: {
+        temperature: weatherData.current_weather?.temperature,
+        weathercode: weatherData.current_weather?.weathercode,
+        is_day: weatherData.current_weather?.is_day,
       },
-      wind: {
-        speed: weatherData.wind?.speed,
-        deg: weatherData.wind?.deg,
-      },
-      visibility: weatherData.visibility,
-      clouds: weatherData.clouds?.all,
-      name: weatherData.name,
-      sys: {
-        sunrise: weatherData.sys?.sunrise,
-        sunset: weatherData.sys?.sunset,
+      hourly: {
+        time: weatherData.hourly?.time,
+        temperature_2m: weatherData.hourly?.temperature_2m,
       },
       timezone: weatherData.timezone,
-      dt: weatherData.dt,
     };
 
     // Update cache

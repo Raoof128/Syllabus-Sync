@@ -1,4 +1,8 @@
 {
+  "todoList": "To-Do List",
+  "addTodo": "Add todo",
+  "completedToday": "completed today",
+  "addTodoPlaceholder": "Add a new task...",
   "deviceUnknown": "Unknown device",
   "deviceThis": "This device",
   "deviceBrowser": "Browser",
