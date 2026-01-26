@@ -362,7 +362,10 @@ const FeedClient = memo(() => {
           role="region"
           aria-label={t('stayConnected')}
         >
-          <Info className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <Info
+            className="h-5 w-5 text-mq-content-secondary flex-shrink-0 mt-0.5"
+            aria-hidden="true"
+          />
           <div className="flex-1">
             <p className="text-mq-sm text-mq-content">
               <strong>{t('stayConnected')}</strong> {t('stayConnectedDesc')}
@@ -377,8 +380,8 @@ const FeedClient = memo(() => {
           {/* Filter Tabs */}
           <ScrollReveal delay={0.15}>
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
+              <div className="mq-magic-card-content p-0">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Filter className="h-5 w-5" aria-hidden="true" />
@@ -420,8 +423,8 @@ const FeedClient = memo(() => {
           {/* Events List */}
           <ScrollReveal delay={0.2}>
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
+              <div className="mq-magic-card-content p-0">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between flex-wrap gap-2">
                       <span className="flex items-center gap-2">
@@ -460,10 +463,10 @@ const FeedClient = memo(() => {
                               ref={(el) => {
                                 if (el) eventRefs.current.set(event.id, el);
                               }}
-                              className={`p-4 bg-mq-background-secondary rounded-mq-lg border border-mq-border transition-all duration-mq-fast ${
+                              className={`p-4 bg-mq-background-secondary rounded-mq-lg border transition-all duration-mq-fast ${
                                 isHighlighted
                                   ? 'border-mq-primary ring-2 ring-mq-primary/50 shadow-lg shadow-mq-primary/20'
-                                  : 'border-mq-border hover:shadow-mq-sm'
+                                  : 'border-mq-border hover:border-mq-border-secondary hover:shadow-mq-sm'
                               }`}
                               aria-posinset={index + 1}
                               aria-setsize={filteredEvents.length}
@@ -553,17 +556,21 @@ const FeedClient = memo(() => {
                                 {event.building && (
                                   <Button
                                     asChild
-                                    variant="ghost"
-                                    size="icon"
-                                    className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
+                                    variant="secondary"
+                                    size="sm"
+                                    className="gap-1.5"
                                   >
                                     <Link
-                                      href={`/map?building=${encodeURIComponent(event.building)}&autonav=true`}
+                                      href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
                                       aria-label={t('navigateToBuildingAria', {
                                         building: event.building,
                                       })}
                                     >
-                                      <Navigation className="h-4 w-4" aria-hidden="true" />
+                                      <Navigation
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                      />
+                                      {t('navigate')}
                                     </Link>
                                   </Button>
                                 )}
@@ -600,7 +607,10 @@ const FeedClient = memo(() => {
                         })
                       ) : (
                         <div className="text-center py-12">
-                          <Rss className="h-12 w-12 mx-auto mb-4" aria-hidden="true" />
+                          <Rss
+                            className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary"
+                            aria-hidden="true"
+                          />
                           <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
                             {t('noEventsFound')}
                           </h3>
@@ -622,8 +632,8 @@ const FeedClient = memo(() => {
           {/* Quick Stats */}
           <ScrollReveal delay={0.25}>
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
+              <div className="mq-magic-card-content p-0">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="h-5 w-5" aria-hidden="true" />
@@ -631,9 +641,9 @@ const FeedClient = memo(() => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg">
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" aria-hidden="true" />
+                        <Calendar className="h-4 w-4 text-mq-info" aria-hidden="true" />
                         <span className="text-mq-sm font-medium text-mq-content">
                           {t('totalEvents')}
                         </span>
@@ -645,9 +655,9 @@ const FeedClient = memo(() => {
                         {stats.total}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg">
                       <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" aria-hidden="true" />
+                        <Users className="h-4 w-4 text-mq-purple" aria-hidden="true" />
                         <span className="text-mq-sm font-medium text-mq-content">
                           {t('thisWeek')}
                         </span>
@@ -659,7 +669,7 @@ const FeedClient = memo(() => {
                         {stats.thisWeek}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-mq-background-secondary rounded-mq-lg">
+                    <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg">
                       <div className="flex items-center gap-2">
                         <span className="text-mq-warning" aria-hidden="true">
                           🍕
@@ -684,8 +694,8 @@ const FeedClient = memo(() => {
           {/* Announcements */}
           <ScrollReveal delay={0.3}>
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
+              <div className="mq-magic-card-content p-0">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Megaphone className="h-5 w-5" aria-hidden="true" />
@@ -730,8 +740,8 @@ const FeedClient = memo(() => {
           {/* Event Categories Legend */}
           <ScrollReveal delay={0.35}>
             <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
+              <div className="mq-magic-card-content p-0">
+                <Card className="border-0 shadow-none bg-transparent">
                   <CardHeader>
                     <CardTitle>{t('eventCategories')}</CardTitle>
                   </CardHeader>
@@ -793,7 +803,7 @@ const FeedClient = memo(() => {
           <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm')}</h3>

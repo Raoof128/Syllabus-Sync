@@ -131,6 +131,9 @@ CREATE TABLE public.deadlines (
   description text,
   unit_code text NOT NULL, -- References unit code (soft reference for flexibility)
   unit_id uuid, -- FK to units table (proper relationship)
+  building text, -- Building code for exams (e.g., "C5C")
+  room text, -- Room number for exams (e.g., "204")
+  color text, -- Custom color override (defaults to unit color)
   due_date timestamp with time zone NOT NULL, -- Single date field (due_at removed)
   priority text NOT NULL DEFAULT 'Medium' CHECK (priority = ANY (ARRAY['Low'::text, 'Medium'::text, 'High'::text, 'Urgent'::text])),
   type text NOT NULL DEFAULT 'Assignment' CHECK (type = ANY (ARRAY['Assignment'::text, 'Exam'::text, 'Quiz'::text, 'Presentation'::text])),
@@ -154,7 +157,9 @@ CREATE TABLE public.events (
   all_day boolean NOT NULL DEFAULT false, -- True for all-day events
   location text NOT NULL,
   building text, -- For map navigation
+  room text, -- Room number within building (e.g., "204")
   category text NOT NULL DEFAULT 'Academic' CHECK (category = ANY (ARRAY['Career'::text, 'Social'::text, 'Academic'::text, 'Free Food'::text])),
+  color text, -- Custom event color (hex value like "#A6192E")
   image_url text,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),

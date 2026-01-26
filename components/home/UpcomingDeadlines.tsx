@@ -18,6 +18,7 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { cn } from '@/lib/utils';
 
+
 const UpcomingDeadlines = memo(() => {
   const isHydrated = useHydration();
   const router = useRouter();
@@ -61,36 +62,34 @@ const UpcomingDeadlines = memo(() => {
 
   return (
     <MagicCard isLiquidEnhanced className="h-full">
-      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-        <Card className="h-full border border-mq-border bg-mq-card-background flex flex-col">
+      <div className="mq-magic-card-content">
+        <Card className="h-full border-0 shadow-none bg-transparent flex flex-col">
           <CardHeader
-            className="flex flex-row items-center justify-between pb-5"
+            className="flex flex-row items-center justify-between"
             style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
           >
-            <CardTitle className="flex items-center gap-3">
-              <CalendarDays className="h-6 w-6 sm:h-7 sm:w-7" />
-              {t('upcomingDeadlines')}
-            </CardTitle>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" />
+                {t('upcomingDeadlines')}
+              </CardTitle>
               {isHydrated && pendingCount > 0 && (
-                <Badge variant="neutral" className="text-sm sm:text-base px-2 sm:px-3 py-1">
+                <Badge
+                  variant="neutral"
+                  className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+                >
                   {pendingCount} {t('pending')}
                 </Badge>
               )}
-              <Button
-                size="default"
-                variant="outline"
-                className="gap-2 text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2"
-                asChild
-              >
-                <Link href="/calendar" aria-label={`${t('viewAll')} ${t('upcomingDeadlines')}`}>
-                  <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-                  <span>{t('viewAll')}</span>
-                </Link>
-              </Button>
             </div>
+            <Button size="sm" variant="outline" className="gap-1.5" asChild>
+              <Link href="/calendar" aria-label={`${t('viewAll')} ${t('upcomingDeadlines')}`}>
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{t('viewAll')}</span>
+              </Link>
+            </Button>
           </CardHeader>
-          <CardContent className="flex-1">
+          <CardContent className="space-y-3 flex-1">
             {!isHydrated ? (
               <div className="h-48 flex items-center justify-center">
                 <p
@@ -107,7 +106,7 @@ const UpcomingDeadlines = memo(() => {
               </div>
             ) : upcomingDeadlines.length === 0 ? (
               <div
-                className="text-center py-16 alabaster-readable"
+                className="text-center py-8 alabaster-readable"
                 style={{
                   color: 'var(--mq-content)',
                   WebkitTextFillColor: 'var(--mq-content)',
@@ -115,24 +114,28 @@ const UpcomingDeadlines = memo(() => {
                   mixBlendMode: 'normal',
                 }}
               >
-                <Clock className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-6" />
-                <h3 className="text-xl sm:text-2xl font-medium text-mq-content mb-4">
+                <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
+                <p className="text-mq-content-tertiary">
                   {t('noUpcomingDeadlines')}
-                </h3>
-                <p className="text-base sm:text-lg font-normal text-mq-content-secondary">
+                </p>
+                <p className="text-mq-content-tertiary text-sm mt-1">
                   {t('noDeadlinesDesc')}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              <div className="space-y-2">
                 {upcomingDeadlines.map((deadline) => {
                   const dueDate = new Date(deadline.dueDate);
                   const isOverdue = isPast(dueDate);
+
                   return (
                     <div
                       key={deadline.id}
                       className={cn(
-                        'p-4 sm:p-6 rounded-xl border-l-4 border-mq-border bg-mq-background-secondary hover:bg-mq-hover-background transition-all cursor-pointer shadow-sm hover:shadow-lg',
+                        'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
+                        isOverdue
+                          ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
+                          : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                       )}
                       onClick={() => router.push(`/calendar?highlightDeadline=${deadline.id}`)}
                       role="button"
@@ -144,60 +147,67 @@ const UpcomingDeadlines = memo(() => {
                         }
                       }}
                     >
-                      <div className="flex items-start justify-between gap-3 sm:gap-4 md:gap-5">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-4 mb-3 sm:mb-4">
+                      {/* Color indicator based on deadline type */}
+                      <div
+                        className={cn(
+                          'w-1.5 self-stretch rounded-full shrink-0',
+                          deadline.type === 'Assignment' && 'bg-blue-500',
+                          deadline.type === 'Exam' && 'bg-red-500',
+                          deadline.type === 'Presentation' && 'bg-purple-500',
+                          deadline.type === 'Quiz' && 'bg-amber-500',
+                        )}
+                      />
+
+                      {/* Deadline info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2 min-w-0">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleComplete(deadline.id);
                               }}
-                              className="flex-shrink-0 p-1.5 hover:bg-mq-hover-background rounded-xl min-h-[40px] min-w-[40px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center transition-colors"
+                              className="shrink-0 hover:bg-mq-hover-background rounded transition-colors"
                               aria-label={
                                 deadline.completed ? t('markIncomplete') : t('markAsCompleted')
                               }
                             >
                               {deadline.completed ? (
-                                <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
                               ) : (
-                                <Circle className="h-5 w-5 sm:h-6 sm:w-6" />
+                                <Circle className="h-4 w-4 text-mq-content-tertiary hover:text-mq-primary" />
                               )}
                             </button>
                             <h4
                               className={cn(
-                                'font-semibold text-base sm:text-lg leading-snug line-clamp-2',
+                                'font-semibold text-mq-content truncate',
                                 deadline.completed && 'line-through text-mq-content-tertiary',
                               )}
                             >
                               {deadline.title}
                             </h4>
                           </div>
-                          <p className="text-xs sm:text-sm text-mq-content-secondary mb-2 pl-2">
-                            {deadline.unitCode} • {getDeadlineTypeLabel(deadline.type)}
-                          </p>
-                          <p
-                            className={cn(
-                              'text-xs sm:text-sm mt-2 flex items-center gap-2.5 pl-2',
-                              isOverdue
-                                ? 'text-red-600 font-semibold'
-                                : 'text-mq-content-secondary',
-                            )}
-                          >
-                            {isOverdue && <AlertCircle className="h-4 w-4 inline flex-shrink-0" />}
-                            {formatDueDate(dueDate)}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-4">
                           <Badge
                             className={cn(
                               PRIORITY_COLORS[deadline.priority],
-                              'text-xs sm:text-sm px-2.5 sm:px-3 py-1 sm:py-1.5 font-medium',
+                              'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
                             )}
                             variant="neutral"
                           >
                             {t(`priority_${deadline.priority}` as TranslationKey)}
                           </Badge>
+                        </div>
+
+                        <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1">
+                          {deadline.unitCode} • {getDeadlineTypeLabel(deadline.type)}
+                        </p>
+
+                        <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
+                          {isOverdue && <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0" />}
+                          <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                            {formatDueDate(dueDate)}
+                          </span>
                         </div>
                       </div>
                     </div>

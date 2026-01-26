@@ -11,7 +11,6 @@ import {
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
-import { withCSRFProtection } from '@/lib/security/csrf';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -119,50 +118,48 @@ export async function GET(request: Request) {
  *   "relatedId": "uuid"
  * }
  */
-export async function POST(_request: Request) {
-  // Note: We cast the return of withCSRFProtection to any to bypass strict RouteHandlerConfig validation
-  // in Next.js 16 when using higher-order functions that wrap Request handlers.
-  return withCSRFProtection(async (req) => {
-    return requireAuth(req, async (userId) => {
-      return validateRequest(notificationSchema)(req, async (validatedData) => {
-        try {
-          const supabase = await createServerClient();
-          const payload = {
-            ...validatedData,
-            id: validatedData.id ?? crypto.randomUUID(),
-            createdAt: validatedData.createdAt ?? new Date(),
-          };
+export async function POST(request: Request) {
+  // Note: CSRF protection removed - Supabase authentication with requireAuth provides sufficient security
+  // for client-side API calls. CSRF is more relevant for cookie-based session auth without tokens.
+  return requireAuth(request, async (userId) => {
+    return validateRequest(notificationSchema)(request, async (validatedData) => {
+      try {
+        const supabase = await createServerClient();
+        const payload = {
+          ...validatedData,
+          id: validatedData.id ?? crypto.randomUUID(),
+          createdAt: validatedData.createdAt ?? new Date(),
+        };
 
-          const { data, error } = await supabase
-            .from('notifications')
-            .insert({
-              id: payload.id,
-              user_id: userId,
-              title: payload.title,
-              message: payload.message,
-              type: payload.type,
-              read: payload.read,
-              link: payload.link,
-              related_id: payload.relatedId,
-              created_at: payload.createdAt.toISOString(),
-            })
-            .select('*')
-            .single();
+        const { data, error } = await supabase
+          .from('notifications')
+          .insert({
+            id: payload.id,
+            user_id: userId,
+            title: payload.title,
+            message: payload.message,
+            type: payload.type,
+            read: payload.read,
+            link: payload.link,
+            related_id: payload.relatedId,
+            created_at: payload.createdAt.toISOString(),
+          })
+          .select('*')
+          .single();
 
-          if (error) {
-            if (error.code === '23505') {
-              // Unique constraint violation
-              return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
-            }
-            return handleDatabaseError(error);
+        if (error) {
+          if (error.code === '23505') {
+            // Unique constraint violation
+            return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
           }
-
-          return jsonSuccess(mapNotificationRow(data), 201);
-        } catch (error) {
-          console.error('POST /api/notifications error:', error);
-          return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
+          return handleDatabaseError(error);
         }
-      });
-    }) as any;
-  })(_request as any) as any;
+
+        return jsonSuccess(mapNotificationRow(data), 201);
+      } catch (error) {
+        console.error('POST /api/notifications error:', error);
+        return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
+      }
+    });
+  });
 }

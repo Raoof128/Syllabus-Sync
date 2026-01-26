@@ -766,13 +766,6 @@ export default function CalendarClient() {
     }
   };
 
-  // Navigate to map with building highlighted
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const navigateToMap = (building: string | undefined) => {
-    if (building) {
-      router.push(`/map?building=${encodeURIComponent(building)}`);
-    }
-  };
 
   // Get building info for a deadline (either from deadline itself or from its unit)
   const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
@@ -1115,8 +1108,8 @@ export default function CalendarClient() {
                         <div
                           key={`${day.toISOString()}-${hour}`}
                           className={cn(
-                            'calendar-grid-cell border-t border-mq-border border-r border-mq-border last:border-r-0',
-                            dayIndex === 0 && 'border-l border-mq-border',
+                            'calendar-grid-cell border-t border-r border-mq-border last:border-r-0',
+                            dayIndex === 0 && 'border-l',
                             dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
                           )}
                           style={{ height: HOUR_HEIGHT }}
@@ -2003,7 +1996,7 @@ export default function CalendarClient() {
                               <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0 justify-end">
                                 {getDeadlineBuilding(assignment) && (
                                   <Link
-                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}&autonav=true`}
+                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}${assignment.room ? `&room=${encodeURIComponent(assignment.room)}` : ''}&autonav=true`}
                                     onClick={(e) => e.stopPropagation()}
                                     aria-label={t('navigateToBuildingAria', {
                                       building: getDeadlineBuilding(assignment) || '',
@@ -2012,12 +2005,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 p-0 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                      aria-label={
-                                        t('navigateToBuildingAria', {
-                                          building: getDeadlineBuilding(assignment) || '',
-                                        }) || t('navigate')
-                                      }
+                                      className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                     >
                                       <Navigation className="h-4 w-4" aria-hidden="true" />
                                     </Button>
@@ -2161,7 +2149,7 @@ export default function CalendarClient() {
                               <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0 justify-end">
                                 {getDeadlineBuilding(exam) && (
                                   <Link
-                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}&autonav=true`}
+                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}${exam.room ? `&room=${encodeURIComponent(exam.room)}` : ''}&autonav=true`}
                                     onClick={(e) => e.stopPropagation()}
                                     aria-label={t('navigateToBuildingAria', {
                                       building: getDeadlineBuilding(exam) || '',
@@ -2170,12 +2158,7 @@ export default function CalendarClient() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 p-0 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                      aria-label={
-                                        t('navigateToBuildingAria', {
-                                          building: getDeadlineBuilding(exam) || '',
-                                        }) || t('navigate')
-                                      }
+                                      className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                     >
                                       <Navigation className="h-4 w-4" aria-hidden="true" />
                                     </Button>
@@ -2296,7 +2279,7 @@ export default function CalendarClient() {
                           <div className="flex items-center gap-0.5 ml-auto pl-2">
                             {unit.location?.building && (
                               <Link
-                                href={`/map?building=${encodeURIComponent(unit.location.building)}&autonav=true`}
+                                href={`/map?building=${encodeURIComponent(unit.location.building)}${unit.location?.room ? `&room=${encodeURIComponent(unit.location.room)}` : ''}&autonav=true`}
                                 onClick={(e) => e.stopPropagation()}
                                 aria-label={t('navigateToBuildingAria', {
                                   building: unit.location.building,
@@ -2305,12 +2288,7 @@ export default function CalendarClient() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 p-0 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                  aria-label={
-                                    t('navigateToBuildingAria', {
-                                      building: unit.location.building,
-                                    }) || t('navigate')
-                                  }
+                                  className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                 >
                                   <Navigation className="h-4 w-4" aria-hidden="true" />
                                 </Button>
@@ -2424,7 +2402,7 @@ export default function CalendarClient() {
                             <div className="flex items-center gap-0.5 ml-auto pl-2">
                               {event.building && (
                                 <Link
-                                  href={`/map?building=${encodeURIComponent(event.building)}&autonav=true`}
+                                  href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
                                   onClick={(e) => e.stopPropagation()}
                                   aria-label={t('navigateToBuildingAria', {
                                     building: event.building,
@@ -2433,11 +2411,7 @@ export default function CalendarClient() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 p-0 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                    aria-label={
-                                      t('navigateToBuildingAria', { building: event.building }) ||
-                                      t('navigate')
-                                    }
+                                    className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                   >
                                     <Navigation className="h-4 w-4" aria-hidden="true" />
                                   </Button>

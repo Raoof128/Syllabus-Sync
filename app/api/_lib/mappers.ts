@@ -74,6 +74,7 @@ export const mapEventRow = (row: Row): Event => {
     building: row.building ? String(row.building) : undefined,
     room: row.room ? String(row.room) : undefined,
     category: row.category as Event['category'],
+    color: row.color ? String(row.color) : undefined,
     imageUrl: row.image_url ? String(row.image_url) : undefined,
     // Primary time fields
     startAt,
@@ -129,7 +130,9 @@ export const serializeEvent = (event: Event & { user_id?: string }) => ({
   description: event.description,
   location: event.location,
   building: event.building,
+  room: event.room,
   category: event.category,
+  color: event.color,
   image_url: event.imageUrl,
   // Primary time fields (no more event_date/event_time)
   start_at: event.startAt.toISOString(),

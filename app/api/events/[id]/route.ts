@@ -24,7 +24,9 @@ const eventUpdateSchema = z.object({
   description: z.string().min(1).optional(),
   location: z.string().min(1).optional(),
   building: z.string().optional(),
+  room: z.string().optional(),
   category: z.enum(['Career', 'Social', 'Academic', 'Free Food']).optional(),
+  color: z.string().optional(),
   imageUrl: z.string().optional(),
   startAt: z.preprocess(
     (val) => (typeof val === 'string' ? new Date(val) : val),
@@ -73,7 +75,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         updatePayload.description = parsed.data.description;
       if (parsed.data.location !== undefined) updatePayload.location = parsed.data.location;
       if (parsed.data.building !== undefined) updatePayload.building = parsed.data.building;
+      if (parsed.data.room !== undefined) updatePayload.room = parsed.data.room;
       if (parsed.data.category !== undefined) updatePayload.category = parsed.data.category;
+      if (parsed.data.color !== undefined) updatePayload.color = parsed.data.color;
       if (parsed.data.imageUrl !== undefined) updatePayload.image_url = parsed.data.imageUrl;
       if (parsed.data.startAt !== undefined)
         updatePayload.start_at = parsed.data.startAt.toISOString();

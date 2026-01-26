@@ -122,7 +122,9 @@ export const useEventsStore = create<EventsState>()(
               description: normalized.description,
               location: normalized.location,
               building: normalized.building,
+              room: normalized.room,
               category: normalized.category,
+              color: normalized.color,
               imageUrl: normalized.imageUrl,
               startAt: normalized.startAt.toISOString(),
               endAt: normalized.endAt?.toISOString(),
@@ -164,7 +166,9 @@ export const useEventsStore = create<EventsState>()(
           if (updates.description !== undefined) updatePayload.description = updates.description;
           if (updates.location !== undefined) updatePayload.location = updates.location;
           if (updates.building !== undefined) updatePayload.building = updates.building;
+          if (updates.room !== undefined) updatePayload.room = updates.room;
           if (updates.category !== undefined) updatePayload.category = updates.category;
+          if (updates.color !== undefined) updatePayload.color = updates.color;
           if (updates.imageUrl !== undefined) updatePayload.imageUrl = updates.imageUrl;
           if (updates.startAt !== undefined)
             updatePayload.startAt =

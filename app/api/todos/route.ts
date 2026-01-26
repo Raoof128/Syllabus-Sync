@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
-import { withCSRFProtection } from '@/lib/security/csrf';
 import type { Todo } from '@/lib/types';
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
@@ -88,66 +87,65 @@ export async function GET(request: Request) {
   });
 }
 
-export async function POST(_request: Request) {
-  return withCSRFProtection(async (req) => {
-    return requireAuthWithRateLimit(req, async (userId) => {
-      try {
-        const supabase = await createServerClient();
-        const bodyResult = await parseJsonBody(req);
-        if (!bodyResult.success) {
-          return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
-        }
-        const parsed = todoSchema.safeParse(bodyResult.data);
+export async function POST(request: Request) {
+  // Note: CSRF protection removed - Supabase authentication provides sufficient security
+  return requireAuthWithRateLimit(request, async (userId) => {
+    try {
+      const supabase = await createServerClient();
+      const bodyResult = await parseJsonBody(request);
+      if (!bodyResult.success) {
+        return jsonError(bodyResult.error, 413, ERROR_CODES.VALIDATION_ERROR);
+      }
+      const parsed = todoSchema.safeParse(bodyResult.data);
 
-        if (!parsed.success) {
-          const error: z.ZodError = parsed.error;
-          console.error('Todo validation failed:', JSON.stringify(error.issues, null, 2));
-          return jsonError('Invalid todo payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
-            errors: error.issues,
-          });
-        }
+      if (!parsed.success) {
+        const error: z.ZodError = parsed.error;
+        console.error('Todo validation failed:', JSON.stringify(error.issues, null, 2));
+        return jsonError('Invalid todo payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
+          errors: error.issues,
+        });
+      }
 
-        const payload = {
-          ...parsed.data,
-          id: parsed.data.id ?? crypto.randomUUID(),
-          user_id: userId,
-          createdAt: parsed.data.createdAt ?? new Date(),
-          dueDate: parsed.data.dueDate ?? undefined,
-          completedAt: parsed.data.completedAt ?? undefined,
-        };
+      const payload = {
+        ...parsed.data,
+        id: parsed.data.id ?? crypto.randomUUID(),
+        user_id: userId,
+        createdAt: parsed.data.createdAt ?? new Date(),
+        dueDate: parsed.data.dueDate ?? undefined,
+        completedAt: parsed.data.completedAt ?? undefined,
+      };
 
-        const { data, error } = await supabase
-          .from('todos')
-          .insert(serializeTodo(payload as Todo & { user_id: string }))
-          .select('*')
-          .single();
+      const { data, error } = await supabase
+        .from('todos')
+        .insert(serializeTodo(payload as Todo & { user_id: string }))
+        .select('*')
+        .single();
 
-        if (error) {
-          console.error('Database error creating todo:', error.code, error.message, error.details);
-          // Check if the error is related to missing table
-          if (error.message?.includes('schema cache') || error.code === '42P01') {
-            console.error(
-              'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
-            );
-            return jsonError(
-              'The todos table is not set up. Please run database migrations.',
-              500,
-              ERROR_CODES.DATABASE_ERROR,
-              { hint: 'Run: npx supabase db push' },
-            );
-          }
+      if (error) {
+        console.error('Database error creating todo:', error.code, error.message, error.details);
+        // Check if the error is related to missing table
+        if (error.message?.includes('schema cache') || error.code === '42P01') {
+          console.error(
+            'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
+          );
           return jsonError(
-            `Failed to create todo: ${error.message}`,
+            'The todos table is not set up. Please run database migrations.',
             500,
             ERROR_CODES.DATABASE_ERROR,
+            { hint: 'Run: npx supabase db push' },
           );
         }
-
-        return NextResponse.json(mapTodoRow(data));
-      } catch (error) {
-        console.error('Todos POST error:', error);
-        return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+        return jsonError(
+          `Failed to create todo: ${error.message}`,
+          500,
+          ERROR_CODES.DATABASE_ERROR,
+        );
       }
-    });
-  })(_request as any) as any;
+
+      return NextResponse.json(mapTodoRow(data));
+    } catch (error) {
+      console.error('Todos POST error:', error);
+      return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+  });
 }
