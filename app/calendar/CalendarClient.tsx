@@ -495,18 +495,72 @@ export default function CalendarClient() {
     };
   }, [highlightedUnitId]);
 
-  // Calendar state
-  const [currentWeekStart, setCurrentWeekStart] = useState(() =>
-    dayjs().startOf('isoWeek').toDate(),
-  );
+  // Get date from URL parameter if provided
+  const urlDate = useMemo(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      const parsed = dayjs(dateParam);
+      if (parsed.isValid()) {
+        return parsed;
+      }
+    }
+    return null;
+  }, [searchParams]);
+
+  // Calendar state - use URL date if provided, otherwise current week
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const dateParam = params.get('date');
+      if (dateParam) {
+        const parsed = dayjs(dateParam);
+        if (parsed.isValid()) {
+          return parsed.startOf('isoWeek').toDate();
+        }
+      }
+    }
+    return dayjs().startOf('isoWeek').toDate();
+  });
 
   // Mobile: track the currently selected day index (0-6 for Mon-Sun)
   const [mobileSelectedDayIndex, setMobileSelectedDayIndex] = useState(() => {
+    // Check for URL date parameter first
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const dateParam = params.get('date');
+      if (dateParam) {
+        const parsed = dayjs(dateParam);
+        if (parsed.isValid()) {
+          const weekStart = parsed.startOf('isoWeek');
+          return parsed.diff(weekStart, 'day');
+        }
+      }
+    }
     // Default to today's day of week (0 = Monday in isoWeek)
     const today = dayjs();
     const weekStart = dayjs().startOf('isoWeek');
     return today.diff(weekStart, 'day');
   });
+
+  // Update week when URL date changes
+  useEffect(() => {
+    if (urlDate) {
+      const newWeekStart = urlDate.startOf('isoWeek').toDate();
+      setCurrentWeekStart(newWeekStart);
+      // Update mobile selected day
+      const dayIndex = urlDate.diff(urlDate.startOf('isoWeek'), 'day');
+      setMobileSelectedDayIndex(dayIndex);
+
+      // Clear the date parameter from URL after processing
+      const clearTimer = setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('date');
+        window.history.replaceState({}, '', url.toString());
+      }, 1000);
+
+      return () => clearTimeout(clearTimer);
+    }
+  }, [urlDate]);
 
   // Get days of the current week
   const weekDays = useMemo(
@@ -529,7 +583,11 @@ export default function CalendarClient() {
   // Get items for a specific day (filtering out "classes" category from MQ dates since we show units instead)
   const getItemsForDay = (date: Date) => {
     const dayDeadlines = deadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
-    const dayEvents = allEvents.filter((e) => dayjs(e.date).isSame(date, 'day'));
+    // Use startAt as source of truth for events, fallback to date for backward compatibility
+    const dayEvents = allEvents.filter((e) => {
+      const eventDate = e.startAt || e.date;
+      return dayjs(eventDate).isSame(date, 'day');
+    });
     const dayMQDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
     const dayUnits = getUnitsForDay(date);
     return { deadlines: dayDeadlines, events: dayEvents, mqDates: dayMQDates, units: dayUnits };
@@ -2422,13 +2480,9 @@ export default function CalendarClient() {
                             tabIndex={0}
                           >
                             <div
-                              className="w-3 h-3 rounded-full flex-shrink-0"
-                              style={eventColors.style ? { backgroundColor: event.color } : undefined}
-                            >
-                              {!eventColors.style && (
-                                <div className={`w-full h-full rounded-full ${eventColors.bg}`} />
-                              )}
-                            </div>
+                              className={`w-3 h-3 rounded-full flex-shrink-0 ${!event.color ? eventColors.bg : ''}`}
+                              style={event.color ? { backgroundColor: event.color } : undefined}
+                            />
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-sm line-clamp-2 break-words">
                                 {eventTitle}
@@ -2694,7 +2748,7 @@ export default function CalendarClient() {
                               {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
                             </p>
                             <p className="text-sm text-mq-content-tertiary mt-2">
-                              Complete tasks to see them here
+                              {tOr('completeTasksHint', 'Complete tasks to see them here')}
                             </p>
                           </div>
                         ) : (

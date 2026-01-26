@@ -2,7 +2,7 @@
 // Events are loaded from Supabase via eventsStore
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, ExternalLink, Calendar } from 'lucide-react';
@@ -14,6 +14,7 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { Event } from '@/lib/types';
+import { useHydration } from '@/lib/hooks';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info border border-mq-info/20',
@@ -26,9 +27,16 @@ const EventsFeed = memo(() => {
   const { t } = useTranslation();
   const router = useRouter();
   const events = useEventsStore((state) => state.events);
+  const isHydrated = useHydration();
 
-  // Filter events to today only
-  const todayEvents = events.filter((event) => isToday(new Date(event.date)));
+  // Filter events to today only - use startAt as source of truth
+  const todayEvents = useMemo(() => {
+    return events.filter((event) => {
+      // Use startAt (source of truth) or fall back to date for backward compatibility
+      const eventDate = event.startAt || event.date;
+      return isToday(new Date(eventDate));
+    });
+  }, [events]);
 
   const handleViewAll = () => {
     router.push('/feed');
@@ -57,9 +65,16 @@ const EventsFeed = memo(() => {
             </Button>
           </CardHeader>
           <CardContent>
-            {todayEvents.length === 0 ? (
+            {!isHydrated ? (
+              <div className="space-y-3 p-2">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
+                  <div className="h-3 bg-mq-background-tertiary rounded w-1/2" />
+                </div>
+              </div>
+            ) : todayEvents.length === 0 ? (
               <div className="text-center py-8">
-                <Calendar className="h-12 w-12 mx-auto mb-4" />
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" aria-hidden="true" />
                 <p className="text-mq-content-tertiary">{t('noEventsToday')}</p>
               </div>
             ) : (

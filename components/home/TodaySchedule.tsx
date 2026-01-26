@@ -221,7 +221,7 @@ const TodaySchedule = memo(() => {
               </div>
             ) : classesWithStatus.length === 0 ? (
               <div className="text-center py-8">
-                <Clock className="h-12 w-12 mx-auto mb-4" aria-hidden="true" />
+                <Clock className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" aria-hidden="true" />
                 <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
                 <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
               </div>

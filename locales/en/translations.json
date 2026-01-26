@@ -2,6 +2,8 @@
   "todoList": "To-Do List",
   "addTodo": "Add todo",
   "completedToday": "completed today",
+  "noCompletedToday": "Nothing completed yet",
+  "completeTasksHint": "Complete tasks to see them here",
   "addTodoPlaceholder": "Add a new task...",
   "priorityHigh": "High",
   "priorityMedium": "Medium",
