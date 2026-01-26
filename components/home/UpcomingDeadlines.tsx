@@ -18,7 +18,6 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { cn } from '@/lib/utils';
 
-
 const UpcomingDeadlines = memo(() => {
   const isHydrated = useHydration();
   const router = useRouter();
@@ -114,13 +113,12 @@ const UpcomingDeadlines = memo(() => {
                   mixBlendMode: 'normal',
                 }}
               >
-                <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
-                <p className="text-mq-content-tertiary">
-                  {t('noUpcomingDeadlines')}
-                </p>
-                <p className="text-mq-content-tertiary text-sm mt-1">
-                  {t('noDeadlinesDesc')}
-                </p>
+                <Clock
+                  className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
+                  aria-hidden="true"
+                />
+                <p className="text-mq-content-tertiary">{t('noUpcomingDeadlines')}</p>
+                <p className="text-mq-content-tertiary text-sm mt-1">{t('noDeadlinesDesc')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -205,7 +203,9 @@ const UpcomingDeadlines = memo(() => {
                         </p>
 
                         <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
-                          {isOverdue && <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0" />}
+                          {isOverdue && (
+                            <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0" />
+                          )}
                           <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
                             {formatDueDate(dueDate)}
                           </span>

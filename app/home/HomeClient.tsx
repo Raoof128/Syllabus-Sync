@@ -361,7 +361,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               {hasHydrated && deadlines.length > 0 && (
                 <>
                   <div className="flex sm:hidden items-center gap-1.5 px-2.5 py-1.5 mq-liquid-glass rounded-full shadow-md">
-                    <TrendingUp className="h-3.5 w-3.5 text-mq-content-secondary" aria-hidden="true" />
+                    <TrendingUp
+                      className="h-3.5 w-3.5 text-mq-content-secondary"
+                      aria-hidden="true"
+                    />
                     <Badge
                       className={`${stressColors[stressLevel]} text-xs px-2 py-0.5 rounded-full font-medium`}
                       aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
@@ -378,7 +381,9 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                       aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                       title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
                     >
-                      <span aria-hidden="true" className="mr-1">{stressEmoji[stressLevel]}</span>
+                      <span aria-hidden="true" className="mr-1">
+                        {stressEmoji[stressLevel]}
+                      </span>
                       {stressLabels[stressLevel]}
                     </Badge>
                   </div>

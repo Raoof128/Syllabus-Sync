@@ -215,7 +215,6 @@ export default function ManageProfilesPage() {
         preferences: currentProfile.preferences,
       };
 
-
       const result = await updateProfile(currentProfile.id, updates);
 
       if (result) {

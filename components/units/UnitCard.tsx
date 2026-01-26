@@ -132,7 +132,12 @@ const UnitCard = React.memo(
                       <span aria-hidden="true">{getUniqueDays()}</span>
                     </Badge>
                   </div>
-                  <p className="text-mq-sm text-mq-content-secondary mt-1 line-clamp-2" title={unit.name}>{unit.name}</p>
+                  <p
+                    className="text-mq-sm text-mq-content-secondary mt-1 line-clamp-2"
+                    title={unit.name}
+                  >
+                    {unit.name}
+                  </p>
                 </div>
               </div>
 

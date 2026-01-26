@@ -546,6 +546,7 @@ export default function CalendarClient() {
   useEffect(() => {
     if (urlDate) {
       const newWeekStart = urlDate.startOf('isoWeek').toDate();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentWeekStart(newWeekStart);
       // Update mobile selected day
       const dayIndex = urlDate.diff(urlDate.startOf('isoWeek'), 'day');
@@ -835,7 +836,6 @@ export default function CalendarClient() {
       setEventToDelete(null);
     }
   };
-
 
   // Get building info for a deadline (either from deadline itself or from its unit)
   const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
@@ -2029,7 +2029,10 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {assignment.completed ? (
-                                    <CheckCircle2 className="h-4 w-4 text-green-600" aria-hidden="true" />
+                                    <CheckCircle2
+                                      className="h-4 w-4 text-green-600"
+                                      aria-hidden="true"
+                                    />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2193,7 +2196,10 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {exam.completed ? (
-                                    <CheckCircle2 className="h-4 w-4 text-green-600" aria-hidden="true" />
+                                    <CheckCircle2
+                                      className="h-4 w-4 text-green-600"
+                                      aria-hidden="true"
+                                    />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2764,7 +2770,10 @@ export default function CalendarClient() {
                                   aria-label={t('markIncomplete')}
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                 >
-                                  <CheckCircle2 className="h-5 w-5 text-green-600" aria-hidden="true" />
+                                  <CheckCircle2
+                                    className="h-5 w-5 text-green-600"
+                                    aria-hidden="true"
+                                  />
                                 </button>
                                 <p
                                   className="text-sm sm:text-base line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal"

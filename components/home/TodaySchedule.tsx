@@ -192,10 +192,7 @@ const TodaySchedule = memo(() => {
               )}
             </div>
             <Button size="sm" variant="outline" className="gap-1.5" asChild>
-              <Link
-                href="/calendar"
-                aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}
-              >
+              <Link href="/calendar" aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}>
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{t('viewInCalendar')}</span>
               </Link>
@@ -221,7 +218,10 @@ const TodaySchedule = memo(() => {
               </div>
             ) : classesWithStatus.length === 0 ? (
               <div className="text-center py-8">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" aria-hidden="true" />
+                <Clock
+                  className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary"
+                  aria-hidden="true"
+                />
                 <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
                 <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
               </div>
@@ -269,7 +269,10 @@ const TodaySchedule = memo(() => {
                         {getStatusBadge(cls.status)}
                       </div>
 
-                      <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1" title={cls.name}>
+                      <p
+                        className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1"
+                        title={cls.name}
+                      >
                         {cls.name}
                       </p>
 

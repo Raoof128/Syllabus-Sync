@@ -554,22 +554,14 @@ const FeedClient = memo(() => {
                                   {isReminded ? t('reminderTimingUpdated') : t('remindMe')}
                                 </Button>
                                 {event.building && (
-                                  <Button
-                                    asChild
-                                    variant="secondary"
-                                    size="sm"
-                                    className="gap-1.5"
-                                  >
+                                  <Button asChild variant="secondary" size="sm" className="gap-1.5">
                                     <Link
                                       href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
                                       aria-label={t('navigateToBuildingAria', {
                                         building: event.building,
                                       })}
                                     >
-                                      <Navigation
-                                        className="h-4 w-4"
-                                        aria-hidden="true"
-                                      />
+                                      <Navigation className="h-4 w-4" aria-hidden="true" />
                                       {t('navigate')}
                                     </Link>
                                   </Button>

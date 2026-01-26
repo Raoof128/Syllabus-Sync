@@ -102,9 +102,7 @@ const WeatherWidget = memo(() => {
       aria-label={`Current weather in ${weatherData.location}: ${weatherData.condition}, ${weatherData.temp} degrees Celsius`}
     >
       {/* Icon */}
-      <div className={`relative shrink-0 ${textClass}`}>
-        {icon}
-      </div>
+      <div className={`relative shrink-0 ${textClass}`}>{icon}</div>
 
       {/* Temperature and condition */}
       <div className={`flex items-center gap-1 ${textClass}`}>

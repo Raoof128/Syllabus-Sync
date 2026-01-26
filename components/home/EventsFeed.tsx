@@ -74,7 +74,10 @@ const EventsFeed = memo(() => {
               </div>
             ) : todayEvents.length === 0 ? (
               <div className="text-center py-8">
-                <Calendar className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" aria-hidden="true" />
+                <Calendar
+                  className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary"
+                  aria-hidden="true"
+                />
                 <p className="text-mq-content-tertiary">{t('noEventsToday')}</p>
               </div>
             ) : (
@@ -85,15 +88,16 @@ const EventsFeed = memo(() => {
                     ? t(event.translationKey as TranslationKey)
                     : event.title;
                   // If translation returned the key itself, use original title
-                  const finalTitle = displayTitle === event.translationKey ? event.title : displayTitle;
+                  const finalTitle =
+                    displayTitle === event.translationKey ? event.title : displayTitle;
 
                   const eventContent = (
                     <>
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-mq-content line-clamp-2">
-                          {finalTitle}
-                        </h3>
-                        <Badge className={`${categoryColors[event.category]} alabaster-readable shrink-0`}>
+                        <h3 className="font-semibold text-mq-content line-clamp-2">{finalTitle}</h3>
+                        <Badge
+                          className={`${categoryColors[event.category]} alabaster-readable shrink-0`}
+                        >
                           {t(`category_${event.category.replace(/ /g, '')}` as TranslationKey)}
                         </Badge>
                       </div>

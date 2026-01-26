@@ -215,14 +215,14 @@ describe('StreakBadge', () => {
   it('applies active styling when streak is active', () => {
     render(<StreakBadge />);
 
-    const badge = screen.getByText('5').closest('span');
-    expect(badge).toHaveClass('bg-orange-100', 'text-orange-600');
+    const badge = screen.getByText('5').parentElement;
+    expect(badge).toHaveClass('bg-linear-to-r', 'from-orange-400', 'to-amber-500', 'text-white');
   });
 
   it('applies custom className', () => {
     render(<StreakBadge className="custom-badge" />);
 
-    const badge = screen.getByText('5').closest('span');
+    const badge = screen.getByText('5').parentElement;
     expect(badge).toHaveClass('custom-badge');
   });
 

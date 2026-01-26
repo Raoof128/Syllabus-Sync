@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
