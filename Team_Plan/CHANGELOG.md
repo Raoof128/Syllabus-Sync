@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: Fix - Dropdown menu bounds (translate full width).
+Summary: Forced end-aligned dropdowns to translate left by full width and neutralized align offsets to keep menus within viewport edges.
+Files: components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+Verification: Chrome DevTools MCP check: profile menu right edge = 1160px at 1200px viewport; notifications menu right edge = 996px at 1200px viewport. `npm run lint` still fails due to existing test-weather lint issues.
+Follow-ups: Confirm behavior on the exact viewport where overflow persists.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: Fix - Dropdown menu bounds (collision boundary + stronger shifts).
+Summary: Defaulted collision boundary to the document root, increased end-aligned offsets, and applied header collision boundaries to keep menus within the viewport.
+Files: components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+Verification: `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, lib/hooks/useWeather.ts).
+Follow-ups: Confirm the exact viewport where overflow persists.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: Fix - Dropdown menu bounds (targeted offsets).
+Summary: Added end-aligned left shift, increased collision padding, and applied header-level collision boundary with stronger align offsets for header dropdowns.
+Files: components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+Verification: `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, lib/hooks/useWeather.ts).
+Follow-ups: Validate on the exact viewport where overflow occurs.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: Fix - Dropdown menu bounds (follow-up).
+Summary: Added end-aligned offset handling and increased collision padding to reduce right overflow on Radix dropdowns.
+Files: components/ui/dropdown-menu.tsx.
+Verification: `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, components/layout/Header.tsx, lib/hooks/useWeather.ts).
+Follow-ups: Verify dropdown position on the reported screen size.
+
+Raouf: 2026-01-26 (Australia/Sydney)
+Scope: Fix - Dropdown menu bounds.
+Summary: Kept Radix dropdown menus within viewport bounds by enabling sticky positioning and hiding detached content.
+Files: components/ui/dropdown-menu.tsx.
+Verification: `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, components/layout/Header.tsx, lib/hooks/useWeather.ts).
+Follow-ups: None.
+
 Raouf: 2026-01-25 - Crawl4AI Integration Test
 
 ### Added

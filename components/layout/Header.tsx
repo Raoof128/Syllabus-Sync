@@ -26,7 +26,7 @@
 // ============================================================================
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -69,6 +69,7 @@ const notificationIcons = {
 const Header = memo(() => {
   const { t, language } = useTranslation();
   const router = useRouter();
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const [user, setUser] = useState<{
     email?: string;
@@ -84,6 +85,18 @@ const Header = memo(() => {
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [collisionBoundary, setCollisionBoundary] = useState<Element | null>(null);
+
+  // Set isClient to true when component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      setCollisionBoundary(document.documentElement);
+    }
+  }, [isClient]);
 
   // Load notifications on mount
   useEffect(() => {
@@ -187,7 +200,10 @@ const Header = memo(() => {
     : null;
 
   return (
-    <header className="h-14 sm:h-16 w-full flex-shrink-0 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40">
+    <header
+      ref={headerRef}
+      className="h-14 sm:h-16 w-full flex-shrink-0 mq-liquid-glass border-b border-[var(--liquid-glass-border)] flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
+    >
       {/* Left side - Logo and title (far left) */}
       <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0 min-w-0">
         <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
@@ -262,7 +278,8 @@ const Header = memo(() => {
               sideOffset={8}
               side="bottom"
               collisionPadding={24}
-              alignOffset={-4}
+              collisionBoundary={collisionBoundary ?? headerRef.current ?? undefined}
+              alignOffset={0}
               className="w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg"
               role="menu"
               aria-label={t('notifications')}
@@ -456,9 +473,11 @@ const Header = memo(() => {
               align="end"
               sideOffset={8}
               side="bottom"
-              collisionPadding={24}
-              alignOffset={-4}
-              className="w-48 max-w-[calc(100vw-1rem)] border-mq-border shadow-mq-lg"
+              collisionPadding={16}
+              collisionBoundary={collisionBoundary ?? headerRef.current ?? undefined}
+              alignOffset={0}
+              avoidCollisions
+              className="w-48 max-w-[90vw] border-mq-border shadow-mq-lg"
             >
               <DropdownMenuItem asChild>
                 <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">

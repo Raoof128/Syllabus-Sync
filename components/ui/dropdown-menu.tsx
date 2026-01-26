@@ -25,19 +25,41 @@ function DropdownMenuTrigger({
 function DropdownMenuContent({
   className,
   sideOffset = 4,
+  collisionPadding = 20,
+  avoidCollisions = true,
+  align,
+  alignOffset,
+  collisionBoundary,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+  const [defaultBoundary, setDefaultBoundary] = React.useState<Element | null>(null);
+  const resolvedAlignOffset = alignOffset ?? 0;
+
+  React.useEffect(() => {
+    setDefaultBoundary(document.documentElement);
+  }, []);
+
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
+        collisionPadding={collisionPadding}
+        avoidCollisions={avoidCollisions}
+        align={align}
+        alignOffset={resolvedAlignOffset}
+        collisionBoundary={collisionBoundary ?? defaultBoundary ?? undefined}
+        sticky="partial"
+        hideWhenDetached
         className={cn(
           // Position fixed is critical for proper scroll behavior - ensures menu stays anchored to trigger
           'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
-          // Light mode: alabaster bg + dark text, Dark mode: charcoal bg + light text
-          'bg-[#edeade] text-[#1a1a1a] border border-[#a0a29c]',
-          'dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]',
+          // Use design system variables for consistent theming
+          'bg-mq-card-background text-mq-content border border-mq-border',
+          // Force end-aligned menus to sit fully left of the anchor to avoid right overflow.
+          'data-[align=end]:-translate-x-full',
+          // Ensure dropdown stays within viewport boundaries
+          'max-w-[80vw]',
           className,
         )}
         {...props}

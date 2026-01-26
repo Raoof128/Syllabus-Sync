@@ -3,6 +3,46 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-26 (Australia/Sydney) - Dropdown menu bounds fix (translate full width)
+- **Status:** ✅ Complete - End-aligned dropdowns are forced left by their full width.
+- **Scope:** Fix - Dropdown menu bounds.
+- **Summary:** Forced end-aligned dropdowns to translate left by full width and neutralized align offsets to keep menus within viewport edges.
+- **Files:** components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+- **Verification:** Chrome DevTools MCP check: profile menu right edge = 1160px at 1200px viewport; notifications menu right edge = 996px at 1200px viewport. `npm run lint` still fails due to existing test-weather lint issues.
+- **Follow-ups:** Confirm behavior on the exact viewport where overflow persists.
+
+### Raouf: 2026-01-26 (Australia/Sydney) - Dropdown menu bounds fix (collision boundary + stronger shifts)
+- **Status:** ✅ Complete - Added document root collision boundary and stronger end alignment shifts.
+- **Scope:** Fix - Dropdown menu bounds.
+- **Summary:** Defaulted collision boundary to the document root, increased end-aligned offsets, and applied header collision boundaries to keep menus within the viewport.
+- **Files:** components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+- **Verification:** `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, lib/hooks/useWeather.ts).
+- **Follow-ups:** Confirm the exact viewport where overflow persists.
+
+### Raouf: 2026-01-26 (Australia/Sydney) - Dropdown menu bounds fix (targeted offsets)
+- **Status:** ✅ Complete - Added stronger offsets and header collision boundary.
+- **Scope:** Fix - Dropdown menu bounds.
+- **Summary:** Added end-aligned left shift, increased collision padding, and applied header-level collision boundary with stronger align offsets for header dropdowns.
+- **Files:** components/ui/dropdown-menu.tsx; components/layout/Header.tsx.
+- **Verification:** `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, lib/hooks/useWeather.ts).
+- **Follow-ups:** Validate on the exact viewport where overflow occurs.
+
+### Raouf: 2026-01-26 (Australia/Sydney) - Dropdown menu bounds fix (follow-up)
+- **Status:** ✅ Complete - Additional positioning guard for right overflow.
+- **Scope:** Fix - Dropdown menu bounds.
+- **Summary:** Added end-aligned offset handling and increased collision padding to reduce right overflow on Radix dropdowns.
+- **Files:** components/ui/dropdown-menu.tsx.
+- **Verification:** `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, components/layout/Header.tsx, lib/hooks/useWeather.ts).
+- **Follow-ups:** Verify dropdown position on the reported screen size.
+
+### Raouf: 2026-01-26 (Australia/Sydney) - Dropdown menu bounds fix
+- **Status:** ✅ Complete - Dropdown menus stay within viewport bounds.
+- **Scope:** Fix - Dropdown menu bounds.
+- **Summary:** Enabled Radix sticky positioning and hide-on-detach; removed fixed margins so collision padding handles edges.
+- **Files:** components/ui/dropdown-menu.tsx.
+- **Verification:** `npm run lint` (fails: app/api/test-weather/client.tsx unexpected any; warnings in app/api/test-weather/route.ts, app/weather-test/page.tsx, components/layout/Header.tsx, lib/hooks/useWeather.ts).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-25 (Australia/Sydney) - Crawl4AI Integration Test
 - **Status:** ✅ Complete - Verified Crawl4AI 0.8.0 functionality.
 - **Task:** Crawled `https://example.com` and extracted the main heading.
