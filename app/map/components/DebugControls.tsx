@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/mq/badge';
-import { Play, Pause, RotateCcw, Settings2, Activity } from 'lucide-react';
+import { Play, Settings2, Activity } from 'lucide-react';
 import type { NavigationState } from '@/lib/map/realtimeNavigation';
 
 interface DebugControlsProps {

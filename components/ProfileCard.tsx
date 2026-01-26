@@ -92,7 +92,9 @@ const ProfileCard = React.memo(
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm sm:text-base text-mq-content">{profile.name}</h3>
+                <h3 className="font-semibold text-sm sm:text-base text-mq-content">
+                  {profile.name}
+                </h3>
                 <p className="text-xs sm:text-sm text-mq-content-secondary">{profile.email}</p>
                 <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
                   <span>

@@ -91,7 +91,7 @@ export const useTodosStore = create<TodosState>()(
           } else if (isTableMissing) {
             // Table missing: log helpful message but continue with local data
             console.warn(
-              'Todos table not found in database. To enable cloud sync, run: npx supabase db push'
+              'Todos table not found in database. To enable cloud sync, run: npx supabase db push',
             );
             set({ hasLoaded: true });
           } else {

@@ -233,12 +233,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
             {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
             <div className="layout-main flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12">
               <Header />
-              <main
-                id="main-content"
-                className="flex-1"
-                role="main"
-                aria-label={t('mainContent')}
-              >
+              <main id="main-content" className="flex-1" role="main" aria-label={t('mainContent')}>
                 <ErrorBoundary>{children}</ErrorBoundary>
               </main>
             </div>

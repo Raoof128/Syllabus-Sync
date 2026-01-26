@@ -67,12 +67,14 @@ export async function GET(request: Request) {
       if (error) {
         // Check if the error is related to missing table
         if (error.message?.includes('schema cache') || error.code === '42P01') {
-          console.error('Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql');
+          console.error(
+            'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
+          );
           return jsonError(
             'The todos table is not set up. Please run database migrations.',
             500,
             ERROR_CODES.DATABASE_ERROR,
-            { hint: 'Run: npx supabase db push' }
+            { hint: 'Run: npx supabase db push' },
           );
         }
         return jsonError('A database error occurred', 500, ERROR_CODES.DATABASE_ERROR);
@@ -124,12 +126,14 @@ export async function POST(_request: Request) {
           console.error('Database error creating todo:', error.code, error.message, error.details);
           // Check if the error is related to missing table
           if (error.message?.includes('schema cache') || error.code === '42P01') {
-            console.error('Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql');
+            console.error(
+              'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
+            );
             return jsonError(
               'The todos table is not set up. Please run database migrations.',
               500,
               ERROR_CODES.DATABASE_ERROR,
-              { hint: 'Run: npx supabase db push' }
+              { hint: 'Run: npx supabase db push' },
             );
           }
           return jsonError(

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Raouf: 2026-01-25 - Crawl4AI Integration Test
+
+### Added
+- **Crawl4AI Test:** Created `test_crawl4ai.py` to verify Crawl4AI 0.8.0 functionality
+- **Web Scraping Test:** Tested crawling `https://example.com` and extracting the main heading
+- **Linting Fix:** Fixed unused import warning in `DebugControls.tsx` by removing unused `Pause` and `RotateCcw` icons
+
+### Verification
+- Crawl4AI functionality verified directly via Python script
+- Extracted main heading: "Example Domain"
+- Linting passed after fix
+
+---
+
 Raouf: 2026-01-24 - Visual Simulation UI
 
 ### Added
