@@ -1971,7 +1971,7 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {assignment.completed ? (
-                                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                                    <CheckCircle2 className="h-4 w-4 text-green-600" aria-hidden="true" />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2106,8 +2106,17 @@ export default function CalendarClient() {
                           return (
                             <div
                               key={exam.id}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => openEditExam(exam)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  openEditExam(exam);
+                                }
+                              }}
                               className={cn(
-                                'flex items-center gap-3 p-3 rounded-lg border border-mq-border transition-all w-full bg-mq-background-secondary',
+                                'flex items-center gap-3 p-3 rounded-lg border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary',
                                 exam.completed && 'opacity-60',
                                 isOverdue && 'bg-mq-primary/10',
                                 !isOverdue && 'hover:bg-mq-primary/10',
@@ -2116,14 +2125,17 @@ export default function CalendarClient() {
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
                                   type="button"
-                                  onClick={() => toggleComplete(exam.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleComplete(exam.id);
+                                  }}
                                   aria-label={
                                     exam.completed ? t('markIncomplete') : t('markAsCompleted')
                                   }
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background rounded h-10 w-10 flex items-center justify-center flex-shrink-0"
                                 >
                                   {exam.completed ? (
-                                    <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                                    <CheckCircle2 className="h-4 w-4 text-green-600" aria-hidden="true" />
                                   ) : (
                                     <Circle
                                       className="h-4 w-4 text-mq-content-secondary"
@@ -2178,7 +2190,10 @@ export default function CalendarClient() {
                                 )}
                                 <button
                                   type="button"
-                                  onClick={() => openEditExam(exam)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openEditExam(exam);
+                                  }}
                                   className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarEditItem', { title: exam.title })}
                                 >
@@ -2186,7 +2201,10 @@ export default function CalendarClient() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteExam(exam)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteExam(exam);
+                                  }}
                                   className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
                                   aria-label={t('calendarDeleteItem', { title: exam.title })}
                                 >
@@ -2388,6 +2406,7 @@ export default function CalendarClient() {
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
                       {allEvents.slice(0, 5).map((event) => {
                         const eventTitle = getEventTitle(event);
+                        const eventColors = getEventColors(event);
                         return (
                           <div
                             key={event.id}
@@ -2402,7 +2421,14 @@ export default function CalendarClient() {
                             role="button"
                             tabIndex={0}
                           >
-                            <div className="w-3 h-3 rounded-full flex-shrink-0 bg-mq-success" />
+                            <div
+                              className="w-3 h-3 rounded-full flex-shrink-0"
+                              style={eventColors.style ? { backgroundColor: event.color } : undefined}
+                            >
+                              {!eventColors.style && (
+                                <div className={`w-full h-full rounded-full ${eventColors.bg}`} />
+                              )}
+                            </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-sm line-clamp-2 break-words">
                                 {eventTitle}
@@ -2657,13 +2683,13 @@ export default function CalendarClient() {
                     {/* Completed Today */}
                     <div>
                       <h4 className="text-base font-semibold text-mq-content mb-5 uppercase tracking-wide flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4" />
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
                         {t('completedToday' as TranslationKey) || 'Completed Today'}
                       </h4>
                       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
                         {getCompletedToday().length === 0 ? (
                           <div className="text-center py-12 bg-mq-background-secondary rounded-xl">
-                            <CheckCircle2 className="h-12 w-12 mx-auto mb-4" />
+                            <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" />
                             <p className="text-base font-medium text-mq-content-secondary">
                               {t('noCompletedToday' as TranslationKey) || 'Nothing completed yet'}
                             </p>
@@ -2684,7 +2710,7 @@ export default function CalendarClient() {
                                   aria-label={t('markIncomplete')}
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                 >
-                                  <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+                                  <CheckCircle2 className="h-5 w-5 text-green-600" aria-hidden="true" />
                                 </button>
                                 <p
                                   className="text-sm sm:text-base line-through text-mq-content-secondary leading-relaxed break-words whitespace-normal"
@@ -2766,7 +2792,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5" />
+                <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">{t('deleteUnitConfirm')}</h3>
@@ -2804,7 +2830,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2845,7 +2871,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2886,7 +2912,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2927,7 +2953,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -2968,7 +2994,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
@@ -3017,7 +3043,7 @@ export default function CalendarClient() {
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
-                <Edit2 className="h-5 w-5" />
+                <Edit2 className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
