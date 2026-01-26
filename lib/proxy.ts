@@ -142,7 +142,8 @@ export async function proxy(request: NextRequest) {
   const isPublicApi =
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
-    path.startsWith('/api/mq-demo');
+    path.startsWith('/api/mq-demo') ||
+    path.startsWith('/api/weather');
 
   // Logic:
   // If authenticated and on auth route -> redirect to /home
