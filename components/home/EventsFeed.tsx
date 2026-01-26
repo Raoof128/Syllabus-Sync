@@ -48,12 +48,12 @@ const EventsFeed = memo(() => {
             <Button
               size="sm"
               variant="outline"
-              className="gap-1"
+              className="gap-1.5"
               onClick={handleViewAll}
               aria-label={t('viewAll')}
             >
-              <ExternalLink className="h-4 w-4" />
-              {t('viewAll')}
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>{t('viewAll')}</span>
             </Button>
           </CardHeader>
           <CardContent>
@@ -65,24 +65,31 @@ const EventsFeed = memo(() => {
             ) : (
               <div className="space-y-3">
                 {todayEvents.map((event) => {
+                  // Get translated title if translationKey exists, otherwise use the original title
+                  const displayTitle = event.translationKey
+                    ? t(event.translationKey as TranslationKey)
+                    : event.title;
+                  // If translation returned the key itself, use original title
+                  const finalTitle = displayTitle === event.translationKey ? event.title : displayTitle;
+
                   const eventContent = (
                     <>
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-mq-content">
-                          {t((event.translationKey || event.title) as TranslationKey)}
+                        <h3 className="font-semibold text-mq-content line-clamp-2">
+                          {finalTitle}
                         </h3>
-                        <Badge className={`${categoryColors[event.category]} alabaster-readable`}>
+                        <Badge className={`${categoryColors[event.category]} alabaster-readable shrink-0`}>
                           {t(`category_${event.category.replace(/ /g, '')}` as TranslationKey)}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {event.time}
+                          <Clock className="h-4 w-4 shrink-0" />
+                          <span>{event.time}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {event.location}
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{event.location}</span>
                         </div>
                       </div>
                     </>

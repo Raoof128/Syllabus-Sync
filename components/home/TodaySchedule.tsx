@@ -193,7 +193,7 @@ const TodaySchedule = memo(() => {
             </div>
             <Button size="sm" variant="outline" className="gap-1.5" asChild>
               <Link
-                href="/calendar?view=today"
+                href="/calendar"
                 aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}
               >
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
@@ -269,7 +269,7 @@ const TodaySchedule = memo(() => {
                         {getStatusBadge(cls.status)}
                       </div>
 
-                      <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1">
+                      <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1" title={cls.name}>
                         {cls.name}
                       </p>
 

@@ -119,20 +119,20 @@ const UnitCard = React.memo(
                 >
                   {unit.code.replace(/[0-9]/g, '').slice(0, 2)}
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <CardTitle as="h3" className="text-mq-medium">
                       {unit.code}
                     </CardTitle>
                     <Badge
                       variant="neutral"
-                      className="font-normal"
+                      className="font-normal shrink-0"
                       aria-label={`${t('days')}: ${getUniqueDays()}`}
                     >
                       <span aria-hidden="true">{getUniqueDays()}</span>
                     </Badge>
                   </div>
-                  <p className="text-mq-sm text-mq-content-secondary mt-1">{unit.name}</p>
+                  <p className="text-mq-sm text-mq-content-secondary mt-1 line-clamp-2" title={unit.name}>{unit.name}</p>
                 </div>
               </div>
 

@@ -168,15 +168,15 @@ const UpcomingDeadlines = memo(() => {
                                 e.stopPropagation();
                                 toggleComplete(deadline.id);
                               }}
-                              className="shrink-0 hover:bg-mq-hover-background rounded transition-colors"
+                              className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                               aria-label={
                                 deadline.completed ? t('markIncomplete') : t('markAsCompleted')
                               }
                             >
                               {deadline.completed ? (
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                <CheckCircle2 className="h-5 w-5 text-green-500" />
                               ) : (
-                                <Circle className="h-4 w-4 text-mq-content-tertiary hover:text-mq-primary" />
+                                <Circle className="h-5 w-5 text-mq-content-tertiary hover:text-mq-primary" />
                               )}
                             </button>
                             <h4
@@ -184,6 +184,7 @@ const UpcomingDeadlines = memo(() => {
                                 'font-semibold text-mq-content truncate',
                                 deadline.completed && 'line-through text-mq-content-tertiary',
                               )}
+                              title={deadline.title}
                             >
                               {deadline.title}
                             </h4>

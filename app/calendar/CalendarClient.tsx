@@ -639,6 +639,18 @@ export default function CalendarClient() {
 
   // Keyboard navigation for weeks
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Skip keyboard shortcuts when user is typing in an input field
+    const target = e.target as HTMLElement;
+    const isInputField =
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable ||
+      target.closest('[contenteditable="true"]');
+
+    if (isInputField) {
+      return; // Don't intercept keyboard events when typing
+    }
+
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       goToPreviousWeek();
