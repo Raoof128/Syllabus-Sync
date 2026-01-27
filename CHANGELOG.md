@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-27 (React 19 Test Migration & Cleanup)
+
+- **Summary**: Migrated test suite to support React 19 by removing deprecated `react-dom/test-utils` usage. Performed deep codebase cleanup by removing temporary test files and fixing broken imports.
+- **Files Changed**:
+  - `tests/settings/PrivacySettings.test.tsx`: Migrated to `React.act`.
+  - `tests/gamification/LevelUpNotification.test.tsx`: Migrated to `React.act`.
+  - `app/login/LoginClient.tsx`: Removed broken reference to deleted `TestWeather` component.
+  - `next.config.ts`: Added `openAnalyzer: false` for better CI/CD bundle analysis.
+  - `app/test-weather/`, `app/api/test-weather/`: Deleted temporary test files.
+- **Verification**:
+  - `npm run check`: Passed (Linting, Formatting, Typecheck, Tests, Build).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-27 (Codebase Audit & Cleanup)
 
 - **Summary**: Conducted full codebase audit including linting, type checking, and security scan. Fixed linting errors and cleaned up unused code.

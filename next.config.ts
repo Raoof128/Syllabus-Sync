@@ -4,6 +4,7 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
 });
 
 const isProduction = process.env.NODE_ENV === 'production';

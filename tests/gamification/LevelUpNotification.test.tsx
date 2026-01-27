@@ -1,6 +1,7 @@
 // tests/gamification/LevelUpNotification.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { act } from 'react';
 import {
   LevelUpNotificationProvider,
   useLevelUpNotification,

@@ -1,6 +1,7 @@
 // tests/settings/PrivacySettings.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act } from 'react';
 import PrivacySettings from '@/app/settings/components/PrivacySettings';
 
 // Mock toast utils
