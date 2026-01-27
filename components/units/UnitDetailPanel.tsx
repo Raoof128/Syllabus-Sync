@@ -13,16 +13,12 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
-  Pencil,
-  Trash2,
-  Navigation,
 } from 'lucide-react';
-import Link from 'next/link';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
-import { Button } from '@/components/ui/mq/button';
+import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;
@@ -194,43 +190,20 @@ export default function UnitDetailPanel({
               <p className="text-sm text-mq-content-secondary">{unit.name}</p>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <Link
-                href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
-                aria-label={
-                  t('navigateToBuildingAria', { building: unit.location.building }) ||
-                  `Navigate to ${unit.location.building} on campus map`
-                }
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
-                  title={t('navigate') || 'Navigate'}
-                  aria-label={t('navigate') || 'Navigate'}
-                >
-                  <Navigation className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                </Button>
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onEditUnit}
-                className="h-8 w-8 text-muted-foreground hover:text-primary"
-                title={t('edit') || 'Edit Unit'}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onDeleteUnit}
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                title={t('delete') || 'Delete Unit'}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <ItemActionButtons
+                itemType="unit"
+                itemId={unit.id}
+                itemTitle={unit.code}
+                building={unit.location?.building}
+                room={unit.location?.room}
+                unitCode={unit.code}
+                onEdit={onEditUnit}
+                onDelete={onDeleteUnit}
+                variant="detail"
+                stopPropagation={false}
+              />
               <div
-                className="w-6 h-6 rounded-full border-2 ml-2"
+                className="w-6 h-6 rounded-full border-2"
                 style={{ backgroundColor: unit.color, borderColor: unit.color }}
                 title="Unit Color"
               />

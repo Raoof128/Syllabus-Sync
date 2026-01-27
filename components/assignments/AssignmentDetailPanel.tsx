@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
-  Pencil,
   CalendarDays,
   BookOpen,
   Navigation,
@@ -24,12 +23,14 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 interface AssignmentDetailPanelProps {
   assignment: Deadline | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (assignment: Deadline) => void;
+  onDelete?: (assignment: Deadline) => void;
 }
 
 export default function AssignmentDetailPanel({
@@ -37,6 +38,7 @@ export default function AssignmentDetailPanel({
   open,
   onOpenChange,
   onEdit,
+  onDelete,
 }: AssignmentDetailPanelProps) {
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const units = useUnitsStore((state) => state.units);
@@ -152,17 +154,19 @@ export default function AssignmentDetailPanel({
               </button>
             </div>
 
-            {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(assignment)}
-                className="gap-1"
-              >
-                <Pencil className="h-4 w-4" />
-                {t('edit')}
-              </Button>
-            )}
+            <ItemActionButtons
+              itemType="assignment"
+              itemId={assignment.id}
+              itemTitle={assignment.title}
+              building={assignment.building}
+              room={assignment.room}
+              unitCode={assignment.unitCode}
+              dateTime={assignment.dueDate}
+              onEdit={onEdit ? () => onEdit(assignment) : undefined}
+              onDelete={onDelete ? () => onDelete(assignment) : undefined}
+              variant="detail"
+              stopPropagation={false}
+            />
           </div>
 
           {/* Info Cards */}

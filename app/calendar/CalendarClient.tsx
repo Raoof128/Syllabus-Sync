@@ -16,13 +16,11 @@ import {
   PartyPopper,
   Trash2,
   AlertTriangle,
-  Navigation,
   ListTodo,
   SquareCheckBig,
   Clock,
   Calendar,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -43,6 +41,7 @@ import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
+import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 dayjs.extend(isoWeek);
 
@@ -2088,46 +2087,20 @@ export default function CalendarClient() {
                                 </div>
                               </div>
                               {/* Action icons - far right */}
-                              <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0 justify-end">
-                                {getDeadlineBuilding(assignment) && (
-                                  <Link
-                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(assignment) || '')}${assignment.room ? `&room=${encodeURIComponent(assignment.room)}` : ''}&autonav=true`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    aria-label={t('navigateToBuildingAria', {
-                                      building: getDeadlineBuilding(assignment) || '',
-                                    })}
-                                  >
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                    >
-                                      <Navigation className="h-4 w-4" aria-hidden="true" />
-                                    </Button>
-                                  </Link>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openEditAssignment(assignment);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
-                                  aria-label={t('calendarEditItem', { title: assignment.title })}
-                                >
-                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteAssignment(assignment);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
-                                  aria-label={t('calendarDeleteItem', { title: assignment.title })}
-                                >
-                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
+                              <div className="flex items-center ml-auto pl-2 shrink-0 justify-end">
+                                <ItemActionButtons
+                                  itemType="assignment"
+                                  itemId={assignment.id}
+                                  itemTitle={assignment.title}
+                                  building={getDeadlineBuilding(assignment)}
+                                  room={assignment.room}
+                                  unitCode={assignment.unitCode}
+                                  dateTime={assignment.dueDate}
+                                  onEdit={() => openEditAssignment(assignment)}
+                                  onDelete={() => handleDeleteAssignment(assignment)}
+                                  variant="compact"
+                                  stopPropagation={true}
+                                />
                               </div>
                             </div>
                           );
@@ -2260,46 +2233,20 @@ export default function CalendarClient() {
                                 </div>
                               </div>
                               {/* Action icons - far right */}
-                              <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0 justify-end">
-                                {getDeadlineBuilding(exam) && (
-                                  <Link
-                                    href={`/map?building=${encodeURIComponent(getDeadlineBuilding(exam) || '')}${exam.room ? `&room=${encodeURIComponent(exam.room)}` : ''}&autonav=true`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    aria-label={t('navigateToBuildingAria', {
-                                      building: getDeadlineBuilding(exam) || '',
-                                    })}
-                                  >
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                    >
-                                      <Navigation className="h-4 w-4" aria-hidden="true" />
-                                    </Button>
-                                  </Link>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    openEditExam(exam);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
-                                  aria-label={t('calendarEditItem', { title: exam.title })}
-                                >
-                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteExam(exam);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus inline-flex items-center justify-center"
-                                  aria-label={t('calendarDeleteItem', { title: exam.title })}
-                                >
-                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
+                              <div className="flex items-center ml-auto pl-2 shrink-0 justify-end">
+                                <ItemActionButtons
+                                  itemType="exam"
+                                  itemId={exam.id}
+                                  itemTitle={exam.title}
+                                  building={getDeadlineBuilding(exam)}
+                                  room={exam.room}
+                                  unitCode={exam.unitCode}
+                                  dateTime={exam.dueDate}
+                                  onEdit={() => openEditExam(exam)}
+                                  onDelete={() => handleDeleteExam(exam)}
+                                  variant="compact"
+                                  stopPropagation={true}
+                                />
                               </div>
                             </div>
                           );
@@ -2396,48 +2343,19 @@ export default function CalendarClient() {
                               {unit.name}
                             </p>
                           </div>
-                          <div className="flex items-center gap-0.5 ml-auto pl-2">
-                            {unit.location?.building && (
-                              <Link
-                                href={`/map?building=${encodeURIComponent(unit.location.building)}${unit.location?.room ? `&room=${encodeURIComponent(unit.location.room)}` : ''}&autonav=true`}
-                                onClick={(e) => e.stopPropagation()}
-                                aria-label={t('navigateToBuildingAria', {
-                                  building: unit.location.building,
-                                })}
-                              >
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                >
-                                  <Navigation className="h-4 w-4" aria-hidden="true" />
-                                </Button>
-                              </Link>
-                            )}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditUnit(unit);
-                              }}
-                              className="h-8 w-8 p-0 flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                              title={t('calendarEditItem', { title: unit.code })}
-                              aria-label={t('calendarEditItem', { title: unit.code })}
-                            >
-                              <Edit2 className="h-4 w-4" aria-hidden="true" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteUnit(unit);
-                              }}
-                              className="h-8 w-8 p-0 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                              title={t('calendarDeleteItem', { title: unit.code })}
-                              aria-label={t('calendarDeleteItem', { title: unit.code })}
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden="true" />
-                            </button>
+                          <div className="flex items-center ml-auto pl-2 shrink-0">
+                            <ItemActionButtons
+                              itemType="unit"
+                              itemId={unit.id}
+                              itemTitle={unit.code}
+                              building={unit.location?.building}
+                              room={unit.location?.room}
+                              unitCode={unit.code}
+                              onEdit={() => openEditUnit(unit)}
+                              onDelete={() => handleDeleteUnit(unit)}
+                              variant="compact"
+                              stopPropagation={true}
+                            />
                           </div>
                         </div>
                       ))}
@@ -2523,48 +2441,19 @@ export default function CalendarClient() {
                                 {event.time} • {event.location}
                               </p>
                             </div>
-                            <div className="flex items-center gap-0.5 ml-auto pl-2">
-                              {event.building && (
-                                <Link
-                                  href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
-                                  onClick={(e) => e.stopPropagation()}
-                                  aria-label={t('navigateToBuildingAria', {
-                                    building: event.building,
-                                  })}
-                                >
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                  >
-                                    <Navigation className="h-4 w-4" aria-hidden="true" />
-                                  </Button>
-                                </Link>
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openEditEvent(event);
-                                }}
-                                className="h-8 w-8 p-0 flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                title={t('calendarEditItem', { title: eventTitle })}
-                                aria-label={t('calendarEditItem', { title: eventTitle })}
-                              >
-                                <Edit2 className="h-4 w-4" aria-hidden="true" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteEvent(event);
-                                }}
-                                className="h-8 w-8 p-0 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-950/30 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background"
-                                title={t('calendarDeleteItem', { title: eventTitle })}
-                                aria-label={t('calendarDeleteItem', { title: eventTitle })}
-                              >
-                                <Trash2 className="h-4 w-4" aria-hidden="true" />
-                              </button>
+                            <div className="flex items-center ml-auto pl-2 shrink-0">
+                              <ItemActionButtons
+                                itemType="event"
+                                itemId={event.id}
+                                itemTitle={eventTitle}
+                                building={event.building}
+                                room={event.room}
+                                dateTime={event.startAt}
+                                onEdit={() => openEditEvent(event)}
+                                onDelete={() => handleDeleteEvent(event)}
+                                variant="compact"
+                                stopPropagation={true}
+                              />
                             </div>
                           </div>
                         );

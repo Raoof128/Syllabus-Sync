@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/mq/badge';
 import {
   MapPin,
   Clock,
-  Pencil,
   CalendarDays,
   Navigation,
   Tag,
@@ -20,12 +19,14 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 interface EventDetailPanelProps {
   event: Event | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (event: Event) => void;
+  onDelete?: (event: Event) => void;
 }
 
 export default function EventDetailPanel({
@@ -33,6 +34,7 @@ export default function EventDetailPanel({
   open,
   onOpenChange,
   onEdit,
+  onDelete,
 }: EventDetailPanelProps) {
   const { t } = useTranslation();
 
@@ -141,17 +143,18 @@ export default function EventDetailPanel({
               </div>
             </div>
 
-            {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(event)}
-                className="gap-1"
-              >
-                <Pencil className="h-4 w-4" />
-                {t('edit')}
-              </Button>
-            )}
+            <ItemActionButtons
+              itemType="event"
+              itemId={event.id}
+              itemTitle={event.title}
+              building={event.building}
+              room={event.room}
+              dateTime={event.startAt}
+              onEdit={onEdit ? () => onEdit(event) : undefined}
+              onDelete={onDelete ? () => onDelete(event) : undefined}
+              variant="detail"
+              stopPropagation={false}
+            />
           </div>
 
           {/* Info Cards */}

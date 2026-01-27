@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
-  Pencil,
   CalendarDays,
   BookOpen,
   Navigation,
@@ -25,12 +24,14 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 interface ExamDetailPanelProps {
   exam: Deadline | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit?: (exam: Deadline) => void;
+  onDelete?: (exam: Deadline) => void;
 }
 
 export default function ExamDetailPanel({
@@ -38,6 +39,7 @@ export default function ExamDetailPanel({
   open,
   onOpenChange,
   onEdit,
+  onDelete,
 }: ExamDetailPanelProps) {
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const units = useUnitsStore((state) => state.units);
@@ -152,17 +154,19 @@ export default function ExamDetailPanel({
               </button>
             </div>
 
-            {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(exam)}
-                className="gap-1"
-              >
-                <Pencil className="h-4 w-4" />
-                {t('edit')}
-              </Button>
-            )}
+            <ItemActionButtons
+              itemType="exam"
+              itemId={exam.id}
+              itemTitle={exam.title}
+              building={exam.building}
+              room={exam.room}
+              unitCode={exam.unitCode}
+              dateTime={exam.dueDate}
+              onEdit={onEdit ? () => onEdit(exam) : undefined}
+              onDelete={onDelete ? () => onDelete(exam) : undefined}
+              variant="detail"
+              stopPropagation={false}
+            />
           </div>
 
           {/* Info Cards */}
