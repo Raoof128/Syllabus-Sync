@@ -48,12 +48,12 @@ export const DEADLINE_TYPES = ['Assignment', 'Exam', 'Quiz', 'Presentation'] as 
 // Event categories
 export const EVENT_CATEGORIES = ['Career', 'Social', 'Academic', 'Free Food'] as const;
 
-// Priority colors for badges
+// Priority colors for badges - High is orange, Urgent is red for visual distinction
 export const PRIORITY_COLORS: Record<Deadline['priority'], string> = {
-  Low: 'bg-mq-success text-white border border-mq-success',
-  Medium: 'bg-mq-warning text-black border border-mq-warning',
-  High: 'bg-orange-600 text-white border border-orange-600',
-  Urgent: 'bg-mq-error text-white border border-mq-error',
+  Low: 'bg-emerald-500 text-white border border-emerald-600',
+  Medium: 'bg-amber-500 text-white border border-amber-600',
+  High: 'bg-orange-500 text-white border border-orange-600',
+  Urgent: 'bg-red-600 text-white border border-red-700',
 };
 
 // Category colors for events

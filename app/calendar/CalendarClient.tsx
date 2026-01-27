@@ -74,6 +74,14 @@ const ExamForm = dynamic(() => import('@/components/exams/ExamForm'), {
   loading: () => null,
 });
 
+const ExamDetailPanel = dynamic(() => import('@/components/exams/ExamDetailPanel'), {
+  loading: () => null,
+});
+
+const EventDetailPanel = dynamic(() => import('@/components/events/EventDetailPanel'), {
+  loading: () => null,
+});
+
 // Hours to display (6 AM to 11 PM = 18 hours)
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (23)
 const HOUR_HEIGHT = 48; // pixels per hour
@@ -374,6 +382,14 @@ export default function CalendarClient() {
   // Assignment detail panel state
   const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Deadline | null>(null);
+
+  // Exam detail panel state
+  const [examDetailOpen, setExamDetailOpen] = useState(false);
+  const [selectedExam, setSelectedExam] = useState<Deadline | null>(null);
+
+  // Event detail panel state
+  const [eventDetailOpen, setEventDetailOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
   const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
@@ -762,10 +778,10 @@ export default function CalendarClient() {
     setExamDialogOpen(true);
   };
 
-  // Event handlers - navigate to feed with highlight to view event details
+  // Event handlers - open detail panel to view event details
   const handleEventClick = (event: Event) => {
-    // Navigate to feed page and highlight the event for viewing
-    router.push(`/feed?highlight=${event.id}`);
+    setSelectedEvent(event);
+    setEventDetailOpen(true);
   };
 
   // Unit handlers
@@ -2175,11 +2191,15 @@ export default function CalendarClient() {
                               key={exam.id}
                               role="button"
                               tabIndex={0}
-                              onClick={() => openEditExam(exam)}
+                              onClick={() => {
+                                setSelectedExam(exam);
+                                setExamDetailOpen(true);
+                              }}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                   e.preventDefault();
-                                  openEditExam(exam);
+                                  setSelectedExam(exam);
+                                  setExamDetailOpen(true);
                                 }
                               }}
                               className={cn(
@@ -3371,6 +3391,28 @@ export default function CalendarClient() {
         onEdit={(assignment) => {
           setAssignmentDetailOpen(false);
           openEditAssignment(assignment);
+        }}
+      />
+
+      {/* Exam Detail Panel */}
+      <ExamDetailPanel
+        exam={selectedExam}
+        open={examDetailOpen}
+        onOpenChange={setExamDetailOpen}
+        onEdit={(exam) => {
+          setExamDetailOpen(false);
+          openEditExam(exam);
+        }}
+      />
+
+      {/* Event Detail Panel */}
+      <EventDetailPanel
+        event={selectedEvent}
+        open={eventDetailOpen}
+        onOpenChange={setEventDetailOpen}
+        onEdit={(event) => {
+          setEventDetailOpen(false);
+          openEditEvent(event);
         }}
       />
     </div>
