@@ -19,6 +19,8 @@ import {
   Navigation,
   ListTodo,
   SquareCheckBig,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -359,11 +361,15 @@ export default function CalendarClient() {
   // Todo input state
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [newTodoPriority, setNewTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [newTodoDueDate, setNewTodoDueDate] = useState('');
+  const [newTodoDueTime, setNewTodoDueTime] = useState('');
   const [todoDeleteConfirmOpen, setTodoDeleteConfirmOpen] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState<{ id: string; title: string } | null>(null);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [editTodoTitle, setEditTodoTitle] = useState('');
   const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [editTodoDueDate, setEditTodoDueDate] = useState('');
+  const [editTodoDueTime, setEditTodoDueTime] = useState('');
 
   // Assignment detail panel state
   const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
@@ -2580,56 +2586,112 @@ export default function CalendarClient() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Quick Add Todo Input with Priority */}
+                {/* Quick Add Todo Input with Priority and Due Date */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     if (newTodoTitle.trim()) {
+                      // Build due date if provided
+                      let dueDate: Date | undefined = undefined;
+                      if (newTodoDueDate) {
+                        dueDate = new Date(newTodoDueDate);
+                        if (newTodoDueTime) {
+                          const [hours, minutes] = newTodoDueTime.split(':').map(Number);
+                          dueDate.setHours(hours, minutes, 0, 0);
+                        } else {
+                          dueDate.setHours(23, 59, 59, 999);
+                        }
+                      }
                       addTodo({
                         title: newTodoTitle.trim(),
                         priority: newTodoPriority,
+                        dueDate,
                       });
                       setNewTodoTitle('');
                       setNewTodoPriority('Medium');
+                      setNewTodoDueDate('');
+                      setNewTodoDueTime('');
                     }
                   }}
-                  className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-6"
+                  className="space-y-3 mb-6"
                 >
-                  <input
-                    type="text"
-                    value={newTodoTitle}
-                    onChange={(e) => setNewTodoTitle(e.target.value)}
-                    placeholder={tOr('addTodoPlaceholder', 'Add a new task...')}
-                    className="flex-1 h-10 sm:h-11 px-3 sm:px-4 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content placeholder:text-mq-content-tertiary"
-                    style={{ wordSpacing: 'normal', letterSpacing: 'normal' }}
-                    aria-label={tOr('addTodoPlaceholder', 'Add a new task')}
-                  />
-                  <div className="flex gap-2 items-center">
-                    <select
-                      value={newTodoPriority}
-                      onChange={(e) =>
-                        setNewTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')
-                      }
-                      className={cn(
-                        'h-10 sm:h-11 px-2 sm:px-3 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-[90px] sm:min-w-[100px]',
-                        newTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
-                        newTodoPriority === 'Medium' && 'text-yellow-600 dark:text-yellow-400',
-                        newTodoPriority === 'Low' && 'text-blue-600 dark:text-blue-400',
-                      )}
-                      aria-label={tOr('selectPriority', 'Select priority')}
-                    >
-                      <option value="High">{tOr('priorityHigh', 'High')}</option>
-                      <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
-                      <option value="Low">{tOr('priorityLow', 'Low')}</option>
-                    </select>
-                    <Button
-                      type="submit"
-                      disabled={!newTodoTitle.trim()}
-                      className="h-10 w-10 sm:h-11 sm:w-11 p-0 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg flex items-center justify-center shrink-0 border border-emerald-600/40 shadow-sm"
-                      aria-label={tOr('addTodo', 'Add todo')}
-                    >
-                      <Plus className="h-5 w-5" aria-hidden="true" />
-                    </Button>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <input
+                      type="text"
+                      value={newTodoTitle}
+                      onChange={(e) => setNewTodoTitle(e.target.value)}
+                      placeholder={tOr('addTodoPlaceholder', 'Add a new task...')}
+                      className="flex-1 h-10 sm:h-11 px-3 sm:px-4 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content placeholder:text-mq-content-tertiary"
+                      style={{ wordSpacing: 'normal', letterSpacing: 'normal' }}
+                      aria-label={tOr('addTodoPlaceholder', 'Add a new task')}
+                    />
+                    <div className="flex gap-2 items-center">
+                      <select
+                        value={newTodoPriority}
+                        onChange={(e) =>
+                          setNewTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')
+                        }
+                        className={cn(
+                          'h-10 sm:h-11 px-2 sm:px-3 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent min-w-[90px] sm:min-w-[100px]',
+                          newTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
+                          newTodoPriority === 'Medium' && 'text-amber-600 dark:text-amber-400',
+                          newTodoPriority === 'Low' && 'text-emerald-600 dark:text-emerald-400',
+                        )}
+                        aria-label={tOr('selectPriority', 'Select priority')}
+                      >
+                        <option value="High">{tOr('priorityHigh', 'High')}</option>
+                        <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
+                        <option value="Low">{tOr('priorityLow', 'Low')}</option>
+                      </select>
+                      <Button
+                        type="submit"
+                        disabled={!newTodoTitle.trim()}
+                        className="h-10 w-10 sm:h-11 sm:w-11 p-0 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg flex items-center justify-center shrink-0 border border-emerald-600/40 shadow-sm"
+                        aria-label={tOr('addTodo', 'Add todo')}
+                      >
+                        <Plus className="h-5 w-5" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  </div>
+                  {/* Due Date and Time Row */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 flex-1">
+                      <Calendar className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                      <input
+                        type="date"
+                        value={newTodoDueDate}
+                        onChange={(e) => setNewTodoDueDate(e.target.value)}
+                        className="flex-1 h-10 sm:h-11 px-3 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
+                        aria-label={tOr('selectDueDate', 'Select due date')}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                      <input
+                        type="time"
+                        value={newTodoDueTime}
+                        onChange={(e) => setNewTodoDueTime(e.target.value)}
+                        disabled={!newTodoDueDate}
+                        className={cn(
+                          'h-10 sm:h-11 px-3 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[120px]',
+                          !newTodoDueDate && 'opacity-50 cursor-not-allowed'
+                        )}
+                        aria-label={tOr('selectDueTime', 'Select due time')}
+                      />
+                    </div>
+                    {(newTodoDueDate || newTodoDueTime) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewTodoDueDate('');
+                          setNewTodoDueTime('');
+                        }}
+                        className="h-10 sm:h-11 px-3 text-sm rounded-lg border border-mq-border bg-mq-background hover:bg-mq-hover-background text-mq-content-secondary transition-colors"
+                        aria-label={tOr('clearDueDate', 'Clear due date')}
+                      >
+                        {tOr('clear', 'Clear')}
+                      </button>
+                    )}
                   </div>
                 </form>
 
@@ -2660,10 +2722,19 @@ export default function CalendarClient() {
                             {tOr('allTasksComplete', 'All tasks complete!')}
                           </p>
                         ) : (
-                          getPendingTodos().map((todo) => (
+                          getPendingTodos().map((todo) => {
+                            // Calculate if task is overdue
+                            const isOverdue = todo.dueDate && new Date(todo.dueDate) < new Date();
+                            const isDueToday = todo.dueDate &&
+                              new Date(todo.dueDate).toDateString() === new Date().toDateString();
+
+                            return (
                             <div
                               key={todo.id}
-                              className="group flex items-center justify-between p-3 sm:p-4 rounded-lg border border-mq-border hover:border-emerald-300 hover:shadow-md transition-all bg-mq-card-background"
+                              className={cn(
+                                "group flex items-center justify-between p-3 sm:p-4 rounded-lg border hover:shadow-md transition-all bg-mq-card-background",
+                                isOverdue ? "border-red-300 dark:border-red-800" : "border-mq-border hover:border-emerald-300"
+                              )}
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
@@ -2673,7 +2744,10 @@ export default function CalendarClient() {
                                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                 >
                                   <Circle
-                                    className="h-5 w-5 text-mq-content-secondary transition-colors"
+                                    className={cn(
+                                      "h-5 w-5 transition-colors",
+                                      isOverdue ? "text-red-500" : "text-mq-content-secondary"
+                                    )}
                                     aria-hidden="true"
                                   />
                                 </button>
@@ -2692,19 +2766,43 @@ export default function CalendarClient() {
                                       {todo.description}
                                     </p>
                                   )}
+                                  {/* Due Date Display */}
+                                  {todo.dueDate && (
+                                    <div className={cn(
+                                      "flex items-center gap-1.5 text-xs",
+                                      isOverdue ? "text-red-600 dark:text-red-400" :
+                                      isDueToday ? "text-amber-600 dark:text-amber-400" :
+                                      "text-mq-content-tertiary"
+                                    )}>
+                                      <Clock className="h-3 w-3" />
+                                      <span>
+                                        {isOverdue ? tOr('overdue', 'Overdue') + ': ' : isDueToday ? tOr('dueToday', 'Due today') + ': ' : ''}
+                                        {new Date(todo.dueDate).toLocaleDateString(undefined, {
+                                          month: 'short',
+                                          day: 'numeric',
+                                          year: new Date(todo.dueDate).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                                        })}
+                                        {' '}
+                                        {new Date(todo.dueDate).toLocaleTimeString(undefined, {
+                                          hour: '2-digit',
+                                          minute: '2-digit'
+                                        })}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                               {/* Action icons - far right */}
                               <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0">
                                 <Badge
                                   className={cn(
-                                    'text-[10px] px-2 py-0.5 font-medium hidden sm:inline-flex',
+                                    'text-[10px] px-2 py-0.5 font-semibold hidden sm:inline-flex',
                                     todo.priority === 'High' &&
-                                      'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+                                      'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800',
                                     todo.priority === 'Medium' &&
-                                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400',
+                                      'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
                                     todo.priority === 'Low' &&
-                                      'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+                                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
                                   )}
                                   variant="neutral"
                                 >
@@ -2716,6 +2814,15 @@ export default function CalendarClient() {
                                     setEditingTodo(todo);
                                     setEditTodoTitle(todo.title);
                                     setEditTodoPriority(todo.priority);
+                                    // Set due date/time for editing
+                                    if (todo.dueDate) {
+                                      const dueDate = new Date(todo.dueDate);
+                                      setEditTodoDueDate(dueDate.toISOString().split('T')[0]);
+                                      setEditTodoDueTime(dueDate.toTimeString().slice(0, 5));
+                                    } else {
+                                      setEditTodoDueDate('');
+                                      setEditTodoDueTime('');
+                                    }
                                   }}
                                   className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                                   aria-label={t('calendarEditItem', { title: todo.title })}
@@ -2735,7 +2842,8 @@ export default function CalendarClient() {
                                 </button>
                               </div>
                             </div>
-                          ))
+                            );
+                          })
                         )}
                       </div>
                     </div>
@@ -3118,13 +3226,27 @@ export default function CalendarClient() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (editTodoTitle.trim() && editingTodo) {
+                  // Build due date if provided
+                  let dueDate: Date | undefined = undefined;
+                  if (editTodoDueDate) {
+                    dueDate = new Date(editTodoDueDate);
+                    if (editTodoDueTime) {
+                      const [hours, minutes] = editTodoDueTime.split(':').map(Number);
+                      dueDate.setHours(hours, minutes, 0, 0);
+                    } else {
+                      dueDate.setHours(23, 59, 59, 999);
+                    }
+                  }
                   updateTodo(editingTodo.id, {
                     title: editTodoTitle.trim(),
                     priority: editTodoPriority,
+                    dueDate,
                   });
                   setEditingTodo(null);
                   setEditTodoTitle('');
                   setEditTodoPriority('Medium');
+                  setEditTodoDueDate('');
+                  setEditTodoDueTime('');
                 }
               }}
               className="space-y-4"
@@ -3160,14 +3282,59 @@ export default function CalendarClient() {
                   className={cn(
                     'w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
                     editTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
-                    editTodoPriority === 'Medium' && 'text-yellow-600 dark:text-yellow-400',
-                    editTodoPriority === 'Low' && 'text-blue-600 dark:text-blue-400',
+                    editTodoPriority === 'Medium' && 'text-amber-600 dark:text-amber-400',
+                    editTodoPriority === 'Low' && 'text-emerald-600 dark:text-emerald-400',
                   )}
                 >
                   <option value="High">{tOr('priorityHigh', 'High')}</option>
                   <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
                   <option value="Low">{tOr('priorityLow', 'Low')}</option>
                 </select>
+              </div>
+              {/* Due Date and Time */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-mq-content">
+                  {tOr('dueDateTime', 'Due Date & Time')}
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <Calendar className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                    <input
+                      type="date"
+                      value={editTodoDueDate}
+                      onChange={(e) => setEditTodoDueDate(e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
+                      aria-label={tOr('selectDueDate', 'Select due date')}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                    <input
+                      type="time"
+                      value={editTodoDueTime}
+                      onChange={(e) => setEditTodoDueTime(e.target.value)}
+                      disabled={!editTodoDueDate}
+                      className={cn(
+                        'px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]',
+                        !editTodoDueDate && 'opacity-50 cursor-not-allowed'
+                      )}
+                      aria-label={tOr('selectDueTime', 'Select due time')}
+                    />
+                  </div>
+                </div>
+                {(editTodoDueDate || editTodoDueTime) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditTodoDueDate('');
+                      setEditTodoDueTime('');
+                    }}
+                    className="text-sm text-mq-content-secondary hover:text-mq-content transition-colors underline"
+                    aria-label={tOr('clearDueDate', 'Clear due date')}
+                  >
+                    {tOr('clearDueDate', 'Clear due date')}
+                  </button>
+                )}
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <Button
@@ -3177,6 +3344,8 @@ export default function CalendarClient() {
                     setEditingTodo(null);
                     setEditTodoTitle('');
                     setEditTodoPriority('Medium');
+                    setEditTodoDueDate('');
+                    setEditTodoDueTime('');
                   }}
                 >
                   {t('cancelAction')}

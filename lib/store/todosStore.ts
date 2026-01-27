@@ -312,11 +312,29 @@ export const useTodosStore = create<TodosState>()(
         return get()
           .todos.filter((t) => !t.completed)
           .sort((a, b) => {
-            // Sort by priority, then by creation date
+            // Sort overdue items first
+            const now = new Date();
+            const aOverdue = a.dueDate && new Date(a.dueDate) < now;
+            const bOverdue = b.dueDate && new Date(b.dueDate) < now;
+
+            if (aOverdue && !bOverdue) return -1;
+            if (!aOverdue && bOverdue) return 1;
+
+            // Then sort by due date (items with due dates first, earlier dates first)
+            if (a.dueDate && !b.dueDate) return -1;
+            if (!a.dueDate && b.dueDate) return 1;
+            if (a.dueDate && b.dueDate) {
+              const dateDiff = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+              if (dateDiff !== 0) return dateDiff;
+            }
+
+            // Then sort by priority
             const priorityOrder = { High: 0, Medium: 1, Low: 2 };
             if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
               return priorityOrder[a.priority] - priorityOrder[b.priority];
             }
+
+            // Finally sort by creation date
             return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           });
       },

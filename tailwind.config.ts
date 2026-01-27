@@ -1,13 +1,28 @@
+/**
+ * Tailwind CSS v4 Configuration
+ *
+ * In Tailwind v4, most configuration is done via CSS @theme directive.
+ * This file provides additional theme extensions that work with the
+ * @tailwindcss/postcss plugin.
+ *
+ * Note: tailwindcss-animate plugin is not compatible with Tailwind v4.
+ * Animation utilities are defined in app/styles/animations.css instead.
+ *
+ * @see app/globals.css for the primary theme configuration via @theme
+ */
+
 import type { Config } from 'tailwindcss';
-import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config: Config = {
-  darkMode: 'class',
+  // Tailwind v4 uses automatic content detection
+  // The content array is kept for compatibility but v4 handles this automatically
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  // darkMode is handled via CSS @theme { --dark-mode: class; } in v4
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -165,7 +180,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  // Note: Plugins like tailwindcss-animate need to be updated for v4 compatibility
+  // Animation utilities are defined in app/styles/animations.css
+  plugins: [],
 };
 
 export default config;
