@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Search, Share2, Download, Calendar, Building2, X, Navigation } from 'lucide-react';
+import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -34,14 +34,6 @@ export default function CampusMapHUD({
     <div className="absolute inset-0 z-[1100] pointer-events-none">
       {/* Top-right actions */}
       <div className="absolute top-3 right-3 flex items-center gap-2 pointer-events-auto">
-        <Button
-          variant="secondary"
-          size="sm"
-          className="gap-2 shadow-sm bg-mq-card-background/90 backdrop-blur border-mq-border/50 hover:bg-mq-card-background text-mq-content"
-        >
-          <Calendar className="h-4 w-4" />
-          <span className="hidden sm:inline">{t('today')}</span>
-        </Button>
         <Button
           variant="secondary"
           size="sm"
@@ -154,20 +146,6 @@ export default function CampusMapHUD({
                     selectedBuilding.category.slice(1)}
                 </Badge>
               )}
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <div className="bg-mq-background-secondary/50 rounded-lg p-2 text-center border border-mq-border/30">
-                  <div className="text-[10px] text-mq-content-tertiary uppercase font-bold tracking-wider">
-                    Status
-                  </div>
-                  <div className="text-sm font-semibold text-mq-success">Open</div>
-                </div>
-                <div className="bg-mq-background-secondary/50 rounded-lg p-2 text-center border border-mq-border/30">
-                  <div className="text-[10px] text-mq-content-tertiary uppercase font-bold tracking-wider">
-                    Crowd
-                  </div>
-                  <div className="text-sm font-semibold text-mq-content">Low</div>
-                </div>
-              </div>
 
               {/* Navigation Buttons */}
               <div className="flex flex-col gap-2 pt-2">

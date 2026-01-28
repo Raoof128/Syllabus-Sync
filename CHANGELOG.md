@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (HUD Cleanup & Settings Polish)
+
+- **Summary**: Refined the Map HUD by removing redundant "Today" and status/crowd widgets. Polished the Settings layout by fixing background visibility and removing unused imports.
+- **Files Changed**:
+  - `app/map/CampusMapHUD.tsx`: Removed "Today" button and status grids.
+  - `app/settings/layout.tsx`: Added `MovingMeshBackground` and cleaned up styles.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+
+### Raouf: 2026-01-28 (Settings Page Modularization)
+
+- **Summary**: Refactored the Settings page into distinct sub-routes for General, Appearance, Security, Experience, and Support. Fixed the "Hero Header" background animation visibility.
+- **Files Changed**:
+  - `app/settings/layout.tsx`: Created a shared layout with sticky sidebar and hero shell.
+  - `app/settings/page.tsx`: Redirects to `/settings/general`.
+  - `app/settings/[section]/page.tsx`: Created individual page components for each section.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-28 (Settings UI Overhaul)
+
+- **Summary**: Transformed the Settings page into a modern, 2-column layout with a sticky sidebar, categorized sections, and a hero header shell.
+- **Files Changed**:
+  - `app/settings/page.tsx`: Implemented `SettingsContent` with responsive grid, scroll spy, and section grouping.
+  - `app/settings/components/index.ts`: Verified exports.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-28 (Map HUD & Navigation Polish)
 
 - **Summary**: Refined the Map HUD by adding navigation actions and fixing UI overlaps. Integrated external Google Maps linking and improved in-app navigation triggers.
