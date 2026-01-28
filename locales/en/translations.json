@@ -903,7 +903,8 @@
   "filter_Social": "Social",
   "filter_Academic": "Academic",
   "filter_FreeFood": "Free Food",
-  "event_careerFair2026_title": "Career Fair 2026",
+  "category_All": "All",
+  "category_Career": "Career",
   "event_careerFair2026_desc": "Meet top employers and explore career opportunities across various industries.",
   "event_freePizzaFriday_title": "Free Pizza Friday",
   "event_freePizzaFriday_desc": "Join us for free pizza and networking with fellow students!",
@@ -1495,5 +1496,17 @@
   "timeRange_upcoming": "Upcoming",
   "clearFilters": "Clear filters",
   "createFirstEvent": "Create first event",
-  "actions": "Actions"
+  "actions": "Actions",
+  "settings_general": "General",
+  "settings_appearance": "Appearance",
+  "settings_privacySecurity": "Privacy & Security",
+  "settings_experience": "Experience",
+  "settings_support": "Support",
+  "settings_sections": "Sections",
+  "event_servicesPopup_title": "Student Services Pop-up",
+  "event_servicesPopup_desc": "Ask quick questions about enrolment, finance, or IT support with the Service Connect team.",
+  "event_librarySprint_title": "Library Late-Night Study Sprint",
+  "event_librarySprint_desc": "Quiet study zone with librarians on call for research help and free snacks after 8pm.",
+  "event_bizCoffee_title": "Biz School Coffee Chat",
+  "event_bizCoffee_desc": "Meet classmates and faculty for an informal coffee hour in the Business School atrium."
 }

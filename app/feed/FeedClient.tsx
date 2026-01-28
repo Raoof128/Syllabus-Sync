@@ -424,7 +424,7 @@ const FeedClient = memo(() => {
         </div>
       </ScrollReveal>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative">
         {/* Main Feed - 2 columns */}
         <div className="lg:col-span-2 space-y-6">
           <FeedFilters

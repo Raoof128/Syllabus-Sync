@@ -3,6 +3,24 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-28 (Australia/Sydney) - Feed Sticky Sidebar & Event Keys
+- **Status:** ✅ Complete - Fixed sticky sidebar and added missing keys.
+- **Scope:** Bug Fix - UI Layout & i18n.
+- **Summary:** Refactored sidebar sticky logic for grid layout; added event translations.
+- **Files:** app/feed/FeedClient.tsx; components/feed/FeedSidebar.tsx; locales/en/translations.json.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+
+### Raouf: 2026-01-28 (Australia/Sydney) - Feed & Settings i18n Audit
+- **Status:** ✅ Complete - Hardcoded strings extracted and Feed UI polished.
+- **Scope:** Maintenance - i18n Audit & UI Polish.
+- **Summary:** Extracted settings/feed text to translations; fixed sidebar sticky behavior; unified card styling; added event translation keys.
+- **Files:** app/settings/layout.tsx; components/feed/FeedSidebar.tsx; locales/en/translations.json.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+
 ### Raouf: 2026-01-28 (Australia/Sydney) - Feed Improvements (Phase 1 & 2 Polish)
 - **Status:** ✅ Complete - Feed cards synchronized with global theme and unified in size.
 - **Scope:** UI/UX - Feed Polish.

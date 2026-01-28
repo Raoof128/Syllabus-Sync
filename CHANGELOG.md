@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Feed Sticky Sidebar & Event Keys)
+
+- **Summary**: Fixed the Feed Sidebar sticky behavior by restructuring the layout (removed `items-start` from grid, wrapped sidebar content in a sticky container). Also added missing translation keys for sample events to ensure full i18n coverage.
+- **Files Changed**:
+  - `app/feed/FeedClient.tsx`: Removed `items-start` from grid container to allow sidebar column to stretch.
+  - `components/feed/FeedSidebar.tsx`: Refactored sticky positioning to apply to the inner content container rather than the aside element.
+  - `locales/en/translations.json`: Added keys for event titles and descriptions.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-28 (Feed & Settings i18n Audit)
+
+- **Summary**: Conducted a comprehensive audit of hardcoded strings in `app/feed` and `app/settings`. Extracted all user-facing text to `locales/en/translations.json` and refactored components to use `t()`. Also polished the Feed Sidebar sticky behavior and card styling to match the global theme.
+- **Files Changed**:
+  - `app/settings/layout.tsx`: Replaced hardcoded navigation labels with translation keys.
+  - `components/feed/FeedSidebar.tsx`: Enhanced sticky positioning (`top-[88px]`) and updated card styling to `bg-mq-card-background`.
+  - `locales/en/translations.json`: Added keys for settings navigation, feed categories, and sample events.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-28 (Feed Improvements: Phase 1 & 2 Polish)
 
 - **Summary**: Polished the "Feed Improvements Blueprint" by synchronizing card colors with the global design system and unifying card dimensions. Ensured all new translation keys are strictly confined to the English locale.

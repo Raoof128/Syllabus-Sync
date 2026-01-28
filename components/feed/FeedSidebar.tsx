@@ -17,20 +17,20 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
   const { t } = useTranslation();
 
   return (
-    <aside className="space-y-6 sticky top-[80px]" aria-label={t('eventStatistics')}>
-      {/* Quick Stats */}
-      <ScrollReveal delay={0.25}>
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" aria-hidden="true" />
+    <aside className="lg:block" aria-label={t('eventStatistics')}>
+      <div className="space-y-6 sticky top-[88px]">
+        {/* Quick Stats */}
+        <ScrollReveal delay={0.25}>
+          <MagicCard isLiquidEnhanced className="overflow-hidden">
+            <Card className="border-mq-border bg-mq-card-background shadow-mq-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                   {t('thisWeek')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg">
+              <CardContent className="space-y-3 pt-2">
+                <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-mq-info" aria-hidden="true" />
                     <span className="text-mq-sm font-medium text-mq-content">
@@ -44,7 +44,7 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                     {stats.total}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg">
+                <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg border border-mq-purple/20">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-mq-purple" aria-hidden="true" />
                     <span className="text-mq-sm font-medium text-mq-content">{t('thisWeek')}</span>
@@ -56,7 +56,7 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                     {stats.thisWeek}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg">
+                <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
                   <div className="flex items-center gap-2">
                     <span className="text-mq-warning" aria-hidden="true">
                       🍕
@@ -72,25 +72,25 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </MagicCard>
-      </ScrollReveal>
+          </MagicCard>
+        </ScrollReveal>
 
-      {/* Announcements */}
-      <ScrollReveal delay={0.3}>
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Megaphone className="h-5 w-5" aria-hidden="true" />
+        {/* Announcements */}
+        <ScrollReveal delay={0.3}>
+          <MagicCard isLiquidEnhanced className="overflow-hidden">
+            <Card className="border-mq-border bg-mq-card-background shadow-mq-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Megaphone className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                   {t('announcements')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 pt-2">
                 <article className="p-3 bg-mq-success/10 rounded-mq-lg border border-mq-success/20">
                   <div className="flex items-start gap-2">
-                    <Badge className="bg-mq-success text-white flex-shrink-0">{t('new')}</Badge>
+                    <Badge className="bg-mq-success text-white flex-shrink-0 text-[10px]">
+                      {t('new')}
+                    </Badge>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-mq-content text-mq-sm">
                         {t('phase2Updates')}
@@ -103,7 +103,9 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                 </article>
                 <article className="p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
                   <div className="flex items-start gap-2">
-                    <Badge className="bg-mq-warning text-white flex-shrink-0">{t('info')}</Badge>
+                    <Badge className="bg-mq-warning text-white flex-shrink-0 text-[10px]">
+                      {t('info')}
+                    </Badge>
                     <div className="min-w-0">
                       <h4 className="font-semibold text-mq-content text-mq-sm">
                         {t('welcomeToApp', { appName: 'Syllabus Sync' })}
@@ -116,23 +118,21 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                 </article>
               </CardContent>
             </Card>
-          </div>
-        </MagicCard>
-      </ScrollReveal>
+          </MagicCard>
+        </ScrollReveal>
 
-      {/* Event Categories Legend */}
-      <ScrollReveal delay={0.35}>
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0">
-            <Card className="border-0 shadow-none bg-transparent">
-              <CardHeader>
-                <CardTitle>{t('eventCategories')}</CardTitle>
+        {/* Event Categories Legend */}
+        <ScrollReveal delay={0.35}>
+          <MagicCard isLiquidEnhanced className="overflow-hidden">
+            <Card className="border-mq-border bg-mq-card-background shadow-mq-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">{t('eventCategories')}</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <dl className="space-y-3">
                   <div className="flex items-center justify-between">
                     <dt>
-                      <Badge className="bg-mq-success/10 text-mq-success">
+                      <Badge className="bg-mq-success/10 text-mq-success border-mq-success/20">
                         {t('category_Academic')}
                       </Badge>
                     </dt>
@@ -140,13 +140,15 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <dt>
-                      <Badge className="bg-mq-info/10 text-mq-info">{t('category_Career')}</Badge>
+                      <Badge className="bg-mq-info/10 text-mq-info border-mq-info/20">
+                        {t('category_Career')}
+                      </Badge>
                     </dt>
                     <dd className="text-mq-sm text-mq-content-secondary">{t('jobInternship')}</dd>
                   </div>
                   <div className="flex items-center justify-between">
                     <dt>
-                      <Badge className="bg-mq-purple/10 text-mq-purple">
+                      <Badge className="bg-mq-purple/10 text-mq-purple border-mq-purple/20">
                         {t('category_Social')}
                       </Badge>
                     </dt>
@@ -156,7 +158,7 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <dt>
-                      <Badge className="bg-mq-warning/10 text-mq-warning">
+                      <Badge className="bg-mq-warning/10 text-mq-warning border-mq-warning/20">
                         {t('category_FreeFood')}
                       </Badge>
                     </dt>
@@ -165,9 +167,9 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
                 </dl>
               </CardContent>
             </Card>
-          </div>
-        </MagicCard>
-      </ScrollReveal>
+          </MagicCard>
+        </ScrollReveal>
+      </div>
     </aside>
   );
 }

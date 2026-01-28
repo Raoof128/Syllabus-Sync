@@ -7,6 +7,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { cn } from '@/lib/utils';
 import { Palette, Shield, Layout, Settings, Sparkles, LifeBuoy } from 'lucide-react';
 import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 import { SettingsSkeleton } from './components';
 
@@ -17,39 +18,45 @@ const useIsClient = () =>
     () => false,
   );
 
-const SECTIONS = [
+const SECTIONS: {
+  id: string;
+  icon: React.ElementType;
+  labelKey: TranslationKey;
+  color: string;
+  path: string;
+}[] = [
   {
     id: 'general',
     icon: Layout,
-    label: 'General',
+    labelKey: 'settings_general',
     color: 'text-blue-500',
     path: '/settings/general',
   },
   {
     id: 'appearance',
     icon: Palette,
-    label: 'Appearance',
+    labelKey: 'settings_appearance',
     color: 'text-purple-500',
     path: '/settings/appearance',
   },
   {
     id: 'security',
     icon: Shield,
-    label: 'Privacy & Security',
+    labelKey: 'settings_privacySecurity',
     color: 'text-green-500',
     path: '/settings/security',
   },
   {
     id: 'experience',
     icon: Sparkles,
-    label: 'Experience',
+    labelKey: 'settings_experience',
     color: 'text-amber-500',
     path: '/settings/experience',
   },
   {
     id: 'support',
     icon: LifeBuoy,
-    label: 'Support',
+    labelKey: 'settings_support',
     color: 'text-slate-500',
     path: '/settings/support',
   },
@@ -119,7 +126,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                   )}
                 >
                   <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-current' : section.color)} />
-                  {section.label}
+                  {t(section.labelKey)}
                 </button>
               );
             })}
@@ -132,7 +139,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
           {/* Desktop Sidebar Navigation */}
           <aside className="hidden lg:block sticky top-32 space-y-1">
             <div className="mb-4 px-3 text-xs font-semibold text-mq-content-tertiary uppercase tracking-wider">
-              Sections
+              {t('settings_sections')}
             </div>
             {SECTIONS.map((section) => {
               const Icon = section.icon;
@@ -159,7 +166,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                         : 'text-mq-content-tertiary group-hover:text-mq-content',
                     )}
                   />
-                  {section.label}
+                  {t(section.labelKey)}
                 </button>
               );
             })}
