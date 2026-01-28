@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Search, Share2, Download, Calendar, Building2, X } from 'lucide-react';
+import { Search, Share2, Download, Calendar, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -15,6 +15,7 @@ type Props = {
   buildingSearch: string;
   setBuildingSearch: (v: string) => void;
   onCopyShare: () => void;
+  onStartNavigation?: () => void;
 };
 
 export default function CampusMapHUD({
@@ -23,6 +24,7 @@ export default function CampusMapHUD({
   buildingSearch,
   setBuildingSearch,
   onCopyShare,
+  onStartNavigation,
 }: Props) {
   const { t } = useTranslation();
 
@@ -165,6 +167,40 @@ export default function CampusMapHUD({
                   </div>
                   <div className="text-sm font-semibold text-mq-content">Low</div>
                 </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex flex-col gap-2 pt-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={() => {
+                    if (onStartNavigation) {
+                      onStartNavigation();
+                    }
+                  }}
+                >
+                  <Navigation className="h-4 w-4" />
+                  {t('navigateOnCampus')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={() => {
+                    const gps = selectedBuilding.location;
+                    if (gps) {
+                      window.open(
+                        `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
+                        '_blank',
+                      );
+                    }
+                  }}
+                >
+                  <Search className="h-4 w-4" />
+                  {t('navigateToGoogleMaps')}
+                </Button>
               </div>
             </div>
           </div>

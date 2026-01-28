@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Map HUD & Navigation Polish)
+
+- **Summary**: Refined the Map HUD by adding navigation actions and fixing UI overlaps. Integrated external Google Maps linking and improved in-app navigation triggers.
+- **Files Changed**:
+  - `app/map/CampusMap.tsx`: Shifted "Center on User" button when building card is visible to prevent overlap. Added `cn` utility.
+  - `app/map/CampusMapHUD.tsx`: Added "Navigate on Campus Map" (scroll-to-action) and "Navigate to Google Maps" (external link) buttons.
+  - `locales/en/translations.json`: Added `navigateOnCampus` and `navigateToGoogleMaps` keys.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-28 (Map UI Redesign: Sales Territory Style)
 
 - **Summary**: Redesigned Campus Map UI to follow a modern "Sales Territory" HUD style. Replaced separate bottom/top cards with a unified map overlay HUD.
@@ -17,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: None.
-
 
 ### Raouf: 2026-01-28 (Full Codebase Audit & Polish)
 

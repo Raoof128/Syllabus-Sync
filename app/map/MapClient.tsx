@@ -45,13 +45,14 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
 const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 
 // Import LocationStatus type
-import type { LocationStatus } from './CampusMap';
+import type { LocationStatus, CampusMapRef } from './CampusMap';
 
 export default function MapClient() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const campusMapRef = useRef<CampusMapRef>(null);
 
   // Location status from CampusMap
   const [, setLocationStatus] = useState<LocationStatus>('idle');
@@ -296,6 +297,7 @@ export default function MapClient() {
                   {shouldRenderMap ? (
                     <MapErrorBoundary>
                       <CampusMap
+                        ref={campusMapRef}
                         selectedBuilding={selectedBuilding}
                         activeOverlays={activeOverlays}
                         onLocationStatusChange={setLocationStatus}
@@ -312,6 +314,7 @@ export default function MapClient() {
                     buildingSearch={buildingSearch}
                     setBuildingSearch={setBuildingSearch}
                     onCopyShare={copyShareableURL}
+                    onStartNavigation={() => campusMapRef.current?.startNavigation()}
                   />
                 </div>
               </CardContent>

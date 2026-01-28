@@ -3,6 +3,15 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-28 (Australia/Sydney) - Map HUD & Navigation Polish
+- **Status:** ✅ Complete - Fixed UI overlaps and added navigation actions.
+- **Scope:** UI/UX - Navigation Accessibility.
+- **Summary:** Moved center button to avoid HUD overlap; added in-app and external navigation buttons to building card.
+- **Files:** app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx; locales/en/translations.json.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+
 ### Raouf: 2026-01-28 (Australia/Sydney) - Map UI Redesign (Sales Territory Style)
 - **Status:** ✅ Complete - Unified map UI with floating HUD overlays.
 - **Scope:** UI/UX - Map Modernization.
