@@ -1484,5 +1484,16 @@
   "loginWithGoogle": "Google",
   "loginWithFacebook": "Facebook",
   "featureComingSoon": "Feature coming soon",
-  "oauthComingSoon": "{{provider}} sign-in will be available soon."
+  "oauthComingSoon": "{{provider}} sign-in will be available soon.",
+  "searchEventsPlaceholder": "Search events...",
+  "sortBy": "Sort by",
+  "sortSoonest": "Soonest",
+  "sortNewest": "Newest",
+  "sortPopular": "Popular",
+  "timeRange_today": "Today",
+  "timeRange_week": "This Week",
+  "timeRange_upcoming": "Upcoming",
+  "clearFilters": "Clear filters",
+  "createFirstEvent": "Create first event",
+  "actions": "Actions"
 }

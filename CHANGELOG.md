@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Feed Improvements: Phase 1 & 2 Polish)
+
+- **Summary**: Polished the "Feed Improvements Blueprint" by synchronizing card colors with the global design system and unifying card dimensions. Ensured all new translation keys are strictly confined to the English locale.
+- **Files Changed**:
+  - `components/feed/FeedEventCard.tsx`: Wrapped cards in `MagicCard` with `isLiquidEnhanced` and switched to `bg-mq-card-background`. Added minimum height constraints for text elements to ensure layout uniformity.
+  - `locales/en/translations.json`: Verified and consolidated all feed-related keys.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-28 (Feed Improvements: Phase 1 & 2)
+
+- **Summary**: Implemented the "Feed Improvements Blueprint" Phases 1 & 2. Overhauled the feed page with a sticky filter bar, advanced search/sort/filter logic, redesigned event cards with "Campus Style" anatomy, and a modular sticky sidebar.
+- **Files Changed**:
+  - `app/feed/FeedClient.tsx`: Refactored to coordinate new sub-components and manage complex filter state.
+  - `components/feed/FeedFilters.tsx`: Created sticky filter bar with search, sort, and time range.
+  - `components/feed/FeedEventCard.tsx`: Created new event card with "Remind me" and map deep-links.
+  - `components/feed/FeedSidebar.tsx`: Extracted sidebar logic into a reusable component.
+  - `locales/en/translations.json`: Added keys for search, sort, filters, and card actions.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: Phase 3 (Sidebar "Quick actions") and Phase 4 (Reminders polish).
+
 ### Raouf: 2026-01-28 (HUD Cleanup & Settings Polish)
 
 - **Summary**: Refined the Map HUD by removing redundant "Today" and status/crowd widgets. Polished the Settings layout by fixing background visibility and removing unused imports.
@@ -16,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: None.
-
 
 ### Raouf: 2026-01-28 (Settings Page Modularization)
 
