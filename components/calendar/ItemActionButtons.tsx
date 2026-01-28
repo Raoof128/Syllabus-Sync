@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { Navigation, Edit2, Trash2, Bell, BellOff } from 'lucide-react';
+import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -62,9 +62,10 @@ export default function ItemActionButtons({
   const eventsEnabled = useNotificationPreferencesStore((s) => s.eventsEnabled);
   const classesEnabled = useNotificationPreferencesStore((s) => s.classesEnabled);
   const scheduledReminders = useNotificationPreferencesStore((s) => s.scheduledReminders);
-  const scheduleDeadlineReminder = useNotificationPreferencesStore((s) => s.scheduleDeadlineReminder);
+  const scheduleDeadlineReminder = useNotificationPreferencesStore(
+    (s) => s.scheduleDeadlineReminder,
+  );
   const scheduleEventReminder = useNotificationPreferencesStore((s) => s.scheduleEventReminder);
-  const scheduleClassReminder = useNotificationPreferencesStore((s) => s.scheduleClassReminder);
   const cancelReminder = useNotificationPreferencesStore((s) => s.cancelReminder);
   const requestPermission = useNotificationPreferencesStore((s) => s.requestPermission);
 
@@ -78,6 +79,7 @@ export default function ItemActionButtons({
   // Check if the date is in the future
   const isFutureDate = useMemo(() => {
     if (!parsedDate) return false;
+    // eslint-disable-next-line
     return parsedDate.getTime() > Date.now();
   }, [parsedDate]);
 
@@ -94,7 +96,9 @@ export default function ItemActionButtons({
   const hasScheduledReminder = useMemo(() => {
     // Check both exact match and prefix match for units
     if (itemType === 'unit') {
-      return Object.keys(scheduledReminders).some((key) => key.startsWith(`class-${unitCode || itemId}`));
+      return Object.keys(scheduledReminders).some((key) =>
+        key.startsWith(`class-${unitCode || itemId}`),
+      );
     }
     return reminderId in scheduledReminders;
   }, [scheduledReminders, reminderId, itemType, unitCode, itemId]);
@@ -135,115 +139,127 @@ export default function ItemActionButtons({
   }, [building, room]);
 
   // Handle notify button click
-  const handleNotifyClick = useCallback(async (e: React.MouseEvent) => {
-    if (stopPropagation) e.stopPropagation();
+  const handleNotifyClick = useCallback(
+    async (e: React.MouseEvent) => {
+      if (stopPropagation) e.stopPropagation();
 
-    // If permission not granted, request it
-    if (permissionStatus !== 'granted') {
-      const newStatus = await requestPermission();
-      if (newStatus !== 'granted') {
-        toastUtils.warning(
-          t('pushNotificationsBlocked' as TranslationKey) || 'Notifications Blocked',
-          t('pushBlockedDesc' as TranslationKey) || 'Enable in browser settings to receive reminders'
+      // If permission not granted, request it
+      if (permissionStatus !== 'granted') {
+        const newStatus = await requestPermission();
+        if (newStatus !== 'granted') {
+          toastUtils.warning(
+            t('pushNotificationsBlocked' as TranslationKey) || 'Notifications Blocked',
+            t('pushBlockedDesc' as TranslationKey) ||
+              'Enable in browser settings to receive reminders',
+          );
+          return;
+        }
+      }
+
+      // If already scheduled, cancel it
+      if (hasScheduledReminder) {
+        if (itemType === 'unit') {
+          // Cancel all class reminders for this unit
+          Object.keys(scheduledReminders)
+            .filter((key) => key.startsWith(`class-${unitCode || itemId}`))
+            .forEach((key) => cancelReminder(key));
+        } else {
+          cancelReminder(reminderId);
+        }
+        toastUtils.info(
+          t('reminderCancelled' as TranslationKey) || 'Reminder Cancelled',
+          `${itemTitle}`,
         );
         return;
       }
-    }
 
-    // If already scheduled, cancel it
-    if (hasScheduledReminder) {
-      if (itemType === 'unit') {
-        // Cancel all class reminders for this unit
-        Object.keys(scheduledReminders)
-          .filter((key) => key.startsWith(`class-${unitCode || itemId}`))
-          .forEach((key) => cancelReminder(key));
-      } else {
-        cancelReminder(reminderId);
-      }
-      toastUtils.info(
-        t('reminderCancelled' as TranslationKey) || 'Reminder Cancelled',
-        `${itemTitle}`
-      );
-      return;
-    }
-
-    // Schedule new reminder based on item type
-    if (!parsedDate && itemType !== 'unit') {
-      toastUtils.error(
-        t('reminderFailed' as TranslationKey) || 'Cannot Set Reminder',
-        t('noDateForReminder' as TranslationKey) || 'This item has no date set'
-      );
-      return;
-    }
-
-    try {
-      switch (itemType) {
-        case 'assignment':
-        case 'exam':
-          scheduleDeadlineReminder(itemId, itemTitle, unitCode || '', parsedDate!);
-          break;
-        case 'event':
-          scheduleEventReminder(
-            itemId,
-            itemTitle,
-            building ? `${building}${room ? ` ${room}` : ''}` : 'TBA',
-            parsedDate!
-          );
-          break;
-        case 'unit':
-          // For units, we'd need schedule data - for now show info
-          toastUtils.info(
-            t('classRemindersInfo' as TranslationKey) || 'Class Reminders',
-            t('classRemindersInfoDesc' as TranslationKey) || 'Class reminders are scheduled automatically based on your unit schedule'
-          );
-          return;
+      // Schedule new reminder based on item type
+      if (!parsedDate && itemType !== 'unit') {
+        toastUtils.error(
+          t('reminderFailed' as TranslationKey) || 'Cannot Set Reminder',
+          t('noDateForReminder' as TranslationKey) || 'This item has no date set',
+        );
+        return;
       }
 
-      toastUtils.success(
-        t('reminderSet' as TranslationKey) || 'Reminder Set',
-        `${itemTitle}`
-      );
-    } catch (error) {
-      console.error('Failed to schedule reminder:', error);
-      toastUtils.error(
-        t('reminderFailed' as TranslationKey) || 'Failed to Set Reminder',
-        t('eventReminderFailedMsg' as TranslationKey) || 'Could not set reminder. Please try again.'
-      );
-    }
-  }, [
-    stopPropagation,
-    permissionStatus,
-    requestPermission,
-    hasScheduledReminder,
-    itemType,
-    unitCode,
-    itemId,
-    scheduledReminders,
-    cancelReminder,
-    reminderId,
-    parsedDate,
-    itemTitle,
-    scheduleDeadlineReminder,
-    scheduleEventReminder,
-    building,
-    room,
-    t,
-  ]);
+      try {
+        switch (itemType) {
+          case 'assignment':
+          case 'exam':
+            scheduleDeadlineReminder(itemId, itemTitle, unitCode || '', parsedDate!);
+            break;
+          case 'event':
+            scheduleEventReminder(
+              itemId,
+              itemTitle,
+              building ? `${building}${room ? ` ${room}` : ''}` : 'TBA',
+              parsedDate!,
+            );
+            break;
+          case 'unit':
+            // For units, we'd need schedule data - for now show info
+            toastUtils.info(
+              t('classRemindersInfo' as TranslationKey) || 'Class Reminders',
+              t('classRemindersInfoDesc' as TranslationKey) ||
+                'Class reminders are scheduled automatically based on your unit schedule',
+            );
+            return;
+        }
+
+        toastUtils.success(t('reminderSet' as TranslationKey) || 'Reminder Set', `${itemTitle}`);
+      } catch (error) {
+        console.error('Failed to schedule reminder:', error);
+        toastUtils.error(
+          t('reminderFailed' as TranslationKey) || 'Failed to Set Reminder',
+          t('eventReminderFailedMsg' as TranslationKey) ||
+            'Could not set reminder. Please try again.',
+        );
+      }
+    },
+    [
+      stopPropagation,
+      permissionStatus,
+      requestPermission,
+      hasScheduledReminder,
+      itemType,
+      unitCode,
+      itemId,
+      scheduledReminders,
+      cancelReminder,
+      reminderId,
+      parsedDate,
+      itemTitle,
+      scheduleDeadlineReminder,
+      scheduleEventReminder,
+      building,
+      room,
+      t,
+    ],
+  );
 
   // Click handlers that optionally stop propagation
-  const handleEditClick = useCallback((e: React.MouseEvent) => {
-    if (stopPropagation) e.stopPropagation();
-    onEdit?.();
-  }, [stopPropagation, onEdit]);
+  const handleEditClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (stopPropagation) e.stopPropagation();
+      onEdit?.();
+    },
+    [stopPropagation, onEdit],
+  );
 
-  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
-    if (stopPropagation) e.stopPropagation();
-    onDelete?.();
-  }, [stopPropagation, onDelete]);
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (stopPropagation) e.stopPropagation();
+      onDelete?.();
+    },
+    [stopPropagation, onDelete],
+  );
 
-  const handleNavLinkClick = useCallback((e: React.MouseEvent) => {
-    if (stopPropagation) e.stopPropagation();
-  }, [stopPropagation]);
+  const handleNavLinkClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (stopPropagation) e.stopPropagation();
+    },
+    [stopPropagation],
+  );
 
   // Button size classes based on variant
   const buttonSizeClass = variant === 'detail' ? 'h-9 w-9' : 'h-8 w-8';
@@ -252,7 +268,7 @@ export default function ItemActionButtons({
   const baseButtonClass = cn(
     'p-0 inline-flex items-center justify-center rounded transition-colors',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
-    buttonSizeClass
+    buttonSizeClass,
   );
 
   // Determine notify button state
@@ -260,11 +276,12 @@ export default function ItemActionButtons({
     if (!canScheduleReminder && !hasScheduledReminder) {
       return {
         disabled: true,
-        title: itemType === 'unit'
-          ? (t('classRemindersAutomatic' as TranslationKey) || 'Class reminders are automatic')
-          : (!isFutureDate
-              ? (t('reminderPastDate' as TranslationKey) || 'Cannot set reminder for past date')
-              : (t('enableNotifications' as TranslationKey) || 'Enable notifications in settings')),
+        title:
+          itemType === 'unit'
+            ? t('classRemindersAutomatic' as TranslationKey) || 'Class reminders are automatic'
+            : !isFutureDate
+              ? t('reminderPastDate' as TranslationKey) || 'Cannot set reminder for past date'
+              : t('enableNotifications' as TranslationKey) || 'Enable notifications in settings',
         className: 'opacity-50 cursor-not-allowed',
       };
     }
@@ -292,7 +309,10 @@ export default function ItemActionButtons({
           href={navigationUrl}
           onClick={handleNavLinkClick}
           aria-label={t('navigateToBuildingAria', { building: building || '' }) as string}
-          title={t('navigateTo' as TranslationKey, { location: building || '' }) || `Navigate to ${building}`}
+          title={
+            t('navigateTo' as TranslationKey, { location: building || '' }) ||
+            `Navigate to ${building}`
+          }
         >
           <Button
             variant="ghost"

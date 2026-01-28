@@ -107,16 +107,12 @@ export default function ExamDetailPanel({
     return `In ${daysUntil} days`;
   };
 
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <div
-              className="w-3 h-3 rounded-full shrink-0"
-              style={{ backgroundColor: color }}
-            />
+            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
             {exam.title}
           </DialogTitle>
         </DialogHeader>
@@ -246,10 +242,7 @@ export default function ExamDetailPanel({
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded shrink-0"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: color }} />
                 <div>
                   <p className="font-semibold text-sm">{exam.building || 'TBA'}</p>
                   {exam.room && (
@@ -288,10 +281,7 @@ export default function ExamDetailPanel({
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded shrink-0"
-                  style={{ backgroundColor: unit.color }}
-                />
+                <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: unit.color }} />
                 <div>
                   <p className="font-semibold text-sm">{unit.code}</p>
                   <p className="text-xs text-mq-content-secondary">{unit.name}</p>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
@@ -299,7 +299,6 @@ function calculateOverlapGroups(
 }
 
 export default function CalendarClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
@@ -2099,8 +2098,8 @@ export default function CalendarClient() {
                                   onEdit={() => openEditAssignment(assignment)}
                                   onDelete={() => handleDeleteAssignment(assignment)}
                                   variant="compact"
-                                  stopPropagation={true}
-                                />
+                                  stopPropagation
+                                />{' '}
                               </div>
                             </div>
                           );
@@ -2245,8 +2244,8 @@ export default function CalendarClient() {
                                   onEdit={() => openEditExam(exam)}
                                   onDelete={() => handleDeleteExam(exam)}
                                   variant="compact"
-                                  stopPropagation={true}
-                                />
+                                  stopPropagation
+                                />{' '}
                               </div>
                             </div>
                           );
@@ -2354,8 +2353,8 @@ export default function CalendarClient() {
                               onEdit={() => openEditUnit(unit)}
                               onDelete={() => handleDeleteUnit(unit)}
                               variant="compact"
-                              stopPropagation={true}
-                            />
+                              stopPropagation
+                            />{' '}
                           </div>
                         </div>
                       ))}
@@ -2452,8 +2451,8 @@ export default function CalendarClient() {
                                 onEdit={() => openEditEvent(event)}
                                 onDelete={() => handleDeleteEvent(event)}
                                 variant="compact"
-                                stopPropagation={true}
-                              />
+                                stopPropagation
+                              />{' '}
                             </div>
                           </div>
                         );
@@ -2583,7 +2582,7 @@ export default function CalendarClient() {
                         disabled={!newTodoDueDate}
                         className={cn(
                           'h-10 sm:h-11 px-3 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[120px]',
-                          !newTodoDueDate && 'opacity-50 cursor-not-allowed'
+                          !newTodoDueDate && 'opacity-50 cursor-not-allowed',
                         )}
                         aria-label={tOr('selectDueTime', 'Select due time')}
                       />
@@ -2634,123 +2633,137 @@ export default function CalendarClient() {
                           getPendingTodos().map((todo) => {
                             // Calculate if task is overdue
                             const isOverdue = todo.dueDate && new Date(todo.dueDate) < new Date();
-                            const isDueToday = todo.dueDate &&
+                            const isDueToday =
+                              todo.dueDate &&
                               new Date(todo.dueDate).toDateString() === new Date().toDateString();
 
                             return (
-                            <div
-                              key={todo.id}
-                              className={cn(
-                                "group flex items-center justify-between p-3 sm:p-4 rounded-lg border hover:shadow-md transition-all bg-mq-card-background",
-                                isOverdue ? "border-red-300 dark:border-red-800" : "border-mq-border hover:border-emerald-300"
-                              )}
-                            >
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleTodoComplete(todo.id)}
-                                  aria-label={t('markAsCompleted')}
-                                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
-                                >
-                                  <Circle
-                                    className={cn(
-                                      "h-5 w-5 transition-colors",
-                                      isOverdue ? "text-red-500" : "text-mq-content-secondary"
-                                    )}
-                                    aria-hidden="true"
-                                  />
-                                </button>
-                                <div className="flex-1 min-w-0 space-y-1">
-                                  <p
-                                    className="text-base font-medium text-mq-content break-words whitespace-normal"
-                                    style={{ wordSpacing: '0.05em', letterSpacing: 'normal' }}
+                              <div
+                                key={todo.id}
+                                className={cn(
+                                  'group flex items-center justify-between p-3 sm:p-4 rounded-lg border hover:shadow-md transition-all bg-mq-card-background',
+                                  isOverdue
+                                    ? 'border-red-300 dark:border-red-800'
+                                    : 'border-mq-border hover:border-emerald-300',
+                                )}
+                              >
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleTodoComplete(todo.id)}
+                                    aria-label={t('markAsCompleted')}
+                                    className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus rounded-lg h-10 w-10 flex items-center justify-center flex-shrink-0 hover:bg-mq-background-secondary transition-colors"
                                   >
-                                    {todo.title}
-                                  </p>
-                                  {todo.description && (
+                                    <Circle
+                                      className={cn(
+                                        'h-5 w-5 transition-colors',
+                                        isOverdue ? 'text-red-500' : 'text-mq-content-secondary',
+                                      )}
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                  <div className="flex-1 min-w-0 space-y-1">
                                     <p
-                                      className="text-sm text-mq-content-secondary leading-relaxed break-words whitespace-normal"
+                                      className="text-base font-medium text-mq-content break-words whitespace-normal"
                                       style={{ wordSpacing: '0.05em', letterSpacing: 'normal' }}
                                     >
-                                      {todo.description}
+                                      {todo.title}
                                     </p>
-                                  )}
-                                  {/* Due Date Display */}
-                                  {todo.dueDate && (
-                                    <div className={cn(
-                                      "flex items-center gap-1.5 text-xs",
-                                      isOverdue ? "text-red-600 dark:text-red-400" :
-                                      isDueToday ? "text-amber-600 dark:text-amber-400" :
-                                      "text-mq-content-tertiary"
-                                    )}>
-                                      <Clock className="h-3 w-3" />
-                                      <span>
-                                        {isOverdue ? tOr('overdue', 'Overdue') + ': ' : isDueToday ? tOr('dueToday', 'Due today') + ': ' : ''}
-                                        {new Date(todo.dueDate).toLocaleDateString(undefined, {
-                                          month: 'short',
-                                          day: 'numeric',
-                                          year: new Date(todo.dueDate).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
-                                        })}
-                                        {' '}
-                                        {new Date(todo.dueDate).toLocaleTimeString(undefined, {
-                                          hour: '2-digit',
-                                          minute: '2-digit'
-                                        })}
-                                      </span>
-                                    </div>
-                                  )}
+                                    {todo.description && (
+                                      <p
+                                        className="text-sm text-mq-content-secondary leading-relaxed break-words whitespace-normal"
+                                        style={{ wordSpacing: '0.05em', letterSpacing: 'normal' }}
+                                      >
+                                        {todo.description}
+                                      </p>
+                                    )}
+                                    {/* Due Date Display */}
+                                    {todo.dueDate && (
+                                      <div
+                                        className={cn(
+                                          'flex items-center gap-1.5 text-xs',
+                                          isOverdue
+                                            ? 'text-red-600 dark:text-red-400'
+                                            : isDueToday
+                                              ? 'text-amber-600 dark:text-amber-400'
+                                              : 'text-mq-content-tertiary',
+                                        )}
+                                      >
+                                        <Clock className="h-3 w-3" />
+                                        <span>
+                                          {isOverdue
+                                            ? `${tOr('overdue', 'Overdue')}: `
+                                            : isDueToday
+                                              ? `${tOr('dueToday', 'Due today')}: `
+                                              : ''}
+                                          {new Date(todo.dueDate).toLocaleDateString(undefined, {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year:
+                                              new Date(todo.dueDate).getFullYear() !==
+                                              new Date().getFullYear()
+                                                ? 'numeric'
+                                                : undefined,
+                                          })}{' '}
+                                          {new Date(todo.dueDate).toLocaleTimeString(undefined, {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                          })}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                {/* Action icons - far right */}
+                                <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0">
+                                  <Badge
+                                    className={cn(
+                                      'text-[10px] px-2 py-0.5 font-semibold hidden sm:inline-flex',
+                                      todo.priority === 'High' &&
+                                        'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800',
+                                      todo.priority === 'Medium' &&
+                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
+                                      todo.priority === 'Low' &&
+                                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+                                    )}
+                                    variant="neutral"
+                                  >
+                                    {todo.priority}
+                                  </Badge>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingTodo(todo);
+                                      setEditTodoTitle(todo.title);
+                                      setEditTodoPriority(todo.priority);
+                                      // Set due date/time for editing
+                                      if (todo.dueDate) {
+                                        const dueDate = new Date(todo.dueDate);
+                                        setEditTodoDueDate(dueDate.toISOString().split('T')[0]);
+                                        setEditTodoDueTime(dueDate.toTimeString().slice(0, 5));
+                                      } else {
+                                        setEditTodoDueDate('');
+                                        setEditTodoDueTime('');
+                                      }
+                                    }}
+                                    className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                    aria-label={t('calendarEditItem', { title: todo.title })}
+                                  >
+                                    <Edit2 className="h-4 w-4" aria-hidden="true" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setTodoToDelete({ id: todo.id, title: todo.title });
+                                      setTodoDeleteConfirmOpen(true);
+                                    }}
+                                    className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                    aria-label={t('calendarDeleteItem', { title: todo.title })}
+                                  >
+                                    <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                  </button>
                                 </div>
                               </div>
-                              {/* Action icons - far right */}
-                              <div className="flex items-center gap-1 ml-auto pl-2 flex-shrink-0">
-                                <Badge
-                                  className={cn(
-                                    'text-[10px] px-2 py-0.5 font-semibold hidden sm:inline-flex',
-                                    todo.priority === 'High' &&
-                                      'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800',
-                                    todo.priority === 'Medium' &&
-                                      'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800',
-                                    todo.priority === 'Low' &&
-                                      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
-                                  )}
-                                  variant="neutral"
-                                >
-                                  {todo.priority}
-                                </Badge>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setEditingTodo(todo);
-                                    setEditTodoTitle(todo.title);
-                                    setEditTodoPriority(todo.priority);
-                                    // Set due date/time for editing
-                                    if (todo.dueDate) {
-                                      const dueDate = new Date(todo.dueDate);
-                                      setEditTodoDueDate(dueDate.toISOString().split('T')[0]);
-                                      setEditTodoDueTime(dueDate.toTimeString().slice(0, 5));
-                                    } else {
-                                      setEditTodoDueDate('');
-                                      setEditTodoDueTime('');
-                                    }
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-mq-hover-background rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                                  aria-label={t('calendarEditItem', { title: todo.title })}
-                                >
-                                  <Edit2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setTodoToDelete({ id: todo.id, title: todo.title });
-                                    setTodoDeleteConfirmOpen(true);
-                                  }}
-                                  className="h-8 w-8 p-0 hover:bg-red-100 dark:hover:bg-red-950/30 rounded-lg flex items-center justify-center opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-                                  aria-label={t('calendarDeleteItem', { title: todo.title })}
-                                >
-                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                                </button>
-                              </div>
-                            </div>
                             );
                           })
                         )}
@@ -3225,7 +3238,7 @@ export default function CalendarClient() {
                       disabled={!editTodoDueDate}
                       className={cn(
                         'px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]',
-                        !editTodoDueDate && 'opacity-50 cursor-not-allowed'
+                        !editTodoDueDate && 'opacity-50 cursor-not-allowed',
                       )}
                       aria-label={tOr('selectDueTime', 'Select due time')}
                     />
