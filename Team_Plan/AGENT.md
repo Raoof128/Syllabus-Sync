@@ -3,6 +3,24 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-28 (Australia/Sydney) - Feed Sticky Stacking & Sidebar
+- **Status:** ✅ Complete - Implemented stacking cards and refined sidebar.
+- **Scope:** UI/UX - Feed Interaction.
+- **Summary:** Added sticky stacking effect to event cards and polished sidebar tracking.
+- **Files:** components/feed/FeedSidebar.tsx; app/feed/FeedClient.tsx.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups:** None.
+
+
+### Raouf: 2026-01-28 (Australia/Sydney) - Feed Sticky Sidebar Polish
+- **Status:** ✅ Complete - Removed internal scrollbar.
+- **Scope:** UI Polish - Feed Sidebar.
+- **Summary:** Removed `overflow-y-auto` to strictly use main window scrollbar; kept sticky positioning.
+- **Files:** components/feed/FeedSidebar.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+
 ### Raouf: 2026-01-28 (Australia/Sydney) - Feed Sticky Sidebar & Event Keys
 - **Status:** ✅ Complete - Fixed sticky sidebar and added missing keys.
 - **Scope:** Bug Fix - UI Layout & i18n.

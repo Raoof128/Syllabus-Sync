@@ -443,12 +443,20 @@ const FeedClient = memo(() => {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event, index) => (
-                <ScrollReveal key={event.id} delay={0.1 + index * 0.05}>
-                  <div
-                    ref={(el) => {
-                      if (el) eventRefs.current.set(event.id, el);
-                    }}
-                  >
+                <article
+                  key={event.id}
+                  className="sticky z-0 transition-transform duration-300"
+                  style={{
+                    // Stacking effect calculation
+                    top: `${140 + index * 10}px`,
+                    // Add slight margin bottom to create spacing when stacked
+                    marginBottom: '2rem',
+                  }}
+                  ref={(el) => {
+                    if (el) eventRefs.current.set(event.id, el);
+                  }}
+                >
+                  <ScrollReveal delay={0.1}>
                     <FeedEventCard
                       event={event}
                       isReminded={remindedEvents.has(event.id)}
@@ -472,8 +480,8 @@ const FeedClient = memo(() => {
                       }}
                       getLocaleString={getLocaleString}
                     />
-                  </div>
-                </ScrollReveal>
+                  </ScrollReveal>
+                </article>
               ))
             ) : (
               <div className="col-span-full py-12 text-center bg-mq-surface rounded-2xl border border-mq-border border-dashed">

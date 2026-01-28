@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Feed Sticky Stacking & Sidebar)
+
+- **Summary**: Implemented "Gen Z" style stacking cards for the feed events and refined the sidebar sticky behavior.
+  - **Sidebar**: Updated to use `sticky top-[88px] h-fit` for a cleaner sticky interaction without internal scrolling.
+  - **Feed Events**: Wrapped events in `sticky` articles with dynamic `top` offsets to create a stacking deck effect as the user scrolls.
+- **Files Changed**:
+  - `components/feed/FeedSidebar.tsx`: Simplified sticky structure.
+  - `app/feed/FeedClient.tsx`: Implemented sticky stacking card logic.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-28 (Feed Sticky Sidebar Polish)
+
+- **Summary**: Refined Feed Sidebar sticky behavior by removing the internal scrollbar (`overflow-y-auto`) as requested. The sidebar now sticks cleanly to the top (`top-[88px]`) and uses the main page scrollbar. Added `transition-all` for smoother resizing if needed.
+- **Files Changed**:
+  - `components/feed/FeedSidebar.tsx`: Removed overflow/max-height constraints.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-28 (Feed Sticky Sidebar & Event Keys)
 
 - **Summary**: Fixed the Feed Sidebar sticky behavior by restructuring the layout (removed `items-start` from grid, wrapped sidebar content in a sticky container). Also added missing translation keys for sample events to ensure full i18n coverage.
