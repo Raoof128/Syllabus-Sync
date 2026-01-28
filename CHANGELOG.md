@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Map UI Redesign: Sales Territory Style)
+
+- **Summary**: Redesigned Campus Map UI to follow a modern "Sales Territory" HUD style. Replaced separate bottom/top cards with a unified map overlay HUD.
+- **Files Changed**:
+  - `app/map/MapClient.tsx`: Injected `CampusMapHUD`, removed redundant `Selected Building Banner` and `Campus Buildings Quick Reference` cards.
+  - `app/map/CampusMapHUD.tsx`: Created new HUD component with floating sidebar, search, and details card.
+  - `locales/en/translations.json`: Added "Share" and "Places" keys.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: None.
+
+
 ### Raouf: 2026-01-28 (Full Codebase Audit & Polish)
 
 - **Summary**: Performed a comprehensive codebase audit, verifying security, testing, and code quality. Resolved lingering lint warnings and purity issues in calendar components. Updated audit report to reflect healthy state.
@@ -18,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
   - `npm audit`: Passed (0 vulnerabilities).
 - **Follow-ups**: None.
-
 
 ### Raouf: 2026-01-27 (React 19 Test Migration & Cleanup)
 
