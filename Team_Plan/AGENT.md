@@ -3,6 +3,22 @@
 ## Current Development Session (January 22-24, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, and Infrastructure Stability
 
+### Raouf: 2026-01-28 (Australia/Sydney) - Calendar Upgrade (Phase 1)
+- **Status:** ✅ Complete - Foundation, Sticky Layout, and Widgets built.
+- **Scope:** Major UI/UX Overhaul - Calendar.
+- **Summary:** Replaced legacy Calendar layout with a new Sticky Header + Sidebar architecture. Built `CalendarHeader`, `CalendarSidebar`, and `CalendarWidgets`; refactored `CalendarClient` to support View Switching (Week/Day/Agenda placeholder). Use non-glass styling for "Gen Z" clean aesthetic.
+- **Files:** app/calendar/CalendarClient.tsx; components/calendar/*; CHANGELOG.md.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups**: Implement core "Day" and "Agenda" views, refine "Week" view visuals (reduce grid clutter), and add "Privacy Mode".
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Implementation
+- **Status:** ✅ Complete - Day and Agenda views implemented.
+- **Scope:** UI/UX - Calendar Views.
+- **Summary**: Built `DayView` and `AgendaView` components. Integrated into `CalendarClient`. Added `FilterPanel` for item visibility control. Extracted shared logic to `calendar-utils.ts`.
+- **Files:** components/calendar/DayView.tsx; components/calendar/AgendaView.tsx; app/calendar/CalendarClient.tsx; lib/calendar-utils.ts.
+- **Verification:** `npm run build` (pass).
+- **Follow-ups:** Styling polish and mobile optimizations.
+
 ### Raouf: 2026-01-28 (Australia/Sydney) - Feed Sticky Stacking & Sidebar
 - **Status:** ✅ Complete - Implemented stacking cards and refined sidebar.
 - **Scope:** UI/UX - Feed Interaction.
@@ -273,3 +289,11 @@
 - **Result:** Navigation system is fully functional and robust.
 
 ### Raouf: 2026-01-24 (Australia/Sydney) - Final Map Polish (Manual Offset)
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Polish & FilterPanel
+- **Status:** ✅ Complete - Views polished and filtered.
+- **Scope:** UI/UX & Refactoring - Calendar.
+- **Summary:** Standardized deadline coloring across all views using `getDeadlineColor`. Polished `FilterPanel` layout and ensured build stability.
+- **Files:** lib/calendar-utils.ts; app/calendar/CalendarClient.tsx; components/calendar/*; CHANGELOG.md.
+- **Verification:** `npm run build` (pass).
+- **Follow-ups:** None.

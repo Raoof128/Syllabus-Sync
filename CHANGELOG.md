@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-28 (Calendar Upgrade: Foundation & Views)
+
+- **Summary**: Implemented the "Calendar Upgrade Blueprint" Phase 1 and started Phase 2. The Calendar is now structured with a "Sticky Layout" featuring a proper Header, Sidebar with widgets, and Main View Area. Moved widgets to a dedicated component and added support for View Switching (Week/Day/Agenda) and Todos in the sidebar.
+- **Files Changed**:
+  - `app/calendar/CalendarClient.tsx`: Massive refactor. Implemented new layout, View State, and removed inline widgets.
+  - `components/calendar/CalendarHeader.tsx`: Created new component for navigation and view controls.
+  - `components/calendar/CalendarSidebar.tsx`: Created new component for sticky sidebar layout.
+  - `components/calendar/CalendarWidgets.tsx`: Extracted and updated widgets (Units, Deadlines, Events, Todos) with non-glass styling.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Follow-ups**: Implement core "Day" and "Agenda" views, refine "Week" view visuals (reduce grid clutter), and add "Privacy Mode".
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Implementation
+- **Summary**: Implemented the "Day" and "Agenda" views for the calendar. Created `DayView` for a detailed hourly schedule and `AgendaView` for a chronological list of items. Refactored `CalendarClient` to use these views and added a `FilterPanel` for toggling visibility of units, deadlines, and events.
+- **Files Changed**:
+  - `components/calendar/DayView.tsx`: Created detailed day view component.
+  - `components/calendar/AgendaView.tsx`: Created agenda list view component.
+  - `components/calendar/FilterPanel.tsx`: Created filter panel component.
+  - `app/calendar/CalendarClient.tsx`: Integrated new views and filter logic.
+  - `lib/calendar-utils.ts`: extracted shared calendar logic.
+  - `components/ui/mq/switch.tsx`: Created switch component.
+- **Verification**: `npm run build` (pass).
+- **Follow-ups**: Address remaining styling polish, drag-and-drop if needed, and further mobile responsiveness optimizations.
+
 ### Raouf: 2026-01-28 (Feed Sticky Stacking & Sidebar)
 
 - **Summary**: Implemented "Gen Z" style stacking cards for the feed events and refined the sidebar sticky behavior.
@@ -176,4 +200,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**:
   - Ran `npm run check:i18n`: All 19 locales now have 100% key coverage (1458 keys).
   - Manual review of `app/calendar/CalendarClient.tsx` and core layout components confirmed `t()` usage.
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Polish & FilterPanel
+- **Summary**: Refined "Day" and "Agenda" views implementation with consistent deadline coloring and visual improvements. Polished the FilterPanel component layout.
+- **Files Changed**:
+  - `lib/calendar-utils.ts`: Added `getDeadlineColor` helper to standardize coloring logic.
+  - `app/calendar/CalendarClient.tsx`: Updated key logic and integrated standardized coloring.
+  - `components/calendar/DayView.tsx`: Implemented `getDeadlineColor` and fixed formatting.
+  - `components/calendar/AgendaView.tsx`: Implemented `getDeadlineColor` for agenda items.
+  - `components/calendar/FilterPanel.tsx`: Renamed header and removed unused imports.
+- **Verification**: `npm run build` (pass).
 - **Follow-ups**: None.
