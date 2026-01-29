@@ -5,24 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
-  CheckCircle2,
-  Circle,
   Edit2,
-  Plus,
-  BookOpen,
-  FileText,
   ChevronLeft,
   ChevronRight,
-  PartyPopper,
   Trash2,
   AlertTriangle,
-  ListTodo,
-  SquareCheckBig,
   Clock,
   Calendar,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
@@ -31,7 +21,6 @@ import { useTodosStore } from '@/lib/store/todosStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
-import { PRIORITY_COLORS } from '@/lib/constants';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
@@ -41,7 +30,6 @@ import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
-import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 import CalendarHeader, { CalendarView } from '@/components/calendar/CalendarHeader';
 import CalendarSidebar from '@/components/calendar/CalendarSidebar';
 import CalendarWidgets from '@/components/calendar/CalendarWidgets';
@@ -91,7 +79,6 @@ import {
   HOURS,
   HOUR_HEIGHT,
   START_HOUR,
-  TYPE_COLORS,
   getEventColors,
   getDeadlineColor,
   parseTimeRange,
@@ -103,21 +90,15 @@ import {
 export default function CalendarClient() {
   const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
   const userEvents = useEventsStore((state) => state.events);
   const removeEvent = useEventsStore((state) => state.removeEvent);
   const units = useUnitsStore((state) => state.units);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
 
-  // Todos store
-  const todos = useTodosStore((state) => state.todos);
   const addTodo = useTodosStore((state) => state.addTodo);
-  const toggleTodoComplete = useTodosStore((state) => state.toggleComplete);
   const removeTodo = useTodosStore((state) => state.removeTodo);
   const updateTodo = useTodosStore((state) => state.updateTodo);
-  const getPendingTodos = useTodosStore((state) => state.getPendingTodos);
-  const getCompletedToday = useTodosStore((state) => state.getCompletedToday);
 
   const hasHydrated = useHydration();
   const { language, t } = useTranslation();
@@ -191,11 +172,6 @@ export default function CalendarClient() {
   const [eventDeleteConfirmOpen, setEventDeleteConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
 
-  // Todo input state
-  const [newTodoTitle, setNewTodoTitle] = useState('');
-  const [newTodoPriority, setNewTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
-  const [newTodoDueDate, setNewTodoDueDate] = useState('');
-  const [newTodoDueTime, setNewTodoDueTime] = useState('');
   const [todoDeleteConfirmOpen, setTodoDeleteConfirmOpen] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState<{ id: string; title: string } | null>(null);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
@@ -419,7 +395,7 @@ export default function CalendarClient() {
   );
 
   // Events from store (loaded from Supabase API)
-  const allEvents = useMemo(() => userEvents, [userEvents]);
+  // const allEvents = useMemo(() => userEvents, [userEvents]);
 
   // Get unit schedules for a specific day
   const getUnitsForDay = (date: Date) => {
@@ -460,8 +436,9 @@ export default function CalendarClient() {
   //     hour: 'numeric',
   //     minute: '2-digit',
   //   });
-  const formatMonthDayTime = (date: Date) =>
-    formatLocalized(date, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  // formatMonthDayTime - available for future use
+  // const formatMonthDayTime = (date: Date) =>
+  //   formatLocalized(date, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
   const formatHourLabel = (hour: number) =>
     formatLocalized(dayjs().hour(hour).minute(0).second(0).millisecond(0).toDate(), {
@@ -733,13 +710,13 @@ export default function CalendarClient() {
   };
 
   // Get building info for a deadline (either from deadline itself or from its unit)
-  const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
-    // First check if deadline has its own building (for exams)
-    if (deadline.building) return deadline.building;
-    // Otherwise, get building from the associated unit
-    const unit = units.find((u) => u.code === deadline.unitCode);
-    return unit?.location?.building;
-  };
+  // const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
+  //   // First check if deadline has its own building (for exams)
+  //   if (deadline.building) return deadline.building;
+  //   // Otherwise, get building from the associated unit
+  //   const unit = units.find((u) => u.code === deadline.unitCode);
+  //   return unit?.location?.building;
+  // };
 
   // Event edit handler
   const openEditEvent = (event: Event) => {
@@ -761,8 +738,8 @@ export default function CalendarClient() {
   };
 
   // Filter deadlines by type
-  const assignments = deadlines.filter((d) => d.type === 'Assignment');
-  const exams = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz');
+  // const assignments = deadlines.filter((d) => d.type === 'Assignment');
+  // const exams = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz');
 
   return (
     <div
@@ -805,302 +782,811 @@ export default function CalendarClient() {
             // Apple/Google Calendar Style Weekly View
             <ScrollReveal delay={0.1}>
               <MagicCard isLiquidEnhanced>
-                <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border overflow-auto h-[calc(100vh-140px)]">
-                  {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
-                  <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md">
-                    {/* Desktop week navigation REMOVED per user request */}
-                    {/* Mobile day navigation */}
-                    <div className="flex md:hidden items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={goToPreviousDay}
-                        aria-label={t('calendarPreviousDay' as TranslationKey) || 'Previous day'}
-                      >
-                        <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={goToToday}>
-                        {t('today')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={goToNextDay}
-                        aria-label={t('calendarNextDay' as TranslationKey) || 'Next day'}
-                      >
-                        <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                      </Button>
-                    </div>
-                    {/* Desktop: Month/Year title */}
-                    <h2 className="hidden md:block text-lg font-semibold text-mq-content">
-                      {formatMonthYear(currentWeekStart)}
-                    </h2>
-                    {/* Mobile: Selected day title */}
-                    <h2 className="md:hidden text-lg font-semibold text-mq-content">
-                      {formatWeekdayLong(mobileSelectedDay)}, {formatDayNumber(mobileSelectedDay)}
-                    </h2>
-                    <div className="w-24" /> {/* Spacer for balance */}
-                  </div>
-
-                  {/* Mobile: Week day quick picker */}
-                  <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary">
-                    {weekDays.map((day, index) => {
-                      const isSelected = index === mobileSelectedDayIndex;
-                      const isTodayPill = dayjs(day).isSame(dayjs(), 'day');
-                      return (
-                        <button
-                          key={day.toISOString()}
-                          type="button"
-                          onClick={() => setMobileSelectedDayIndex(index)}
-                          className={cn(
-                            'flex flex-col items-center justify-center w-10 h-14 rounded-lg transition-all',
-                            isSelected
-                              ? 'bg-mq-primary text-white shadow-md'
-                              : isTodayPill
-                                ? 'bg-mq-primary/10 text-mq-primary'
-                                : 'bg-mq-background hover:bg-mq-hover-background text-mq-content',
-                          )}
-                          aria-label={`${formatWeekdayLong(day)}, ${formatDayNumber(day)}`}
-                          aria-pressed={isSelected}
+                <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border overflow-visible">
+                  <div className="overflow-x-auto">
+                    {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
+                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md min-w-[800px] md:min-w-0">
+                      {/* Desktop week navigation REMOVED per user request */}
+                      {/* Mobile day navigation */}
+                      <div className="flex md:hidden items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={goToPreviousDay}
+                          aria-label={t('calendarPreviousDay' as TranslationKey) || 'Previous day'}
                         >
-                          <span className="text-[10px] font-medium uppercase">
-                            {formatWeekdayShort(day).slice(0, 2)}
-                          </span>
-                          <span className={cn('text-sm font-semibold', isSelected && 'text-white')}>
-                            {formatDayNumber(day)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={goToToday}>
+                          {t('today')}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={goToNextDay}
+                          aria-label={t('calendarNextDay' as TranslationKey) || 'Next day'}
+                        >
+                          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                        </Button>
+                      </div>
+                      {/* Desktop: Month/Year title */}
+                      <h2 className="hidden md:block text-lg font-semibold text-mq-content">
+                        {formatMonthYear(currentWeekStart)}
+                      </h2>
+                      {/* Mobile: Selected day title */}
+                      <h2 className="md:hidden text-lg font-semibold text-mq-content">
+                        {formatWeekdayLong(mobileSelectedDay)}, {formatDayNumber(mobileSelectedDay)}
+                      </h2>
+                      <div className="w-24" /> {/* Spacer for balance */}
+                    </div>
 
-                  {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
-                  {/* Desktop: Full week view */}
-                  <div
-                    className="hidden md:block"
-                    role="grid"
-                    aria-label={t('calendarWeeklyGridLabel')}
-                    aria-roledescription={t('calendarWeeklyGridDescription')}
-                  >
-                    <div className="min-w-[800px]">
-                      {/* Day Headers - Sticky with MQ Key Dates */}
-                      <div
-                        className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-[73px] bg-mq-background/95 backdrop-blur-md z-30"
-                        role="row"
-                      >
+                    {/* Mobile: Week day quick picker */}
+                    <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary">
+                      {weekDays.map((day, index) => {
+                        const isSelected = index === mobileSelectedDayIndex;
+                        const isTodayPill = dayjs(day).isSame(dayjs(), 'day');
+                        return (
+                          <button
+                            key={day.toISOString()}
+                            type="button"
+                            onClick={() => setMobileSelectedDayIndex(index)}
+                            className={cn(
+                              'flex flex-col items-center justify-center w-10 h-14 rounded-lg transition-all',
+                              isSelected
+                                ? 'bg-mq-primary text-white shadow-md'
+                                : isTodayPill
+                                  ? 'bg-mq-primary/10 text-mq-primary'
+                                  : 'bg-mq-background hover:bg-mq-hover-background text-mq-content',
+                            )}
+                            aria-label={`${formatWeekdayLong(day)}, ${formatDayNumber(day)}`}
+                            aria-pressed={isSelected}
+                          >
+                            <span className="text-[10px] font-medium uppercase">
+                              {formatWeekdayShort(day).slice(0, 2)}
+                            </span>
+                            <span
+                              className={cn('text-sm font-semibold', isSelected && 'text-white')}
+                            >
+                              {formatDayNumber(day)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
+                    {/* Desktop: Full week view */}
+                    <div
+                      className="hidden md:block"
+                      role="grid"
+                      aria-label={t('calendarWeeklyGridLabel')}
+                      aria-roledescription={t('calendarWeeklyGridDescription')}
+                    >
+                      <div className="min-w-[800px] overflow-visible">
+                        {/* Day Headers - Sticky with MQ Key Dates */}
                         <div
-                          className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border"
-                          aria-hidden="true"
-                        />
-                        {weekDays.map((day) => {
-                          const dayMQDates = getMQKeyDatesForDay(day)
-                            .filter((d) => d.category !== 'classes')
-                            .sort((a, b) => {
-                              const isEnroll = (event: string) =>
-                                /last date to enrol/i.test(event) ? 0 : 1;
-                              return isEnroll(a.event) - isEnroll(b.event);
-                            });
-                          const dayName = formatWeekdayLong(day);
-                          const dayDate = formatDayNumber(day);
-                          const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
+                          className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-[73px] bg-mq-background/95 backdrop-blur-md z-30"
+                          role="row"
+                        >
+                          <div
+                            className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border"
+                            aria-hidden="true"
+                          />
+                          {weekDays.map((day) => {
+                            const dayMQDates = getMQKeyDatesForDay(day)
+                              .filter((d) => d.category !== 'classes')
+                              .sort((a, b) => {
+                                const isEnroll = (event: string) =>
+                                  /last date to enrol/i.test(event) ? 0 : 1;
+                                return isEnroll(a.event) - isEnroll(b.event);
+                              });
+                            const dayName = formatWeekdayLong(day);
+                            const dayDate = formatDayNumber(day);
+                            const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
+                            return (
+                              <div
+                                key={day.toISOString()}
+                                className={cn(
+                                  'p-2 text-center border-r border-mq-border last:border-r-0',
+                                  isTodayCell && 'bg-mq-primary/10',
+                                )}
+                                role="columnheader"
+                                aria-label={
+                                  isTodayCell
+                                    ? t('calendarDayAriaLabelToday', {
+                                        dayDate,
+                                        dayName,
+                                        todayLabel: t('today'),
+                                      })
+                                    : t('calendarDayAriaLabel', { dayDate, dayName })
+                                }
+                              >
+                                <div
+                                  className="text-xs text-mq-content-secondary uppercase font-medium"
+                                  aria-hidden="true"
+                                >
+                                  {formatWeekdayShort(day)}
+                                </div>
+                                <div
+                                  className={cn(
+                                    'text-xl font-semibold mt-1 inline-flex items-center justify-center',
+                                    isTodayCell
+                                      ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
+                                      : 'text-mq-content',
+                                  )}
+                                  aria-hidden="true"
+                                >
+                                  {formatDayNumber(day)}
+                                </div>
+                                {/* MQ Key Dates badges in header - only show important alerts */}
+                                {dayMQDates.filter((d) => /last date to enrol/i.test(d.event))
+                                  .length > 0 && (
+                                  <div className="mt-1 flex flex-col gap-1">
+                                    {dayMQDates
+                                      .filter((d) => /last date to enrol/i.test(d.event))
+                                      .slice(0, 1)
+                                      .map((mqDate) => {
+                                        return (
+                                          <div
+                                            key={mqDate.id}
+                                            className="text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white rounded-md font-semibold"
+                                            title={
+                                              mqDate.description
+                                                ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                                : `${mqDate.event} - ${mqDate.term}`
+                                            }
+                                          >
+                                            <span className="flex items-center justify-center gap-1">
+                                              <AlertTriangle
+                                                className="h-3 w-3"
+                                                aria-hidden="true"
+                                              />
+                                              {mqDate.event}
+                                            </span>
+                                          </div>
+                                        );
+                                      })}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Full-Day Events Row - MQ Key Dates as visual blocks */}
+                        {(() => {
+                          // Check if any day has MQ key dates (non-class)
+                          const hasAnyFullDayEvents = weekDays.some((day) => {
+                            const mqDates = getMQKeyDatesForDay(day).filter(
+                              (d) => d.category !== 'classes',
+                            );
+                            return mqDates.length > 0;
+                          });
+
+                          if (!hasAnyFullDayEvents) return null;
+
                           return (
                             <div
-                              key={day.toISOString()}
-                              className={cn(
-                                'p-2 text-center border-r border-mq-border last:border-r-0',
-                                isTodayCell && 'bg-mq-primary/10',
-                              )}
-                              role="columnheader"
-                              aria-label={
-                                isTodayCell
-                                  ? t('calendarDayAriaLabelToday', {
-                                      dayDate,
-                                      dayName,
-                                      todayLabel: t('today'),
-                                    })
-                                  : t('calendarDayAriaLabel', { dayDate, dayName })
-                              }
+                              className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary"
+                              role="row"
                             >
-                              <div
-                                className="text-xs text-mq-content-secondary uppercase font-medium"
-                                aria-hidden="true"
-                              >
-                                {formatWeekdayShort(day)}
+                              {/* Label column */}
+                              <div className="p-2 text-xs text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end">
+                                {t('calendarAllDay')}
                               </div>
-                              <div
-                                className={cn(
-                                  'text-xl font-semibold mt-1 inline-flex items-center justify-center',
-                                  isTodayCell
-                                    ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
-                                    : 'text-mq-content',
-                                )}
-                                aria-hidden="true"
-                              >
-                                {formatDayNumber(day)}
-                              </div>
-                              {/* MQ Key Dates badges in header - only show important alerts */}
-                              {dayMQDates.filter((d) => /last date to enrol/i.test(d.event))
-                                .length > 0 && (
-                                <div className="mt-1 flex flex-col gap-1">
-                                  {dayMQDates
-                                    .filter((d) => /last date to enrol/i.test(d.event))
-                                    .slice(0, 1)
-                                    .map((mqDate) => {
+                              {/* Full-day events for each day */}
+                              {weekDays.map((day) => {
+                                const dayMQDates = getMQKeyDatesForDay(day).filter(
+                                  (d) =>
+                                    d.category !== 'classes' &&
+                                    !/last date to enrol/i.test(d.event),
+                                );
+                                const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
+
+                                return (
+                                  <div
+                                    key={`fullday-${day.toISOString()}`}
+                                    className={cn(
+                                      'min-h-[48px] p-1 border-r border-mq-border last:border-r-0 flex flex-col gap-1',
+                                      isTodayCell && 'bg-mq-primary/10',
+                                    )}
+                                  >
+                                    {dayMQDates.map((mqDate) => {
+                                      const colors = MQ_DATE_COLORS[mqDate.category];
                                       return (
                                         <div
                                           key={mqDate.id}
-                                          className="text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white rounded-md font-semibold"
+                                          className={cn(
+                                            'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-bold flex items-center justify-center text-center leading-tight shadow-md ring-1 ring-inset ring-white/20',
+                                            colors.bg,
+                                            colors.text,
+                                            colors.border,
+                                            'border-2',
+                                          )}
                                           title={
                                             mqDate.description
                                               ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
                                               : `${mqDate.event} - ${mqDate.term}`
                                           }
                                         >
-                                          <span className="flex items-center justify-center gap-1">
-                                            <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                                          <span className="line-clamp-2 drop-shadow-sm">
                                             {mqDate.event}
                                           </span>
                                         </div>
                                       );
                                     })}
-                                </div>
-                              )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           );
-                        })}
-                      </div>
+                        })()}
 
-                      {/* Full-Day Events Row - MQ Key Dates as visual blocks */}
-                      {(() => {
-                        // Check if any day has MQ key dates (non-class)
-                        const hasAnyFullDayEvents = weekDays.some((day) => {
-                          const mqDates = getMQKeyDatesForDay(day).filter(
-                            (d) => d.category !== 'classes',
-                          );
-                          return mqDates.length > 0;
-                        });
-
-                        if (!hasAnyFullDayEvents) return null;
-
-                        return (
-                          <div
-                            className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary"
-                            role="row"
-                          >
-                            {/* Label column */}
-                            <div className="p-2 text-xs text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end">
-                              {t('calendarAllDay')}
+                        {/* Time Grid */}
+                        <div
+                          className="relative"
+                          style={{
+                            height: HOURS.length * HOUR_HEIGHT + 12,
+                          }}
+                          role="presentation"
+                          aria-hidden="true"
+                        >
+                          {/* Hour Lines */}
+                          {HOURS.map((hour, index) => (
+                            <div
+                              key={hour}
+                              className="absolute left-0 right-0 grid grid-cols-[60px_repeat(7,1fr)]"
+                              style={{ top: index * HOUR_HEIGHT + 8 }}
+                              role="row"
+                            >
+                              {/* Time Label */}
+                              <div
+                                className="text-xs text-mq-content-secondary text-right pr-2 -mt-2"
+                                role="rowheader"
+                                aria-label={formatHourLabel(hour)}
+                              >
+                                {formatHourLabel(hour)}
+                              </div>
+                              {/* Hour Lines for each day */}
+                              {weekDays.map((day, dayIndex) => (
+                                <div
+                                  key={`${day.toISOString()}-${hour}`}
+                                  className={cn(
+                                    'calendar-grid-cell border-t border-r border-mq-border last:border-r-0',
+                                    dayIndex === 0 && 'border-l',
+                                    dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
+                                  )}
+                                  style={{ height: HOUR_HEIGHT }}
+                                  role="gridcell"
+                                  aria-hidden="true"
+                                />
+                              ))}
                             </div>
-                            {/* Full-day events for each day */}
+                          ))}
+
+                          {/* Current Time Indicator */}
+                          {currentTimePosition !== null && (
+                            <div
+                              className="absolute left-[60px] right-0 z-30 pointer-events-none"
+                              style={{ top: currentTimePosition + 8 }}
+                            >
+                              <div className="flex items-center">
+                                <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
+                                <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Events, Units and Deadlines Overlay */}
+                          <div className="absolute left-[60px] right-0 top-[8px] bottom-0 grid grid-cols-7">
                             {weekDays.map((day) => {
-                              const dayMQDates = getMQKeyDatesForDay(day).filter(
-                                (d) =>
-                                  d.category !== 'classes' && !/last date to enrol/i.test(d.event),
-                              );
-                              const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
+                              const {
+                                deadlines: dayDeadlines,
+                                events: dayEvents,
+                                units: dayUnits,
+                              } = getItemsForDay(day);
+
+                              // Build calendar items for collision detection
+                              const calendarItems: CalendarItem[] = [];
+
+                              // Add units
+                              dayUnits.forEach((unitData) => {
+                                const schedule = unitData.schedule;
+                                const timeInfo = parseTimeRange(
+                                  `${schedule.startTime} - ${schedule.endTime}`,
+                                );
+                                if (timeInfo) {
+                                  calendarItems.push({
+                                    id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
+                                    startHour: timeInfo.startHour,
+                                    startMin: timeInfo.startMin,
+                                    endHour: timeInfo.endHour,
+                                    endMin: timeInfo.endMin,
+                                    type: 'unit',
+                                    data: unitData,
+                                  });
+                                }
+                              });
+
+                              // Add deadlines
+                              dayDeadlines.forEach((deadline) => {
+                                const dueDayjs = dayjs(deadline.dueDate);
+                                const hours = dueDayjs.hour();
+                                const minutes = dueDayjs.minute();
+                                if (hours >= START_HOUR) {
+                                  calendarItems.push({
+                                    id: `deadline-${deadline.id}`,
+                                    startHour: hours,
+                                    startMin: minutes,
+                                    endHour: hours + 1,
+                                    endMin: minutes,
+                                    type: 'deadline',
+                                    data: deadline,
+                                  });
+                                }
+                              });
+
+                              // Add events
+                              dayEvents.forEach((event) => {
+                                const timeInfo = parseTimeRange(event.time);
+                                if (timeInfo) {
+                                  calendarItems.push({
+                                    id: `event-${event.id}`,
+                                    startHour: timeInfo.startHour,
+                                    startMin: timeInfo.startMin,
+                                    endHour: timeInfo.endHour,
+                                    endMin: timeInfo.endMin,
+                                    type: 'event',
+                                    data: event,
+                                  });
+                                }
+                              });
+
+                              // Calculate overlap groups
+                              const overlapInfo = calculateOverlapGroups(calendarItems);
 
                               return (
                                 <div
-                                  key={`fullday-${day.toISOString()}`}
-                                  className={cn(
-                                    'min-h-[48px] p-1 border-r border-mq-border last:border-r-0 flex flex-col gap-1',
-                                    isTodayCell && 'bg-mq-primary/10',
-                                  )}
+                                  key={day.toISOString()}
+                                  className="calendar-day-column relative border-r border-mq-border last:border-r-0"
                                 >
-                                  {dayMQDates.map((mqDate) => {
-                                    const colors = MQ_DATE_COLORS[mqDate.category];
+                                  {/* Units - filled time block with unit color */}
+                                  {dayUnits.map((unitData) => {
+                                    const schedule = unitData.schedule;
+                                    const timeInfo = parseTimeRange(
+                                      `${schedule.startTime} - ${schedule.endTime}`,
+                                    );
+
+                                    if (!timeInfo) return null;
+
+                                    const posInfo = getTimePositionAndHeight(
+                                      timeInfo.startHour,
+                                      timeInfo.startMin,
+                                      timeInfo.endHour,
+                                      timeInfo.endMin,
+                                    );
+                                    if (!posInfo) return null;
+
+                                    // Get overlap info for this item
+                                    const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
+                                    const overlap = overlapInfo.get(itemId) || {
+                                      column: 0,
+                                      totalColumns: 1,
+                                    };
+                                    const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                    const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                                    const locationSuffix = unitData.location?.building
+                                      ? t('calendarUnitLocationSuffix', {
+                                          building: unitData.location.building,
+                                          room: unitData.location.room,
+                                        })
+                                      : '';
+
                                     return (
-                                      <div
-                                        key={mqDate.id}
-                                        className={cn(
-                                          'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-bold flex items-center justify-center text-center leading-tight shadow-md ring-1 ring-inset ring-white/20',
-                                          colors.bg,
-                                          colors.text,
-                                          colors.border,
-                                          'border-2',
-                                        )}
-                                        title={
-                                          mqDate.description
-                                            ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                            : `${mqDate.event} - ${mqDate.term}`
-                                        }
+                                      <button
+                                        key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
+                                        type="button"
+                                        className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur"
+                                        style={{
+                                          top: posInfo.top,
+                                          height: Math.max(posInfo.height, 44),
+                                          left,
+                                          width,
+                                          borderLeftColor: unitData.color,
+                                        }}
+                                        aria-label={t('calendarUnitAriaLabel', {
+                                          endTime: formatScheduleTime(schedule.endTime),
+                                          instruction: t('calendarPressEnterOrSpaceToViewDetails'),
+                                          locationSuffix,
+                                          startTime: formatScheduleTime(schedule.startTime),
+                                          unitCode: unitData.code,
+                                        })}
+                                        title={t('calendarUnitTitle', { unitCode: unitData.code })}
+                                        onClick={() => {
+                                          const originalUnit = units.find(
+                                            (u) => u.id === unitData.id,
+                                          );
+                                          if (originalUnit) openUnitDetail(originalUnit);
+                                        }}
                                       >
-                                        <span className="line-clamp-2 drop-shadow-sm">
-                                          {mqDate.event}
+                                        <div className="p-1 h-full overflow-hidden text-mq-content">
+                                          <span className="block text-xs font-bold line-clamp-2 break-words leading-tight">
+                                            {unitData.code}
+                                          </span>
+                                          <span className="text-[10px] opacity-80 block">
+                                            {formatScheduleTime(schedule.startTime)} -{' '}
+                                            {formatScheduleTime(schedule.endTime)}
+                                          </span>
+                                          {posInfo.height > 50 && (
+                                            <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
+                                              {formatLocation(
+                                                unitData.location.building,
+                                                unitData.location.room,
+                                                t('room'),
+                                              )}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+
+                                  {/* Deadlines - filled time block with unit color */}
+                                  {dayDeadlines.map((deadline, idx) => {
+                                    const dueDayjs = dayjs(deadline.dueDate);
+                                    const dueDate = dueDayjs.toDate();
+                                    const hours = dueDayjs.hour();
+                                    const minutes = dueDayjs.minute();
+                                    const deadlineColor = getDeadlineColor(deadline, units);
+                                    const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
+
+                                    // Default 1 hour duration from due time
+                                    const posInfo = getTimePositionAndHeight(
+                                      hours,
+                                      minutes,
+                                      hours + 1,
+                                      minutes,
+                                    );
+
+                                    // Display name: UNIT_CODE – Type or Title
+                                    const displayName = `${deadline.unitCode} – ${deadline.title}`;
+
+                                    if (!posInfo || hours < START_HOUR) {
+                                      // Show at top if outside visible hours
+                                      const isHighlighted =
+                                        deadlineHighlightActive &&
+                                        highlightedDeadlineId === deadline.id;
+                                      return (
+                                        <button
+                                          key={deadline.id}
+                                          type="button"
+                                          ref={(el) => {
+                                            if (el) deadlineRefs.current.set(deadline.id, el);
+                                          }}
+                                          onClick={() => openEditDeadline(deadline)}
+                                          className={cn(
+                                            'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                            deadline.completed && 'opacity-50 line-through',
+                                            isHighlighted &&
+                                              'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
+                                          )}
+                                          style={{
+                                            top: 4 + idx * 24,
+                                            backgroundColor: deadlineColor,
+                                          }}
+                                          aria-label={t('calendarDeadlineAriaLabel', {
+                                            displayName,
+                                            instruction: t('calendarPressEnterToEdit'),
+                                            time: formatTimeShort(dueDate),
+                                            type: deadlineTypeLabel,
+                                          })}
+                                          title={t('calendarDeadlineTitle', {
+                                            displayName,
+                                            time: formatTimeShort(dueDate),
+                                            type: deadlineTypeLabel,
+                                          })}
+                                        >
+                                          <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal">
+                                            {displayName}
+                                          </span>
+                                        </button>
+                                      );
+                                    }
+
+                                    // Get overlap info for this item
+                                    const itemId = `deadline-${deadline.id}`;
+                                    const overlap = overlapInfo.get(itemId) || {
+                                      column: 0,
+                                      totalColumns: 1,
+                                    };
+                                    const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                    const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+                                    const isHighlightedDeadline =
+                                      deadlineHighlightActive &&
+                                      highlightedDeadlineId === deadline.id;
+
+                                    return (
+                                      <button
+                                        key={deadline.id}
+                                        type="button"
+                                        ref={(el) => {
+                                          if (el) deadlineRefs.current.set(deadline.id, el);
+                                        }}
+                                        onClick={() => openEditDeadline(deadline)}
+                                        className={cn(
+                                          'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                          deadline.completed && 'opacity-50 line-through',
+                                          isHighlightedDeadline &&
+                                            'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
+                                        )}
+                                        style={{
+                                          top: posInfo.top,
+                                          height: Math.max(posInfo.height, 44),
+                                          left,
+                                          width,
+                                          backgroundColor: `${deadlineColor}dd`,
+                                          borderLeftColor: deadlineColor,
+                                        }}
+                                        aria-label={t('calendarDeadlineAriaLabelStatus', {
+                                          displayName,
+                                          instruction: t('calendarPressEnterToEdit'),
+                                          status: deadline.completed
+                                            ? t('calendarCompletedStatus')
+                                            : t('calendarNotCompletedStatus'),
+                                          time: formatTimeShort(dueDate),
+                                          type: deadlineTypeLabel,
+                                        })}
+                                        title={t('calendarDeadlineTitle', {
+                                          displayName,
+                                          time: formatTimeShort(dueDate),
+                                          type: deadlineTypeLabel,
+                                        })}
+                                      >
+                                        <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
+                                          {displayName}
                                         </span>
-                                      </div>
+                                        <span className="text-[10px] opacity-80">
+                                          {formatTimeShort(dueDate)}
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+
+                                  {/* Events - filled time block */}
+                                  {dayEvents.map((event, idx) => {
+                                    const timeInfo = parseTimeRange(event.time);
+                                    const eventColors = getEventColors(event);
+                                    const eventTitle = getEventTitle(event);
+
+                                    if (!timeInfo) {
+                                      // Show at top if no valid time
+                                      const offsetTop = 4 + dayDeadlines.length * 24 + idx * 24;
+                                      return (
+                                        <button
+                                          key={event.id}
+                                          type="button"
+                                          onClick={() => handleEventClick(event)}
+                                          className={cn(
+                                            'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                            eventColors.bg,
+                                            eventColors.text,
+                                          )}
+                                          style={{ top: offsetTop, ...eventColors.style }}
+                                          aria-label={t('calendarEventAriaLabel', {
+                                            instruction: t('calendarPressEnterToViewDetails'),
+                                            time: event.time,
+                                            title: eventTitle,
+                                          })}
+                                          title={t('calendarEventTitle', {
+                                            time: event.time,
+                                            title: eventTitle,
+                                          })}
+                                        >
+                                          <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal hover:overflow-visible">
+                                            {eventTitle}
+                                          </span>
+                                        </button>
+                                      );
+                                    }
+
+                                    const posInfo = getTimePositionAndHeight(
+                                      timeInfo.startHour,
+                                      timeInfo.startMin,
+                                      timeInfo.endHour,
+                                      timeInfo.endMin,
+                                    );
+
+                                    if (!posInfo) {
+                                      const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
+                                      return (
+                                        <button
+                                          key={event.id}
+                                          type="button"
+                                          onClick={() => handleEventClick(event)}
+                                          className={cn(
+                                            'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+                                            eventColors.bg,
+                                            eventColors.text,
+                                          )}
+                                          style={{ top: offsetTop, ...eventColors.style }}
+                                          aria-label={t('calendarEventAriaLabelShort', {
+                                            time: event.time,
+                                            title: eventTitle,
+                                          })}
+                                          title={t('calendarEventTitle', {
+                                            time: event.time,
+                                            title: eventTitle,
+                                          })}
+                                        >
+                                          {eventTitle}
+                                        </button>
+                                      );
+                                    }
+
+                                    // Get overlap info for this item
+                                    const itemId = `event-${event.id}`;
+                                    const overlap = overlapInfo.get(itemId) || {
+                                      column: 0,
+                                      totalColumns: 1,
+                                    };
+                                    const evtWidth = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                    const evtLeft = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                                    return (
+                                      <button
+                                        key={event.id}
+                                        type="button"
+                                        onClick={() => handleEventClick(event)}
+                                        className={cn(
+                                          'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit overflow-hidden hover:overflow-visible',
+                                          eventColors.bg,
+                                          eventColors.border,
+                                          eventColors.text,
+                                        )}
+                                        style={{
+                                          top: posInfo.top,
+                                          height: Math.max(posInfo.height, 44),
+                                          left: evtLeft,
+                                          width: evtWidth,
+                                          ...eventColors.style,
+                                        }}
+                                        aria-label={t('calendarEventAriaLabel', {
+                                          instruction: t('calendarPressEnterToViewDetails'),
+                                          time: event.time,
+                                          title: eventTitle,
+                                        })}
+                                        title={t('calendarEventTitle', {
+                                          time: event.time,
+                                          title: eventTitle,
+                                        })}
+                                      >
+                                        <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
+                                          {eventTitle}
+                                        </span>
+                                        <span className="text-[8px] opacity-80 block truncate">
+                                          {event.time}
+                                        </span>
+                                      </button>
                                     );
                                   })}
                                 </div>
                               );
                             })}
                           </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile: Single day view */}
+                    <div
+                      className="md:hidden"
+                      role="region"
+                      aria-label={t('calendarDayViewLabel' as TranslationKey) || 'Day view'}
+                    >
+                      {/* Mobile Day Header with MQ Key Dates */}
+                      {(() => {
+                        const dayMQDates = getMQKeyDatesForDay(mobileSelectedDay).filter(
+                          (d) => d.category !== 'classes',
+                        );
+                        const isTodayCell = dayjs(mobileSelectedDay).isSame(dayjs(), 'day');
+
+                        return (
+                          <div
+                            className={cn(
+                              'p-3 border-b border-mq-border',
+                              isTodayCell && 'bg-mq-primary/10',
+                            )}
+                          >
+                            {/* MQ Key Dates for mobile */}
+                            {dayMQDates.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {dayMQDates.map((mqDate) => {
+                                  const colors = MQ_DATE_COLORS[mqDate.category];
+                                  const isAlert = /last date to enrol/i.test(mqDate.event);
+                                  return (
+                                    <div
+                                      key={mqDate.id}
+                                      className={cn(
+                                        'px-2 py-1 rounded-md text-xs font-bold shadow-md ring-1 ring-inset ring-white/20',
+                                        isAlert
+                                          ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background bg-red-600 text-white'
+                                          : cn(colors.bg, colors.text, colors.border, 'border-2'),
+                                      )}
+                                      title={
+                                        mqDate.description
+                                          ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                          : `${mqDate.event} - ${mqDate.term}`
+                                      }
+                                    >
+                                      {isAlert && (
+                                        <AlertTriangle
+                                          className="inline h-3 w-3 mr-1"
+                                          aria-hidden="true"
+                                        />
+                                      )}
+                                      <span className="drop-shadow-sm">{mqDate.event}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })()}
 
-                      {/* Time Grid */}
+                      {/* Mobile Time Grid */}
                       <div
                         className="relative"
                         style={{
                           height: HOURS.length * HOUR_HEIGHT + 12,
                         }}
-                        role="presentation"
-                        aria-hidden="true"
                       >
                         {/* Hour Lines */}
                         {HOURS.map((hour, index) => (
                           <div
                             key={hour}
-                            className="absolute left-0 right-0 grid grid-cols-[60px_repeat(7,1fr)]"
+                            className="absolute left-0 right-0 flex"
                             style={{ top: index * HOUR_HEIGHT + 8 }}
-                            role="row"
                           >
                             {/* Time Label */}
-                            <div
-                              className="text-xs text-mq-content-secondary text-right pr-2 -mt-2"
-                              role="rowheader"
-                              aria-label={formatHourLabel(hour)}
-                            >
+                            <div className="w-14 text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border flex-shrink-0">
                               {formatHourLabel(hour)}
                             </div>
-                            {/* Hour Lines for each day */}
-                            {weekDays.map((day, dayIndex) => (
-                              <div
-                                key={`${day.toISOString()}-${hour}`}
-                                className={cn(
-                                  'calendar-grid-cell border-t border-r border-mq-border last:border-r-0',
-                                  dayIndex === 0 && 'border-l',
-                                  dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
-                                )}
-                                style={{ height: HOUR_HEIGHT }}
-                                role="gridcell"
-                                aria-hidden="true"
-                              />
-                            ))}
+                            {/* Hour line */}
+                            <div
+                              className={cn(
+                                'flex-1 border-t border-mq-border',
+                                dayjs(mobileSelectedDay).isSame(dayjs(), 'day') &&
+                                  'bg-mq-primary/10',
+                              )}
+                              style={{ height: HOUR_HEIGHT }}
+                            />
                           </div>
                         ))}
 
-                        {/* Current Time Indicator */}
-                        {currentTimePosition !== null && (
-                          <div
-                            className="absolute left-[60px] right-0 z-30 pointer-events-none"
-                            style={{ top: currentTimePosition + 8 }}
-                          >
-                            <div className="flex items-center">
-                              <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
-                              <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
+                        {/* Current Time Indicator (only if viewing today) */}
+                        {currentTimePosition !== null &&
+                          dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && (
+                            <div
+                              className="absolute left-[56px] right-0 z-30 pointer-events-none"
+                              style={{ top: currentTimePosition + 8 }}
+                            >
+                              <div className="flex items-center">
+                                <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
+                                <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {/* Events, Units and Deadlines Overlay */}
-                        <div className="absolute left-[60px] right-0 top-[8px] bottom-0 grid grid-cols-7">
-                          {weekDays.map((day) => {
+                        {/* Mobile Events Overlay */}
+                        <div className="absolute left-[56px] right-0 top-[8px] bottom-0">
+                          {(() => {
                             const {
                               deadlines: dayDeadlines,
                               events: dayEvents,
                               units: dayUnits,
-                            } = getItemsForDay(day);
+                            } = getItemsForDay(mobileSelectedDay);
 
                             // Build calendar items for collision detection
                             const calendarItems: CalendarItem[] = [];
@@ -1162,16 +1648,125 @@ export default function CalendarClient() {
                             const overlapInfo = calculateOverlapGroups(calendarItems);
 
                             return (
-                              <div
-                                key={day.toISOString()}
-                                className="calendar-day-column relative border-r border-mq-border last:border-r-0"
-                              >
-                                {/* Units - filled time block with unit color */}
+                              <>
+                                {/* Units */}
                                 {dayUnits.map((unitData) => {
                                   const schedule = unitData.schedule;
                                   const timeInfo = parseTimeRange(
                                     `${schedule.startTime} - ${schedule.endTime}`,
                                   );
+                                  if (!timeInfo) return null;
+
+                                  const posInfo = getTimePositionAndHeight(
+                                    timeInfo.startHour,
+                                    timeInfo.startMin,
+                                    timeInfo.endHour,
+                                    timeInfo.endMin,
+                                  );
+                                  if (!posInfo) return null;
+
+                                  const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
+                                  const overlap = overlapInfo.get(itemId) || {
+                                    column: 0,
+                                    totalColumns: 1,
+                                  };
+                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                                  return (
+                                    <button
+                                      key={`mobile-${unitData.id}-${schedule.day}-${schedule.startTime}`}
+                                      type="button"
+                                      className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur p-2"
+                                      style={{
+                                        top: posInfo.top,
+                                        height: Math.max(posInfo.height, 44),
+                                        left,
+                                        width,
+                                        borderLeftColor: unitData.color,
+                                      }}
+                                      onClick={() => {
+                                        const originalUnit = units.find(
+                                          (u) => u.id === unitData.id,
+                                        );
+                                        if (originalUnit) openUnitDetail(originalUnit);
+                                      }}
+                                    >
+                                      <span className="text-xs font-bold text-mq-content line-clamp-1">
+                                        {unitData.code}
+                                      </span>
+                                      <span className="text-[10px] text-mq-content-secondary">
+                                        {formatScheduleTime(schedule.startTime)} -{' '}
+                                        {formatScheduleTime(schedule.endTime)}
+                                      </span>
+                                      <span className="text-[10px] text-mq-content-secondary line-clamp-1">
+                                        {formatLocation(
+                                          unitData.location.building,
+                                          unitData.location.room,
+                                          t('room'),
+                                        )}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+
+                                {/* Deadlines */}
+                                {dayDeadlines.map((deadline) => {
+                                  const dueDayjs = dayjs(deadline.dueDate);
+                                  const dueDate = dueDayjs.toDate();
+                                  const hours = dueDayjs.hour();
+                                  const minutes = dueDayjs.minute();
+                                  const deadlineColor = getDeadlineColor(deadline, units);
+
+                                  const posInfo = getTimePositionAndHeight(
+                                    hours,
+                                    minutes,
+                                    hours + 1,
+                                    minutes,
+                                  );
+                                  if (!posInfo || hours < START_HOUR) return null;
+
+                                  const itemId = `deadline-${deadline.id}`;
+                                  const overlap = overlapInfo.get(itemId) || {
+                                    column: 0,
+                                    totalColumns: 1,
+                                  };
+                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+                                  return (
+                                    <button
+                                      key={`mobile-deadline-${deadline.id}`}
+                                      type="button"
+                                      onClick={() => openEditDeadline(deadline)}
+                                      className={cn(
+                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                        deadline.completed && 'opacity-50 line-through',
+                                      )}
+                                      style={{
+                                        top: posInfo.top,
+                                        height: Math.max(posInfo.height, 44),
+                                        left,
+                                        width,
+                                        backgroundColor: `${deadlineColor}dd`,
+                                        borderLeftColor: deadlineColor,
+                                      }}
+                                    >
+                                      <span className="block line-clamp-2 hover:line-clamp-none">
+                                        {deadline.unitCode} – {deadline.title}
+                                      </span>
+                                      <span className="text-[10px] opacity-80">
+                                        {formatTimeShort(dueDate)}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+
+                                {/* Events */}
+                                {dayEvents.map((event) => {
+                                  const timeInfo = parseTimeRange(event.time);
+                                  const eventColors = getEventColors(event);
+                                  const eventTitle = getEventTitle(event);
 
                                   if (!timeInfo) return null;
 
@@ -1183,279 +1778,21 @@ export default function CalendarClient() {
                                   );
                                   if (!posInfo) return null;
 
-                                  // Get overlap info for this item
-                                  const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
-                                  const overlap = overlapInfo.get(itemId) || {
-                                    column: 0,
-                                    totalColumns: 1,
-                                  };
-                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                  const locationSuffix = unitData.location?.building
-                                    ? t('calendarUnitLocationSuffix', {
-                                        building: unitData.location.building,
-                                        room: unitData.location.room,
-                                      })
-                                    : '';
-
-                                  return (
-                                    <button
-                                      key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                      type="button"
-                                      className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur"
-                                      style={{
-                                        top: posInfo.top,
-                                        height: Math.max(posInfo.height, 44),
-                                        left,
-                                        width,
-                                        borderLeftColor: unitData.color,
-                                      }}
-                                      aria-label={t('calendarUnitAriaLabel', {
-                                        endTime: formatScheduleTime(schedule.endTime),
-                                        instruction: t('calendarPressEnterOrSpaceToViewDetails'),
-                                        locationSuffix,
-                                        startTime: formatScheduleTime(schedule.startTime),
-                                        unitCode: unitData.code,
-                                      })}
-                                      title={t('calendarUnitTitle', { unitCode: unitData.code })}
-                                      onClick={() => {
-                                        const originalUnit = units.find(
-                                          (u) => u.id === unitData.id,
-                                        );
-                                        if (originalUnit) openUnitDetail(originalUnit);
-                                      }}
-                                    >
-                                      <div className="p-1 h-full overflow-hidden text-mq-content">
-                                        <span className="block text-xs font-bold line-clamp-2 break-words leading-tight">
-                                          {unitData.code}
-                                        </span>
-                                        <span className="text-[10px] opacity-80 block">
-                                          {formatScheduleTime(schedule.startTime)} -{' '}
-                                          {formatScheduleTime(schedule.endTime)}
-                                        </span>
-                                        {posInfo.height > 50 && (
-                                          <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
-                                            {formatLocation(
-                                              unitData.location.building,
-                                              unitData.location.room,
-                                              t('room'),
-                                            )}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </button>
-                                  );
-                                })}
-
-                                {/* Deadlines - filled time block with unit color */}
-                                {dayDeadlines.map((deadline, idx) => {
-                                  const dueDayjs = dayjs(deadline.dueDate);
-                                  const dueDate = dueDayjs.toDate();
-                                  const hours = dueDayjs.hour();
-                                  const minutes = dueDayjs.minute();
-                                  const deadlineColor = getDeadlineColor(deadline, units);
-                                  const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
-
-                                  // Default 1 hour duration from due time
-                                  const posInfo = getTimePositionAndHeight(
-                                    hours,
-                                    minutes,
-                                    hours + 1,
-                                    minutes,
-                                  );
-
-                                  // Display name: UNIT_CODE – Type or Title
-                                  const displayName = `${deadline.unitCode} – ${deadline.title}`;
-
-                                  if (!posInfo || hours < START_HOUR) {
-                                    // Show at top if outside visible hours
-                                    const isHighlighted =
-                                      deadlineHighlightActive &&
-                                      highlightedDeadlineId === deadline.id;
-                                    return (
-                                      <button
-                                        key={deadline.id}
-                                        type="button"
-                                        ref={(el) => {
-                                          if (el) deadlineRefs.current.set(deadline.id, el);
-                                        }}
-                                        onClick={() => openEditDeadline(deadline)}
-                                        className={cn(
-                                          'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                          deadline.completed && 'opacity-50 line-through',
-                                          isHighlighted &&
-                                            'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
-                                        )}
-                                        style={{
-                                          top: 4 + idx * 24,
-                                          backgroundColor: deadlineColor,
-                                        }}
-                                        aria-label={t('calendarDeadlineAriaLabel', {
-                                          displayName,
-                                          instruction: t('calendarPressEnterToEdit'),
-                                          time: formatTimeShort(dueDate),
-                                          type: deadlineTypeLabel,
-                                        })}
-                                        title={t('calendarDeadlineTitle', {
-                                          displayName,
-                                          time: formatTimeShort(dueDate),
-                                          type: deadlineTypeLabel,
-                                        })}
-                                      >
-                                        <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal">
-                                          {displayName}
-                                        </span>
-                                      </button>
-                                    );
-                                  }
-
-                                  // Get overlap info for this item
-                                  const itemId = `deadline-${deadline.id}`;
-                                  const overlap = overlapInfo.get(itemId) || {
-                                    column: 0,
-                                    totalColumns: 1,
-                                  };
-                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-                                  const isHighlightedDeadline =
-                                    deadlineHighlightActive &&
-                                    highlightedDeadlineId === deadline.id;
-
-                                  return (
-                                    <button
-                                      key={deadline.id}
-                                      type="button"
-                                      ref={(el) => {
-                                        if (el) deadlineRefs.current.set(deadline.id, el);
-                                      }}
-                                      onClick={() => openEditDeadline(deadline)}
-                                      className={cn(
-                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                        deadline.completed && 'opacity-50 line-through',
-                                        isHighlightedDeadline &&
-                                          'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
-                                      )}
-                                      style={{
-                                        top: posInfo.top,
-                                        height: Math.max(posInfo.height, 44),
-                                        left,
-                                        width,
-                                        backgroundColor: `${deadlineColor}dd`,
-                                        borderLeftColor: deadlineColor,
-                                      }}
-                                      aria-label={t('calendarDeadlineAriaLabelStatus', {
-                                        displayName,
-                                        instruction: t('calendarPressEnterToEdit'),
-                                        status: deadline.completed
-                                          ? t('calendarCompletedStatus')
-                                          : t('calendarNotCompletedStatus'),
-                                        time: formatTimeShort(dueDate),
-                                        type: deadlineTypeLabel,
-                                      })}
-                                      title={t('calendarDeadlineTitle', {
-                                        displayName,
-                                        time: formatTimeShort(dueDate),
-                                        type: deadlineTypeLabel,
-                                      })}
-                                    >
-                                      <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
-                                        {displayName}
-                                      </span>
-                                      <span className="text-[10px] opacity-80">
-                                        {formatTimeShort(dueDate)}
-                                      </span>
-                                    </button>
-                                  );
-                                })}
-
-                                {/* Events - filled time block */}
-                                {dayEvents.map((event, idx) => {
-                                  const timeInfo = parseTimeRange(event.time);
-                                  const eventColors = getEventColors(event);
-                                  const eventTitle = getEventTitle(event);
-
-                                  if (!timeInfo) {
-                                    // Show at top if no valid time
-                                    const offsetTop = 4 + dayDeadlines.length * 24 + idx * 24;
-                                    return (
-                                      <button
-                                        key={event.id}
-                                        type="button"
-                                        onClick={() => handleEventClick(event)}
-                                        className={cn(
-                                          'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                          eventColors.bg,
-                                          eventColors.text,
-                                        )}
-                                        style={{ top: offsetTop, ...eventColors.style }}
-                                        aria-label={t('calendarEventAriaLabel', {
-                                          instruction: t('calendarPressEnterToViewDetails'),
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                        title={t('calendarEventTitle', {
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                      >
-                                        <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal hover:overflow-visible">
-                                          {eventTitle}
-                                        </span>
-                                      </button>
-                                    );
-                                  }
-
-                                  const posInfo = getTimePositionAndHeight(
-                                    timeInfo.startHour,
-                                    timeInfo.startMin,
-                                    timeInfo.endHour,
-                                    timeInfo.endMin,
-                                  );
-
-                                  if (!posInfo) {
-                                    const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
-                                    return (
-                                      <button
-                                        key={event.id}
-                                        type="button"
-                                        onClick={() => handleEventClick(event)}
-                                        className={cn(
-                                          'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
-                                          eventColors.bg,
-                                          eventColors.text,
-                                        )}
-                                        style={{ top: offsetTop, ...eventColors.style }}
-                                        aria-label={t('calendarEventAriaLabelShort', {
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                        title={t('calendarEventTitle', {
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                      >
-                                        {eventTitle}
-                                      </button>
-                                    );
-                                  }
-
-                                  // Get overlap info for this item
                                   const itemId = `event-${event.id}`;
                                   const overlap = overlapInfo.get(itemId) || {
                                     column: 0,
                                     totalColumns: 1,
                                   };
-                                  const evtWidth = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const evtLeft = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
 
                                   return (
                                     <button
-                                      key={event.id}
+                                      key={`mobile-event-${event.id}`}
                                       type="button"
                                       onClick={() => handleEventClick(event)}
                                       className={cn(
-                                        'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                         eventColors.bg,
                                         eventColors.border,
                                         eventColors.text,
@@ -1463,369 +1800,22 @@ export default function CalendarClient() {
                                       style={{
                                         top: posInfo.top,
                                         height: Math.max(posInfo.height, 44),
-                                        left: evtLeft,
-                                        width: evtWidth,
+                                        left,
+                                        width,
                                         ...eventColors.style,
                                       }}
-                                      aria-label={t('calendarEventAriaLabel', {
-                                        instruction: t('calendarPressEnterToViewDetails'),
-                                        time: event.time,
-                                        title: eventTitle,
-                                      })}
-                                      title={t('calendarEventTitle', {
-                                        time: event.time,
-                                        title: eventTitle,
-                                      })}
                                     >
-                                      <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
+                                      <span className="block line-clamp-2 hover:line-clamp-none">
                                         {eventTitle}
                                       </span>
-                                      <span className="text-[8px] opacity-80">{event.time}</span>
+                                      <span className="text-[10px] opacity-80">{event.time}</span>
                                     </button>
                                   );
                                 })}
-                              </div>
+                              </>
                             );
-                          })}
+                          })()}
                         </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mobile: Single day view */}
-                  <div
-                    className="md:hidden"
-                    role="region"
-                    aria-label={t('calendarDayViewLabel' as TranslationKey) || 'Day view'}
-                  >
-                    {/* Mobile Day Header with MQ Key Dates */}
-                    {(() => {
-                      const dayMQDates = getMQKeyDatesForDay(mobileSelectedDay).filter(
-                        (d) => d.category !== 'classes',
-                      );
-                      const isTodayCell = dayjs(mobileSelectedDay).isSame(dayjs(), 'day');
-
-                      return (
-                        <div
-                          className={cn(
-                            'p-3 border-b border-mq-border',
-                            isTodayCell && 'bg-mq-primary/10',
-                          )}
-                        >
-                          {/* MQ Key Dates for mobile */}
-                          {dayMQDates.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {dayMQDates.map((mqDate) => {
-                                const colors = MQ_DATE_COLORS[mqDate.category];
-                                const isAlert = /last date to enrol/i.test(mqDate.event);
-                                return (
-                                  <div
-                                    key={mqDate.id}
-                                    className={cn(
-                                      'px-2 py-1 rounded-md text-xs font-bold shadow-md ring-1 ring-inset ring-white/20',
-                                      isAlert
-                                        ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background bg-red-600 text-white'
-                                        : cn(colors.bg, colors.text, colors.border, 'border-2'),
-                                    )}
-                                    title={
-                                      mqDate.description
-                                        ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                        : `${mqDate.event} - ${mqDate.term}`
-                                    }
-                                  >
-                                    {isAlert && (
-                                      <AlertTriangle
-                                        className="inline h-3 w-3 mr-1"
-                                        aria-hidden="true"
-                                      />
-                                    )}
-                                    <span className="drop-shadow-sm">{mqDate.event}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-
-                    {/* Mobile Time Grid */}
-                    <div
-                      className="relative"
-                      style={{
-                        height: HOURS.length * HOUR_HEIGHT + 12,
-                      }}
-                    >
-                      {/* Hour Lines */}
-                      {HOURS.map((hour, index) => (
-                        <div
-                          key={hour}
-                          className="absolute left-0 right-0 flex"
-                          style={{ top: index * HOUR_HEIGHT + 8 }}
-                        >
-                          {/* Time Label */}
-                          <div className="w-14 text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border flex-shrink-0">
-                            {formatHourLabel(hour)}
-                          </div>
-                          {/* Hour line */}
-                          <div
-                            className={cn(
-                              'flex-1 border-t border-mq-border',
-                              dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
-                            )}
-                            style={{ height: HOUR_HEIGHT }}
-                          />
-                        </div>
-                      ))}
-
-                      {/* Current Time Indicator (only if viewing today) */}
-                      {currentTimePosition !== null &&
-                        dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && (
-                          <div
-                            className="absolute left-[56px] right-0 z-30 pointer-events-none"
-                            style={{ top: currentTimePosition + 8 }}
-                          >
-                            <div className="flex items-center">
-                              <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
-                              <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
-                            </div>
-                          </div>
-                        )}
-
-                      {/* Mobile Events Overlay */}
-                      <div className="absolute left-[56px] right-0 top-[8px] bottom-0">
-                        {(() => {
-                          const {
-                            deadlines: dayDeadlines,
-                            events: dayEvents,
-                            units: dayUnits,
-                          } = getItemsForDay(mobileSelectedDay);
-
-                          // Build calendar items for collision detection
-                          const calendarItems: CalendarItem[] = [];
-
-                          // Add units
-                          dayUnits.forEach((unitData) => {
-                            const schedule = unitData.schedule;
-                            const timeInfo = parseTimeRange(
-                              `${schedule.startTime} - ${schedule.endTime}`,
-                            );
-                            if (timeInfo) {
-                              calendarItems.push({
-                                id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
-                                startHour: timeInfo.startHour,
-                                startMin: timeInfo.startMin,
-                                endHour: timeInfo.endHour,
-                                endMin: timeInfo.endMin,
-                                type: 'unit',
-                                data: unitData,
-                              });
-                            }
-                          });
-
-                          // Add deadlines
-                          dayDeadlines.forEach((deadline) => {
-                            const dueDayjs = dayjs(deadline.dueDate);
-                            const hours = dueDayjs.hour();
-                            const minutes = dueDayjs.minute();
-                            if (hours >= START_HOUR) {
-                              calendarItems.push({
-                                id: `deadline-${deadline.id}`,
-                                startHour: hours,
-                                startMin: minutes,
-                                endHour: hours + 1,
-                                endMin: minutes,
-                                type: 'deadline',
-                                data: deadline,
-                              });
-                            }
-                          });
-
-                          // Add events
-                          dayEvents.forEach((event) => {
-                            const timeInfo = parseTimeRange(event.time);
-                            if (timeInfo) {
-                              calendarItems.push({
-                                id: `event-${event.id}`,
-                                startHour: timeInfo.startHour,
-                                startMin: timeInfo.startMin,
-                                endHour: timeInfo.endHour,
-                                endMin: timeInfo.endMin,
-                                type: 'event',
-                                data: event,
-                              });
-                            }
-                          });
-
-                          // Calculate overlap groups
-                          const overlapInfo = calculateOverlapGroups(calendarItems);
-
-                          return (
-                            <>
-                              {/* Units */}
-                              {dayUnits.map((unitData) => {
-                                const schedule = unitData.schedule;
-                                const timeInfo = parseTimeRange(
-                                  `${schedule.startTime} - ${schedule.endTime}`,
-                                );
-                                if (!timeInfo) return null;
-
-                                const posInfo = getTimePositionAndHeight(
-                                  timeInfo.startHour,
-                                  timeInfo.startMin,
-                                  timeInfo.endHour,
-                                  timeInfo.endMin,
-                                );
-                                if (!posInfo) return null;
-
-                                const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
-                                const overlap = overlapInfo.get(itemId) || {
-                                  column: 0,
-                                  totalColumns: 1,
-                                };
-                                const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                return (
-                                  <button
-                                    key={`mobile-${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                    type="button"
-                                    className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur p-2"
-                                    style={{
-                                      top: posInfo.top,
-                                      height: Math.max(posInfo.height, 44),
-                                      left,
-                                      width,
-                                      borderLeftColor: unitData.color,
-                                    }}
-                                    onClick={() => {
-                                      const originalUnit = units.find((u) => u.id === unitData.id);
-                                      if (originalUnit) openUnitDetail(originalUnit);
-                                    }}
-                                  >
-                                    <span className="text-xs font-bold text-mq-content line-clamp-1">
-                                      {unitData.code}
-                                    </span>
-                                    <span className="text-[10px] text-mq-content-secondary">
-                                      {formatScheduleTime(schedule.startTime)} -{' '}
-                                      {formatScheduleTime(schedule.endTime)}
-                                    </span>
-                                    <span className="text-[10px] text-mq-content-secondary line-clamp-1">
-                                      {formatLocation(
-                                        unitData.location.building,
-                                        unitData.location.room,
-                                        t('room'),
-                                      )}
-                                    </span>
-                                  </button>
-                                );
-                              })}
-
-                              {/* Deadlines */}
-                              {dayDeadlines.map((deadline) => {
-                                const dueDayjs = dayjs(deadline.dueDate);
-                                const dueDate = dueDayjs.toDate();
-                                const hours = dueDayjs.hour();
-                                const minutes = dueDayjs.minute();
-                                const deadlineColor = getDeadlineColor(deadline, units);
-
-                                const posInfo = getTimePositionAndHeight(
-                                  hours,
-                                  minutes,
-                                  hours + 1,
-                                  minutes,
-                                );
-                                if (!posInfo || hours < START_HOUR) return null;
-
-                                const itemId = `deadline-${deadline.id}`;
-                                const overlap = overlapInfo.get(itemId) || {
-                                  column: 0,
-                                  totalColumns: 1,
-                                };
-                                const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                return (
-                                  <button
-                                    key={`mobile-deadline-${deadline.id}`}
-                                    type="button"
-                                    onClick={() => openEditDeadline(deadline)}
-                                    className={cn(
-                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                      deadline.completed && 'opacity-50 line-through',
-                                    )}
-                                    style={{
-                                      top: posInfo.top,
-                                      height: Math.max(posInfo.height, 44),
-                                      left,
-                                      width,
-                                      backgroundColor: `${deadlineColor}dd`,
-                                      borderLeftColor: deadlineColor,
-                                    }}
-                                  >
-                                    <span className="block line-clamp-2 hover:line-clamp-none">
-                                      {deadline.unitCode} – {deadline.title}
-                                    </span>
-                                    <span className="text-[10px] opacity-80">
-                                      {formatTimeShort(dueDate)}
-                                    </span>
-                                  </button>
-                                );
-                              })}
-
-                              {/* Events */}
-                              {dayEvents.map((event) => {
-                                const timeInfo = parseTimeRange(event.time);
-                                const eventColors = getEventColors(event);
-                                const eventTitle = getEventTitle(event);
-
-                                if (!timeInfo) return null;
-
-                                const posInfo = getTimePositionAndHeight(
-                                  timeInfo.startHour,
-                                  timeInfo.startMin,
-                                  timeInfo.endHour,
-                                  timeInfo.endMin,
-                                );
-                                if (!posInfo) return null;
-
-                                const itemId = `event-${event.id}`;
-                                const overlap = overlapInfo.get(itemId) || {
-                                  column: 0,
-                                  totalColumns: 1,
-                                };
-                                const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                return (
-                                  <button
-                                    key={`mobile-event-${event.id}`}
-                                    type="button"
-                                    onClick={() => handleEventClick(event)}
-                                    className={cn(
-                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                      eventColors.bg,
-                                      eventColors.border,
-                                      eventColors.text,
-                                    )}
-                                    style={{
-                                      top: posInfo.top,
-                                      height: Math.max(posInfo.height, 44),
-                                      left,
-                                      width,
-                                      ...eventColors.style,
-                                    }}
-                                  >
-                                    <span className="block line-clamp-2 hover:line-clamp-none">
-                                      {eventTitle}
-                                    </span>
-                                    <span className="text-[10px] opacity-80">{event.time}</span>
-                                  </button>
-                                );
-                              })}
-                            </>
-                          );
-                        })()}
                       </div>
                     </div>
                   </div>

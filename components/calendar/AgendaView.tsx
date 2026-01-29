@@ -32,7 +32,7 @@ export default function AgendaView({
   onDeadlineClick,
   onEventClick,
 }: AgendaViewProps) {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const startDate = dayjs(date);
 
   // Generate array of days to show

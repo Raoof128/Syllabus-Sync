@@ -337,3 +337,22 @@
 - **Files:** app/calendar/CalendarClient.tsx.
 - **Verification:** `npm run check` (pass).
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Audit & Accessibility Fixes
+- **Status:** ✅ Complete.
+- **Scope:** Code Quality & Accessibility.
+- **Summary:** Conducted full audit of calendar module. Fixed 30+ linting issues (unused vars/imports) and resolved accessibility warnings in `CalendarWidgets.tsx` (added keyboard support).
+- **Files:** app/calendar/CalendarClient.tsx; components/calendar/*; CHANGELOG.md.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Layout Refactor (Scroll & Events)
+- **Status:** ✅ Complete.
+- **Scope:** UX - Calendar Responsiveness & Polish.
+- **Summary:**
+  - **Horizontal Scroll:** Implemented `overflow-x-auto` wrapper to allow horizontal scrolling on smaller screens while keeping vertical scroll on the window.
+  - **Sticky Headers:** Ensured headers remain sticky relative to viewport during scroll.
+  - **Event Rendering:** Fixed messy event rendering by adding truncation and `overflow-hidden` by default, with `hover:overflow-visible` for details.
+- **Files:** app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.

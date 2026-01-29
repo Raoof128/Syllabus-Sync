@@ -255,13 +255,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.
 
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Layout Refactor (Scroll & Events)
+- **Status**: ✅ Complete.
+- **Scope**: UX - Calendar Responsiveness & Polish.
+- **Summary**:
+    - **Horizontal Scroll**: Implemented `overflow-x-auto` wrapper to allow horizontal scrolling on smaller screens while keeping vertical scroll on the window.
+    - **Sticky Headers**: Ensured headers remain sticky relative to viewport during scroll.
+    - **Event Rendering**: Fixed messy event rendering by adding truncation and `overflow-hidden` by default, with `hover:overflow-visible` for details.
+- **Files**: `app/calendar/CalendarClient.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Audit & Accessibility Fixes
+
+- **Status**: ✅ Complete.
+- **Scope**: Code Quality & Accessibility.
+- **Summary**:
+  - **Code Cleanup**: Conducted a full audit of `app/calendar` and `components/calendar`. Removed unused imports, variables, and dead code in `CalendarClient.tsx`, `CalendarHeader.tsx`, and `AgendaView.tsx`.
+  - **Accessibility**: Fixed a11y issues in `CalendarWidgets.tsx` by adding keyboard support (`onKeyDown`, `tabIndex`, `role="button"`) to interactive list items (Units, Deadlines, Events).
+  - **Linting**: Resolved all linter warnings in the calendar module.
+- **Files**: `app/calendar/CalendarClient.tsx`, `components/calendar/CalendarWidgets.tsx`, `components/calendar/AgendaView.tsx`, `components/calendar/CalendarHeader.tsx`.
+- **Verification**: `npm run lint` (pass), `npm run typecheck` (pass).
+- **Follow-ups**: None.
+
 ### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Scroll & Navigation
+
 - **Status**: ✅ Complete.
 - **Scope**: UX - Calendar Interactivity.
 - **Summary**:
-    - **Navigation Buttons**: Removed desktop "Previous Week / Today / Next Week" buttons per request.
-    - **Calendar Grid**: Restored internal scrolling container (`overflow-auto`) with fixed height (`calc(100vh-140px)`) to provide "map-like" 2D scrolling (vertical and horizontal) for the timetable view.
-    - **Sticky Headers**: Updated sticky offsets to align with the new scroll container context.
+  - **Navigation Buttons**: Removed desktop "Previous Week / Today / Next Week" buttons per request.
+  - **Calendar Grid**: Restored internal scrolling container (`overflow-auto`) with fixed height (`calc(100vh-140px)`) to provide "map-like" 2D scrolling (vertical and horizontal) for the timetable view.
+  - **Sticky Headers**: Updated sticky offsets to align with the new scroll container context.
 - **Files**: `app/calendar/CalendarClient.tsx`.
 - **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.

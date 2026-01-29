@@ -170,6 +170,13 @@ export default function CalendarWidgets({
     return unit?.location?.building;
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Assignments Widget */}
@@ -236,6 +243,11 @@ export default function CalendarWidgets({
                           )}
                           style={{ borderLeftColor: deadlineColor }}
                           onClick={() => onOpenAssignmentDetail(assignment)}
+                          onKeyDown={(e) =>
+                            handleKeyDown(e, () => onOpenAssignmentDetail(assignment))
+                          }
+                          role="button"
+                          tabIndex={0}
                         >
                           <button
                             onClick={(e) => {
@@ -352,6 +364,9 @@ export default function CalendarWidgets({
                           )}
                           style={{ borderLeftColor: deadlineColor }}
                           onClick={() => onOpenExamDetail(exam)}
+                          onKeyDown={(e) => handleKeyDown(e, () => onOpenExamDetail(exam))}
+                          role="button"
+                          tabIndex={0}
                         >
                           <button
                             onClick={(e) => {
@@ -460,6 +475,9 @@ export default function CalendarWidgets({
                         highlightedUnitId === unit.id && 'border-mq-primary bg-mq-primary/5',
                       )}
                       onClick={() => onOpenUnitDetail(unit)}
+                      onKeyDown={(e) => handleKeyDown(e, () => onOpenUnitDetail(unit))}
+                      role="button"
+                      tabIndex={0}
                     >
                       <div
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0"
@@ -524,6 +542,9 @@ export default function CalendarWidgets({
                     key={event.id}
                     className="group flex items-center gap-3 p-2 rounded-md border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface"
                     onClick={() => onOpenEventDetail(event)}
+                    onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-xs truncate">{event.title}</h4>

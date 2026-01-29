@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, Filter, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { format, isSameDay, startOfDay } from 'date-fns';
+import { format } from 'date-fns';
 
 export type CalendarView = 'week' | 'day' | 'agenda';
 
