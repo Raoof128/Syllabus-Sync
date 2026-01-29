@@ -216,9 +216,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Follow-ups**: None.
 
 ### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Sticky Headers
+
 - **Status**: ✅ Complete - Implemented sticky navigation and day headers.
 - **Scope**: UX Improvement - Calendar Scroll Behavior.
 - **Summary**: Applied `sticky` positioning to the Calendar Header and Week Day Headers within the `WeekView`. Added `backdrop-blur-md` and adjusted `z-index` to ensure headers float above the scrolling time grid. Removed `overflow-hidden` from the main container to correctly support sticky behavior.
+- **Files**: `app/calendar/CalendarClient.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Viewport Scroll
+- **Status**: ✅ Complete - Unbound calendar scroll to viewport.
+- **Scope**: UX Improvement - Calendar Scroll Behavior.
+- **Summary**: Removed `overflow-auto` and fixed `maxHeight` constraints from the Calendar Grid (both Desktop and Mobile). This allows the calendar to expand fully and use the main window scrollbar, enabling proper sticky header behavior relative to the viewport.
 - **Files**: `app/calendar/CalendarClient.tsx`.
 - **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.

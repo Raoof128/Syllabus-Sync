@@ -305,3 +305,11 @@
 - **Files:** app/calendar/CalendarClient.tsx.
 - **Verification:** `npm run check` (pass).
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Viewport Scroll
+- **Status:** ✅ Complete - Calendar uses window scroll.
+- **Scope:** UX - Calendar View.
+- **Summary:** Removed internal scroll containers (`maxHeight`, `overflow-auto`) from `CalendarClient.tsx` to let the calendar flow naturally with the page. This fixes sticky header context.
+- **Files:** app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.

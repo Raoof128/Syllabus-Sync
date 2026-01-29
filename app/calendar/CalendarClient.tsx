@@ -873,8 +873,7 @@ export default function CalendarClient() {
                   {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
                   {/* Desktop: Full week view */}
                   <div
-                    className="hidden md:block overflow-auto"
-                    style={{ maxHeight: '700px' }}
+                    className="hidden md:block"
                     role="grid"
                     aria-label={t('calendarWeeklyGridLabel')}
                     aria-roledescription={t('calendarWeeklyGridDescription')}
@@ -1487,8 +1486,7 @@ export default function CalendarClient() {
 
                   {/* Mobile: Single day view */}
                   <div
-                    className="md:hidden overflow-auto"
-                    style={{ maxHeight: '600px' }}
+                    className="md:hidden"
                     role="region"
                     aria-label={t('calendarDayViewLabel' as TranslationKey) || 'Day view'}
                   >
