@@ -1,4 +1,3 @@
-
 import { Event, Unit, Deadline } from '@/lib/types';
 import React from 'react';
 
