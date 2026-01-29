@@ -245,11 +245,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Follow-ups**: None.
 
 ### Raouf: 2026-01-29 (Australia/Sydney) - Todo Add & Sidebar Width
+
 - **Status**: ✅ Complete.
 - **Scope**: UX - Calendar Todo Widget & Sidebar.
 - **Summary**:
-    - **Todo Add**: Implemented "Add Task" functionality. Added a "+" button to the Todo widget header, reused the Edit Todo modal for creating new tasks.
-    - **Sidebar Width**: Increased Calendar Sidebar width from `w-80` (320px) to `w-96` (384px) to prevent widget content truncation and afford more readability.
+  - **Todo Add**: Implemented "Add Task" functionality. Added a "+" button to the Todo widget header, reused the Edit Todo modal for creating new tasks.
+  - **Sidebar Width**: Increased Calendar Sidebar width from `w-80` (320px) to `w-96` (384px) to prevent widget content truncation and afford more readability.
 - **Files**: `app/calendar/CalendarClient.tsx`, `components/calendar/CalendarWidgets.tsx`, `components/calendar/CalendarSidebar.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Scroll & Navigation
+- **Status**: ✅ Complete.
+- **Scope**: UX - Calendar Interactivity.
+- **Summary**:
+    - **Navigation Buttons**: Removed desktop "Previous Week / Today / Next Week" buttons per request.
+    - **Calendar Grid**: Restored internal scrolling container (`overflow-auto`) with fixed height (`calc(100vh-140px)`) to provide "map-like" 2D scrolling (vertical and horizontal) for the timetable view.
+    - **Sticky Headers**: Updated sticky offsets to align with the new scroll container context.
+- **Files**: `app/calendar/CalendarClient.tsx`.
 - **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.

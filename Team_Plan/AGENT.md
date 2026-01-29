@@ -329,3 +329,11 @@
 - **Files:** app/calendar/CalendarClient.tsx, components/calendar/CalendarWidgets.tsx, components/calendar/CalendarSidebar.tsx.
 - **Verification:** `npm run check` (pass).
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Scroll & Navigation
+- **Status:** ✅ Complete.
+- **Scope:** UX - Calendar Interactivity.
+- **Summary:** Removed Week/Today/Next buttons. Restored `overflow-auto` for 2D scrolling (map-style) of the calendar grid.
+- **Files:** app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
