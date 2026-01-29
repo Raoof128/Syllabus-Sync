@@ -297,3 +297,11 @@
 - **Files:** lib/calendar-utils.ts; app/calendar/CalendarClient.tsx; components/calendar/*; CHANGELOG.md.
 - **Verification:** `npm run build` (pass).
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Sticky Headers
+- **Status:** ✅ Complete - Headers now stick during scroll.
+- **Scope:** UX - Calendar View.
+- **Summary:** Refactored `CalendarClient` Week View to use `sticky` positioning for the navigation bar and day headers. Ensured correct stacking context and z-indexing.
+- **Files:** app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.

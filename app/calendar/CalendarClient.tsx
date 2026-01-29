@@ -780,9 +780,9 @@ export default function CalendarClient() {
             // Apple/Google Calendar Style Weekly View
             <ScrollReveal delay={0.1}>
               <MagicCard isLiquidEnhanced>
-                <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border">
+                <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border overflow-visible">
                   {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
-                  <div className="flex items-center justify-between p-4 border-b border-mq-border">
+                  <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md">
                     {/* Desktop week navigation */}
                     <div className="hidden md:flex items-center gap-2">
                       <Button
@@ -882,7 +882,7 @@ export default function CalendarClient() {
                     <div className="min-w-[800px]">
                       {/* Day Headers - Sticky with MQ Key Dates */}
                       <div
-                        className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-0 bg-mq-background z-20"
+                        className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-0 md:top-[73px] bg-mq-background/95 backdrop-blur-md z-30"
                         role="row"
                       >
                         <div

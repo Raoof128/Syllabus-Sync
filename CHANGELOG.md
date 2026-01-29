@@ -214,3 +214,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `components/calendar/FilterPanel.tsx`: Renamed header and removed unused imports.
 - **Verification**: `npm run build` (pass).
 - **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Sticky Headers
+- **Status**: ✅ Complete - Implemented sticky navigation and day headers.
+- **Scope**: UX Improvement - Calendar Scroll Behavior.
+- **Summary**: Applied `sticky` positioning to the Calendar Header and Week Day Headers within the `WeekView`. Added `backdrop-blur-md` and adjusted `z-index` to ensure headers float above the scrolling time grid. Removed `overflow-hidden` from the main container to correctly support sticky behavior.
+- **Files**: `app/calendar/CalendarClient.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
