@@ -25,6 +25,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
+import { getDeadlineColor } from '@/lib/calendar-utils';
 import dayjs from 'dayjs';
 import { Deadline, Event, Unit } from '@/lib/types';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
@@ -205,7 +206,7 @@ export default function CalendarWidgets({
                   <p className="text-xs">{t('noAssignmentsYet')}</p>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                <div className="space-y-2 pr-1">
                   {assignments
                     .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
                     .map((assignment) => {
@@ -213,15 +214,18 @@ export default function CalendarWidgets({
                       const isOverdue = !assignment.completed && due.isBefore(dayjs());
                       const isHighlighted =
                         deadlineHighlightActive && highlightedDeadlineId === assignment.id;
+                      const deadlineColor = getDeadlineColor(assignment, units);
+
                       return (
                         <div
                           key={assignment.id}
                           className={cn(
-                            'group flex items-center gap-3 p-2 rounded-md border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface',
-                            assignment.completed && 'opacity-60',
-                            isOverdue && 'bg-red-500/5 border-red-500/20',
+                            'group flex items-center gap-3 p-2 rounded-md border border-l-[4px] border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                            assignment.completed && 'opacity-60 grayscale',
+                            isOverdue && 'bg-red-500/5',
                             isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                           )}
+                          style={{ borderLeftColor: deadlineColor }}
                           onClick={() => onOpenAssignmentDetail(assignment)}
                         >
                           <button
@@ -229,10 +233,13 @@ export default function CalendarWidgets({
                               e.stopPropagation();
                               toggleComplete(assignment.id);
                             }}
-                            className="text-mq-content-secondary hover:text-mq-primary transition-colors"
+                            className={cn(
+                              'text-mq-content-secondary hover:text-mq-primary transition-colors',
+                              assignment.completed ? 'text-green-600' : '',
+                            )}
                           >
                             {assignment.completed ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <CheckCircle2 className="h-4 w-4" />
                             ) : (
                               <Circle className="h-4 w-4" />
                             )}
@@ -318,20 +325,23 @@ export default function CalendarWidgets({
                   <p className="text-xs">{t('noExamsYet')}</p>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                <div className="space-y-2 pr-1">
                   {exams
                     .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
                     .map((exam) => {
                       const due = dayjs(exam.dueDate);
                       const isOverdue = !exam.completed && due.isBefore(dayjs());
+                      const deadlineColor = getDeadlineColor(exam, units);
+
                       return (
                         <div
                           key={exam.id}
                           className={cn(
-                            'group flex items-center gap-3 p-2 rounded-md border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface',
-                            exam.completed && 'opacity-60',
-                            isOverdue && 'bg-red-500/5 border-red-500/20',
+                            'group flex items-center gap-3 p-2 rounded-md border border-l-[4px] border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                            exam.completed && 'opacity-60 grayscale',
+                            isOverdue && 'bg-red-500/5',
                           )}
+                          style={{ borderLeftColor: deadlineColor }}
                           onClick={() => onOpenExamDetail(exam)}
                         >
                           <button
@@ -339,10 +349,13 @@ export default function CalendarWidgets({
                               e.stopPropagation();
                               toggleComplete(exam.id);
                             }}
-                            className="text-mq-content-secondary hover:text-mq-primary"
+                            className={cn(
+                              'text-mq-content-secondary hover:text-mq-primary transition-colors',
+                              exam.completed ? 'text-green-600' : '',
+                            )}
                           >
                             {exam.completed ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              <CheckCircle2 className="h-4 w-4" />
                             ) : (
                               <Circle className="h-4 w-4" />
                             )}
@@ -429,7 +442,7 @@ export default function CalendarWidgets({
                   <p className="text-xs">{t('noUnitsYet')}</p>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                <div className="space-y-2 pr-1">
                   {units.map((unit) => (
                     <div
                       key={unit.id}
@@ -496,7 +509,7 @@ export default function CalendarWidgets({
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+              <div className="space-y-2 pr-1">
                 {events.slice(0, 5).map((event) => (
                   <div
                     key={event.id}
@@ -547,7 +560,7 @@ export default function CalendarWidgets({
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+              <div className="space-y-2 pr-1">
                 {pendingTodos.length === 0 ? (
                   <div className="text-center py-6 text-mq-content-tertiary">
                     <p className="text-xs">{t('noTodos' as TranslationKey)}</p>
