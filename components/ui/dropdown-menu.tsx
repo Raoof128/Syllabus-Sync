@@ -49,15 +49,11 @@ function DropdownMenuContent({
         align={align}
         alignOffset={resolvedAlignOffset}
         collisionBoundary={collisionBoundary ?? defaultBoundary ?? undefined}
-        sticky="partial"
-        hideWhenDetached
         className={cn(
           // Position fixed is critical for proper scroll behavior - ensures menu stays anchored to trigger
           'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
           // Use design system variables for consistent theming
           'bg-mq-card-background text-mq-content border border-mq-border',
-          // Force end-aligned menus to sit fully left of the anchor to avoid right overflow.
-          'data-[align=end]:-translate-x-full',
           // Ensure dropdown stays within viewport boundaries
           'max-w-[80vw]',
           className,

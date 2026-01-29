@@ -121,8 +121,8 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                   className={cn(
                     'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
                     isActive
-                      ? 'bg-mq-content text-mq-background shadow-sm'
-                      : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content',
+                      ? 'bg-mq-primary text-mq-background shadow-sm'
+                      : 'bg-mq-card-background text-mq-content-secondary border border-mq-border/60 hover:bg-mq-card-background hover:text-mq-content',
                   )}
                 >
                   <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-current' : section.color)} />

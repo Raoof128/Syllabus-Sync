@@ -69,29 +69,48 @@ export const FeedEventCard = memo(
             </Badge>
 
             {(onEdit || onDelete) && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 -mr-2 text-mq-content-tertiary hover:text-mq-content"
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                    <span className="sr-only">{t('actions')}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {onEdit && <DropdownMenuItem onClick={onEdit}>{t('edit')}</DropdownMenuItem>}
-                  {onDelete && (
-                    <DropdownMenuItem
-                      onClick={onDelete}
-                      className="text-red-500 focus:text-red-600"
+              // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+              <div
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="-mr-2"
+              >
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-mq-content-tertiary hover:text-mq-content"
                     >
-                      {t('delete')}
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <MoreVertical className="h-4 w-4" />
+                      <span className="sr-only">{t('actions')}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {onEdit && (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit();
+                        }}
+                      >
+                        {t('edit')}
+                      </DropdownMenuItem>
+                    )}
+                    {onDelete && (
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete();
+                        }}
+                        className="text-red-500 focus:text-red-600"
+                      >
+                        {t('delete')}
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </div>
 

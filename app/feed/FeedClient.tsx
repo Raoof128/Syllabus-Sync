@@ -7,6 +7,7 @@ import { Plus, Trash2, Rss, Info } from 'lucide-react';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { cn } from '@/lib/utils';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { toastUtils } from '@/lib/utils/toast';
 import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
@@ -87,7 +88,7 @@ const FeedClient = memo(() => {
   const cancelReminder = useNotificationPreferencesStore((state) => state.cancelReminder);
 
   // User events store - load events for potential future use
-  useEventsStore((state) => state.events);
+  // useEventsStore((state) => state.events);
 
   // Scroll to and highlight the event when component mounts or highlight changes
   useEffect(() => {
@@ -442,47 +443,59 @@ const FeedClient = memo(() => {
           {/* Events Grid/List */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {filteredEvents.length > 0 ? (
-              filteredEvents.map((event, index) => (
-                <article
-                  key={event.id}
-                  className="sticky z-0 transition-transform duration-300"
-                  style={{
-                    // Stacking effect calculation
-                    top: `${140 + index * 10}px`,
-                    // Add slight margin bottom to create spacing when stacked
-                    marginBottom: '2rem',
-                  }}
-                  ref={(el) => {
-                    if (el) eventRefs.current.set(event.id, el);
-                  }}
-                >
-                  <ScrollReveal delay={0.1}>
-                    <FeedEventCard
-                      event={event}
-                      isReminded={remindedEvents.has(event.id)}
-                      isLoading={loadingEvents.has(event.id)}
-                      isHighlighted={highlightedEvent === event.id}
-                      onRemind={() =>
-                        handleRemindMe(
-                          event.id,
-                          t((event.translationKey || event.title) as TranslationKey),
-                          event.startAt,
-                          event.location || '',
-                        )
-                      }
-                      onEdit={() => {
-                        setEditingEvent(event);
-                        setEventFormOpen(true);
-                      }}
-                      onDelete={() => {
-                        setEventToDelete(event);
-                        setDeleteConfirmOpen(true);
-                      }}
-                      getLocaleString={getLocaleString}
-                    />
-                  </ScrollReveal>
-                </article>
-              ))
+              filteredEvents.map((event, index) => {
+                // Limit sticky stacking to first 10 elements to prevent "infinite top" issues
+                // and z-index/overflow bugs with dropdowns on lower cards
+                const isSticky = index < 10;
+
+                return (
+                  <article
+                    key={event.id}
+                    className={cn(
+                      'transition-transform duration-300',
+                      // Both sticky and non-sticky need to be positioned (relative vs sticky)
+                      // and have z-0 to maintain correct stacking context (later covers earlier)
+                      isSticky ? 'sticky' : 'relative',
+                      'z-0',
+                    )}
+                    style={{
+                      // Stacking effect calculation only for top cards
+                      top: isSticky ? `${140 + index * 10}px` : undefined,
+                      // Add slight margin bottom to create spacing when stacked
+                      marginBottom: '2rem',
+                    }}
+                    ref={(el) => {
+                      if (el) eventRefs.current.set(event.id, el);
+                    }}
+                  >
+                    <ScrollReveal delay={0.1}>
+                      <FeedEventCard
+                        event={event}
+                        isReminded={remindedEvents.has(event.id)}
+                        isLoading={loadingEvents.has(event.id)}
+                        isHighlighted={highlightedEvent === event.id}
+                        onRemind={() =>
+                          handleRemindMe(
+                            event.id,
+                            t((event.translationKey || event.title) as TranslationKey),
+                            event.startAt,
+                            event.location || '',
+                          )
+                        }
+                        onEdit={() => {
+                          setEditingEvent(event);
+                          setEventFormOpen(true);
+                        }}
+                        onDelete={() => {
+                          setEventToDelete(event);
+                          setDeleteConfirmOpen(true);
+                        }}
+                        getLocaleString={getLocaleString}
+                      />
+                    </ScrollReveal>
+                  </article>
+                );
+              })
             ) : (
               <div className="col-span-full py-12 text-center bg-mq-surface rounded-2xl border border-mq-border border-dashed">
                 <Rss className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" />

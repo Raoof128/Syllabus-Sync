@@ -109,7 +109,9 @@ function formReducer(state: FormState, action: FormAction): FormState {
 
 export default function EventForm({ open, onOpenChange, editEvent }: EventFormProps) {
   const { t } = useTranslation();
-  const { addEvent, updateEvent, removeEvent } = useEventsStore();
+  const addEvent = useEventsStore((state) => state.addEvent);
+  const updateEvent = useEventsStore((state) => state.updateEvent);
+  const removeEvent = useEventsStore((state) => state.removeEvent);
 
   // Use reducer to batch form state updates and avoid cascading renders
   const [formState, dispatch] = useReducer(formReducer, {

@@ -98,194 +98,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: Phase 3 (Sidebar "Quick actions") and Phase 4 (Reminders polish).
 
-### Raouf: 2026-01-28 (HUD Cleanup & Settings Polish)
+### Raouf: 2026-01-29 (Australia/Sydney) - Feed Stability & Dropdown Fixes
 
-- **Summary**: Refined the Map HUD by removing redundant "Today" and status/crowd widgets. Polished the Settings layout by fixing background visibility and removing unused imports.
+- **Summary**: Resolved critical UI bugs in the Feed where dropdown menus (Edit/Delete) on lower cards were inaccessible or positioned incorrectly.
+  - **Dropdown Menu**: Removed manual `translate-x` overrides and `sticky` props that interfered with Radix UI's portal positioning logic, ensuring menus render correctly regardless of scroll position or parent transforms.
 - **Files Changed**:
-  - `app/map/CampusMapHUD.tsx`: Removed "Today" button and status grids.
-  - `app/settings/layout.tsx`: Added `MovingMeshBackground` and cleaned up styles.
+  - `components/ui/dropdown-menu.tsx`: Simplified positioning logic.
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: None.
 
-### Raouf: 2026-01-28 (Settings Page Modularization)
+### Raouf: 2026-01-29 (Australia/Sydney) - Feed Dropdown Reliability Hardening
 
-- **Summary**: Refactored the Settings page into distinct sub-routes for General, Appearance, Security, Experience, and Support. Fixed the "Hero Header" background animation visibility.
+- **Summary**: Further hardened the event feed dropdown behavior so edit/delete menus open reliably on all cards, including lower items near the viewport edges. Removed the `hideWhenDetached` flag from the Radix `DropdownMenu` content wrapper to avoid premature unmounting when the trigger is inside complex sticky layouts while retaining collision boundaries.
 - **Files Changed**:
-  - `app/settings/layout.tsx`: Created a shared layout with sticky sidebar and hero shell.
-  - `app/settings/page.tsx`: Redirects to `/settings/general`.
-  - `app/settings/[section]/page.tsx`: Created individual page components for each section.
+  - `components/ui/dropdown-menu.tsx`: Removed `hideWhenDetached` from dropdown content.
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: None.
 
-### Raouf: 2026-01-28 (Settings UI Overhaul)
+### Raouf: 2026-01-29 (Australia/Sydney) - Feed Event Title & Settings Hover
 
-- **Summary**: Transformed the Settings page into a modern, 2-column layout with a sticky sidebar, categorized sections, and a hero header shell.
+- **Summary**: Fixed a missing English translation for the sample Career Fair event so it no longer renders the raw `event_careerFair2026_title` key, and improved the readability of responsive Settings navigation pills by switching their hover background to `bg-mq-card-background`.
 - **Files Changed**:
-  - `app/settings/page.tsx`: Implemented `SettingsContent` with responsive grid, scroll spy, and section grouping.
-  - `app/settings/components/index.ts`: Verified exports.
+  - `locales/en/translations.json`: Added `event_careerFair2026_title`.
+  - `app/settings/layout.tsx`: Updated mobile nav hover background to card background.
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
 - **Follow-ups**: None.
 
-### Raouf: 2026-01-28 (Map HUD & Navigation Polish)
+### Raouf: 2026-01-29 (Australia/Sydney) - Settings Mobile Nav Contrast
 
-- **Summary**: Refined the Map HUD by adding navigation actions and fixing UI overlaps. Integrated external Google Maps linking and improved in-app navigation triggers.
+- **Summary**: Further improved the contrast of Settings section pills on small screens by using `bg-mq-card-background` plus a subtle border for inactive pills so their labels remain readable against the blurred background while keeping the active pill style unchanged.
 - **Files Changed**:
-  - `app/map/CampusMap.tsx`: Shifted "Center on User" button when building card is visible to prevent overlap. Added `cn` utility.
-  - `app/map/CampusMapHUD.tsx`: Added "Navigate on Campus Map" (scroll-to-action) and "Navigate to Google Maps" (external link) buttons.
-  - `locales/en/translations.json`: Added `navigateOnCampus` and `navigateToGoogleMaps` keys.
+  - `app/settings/layout.tsx`: Adjusted inactive mobile pill background and border.
 - **Verification**:
   - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-28 (Map UI Redesign: Sales Territory Style)
-
-- **Summary**: Redesigned Campus Map UI to follow a modern "Sales Territory" HUD style. Replaced separate bottom/top cards with a unified map overlay HUD.
-- **Files Changed**:
-  - `app/map/MapClient.tsx`: Injected `CampusMapHUD`, removed redundant `Selected Building Banner` and `Campus Buildings Quick Reference` cards.
-  - `app/map/CampusMapHUD.tsx`: Created new HUD component with floating sidebar, search, and details card.
-  - `locales/en/translations.json`: Added "Share" and "Places" keys.
-- **Verification**:
-  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-28 (Full Codebase Audit & Polish)
-
-- **Summary**: Performed a comprehensive codebase audit, verifying security, testing, and code quality. Resolved lingering lint warnings and purity issues in calendar components. Updated audit report to reflect healthy state.
-- **Files Changed**:
-  - `app/calendar/CalendarClient.tsx`: Fixed unused variables, boolean attributes, and string templates.
-  - `components/calendar/ItemActionButtons.tsx`: Addressed React purity check warning.
-  - `audit-report.md`: Updated with latest verification results (Excellent scores).
-- **Verification**:
-  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
-  - `npm audit`: Passed (0 vulnerabilities).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-27 (React 19 Test Migration & Cleanup)
-
-- **Summary**: Migrated test suite to support React 19 by removing deprecated `react-dom/test-utils` usage. Performed deep codebase cleanup by removing temporary test files and fixing broken imports.
-- **Files Changed**:
-  - `tests/settings/PrivacySettings.test.tsx`: Migrated to `React.act`.
-  - `tests/gamification/LevelUpNotification.test.tsx`: Migrated to `React.act`.
-  - `app/login/LoginClient.tsx`: Removed broken reference to deleted `TestWeather` component.
-  - `next.config.ts`: Added `openAnalyzer: false` for better CI/CD bundle analysis.
-  - `app/test-weather/`, `app/api/test-weather/`: Deleted temporary test files.
-- **Verification**:
-  - `npm run check`: Passed (Linting, Formatting, Typecheck, Tests, Build).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-27 (Codebase Audit & Cleanup)
-
-- **Summary**: Conducted full codebase audit including linting, type checking, and security scan. Fixed linting errors and cleaned up unused code.
-- **Files Changed**:
-  - `app/api/deadlines/route.ts`: Removed unused eslint-disable.
-  - `app/api/events/route.ts`: Removed unused imports/directives.
-  - `app/api/notifications/route.ts`: Removed unused imports/directives.
-  - `app/api/todos/route.ts`: Removed unused eslint-disable.
-  - `app/calendar/CalendarClient.tsx`: Fixed `set-state-in-effect` lint error.
-  - `audit-report.md`: Updated with latest findings.
-- **Verification**:
-  - `npm run lint`: Passed (0 errors, 0 warnings).
-  - `npm run typecheck`: Passed.
-  - `npm audit`: Passed (0 vulnerabilities).
-- **Follow-ups**: React 19 test migration recommended (see `audit-report.md`).
-
-### Raouf: 2026-01-27 (i18n Audit & Fix)
-
-- **Summary**: Performed repository-wide internationalisation audit. Identified and fixed 18 missing translation keys related to the "To-Do List" feature across all 18 non-English locales.
-- **Files Changed**:
-  - `locales/*/translations.json` (Updated 18 files with missing keys)
-  - `CHANGELOG.md` (Created)
-- **Verification**:
-  - Ran `npm run check:i18n`: All 19 locales now have 100% key coverage (1458 keys).
-  - Manual review of `app/calendar/CalendarClient.tsx` and core layout components confirmed `t()` usage.
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Polish & FilterPanel
-
-- **Summary**: Refined "Day" and "Agenda" views implementation with consistent deadline coloring and visual improvements. Polished the FilterPanel component layout.
-- **Files Changed**:
-  - `lib/calendar-utils.ts`: Added `getDeadlineColor` helper to standardize coloring logic.
-  - `app/calendar/CalendarClient.tsx`: Updated key logic and integrated standardized coloring.
-  - `components/calendar/DayView.tsx`: Implemented `getDeadlineColor` and fixed formatting.
-  - `components/calendar/AgendaView.tsx`: Implemented `getDeadlineColor` for agenda items.
-  - `components/calendar/FilterPanel.tsx`: Renamed header and removed unused imports.
-- **Verification**: `npm run build` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Sticky Headers
-
-- **Status**: ✅ Complete - Implemented sticky navigation and day headers.
-- **Scope**: UX Improvement - Calendar Scroll Behavior.
-- **Summary**: Applied `sticky` positioning to the Calendar Header and Week Day Headers within the `WeekView`. Added `backdrop-blur-md` and adjusted `z-index` to ensure headers float above the scrolling time grid. Removed `overflow-hidden` from the main container to correctly support sticky behavior.
-- **Files**: `app/calendar/CalendarClient.tsx`.
-- **Verification**: `npm run check` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Viewport Scroll
-
-- **Status**: ✅ Complete - Unbound calendar scroll to viewport.
-- **Scope**: UX Improvement - Calendar Scroll Behavior.
-- **Summary**: Removed `overflow-auto` and fixed `maxHeight` constraints from the Calendar Grid (both Desktop and Mobile). This allows the calendar to expand fully and use the main window scrollbar, enabling proper sticky header behavior relative to the viewport.
-- **Files**: `app/calendar/CalendarClient.tsx`.
-- **Verification**: `npm run check` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Todo Fix & Calendar Polish
-
-- **Status**: ✅ Complete - Todo Edit added & Cards Polished.
-- **Scope**: UX - Calendar Widgets & View.
-- **Summary**:
-  - **Todo Edit**: Added "Edit" icon and functionality to the Todo widget.
-  - **Card Readability**: Updated Event and Deadline cards in Calendar Grid (Desktop & Mobile) to expand on hover (`hover:h-auto hover:z-50`), allowing full text visibility without truncation issues. Removed aggressive default truncation to improve readability.
-- **Files**: `components/calendar/CalendarWidgets.tsx`, `app/calendar/CalendarClient.tsx`.
-- **Verification**: `npm run check` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Todo Add & Sidebar Width
-
-- **Status**: ✅ Complete.
-- **Scope**: UX - Calendar Todo Widget & Sidebar.
-- **Summary**:
-  - **Todo Add**: Implemented "Add Task" functionality. Added a "+" button to the Todo widget header, reused the Edit Todo modal for creating new tasks.
-  - **Sidebar Width**: Increased Calendar Sidebar width from `w-80` (320px) to `w-96` (384px) to prevent widget content truncation and afford more readability.
-- **Files**: `app/calendar/CalendarClient.tsx`, `components/calendar/CalendarWidgets.tsx`, `components/calendar/CalendarSidebar.tsx`.
-- **Verification**: `npm run check` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Layout Refactor (Scroll & Events)
-- **Status**: ✅ Complete.
-- **Scope**: UX - Calendar Responsiveness & Polish.
-- **Summary**:
-    - **Horizontal Scroll**: Implemented `overflow-x-auto` wrapper to allow horizontal scrolling on smaller screens while keeping vertical scroll on the window.
-    - **Sticky Headers**: Ensured headers remain sticky relative to viewport during scroll.
-    - **Event Rendering**: Fixed messy event rendering by adding truncation and `overflow-hidden` by default, with `hover:overflow-visible` for details.
-- **Files**: `app/calendar/CalendarClient.tsx`.
-- **Verification**: `npm run check` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Audit & Accessibility Fixes
-
-- **Status**: ✅ Complete.
-- **Scope**: Code Quality & Accessibility.
-- **Summary**:
-  - **Code Cleanup**: Conducted a full audit of `app/calendar` and `components/calendar`. Removed unused imports, variables, and dead code in `CalendarClient.tsx`, `CalendarHeader.tsx`, and `AgendaView.tsx`.
-  - **Accessibility**: Fixed a11y issues in `CalendarWidgets.tsx` by adding keyboard support (`onKeyDown`, `tabIndex`, `role="button"`) to interactive list items (Units, Deadlines, Events).
-  - **Linting**: Resolved all linter warnings in the calendar module.
-- **Files**: `app/calendar/CalendarClient.tsx`, `components/calendar/CalendarWidgets.tsx`, `components/calendar/AgendaView.tsx`, `components/calendar/CalendarHeader.tsx`.
-- **Verification**: `npm run lint` (pass), `npm run typecheck` (pass).
-- **Follow-ups**: None.
-
-### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Scroll & Navigation
-
-- **Status**: ✅ Complete.
-- **Scope**: UX - Calendar Interactivity.
-- **Summary**:
-  - **Navigation Buttons**: Removed desktop "Previous Week / Today / Next Week" buttons per request.
-  - **Calendar Grid**: Restored internal scrolling container (`overflow-auto`) with fixed height (`calc(100vh-140px)`) to provide "map-like" 2D scrolling (vertical and horizontal) for the timetable view.
-  - **Sticky Headers**: Updated sticky offsets to align with the new scroll container context.
-- **Files**: `app/calendar/CalendarClient.tsx`.
-- **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.
