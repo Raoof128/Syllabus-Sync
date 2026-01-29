@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { format } from 'date-fns';
 import CalendarPage from '@/app/calendar/page';
 import translations from '@/locales/en/translations.json';
 
@@ -78,8 +79,11 @@ describe('CalendarPage', () => {
   it('renders the calendar page with header', async () => {
     render(<CalendarPage />);
 
-    // Check that the main calendar heading is present
-    expect(screen.getByRole('heading', { name: translations.calendar })).toBeInTheDocument();
+    // Check that the main calendar heading matches the date (January 2026)
+    // view defaults to 'week' so it shows "Month Year"
+    const expectedDate = format(new Date(2026, 0, 15), 'MMMM yyyy');
+    const headings = screen.getAllByRole('heading', { name: expectedDate });
+    expect(headings.length).toBeGreaterThan(0);
   });
 
   it('displays deadline information in the sidebar', async () => {

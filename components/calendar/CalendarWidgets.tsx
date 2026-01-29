@@ -104,10 +104,8 @@ export default function CalendarWidgets({
 
         // Then sort by priority
         const priorityOrder = { High: 0, Medium: 1, Low: 2 };
-        // @ts-ignore - priority string key access
-        const pA = priorityOrder[a.priority] ?? 3;
-        // @ts-ignore
-        const pB = priorityOrder[b.priority] ?? 3;
+        const pA = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 3;
+        const pB = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 3;
         if (pA !== pB) return pA - pB;
 
         // Finally sort by creation date
