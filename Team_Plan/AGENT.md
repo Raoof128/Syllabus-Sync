@@ -313,3 +313,19 @@
 - **Files:** app/calendar/CalendarClient.tsx.
 - **Verification:** `npm run check` (pass).
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Todo Fix & Calendar Polish
+- **Status:** ✅ Complete - Todo Edit & Event Hover.
+- **Scope:** UX - Calendar Widgets.
+- **Summary:** Added edit button to Todo widget. Implemented hover-to-expand logic for Calendar Event/Deadline cards to solve truncation issues.
+- **Files:** components/calendar/CalendarWidgets.tsx, app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Todo Add & Sidebar Width
+- **Status:** ✅ Complete.
+- **Scope:** UX - Calendar Todo Widget & Sidebar.
+- **Summary:** Added "Add Task" button and functionality. Widened sidebar to `w-96` to fix truncation issues.
+- **Files:** app/calendar/CalendarClient.tsx, components/calendar/CalendarWidgets.tsx, components/calendar/CalendarSidebar.tsx.
+- **Verification:** `npm run check` (pass).
+- **Follow-ups:** None.

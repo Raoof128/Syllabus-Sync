@@ -199,6 +199,7 @@ export default function CalendarClient() {
   const [todoDeleteConfirmOpen, setTodoDeleteConfirmOpen] = useState(false);
   const [todoToDelete, setTodoToDelete] = useState<{ id: string; title: string } | null>(null);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [todoDialogOpen, setTodoDialogOpen] = useState(false);
   const [editTodoTitle, setEditTodoTitle] = useState('');
   const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
   const [editTodoDueDate, setEditTodoDueDate] = useState('');
@@ -600,6 +601,30 @@ export default function CalendarClient() {
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
     setEventDetailOpen(true);
+  };
+
+  const openAddTodo = () => {
+    setEditingTodo(null);
+    setEditTodoTitle('');
+    setEditTodoPriority('Medium');
+    setEditTodoDueDate('');
+    setEditTodoDueTime('');
+    setTodoDialogOpen(true);
+  };
+
+  const openEditTodo = (todo: Todo) => {
+    setEditingTodo(todo);
+    setEditTodoTitle(todo.title);
+    setEditTodoPriority(todo.priority);
+    if (todo.dueDate) {
+      const date = new Date(todo.dueDate);
+      setEditTodoDueDate(dayjs(date).format('YYYY-MM-DD'));
+      setEditTodoDueTime(dayjs(date).format('HH:mm'));
+    } else {
+      setEditTodoDueDate('');
+      setEditTodoDueTime('');
+    }
+    setTodoDialogOpen(true);
   };
 
   // Unit handlers
@@ -1278,7 +1303,7 @@ export default function CalendarClient() {
                                         }}
                                         onClick={() => openEditDeadline(deadline)}
                                         className={cn(
-                                          'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
+                                          'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                           deadline.completed && 'opacity-50 line-through',
                                           isHighlighted &&
                                             'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
@@ -1299,7 +1324,9 @@ export default function CalendarClient() {
                                           type: deadlineTypeLabel,
                                         })}
                                       >
-                                        <span className="block truncate">{displayName}</span>
+                                        <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal">
+                                          {displayName}
+                                        </span>
                                       </button>
                                     );
                                   }
@@ -1325,7 +1352,7 @@ export default function CalendarClient() {
                                       }}
                                       onClick={() => openEditDeadline(deadline)}
                                       className={cn(
-                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
+                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                         deadline.completed && 'opacity-50 line-through',
                                         isHighlightedDeadline &&
                                           'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
@@ -1353,7 +1380,7 @@ export default function CalendarClient() {
                                         type: deadlineTypeLabel,
                                       })}
                                     >
-                                      <span className="block line-clamp-2 break-words leading-tight">
+                                      <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
                                         {displayName}
                                       </span>
                                       <span className="text-[10px] opacity-80">
@@ -1378,7 +1405,7 @@ export default function CalendarClient() {
                                         type="button"
                                         onClick={() => handleEventClick(event)}
                                         className={cn(
-                                          'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
+                                          'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                           eventColors.bg,
                                           eventColors.text,
                                         )}
@@ -1393,7 +1420,9 @@ export default function CalendarClient() {
                                           title: eventTitle,
                                         })}
                                       >
-                                        <span className="block truncate">{eventTitle}</span>
+                                        <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal hover:overflow-visible">
+                                          {eventTitle}
+                                        </span>
                                       </button>
                                     );
                                   }
@@ -1447,7 +1476,7 @@ export default function CalendarClient() {
                                       type="button"
                                       onClick={() => handleEventClick(event)}
                                       className={cn(
-                                        'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px]',
+                                        'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                         eventColors.bg,
                                         eventColors.border,
                                         eventColors.text,
@@ -1469,7 +1498,7 @@ export default function CalendarClient() {
                                         title: eventTitle,
                                       })}
                                     >
-                                      <span className="block line-clamp-2 break-words leading-tight">
+                                      <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
                                         {eventTitle}
                                       </span>
                                       <span className="text-[8px] opacity-80">{event.time}</span>
@@ -1743,7 +1772,7 @@ export default function CalendarClient() {
                                     type="button"
                                     onClick={() => openEditDeadline(deadline)}
                                     className={cn(
-                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px]',
+                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                       deadline.completed && 'opacity-50 line-through',
                                     )}
                                     style={{
@@ -1755,7 +1784,7 @@ export default function CalendarClient() {
                                       borderLeftColor: deadlineColor,
                                     }}
                                   >
-                                    <span className="block line-clamp-2">
+                                    <span className="block line-clamp-2 hover:line-clamp-none">
                                       {deadline.unitCode} – {deadline.title}
                                     </span>
                                     <span className="text-[10px] opacity-80">
@@ -1795,7 +1824,7 @@ export default function CalendarClient() {
                                     type="button"
                                     onClick={() => handleEventClick(event)}
                                     className={cn(
-                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px]',
+                                      'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
                                       eventColors.bg,
                                       eventColors.border,
                                       eventColors.text,
@@ -1808,7 +1837,9 @@ export default function CalendarClient() {
                                       ...eventColors.style,
                                     }}
                                   >
-                                    <span className="block line-clamp-2">{eventTitle}</span>
+                                    <span className="block line-clamp-2 hover:line-clamp-none">
+                                      {eventTitle}
+                                    </span>
                                     <span className="text-[10px] opacity-80">{event.time}</span>
                                   </button>
                                 );
@@ -1876,6 +1907,8 @@ export default function CalendarClient() {
             onDeleteEvent={handleDeleteEvent}
             onDeleteAssignment={handleDeleteAssignment}
             onDeleteExam={handleDeleteExam}
+            onEditTodo={openEditTodo}
+            onAddTodo={openAddTodo}
           />
         </CalendarSidebar>
       </div>
@@ -2174,8 +2207,8 @@ export default function CalendarClient() {
         </div>
       )}
 
-      {/* Edit Todo Modal */}
-      {editingTodo && (
+      {/* Todo Modal */}
+      {todoDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
           <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
@@ -2184,14 +2217,14 @@ export default function CalendarClient() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
-                  {tOr('editTodo', 'Edit Task')}
+                  {editingTodo ? tOr('editTodo', 'Edit Task') : tOr('addTodo', 'Add Task')}
                 </h3>
               </div>
             </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (editTodoTitle.trim() && editingTodo) {
+                if (editTodoTitle.trim()) {
                   // Build due date if provided
                   let dueDate: Date | undefined = undefined;
                   if (editTodoDueDate) {
@@ -2203,11 +2236,22 @@ export default function CalendarClient() {
                       dueDate.setHours(23, 59, 59, 999);
                     }
                   }
-                  updateTodo(editingTodo.id, {
-                    title: editTodoTitle.trim(),
-                    priority: editTodoPriority,
-                    dueDate,
-                  });
+
+                  if (editingTodo) {
+                    updateTodo(editingTodo.id, {
+                      title: editTodoTitle.trim(),
+                      priority: editTodoPriority,
+                      dueDate,
+                    });
+                  } else {
+                    addTodo({
+                      title: editTodoTitle.trim(),
+                      priority: editTodoPriority,
+                      dueDate,
+                    });
+                  }
+
+                  setTodoDialogOpen(false);
                   setEditingTodo(null);
                   setEditTodoTitle('');
                   setEditTodoPriority('Medium');
@@ -2307,6 +2351,7 @@ export default function CalendarClient() {
                   type="button"
                   variant="outline"
                   onClick={() => {
+                    setTodoDialogOpen(false);
                     setEditingTodo(null);
                     setEditTodoTitle('');
                     setEditTodoPriority('Medium');
@@ -2321,7 +2366,7 @@ export default function CalendarClient() {
                   disabled={!editTodoTitle.trim()}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 >
-                  {tOr('saveChanges', 'Save Changes')}
+                  {tOr('saveChanges', editingTodo ? 'Save Changes' : 'Add Task')}
                 </Button>
               </div>
             </form>

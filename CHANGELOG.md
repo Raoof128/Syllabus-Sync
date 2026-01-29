@@ -225,6 +225,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Follow-ups**: None.
 
 ### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Viewport Scroll
+
 - **Status**: ✅ Complete - Unbound calendar scroll to viewport.
 - **Scope**: UX Improvement - Calendar Scroll Behavior.
 - **Summary**: Removed `overflow-auto` and fixed `maxHeight` constraints from the Calendar Grid (both Desktop and Mobile). This allows the calendar to expand fully and use the main window scrollbar, enabling proper sticky header behavior relative to the viewport.
@@ -232,3 +233,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**: `npm run check` (pass).
 - **Follow-ups**: None.
 
+### Raouf: 2026-01-29 (Australia/Sydney) - Todo Fix & Calendar Polish
+
+- **Status**: ✅ Complete - Todo Edit added & Cards Polished.
+- **Scope**: UX - Calendar Widgets & View.
+- **Summary**:
+  - **Todo Edit**: Added "Edit" icon and functionality to the Todo widget.
+  - **Card Readability**: Updated Event and Deadline cards in Calendar Grid (Desktop & Mobile) to expand on hover (`hover:h-auto hover:z-50`), allowing full text visibility without truncation issues. Removed aggressive default truncation to improve readability.
+- **Files**: `components/calendar/CalendarWidgets.tsx`, `app/calendar/CalendarClient.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - Todo Add & Sidebar Width
+- **Status**: ✅ Complete.
+- **Scope**: UX - Calendar Todo Widget & Sidebar.
+- **Summary**:
+    - **Todo Add**: Implemented "Add Task" functionality. Added a "+" button to the Todo widget header, reused the Edit Todo modal for creating new tasks.
+    - **Sidebar Width**: Increased Calendar Sidebar width from `w-80` (320px) to `w-96` (384px) to prevent widget content truncation and afford more readability.
+- **Files**: `app/calendar/CalendarClient.tsx`, `components/calendar/CalendarWidgets.tsx`, `components/calendar/CalendarSidebar.tsx`.
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.

@@ -14,6 +14,7 @@ import {
   Trash2,
   CheckSquare,
   Clock,
+  Edit2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -27,7 +28,7 @@ import { useTodosStore } from '@/lib/store/todosStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { getDeadlineColor } from '@/lib/calendar-utils';
 import dayjs from 'dayjs';
-import { Deadline, Event, Unit } from '@/lib/types';
+import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
 
@@ -48,6 +49,8 @@ interface CalendarWidgetsProps {
   onDeleteEvent: (event: Event) => void;
   onDeleteAssignment: (assignment: Deadline) => void;
   onDeleteExam: (exam: Deadline) => void;
+  onEditTodo: (todo: Todo) => void;
+  onAddTodo?: () => void;
 }
 
 export default function CalendarWidgets({
@@ -67,8 +70,14 @@ export default function CalendarWidgets({
   onDeleteEvent,
   onDeleteAssignment,
   onDeleteExam,
+  onEditTodo,
+  onAddTodo,
 }: CalendarWidgetsProps) {
   const { t, language } = useTranslation();
+  const tOr = (key: TranslationKey | string, fallback: string) => {
+    const value = t(key as TranslationKey);
+    return value === key ? fallback : value;
+  };
   const searchParams = useSearchParams();
 
   // Stores
@@ -554,9 +563,20 @@ export default function CalendarWidgets({
                   <CheckSquare className="h-4 w-4" />
                   {t('todos' as TranslationKey)}
                 </span>
-                <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                  {pendingTodos.length}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                    {pendingTodos.length}
+                  </Badge>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6"
+                    onClick={() => onAddTodo?.()}
+                    aria-label={tOr('addTodo', 'Add Todo')}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -598,8 +618,16 @@ export default function CalendarWidgets({
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
+                          onClick={() => onEditTodo(todo)}
+                          className="p-1 hover:text-mq-primary text-mq-content-secondary"
+                          title={tOr('editTodo', 'Edit')}
+                        >
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </button>
+                        <button
                           onClick={() => deleteTodo(todo.id)}
                           className="p-1 hover:text-red-500 text-mq-content-secondary"
+                          title={t('delete')}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
