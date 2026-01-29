@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Follow-ups**: Implement core "Day" and "Agenda" views, refine "Week" view visuals (reduce grid clutter), and add "Privacy Mode".
 
 ### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Implementation
+
 - **Summary**: Implemented the "Day" and "Agenda" views for the calendar. Created `DayView` for a detailed hourly schedule and `AgendaView` for a chronological list of items. Refactored `CalendarClient` to use these views and added a `FilterPanel` for toggling visibility of units, deadlines, and events.
 - **Files Changed**:
   - `components/calendar/DayView.tsx`: Created detailed day view component.
@@ -203,6 +204,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Follow-ups**: None.
 
 ### Raouf: 2026-01-29 (Australia/Sydney) - Calendar Views Polish & FilterPanel
+
 - **Summary**: Refined "Day" and "Agenda" views implementation with consistent deadline coloring and visual improvements. Polished the FilterPanel component layout.
 - **Files Changed**:
   - `lib/calendar-utils.ts`: Added `getDeadlineColor` helper to standardize coloring logic.
