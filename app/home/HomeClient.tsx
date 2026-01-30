@@ -337,7 +337,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="home-page">
+      <div className="home-page overflow-x-hidden">
         {/* Header */}
         <ScrollReveal>
           <header className="mb-6" role="banner">

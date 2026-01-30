@@ -10,13 +10,14 @@ import { CardSolid } from './HomeCard';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useHydration } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 export default function WeekHeatStrip() {
   const { t } = useTranslation();
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const prefersReducedMotion = useReducedMotion();
 
   const weekData = useMemo(() => {
     if (!isHydrated) return [];
@@ -109,16 +110,31 @@ export default function WeekHeatStrip() {
     return 'bg-mq-primary/60'; // Normal load
   };
 
+  const totalClasses = weekData.reduce((sum, day) => sum + day.classCount, 0);
+  const totalDeadlines = weekData.reduce((sum, day) => sum + day.deadlineCount, 0);
+
   return (
-    <CardSolid className="p-4 mb-6 overflow-hidden">
+    <CardSolid className="p-4 sm:p-5 mb-6 overflow-hidden">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-mq-content-secondary">
+        <h3 className="text-sm font-semibold text-mq-content">
           {t('weekAtAGlance') || 'Week Ahead'}
         </h3>
-        <span className="text-xs text-mq-content-tertiary hidden sm:inline-block">
-          {format(weekData[0]?.date || new Date(), 'MMM d')} -{' '}
-          {format(weekData[6]?.date || new Date(), 'MMM d')}
-        </span>
+        <div className="flex items-center gap-3 text-[11px] text-mq-content-tertiary">
+          <span className="hidden sm:inline-block">
+            {format(weekData[0]?.date || new Date(), 'MMM d')} –{' '}
+            {format(weekData[6]?.date || new Date(), 'MMM d')}
+          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mq-background-secondary text-mq-content-secondary border border-mq-border/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-mq-primary" />
+              {totalClasses} classes
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mq-background-secondary text-mq-content-secondary border border-mq-border/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-mq-accent" />
+              {totalDeadlines} deadlines
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-between items-end h-24 gap-2 sm:gap-4">
@@ -126,10 +142,9 @@ export default function WeekHeatStrip() {
           <Link
             key={i}
             href={`/calendar?date=${format(day.date, 'yyyy-MM-dd')}`}
-            className="flex-1 flex flex-col justify-end h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:outline-none"
+            className="flex-1 flex flex-col justify-end h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none"
             aria-label={`${day.fullDate}: ${day.classCount} classes, ${day.deadlineCount} deadlines`}
           >
-            {/* Tooltip-ish overlay */}
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[150px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
               <p className="font-bold">{day.fullDate}</p>
               <p>{day.classCount} classes</p>
@@ -137,22 +152,41 @@ export default function WeekHeatStrip() {
             </div>
 
             <div className="w-full flex flex-col justify-end flex-grow pb-1">
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: '100%' }}
-                className="w-full flex items-end justify-center"
-              >
-                <div
-                  className={cn(
-                    'w-full rounded-md transition-all duration-300',
-                    getHeight(day.intensity),
-                    getColor(day.intensity, day.isToday),
-                    day.isToday &&
-                      'ring-2 ring-offset-2 ring-mq-primary ring-offset-mq-card-background',
-                  )}
-                  aria-label={`${day.dayShort}: ${day.classCount} classes, ${day.deadlineCount} deadlines`}
-                />
-              </motion.div>
+              {prefersReducedMotion ? (
+                <div className="w-full flex items-end justify-center">
+                  <div
+                    className={cn(
+                      'w-full rounded-md',
+                      getHeight(day.intensity),
+                      getColor(day.intensity, day.isToday),
+                      day.isToday &&
+                        'ring-2 ring-offset-2 ring-mq-primary ring-offset-mq-card-background',
+                    )}
+                    aria-label={`${day.dayShort}: ${day.classCount} classes, ${day.deadlineCount} deadlines`}
+                  />
+                </div>
+              ) : (
+                <div className="w-full flex items-end justify-center">
+                  <motion.div
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    transition={{
+                      duration: 0.4,
+                      ease: 'easeOut',
+                      delay: i * 0.05, // Stagger effect
+                    }}
+                    style={{ originY: 1 }}
+                    className={cn(
+                      'w-full rounded-md',
+                      getHeight(day.intensity),
+                      getColor(day.intensity, day.isToday),
+                      day.isToday &&
+                        'ring-2 ring-offset-2 ring-mq-primary ring-offset-mq-card-background',
+                    )}
+                    aria-label={`${day.dayShort}: ${day.classCount} classes, ${day.deadlineCount} deadlines`}
+                  />
+                </div>
+              )}
             </div>
 
             <p

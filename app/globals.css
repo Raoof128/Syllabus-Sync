@@ -201,7 +201,7 @@
 @import './styles/sidebar.css';
 @import './styles/settings-page.css';
 @import './styles/alabaster-contrast.css';
-@import './styles/liquid-glass.css';
+/* @import './styles/liquid-glass.css'; - Deprecated in favor of solid surfaces */
 
 /* Login Page Readability Fixes */
 .login-page input::placeholder {

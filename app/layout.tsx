@@ -83,144 +83,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="font-sans" suppressHydrationWarning>
         {/* ================================================================
-            ANIMATED MESH BACKGROUND - "Macquarie Fluid Mesh"
-            ================================================================
-            CSS-only animated background with MQ Navy and Red brand colors.
-            Creates slowly drifting gradient blobs that make the liquid glass
-            refraction effect visible and dynamic.
-            
-            WHY HERE (not in ClientLayout):
-            - Renders immediately without JS hydration delay
-            - Prevents flash of unstyled background
-            - Pure CSS = works even with JS disabled
+            LIQUID GLASS EFFECTS REMOVED
+            Replaced with solid surface design system (Phase 0.2)
             ================================================================ */}
-        <div className="mq-mesh-background" aria-hidden="true" />
 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <ClientLayout>{children}</ClientLayout>
-
-        {/* ================================================================
-            SVG FILTERS FOR LIQUID GLASS EFFECTS
-            ================================================================
-            These filters are required by liquid-glass.css and the 
-            LiquidRefractionMap component for organic distortion effects.
-            
-            Filter IDs:
-            - #mq-liquid-refraction: Primary Apple Liquid Glass filter
-            - #mq-liquid-distortion: Legacy filter for backward compatibility
-            - #mq-liquid-subtle: Lighter effect for smaller elements
-            - #mq-glow: Bloom effect for buttons and interactive elements
-            - #mq-security-shield: Navy-tinted security context filter
-            ================================================================ */}
-        <svg
-          width="0"
-          height="0"
-          style={{ position: 'absolute' }}
-          aria-hidden="true"
-          className="liquid-glass-filters"
-        >
-          <defs>
-            {/* ============================================================
-                PRIMARY LIQUID REFRACTION FILTER
-                ============================================================
-                Apple Liquid Glass style using feTurbulence + feDisplacementMap
-                with Gaussian blur softening for organic "liquid" warping.
-                ============================================================ */}
-            <filter
-              id="mq-liquid-refraction"
-              x="-20%"
-              y="-20%"
-              width="140%"
-              height="140%"
-              colorInterpolationFilters="sRGB"
-            >
-              {/* Step 1: Generate organic noise pattern */}
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency="0.012"
-                numOctaves="3"
-                seed="42"
-                stitchTiles="stitch"
-                result="noise"
-              />
-              {/* Step 2: Apply displacement for "liquid" warping */}
-              <feDisplacementMap
-                in="SourceGraphic"
-                in2="noise"
-                scale="35"
-                xChannelSelector="R"
-                yChannelSelector="G"
-                result="displaced"
-              />
-              {/* Step 3: Soften with Gaussian blur for smooth effect */}
-              <feGaussianBlur in="displaced" stdDeviation="2" result="softened" />
-              {/* Step 4: Add subtle specular highlight */}
-              <feFlood floodColor="white" floodOpacity="0.08" result="highlight" />
-              <feComposite in="highlight" in2="softened" operator="atop" result="withHighlight" />
-              <feBlend in="withHighlight" in2="softened" mode="screen" />
-            </filter>
-
-            {/* Legacy distortion filter for backward compatibility */}
-            <filter id="mq-liquid-distortion">
-              <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="2" />
-              <feDisplacementMap in="SourceGraphic" scale="12" />
-            </filter>
-
-            {/* Subtle distortion for smaller elements */}
-            <filter id="mq-liquid-subtle">
-              <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed="3" />
-              <feDisplacementMap in="SourceGraphic" scale="6" />
-            </filter>
-
-            {/* Glow effect for buttons and interactive elements */}
-            <filter id="mq-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* MQ Red glow for hover states */}
-            <filter id="mq-liquid-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-              <feColorMatrix
-                in="blur"
-                type="matrix"
-                values="0.65 0 0 0 0
-                        0.1 0 0 0 0
-                        0.18 0 0 0 0
-                        0 0 0 0.8 0"
-                result="coloredBlur"
-              />
-              <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* Security shield effect - used for settings/security contexts */}
-            <filter id="mq-security-shield">
-              <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="2" seed="7" />
-              <feDisplacementMap in="SourceGraphic" scale="8" />
-            </filter>
-
-            {/* Specular highlight for rim lighting */}
-            <filter id="mq-specular-highlight" x="-10%" y="-10%" width="120%" height="120%">
-              <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="dilated" />
-              <feGaussianBlur in="dilated" stdDeviation="2" result="blurred" />
-              <feFlood floodColor="white" floodOpacity="0.15" result="white" />
-              <feComposite in="white" in2="blurred" operator="in" result="rim" />
-              <feMerge>
-                <feMergeNode in="SourceGraphic" />
-                <feMergeNode in="rim" />
-              </feMerge>
-            </filter>
-          </defs>
-        </svg>
       </body>
     </html>
   );

@@ -1,15 +1,11 @@
 // components/layout/Header.tsx
 // ============================================================================
-// HEADER COMPONENT - APPLE LIQUID GLASS EDITION
+// HEADER COMPONENT - SOLID SURFACE EDITION
 // ============================================================================
-// Premium top bar with "Apple Liquid Glass" effect featuring:
-// - Optical refraction via feTurbulence + feDisplacementMap filters
-// - 25px backdrop-filter blur with saturation boost
-// - Specular highlights via inset box-shadow
+// Premium top bar with "Solid Surface" design featuring:
+// - Clean, opaque background consistent with MQ design system
+// - Sharp border for clear separation
 // - LiveClock (date display) and NotificationSystem
-//
-// The header acts as a floating glass panel over the content, creating
-// visible distortion of the parallax mesh background beneath it.
 //
 // COMPONENTS:
 // - Logo and app title (left)
@@ -218,7 +214,7 @@ const Header = memo(() => {
   return (
     <header
       ref={headerRef}
-      className="h-14 sm:h-16 w-full shrink-0 mq-liquid-glass border-b border-mq-border/50 flex items-center justify-between pl-14 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
+      className="h-14 sm:h-16 w-full shrink-0 bg-mq-background border-b border-mq-border flex items-center justify-between pl-20 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
     >
       {/* Left side - Logo and title (far left) */}
       <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0">
@@ -479,7 +475,6 @@ const Header = memo(() => {
           </button>
         )}
 
-        {/* Profile */}
         {isClient && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -527,7 +522,7 @@ const Header = memo(() => {
               side="bottom"
               collisionPadding={16}
               collisionBoundary={collisionBoundary ?? headerRef.current ?? undefined}
-              alignOffset={0}
+              alignOffset={-8}
               avoidCollisions
               className="w-48 max-w-[90vw] border-mq-border shadow-mq-lg"
             >
@@ -540,16 +535,12 @@ const Header = memo(() => {
               <DropdownMenuItem
                 onClick={async () => {
                   try {
-                    // SECURITY: Reset all stores and clear client storage before signing out
-                    // This prevents sensitive data from persisting after logout
-                    // and ensures fresh data is loaded on next login
                     await resetAllStores();
                     await clearAllClientStorage();
                     await apiRequest('/api/auth/signout', { method: 'POST', noRetry: true });
                     setUser(null);
                     router.push('/login');
                   } catch {
-                    // Silent fail - redirect to login anyway
                     router.push('/login');
                   }
                 }}

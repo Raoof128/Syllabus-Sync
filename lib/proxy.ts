@@ -8,7 +8,17 @@ import { setCSRFCookie } from '@/lib/security/csrf';
  * Enforces security headers, refreshes sessions, and protects routes.
  */
 export async function proxy(request: NextRequest) {
-  // Get appropriate CSP based on environment
+  const path = request.nextUrl.pathname;
+
+  if (path === '/@vite/client') {
+    return new NextResponse('', {
+      status: 204,
+      headers: {
+        'Content-Type': 'application/javascript',
+      },
+    });
+  }
+
   const cspHeader = getCSP();
 
   let response = NextResponse.next({
@@ -127,8 +137,6 @@ export async function proxy(request: NextRequest) {
   }
 
   // 4. Route Protection
-  const path = request.nextUrl.pathname;
-
   // Protected Pages (temporarily disabled for testing)
   const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const publicRoutes = ['/test-weather'];

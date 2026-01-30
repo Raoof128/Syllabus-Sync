@@ -24,7 +24,6 @@ import { useHydration } from '@/lib/hooks';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { MagicCard } from '@/components/ui/MagicCard';
 // Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
 import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
@@ -781,8 +780,8 @@ export default function CalendarClient() {
           {view === 'week' && (
             // Apple/Google Calendar Style Weekly View
             <ScrollReveal delay={0.1}>
-              <MagicCard isLiquidEnhanced>
-                <div className="mq-magic-card-content p-0 calendar-main-panel bg-mq-card-background border border-mq-border overflow-visible">
+              <div className="bg-mq-card-background border border-mq-border rounded-mq-xl shadow-sm overflow-hidden">
+                <div className="p-0 calendar-main-panel overflow-visible">
                   <div className="overflow-x-auto">
                     {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
                     <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md min-w-[800px] md:min-w-0">
@@ -1820,7 +1819,7 @@ export default function CalendarClient() {
                     </div>
                   </div>
                 </div>
-              </MagicCard>
+              </div>
             </ScrollReveal>
           )}
 

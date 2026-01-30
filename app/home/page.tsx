@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <section className="container mx-auto p-6 max-w-7xl" aria-label="Dashboard overview">
+    <section className="container mx-auto p-4 sm:p-6 max-w-7xl" aria-label="Dashboard overview">
       <HomeClient initialUser={null} />
     </section>
   );

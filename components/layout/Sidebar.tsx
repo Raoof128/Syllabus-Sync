@@ -1,30 +1,22 @@
 // components/layout/Sidebar.tsx
 // ============================================================================
-// SIDEBAR COMPONENT - APPLE LIQUID GLASS EDITION
+// SIDEBAR COMPONENT - SOLID SURFACE EDITION
 // ============================================================================
-// Premium expandable sidebar with "Apple Liquid Glass" effect featuring:
-// - Optical refraction via feTurbulence + feDisplacementMap filters
-// - 25px backdrop-filter blur with saturation boost
-// - Specular highlights via inset box-shadow
-// - GPU-accelerated animations (will-change: backdrop-filter)
-//
-// The sidebar acts as a "heavy glass pane" sliding over the stable map grid,
-// creating visible distortion of the parallax mesh background.
+// Premium expandable sidebar with "Solid Surface" design featuring:
+// - Clean, opaque backgrounds consistent with MQ design system
+// - Sharp borders and consistent shadows
+// - Performance-first animations
 //
 // FEATURES:
-// - Desktop: Hover to expand with heavy, fluid slide animation
+// - Desktop: Hover to expand with fluid slide animation
 // - Mobile: Hamburger button toggles slide-out drawer with overlay
-// - Liquid Glass: Backdrop blur, refraction filter, layered shadows
-// - Permanent Shadow: Always-visible depth shadow on trigger and panel
+// - Solid Surface: Opaque backgrounds, high contrast borders
 // - Accessibility: Focus trap, keyboard navigation, ARIA attributes
-// - Performance: GPU-accelerated animations, respects prefers-reduced-motion
 //
-// CSS CLASSES (defined in sidebar.css + liquid-glass.css):
+// CSS CLASSES:
 // - .sidebar-shell           → Main container, detects :hover
 // - .sidebar-trigger         → Always-visible 48px strip with hamburger
-// - .sidebar-panel           → Sliding content panel with liquid glass
-// - .mq-liquid-glass         → Apple Liquid Glass (25px blur + refraction)
-// - .mq-liquid-glass-subtle  → Lighter glass for trigger strip
+// - .sidebar-panel           → Sliding content panel
 // ============================================================================
 'use client';
 
@@ -277,7 +269,7 @@ const Sidebar = memo(() => {
             ---------------------------------------------------------------------- */}
         <button
           type="button"
-          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger mq-liquid-glass-subtle"
+          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
           aria-label={pinnedOpen ? t('closeMenu') : t('openMenu')}
           aria-pressed={pinnedOpen}
           aria-expanded={pinnedOpen}
@@ -307,7 +299,7 @@ const Sidebar = memo(() => {
           aria-modal={mobileMenuOpen ? 'true' : undefined}
           aria-label={t('mainNavigation')}
           className={cn(
-            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel mq-liquid-glass',
+            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background',
             mobileMenuOpen && 'sidebar-panel-open',
           )}
         >
@@ -379,8 +371,8 @@ const Sidebar = memo(() => {
                   className={cn(
                     'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item',
                     isActive
-                      ? 'bg-[#7A0A21] text-white shadow-mq-sm border border-white/10 border-l-4 border-white/80 pl-2 pr-3 font-semibold'
-                      : 'text-mq-content-secondary hover:text-white hover:bg-mq-red hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
+                      ? 'bg-mq-primary text-white shadow-mq-sm border border-white/10 border-l-4 border-white/80 pl-2 pr-3 font-semibold'
+                      : 'text-mq-content-secondary hover:text-white hover:bg-mq-primary hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >

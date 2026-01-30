@@ -178,9 +178,9 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   if (isAuthenticated === null) {
     return (
       <ThemeProvider>
-        <div className="flex min-h-screen bg-mq-background">
+        <div className="flex h-screen h-[100dvh] overflow-hidden bg-mq-background layout-shell">
           <Sidebar />
-          <div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12">
+          <div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12 layout-main relative">
             <Header />
             <main id="main-content" className="flex-1" role="main">
               <div className="min-h-[60vh] flex items-center justify-center">
@@ -203,48 +203,40 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Don't render layout for auth routes
-  if (isAuthRoute) {
+  // Authenticated state
+  if (!isAuthenticated) {
     return (
       <ThemeProvider>
-        <ErrorBoundary>{children}</ErrorBoundary>
-        <Toaster />
+        <div className="flex min-h-screen bg-mq-background">
+          <main className="flex-1" role="main">
+            {children}
+          </main>
+          <Toaster />
+        </div>
       </ThemeProvider>
     );
   }
 
-  // Render full layout for authenticated routes
   return (
     <ThemeProvider>
-      {/* Level-up notifications for gamification */}
       <LevelUpNotificationProvider locale={language}>
-        {/* Global SVG filters for liquid glass effects - REMOVED (Redundant: using static filters from layout.tsx) */}
-        {/* Mesh background now rendered in layout.tsx as CSS-only for performance */}
-
-        {/* Skip to main content link for accessibility */}
         <a href="#main-content" className="skip-link">
           {t('skipToContent')}
         </a>
-        <div className="layout-shell flex min-h-screen flex-col">
-          <div className="flex flex-1">
-            {/* Sidebar */}
-            <Sidebar />
-
-            {/* Main Content - offset by sidebar trigger width (48px = w-12) on desktop */}
-            <div className="layout-main flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12">
-              <Header />
-              <main id="main-content" className="flex-1" role="main" aria-label={t('mainContent')}>
-                <ErrorBoundary>{children}</ErrorBoundary>
-              </main>
-            </div>
+        <div className="flex h-screen h-[100dvh] overflow-hidden bg-mq-background layout-shell">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12 layout-main relative">
+            <Header />
+            <main id="main-content" className="flex-1" role="main" aria-label={t('mainContent')}>
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </main>
+            <footer role="contentinfo" className="sr-only" aria-label={t('footer')}>
+              <p>{t('copyright', { year: new Date().getFullYear() })}</p>
+            </footer>
+            <OfflineIndicator />
+            <Toaster />
           </div>
-          {/* Footer landmark for accessibility - screen reader only */}
-          <footer role="contentinfo" className="sr-only" aria-label={t('footer')}>
-            <p>{t('copyright', { year: new Date().getFullYear() })}</p>
-          </footer>
         </div>
-        <Toaster />
-        <OfflineIndicator />
       </LevelUpNotificationProvider>
     </ThemeProvider>
   );

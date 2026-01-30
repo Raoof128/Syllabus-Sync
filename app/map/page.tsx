@@ -45,7 +45,7 @@ function MapSkeleton() {
       {/* Map skeleton with fixed dimensions to prevent CLS */}
       <div className="bg-mq-card-background rounded-mq-lg border border-mq-border p-4 mb-6">
         <div className="h-8 bg-mq-background-secondary rounded-mq w-48 mb-4" />
-        <div className="h-96 md:h-[500px] bg-mq-background-secondary rounded-mq-lg flex items-center justify-center">
+        <div className="h-96 md:h-[500px] max-h-[70vh] bg-mq-background-secondary rounded-mq-lg flex items-center justify-center">
           <div className="text-mq-content-tertiary">Loading map...</div>
         </div>
       </div>

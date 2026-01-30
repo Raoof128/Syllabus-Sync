@@ -3,6 +3,22 @@
 ## Current Development Session (January 22-30, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Solid Surface Migration & QA
+- **Status:** ✅ Complete - Migrated core layout to Solid Surface design and resolved linting/formatting issues.
+- **Scope:** Layout Refactor, QA.
+- **Summary:** Removed all Liquid Glass effects from `Sidebar`, `Header`, and global `layout.tsx`. Implemented `CardSolid` and `CardMuted` variants across the Home route. Improved `WeekHeatStrip` with staggered animations and reduced-motion support. Fixed `@vite/client` 404 errors in proxy. Resolved linting warnings and verified build stability with `npm run check`.
+- **Files:** components/layout/Sidebar.tsx; components/layout/Header.tsx; app/layout.tsx; app/home/HomeClient.tsx; components/home/WeekHeatStrip.tsx; lib/proxy.ts; app/calendar/CalendarClient.tsx.
+- **Verification:** `npm run check` passed successfully.
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-30 (Australia/Sydney) - Home Header Polish & Devtools Noise Fix
+- **Status:** ✅ Complete - Header/profile polish and devtools noise reduction.
+- **Scope:** Home UX, Proxy, Week Heat-Strip.
+- **Summary:** Adjusted the profile dropdown alignment so the menu no longer opens off-screen on the right edge while preserving Radix collision handling. Routed `@vite/client` requests through the Next 16 `proxy.ts` layer to return a harmless 204 response, eliminating persistent 404 noise in Chrome DevTools. Refined the Home Week Heat-Strip card with clearer header badges (total classes/deadlines), stronger focus outlines, and proper reduced-motion behaviour that falls back to static bars when animations are disabled.
+- **Files:** lib/proxy.ts; components/layout/Header.tsx; components/home/WeekHeatStrip.tsx.
+- **Verification:** `npm run check` (secrets, format, typecheck, lint, tests, build) - all passing.
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 0-4)
 - **Status:** ✅ Complete - Home route transformed to designed product.
 - **Scope:** Layout Refactor & Design Overhaul.

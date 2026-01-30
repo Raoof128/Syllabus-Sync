@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-30 (Australia/Sydney)
+Scope: UI - Solid Surface Migration & QA
+Summary: Migrated core layout to Solid Surface design and resolved linting/formatting issues.
+- **UI/UX:** Removed all Liquid Glass effects from `Sidebar`, `Header`, and global `layout.tsx`.
+- **UI/UX:** Implemented `CardSolid` and `CardMuted` variants across the Home route.
+- **UI/UX:** Improved `WeekHeatStrip` with staggered animations and reduced-motion support.
+- **QA/Fix:** Fixed `@vite/client` 404 errors in proxy.
+- **QA/Fix:** Resolved linting warnings and verified build stability with `npm run check`.
+- **Verification:** `npm run check` passed successfully.
+Files: components/layout/Sidebar.tsx; components/layout/Header.tsx; app/layout.tsx; app/home/HomeClient.tsx; components/home/WeekHeatStrip.tsx; lib/proxy.ts; app/calendar/CalendarClient.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-30 (Australia/Sydney)
 Scope: Home - Heat-Strip Accessibility Polish
 Summary: Improved Week Heat-Strip accessibility and screen reader support.
 - **UX/Accessibility:** Added descriptive `aria-label` metadata to each Heat-Strip day link so assistive technologies announce the full date and class/deadline counts instead of a single-letter label.
