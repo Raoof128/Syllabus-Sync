@@ -15,6 +15,7 @@ import {
   CheckSquare,
   Clock,
   Edit2,
+  Bell,
 } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -51,6 +52,9 @@ interface CalendarWidgetsProps {
   onDeleteExam: (exam: Deadline) => void;
   onEditTodo: (todo: Todo) => void;
   onAddTodo?: () => void;
+  onOpenTodoDetail?: (todo: Todo) => void;
+  onDeleteTodo?: (todo: Todo) => void;
+  onNotifyTodo?: (todo: Todo) => void;
 }
 
 export default function CalendarWidgets({
@@ -72,6 +76,9 @@ export default function CalendarWidgets({
   onDeleteExam,
   onEditTodo,
   onAddTodo,
+  onOpenTodoDetail,
+  onDeleteTodo,
+  onNotifyTodo,
 }: CalendarWidgetsProps) {
   const { t, language } = useTranslation();
   const tOr = (key: TranslationKey | string, fallback: string) => {
@@ -245,12 +252,12 @@ export default function CalendarWidgets({
                         <div
                           key={assignment.id}
                           className={cn(
-                            'group flex items-center gap-3 p-2 rounded-md border border-l-[4px] border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
                             assignment.completed && 'opacity-60 grayscale',
                             isOverdue && 'bg-red-500/5',
                             isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                           )}
-                          style={{ borderLeftColor: deadlineColor }}
+                          style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
                           onClick={() => onOpenAssignmentDetail(assignment)}
                           onKeyDown={(e) =>
                             handleKeyDown(e, () => onOpenAssignmentDetail(assignment))
@@ -278,7 +285,7 @@ export default function CalendarWidgets({
                             <div className="flex items-center justify-between">
                               <h4
                                 className={cn(
-                                  'font-medium text-xs truncate',
+                                  'font-medium text-sm truncate',
                                   assignment.completed &&
                                     'line-through decoration-mq-content-tertiary',
                                 )}
@@ -295,7 +302,7 @@ export default function CalendarWidgets({
                                 {t(`priority_${assignment.priority}` as TranslationKey)}
                               </Badge>
                             </div>
-                            <p className="text-[10px] text-mq-content-secondary truncate mt-0.5">
+                            <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
                               {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
                             </p>
                           </div>
@@ -367,11 +374,11 @@ export default function CalendarWidgets({
                         <div
                           key={exam.id}
                           className={cn(
-                            'group flex items-center gap-3 p-2 rounded-md border border-l-[4px] border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
                             exam.completed && 'opacity-60 grayscale',
                             isOverdue && 'bg-red-500/5',
                           )}
-                          style={{ borderLeftColor: deadlineColor }}
+                          style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
                           onClick={() => onOpenExamDetail(exam)}
                           onKeyDown={(e) => handleKeyDown(e, () => onOpenExamDetail(exam))}
                           role="button"
@@ -394,15 +401,26 @@ export default function CalendarWidgets({
                             )}
                           </button>
                           <div className="flex-1 min-w-0">
-                            <h4
-                              className={cn(
-                                'font-medium text-xs truncate',
-                                exam.completed && 'line-through decoration-mq-content-tertiary',
-                              )}
-                            >
-                              {exam.title}
-                            </h4>
-                            <p className="text-[10px] text-mq-content-secondary truncate mt-0.5">
+                            <div className="flex items-center justify-between">
+                              <h4
+                                className={cn(
+                                  'font-medium text-sm truncate',
+                                  exam.completed && 'line-through decoration-mq-content-tertiary',
+                                )}
+                              >
+                                {exam.title}
+                              </h4>
+                              <Badge
+                                className={cn(
+                                  PRIORITY_COLORS[exam.priority],
+                                  'ml-2 text-[10px] h-4 px-1',
+                                )}
+                                variant="neutral"
+                              >
+                                {t(`priority_${exam.priority}` as TranslationKey)}
+                              </Badge>
+                            </div>
+                            <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
                               {exam.unitCode} • {formatMonthDayTime(due.toDate())}
                             </p>
                           </div>
@@ -480,21 +498,18 @@ export default function CalendarWidgets({
                     <div
                       key={unit.id}
                       className={cn(
-                        'group flex items-center gap-3 p-2 rounded-md border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface',
+                        'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
                         highlightedUnitId === unit.id && 'border-mq-primary bg-mq-primary/5',
                       )}
+                      style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
                       onClick={() => onOpenUnitDetail(unit)}
                       onKeyDown={(e) => handleKeyDown(e, () => onOpenUnitDetail(unit))}
                       role="button"
                       tabIndex={0}
                     >
-                      <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: unit.color }}
-                      />
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-xs truncate">{unit.code}</h4>
-                        <p className="text-[10px] text-mq-content-secondary truncate">
+                        <h4 className="font-medium text-sm truncate">{unit.code}</h4>
+                        <p className="text-[11px] text-mq-content-secondary truncate">
                           {unit.name}
                         </p>
                       </div>
@@ -546,34 +561,52 @@ export default function CalendarWidgets({
             </CardHeader>
             <CardContent className="pt-0">
               <div className="space-y-2 pr-1">
-                {events.slice(0, 5).map((event) => (
-                  <div
-                    key={event.id}
-                    className="group flex items-center gap-3 p-2 rounded-md border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface"
-                    onClick={() => onOpenEventDetail(event)}
-                    onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-xs truncate">{event.title}</h4>
-                      <p className="text-[10px] text-mq-content-secondary truncate">
-                        {event.time} • {event.location}
-                      </p>
-                    </div>
-                    <ItemActionButtons
-                      itemType="event"
-                      itemId={event.id}
-                      itemTitle={event.title}
-                      dateTime={event.startAt || event.date}
-                      onEdit={() => onEditEvent(event)}
-                      onDelete={() => onDeleteEvent(event)}
-                      variant="compact"
-                      stopPropagation
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
+                {events.length === 0 ? (
+                  <div className="text-center py-6 text-mq-content-tertiary">
+                    <p className="text-xs">{t('noEventsYet' as TranslationKey)}</p>
                   </div>
-                ))}
+                ) : (
+                  events.slice(0, 5).map((event) => {
+                    // Get category color
+                    const categoryColors: Record<string, string> = {
+                      Career: '#3B82F6',
+                      Social: '#8B5CF6',
+                      Academic: '#10B981',
+                      'Free Food': '#F59E0B',
+                    };
+                    const eventColor = event.color || categoryColors[event.category] || '#A6192E';
+
+                    return (
+                      <div
+                        key={event.id}
+                        className="group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm"
+                        style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
+                        onClick={() => onOpenEventDetail(event)}
+                        onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                          <p className="text-[11px] text-mq-content-secondary truncate">
+                            {event.time} • {event.location}
+                          </p>
+                        </div>
+                        <ItemActionButtons
+                          itemType="event"
+                          itemId={event.id}
+                          itemTitle={event.title}
+                          dateTime={event.startAt || event.date}
+                          onEdit={() => onEditEvent(event)}
+                          onDelete={() => onDeleteEvent(event)}
+                          variant="compact"
+                          stopPropagation
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardContent>
           </Card>
@@ -595,7 +628,7 @@ export default function CalendarWidgets({
                 </span>
                 <div className="flex items-center gap-2">
                   <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                    {pendingTodos.length}
+                    {pendingTodos.length} {t('pending')}
                   </Badge>
                   <Button
                     size="icon"
@@ -616,54 +649,120 @@ export default function CalendarWidgets({
                     <p className="text-xs">{t('noTodos' as TranslationKey)}</p>
                   </div>
                 ) : (
-                  pendingTodos.map((todo) => (
-                    <div
-                      key={todo.id}
-                      className="group flex items-center gap-3 p-2 rounded-md border border-mq-border bg-mq-background-secondary transition-all hover:bg-mq-surface"
-                    >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleTodoComplete(todo.id);
-                        }}
-                        className="text-mq-content-secondary hover:text-mq-primary transition-colors flex-shrink-0"
-                      >
-                        <Circle className="h-4 w-4" />
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <h4
-                          className={cn(
-                            'font-medium text-xs break-words',
-                            todo.completed && 'line-through decoration-mq-content-tertiary',
-                          )}
-                        >
-                          {todo.title}
-                        </h4>
-                        {todo.dueDate && (
-                          <p className="text-[10px] text-mq-content-secondary flex items-center gap-1 mt-0.5">
-                            <Clock className="h-3 w-3" />
-                            {formatMonthDayTime(new Date(todo.dueDate))}
-                          </p>
+                  pendingTodos.map((todo) => {
+                    // Priority-based left border color
+                    const priorityColors: Record<string, string> = {
+                      High: '#EF4444',
+                      Medium: '#F59E0B',
+                      Low: '#10B981',
+                    };
+                    const todoColor = priorityColors[todo.priority] || '#6B7280';
+                    const isOverdue = todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed;
+
+                    return (
+                      <div
+                        key={todo.id}
+                        className={cn(
+                          'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                          todo.completed && 'opacity-60 grayscale',
+                          isOverdue && 'bg-red-500/5',
                         )}
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        style={{ borderLeftColor: todoColor, borderLeftWidth: '4px' }}
+                        onClick={() => onOpenTodoDetail?.(todo)}
+                        onKeyDown={(e) => handleKeyDown(e, () => onOpenTodoDetail?.(todo))}
+                        role="button"
+                        tabIndex={0}
+                      >
                         <button
-                          onClick={() => onEditTodo(todo)}
-                          className="p-1 hover:text-mq-primary text-mq-content-secondary"
-                          title={tOr('editTodo', 'Edit')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTodoComplete(todo.id);
+                          }}
+                          className={cn(
+                            'text-mq-content-secondary hover:text-mq-primary transition-colors shrink-0',
+                            todo.completed && 'text-green-600',
+                          )}
+                          aria-label={todo.completed ? tOr('markIncomplete', 'Mark incomplete') : tOr('markComplete', 'Mark complete')}
                         >
-                          <Edit2 className="h-3.5 w-3.5" />
+                          {todo.completed ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                          ) : (
+                            <Circle className="h-4 w-4" />
+                          )}
                         </button>
-                        <button
-                          onClick={() => deleteTodo(todo.id)}
-                          className="p-1 hover:text-red-500 text-mq-content-secondary"
-                          title={t('delete')}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4
+                              className={cn(
+                                'font-medium text-sm truncate',
+                                todo.completed && 'line-through decoration-mq-content-tertiary',
+                              )}
+                            >
+                              {todo.title}
+                            </h4>
+                            <Badge
+                              className={cn(
+                                PRIORITY_COLORS[todo.priority],
+                                'ml-2 text-[10px] h-4 px-1',
+                              )}
+                              variant="neutral"
+                            >
+                              {t(`priority_${todo.priority}` as TranslationKey)}
+                            </Badge>
+                          </div>
+                          {todo.dueDate && (
+                            <p className={cn(
+                              'text-[11px] text-mq-content-secondary flex items-center gap-1 mt-0.5',
+                              isOverdue && 'text-red-500 font-medium',
+                            )}>
+                              <Clock className="h-3 w-3" />
+                              {`${isOverdue ? `${tOr('overdue', 'Overdue')} • ` : ''}${formatMonthDayTime(new Date(todo.dueDate))}`}
+                            </p>
+                          )}
+                        </div>
+                        {/* Action buttons - Bell, Edit, Delete (no Navigate for Todos) */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onNotifyTodo?.(todo);
+                            }}
+                            className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-amber-500"
+                            title={tOr('setReminder', 'Set reminder')}
+                            aria-label={tOr('setReminder', 'Set reminder')}
+                          >
+                            <Bell className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditTodo(todo);
+                            }}
+                            className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
+                            title={tOr('editTodo', 'Edit')}
+                            aria-label={tOr('editTodo', 'Edit todo')}
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onDeleteTodo) {
+                                onDeleteTodo(todo);
+                              } else {
+                                deleteTodo(todo.id);
+                              }
+                            }}
+                            className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded transition-colors text-mq-content-secondary hover:text-red-500"
+                            title={t('delete')}
+                            aria-label={t('delete')}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </CardContent>

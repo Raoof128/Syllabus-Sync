@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ChevronLeft, ChevronRight, Filter, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/lib/hooks/useTranslation';
@@ -15,7 +15,6 @@ interface CalendarHeaderProps {
   onViewChange: (view: CalendarView) => void;
   onDateChange: (date: Date) => void;
   onToday: () => void;
-  onNow: () => void;
   onToggleFilters: () => void;
   isFiltersOpen: boolean;
 }
@@ -26,7 +25,6 @@ export default function CalendarHeader({
   onViewChange,
   onDateChange,
   onToday,
-  onNow,
   onToggleFilters,
   isFiltersOpen,
 }: CalendarHeaderProps) {
@@ -127,12 +125,7 @@ export default function CalendarHeader({
 
           <div className="h-6 w-px bg-mq-border mx-1" />
 
-          {/* Actions */}
-          <Button variant="outline" size="sm" className="gap-2" onClick={onNow}>
-            <Clock className="h-4 w-4 text-mq-primary" />
-            <span className="hidden sm:inline">Now</span>
-          </Button>
-
+          {/* Filters button only - "Now" button removed per user request */}
           <Button
             variant={isFiltersOpen ? 'secondary' : 'outline'}
             size="sm"

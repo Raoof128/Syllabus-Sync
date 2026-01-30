@@ -1116,6 +1116,78 @@ export const PROGRAM_LABELS: Record<MQProgram, string> = {
   'global-mba': 'Global MBA',
 };
 
+// Program-specific visual styles for legend and All-Day items
+// Uses distinct colors, borders, and icon patterns for clear differentiation
+export const PROGRAM_STYLES: Record<
+  MQProgram,
+  {
+    bg: string;
+    bgLight: string;
+    border: string;
+    text: string;
+    icon: string; // Emoji or text prefix for additional differentiation
+    pattern: string; // CSS pattern class for visual distinction
+  }
+> = {
+  general: {
+    bg: 'bg-blue-600',
+    bgLight: 'bg-blue-100 dark:bg-blue-900/30',
+    border: 'border-blue-600',
+    text: 'text-blue-700 dark:text-blue-300',
+    icon: '🎓',
+    pattern: '', // Solid
+  },
+  'business-school': {
+    bg: 'bg-purple-600',
+    bgLight: 'bg-purple-100 dark:bg-purple-900/30',
+    border: 'border-purple-600',
+    text: 'text-purple-700 dark:text-purple-300',
+    icon: '💼',
+    pattern: 'bg-stripes-purple', // Striped pattern
+  },
+  college: {
+    bg: 'bg-amber-600',
+    bgLight: 'bg-amber-100 dark:bg-amber-900/30',
+    border: 'border-amber-600',
+    text: 'text-amber-700 dark:text-amber-300',
+    icon: '📚',
+    pattern: 'bg-dots-amber', // Dotted pattern
+  },
+  'global-mba': {
+    bg: 'bg-emerald-600',
+    bgLight: 'bg-emerald-100 dark:bg-emerald-900/30',
+    border: 'border-emerald-600',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    icon: '🌐',
+    pattern: 'border-dashed', // Dashed border
+  },
+};
+
+// Get all unique programs that have key dates
+export function getActiveProgramsForDateRange(startDate: Date, endDate: Date): MQProgram[] {
+  const programs = new Set<MQProgram>();
+  mqKeyDates.forEach((keyDate) => {
+    const kd = new Date(keyDate.date);
+    kd.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
+
+    if (kd >= start && kd <= end) {
+      programs.add(keyDate.program);
+    }
+    if (keyDate.endDate) {
+      const endKd = new Date(keyDate.endDate);
+      endKd.setHours(0, 0, 0, 0);
+      if ((kd <= end && endKd >= start)) {
+        programs.add(keyDate.program);
+      }
+    }
+  });
+  return Array.from(programs);
+}
+
 // Get MQ key dates for a specific date (includes date ranges)
 export function getMQKeyDatesForDay(date: Date): MQKeyDate[] {
   return mqKeyDates.filter((keyDate) => {

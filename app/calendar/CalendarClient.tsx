@@ -25,13 +25,15 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 // Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
-import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
+import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES, PROGRAM_LABELS } from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
+import { toastUtils } from '@/lib/utils/toast';
 import { cn } from '@/lib/utils';
 import CalendarHeader, { CalendarView } from '@/components/calendar/CalendarHeader';
 import CalendarSidebar from '@/components/calendar/CalendarSidebar';
 import CalendarWidgets from '@/components/calendar/CalendarWidgets';
+import ProgramLegend from '@/components/calendar/ProgramLegend';
 import DayView from '@/components/calendar/DayView';
 import AgendaView from '@/components/calendar/AgendaView';
 import FilterPanel, { CalendarFilters } from '@/components/calendar/FilterPanel';
@@ -71,6 +73,10 @@ const ExamDetailPanel = dynamic(() => import('@/components/exams/ExamDetailPanel
 });
 
 const EventDetailPanel = dynamic(() => import('@/components/events/EventDetailPanel'), {
+  loading: () => null,
+});
+
+const TodoDetailPanel = dynamic(() => import('@/components/calendar/TodoDetailPanel'), {
   loading: () => null,
 });
 
@@ -192,6 +198,10 @@ export default function CalendarClient() {
   const [eventDetailOpen, setEventDetailOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
+  // Todo detail panel state
+  const [todoDetailOpen, setTodoDetailOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
   const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
 
@@ -210,7 +220,7 @@ export default function CalendarClient() {
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
   const deadlineRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-  // Handle highlighted deadline side effects (scroll + highlight + auto-clear URL + show detail panel)
+  // Handle highlighted deadline side effects (scroll + show detail panel)
   useEffect(() => {
     if (!highlightedDeadlineId) {
       return;
@@ -239,37 +249,48 @@ export default function CalendarClient() {
         setSelectedAssignment(highlightedDeadline);
         setAssignmentDetailOpen(true);
       }
-    }, 300);
 
-    // Clear highlight and URL parameter after 5 seconds
-    const clearTimer = window.setTimeout(() => {
+      // Clear the URL parameter after capturing state (panel will stay open)
       const url = new URL(window.location.href);
       url.searchParams.delete('highlightDeadline');
       window.history.replaceState({}, '', url.toString());
-    }, 5000);
+    }, 300);
 
     return () => {
       clearTimeout(scrollTimer);
-      clearTimeout(clearTimer);
     };
   }, [highlightedDeadlineId, deadlines]);
-  const effectiveSelectedUnit = highlightedUnit ?? selectedUnit;
-  const effectiveUnitDetailOpen = unitDetailOpen || Boolean(highlightedUnit);
+
+  // Track if we've already opened the unit panel for this highlight (to prevent re-opening)
+  const processedUnitHighlightRef = useRef<string | null>(null);
+
+  // Handle highlighted unit - open the detail panel when a unit is highlighted via URL
+  useEffect(() => {
+    if (highlightedUnitId && highlightedUnit && processedUnitHighlightRef.current !== highlightedUnitId) {
+      processedUnitHighlightRef.current = highlightedUnitId;
+
+      // Use a microtask to avoid the lint warning about setState in effect
+      queueMicrotask(() => {
+        setSelectedUnit(highlightedUnit);
+        setUnitDetailOpen(true);
+
+        // Clear the URL parameter immediately (we've captured the state)
+        const url = new URL(window.location.href);
+        url.searchParams.delete('highlightUnit');
+        window.history.replaceState({}, '', url.toString());
+      });
+    }
+  }, [highlightedUnitId, highlightedUnit]);
+
+  // Use selectedUnit for the panel (no longer depends on URL)
+  const effectiveSelectedUnit = selectedUnit;
+  const effectiveUnitDetailOpen = unitDetailOpen;
 
   const handleUnitDetailOpenChange = useCallback(
     (open: boolean) => {
-      if (!open) {
-        setUnitDetailOpen(false);
-        if (highlightedUnitId) {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('highlightUnit');
-          window.history.replaceState({}, '', url.toString());
-        }
-        return;
-      }
-      setUnitDetailOpen(true);
+      setUnitDetailOpen(open);
     },
-    [highlightedUnitId],
+    [],
   );
 
   // Highlighted widget derived from URL query parameter (e.g., "units" for My Units widget)
@@ -298,7 +319,7 @@ export default function CalendarClient() {
     };
   }, [highlightedWidget]);
 
-  // Handle highlighted unit side effects (scroll + auto-clear URL)
+  // Scroll to units widget when highlighted via URL (URL clearing is handled in the panel open effect)
   useEffect(() => {
     if (!highlightedUnitId) return;
 
@@ -306,15 +327,8 @@ export default function CalendarClient() {
       unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 
-    const clearTimer = window.setTimeout(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightUnit');
-      window.history.replaceState({}, '', url.toString());
-    }, 3000);
-
     return () => {
       clearTimeout(scrollTimer);
-      clearTimeout(clearTimer);
     };
   }, [highlightedUnitId]);
 
@@ -630,21 +644,6 @@ export default function CalendarClient() {
 
   const handleToggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
 
-  const handleNowClick = () => {
-    // Scroll to current time logic
-    const now = new Date();
-    const hours = now.getHours();
-    if (hours < 6) return;
-
-    // Simple heuristic scroll for now
-    const scrollContainer = document.querySelector('.calendar-main-panel .overflow-auto');
-    if (scrollContainer) {
-      const rowHeight = 48; // aprox
-      const scrollPos = (hours - 6) * rowHeight;
-      scrollContainer.scrollTo({ top: scrollPos, behavior: 'smooth' });
-    }
-  };
-
   const handleDateChange = (date: Date) => {
     setCurrentWeekStart(dayjs(date).startOf('isoWeek').toDate());
   };
@@ -708,6 +707,29 @@ export default function CalendarClient() {
     }
   };
 
+  // Todo handlers
+  const handleDeleteTodo = (todo: Todo) => {
+    setTodoToDelete({ id: todo.id, title: todo.title });
+    setTodoDeleteConfirmOpen(true);
+  };
+
+  const handleNotifyTodo = (todo: Todo) => {
+    // Schedule a reminder for this todo
+    if (todo.dueDate) {
+      // Use toast to confirm reminder was set
+      const dueDate = new Date(todo.dueDate);
+      toastUtils.success(
+        t('reminderSet' as TranslationKey) || 'Reminder Set',
+        `${todo.title} - ${dueDate.toLocaleDateString()}`,
+      );
+    } else {
+      toastUtils.info(
+        t('noDateForReminder' as TranslationKey) || 'No Due Date',
+        t('todoNeedsDueDate' as TranslationKey) || 'Add a due date to set a reminder',
+      );
+    }
+  };
+
   // Get building info for a deadline (either from deadline itself or from its unit)
   // const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
   //   // First check if deadline has its own building (for exams)
@@ -754,7 +776,6 @@ export default function CalendarClient() {
         onViewChange={handleViewChange}
         onDateChange={handleDateChange}
         onToday={goToToday}
-        onNow={handleNowClick}
         onToggleFilters={handleToggleFilters}
         isFiltersOpen={isFiltersOpen}
       />
@@ -766,7 +787,10 @@ export default function CalendarClient() {
         onFilterChange={setFilters}
       />
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-6">
+      {/* Program Legend - helps users understand All-Day items by program/stream */}
+      <ProgramLegend className="mt-4" />
+
+      <div className="flex flex-col lg:flex-row gap-6 mt-4">
         {/* Main Calendar Area */}
         <div className="flex-1 min-w-0">
           {!hasHydrated && (
@@ -966,11 +990,11 @@ export default function CalendarClient() {
 
                           return (
                             <div
-                              className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border bg-mq-background-secondary"
+                              className="grid grid-cols-[60px_repeat(7,1fr)] border-b-2 border-mq-border bg-mq-background-secondary/50"
                               role="row"
                             >
                               {/* Label column */}
-                              <div className="p-2 text-xs text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end">
+                              <div className="p-2 text-xs font-medium text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end min-h-[80px]">
                                 {t('calendarAllDay')}
                               </div>
                               {/* Full-day events for each day */}
@@ -986,29 +1010,50 @@ export default function CalendarClient() {
                                   <div
                                     key={`fullday-${day.toISOString()}`}
                                     className={cn(
-                                      'min-h-[48px] p-1 border-r border-mq-border last:border-r-0 flex flex-col gap-1',
+                                      'min-h-[80px] max-h-[160px] overflow-y-auto p-2 border-r border-mq-border last:border-r-0 flex flex-col gap-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent',
                                       isTodayCell && 'bg-mq-primary/10',
                                     )}
                                   >
                                     {dayMQDates.map((mqDate) => {
-                                      const colors = MQ_DATE_COLORS[mqDate.category];
+                                      const categoryColors = MQ_DATE_COLORS[mqDate.category];
+                                      const programStyle = PROGRAM_STYLES[mqDate.program];
+                                      // Category short label for badge
+                                      const categoryLabel = {
+                                        exams: 'Exam',
+                                        admin: 'Admin',
+                                        results: 'Results',
+                                        payment: 'Payment',
+                                        enrollment: 'Enroll',
+                                        recess: 'Break',
+                                        classes: 'Class',
+                                      }[mqDate.category] || mqDate.category;
+
                                       return (
                                         <div
                                           key={mqDate.id}
                                           className={cn(
-                                            'flex-1 min-h-[28px] px-2 py-1 rounded-md text-[10px] font-bold flex items-center justify-center text-center leading-tight shadow-md ring-1 ring-inset ring-white/20',
-                                            colors.bg,
-                                            colors.text,
-                                            colors.border,
-                                            'border-2',
+                                            'min-h-[36px] px-2 py-1.5 rounded-md text-[11px] font-semibold flex flex-col justify-center leading-tight shadow-sm border-l-4',
+                                            programStyle.bgLight,
+                                            programStyle.border,
+                                            programStyle.pattern,
                                           )}
                                           title={
                                             mqDate.description
-                                              ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                              : `${mqDate.event} - ${mqDate.term}`
+                                              ? `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                              : `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}`
                                           }
                                         >
-                                          <span className="line-clamp-2 drop-shadow-sm">
+                                          <div className="flex items-center gap-1 mb-0.5">
+                                            <span className="text-sm" aria-hidden="true">{programStyle.icon}</span>
+                                            <span className={cn(
+                                              'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                                              categoryColors.bg,
+                                              categoryColors.text,
+                                            )}>
+                                              {categoryLabel}
+                                            </span>
+                                          </div>
+                                          <span className={cn('line-clamp-2', programStyle.text)}>
                                             {mqDate.event}
                                           </span>
                                         </div>
@@ -1231,7 +1276,7 @@ export default function CalendarClient() {
                                     );
                                   })}
 
-                                  {/* Deadlines - filled time block with unit color */}
+                                  {/* Deadlines - point-in-time markers (not time blocks) */}
                                   {dayDeadlines.map((deadline, idx) => {
                                     const dueDayjs = dayjs(deadline.dueDate);
                                     const dueDate = dueDayjs.toDate();
@@ -1240,18 +1285,15 @@ export default function CalendarClient() {
                                     const deadlineColor = getDeadlineColor(deadline, units);
                                     const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
 
-                                    // Default 1 hour duration from due time
-                                    const posInfo = getTimePositionAndHeight(
-                                      hours,
-                                      minutes,
-                                      hours + 1,
-                                      minutes,
-                                    );
+                                    // Calculate position at exact due time (point-in-time, not duration)
+                                    // Use a small fixed height for the marker instead of spanning an hour
+                                    const MARKER_HEIGHT = 28; // Fixed height for deadline marker
+                                    const topPosition = (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT + 8;
 
                                     // Display name: UNIT_CODE – Type or Title
                                     const displayName = `${deadline.unitCode} – ${deadline.title}`;
 
-                                    if (!posInfo || hours < START_HOUR) {
+                                    if (hours < START_HOUR) {
                                       // Show at top if outside visible hours
                                       const isHighlighted =
                                         deadlineHighlightActive &&
@@ -1265,13 +1307,14 @@ export default function CalendarClient() {
                                           }}
                                           onClick={() => openEditDeadline(deadline)}
                                           className={cn(
-                                            'absolute left-1 right-1 text-left text-xs px-2 py-1.5 rounded shadow-sm font-medium z-10 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                            'absolute left-1 right-1 text-left text-xs px-2 py-1 rounded shadow-sm font-medium z-10 text-white overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background transition-all hover:z-50',
                                             deadline.completed && 'opacity-50 line-through',
                                             isHighlighted &&
                                               'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
                                           )}
                                           style={{
                                             top: 4 + idx * 24,
+                                            height: 24,
                                             backgroundColor: deadlineColor,
                                           }}
                                           aria-label={t('calendarDeadlineAriaLabel', {
@@ -1280,13 +1323,9 @@ export default function CalendarClient() {
                                             time: formatTimeShort(dueDate),
                                             type: deadlineTypeLabel,
                                           })}
-                                          title={t('calendarDeadlineTitle', {
-                                            displayName,
-                                            time: formatTimeShort(dueDate),
-                                            type: deadlineTypeLabel,
-                                          })}
+                                          title={`${deadlineTypeLabel}: ${displayName} - Due ${formatTimeShort(dueDate)}`}
                                         >
-                                          <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal">
+                                          <span className="block truncate text-[10px]">
                                             {displayName}
                                           </span>
                                         </button>
@@ -1314,17 +1353,17 @@ export default function CalendarClient() {
                                         }}
                                         onClick={() => openEditDeadline(deadline)}
                                         className={cn(
-                                          'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
+                                          'absolute text-left text-xs px-1.5 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background transition-all hover:z-50 hover:shadow-lg',
                                           deadline.completed && 'opacity-50 line-through',
                                           isHighlightedDeadline &&
                                             'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
                                         )}
                                         style={{
-                                          top: posInfo.top,
-                                          height: Math.max(posInfo.height, 44),
+                                          top: topPosition,
+                                          height: MARKER_HEIGHT, // Fixed height for point-in-time marker
                                           left,
                                           width,
-                                          backgroundColor: `${deadlineColor}dd`,
+                                          backgroundColor: `${deadlineColor}`,
                                           borderLeftColor: deadlineColor,
                                         }}
                                         aria-label={t('calendarDeadlineAriaLabelStatus', {
@@ -1336,18 +1375,14 @@ export default function CalendarClient() {
                                           time: formatTimeShort(dueDate),
                                           type: deadlineTypeLabel,
                                         })}
-                                        title={t('calendarDeadlineTitle', {
-                                          displayName,
-                                          time: formatTimeShort(dueDate),
-                                          type: deadlineTypeLabel,
-                                        })}
+                                        title={`${deadlineTypeLabel}: ${displayName} - Due at ${formatTimeShort(dueDate)}`}
                                       >
-                                        <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
-                                          {displayName}
-                                        </span>
-                                        <span className="text-[10px] opacity-80">
-                                          {formatTimeShort(dueDate)}
-                                        </span>
+                                        {/* Compact deadline marker */}
+                                        <div className="flex items-center gap-1 h-full">
+                                          <Clock className="h-3 w-3 shrink-0 opacity-80" aria-hidden="true" />
+                                          <span className="text-[10px] font-bold shrink-0">{formatTimeShort(dueDate)}</span>
+                                          <span className="text-[10px] truncate opacity-90">{displayName}</span>
+                                        </div>
                                       </button>
                                     );
                                   })}
@@ -1877,6 +1912,12 @@ export default function CalendarClient() {
             onDeleteExam={handleDeleteExam}
             onEditTodo={openEditTodo}
             onAddTodo={openAddTodo}
+            onOpenTodoDetail={(todo) => {
+              setSelectedTodo(todo);
+              setTodoDetailOpen(true);
+            }}
+            onDeleteTodo={handleDeleteTodo}
+            onNotifyTodo={handleNotifyTodo}
           />
         </CalendarSidebar>
       </div>
@@ -2351,6 +2392,10 @@ export default function CalendarClient() {
           setAssignmentDetailOpen(false);
           openEditAssignment(assignment);
         }}
+        onDelete={(assignment) => {
+          setAssignmentDetailOpen(false);
+          handleDeleteAssignment(assignment);
+        }}
       />
 
       {/* Exam Detail Panel */}
@@ -2362,6 +2407,10 @@ export default function CalendarClient() {
           setExamDetailOpen(false);
           openEditExam(exam);
         }}
+        onDelete={(exam) => {
+          setExamDetailOpen(false);
+          handleDeleteExam(exam);
+        }}
       />
 
       {/* Event Detail Panel */}
@@ -2372,6 +2421,28 @@ export default function CalendarClient() {
         onEdit={(event) => {
           setEventDetailOpen(false);
           openEditEvent(event);
+        }}
+        onDelete={(event) => {
+          setEventDetailOpen(false);
+          handleDeleteEvent(event);
+        }}
+      />
+
+      {/* Todo Detail Panel */}
+      <TodoDetailPanel
+        todo={selectedTodo}
+        open={todoDetailOpen}
+        onOpenChange={setTodoDetailOpen}
+        onEdit={(todo) => {
+          setTodoDetailOpen(false);
+          openEditTodo(todo);
+        }}
+        onDelete={(todo) => {
+          setTodoDetailOpen(false);
+          handleDeleteTodo(todo);
+        }}
+        onNotify={(todo) => {
+          handleNotifyTodo(todo);
         }}
       />
     </div>
