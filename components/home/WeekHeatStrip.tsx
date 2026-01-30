@@ -127,6 +127,7 @@ export default function WeekHeatStrip() {
             key={i}
             href={`/calendar?date=${format(day.date, 'yyyy-MM-dd')}`}
             className="flex-1 flex flex-col justify-end h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:outline-none"
+            aria-label={`${day.fullDate}: ${day.classCount} classes, ${day.deadlineCount} deadlines`}
           >
             {/* Tooltip-ish overlay */}
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[150px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">

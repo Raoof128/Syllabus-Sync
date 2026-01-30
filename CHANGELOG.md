@@ -34,6 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Verification**: `npx tsc --noEmit` (pass).
 - **Follow-ups**: Integrate security modules into existing authentication flows and configure CSP headers in production.
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Home Heat-Strip Accessibility Polish
+
+- **Summary**: Improved the Home Week Heat-Strip component so each day link exposes a descriptive `aria-label` that includes the full date and class/deadline counts, making the strip understandable for screen readers while keeping the visual design unchanged.
+- **Files Changed**:
+  - `components/home/WeekHeatStrip.tsx`: Added per-day `aria-label` metadata to the calendar navigation links.
+- **Verification**:
+  - `npm run check`: Passed (Lint, Types, Tests, Build).
+
 ### Raouf: 2026-01-28 (Calendar Upgrade: Foundation & Views)
 
 - **Summary**: Implemented the "Calendar Upgrade Blueprint" Phase 1 and started Phase 2. The Calendar is now structured with a "Sticky Layout" featuring a proper Header, Sidebar with widgets, and Main View Area. Moved widgets to a dedicated component and added support for View Switching (Week/Day/Agenda) and Todos in the sidebar.

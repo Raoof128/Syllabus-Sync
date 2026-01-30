@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-30 (Australia/Sydney)
+Scope: Home - Heat-Strip Accessibility Polish
+Summary: Improved Week Heat-Strip accessibility and screen reader support.
+- **UX/Accessibility:** Added descriptive `aria-label` metadata to each Heat-Strip day link so assistive technologies announce the full date and class/deadline counts instead of a single-letter label.
+- **Verification:** `npm run check` (pass; tests, typecheck, build).
+Files: components/home/WeekHeatStrip.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-30 (Australia/Sydney)
 Scope: Home - Lint & QA Hardening
 Summary: Cleaned up codebase for production.
 - **QA:** Removed unused imports and variables in `HomeClient.tsx`, `loading.tsx`, `EventsFeed.tsx`, `WeekHeatStrip.tsx`, and `UnitCard.tsx`.

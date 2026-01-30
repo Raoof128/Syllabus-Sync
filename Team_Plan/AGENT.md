@@ -27,6 +27,14 @@
 - **Verification:** Verified hydration stability (no mismatches). Verified skeleton layout alignment.
 - **Follow-ups:** None.
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Home Heat-Strip Accessibility Polish
+- **Status:** ✅ Complete - Improved Week Heat-Strip screen reader support.
+- **Scope:** Accessibility, UX Polish.
+- **Summary:** Added descriptive `aria-label` metadata to each Heat-Strip day link so assistive technologies announce the full date and class/deadline counts instead of a single letter. Ensured no visual regressions and kept motion behaviour unchanged.
+- **Files:** components/home/WeekHeatStrip.tsx.
+- **Verification:** `npm run check` (pass: tests, typecheck, build).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-30 (Australia/Sydney) - Security Enhancements Implementation
 - **Status:** ✅ Complete - 12 security enhancements implemented.
 - **Scope:** Security - Comprehensive Security Suite.
