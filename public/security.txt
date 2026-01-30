@@ -1,0 +1,169 @@
+# Security Policy for Syllabus Sync
+# Last Updated: 2026-01-29
+# Contact: security@syllabus-sync.dev
+
+# ============================================================================
+# CONTACT INFORMATION
+# ============================================================================
+
+# Preferred contact method for security issues
+Contact: mailto:security@syllabus-sync.dev
+
+# Alternative contact methods
+Contact: https://github.com/mrpouyaalavi/syllabus-sync/security/advisories
+Contact: https://hackerone.com/syllabus-sync
+
+# Security team Twitter/X handle
+Twitter: @syllabussync
+
+# ============================================================================
+# SECURITY POLICY
+# ============================================================================
+
+# Link to our security policy
+Policy: https://syllabus-sync.dev/SECURITY.md
+
+# Link to our disclosure policy
+Disclosure: https://syllabus-sync.dev/SECURITY_POLICY.md
+
+# ============================================================================
+# ENCRYPTION
+# ============================================================================
+
+# Our PGP key for encrypted communications
+# Key ID: 0x1234567890ABCDEF
+# Fingerprint: 1234 5678 90AB CDEF 1234 5678 90AB CDEF 1234 5678
+Encryption: https://syllabus-sync.dev/pgp-key.txt
+
+# ============================================================================
+# ACKNOWLEDGMENTS
+# ============================================================================
+
+# Hall of Fame for security researchers who have helped us
+Acknowledgments: https://syllabus-sync.dev/security/hall-of-fame
+
+# ============================================================================
+# PREFERRED LANGUAGES
+# ============================================================================
+
+# Languages we prefer for security reports
+Preferred-Languages: en, es, fr, de, zh, ja, ko, ar
+
+# ============================================================================
+# SECURITY SCOPE
+# ============================================================================
+
+# What's in scope for security testing
+# - Main application: https://syllabus-sync.dev
+# - API endpoints: https://api.syllabus-sync.dev
+# - Authentication system
+# - User data handling
+# - Session management
+
+# What's out of scope
+# - Third-party services (Supabase, OpenWeather, etc.)
+# - Public documentation
+# - Static assets (CDN)
+# - Social media accounts
+# - User-generated content (unless it's a vulnerability in our handling)
+
+# ============================================================================
+# SAFE HARBOR
+# ============================================================================
+
+# We commit to not taking legal action against security researchers
+# who follow our responsible disclosure policy
+Canonical: https://syllabus-sync.dev/SECURITY_POLICY.md#safe-harbor
+
+# ============================================================================
+# SECURITY POLICY SUMMARY
+# ============================================================================
+
+# Our security policy includes:
+# 1. We encourage responsible disclosure of security vulnerabilities
+# 2. We will respond to security reports within 48 hours
+# 3. We will work with researchers to understand and fix vulnerabilities
+# 4. We will credit researchers for their findings (if desired)
+# 5. We will not pursue legal action against researchers who follow our policy
+
+# ============================================================================
+# VULNERABILITY REPORTING
+# ============================================================================
+
+# How to report a vulnerability:
+# 1. Email us at security@syllabus-sync.dev
+# 2. Include detailed information about the vulnerability
+# 3. Include steps to reproduce (if applicable)
+# 4. Include proof of concept (if applicable)
+# 5. Allow us reasonable time to fix the issue before public disclosure
+
+# What to include in your report:
+# - Description of the vulnerability
+# - Steps to reproduce
+# - Proof of concept (if applicable)
+# - Impact assessment
+# - Suggested fix (if any)
+
+# What you can expect from us:
+# - Response within 48 hours
+# - Confirmation of receipt
+# - Regular updates on our progress
+# - Credit in our security advisories (if desired)
+# - Possible bounty payment (for critical vulnerabilities)
+
+# ============================================================================
+# SECURITY FEATURES
+# ============================================================================
+
+# Our security features include:
+# - Content Security Policy (CSP) with hash-based validation
+# - Subresource Integrity (SRI) for CDN assets
+# - HTTPS enforcement with HSTS
+# - CSRF protection with token validation
+# - Rate limiting on all endpoints
+# - Input validation and sanitization
+# - SQL injection prevention (parameterized queries)
+# - XSS prevention (output encoding, CSP)
+# - Authentication with Supabase Auth
+# - Session management with secure cookies
+# - Password breach checking (Have I Been Pwned)
+# - Device fingerprinting for anomaly detection
+# - IP anomaly detection
+# - Audit logging for all sensitive operations
+# - Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
+
+# ============================================================================
+# COMPLIANCE
+# ============================================================================
+
+# We comply with:
+# - GDPR (General Data Protection Regulation)
+# - CCPA (California Consumer Privacy Act)
+# - SOC 2 Type II (in progress)
+# - ISO 27001 (in progress)
+
+# ============================================================================
+# ADDITIONAL RESOURCES
+# ============================================================================
+
+# Security documentation
+Documentation: https://docs.syllabus-sync.dev/security
+
+# API security documentation
+API-Security: https://docs.syllabus-sync.dev/api/security
+
+# Bug bounty program
+Bug-Bounty: https://syllabus-sync.dev/bug-bounty
+
+# ============================================================================
+# VERSION
+# ============================================================================
+
+# Version of this security.txt file
+Version: 1.0
+
+# Last updated
+Last-Updated: 2026-01-29
+
+# Expiration date (recommended to update every 90 days)
+Expires: 2026-04-29T23:59:59Z

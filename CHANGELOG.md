@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Security Enhancements Implementation
+
+- **Summary**: Implemented comprehensive security enhancements across 12 areas including Subresource Integrity (SRI), CSP reporting, database audit logging, API request signing, password breach checking, device fingerprinting, session termination on password change, IP anomaly detection, security headers scanning, password strength indicator, 2FA backup codes, and security.txt file.
+- **Files Changed**:
+  - `lib/security/sri.ts`: Created SRI utilities for CDN asset integrity verification.
+  - `lib/security/csp.ts`: Created Content Security Policy configuration and reporting.
+  - `app/api/csp-report/route.ts`: Implemented CSP violation reporting endpoint.
+  - `lib/security/audit.ts`: Created audit logging utilities for security events.
+  - `app/api/audit/route.ts`: Implemented audit log API endpoint.
+  - `lib/supabase/migrations/002_security_audit_logging.sql`: Created database migration for audit logs.
+  - `lib/security/request-signing.ts`: Created HMAC-SHA256 request signing with replay attack prevention.
+  - `lib/security/password-breach.ts`: Created password breach checking using Have I Been Pwned API.
+  - `app/api/security/check-password-breach/route.ts`: Implemented password breach checking endpoint.
+  - `lib/security/device-fingerprinting.ts`: Created device fingerprinting for browser identification.
+  - `lib/security/session-termination.ts`: Created session management and termination utilities.
+  - `lib/security/ip-anomaly-detection.ts`: Created IP anomaly detection with geolocation tracking.
+  - `lib/security/headers-scanner.ts`: Created security headers scanning utilities.
+  - `app/api/security/scan-headers/route.ts`: Implemented security headers scanning endpoint.
+  - `components/security/PasswordStrengthIndicator.tsx`: Created password strength indicator component.
+  - `lib/security/two-factor-backup-codes.ts`: Created 2FA backup codes generation and validation.
+  - `public/security.txt`: Created RFC 9116 compliant security.txt file.
+  - `lib/security/index.ts`: Created central export for all security modules.
+  - `docs/SECURITY_ENHANCEMENTS.md`: Created comprehensive security documentation.
+  - `SECURITY_IMPLEMENTATION_SUMMARY.md`: Created implementation overview.
+- **Verification**: `npx tsc --noEmit` (pass).
+- **Follow-ups**: Integrate security modules into existing authentication flows and configure CSP headers in production.
+
 ### Raouf: 2026-01-28 (Calendar Upgrade: Foundation & Views)
 
 - **Summary**: Implemented the "Calendar Upgrade Blueprint" Phase 1 and started Phase 2. The Calendar is now structured with a "Sticky Layout" featuring a proper Header, Sidebar with widgets, and Main View Area. Moved widgets to a dedicated component and added support for View Switching (Week/Day/Agenda) and Todos in the sidebar.
@@ -132,6 +159,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Summary**: Further improved the contrast of Settings section pills on small screens by using `bg-mq-card-background` plus a subtle border for inactive pills so their labels remain readable against the blurred background while keeping the active pill style unchanged.
 - **Files Changed**:
   - `app/settings/layout.tsx`: Adjusted inactive mobile pill background and border.
-- **Verification**:
-  - `npm run check`: Passed (Lint, Types, Format, Build, Tests).
+- **Verification**: `npm run check` (pass).
+- **Follow-ups**: None.
+
+### Raouf: 2026-01-29 (Australia/Sydney) - SSH MCP Configuration Update
+
+- **Summary**: Configured the `ssh-mcp` server with specific connection details for the Linux server at `185.253.73.145`. Updated authentication parameters to use the provided password and default root user.
+- **Files Changed**:
+  - `.gemini/settings.json`: Updated `ssh-mcp` arguments with host, user, and password.
+- **Verification**: Verified JSON syntax using Node.js.
 - **Follow-ups**: None.

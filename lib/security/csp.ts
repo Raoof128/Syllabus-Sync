@@ -52,19 +52,27 @@ export interface CSPOptions {
   additionalScriptSrc?: string[];
   /** Additional connect sources to allow */
   additionalConnectSrc?: string[];
-  /** Report URI for CSP violations */
+  /** Report URI for CSP violations (legacy, use reportTo) */
   reportUri?: string;
+  /** Report-To directive for CSP violations (modern browsers) */
+  reportTo?: string;
+  /** Enable report-only mode (violations logged but not enforced) */
+  reportOnly?: boolean;
 }
 
 /**
  * Build a Content Security Policy header value
+ * 
+ * SECURITY: CSP reporting helps detect and prevent XSS attacks by monitoring
+ * policy violations. Configure CSP_REPORT_URI or CSP_REPORT_TO env vars.
  */
 export function buildCSP(options: CSPOptions = {}): string {
   const {
     upgradeInsecure = process.env.NODE_ENV === 'production',
     additionalScriptSrc = [],
     additionalConnectSrc = [],
-    reportUri,
+    reportUri = process.env.CSP_REPORT_URI,
+    reportTo = process.env.CSP_REPORT_TO,
   } = options;
 
   // Build script-src with hashes
@@ -106,7 +114,10 @@ export function buildCSP(options: CSPOptions = {}): string {
     // Upgrade insecure in production
     ...(upgradeInsecure ? ['upgrade-insecure-requests'] : []),
 
-    // Report URI if configured
+    // Report-To directive (modern browsers, preferred over report-uri)
+    ...(reportTo ? [`report-to ${reportTo}`] : []),
+
+    // Report URI if configured (legacy, but still supported)
     ...(reportUri ? [`report-uri ${reportUri}`] : []),
   ];
 

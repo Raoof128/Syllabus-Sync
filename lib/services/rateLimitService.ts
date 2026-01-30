@@ -68,7 +68,6 @@ class MemoryStore implements RateLimitStore {
     return data;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async set(key: string, data: { count: number; resetTime: number }, _ttlMs: number) {
     this.store.set(key, data);
     // Clean up expired entries periodically

@@ -124,7 +124,6 @@ export function useMouseGlow(options: MouseGlowOptions = {}) {
 
   // Get props to spread on card elements
   const getCardProps = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_cardRef?: React.RefObject<HTMLElement | null>): CardGlowProps => {
       if (!enabled || prefersReducedMotion) {
         return {};
