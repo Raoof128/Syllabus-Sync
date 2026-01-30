@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Unit } from '@/lib/types';
-import { Card, CardTitle } from '@/components/ui/mq/card';
+import { CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';

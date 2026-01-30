@@ -11,6 +11,14 @@
 - **Verification:** Verified no `mq-liquid-glass` usage in Home route. Linter checks passed.
 - **Follow-ups:** None.
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Lint & QA Hardening
+- **Status:** ✅ Complete - Cleaned up all linting warnings and verified build stability.
+- **Scope:** QA, Linting.
+- **Summary:** Removed unused imports and variables in `HomeClient.tsx`, `loading.tsx`, `EventsFeed.tsx`, `WeekHeatStrip.tsx`, and `UnitCard.tsx`. Verified clean build with `npm run check`.
+- **Files:** app/home/HomeClient.tsx; app/home/loading.tsx; components/home/EventsFeed.tsx; components/home/WeekHeatStrip.tsx; components/units/UnitCard.tsx.
+- **Verification:** `npm run check` passed with 0 errors and 0 warnings.
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 5-9)
 - **Status:** ✅ Complete - Home route performance, accessibility, and correctness hardening.
 - **Scope:** Performance, Accessibility, QA.

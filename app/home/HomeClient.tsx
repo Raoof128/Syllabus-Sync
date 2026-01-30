@@ -19,7 +19,7 @@ import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, TrendingUp, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
 import { CardSolid } from '@/components/home/HomeCard';
@@ -329,26 +329,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     High: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700/50',
   };
 
-  const stressEmoji = {
-    Low: '😊',
-    Busy: '😅',
-    High: '😰',
-  };
-
   const stressLabels = {
     Low: t('stressLow'),
     Busy: t('stressBusy'),
     High: t('stressHigh'),
-  };
-
-  // Get aria-label for stress level
-  const getStressAriaLabel = (level: 'Low' | 'Busy' | 'High') => {
-    const labels = {
-      Low: t('stressLevelLow'),
-      Busy: t('stressLevelBusy'),
-      High: t('stressLevelHigh'),
-    };
-    return labels[level];
   };
 
   return (

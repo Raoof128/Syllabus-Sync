@@ -1,5 +1,4 @@
 // app/home/loading.tsx
-import { Metadata } from 'next';
 
 // Skeleton loader for home page - provides meaningful first paint
 export default function HomeLoading() {

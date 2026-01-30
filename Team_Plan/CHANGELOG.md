@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-30 (Australia/Sydney)
+Scope: Home - Lint & QA Hardening
+Summary: Cleaned up codebase for production.
+- **QA:** Removed unused imports and variables in `HomeClient.tsx`, `loading.tsx`, `EventsFeed.tsx`, `WeekHeatStrip.tsx`, and `UnitCard.tsx`.
+- **Verification:** `npm run check` passed with 0 warnings.
+Files: app/home/HomeClient.tsx; app/home/loading.tsx; components/home/EventsFeed.tsx; components/home/WeekHeatStrip.tsx; components/units/UnitCard.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-30 (Australia/Sydney)
 Scope: Home - Performance, Accessibility, & QA (Phases 5-9)
 Summary: Hardened Home route for production.
 - **Performance:** Updated `loading.tsx` skeleton to perfectly match final layout (Header -> KPI -> Heat-Strip -> Grid) to minimize CLS. Verified memoization and hydration stability.

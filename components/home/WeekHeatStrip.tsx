@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { startOfWeek, addDays, format, isSameDay, isToday, startOfDay, endOfDay } from 'date-fns';
+import { startOfWeek, addDays, format, isSameDay, isToday } from 'date-fns';
 import { enAU } from 'date-fns/locale';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';

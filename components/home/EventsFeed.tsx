@@ -3,7 +3,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, ExternalLink, Calendar } from 'lucide-react';
 import { useEventsStore } from '@/lib/store/eventsStore';
