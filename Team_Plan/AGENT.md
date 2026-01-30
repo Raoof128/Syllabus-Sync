@@ -11,6 +11,14 @@
 - **Verification:** Verified no `mq-liquid-glass` usage in Home route. Linter checks passed.
 - **Follow-ups:** None.
 
+### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 5-9)
+- **Status:** ✅ Complete - Home route performance, accessibility, and correctness hardening.
+- **Scope:** Performance, Accessibility, QA.
+- **Summary:** Implemented hydration-safe memoization for KPI and Heat-Strip components. Updated `loading.tsx` skeleton to match the final solid layout (Header -> KPI -> Heat-Strip -> Grid). Hardened accessibility with `focus-visible` rings on interactive elements. Verified no Suspense wrapper in `page.tsx`.
+- **Files:** app/home/loading.tsx; app/home/page.tsx; components/home/WeekHeatStrip.tsx.
+- **Verification:** Verified hydration stability (no mismatches). Verified skeleton layout alignment.
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-30 (Australia/Sydney) - Security Enhancements Implementation
 - **Status:** ✅ Complete - 12 security enhancements implemented.
 - **Scope:** Security - Comprehensive Security Suite.

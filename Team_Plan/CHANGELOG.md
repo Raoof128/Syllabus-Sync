@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-30 (Australia/Sydney)
+Scope: Home - Performance, Accessibility, & QA (Phases 5-9)
+Summary: Hardened Home route for production.
+- **Performance:** Updated `loading.tsx` skeleton to perfectly match final layout (Header -> KPI -> Heat-Strip -> Grid) to minimize CLS. Verified memoization and hydration stability.
+- **Accessibility:** Added `focus-visible` rings to interactive elements (Heat-Strip days).
+- **Correctness:** Verified removal of page-level Suspense in favor of route-level loading.
+Files: app/home/loading.tsx; app/home/page.tsx; components/home/WeekHeatStrip.tsx.
+Verification: Passed `npm run check`. Visual verification of skeleton and focus states.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-30 (Australia/Sydney)
 Scope: Home - Layout Refactor & Design Overhaul (Phases 0-4)
 Summary: Transformed Home route to a solid-surface, designed product. Replaced glass effects with consistent `CardSolid`/`CardMuted` variants. Implemented route-level loading (`loading.tsx`), Week Heat-Strip (wow element), and Hero header (workload badge + primary action). Standardized interaction (hover effects) and typography. Added missing translation keys and reduced motion support.
 Files: app/home/page.tsx; app/home/loading.tsx; app/home/HomeClient.tsx; components/home/HomeCard.tsx; components/home/WeekHeatStrip.tsx; components/home/WelcomeHeader.tsx; components/home/HomeKpiStrip.tsx; components/home/TodaySchedule.tsx; components/units/UnitCard.tsx; lib/config.ts; locales/en/translations.json; app/mq-tokens.css.
