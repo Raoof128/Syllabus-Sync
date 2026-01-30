@@ -105,6 +105,20 @@ const Header = memo(() => {
     }
   }, [isClient, loadNotifications]);
 
+  // Error boundary for notifications
+  const [notificationError, setNotificationError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const handleNotificationError = (event: CustomEvent) => {
+      setNotificationError(event.detail as Error);
+    };
+
+    window.addEventListener('notification-error', handleNotificationError as EventListener);
+    return () => {
+      window.removeEventListener('notification-error', handleNotificationError as EventListener);
+    };
+  }, []);
+
   // Load user authentication state
   useEffect(() => {
     let isActive = true;
@@ -304,7 +318,22 @@ const Header = memo(() => {
                 </DropdownMenuItem>
               </div>
               <div className="max-h-[min(20rem,calc(100vh-10rem))] overflow-y-auto">
-                {recentNotifications.length === 0 ? (
+                {notificationError ? (
+                  <div className="p-4 text-center">
+                    <p className="text-mq-error text-sm font-medium">
+                      {t('notificationLoadError')}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setNotificationError(null);
+                        loadNotifications({ force: true });
+                      }}
+                      className="text-xs text-mq-info hover:underline mt-2"
+                    >
+                      {t('retry')}
+                    </button>
+                  </div>
+                ) : recentNotifications.length === 0 ? (
                   <div className="p-4 text-center">
                     <p className="text-mq-content-tertiary text-sm font-medium">
                       {t('noNotificationsYet')}

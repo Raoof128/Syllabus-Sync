@@ -699,6 +699,8 @@
   "markAsRead": "Mark as read",
   "markAllRead": "Mark all read",
   "deleteNotification": "Delete notification",
+  "notificationLoadError": "Failed to load notifications",
+  "retry": "Retry",
   "signOut": "Sign out",
   "switchToLight": "Switch to light mode",
   "switchToDark": "Switch to dark mode",

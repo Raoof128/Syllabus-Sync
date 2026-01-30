@@ -110,9 +110,14 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
 
       if (apiPayload.link) {
         try {
-          const base = typeof window !== 'undefined' ? window.location.origin : undefined;
-          apiPayload.link = new URL(apiPayload.link, base).toString();
+          const base = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+          // Handle relative URLs by prepending base
+          const linkUrl = apiPayload.link.startsWith('/')
+            ? new URL(apiPayload.link, base).toString()
+            : new URL(apiPayload.link).toString();
+          apiPayload.link = linkUrl;
         } catch {
+          // If URL parsing fails, remove the invalid link
           delete apiPayload.link;
         }
       }
@@ -241,12 +246,13 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
 
   clearAll: async () => {
     const notificationsToRestore = [...get().notifications];
-    set({ notifications: [] });
+    set({ notifications: [], isLoading: true });
 
     try {
       await apiRequest<{ deleted: number }>('/api/notifications', { method: 'DELETE' });
+      set({ notifications: [], isLoading: false });
     } catch (error) {
-      set({ notifications: notificationsToRestore });
+      set({ notifications: notificationsToRestore, isLoading: false });
       errorHandler.logError(
         error instanceof Error ? error : new Error('Failed to clear all notifications'),
         'NotificationsStore.clearAll',

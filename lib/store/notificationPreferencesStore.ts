@@ -151,6 +151,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         unitCode: string,
         dueDate: Date,
       ) => {
+        if (typeof window === 'undefined') return;
+
         const state = get();
         if (!state.pushEnabled || !state.deadlinesEnabled) return;
         if (state.permissionStatus !== 'granted') return;
@@ -212,6 +214,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         room: string,
         classTime: Date,
       ) => {
+        if (typeof window === 'undefined') return;
+
         const state = get();
         if (!state.pushEnabled || !state.classesEnabled) return;
         if (state.permissionStatus !== 'granted') return;
@@ -275,6 +279,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         location: string,
         eventTime: Date,
       ) => {
+        if (typeof window === 'undefined') return;
+
         const state = get();
         if (!state.pushEnabled || !state.eventsEnabled) return;
         if (state.permissionStatus !== 'granted') return;
@@ -351,6 +357,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       },
 
       reschedulePending: () => {
+        if (typeof window === 'undefined') return;
+
         const state = get();
         if (!state.pushEnabled || state.permissionStatus !== 'granted') return;
 

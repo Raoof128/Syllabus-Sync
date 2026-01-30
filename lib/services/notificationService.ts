@@ -21,21 +21,30 @@ export interface NotificationOptions {
 class NotificationService {
   private static instance: NotificationService;
   private notificationClickHandlers: Map<string, () => void> = new Map();
+  private isInitialized = false;
 
   private constructor() {
+    // Initialize only once
+    if (this.isInitialized) return;
+    this.isInitialized = true;
+
     // Set up notification click handler
     if (typeof window !== 'undefined' && 'Notification' in window) {
       // Listen for service worker messages (for notification clicks)
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data?.type === 'NOTIFICATION_CLICK') {
-            const handler = this.notificationClickHandlers.get(event.data.tag);
-            if (handler) {
-              handler();
-              this.notificationClickHandlers.delete(event.data.tag);
+        try {
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data?.type === 'NOTIFICATION_CLICK') {
+              const handler = this.notificationClickHandlers.get(event.data.tag);
+              if (handler) {
+                handler();
+                this.notificationClickHandlers.delete(event.data.tag);
+              }
             }
-          }
-        });
+          });
+        } catch (error) {
+          console.error('Failed to register service worker message listener:', error);
+        }
       }
     }
   }
@@ -95,15 +104,26 @@ class NotificationService {
     try {
       // Prefer service worker notifications if available (more resilient when tab is hidden)
       if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        if (registration?.showNotification) {
-          await registration.showNotification(options.title, {
-            body: options.body,
-            icon: options.icon || '/MQ_Logo_Final.png',
-            tag: options.tag,
-            data: options.data,
-          });
-          return true;
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          if (registration?.showNotification) {
+            await registration.showNotification(options.title, {
+              body: options.body,
+              icon: options.icon || '/MQ_Logo_Final.png',
+              tag: options.tag,
+              data: options.data,
+            });
+            // Register click handler for service worker notifications
+            if (options.tag && options.onClick) {
+              this.notificationClickHandlers.set(options.tag, options.onClick);
+            }
+            return true;
+          }
+        } catch (swError) {
+          console.warn(
+            'Service worker notification failed, falling back to standard notification:',
+            swError,
+          );
         }
       }
 
