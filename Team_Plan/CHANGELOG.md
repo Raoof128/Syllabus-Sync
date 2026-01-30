@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-30 (Australia/Sydney)
+Scope: Home - Layout Refactor & Design Overhaul (Phases 0-4)
+Summary: Transformed Home route to a solid-surface, designed product. Replaced glass effects with consistent `CardSolid`/`CardMuted` variants. Implemented route-level loading (`loading.tsx`), Week Heat-Strip (wow element), and Hero header (workload badge + primary action). Standardized interaction (hover effects) and typography. Added missing translation keys and reduced motion support.
+Files: app/home/page.tsx; app/home/loading.tsx; app/home/HomeClient.tsx; components/home/HomeCard.tsx; components/home/WeekHeatStrip.tsx; components/home/WelcomeHeader.tsx; components/home/HomeKpiStrip.tsx; components/home/TodaySchedule.tsx; components/units/UnitCard.tsx; lib/config.ts; locales/en/translations.json; app/mq-tokens.css.
+Verification: Verified no `mq-liquid-glass` usage in Home route. Verified component integration and linter passes.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-30 (Australia/Sydney)
 Scope: Security - Comprehensive Security Enhancements (12 items)
 Summary: Implemented 12 security enhancements including Subresource Integrity (SRI) for CDN assets, CSP reporting, database audit logging, API request signing, password breach checking, device fingerprinting, session termination on password change, IP anomaly detection, security headers scanning, password strength indicator, 2FA backup codes, and security.txt file.
 Files: lib/security/sri.ts; lib/security/csp.ts; app/api/csp-report/route.ts; lib/security/audit.ts; app/api/audit/route.ts; lib/supabase/migrations/002_security_audit_logging.sql; lib/security/request-signing.ts; lib/security/password-breach.ts; app/api/security/check-password-breach/route.ts; lib/security/device-fingerprinting.ts; lib/security/session-termination.ts; lib/security/ip-anomaly-detection.ts; lib/security/headers-scanner.ts; app/api/security/scan-headers/route.ts; components/security/PasswordStrengthIndicator.tsx; lib/security/two-factor-backup-codes.ts; public/security.txt; lib/security/index.ts; docs/SECURITY_ENHANCEMENTS.md; SECURITY_IMPLEMENTATION_SUMMARY.md.

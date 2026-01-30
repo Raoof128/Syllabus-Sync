@@ -98,8 +98,15 @@ export const FEATURES = {
   // Enable notifications
   notificationsEnabled: true,
   // Enable user settings
-  settingsEnabled: true,
+  userSettingsEnabled: true,
 } as const;
+
+/**
+ * Home Page Style Variant
+ * 'glass' - Current liquid glass style
+ * 'solid' - New solid, designed product style
+ */
+export const HOME_STYLE_VARIANT = 'solid';
 
 /**
  * Social Links

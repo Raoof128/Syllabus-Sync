@@ -19,7 +19,7 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, ReactNode } from 'react';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { GamificationStats } from '@/components/gamification';
 
@@ -36,6 +36,7 @@ interface WelcomeHeaderProps {
   className?: string;
   /** Show gamification stats (level, streak) */
   showGamification?: boolean;
+  children?: ReactNode;
 }
 
 // ============================================
@@ -108,6 +109,7 @@ export function WelcomeHeader({
   fallbackName,
   className = '',
   showGamification = true,
+  children,
 }: WelcomeHeaderProps) {
   const { t } = useTranslation();
 
@@ -142,14 +144,16 @@ export function WelcomeHeader({
   const message = messageKey ? t(messageKey as 'welcomeMsg1') : t('dayAtGlance');
 
   return (
-    <div className={`flex-1 min-w-0 ${className}`}>
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-mq-content leading-tight">
-          {greeting}
-        </h1>
-        {showGamification && <GamificationStats variant="compact" />}
+    <div className={`flex flex-col md:flex-row md:items-end justify-between gap-4 ${className}`}>
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
+          <h1 className="text-2xl font-semibold text-mq-content leading-tight">{greeting}</h1>
+          {showGamification && <GamificationStats variant="compact" />}
+        </div>
+        <p className="text-sm text-mq-content-secondary">{message}</p>
       </div>
-      <p className="text-mq-content-secondary text-sm sm:text-base">{message}</p>
+
+      {children && <div className="flex items-center gap-3 shrink-0">{children}</div>}
     </div>
   );
 }

@@ -3,14 +3,14 @@
 
 import React, { useMemo, memo, useState, useEffect } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Clock, MapPin, CalendarDays, Zap, CheckCircle2 } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import Link from 'next/link';
-import { MagicCard } from '@/components/ui/MagicCard';
+import { CardSolid } from '@/components/home/HomeCard';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 
 // Parse time string "HH:MM" to minutes since midnight
@@ -173,145 +173,138 @@ const TodaySchedule = memo(() => {
   };
 
   return (
-    <MagicCard isLiquidEnhanced className="h-full">
-      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-        <Card className="h-full border border-mq-border bg-mq-card-background flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="flex items-center gap-2">{t('todaysClasses')}</CardTitle>
-              {/* Smart indicator - remaining classes */}
-              {isHydrated && classesWithStatus.length > 0 && (
-                <Badge
-                  variant="neutral"
-                  className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
-                >
-                  {remainingClasses > 0
-                    ? t('classesRemaining', { count: remainingClasses })
-                    : t('allClassesDone')}
-                </Badge>
-              )}
-            </div>
-            <Button size="sm" variant="outline" className="gap-1.5" asChild>
-              <Link href="/calendar" aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}>
-                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>{t('viewInCalendar')}</span>
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3 flex-1">
-            {!isHydrated ? (
-              <div className="space-y-4 p-2">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
-                  <div className="space-y-2">
-                    <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                    <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
-                  </div>
-                </div>
-                <div className="animate-pulse animation-delay-100">
-                  <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
-                  <div className="space-y-2">
-                    <div className="h-3 bg-mq-background-tertiary rounded w-full" />
-                    <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
-                  </div>
-                </div>
-              </div>
-            ) : classesWithStatus.length === 0 ? (
-              <div className="text-center py-8">
-                <Clock
-                  className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary"
-                  aria-hidden="true"
-                />
-                <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
-                <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
-              </div>
-            ) : (
+    <CardSolid className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">{t('todaysClasses')}</CardTitle>
+          {/* Smart indicator - remaining classes */}
+          {isHydrated && classesWithStatus.length > 0 && (
+            <Badge
+              variant="neutral"
+              className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+            >
+              {remainingClasses > 0
+                ? t('classesRemaining', { count: remainingClasses })
+                : t('allClassesDone')}
+            </Badge>
+          )}
+        </div>
+        <Button size="sm" variant="outline" className="gap-1.5" asChild>
+          <Link href="/calendar" aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}>
+            <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>{t('viewInCalendar')}</span>
+          </Link>
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3 flex-1">
+        {!isHydrated ? (
+          <div className="space-y-4 p-2">
+            <div className="animate-pulse">
+              <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
               <div className="space-y-2">
-                {classesWithStatus.map((cls) => (
-                  <Link
-                    key={`${cls.id}-${cls.code}-${cls.startTime}`}
-                    href={`/calendar?date=${todayDate}&highlightUnit=${encodeURIComponent(cls.id)}`}
-                    className={`group relative flex items-start gap-3 p-3 rounded-lg border border-mq-border transition-all duration-300 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${
-                      cls.status === 'now'
-                        ? 'bg-mq-primary/10 shadow-sm'
-                        : cls.status === 'next'
-                          ? 'bg-mq-primary/10 shadow-sm'
-                          : cls.status === 'done'
-                            ? 'bg-mq-background-secondary opacity-60'
-                            : 'bg-mq-background-secondary hover:bg-mq-hover-background'
-                    }`}
-                    aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}, ${cls.status}`}
-                  >
-                    {/* Progress bar for "now" status */}
-                    {cls.status === 'now' && cls.progressPercent !== undefined && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-mq-background-secondary rounded-b-lg overflow-hidden">
-                        <div
-                          className="h-full bg-mq-primary/10 transition-all duration-1000"
-                          style={{ width: `${cls.progressPercent}%` }}
-                        />
-                      </div>
-                    )}
-
-                    {/* Color indicator - thicker for emphasis */}
-                    <div
-                      className="w-1.5 self-stretch rounded-full flex-shrink-0"
-                      style={{ backgroundColor: cls.color }}
-                    />
-
-                    {/* Class info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <h3
-                          className={`font-semibold text-mq-content ${cls.status === 'done' ? 'line-through' : ''}`}
-                        >
-                          {cls.code}
-                        </h3>
-                        {getStatusBadge(cls.status)}
-                      </div>
-
-                      <p
-                        className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1"
-                        title={cls.name}
-                      >
-                        {cls.name}
-                      </p>
-
-                      <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-mq-content-secondary">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>
-                            {formatScheduleTime(cls.startTime, language)} -{' '}
-                            {formatScheduleTime(cls.endTime, language)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>
-                            {formatLocation(cls.location.building, cls.location.room, t('room'))}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Smart time indicator */}
-                      {cls.status === 'now' && cls.minutesUntilEnd !== undefined && (
-                        <p className="text-xs text-green-600 dark:text-green-400 mt-1.5 font-medium">
-                          {t('classEndsIn', { time: formatTimeDiff(cls.minutesUntilEnd) })}
-                        </p>
-                      )}
-                      {cls.status === 'next' && cls.minutesUntilStart !== undefined && (
-                        <p className="text-xs text-mq-primary mt-1.5 font-medium">
-                          {t('classStartsIn', { time: formatTimeDiff(cls.minutesUntilStart) })}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                <div className="h-3 bg-mq-background-tertiary rounded w-5/6" />
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </MagicCard>
+            </div>
+            <div className="animate-pulse animation-delay-100">
+              <div className="h-4 bg-mq-background-tertiary rounded w-2/3 mb-3" />
+              <div className="space-y-2">
+                <div className="h-3 bg-mq-background-tertiary rounded w-full" />
+                <div className="h-3 bg-mq-background-tertiary rounded w-4/5" />
+              </div>
+            </div>
+          </div>
+        ) : classesWithStatus.length === 0 ? (
+          <div className="text-center py-8">
+            <Clock className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" aria-hidden="true" />
+            <p className="text-mq-content-tertiary">{t('noClassesToday')}</p>
+            <p className="text-mq-content-tertiary text-sm mt-1">{t('noClassesDesc')}</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {classesWithStatus.map((cls) => (
+              <Link
+                key={`${cls.id}-${cls.code}-${cls.startTime}`}
+                href={`/calendar?date=${todayDate}&highlightUnit=${encodeURIComponent(cls.id)}`}
+                className={`group relative flex items-start gap-3 p-3 rounded-lg border border-mq-border transition-all duration-300 hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 ${
+                  cls.status === 'now'
+                    ? 'bg-mq-primary/10 shadow-sm'
+                    : cls.status === 'next'
+                      ? 'bg-mq-primary/10 shadow-sm'
+                      : cls.status === 'done'
+                        ? 'bg-mq-background-secondary opacity-60'
+                        : 'bg-mq-background-secondary hover:bg-mq-hover-background'
+                }`}
+                aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}, ${cls.status}`}
+              >
+                {/* Progress bar for "now" status */}
+                {cls.status === 'now' && cls.progressPercent !== undefined && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-mq-background-secondary rounded-b-lg overflow-hidden">
+                    <div
+                      className="h-full bg-mq-primary/10 transition-all duration-1000"
+                      style={{ width: `${cls.progressPercent}%` }}
+                    />
+                  </div>
+                )}
+
+                {/* Color indicator - thicker for emphasis */}
+                <div
+                  className="w-1.5 self-stretch rounded-full flex-shrink-0"
+                  style={{ backgroundColor: cls.color }}
+                />
+
+                {/* Class info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <h3
+                      className={`font-semibold text-mq-content ${cls.status === 'done' ? 'line-through' : ''}`}
+                    >
+                      {cls.code}
+                    </h3>
+                    {getStatusBadge(cls.status)}
+                  </div>
+
+                  <p
+                    className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1"
+                    title={cls.name}
+                  >
+                    {cls.name}
+                  </p>
+
+                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-mq-content-secondary">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>
+                        {formatScheduleTime(cls.startTime, language)} -{' '}
+                        {formatScheduleTime(cls.endTime, language)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>
+                        {formatLocation(cls.location.building, cls.location.room, t('room'))}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Smart time indicator */}
+                  {cls.status === 'now' && cls.minutesUntilEnd !== undefined && (
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1.5 font-medium">
+                      {t('classEndsIn', { time: formatTimeDiff(cls.minutesUntilEnd) })}
+                    </p>
+                  )}
+                  {cls.status === 'next' && cls.minutesUntilStart !== undefined && (
+                    <p className="text-xs text-mq-primary mt-1.5 font-medium">
+                      {t('classStartsIn', { time: formatTimeDiff(cls.minutesUntilStart) })}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </CardSolid>
   );
 });
 

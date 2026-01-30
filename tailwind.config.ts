@@ -161,6 +161,7 @@ const config: Config = {
         'mq-sm': 'var(--c-radius-sm)',
         mq: 'var(--c-radius)',
         'mq-lg': 'var(--c-radius-lg)',
+        'mq-xl': 'var(--c-radius-xl)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',

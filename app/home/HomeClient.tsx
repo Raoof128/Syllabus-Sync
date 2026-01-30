@@ -22,7 +22,9 @@ import { Badge } from '@/components/ui/mq/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
-import { MagicCard } from '@/components/ui/MagicCard';
+import { CardSolid } from '@/components/home/HomeCard';
+import HomeKpiStrip from '@/components/home/HomeKpiStrip';
+import WeekHeatStrip from '@/components/home/WeekHeatStrip';
 import { apiRequest } from '@/lib/utils/api';
 
 type AuthUser = {
@@ -354,43 +356,50 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
       <div className="home-page">
         {/* Header */}
         <ScrollReveal>
-          <header className="mb-8 flex items-center justify-between flex-wrap gap-4" role="banner">
-            <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name} />
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Stress Level Indicator */}
-              {hasHydrated && deadlines.length > 0 && (
+          <header className="mb-6" role="banner">
+            <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name}>
+              {hasHydrated && (
                 <>
-                  <div className="flex sm:hidden items-center gap-1.5 px-2.5 py-1.5 mq-liquid-glass rounded-full shadow-md">
-                    <TrendingUp
-                      className="h-3.5 w-3.5 text-mq-content-secondary"
-                      aria-hidden="true"
-                    />
-                    <Badge
-                      className={`${stressColors[stressLevel]} text-xs px-2 py-0.5 rounded-full font-medium`}
-                      aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                      title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                    >
-                      <span aria-hidden="true">{stressEmoji[stressLevel]}</span>
-                    </Badge>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-2.5 px-4 py-2 mq-liquid-glass rounded-full shadow-md">
-                    <TrendingUp className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                    <span className="text-sm font-medium text-mq-content">{t('workload')}</span>
-                    <Badge
-                      className={`${stressColors[stressLevel]} text-xs px-2.5 py-1 rounded-full font-semibold`}
-                      aria-label={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                      title={`${t('workload')}: ${getStressAriaLabel(stressLevel)}`}
-                    >
-                      <span aria-hidden="true" className="mr-1">
-                        {stressEmoji[stressLevel]}
+                  {/* Workload Badge */}
+                  {deadlines.length > 0 && (
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-mq-background-secondary border border-mq-border rounded-full mr-2">
+                      <TrendingUp className="h-3.5 w-3.5 text-mq-content-secondary" />
+                      <span className="text-xs font-medium text-mq-content-secondary">
+                        {t('workload')}
                       </span>
-                      {stressLabels[stressLevel]}
-                    </Badge>
-                  </div>
+                      <Badge
+                        variant="neutral"
+                        className={`${stressColors[stressLevel]} border-0 text-xs px-2 py-0.5 rounded-full ml-1`}
+                      >
+                        {stressLabels[stressLevel]}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Primary Action */}
+                  <Button
+                    asChild
+                    className="gap-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <Link href="/calendar?action=add-deadline">
+                      <Plus className="h-4 w-4" />
+                      <span>{t('addTask')}</span>
+                    </Link>
+                  </Button>
                 </>
               )}
-            </div>
+            </WelcomeHeader>
           </header>
+        </ScrollReveal>
+
+        {/* KPI Strip - Phase 3.1 */}
+        <ScrollReveal delay={0.1}>
+          <HomeKpiStrip />
+        </ScrollReveal>
+
+        {/* Week Heat-Strip - Phase 3.3 */}
+        <ScrollReveal delay={0.15}>
+          <WeekHeatStrip />
         </ScrollReveal>
 
         {/* Get Started Banner */}
@@ -429,121 +438,115 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         {/* My Units Section - READ ONLY on Home page */}
         <ScrollReveal delay={0.3} staggerChildren={0.1}>
           <section aria-labelledby="units-section-heading" className="mb-6">
-            <MagicCard isLiquidEnhanced>
-              <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle id="units-section-heading" className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5" aria-hidden="true" />
-                      {t('myUnits')}
-                      {/* View Only Badge - makes read-only state obvious */}
-                      {hasHydrated && units.length > 0 && (
-                        <Badge
-                          variant="neutral"
-                          className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
-                        >
-                          <Eye className="h-3 w-3" aria-hidden="true" />
-                          {t('viewOnly')}
-                        </Badge>
-                      )}
-                    </CardTitle>
-                    <Button size="sm" variant="outline" className="gap-1.5" asChild>
-                      <Link
-                        href="/calendar?highlightWidget=units"
-                        aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
-                      >
-                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{t('manageInCalendar')}</span>
+            <CardSolid>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle id="units-section-heading" className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" aria-hidden="true" />
+                  {t('myUnits')}
+                  {/* View Only Badge - makes read-only state obvious */}
+                  {hasHydrated && units.length > 0 && (
+                    <Badge
+                      variant="neutral"
+                      className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
+                    >
+                      <Eye className="h-3 w-3" aria-hidden="true" />
+                      {t('viewOnly')}
+                    </Badge>
+                  )}
+                </CardTitle>
+                <Button size="sm" variant="outline" className="gap-1.5" asChild>
+                  <Link
+                    href="/calendar?highlightWidget=units"
+                    aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{t('manageInCalendar')}</span>
+                  </Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {!hasHydrated ? (
+                  <div className="h-32 flex items-center justify-center">
+                    <div className="animate-pulse space-y-3 w-full max-w-md">
+                      <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
+                      <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
+                    </div>
+                  </div>
+                ) : units.length === 0 ? (
+                  <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 mx-auto mb-4" />
+                    <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
+                      {t('noUnitsYet')}
+                    </h3>
+                    <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
+                      {t('addFirstUnitDesc')}
+                    </p>
+                    <Button asChild className="gap-2">
+                      <Link href="/calendar">
+                        <Plus className="h-4 w-4" />
+                        {t('addYourFirstUnit')}
                       </Link>
                     </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {!hasHydrated ? (
-                      <div className="h-32 flex items-center justify-center">
-                        <div className="animate-pulse space-y-3 w-full max-w-md">
-                          <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mx-auto" />
-                          <div className="h-4 bg-mq-background-tertiary rounded w-1/2 mx-auto" />
-                        </div>
-                      </div>
-                    ) : units.length === 0 ? (
-                      <div className="text-center py-12">
-                        <BookOpen className="h-12 w-12 mx-auto mb-4" />
-                        <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                          {t('noUnitsYet')}
-                        </h3>
-                        <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                          {t('addFirstUnitDesc')}
+                  </div>
+                ) : (
+                  <>
+                    {/* Unit Stats */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
+                      <div className="text-center">
+                        <p className="text-mq-2xl font-bold text-mq-content">
+                          {unitStats.unitCount}
                         </p>
-                        <Button asChild className="gap-2">
-                          <Link href="/calendar">
-                            <Plus className="h-4 w-4" />
-                            {t('addYourFirstUnit')}
-                          </Link>
-                        </Button>
+                        <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
                       </div>
-                    ) : (
-                      <>
-                        {/* Unit Stats */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 bg-mq-background-secondary rounded-mq-lg mb-6 border border-mq-border">
-                          <div className="text-center">
-                            <p className="text-mq-2xl font-bold text-mq-content">
-                              {unitStats.unitCount}
-                            </p>
-                            <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-mq-2xl font-bold text-mq-content">
-                              {unitStats.totalClasses}
-                            </p>
-                            <p className="text-mq-xs text-mq-content-secondary">
-                              {t('classesPerWeek')}
-                            </p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-mq-2xl font-bold text-mq-content">
-                              {unitStats.studyHours}h
-                            </p>
-                            <p className="text-mq-xs text-mq-content-secondary">
-                              {t('studyHours')}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* View-only hint */}
-                        <p className="text-mq-xs text-mq-content-tertiary mb-3 flex items-center gap-1.5">
-                          <Info className="h-3 w-3" aria-hidden="true" />
-                          {t('homeViewOnlyHint')}
+                      <div className="text-center">
+                        <p className="text-mq-2xl font-bold text-mq-content">
+                          {unitStats.totalClasses}
                         </p>
+                        <p className="text-mq-xs text-mq-content-secondary">
+                          {t('classesPerWeek')}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-mq-2xl font-bold text-mq-content">
+                          {unitStats.studyHours}h
+                        </p>
+                        <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+                      </div>
+                    </div>
 
-                        {/* Units Grid - READ ONLY (no edit/delete) */}
+                    {/* View-only hint */}
+                    <p className="text-mq-xs text-mq-content-tertiary mb-3 flex items-center gap-1.5">
+                      <Info className="h-3 w-3" aria-hidden="true" />
+                      {t('homeViewOnlyHint')}
+                    </p>
+
+                    {/* Units Grid - READ ONLY (no edit/delete) */}
+                    <m.div
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
+                      variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                    >
+                      {units.map((unit) => (
                         <m.div
-                          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
-                          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                          key={unit.id}
+                          variants={revealChildVariants}
+                          className="relative z-0 hover:z-50 focus-within:z-50 h-full"
                         >
-                          {units.map((unit) => (
-                            <m.div
-                              key={unit.id}
-                              variants={revealChildVariants}
-                              className="relative z-0 hover:z-50 focus-within:z-50 h-full"
-                            >
-                              <UnitCard
-                                unit={unit}
-                                showActions={false}
-                                onClick={(clickedUnit) => {
-                                  router.push(
-                                    `/calendar?highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
-                                  );
-                                }}
-                              />
-                            </m.div>
-                          ))}
+                          <UnitCard
+                            unit={unit}
+                            showActions={false}
+                            onClick={(clickedUnit) => {
+                              router.push(
+                                `/calendar?highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
+                              );
+                            }}
+                          />
                         </m.div>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </MagicCard>
+                      ))}
+                    </m.div>
+                  </>
+                )}
+              </CardContent>
+            </CardSolid>
           </section>
         </ScrollReveal>
 
