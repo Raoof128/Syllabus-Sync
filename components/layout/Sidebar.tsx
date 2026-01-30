@@ -40,7 +40,7 @@ const navigation: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { name: 'home', href: '/', icon: Home },
+  { name: 'home', href: '/home', icon: Home },
   { name: 'calendar', href: '/calendar', icon: Calendar },
   { name: 'map', href: '/map', icon: MapPin },
   { name: 'feed', href: '/feed', icon: MessageSquare },
@@ -212,11 +212,9 @@ const Sidebar = memo(() => {
       <button
         ref={menuButtonRef}
         type="button"
-        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-mq-mid ease-mq-ease touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center btn-premium"
-        onClick={toggleMobileMenu}
-        onTouchEnd={(e) => {
-          // Prevent ghost clicks and double-firing on touch devices
-          e.preventDefault();
+        className="md:hidden fixed top-3 left-3 z-[60] p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red active:scale-95 transition-all duration-200 touch-manipulation min-h-11 min-w-11 flex items-center justify-center"
+        onClick={(e) => {
+          e.stopPropagation();
           toggleMobileMenu();
         }}
         aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
@@ -234,7 +232,7 @@ const Sidebar = memo(() => {
           ======================================================================== */}
       {mobileMenuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 dark:bg-black/60 z-40"
+          className="md:hidden fixed inset-0 bg-black/50 dark:bg-black/60 z-[55]"
           onClick={handleOverlayClick}
           role="presentation"
           aria-hidden="true"
@@ -242,7 +240,102 @@ const Sidebar = memo(() => {
       )}
 
       {/* ========================================================================
-          SIDEBAR CONTAINER
+          MOBILE SIDEBAR PANEL
+          ========================================================================
+          On mobile, this panel slides in from the left when hamburger is clicked.
+          It must be OUTSIDE the hidden md:block aside to render on mobile.
+          ======================================================================== */}
+      <div
+        ref={sidebarRef}
+        id="mobile-sidebar"
+        role={mobileMenuOpen ? 'dialog' : 'navigation'}
+        aria-modal={mobileMenuOpen ? 'true' : undefined}
+        aria-label={t('mainNavigation')}
+        className={cn(
+          'md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out',
+          mobileMenuOpen ? 'z-[58] translate-x-0' : 'z-40 -translate-x-full',
+        )}
+      >
+        {/* Logo */}
+        <div className="mb-4">
+          <Link
+            href="/"
+            className="flex items-center gap-2"
+            ref={firstFocusableRef}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <Image
+              src="/MQ_Logo_Final.png"
+              alt={t('mqLogoAlt')}
+              width={80}
+              height={80}
+              priority
+              className="h-12 w-auto"
+              style={{ objectFit: 'contain', borderRadius: '8px' }}
+            />
+            <span className="text-sm font-semibold text-mq-content">Syllabus Sync</span>
+          </Link>
+        </div>
+
+        {/* XP/Level Badge */}
+        {profile && (
+          <Link
+            href="/settings"
+            onClick={() => setMobileMenuOpen(false)}
+            className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
+            title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mq-primary text-white text-xs font-bold">
+              {profile.level}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-mq-content truncate">
+                {t(getLevelTitleKey(profile.level))}
+              </p>
+              <div className="flex items-center gap-1">
+                <Sparkles className="h-3 w-3 text-mq-primary" aria-hidden="true" />
+                <span className="text-[10px] text-mq-content-secondary">
+                  {profile.xp.toLocaleString()} XP
+                </span>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {/* Navigation Links */}
+        <nav className="space-y-2 flex-1" role="navigation" aria-label={t('mainNavigation')}>
+          {navigation.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-3 rounded-mq text-sm font-medium touch-manipulation min-h-11',
+                  isActive
+                    ? 'bg-mq-primary text-white shadow-md'
+                    : 'text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary',
+                )}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+                {t(item.name)}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Social Buttons */}
+        <div className="pt-4 border-t border-mq-border">
+          <SocialButtons />
+        </div>
+      </div>
+
+      {/* ========================================================================
+          DESKTOP SIDEBAR CONTAINER
           ========================================================================
           The main sidebar wrapper. On desktop, hovering this container triggers
           all child animations via CSS :hover selectors in sidebar.css.
@@ -285,31 +378,22 @@ const Sidebar = memo(() => {
         </button>
 
         {/* ----------------------------------------------------------------------
-            SLIDING PANEL - LIQUID GLASS
+            DESKTOP SLIDING PANEL
             ----------------------------------------------------------------------
-            The main sidebar content that slides in from the left on hover (desktop)
-            or when mobileMenuOpen is true (mobile).
-            Uses .mq-liquid-glass for premium backdrop blur, refraction, and
-            permanent shadow for depth.
+            The main sidebar content that slides in from the left on hover (desktop).
+            Uses sidebar-panel CSS class for animations.
             ---------------------------------------------------------------------- */}
         <div
-          ref={sidebarRef}
-          id="mobile-sidebar"
-          role={mobileMenuOpen ? 'dialog' : 'navigation'}
-          aria-modal={mobileMenuOpen ? 'true' : undefined}
+          id="desktop-sidebar"
+          role="navigation"
           aria-label={t('mainNavigation')}
-          className={cn(
-            'fixed md:relative z-40 w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background',
-            mobileMenuOpen && 'sidebar-panel-open',
-          )}
+          className="fixed md:relative w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background border-r border-mq-border z-40"
         >
           {/* Logo - bounces in with slight overshoot */}
           <div className="mb-4 sidebar-logo">
             <Link
               href="/"
               className="flex items-center gap-2"
-              ref={firstFocusableRef}
-              onClick={() => setMobileMenuOpen(false)}
             >
               <Image
                 src="/MQ_Logo_Final.png"
@@ -331,7 +415,6 @@ const Sidebar = memo(() => {
           {profile && (
             <Link
               href="/settings"
-              onClick={() => setMobileMenuOpen(false)}
               className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors sidebar-menu-item"
               title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
               aria-label={t('gamificationProgress', {
@@ -367,7 +450,6 @@ const Sidebar = memo(() => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item',
                     isActive

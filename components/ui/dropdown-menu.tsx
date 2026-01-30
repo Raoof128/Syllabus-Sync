@@ -25,19 +25,14 @@ function DropdownMenuTrigger({
 function DropdownMenuContent({
   className,
   sideOffset = 4,
-  collisionPadding = 20,
+  collisionPadding = 16,
   avoidCollisions = true,
-  align,
+  align = 'end',
   alignOffset,
-  collisionBoundary,
+  side = 'bottom',
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
-  const [defaultBoundary, setDefaultBoundary] = React.useState<Element | null>(null);
   const resolvedAlignOffset = alignOffset ?? 0;
-
-  React.useEffect(() => {
-    setDefaultBoundary(document.documentElement);
-  }, []);
 
   return (
     <DropdownMenuPrimitive.Portal>
@@ -48,14 +43,18 @@ function DropdownMenuContent({
         avoidCollisions={avoidCollisions}
         align={align}
         alignOffset={resolvedAlignOffset}
-        collisionBoundary={collisionBoundary ?? defaultBoundary ?? undefined}
+        side={side}
         className={cn(
-          // Position fixed is critical for proper scroll behavior - ensures menu stays anchored to trigger
-          'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
+          // z-index must be high enough to appear above sticky header
+          'z-[9999]',
+          // Animation and transitions
+          'shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          // Size and overflow constraints
+          'max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
           // Use design system variables for consistent theming
           'bg-mq-card-background text-mq-content border border-mq-border',
-          // Ensure dropdown stays within viewport boundaries
-          'max-w-[80vw]',
+          // Ensure dropdown stays within viewport boundaries - critical for mobile
+          'max-w-[calc(100vw-2rem)]',
           className,
         )}
         {...props}

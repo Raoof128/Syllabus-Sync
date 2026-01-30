@@ -13,12 +13,16 @@ export default function CalendarSidebar({ children, className }: CalendarSidebar
   return (
     <aside
       className={cn(
-        'hidden lg:block w-96 flex-shrink-0 space-y-6 sticky top-[80px] p-1',
+        // Mobile & tablet: full width, stacked below calendar
+        'w-full lg:w-96 lg:flex-shrink-0 space-y-4 lg:space-y-6',
+        // Desktop: sticky sidebar
+        'lg:sticky lg:top-[80px] lg:p-1',
+        // Order: on mobile, widgets come after calendar (order handled in parent)
         className,
       )}
     >
       <ScrollReveal>
-        <div className="space-y-6">{children}</div>
+        <div className="space-y-4 lg:space-y-6">{children}</div>
       </ScrollReveal>
     </aside>
   );

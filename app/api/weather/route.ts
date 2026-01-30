@@ -13,9 +13,9 @@ import { getClientIP } from '@/lib/security/ip';
 
 const OPENMETEO_BASE_URL = 'https://api.open-meteo.com/v1';
 
-// Cache weather data for 10 minutes to reduce API calls
+// Cache weather data for 5 minutes to reduce API calls while keeping data fresh
 const weatherCache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function GET(request: NextRequest) {
   // SECURITY: Rate limit weather API requests

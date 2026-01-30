@@ -81,18 +81,12 @@ const Header = memo(() => {
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [collisionBoundary, setCollisionBoundary] = useState<Element | null>(null);
 
   // Set isClient to true when component mounts
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    if (isClient) {
-      setCollisionBoundary(document.documentElement);
-    }
-  }, [isClient]);
 
   // Load notifications on mount
   useEffect(() => {
@@ -214,52 +208,67 @@ const Header = memo(() => {
   return (
     <header
       ref={headerRef}
-      className="h-14 sm:h-16 w-full shrink-0 bg-mq-background border-b border-mq-border flex items-center justify-between pl-20 sm:pl-16 pr-3 sm:pr-4 md:px-6 sticky top-0 z-40"
+      className="h-auto min-h-14 sm:min-h-16 w-full shrink-0 bg-mq-background border-b border-mq-border flex flex-col sm:flex-row sm:items-center sm:justify-between pl-16 pr-3 sm:pr-4 md:pr-6 py-2 sm:py-0 sticky top-0 z-50"
     >
-      {/* Left side - Logo and title (far left) */}
-      <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0">
-        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 md:gap-3 min-w-0">
+      {/* Top row on mobile / Left side on desktop - Logo, title, date, weather */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink-0">
           <Image
             src="/MQ_Logo_Final.png"
             alt={t('mqLogoAlt')}
             width={80}
             height={80}
             priority
-            className="h-10 sm:h-12 md:h-14 w-auto shrink-0"
+            className="h-8 sm:h-10 md:h-12 w-auto shrink-0"
             style={{ width: 'auto' }}
           />
-          <div className="hidden sm:block min-w-0">
-            <span className="text-sm md:text-base lg:text-lg font-semibold text-mq-content block truncate leading-tight">
+          <div className="min-w-0">
+            <span className="text-xs sm:text-sm md:text-base font-semibold text-mq-content block truncate leading-tight">
               {APP_CONFIG.name}
             </span>
-            <span className="text-[10px] md:text-xs text-mq-content-secondary block truncate">
+            <span className="text-[9px] sm:text-[10px] md:text-xs text-mq-content-secondary block truncate">
               {UNIVERSITY_CONFIG.shortName}
             </span>
           </div>
         </Link>
 
-        {/* Date and Weather display - next to logo/title */}
+        {/* Date and Weather - visible on all sizes but condensed on mobile */}
         {isClient && (
-          <div className="hidden md:flex items-center gap-3 ml-4 pl-4 border-l border-mq-border/50">
+          <div className="flex items-center gap-2 ml-auto sm:ml-4 sm:pl-4 sm:border-l sm:border-mq-border/50">
             <time
-              className="text-sm font-medium text-mq-content whitespace-nowrap"
+              className="text-[10px] sm:text-xs md:text-sm font-medium text-mq-content-secondary sm:text-mq-content whitespace-nowrap"
               dateTime={new Date().toISOString().split('T')[0]}
             >
-              {new Date().toLocaleDateString(getLocaleString(language), {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
+              <span className="sm:hidden">
+                {new Date().toLocaleDateString(getLocaleString(language), {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </span>
+              <span className="hidden sm:inline md:hidden">
+                {new Date().toLocaleDateString(getLocaleString(language), {
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </span>
+              <span className="hidden md:inline">
+                {new Date().toLocaleDateString(getLocaleString(language), {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </span>
             </time>
-            <div className="w-px h-5 bg-mq-border/50" aria-hidden="true" />
+            <div className="hidden sm:block w-px h-5 bg-mq-border/50" aria-hidden="true" />
             <WeatherWidget />
           </div>
         )}
       </div>
 
-      {/* Right side - Actions (far right) */}
-      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+      {/* Right side - Actions */}
+      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 mt-1 sm:mt-0">
         {/* Notifications - wrapped in isClient to prevent hydration mismatch with Radix UI IDs */}
         {isClient && (
           <DropdownMenu>
@@ -290,12 +299,8 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              sideOffset={8}
-              side="bottom"
-              collisionPadding={24}
-              collisionBoundary={collisionBoundary ?? headerRef.current ?? undefined}
-              alignOffset={0}
-              className="w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg"
+              sideOffset={4}
+              className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg"
               role="menu"
               aria-label={t('notifications')}
             >
@@ -518,13 +523,8 @@ const Header = memo(() => {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              sideOffset={8}
-              side="bottom"
-              collisionPadding={16}
-              collisionBoundary={collisionBoundary ?? headerRef.current ?? undefined}
-              alignOffset={-8}
-              avoidCollisions
-              className="w-48 max-w-[90vw] border-mq-border shadow-mq-lg"
+              sideOffset={4}
+              className="w-48 max-w-[calc(100vw-2rem)] border-mq-border shadow-mq-lg"
             >
               <DropdownMenuItem asChild>
                 <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">

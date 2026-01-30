@@ -16,7 +16,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, TrendingUp, Eye, Pencil } from 'lucide-react';
+import { Info, Plus, BookOpen, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -52,16 +52,24 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const [fabOpen, setFabOpen] = useState(false);
 
   const units = useUnitsStore((state) => state.units);
+  const loadUnits = useUnitsStore((state) => state.loadUnits);
   const addUnit = useUnitsStore((state) => state.addUnit);
-  const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
-  const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
   const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
   const profiles = useProfilesStore((state) => state.profiles);
   const currentProfileId = useProfilesStore((state) => state.currentProfileId);
   const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
   const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
+
+  // Load data from database on mount
+  useEffect(() => {
+    if (hasHydrated) {
+      loadUnits();
+      loadDeadlines();
+    }
+  }, [hasHydrated, loadUnits, loadDeadlines]);
 
   // Keep user state in sync with auth endpoint
   useEffect(() => {
@@ -218,14 +226,6 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   }, [router]);
 
   const hasUnits = units.length > 0;
-  const stressLevel = useMemo(() => {
-    if (!hasHydrated) return 'Low';
-    try {
-      return getStressLevel();
-    } catch {
-      return 'Low';
-    }
-  }, [hasHydrated, getStressLevel]);
 
   // Memoized unit stats calculation for better performance
   const unitStats = useMemo(() => {
@@ -323,18 +323,6 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     );
   }
 
-  const stressColors = {
-    Low: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/50',
-    Busy: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50',
-    High: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700/50',
-  };
-
-  const stressLabels = {
-    Low: t('stressLow'),
-    Busy: t('stressBusy'),
-    High: t('stressHigh'),
-  };
-
   return (
     <LazyMotion features={domAnimation}>
       <div className="home-page overflow-x-hidden">
@@ -343,34 +331,15 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           <header className="mb-6" role="banner">
             <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name}>
               {hasHydrated && (
-                <>
-                  {/* Workload Badge */}
-                  {deadlines.length > 0 && (
-                    <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-mq-background-secondary border border-mq-border rounded-full mr-2">
-                      <TrendingUp className="h-3.5 w-3.5 text-mq-content-secondary" />
-                      <span className="text-xs font-medium text-mq-content-secondary">
-                        {t('workload')}
-                      </span>
-                      <Badge
-                        variant="neutral"
-                        className={`${stressColors[stressLevel]} border-0 text-xs px-2 py-0.5 rounded-full ml-1`}
-                      >
-                        {stressLabels[stressLevel]}
-                      </Badge>
-                    </div>
-                  )}
-
-                  {/* Primary Action */}
-                  <Button
-                    asChild
-                    className="gap-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <Link href="/calendar?action=add-deadline">
-                      <Plus className="h-4 w-4" />
-                      <span>{t('addTask')}</span>
-                    </Link>
-                  </Button>
-                </>
+                <Button
+                  asChild
+                  className="gap-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <Link href="/calendar?action=add-deadline">
+                    <Plus className="h-4 w-4" />
+                    <span>{t('addTask')}</span>
+                  </Link>
+                </Button>
               )}
             </WelcomeHeader>
           </header>

@@ -6,7 +6,6 @@ import { useGamificationStore, useXPProgress, useStreak } from '@/lib/store/gami
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { LevelBadge } from './LevelBadge';
 import { XPProgressBar } from './XPProgressBar';
-import { StreakBadge } from './StreakIndicator';
 
 type LevelColors = {
   pillGradientStyle: string;
@@ -145,45 +144,51 @@ export function GamificationStats({
     const levelTooltip = t('levelTooltip', { level, xp: currentXP.toLocaleString() });
 
     return (
-      <div className={cn('flex items-center gap-3', className)}>
-        <span
+      <div className={cn('flex items-center gap-2 flex-wrap', className)}>
+        {/* Level Badge with XP display */}
+        <div
           className={cn(
-            'relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg ring-2',
-            levelColors.ringClass,
+            'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition-all duration-200 hover:shadow-lg cursor-default',
             levelColors.textClass,
           )}
           style={{
             background: levelColors.pillGradientStyle,
-            boxShadow: `0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 2px ${levelColors.ringColor}`,
           }}
           aria-label={levelAriaLabel}
           title={levelTooltip}
           data-testid="level-badge"
         >
-          {t('level')} {level}
+          {/* Level text with XP */}
+          <span className="whitespace-nowrap">{t('level')} {level}</span>
+          <span className="opacity-70">•</span>
+          <span className="whitespace-nowrap tabular-nums">{currentXP.toLocaleString()} XP</span>
+
+          {/* XP Progress bar */}
           <span
-            className={cn('h-2.5 w-14 rounded-full overflow-hidden shadow-inner border')}
-            style={{
-              background: levelColors.trackBgStyle,
-              borderColor: levelColors.trackBorderStyle,
-            }}
+            className="h-2 w-12 rounded-full overflow-hidden bg-white/20"
             aria-hidden="true"
           >
             <span
-              className={cn(
-                'block h-full transition-[width] duration-300 shadow-[0_0_10px_rgba(255,255,255,0.75)]',
-              )}
-              style={{
-                width: `${progressPercent}%`,
-                background: levelColors.fillGradientStyle,
-              }}
-              aria-hidden="true"
+              className="block h-full transition-[width] duration-300 bg-white/80 rounded-full"
+              style={{ width: `${progressPercent}%` }}
             />
           </span>
-        </span>
-        {showStreak && days > 0 && <StreakBadge />}
+        </div>
+
+        {/* Streak Badge - polished and consistent */}
+        {showStreak && days > 0 && (
+          <div
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md bg-gradient-to-r from-orange-500 to-amber-500 text-white"
+            title={t('streakDayTooltip', { count: days, longest: days })}
+            aria-label={t('streakDay', { count: days })}
+          >
+            <span className="text-base leading-none" role="img" aria-hidden="true">🔥</span>
+            <span className="tabular-nums">{days} day{days !== 1 ? 's' : ''}</span>
+          </div>
+        )}
+
         {isDemo && (
-          <span className="text-xs text-mq-content-tertiary bg-mq-background-secondary px-1.5 py-0.5 rounded">
+          <span className="text-[10px] text-mq-content-tertiary bg-mq-background-secondary px-1.5 py-0.5 rounded-full border border-mq-border">
             {t('demo')}
           </span>
         )}

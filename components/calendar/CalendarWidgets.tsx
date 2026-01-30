@@ -178,8 +178,17 @@ export default function CalendarWidgets({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Assignments Widget */}
+    <div className="space-y-4 lg:space-y-6">
+      {/* Mobile section header - only visible on smaller screens */}
+      <div className="lg:hidden flex items-center gap-2 pb-2 border-b border-mq-border">
+        <h2 className="text-lg font-semibold text-mq-content">{tOr('calendarWidgets' as TranslationKey, 'Quick Access')}</h2>
+        <span className="text-xs text-mq-content-tertiary">
+          ({assignments.length + exams.length + units.length + events.length} {tOr('items' as TranslationKey, 'items')})
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
+        {/* Assignments Widget */}
       <MagicCard
         isLiquidEnhanced
         className={
@@ -661,6 +670,7 @@ export default function CalendarWidgets({
           </Card>
         </div>
       </MagicCard>
+      </div>
     </div>
   );
 }

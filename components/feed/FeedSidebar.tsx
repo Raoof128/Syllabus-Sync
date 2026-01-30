@@ -18,9 +18,14 @@ export function FeedSidebar({ stats }: FeedSidebarProps) {
 
   return (
     <aside
-      className="space-y-6 hidden lg:block lg:sticky lg:top-[88px] lg:h-fit"
+      className="space-y-4 lg:space-y-6 w-full lg:w-auto lg:sticky lg:top-[88px] lg:h-fit"
       aria-label={t('eventStatistics')}
     >
+      {/* Mobile section header - only visible on smaller screens */}
+      <div className="lg:hidden flex items-center gap-2 pb-2 border-b border-mq-border">
+        <h2 className="text-lg font-semibold text-mq-content">{t('eventStatistics')}</h2>
+      </div>
+
       {/* Quick Stats */}
       <ScrollReveal delay={0.25}>
         <MagicCard isLiquidEnhanced className="overflow-hidden">
