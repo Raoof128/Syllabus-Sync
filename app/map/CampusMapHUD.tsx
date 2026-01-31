@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/lib/map/buildings';
@@ -33,6 +33,7 @@ export default function CampusMapHUD({
   onStartNavigation,
 }: Props) {
   const { t } = useTranslation();
+  const prefersReducedMotion = useReducedMotion();
 
   const topSlice = useMemo(() => buildings.slice(0, 15), [buildings]);
 
@@ -102,7 +103,7 @@ export default function CampusMapHUD({
               hidden: { opacity: 0 },
               visible: {
                 opacity: 1,
-                transition: { staggerChildren: 0.05 },
+                transition: { staggerChildren: prefersReducedMotion ? 0 : 0.05 },
               },
             }}
           >
@@ -114,24 +115,28 @@ export default function CampusMapHUD({
                   href={isSelected ? '/map' : `/map?building=${b.id}`}
                   onClick={() => triggerHaptic('tap', 'medium')}
                   variants={{
-                    hidden: { opacity: 0, x: -10 },
+                    hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -10 },
                     visible: { opacity: 1, x: 0 },
                   }}
-                  whileHover={{
-                    scale: 1.02,
-                    borderColor: 'var(--mq-primary)',
-                    backgroundColor: isSelected
-                      ? 'rgba(var(--mq-primary), 0.15)'
-                      : 'var(--mq-background-secondary)',
-                  }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={
+                    prefersReducedMotion
+                      ? {}
+                      : {
+                          scale: 1.02,
+                          borderColor: 'var(--mq-primary)',
+                          backgroundColor: isSelected
+                            ? 'rgba(var(--mq-primary), 0.15)'
+                            : 'var(--mq-background-secondary)',
+                        }
+                  }
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                   animate={
                     isSelected
                       ? {
                           borderLeftWidth: '4px',
                           borderLeftColor: 'var(--mq-primary)',
                           backgroundColor: 'var(--mq-primary-alpha-5)',
-                          x: 4,
+                          x: prefersReducedMotion ? 0 : 4,
                         }
                       : {
                           borderLeftWidth: '1px',
@@ -177,10 +182,10 @@ export default function CampusMapHUD({
         {selectedBuilding && (
           <m.div
             className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto"
-            initial={{ y: 20, opacity: 0 }}
+            initial={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            exit={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
           >
             <LayeredCard interactive={false} className="rounded-mq-xl border-mq-border p-4">
               <div className="flex justify-between items-start mb-2">

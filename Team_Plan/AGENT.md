@@ -124,3 +124,14 @@
 - **Files:** app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
 - **Verification:** `npm run check` (all pass: tests, lint, typecheck, build). Visual verification of animations and responsive layout.
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-31 (Australia/Sydney) - Tier 7 Performance Tweaks
+- **Status:** ✅ Complete - 60fps Animations, Icon Caching, Reduced Motion.
+- **Scope:** Performance, Accessibility.
+- **Summary:** Implemented performance optimizations and accessibility enhancements:
+    - **Icon Caching:** Implemented `iconCache` in `mapUtils.ts` to reuse Leaflet icon instances.
+    - **Reduced Motion:** Integrated `useReducedMotion` in `CampusMap.tsx` and `CampusMapHUD.tsx` to disable/simplify animations for users who prefer reduced motion.
+    - **60fps Animations:** Verified and ensured all key animations use GPU-accelerated `transform` properties.
+- **Files:** lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
+- **Verification:** `npm run check` passed.
+- **Follow-ups:** None.

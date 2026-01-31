@@ -29,6 +29,7 @@ import { useMapLocation } from './hooks/useMapLocation';
 import { useMapNavigation } from './hooks/useMapNavigation';
 import { MapOverlays } from './components/MapOverlays';
 import { DebugControls } from './components/DebugControls';
+import { useReducedMotion } from 'framer-motion';
 
 // Map-specific logger
 const mapLog = devLog.map;
@@ -293,6 +294,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         setMapInstanceProp: (map: import('leaflet').Map) => void;
       }) => {
         const map = useMap();
+        const prefersReducedMotion = useReducedMotion();
         const [isReady, setIsReady] = useState(false);
 
         useEffect(() => {
@@ -331,12 +333,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             );
 
             // Smooth transition to building (Tier 4: Contextual Animations)
+            // Tier 7: Reduced Motion Respect
+            const shouldAnimate = !prefersReducedMotion;
+
             map.flyTo(buildingLatLng, 1, {
-              duration: 1.5,
+              duration: shouldAnimate ? 1.5 : 0,
               easeLinearity: 0.25,
               paddingTopLeft: [0, 0], // Can adjust based on sidebar
               paddingBottomRight: [0, 0],
-              animate: true,
+              animate: shouldAnimate,
             } as import('leaflet').ZoomPanOptions);
 
             map.eachLayer((layer) => {

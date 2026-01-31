@@ -60,6 +60,9 @@ export function generateMarkerSvgDataUrl(options: {
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
+// Cache for marker icons to prevent recreating them
+const iconCache = new Map<string, import('leaflet').Icon>();
+
 /**
  * Creates a Leaflet Icon instance for map markers
  *
@@ -73,7 +76,13 @@ export function createMarkerIcon(
   isSelected: boolean,
   className?: string,
 ): import('leaflet').Icon {
-  return new L.Icon({
+  const cacheKey = `${isSelected}-${className || ''}`;
+
+  if (iconCache.has(cacheKey)) {
+    return iconCache.get(cacheKey)!;
+  }
+
+  const icon = new L.Icon({
     iconUrl: generateMarkerSvgDataUrl({ isSelected }),
     iconSize: [MARKER_DIMENSIONS.width, MARKER_DIMENSIONS.height],
     iconAnchor: [MARKER_DIMENSIONS.anchorX, MARKER_DIMENSIONS.anchorY],
@@ -82,6 +91,9 @@ export function createMarkerIcon(
     shadowSize: [MARKER_DIMENSIONS.shadowWidth, MARKER_DIMENSIONS.shadowHeight],
     className: className,
   });
+
+  iconCache.set(cacheKey, icon);
+  return icon;
 }
 
 /**

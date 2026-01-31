@@ -111,8 +111,23 @@ Follow-ups: None.
 Raouf: 2026-01-31 (Australia/Sydney)
 Scope: Map - Tier 4 (Animations), Tier 5 (Polish), & Tier 6 (Layout)
 Summary: Implemented major UX enhancements for the Map module including cinematic transitions, visual system upgrades, and responsive layout improvements.
-- **Tier 4 (Contextual Animations):** Replaced `setView` with `flyTo` for smooth building navigation; upgraded `MapSkeleton` with pulsing gradients and shimmer effects.
-- **Tier 5 (Visual Polish):** Defined semantic `--icon-*` variables in `globals.css`; added `lg` size variant to `Badge`; implemented global `.focus-ring` with animation.
-- **Tier 6 (Layout Improvements):** Refactored `CampusMapHUD` to be responsive (Sidebar on desktop, Bottom Sheet on mobile); added `AnimatePresence` for smooth drawer entry/exit; enabled elastic drag for touch devices.
+- **Feature (Tier 4):** Added `flyTo` camera transitions and enhanced `MapSkeleton` with shimmer effects.
+- **Feature (Tier 5):** Defined semantic Icon System in `globals.css` and improved `Badge` typography.
+- **Feature (Tier 6):** Created responsive HUD with mobile bottom-sheet behavior and elastic drag.
+- **Fix:** Resolved missing `AnimatePresence` and added `focus-ring` accessibility styles.
+- **Verification:** Verified visually and via `npm run check`.
 Files: app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Performance - Tier 7 Optimizations
+Summary: Applied performance and accessibility tweaks to the Map module.
+- **Perf:** Implemented marker icon caching in `mapUtils.ts` to reduce object creation.
+- **A11y:** Added `prefers-reduced-motion` support to disable camera flying and simplify HUD animations.
+- **Perf:** Confirmed use of GPU-accelerated `transform` properties for smooth 60fps animations.
+- **Verification:** `npm run check` passed.
+Files: lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
+Follow-ups: None.
+
