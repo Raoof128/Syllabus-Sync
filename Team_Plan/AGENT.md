@@ -3,6 +3,14 @@
 ## Current Development Session (January 22-30, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-01-31 (Australia/Sydney) - Auth Logs & Image QA
+- **Status:** ✅ Complete - Fixed console noise and image warnings.
+- **Scope:** QA, Bug Fixes.
+- **Summary:** Investigated and resolved console errors. Suppressed "Refresh Token Not Found" spam in Supabase middleware (expected behavior for expired sessions). Fixed `next/image` aspect ratio warning in `Sidebar.tsx` by ensuring `width: auto` is applied when height is constrained. Verified Service Worker safety despite external extension errors.
+- **Files:** lib/supabase/middleware.ts; components/layout/Sidebar.tsx.
+- **Verification:** `npm run check` (all pass: 0 errors).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-31 (Australia/Sydney) - Solid Surface Final Polish & Gamification QA
 - **Status:** ✅ Complete - Final "Glass" removal and Gamification/Translation fixes.
 - **Scope:** QA, Polish, Bug Fixes.
@@ -46,7 +54,7 @@
 ### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 5-9)
 - **Status:** ✅ Complete - Home route performance, accessibility, and correctness hardening.
 - **Scope:** Performance, Accessibility, QA.
-- **Summary:** Implemented hydration-safe memoization for KPI and Heat-Strip components. Updated `loading.tsx` skeleton to match the final solid layout (Header -> KPI -> Heat-Strip -> Grid). Hardened accessibility with `focus-visible` rings on interactive elements. Verified no Suspense wrapper in `page.tsx`.
+- **Summary:** Implemented hydration-safe memoization for KPI and Heat-Strip components. Updated `loading.tsx` skeleton to perfectly match final layout (Header -> KPI -> Heat-Strip -> Grid) to minimize CLS. Hardened accessibility with `focus-visible` rings on interactive elements. Verified no Suspense wrapper in `page.tsx`.
 - **Files:** app/home/loading.tsx; app/home/page.tsx; components/home/WeekHeatStrip.tsx.
 - **Verification:** Verified hydration stability (no mismatches). Verified skeleton layout alignment.
 - **Follow-ups:** None.

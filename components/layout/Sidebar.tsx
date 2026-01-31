@@ -271,7 +271,7 @@ const Sidebar = memo(() => {
               height={80}
               priority
               className="h-12 w-auto"
-              style={{ objectFit: 'contain', borderRadius: '8px' }}
+              style={{ objectFit: 'contain', borderRadius: '8px', width: 'auto' }}
             />
             <span className="text-sm font-semibold text-mq-content">Syllabus Sync</span>
           </Link>

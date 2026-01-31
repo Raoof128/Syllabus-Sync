@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
+Scope: QA - Auth Logs & Image Fixes
+Summary: Resolved console errors and warnings to ensure a clean developer experience.
+- **QA/Fix:** Suppressed "Refresh Token Not Found" errors in `lib/supabase/middleware.ts` to prevent server log spam (handled silently as expected for expired sessions).
+- **QA/Fix:** Fixed `next/image` aspect ratio warning in `Sidebar.tsx` by enforcing `width: auto` style on resized logo.
+- **Verification:** `npm run check` passed successfully (0 errors).
+Files: lib/supabase/middleware.ts; components/layout/Sidebar.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
 Scope: Home - Solid Surface Polish & Gamification QA
 Summary: Final polish of Home route to ensure 100% Solid Surface compliance and resolved all QA findings.
 - **UI/UX:** Replaced remaining `glass` variant in `QuickActions` with `secondary` solid style.
