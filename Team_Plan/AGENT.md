@@ -135,3 +135,14 @@
 - **Files:** lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
 - **Verification:** `npm run check` passed.
 - **Follow-ups:** None.
+
+### Raouf: 2026-01-31 (Australia/Sydney) - Final Lint & Cleanup
+- **Status:** ✅ Complete - Lint clean and workspace organized.
+- **Scope:** QA, Cleanup.
+- **Summary:** Finalized workspace for session handover.
+    - **Lint:** Fixed missing dependency warning in `CampusMap.tsx`.
+    - **Cleanup:** Deleted redundant tracked artifacts (`scripts/i18n-audit-results.json`, `scripts/i18n-audit-temp.cjs`, `test_crawl4ai.py`) and untracked junk (`middleware.ts.bak`, `AUDIT_MAP.md`).
+    - **Git:** Staged all recent map improvements and new tests for commit.
+- **Files:** app/map/CampusMap.tsx; Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md.
+- **Verification:** `npm run lint` returns "Lint OK". `git status` verified.
+- **Follow-ups:** None.

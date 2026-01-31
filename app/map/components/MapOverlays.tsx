@@ -8,8 +8,7 @@ const mapLog = devLog.map;
 
 interface MapOverlaysProps {
   mapInstance: LeafletMap | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  leafletModule: any;
+  leafletModule: typeof import('leaflet') | null;
   activeOverlays: MapOverlayId[];
   overlaysReady: boolean;
 }

@@ -86,6 +86,7 @@ export default function CampusMapHUD({
                 value={buildingSearch}
                 onChange={(e) => setBuildingSearch(e.target.value)}
                 placeholder={t('filterBuildings')}
+                aria-label={t('filterBuildings')}
                 className="w-full pl-10 pr-3 py-2 bg-mq-background border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
               />
             </div>

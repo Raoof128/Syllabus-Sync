@@ -143,10 +143,8 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       leafletModule,
       isMapReady,
       userIcon,
-      isNavigating: false,
       navManagerRef,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    });
 
     // 2. Navigation Logic
     const {
@@ -361,7 +359,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           } catch (error) {
             mapLog.log('Building nav error:', error);
           }
-        }, [selectedBuildingProp, map, isReady]);
+        }, [selectedBuildingProp, map, isReady, prefersReducedMotion]);
 
         return null;
       };
@@ -437,15 +435,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               mapInstance={mapInstance}
               leafletModule={leafletModule}
               activeOverlays={activeOverlays}
-              overlaysReady={overlaysReady}
-            />
-
-            {/* Campus Base Layer */}
-            <MapOverlays
-              mapInstance={mapInstance}
-              leafletModule={leafletModule}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              activeOverlays={['base' as any]}
               overlaysReady={overlaysReady}
             />
 

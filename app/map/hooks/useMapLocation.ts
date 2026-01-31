@@ -24,11 +24,10 @@ const mapLog = devLog.map;
 
 interface UseMapLocationProps {
   mapInstance: LeafletMap | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  leafletModule: any;
+  leafletModule: typeof import('leaflet') | null;
   isMapReady: (map: LeafletMap | null) => boolean;
-  userIcon: Icon | null;
-  isNavigating: boolean;
+  userIcon: Icon | import('leaflet').DivIcon | null;
+  isNavigating?: boolean;
   navManagerRef: React.MutableRefObject<NavigationStateManager | null>;
 }
 
@@ -236,7 +235,7 @@ export function useMapLocation({
 
           if (crsPos) {
             // User Marker
-            if (!userMarkerRef.current && userIcon) {
+            if (!userMarkerRef.current && userIcon && mapInstance) {
               userMarkerRef.current = leafletModule
                 .marker([crsPos.lat, crsPos.lng], {
                   icon: userIcon,
@@ -284,7 +283,7 @@ export function useMapLocation({
             // Accuracy Circle
             const accuracy = pos.coords.accuracy;
             const pixelAccuracy = accuracy / 0.42; // approx 1px = 0.42m
-            if (!accuracyCircleRef.current) {
+            if (!accuracyCircleRef.current && mapInstance) {
               accuracyCircleRef.current = leafletModule
                 .circle([crsPos.lat, crsPos.lng], {
                   radius: pixelAccuracy,
@@ -294,7 +293,7 @@ export function useMapLocation({
                   fillOpacity: 0.1,
                 })
                 .addTo(mapInstance);
-            } else {
+            } else if (accuracyCircleRef.current) {
               accuracyCircleRef.current.setLatLng([crsPos.lat, crsPos.lng]);
               accuracyCircleRef.current.setRadius(pixelAccuracy);
             }
@@ -418,7 +417,7 @@ export function useMapLocation({
         const crsPos = gpsToCrsSimple(lat, lng);
         if (crsPos) {
           // User Marker
-          if (!userMarkerRef.current && userIcon) {
+          if (!userMarkerRef.current && userIcon && mapInstance) {
             userMarkerRef.current = leafletModule
               .marker([crsPos.lat, crsPos.lng], {
                 icon: userIcon,
@@ -441,15 +440,17 @@ export function useMapLocation({
 
           // Accuracy Circle
           if (!accuracyCircleRef.current) {
-            accuracyCircleRef.current = leafletModule
-              .circle([crsPos.lat, crsPos.lng], {
-                radius: 10, // Small radius for sim
-                color: 'var(--mq-primary, #1a73e8)',
-                weight: 1,
-                opacity: 0.4,
-                fillOpacity: 0.1,
-              })
-              .addTo(mapInstance);
+            if (mapInstance) {
+              accuracyCircleRef.current = leafletModule
+                .circle([crsPos.lat, crsPos.lng], {
+                  radius: 10, // Small radius for sim
+                  color: 'var(--mq-primary, #1a73e8)',
+                  weight: 1,
+                  opacity: 0.4,
+                  fillOpacity: 0.1,
+                })
+                .addTo(mapInstance);
+            }
           } else {
             accuracyCircleRef.current.setLatLng([crsPos.lat, crsPos.lng]);
           }

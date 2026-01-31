@@ -127,7 +127,16 @@ Summary: Applied performance and accessibility tweaks to the Map module.
 - **Perf:** Implemented marker icon caching in `mapUtils.ts` to reduce object creation.
 - **A11y:** Added `prefers-reduced-motion` support to disable camera flying and simplify HUD animations.
 - **Perf:** Confirmed use of GPU-accelerated `transform` properties for smooth 60fps animations.
-- **Verification:** `npm run check` passed.
+Verification: `npm run check` passed.
 Files: lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: QA - Final Cleanup & Lint
+Summary: Cleaned up workspace artifacts and resolved final lint warnings.
+- **Fix:** Resolved `react-hooks/exhaustive-deps` warning in `CampusMap.tsx` by adding `prefersReducedMotion` to the `useEffect` dependency array.
+- **Cleanup:** Removed redundant tracked files (`scripts/i18n-audit-results.json`, `scripts/i18n-audit-temp.cjs`, `test_crawl4ai.py`) and temporary junk (`middleware.ts.bak`).
+- **Git:** Staged all map module improvements and new test suites.
+Files: app/map/CampusMap.tsx; Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md.
 Follow-ups: None.
 
