@@ -383,7 +383,10 @@ const FeedClient = memo(() => {
   }, [storeEvents]);
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-7xl feed-page">
+    <section
+      className="container mx-auto p-4 sm:p-6 max-w-7xl feed-page"
+      aria-label={t('campusFeedLabel')}
+    >
       {/* Header */}
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
@@ -578,7 +581,7 @@ const FeedClient = memo(() => {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 });
 

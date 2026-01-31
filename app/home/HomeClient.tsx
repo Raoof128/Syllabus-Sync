@@ -325,7 +325,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="home-page overflow-x-hidden">
+      <section
+        className="home-page overflow-x-hidden container mx-auto p-4 sm:p-6 max-w-7xl"
+        aria-label={t('dashboardOverviewLabel')}
+      >
         {/* Header */}
         <ScrollReveal>
           <header className="mb-6" role="banner">
@@ -565,7 +568,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
             </Button>
           </div>
         </div>
-      </div>
+      </section>
     </LazyMotion>
   );
 }

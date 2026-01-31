@@ -598,7 +598,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="current-password"
                   required
                   data-testid="current-password-input"
@@ -631,7 +631,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-3 py-2 pr-10 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary"
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="new-password"
                   minLength={12}
                   required
@@ -700,7 +700,7 @@ const PrivacySettings = memo(({ t, units, deadlines, theme, language }: PrivacyS
                       ? 'border-mq-error'
                       : 'border-mq-border'
                   }`}
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   autoComplete="new-password"
                   required
                   data-testid="confirm-password-input"

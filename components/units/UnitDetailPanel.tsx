@@ -197,7 +197,7 @@ export default function UnitDetailPanel({
               <div
                 className="w-6 h-6 rounded-full border-2"
                 style={{ backgroundColor: unit.color, borderColor: unit.color }}
-                title="Unit Color"
+                title={t('unitColor')}
               />
             </div>
           </div>

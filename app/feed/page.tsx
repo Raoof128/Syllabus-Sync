@@ -69,9 +69,7 @@ function FeedSkeleton() {
 export default function FeedPage() {
   return (
     <Suspense fallback={<FeedSkeleton />}>
-      <section className="container mx-auto p-6 max-w-7xl feed-page" aria-label="Campus Feed">
-        <FeedClient />
-      </section>
+      <FeedClient />
     </Suspense>
   );
 }

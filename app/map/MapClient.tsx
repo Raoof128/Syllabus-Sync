@@ -184,7 +184,10 @@ export default function MapClient() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="container mx-auto p-4 max-w-7xl map-page">
+      <section
+        className="container mx-auto p-4 max-w-7xl map-page"
+        aria-label={t('campusMapLabel')}
+      >
         {/* Header */}
         <header className="mb-6">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('map')}</h1>
@@ -299,7 +302,7 @@ export default function MapClient() {
                         size="sm"
                         onClick={copyShareableURL}
                         className="gap-1 text-mq-info"
-                        title="Copy shareable URL with current layers"
+                        title={t('copyShareableURL')}
                       >
                         <LinkIcon className="h-4 w-4" />
                         {t('copyLink')}
@@ -360,7 +363,7 @@ export default function MapClient() {
             </Card>
           </div>
         </MagicCard>
-      </div>
+      </section>
     </LazyMotion>
   );
 }

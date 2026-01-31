@@ -1527,5 +1527,18 @@
   "event_librarySprint_title": "Library Late-Night Study Sprint",
   "event_librarySprint_desc": "Quiet study zone with librarians on call for research help and free snacks after 8pm.",
   "event_bizCoffee_title": "Biz School Coffee Chat",
-  "event_bizCoffee_desc": "Meet classmates and faculty for an informal coffee hour in the Business School atrium."
+  "event_bizCoffee_desc": "Meet classmates and faculty for an informal coffee hour in the Business School atrium.",
+  "stopNavigation": "Stop navigation",
+  "campusFeedLabel": "Campus Feed",
+  "campusMapLabel": "Campus Map",
+  "dashboardOverviewLabel": "Dashboard overview",
+  "keyboardShortcuts": "Keyboard Shortcuts",
+  "ctrlKey": "Ctrl",
+  "dueTomorrow": "Due tomorrow",
+  "dayOverdue": "{{count}} day overdue",
+  "daysOverdue": "{{count}} days overdue",
+  "dueInDays": "Due in {{count}} days",
+  "copyShareableURL": "Copy shareable URL with current layers",
+    "studentIdPlaceholder": "12345678",
+    "passwordPlaceholder": "••••••••"
 }

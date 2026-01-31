@@ -249,12 +249,12 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
               <div>
                 <Label htmlFor="account-student-id">{t('studentId')}</Label>
                 <Input
-                  id="account-student-id"
-                  value={formData.studentId}
-                  onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-                  placeholder="12345678"
-                  disabled={isSaving}
-                />
+                id="account-student-id"
+                value={formData.studentId}
+                onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                placeholder={t('studentIdPlaceholder')}
+                disabled={isSaving}
+              />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

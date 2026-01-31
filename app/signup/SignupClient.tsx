@@ -361,7 +361,7 @@ export default function SignupClient() {
                 <Input
                   id="studentId"
                   type="text"
-                  placeholder="12345678"
+                  placeholder={t('studentIdPlaceholder')}
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
                   required

@@ -142,7 +142,15 @@
 - **Summary:** Finalized workspace for session handover.
     - **Lint:** Fixed missing dependency warning in `CampusMap.tsx`.
     - **Cleanup:** Deleted redundant tracked artifacts (`scripts/i18n-audit-results.json`, `scripts/i18n-audit-temp.cjs`, `test_crawl4ai.py`) and untracked junk (`middleware.ts.bak`, `AUDIT_MAP.md`).
-    - **Git:** Staged all recent map improvements and new tests for commit.
+    - **Git:** Staged all map module improvements and new tests for commit.
 - **Files:** app/map/CampusMap.tsx; Team_Plan/AGENT.md; Team_Plan/CHANGELOG.md.
 - **Verification:** `npm run lint` returns "Lint OK". `git status` verified.
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-31 (Australia/Sydney) - Repo-wide I18n Audit & Final Cleanup
+- **Status:** ✅ Complete - All hardcoded strings replaced, locales synced, and workspace cleaned.
+- **Scope:** Internationalization, QA, Cleanup.
+- **Summary:** Performed a comprehensive i18n audit. Replaced hardcoded user-facing strings (aria-labels, placeholders, titles) with translation keys across the app. Automated propagation of new keys to all 18 other locales. Finalized session by cleaning up temporary audit scripts and JSON reports.
+- **Files:** `app/map/MapClient.tsx`, `app/feed/FeedClient.tsx`, `components/ui/KeyboardShortcuts.tsx`, `locales/**/*.json`, `app/settings/components/AccountSettings.tsx`, `app/signup/SignupClient.tsx`, `app/settings/components/PrivacySettings.tsx`, `components/units/UnitDetailPanel.tsx`.
+- **Verification:** `audit_locales.js` reports 0 missing keys. `npm run lint` passes. Git workspace is clean.
 - **Follow-ups:** None.
