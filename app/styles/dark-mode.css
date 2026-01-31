@@ -35,7 +35,11 @@
 }
 
 /* Header - MQ token styling (only for the top navigation header, not page content headers) */
-.dark .layout-main > header,
+.dark .layout-main > header {
+  background-color: var(--c-background);
+  border-color: var(--c-border);
+}
+
 .dark header.h-16 {
   background-color: var(--c-background);
   border-color: var(--c-border);
@@ -55,6 +59,7 @@
 /* Cards & Surfaces - MQ backgrounds */
 .dark .bg-white {
   background-color: var(--c-card-background);
+  border-color: var(--c-border);
 }
 
 /* Buttons - MQ primary colors */
@@ -73,14 +78,22 @@
 }
 
 .dark input::placeholder,
-.dark textarea::placeholder,
-.dark select {
+.dark textarea::placeholder {
   color: var(--c-content-tertiary);
 }
 
-/* Focus states for form elements */
-.dark input:focus,
-.dark textarea:focus,
+/* Form Elements Focus States - Split to ensure parser stability */
+/* Forced invalidation check */
+.dark input:focus {
+  border-color: var(--mq-focus);
+  --tw-ring-color: var(--mq-focus);
+}
+
+.dark textarea:focus {
+  border-color: var(--mq-focus);
+  --tw-ring-color: var(--mq-focus);
+}
+
 .dark select:focus {
   border-color: var(--mq-focus);
   --tw-ring-color: var(--mq-focus);
@@ -89,7 +102,6 @@
 /* State color overrides - using MQ semantic colors */
 .dark .bg-green-100 {
   background-color: var(--mq-success);
-  opacity: 0.1;
 }
 
 .dark .text-green-800 {
@@ -99,117 +111,4 @@
 .dark .bg-red-100 {
   background-color: var(--mq-error);
   opacity: 0.1;
-}
-
-.dark .text-red-800 {
-  color: var(--mq-error);
-}
-
-.dark .bg-yellow-100 {
-  background-color: var(--mq-warning);
-  opacity: 0.1;
-}
-
-.dark .text-yellow-800 {
-  color: var(--mq-warning);
-}
-
-.dark .bg-blue-100 {
-  background-color: var(--mq-info);
-  opacity: 0.1;
-}
-
-.dark .text-blue-800 {
-  color: var(--mq-info);
-}
-
-/* Component Specific */
-.dark .shadow-sm {
-  box-shadow: var(--mq-shadow-sm);
-}
-
-.dark .shadow {
-  box-shadow: var(--mq-shadow);
-}
-
-.dark .shadow-md {
-  box-shadow: var(--mq-shadow-md);
-}
-
-/* V3.1: Optimized dark-mode text enforcement - targeted selectors instead of universal */
-/* Previous implementation used :where(*:not(...)) which matches thousands of elements */
-/* Now targeting specific text containers for better performance */
-html.dark .text-mq-content,
-html.dark .text-mq-content-secondary,
-html.dark .text-mq-content-tertiary,
-html.dark main p,
-html.dark main span:not([class*='icon']),
-html.dark main div:not([class*='bg-']):not([class*='backdrop']),
-html.dark section p,
-html.dark section span:not([class*='icon']),
-html.dark article p,
-html.dark article span:not([class*='icon']) {
-  color: var(--mq-content);
-  -webkit-text-fill-color: var(--mq-content);
-}
-
-/* ============================================
-   DARK MODE - Ensure no black backgrounds on headers
-   Fix for header text having visible dark backgrounds
-   ============================================ */
-html.dark h1,
-html.dark h2,
-html.dark h3,
-html.dark h4,
-html.dark h5,
-html.dark h6,
-html.dark p,
-html.dark span,
-html.dark label,
-html.dark .text-mq-3xl,
-html.dark .text-mq-2xl,
-html.dark .text-mq-lg {
-  background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Fix for WelcomeHeader and page header areas having dark backgrounds */
-html.dark .home-page > header,
-html.dark .home-page header[role='banner'],
-html.dark .calendar-page > header,
-html.dark .calendar-page header[role='banner'],
-html.dark .feed-page > header,
-html.dark .feed-page header[role='banner'],
-html.dark .map-page > header,
-html.dark .map-page header[role='banner'],
-html.dark .flex-1.min-w-0,
-html.dark [class*='ScrollReveal'] > header,
-html.dark .container.mx-auto > header {
-  background-color: transparent !important;
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* Ensure main content containers are transparent in dark mode */
-html.dark main#main-content,
-html.dark .container.mx-auto,
-html.dark .home-page,
-html.dark .calendar-page,
-html.dark .feed-page,
-html.dark .map-page {
-  background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Calendar grid line color for dark mode */
-html.dark .calendar-page {
-  --calendar-grid-line: var(--c-border);
-  --calendar-card-bg: var(--c-card-background);
-  --calendar-card-border: var(--c-border);
-}
-
-/* Calendar cards (MagicCard content) alignment with theme */
-html.dark .calendar-page .mq-magic-card-content {
-  background-color: var(--calendar-card-bg) !important;
-  border-color: var(--calendar-card-border) !important;
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { LazyMotion, domAnimation } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import '@/app/styles/leaflet.css';
 import {
   X,
@@ -31,6 +31,8 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
+
+import { triggerHaptic } from '@/lib/utils/haptics';
 
 // Map overlay icons
 const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
@@ -229,17 +231,44 @@ export default function MapClient() {
                       const Icon = OVERLAY_ICONS[overlay.id];
                       const isActive = activeOverlays.includes(overlay.id);
                       return (
-                        <button
+                        <m.button
                           key={overlay.id}
-                          onClick={() => toggleOverlay(overlay.id)}
+                          onClick={() => {
+                            toggleOverlay(overlay.id);
+                            triggerHaptic('tap', 'light');
+                          }}
                           aria-pressed={isActive}
-                          className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-all duration-200 text-left ${
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
                             isActive
                               ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
                               : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
                           }`}
                         >
-                          <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
+                          {/* Ripple Effect */}
+                          {isActive && (
+                            <m.div
+                              className="absolute inset-0 bg-mq-primary/5 rounded-mq-lg pointer-events-none"
+                              initial={{ scale: 0, opacity: 0.5 }}
+                              animate={{ scale: 1.5, opacity: 0 }}
+                              transition={{ duration: 0.5 }}
+                            />
+                          )}
+
+                          <m.div
+                            animate={
+                              isActive
+                                ? {
+                                    scale: [1, 1.2, 1],
+                                    rotate: [0, 5, -5, 0],
+                                  }
+                                : {}
+                            }
+                            transition={{ duration: 0.4 }}
+                          >
+                            <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
+                          </m.div>
                           <div className="min-w-0 flex-1">
                             <p className="text-mq-sm font-medium truncate">
                               {t(`overlay_${overlay.id}_name` as TranslationKey)}
@@ -248,8 +277,18 @@ export default function MapClient() {
                               {t(`overlay_${overlay.id}_desc` as TranslationKey)}
                             </p>
                           </div>
-                          {isActive && <CheckCircle2 className="h-4 w-4 flex-shrink-0" />}
-                        </button>
+                          <AnimatePresence>
+                            {isActive && (
+                              <m.div
+                                initial={{ x: 10, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: 10, opacity: 0 }}
+                              >
+                                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                              </m.div>
+                            )}
+                          </AnimatePresence>
+                        </m.button>
                       );
                     })}
                   </div>

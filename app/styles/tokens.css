@@ -21,4 +21,25 @@
   /* Legacy aliases (deprecated, use --mq-anim-* instead) */
   --anim-primary: var(--mq-anim-primary);
   --anim-secondary: var(--mq-anim-secondary);
+
+  /* ============================================
+     MAP SPECIFIC TOKENS
+     ============================================ */
+
+  /* User Location */
+  --mq-map-user-dot: hsl(200, 95%, 55%); /* bright blue */
+  --mq-map-user-glow: hsl(200, 95%, 55%, 0.2); /* soft halo */
+
+  /* Selected Building */
+  --mq-map-selected: hsl(24, 95%, 60%); /* MQ orange */
+  --mq-map-selected-glow: hsl(24, 95%, 60%, 0.15);
+
+  /* Navigation Route */
+  --mq-map-route-active: hsl(200, 95%, 55%); /* blue path */
+  --mq-map-route-preview: hsl(200, 40%, 60%); /* muted preview */
+
+  /* Overlays */
+  --mq-map-parking: hsl(280, 70%, 60%); /* purple */
+  --mq-map-accessibility: hsl(145, 70%, 50%); /* green */
+  --mq-map-water: hsl(200, 85%, 55%); /* cyan */
 }

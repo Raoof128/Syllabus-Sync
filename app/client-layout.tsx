@@ -52,6 +52,7 @@ if (typeof window !== 'undefined') {
     ) {
       return; // Silently ignore this specific warning
     }
+    // eslint-disable-next-line no-console
     originalConsoleError(...args);
   };
 
@@ -64,6 +65,7 @@ if (typeof window !== 'undefined') {
     if (typeof firstArg === 'string' && firstArg.includes(REACT_DEVTOOLS_MSG)) {
       return;
     }
+    // eslint-disable-next-line no-console
     originalConsoleInfo(...args);
   };
 

@@ -99,7 +99,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const getMarkerIcon = useCallback(
       (isSelected: boolean) => {
         if (!leafletModule) return undefined;
-        return createMarkerIcon(leafletModule, isSelected);
+        return createMarkerIcon(leafletModule, isSelected, 'animate-marker-drop-in');
       },
       [leafletModule],
     );
@@ -405,6 +405,11 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             center={CAMPUS_CENTER_PIXEL}
             zoom={0}
             zoomControl={false}
+            scrollWheelZoom={false}
+            doubleClickZoom="center"
+            inertia
+            inertiaDeceleration={3000}
+            maxBoundsViscosity={0.5}
             style={{ height: '100%', width: '100%' }}
           >
             <MapController
@@ -438,6 +443,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 opacity={0.9}
                 dashArray="1, 12"
                 lineCap="round"
+                className="animate-route-dash"
               />
             )}
 

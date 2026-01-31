@@ -8,6 +8,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Map - Tier 1 (Visual Hierarchy & Depth)
+Summary: Implemented Tier 1 map improvements (Soft Spatial UI) and resolved build errors.
+- **Visual Hierarchy:** Enhanced `LayeredCard` with glassmorphism, multi-layered shadows, and inner lighting for 3D depth.
+- **UX:** Grouped map actions (Share, Export) into a floating "LayeredCard" toolbar in `CampusMapHUD.tsx`.
+- **Fix:** Resolved `CssSyntaxError` in `dark-mode.css` (missing closing brace).
+- **Revert:** Reverted dark mode color refinements in `tokens.css` and `dark-mode.css` as per user request to maintain original color scheme.
+Files: app/map/components/LayeredCard.tsx; app/map/CampusMapHUD.tsx; app/styles/tokens.css; app/styles/dark-mode.css.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Map - Dark Mode & Link Safety
+Summary: Audited map dark-mode implementation and external navigation links.
+- **Theming:** Removed hard-coded dark-mode overrides in `dark-mode.css` so MQ dark design tokens in `mq-tokens.css` fully control backgrounds, content colors, and primary accents.
+- **Cards/Buttons:** Ensured `.dark .bg-white` and `.dark .bg-blue-600` now simply reuse `--c-card-background`, `--c-border`, and `--c-primary` token values instead of local HSL overrides.
+- **Security/UX:** Updated the “Navigate to Google Maps” button for selected buildings to open links with `noopener,noreferrer` and use the `touch-optimized` utility class for better touch ergonomics.
+Files: app/styles/dark-mode.css; app/map/CampusMapHUD.tsx.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Build - Dark Mode CSS
+Summary: Re-validated `dark-mode.css` focus selector closure to prevent Tailwind CssSyntaxError.
+Files: app/styles/dark-mode.css.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Build - Dark Mode CSS
+Summary: Rewrote dark-mode form input and focus selector blocks to normalize brace closure and stabilize Tailwind parsing.
+Files: app/styles/dark-mode.css.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Build - Dark Mode CSS
+Summary: Simplified placeholder selector list in `dark-mode.css` to avoid Tailwind CssSyntaxError while preserving placeholder styling.
+Files: app/styles/dark-mode.css.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Map - Tier 2 (Micro-Interactions) & Tier 3 (Touch/Gesture Polish)
+Summary: Implemented advanced map interactions including marker pulse/drop-in animations, route dash animations, overlay toggle feedback, and touch optimizations.
+- **Animations:** Added `marker-drop-in` (with hover/active states) and `route-dash` keyframes to `animations.css`.
+- **Micro-Interactions:** Implemented ripple effect and bounce animation for overlay toggles in `MapClient.tsx`.
+- **Haptics:** Integrated `triggerHaptic` for marker selection, overlay toggling, and building card selection.
+- **Touch Polish:** Added `.touch-optimized` utility class for accessible touch targets (48px min).
+Files: app/styles/animations.css; app/map/CampusMapHUD.tsx; app/map/MapClient.tsx; app/map/CampusMap.tsx.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Build - Dark Mode CSS
+Summary: Resolved persistent `CssSyntaxError` by splitting comma-separated focus selectors in `dark-mode.css` into individual rules to stabilize parsing.
+Files: app/styles/dark-mode.css.
+Follow-ups: None.
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: QA - Linting & Console Cleanup
+Summary: Fixed lint warnings and suppressed intentional console overrides.
+- **Map:** Fixed boolean attribute usage and unused imports in `CampusMap.tsx` and `MapClient.tsx`.
+- **Layout:** Suppressed linter warnings for intentional `console.error`/`info` overrides in `client-layout.tsx` (used for filtering Turbopack/DevTools noise).
+- **A11y:** Handled keyboard event warning in `BuildingAutocomplete.tsx` (delegated to input).
+Files: app/map/CampusMap.tsx; app/map/MapClient.tsx; app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
 Scope: Documentation - Console Logs Guide
 Summary: Added documentation for common console logs and troubleshooting.
 - **Docs:** Created `docs/LOGS_EXPLANATION.md` explaining React DevTools, HMR, and Rokt warnings.
@@ -98,49 +164,3 @@ Verification: Passed `npm run check`. Visual verification of skeleton and focus 
 Follow-ups: None.
 
 ---
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: Home - Layout Refactor & Design Overhaul (Phases 0-4)
-Summary: Transformed Home route to a solid-surface, designed product. Replaced glass effects with consistent `CardSolid`/`CardMuted` variants. Implemented route-level loading (`loading.tsx`), Week Heat-Strip (wow element), and Hero header (workload badge + primary action). Standardized interaction (hover effects, typography). Added missing translation keys and reduced motion support.
-Files: app/home/page.tsx; app/home/loading.tsx; app/home/HomeClient.tsx; components/home/HomeCard.tsx; components/home/WeekHeatStrip.tsx; components/home/WelcomeHeader.tsx; components/home/HomeKpiStrip.tsx; components/home/TodaySchedule.tsx; components/units/UnitCard.tsx; lib/config.ts; locales/en/translations.json; app/mq-tokens.css.
-Verification: Verified no `mq-liquid-glass` usage in Home route. Verified component integration and linter passes.
-Follow-ups: None.
-
----
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: Security - Comprehensive Security Enhancements (12 items)
-Summary: Implemented 12 security enhancements including Subresource Integrity (SRI) for CDN assets, CSP reporting, database audit logging, API request signing, password breach checking, device fingerprinting, session termination on password change, IP anomaly detection, security headers scanning, password strength indicator, 2FA backup codes, and security.txt file.
-Files: lib/security/sri.ts; lib/security/csp.ts; app/api/csp-report/route.ts; lib/security/audit.ts; app/api/audit/route.ts; lib/supabase/migrations/002_security_audit_logging.sql; lib/security/request-signing.ts; lib/security/password-breach.ts; app/api/security/check-password-breach/route.ts; lib/security/device-fingerprinting.ts; lib/security/session-termination.ts; lib/security/ip-anomaly-detection.ts; lib/security/headers-scanner.ts; app/api/security/scan-headers/route.ts; components/security/PasswordStrengthIndicator.tsx; lib/security/two-factor-backup-codes.ts; public/security.txt; lib/security/index.ts; docs/SECURITY_ENHANCEMENTS.md; SECURITY_IMPLEMENTATION_SUMMARY.md.
-Verification: `npx tsc --noEmit` (pass).
-Follow-ups: Integrate security modules into existing authentication flows and configure CSP headers in production.
-
----
-
-Raouf: 2026-01-26 (Australia/Sydney)
-Scope: UI - Map building toggle + toast palette.
-Summary: Made building cards toggle selection off when clicked again and normalized toast surfaces to the standard card background/border with current text color.
-Files: app/map/MapClient.tsx; components/ui/toast.tsx.
-Verification: `npm run check` (pass; tests emit expected circular JSON warning in response-critical tests and in-memory rate-limit warning).
-Follow-ups: None.
-
-Raouf: 2026-01-26 (Australia/Sydney)
-Scope: UI - Card palette normalization across pages.
-Summary: Added solid card backgrounds/borders to empty states and calendar skeletons, normalized calendar list items and unit/assignment panels to theme card backgrounds, and moved icon color handling to inherit current text color.
-Files: app/calendar/CalendarClient.tsx; app/calendar/page.tsx; components/ui/EmptyState.tsx; components/units/UnitDetailPanel.tsx; components/assignments/AssignmentDetailPanel.tsx; app/manage-profiles/page.tsx; components/layout/WeatherWidget.tsx.
-Verification: Not run (not requested).
-Follow-ups: None.
-
-Raouf: 2026-01-26 (Australia/Sydney)
-Scope: UI - Calendar card palette override.
-Summary: Overrode dark-mode calendar card background/border variables to use core theme tokens and removed remaining hue-specific SVG classes in calendar UI.
-Files: app/calendar/CalendarClient.tsx; app/styles/dark-mode.css; app/styles/liquid-glass.css.
-Verification: Chrome DevTools MCP: calendar main panel and cards now compute `background-color` as `rgb(55, 58, 54)` with `border-color` `rgb(113, 115, 107)`; `svg` stroke inherits current text color.
-Follow-ups: None.
-
-Raouf: 2026-01-26 (Australia/Sydney)
-Scope: UI - Calendar card palette normalization.
-Summary: Normalized calendar card backgrounds to mq tokens, aligned borders to `border-mq-border`, and removed hue-specific SVG classes so icons inherit text color.
-Files: app/calendar/CalendarClient.tsx.
-Verification: Not run (not requested).
-Follow-ups: None.

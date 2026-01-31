@@ -65,11 +65,13 @@ export function generateMarkerSvgDataUrl(options: {
  *
  * @param L - The Leaflet module
  * @param isSelected - Whether the marker is in selected state
+ * @param className - Optional CSS class for the marker
  * @returns A Leaflet Icon instance
  */
 export function createMarkerIcon(
   L: typeof import('leaflet'),
   isSelected: boolean,
+  className?: string,
 ): import('leaflet').Icon {
   return new L.Icon({
     iconUrl: generateMarkerSvgDataUrl({ isSelected }),
@@ -78,6 +80,7 @@ export function createMarkerIcon(
     popupAnchor: [MARKER_DIMENSIONS.popupAnchorX, MARKER_DIMENSIONS.popupAnchorY],
     shadowUrl: '/images/leaflet/marker-shadow.png',
     shadowSize: [MARKER_DIMENSIONS.shadowWidth, MARKER_DIMENSIONS.shadowHeight],
+    className: className,
   });
 }
 
