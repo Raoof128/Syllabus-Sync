@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
+Scope: Documentation - Console Logs Guide
+Summary: Added documentation for common console logs and troubleshooting.
+- **Docs:** Created `docs/LOGS_EXPLANATION.md` explaining React DevTools, HMR, and Rokt warnings.
+- **QA:** Verified no internal "Rokt" references; confirmed warning is from external extension.
+- **Verification:** `npm run check` passed.
+Files: docs/LOGS_EXPLANATION.md.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
+Scope: QA - Critical Bug Fixes (Sidebar & Auth)
+Summary: Resolved critical UI/functional regressions including Chrome sidebar visibility, API authentication, and console noise.
+- **Fix:** Fixed Sidebar visibility in Chrome by increasing z-index of `.sidebar-shell` to 60 (above Header's 50).
+- **Fix:** Resolved 401 Unauthorized errors on `api/notifications` by adding `credentials: 'include'` to `apiRequest` and implementing client-side redirect to login on 401 in `notificationsStore`.
+- **Fix:** Fixed `next/image` aspect ratio warning in `LoginClient.tsx` and `Sidebar.tsx` by replacing `fill` with explicit dimensions and `w-auto h-auto` classes.
+- **Fix:** Suppressed "Download React DevTools" and Chrome extension "Frame removed" errors in `client-layout.tsx`.
+- **Verification:** `npm run check` passed successfully.
+Files: app/styles/sidebar.css; lib/utils/api.ts; app/login/LoginClient.tsx; components/layout/Sidebar.tsx; lib/store/notificationsStore.ts; app/client-layout.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-01-31 (Australia/Sydney)
 Scope: QA - Auth Logs & Image Fixes
 Summary: Resolved console errors and warnings to ensure a clean developer experience.
 - **QA/Fix:** Suppressed "Refresh Token Not Found" errors in `lib/supabase/middleware.ts` to prevent server log spam (handled silently as expected for expired sessions).

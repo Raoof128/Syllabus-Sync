@@ -398,6 +398,7 @@ const Sidebar = memo(() => {
                 width={128}
                 height={128}
                 priority
+                className="w-auto h-auto"
                 style={{ objectFit: 'contain', borderRadius: '8px' }}
                 onError={(e) => {
                   // Fallback for logo image

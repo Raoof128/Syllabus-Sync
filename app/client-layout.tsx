@@ -54,6 +54,29 @@ if (typeof window !== 'undefined') {
     }
     originalConsoleError(...args);
   };
+
+  // Override console.info to suppress React DevTools promotion
+  const originalConsoleInfo = console.info.bind(console);
+  const REACT_DEVTOOLS_MSG = 'Download the React DevTools';
+
+  console.info = (...args: unknown[]) => {
+    const firstArg = args[0];
+    if (typeof firstArg === 'string' && firstArg.includes(REACT_DEVTOOLS_MSG)) {
+      return;
+    }
+    originalConsoleInfo(...args);
+  };
+
+  // Suppress specific unhandled rejections from Chrome extensions
+  window.addEventListener('unhandledrejection', (event) => {
+    const message = event.reason?.message || '';
+    if (
+      message.includes('message channel closed') ||
+      message.includes('Frame with ID 0 was removed')
+    ) {
+      event.preventDefault();
+    }
+  });
 }
 
 const scheduleIdleTask = (callback: () => void) => {

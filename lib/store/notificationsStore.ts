@@ -70,6 +70,10 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
 
       if (isAuthError) {
         set({ notifications: [], hasLoaded: true, lastLoadedAt: Date.now() });
+        // Redirect to login if session is invalid
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
       } else {
         console.warn('Failed to load notifications from API:', error);
         set({ hasLoaded: true, lastLoadedAt: Date.now() });

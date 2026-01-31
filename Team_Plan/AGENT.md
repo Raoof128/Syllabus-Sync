@@ -3,6 +3,22 @@
 ## Current Development Session (January 22-30, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-01-31 (Australia/Sydney) - Console Logs & Documentation
+- **Status:** ✅ Complete - Added console logs explanation guide and verified clean build.
+- **Scope:** Documentation, QA.
+- **Summary:** Added `docs/LOGS_EXPLANATION.md` to document common console logs (React DevTools, HMR, Rokt warnings) and their fixes/explanations. Verified codebase is free of "Rokt" references (confirming the warning is external). Ran `npm run check` and fixed formatting issues.
+- **Files:** docs/LOGS_EXPLANATION.md.
+- **Verification:** `npm run check` passed successfully.
+- **Follow-ups:** None.
+
+### Raouf: 2026-01-31 (Australia/Sydney) - Critical Bug Fixes (Sidebar & Auth)
+- **Status:** ✅ Complete - Fixed Chrome sidebar visibility, 401 Auth errors, and Login/Sidebar image issues.
+- **Scope:** Bug Fixes, QA.
+- **Summary:** Resolved critical UI/functional regressions. Fixed Sidebar visibility in Chrome by increasing z-index. Fixed persistent 401 Unauthorized errors by ensuring credentials (cookies) are sent with requests AND adding client-side redirect in `notificationsStore`. Fixed `next/image` aspect ratio warnings in `LoginClient.tsx` and `Sidebar.tsx`. Suppressed React DevTools and Chrome extension noise in console.
+- **Files:** app/styles/sidebar.css; lib/utils/api.ts; app/login/LoginClient.tsx; components/layout/Sidebar.tsx; lib/store/notificationsStore.ts; app/client-layout.tsx.
+- **Verification:** `npm run check` (all pass). Visual verification of Sidebar z-index and console cleanliness.
+- **Follow-ups:** None.
+
 ### Raouf: 2026-01-31 (Australia/Sydney) - Auth Logs & Image QA
 - **Status:** ✅ Complete - Fixed console noise and image warnings.
 - **Scope:** QA, Bug Fixes.

@@ -404,8 +404,10 @@ export default function LoginClient() {
               <Image
                 src="/MQ_Logo_Final.png"
                 alt={t('mqLogoAlt')}
-                fill
-                className="object-contain drop-shadow-xl"
+                width={160}
+                height={160}
+                className="object-contain drop-shadow-xl w-auto h-auto"
+                priority
               />
             </div>
           </div>

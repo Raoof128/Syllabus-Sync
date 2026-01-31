@@ -81,7 +81,7 @@
   position: relative;
   height: 100vh;
   height: 100dvh; /* Dynamic viewport height for mobile browsers */
-  z-index: 40;
+  z-index: 60; /* Higher than Header (z-50) */
 }
 
 /* Desktop: Fix sidebar shell to viewport so hover works after scroll */

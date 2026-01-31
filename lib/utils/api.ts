@@ -94,6 +94,11 @@ export async function apiRequest<T>(input: RequestInfo, init?: ApiRequestOptions
     }
   }
 
+  // Ensure cookies are sent with requests (critical for Supabase auth)
+  if (!fetchInit.credentials) {
+    fetchInit.credentials = 'include';
+  }
+
   const executeRequest = async (): Promise<T> => {
     const response = await fetch(input, fetchInit);
     const data = (await response.json().catch(() => null)) as T | ApiSuccessResponse<T> | null;
