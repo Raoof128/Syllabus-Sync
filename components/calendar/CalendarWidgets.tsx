@@ -188,587 +188,597 @@ export default function CalendarWidgets({
     <div className="space-y-4 lg:space-y-6">
       {/* Mobile section header - only visible on smaller screens */}
       <div className="lg:hidden flex items-center gap-2 pb-2 border-b border-mq-border">
-        <h2 className="text-lg font-semibold text-mq-content">{tOr('calendarWidgets' as TranslationKey, 'Quick Access')}</h2>
+        <h2 className="text-lg font-semibold text-mq-content">
+          {tOr('calendarWidgets' as TranslationKey, 'Quick Access')}
+        </h2>
         <span className="text-xs text-mq-content-tertiary">
-          ({assignments.length + exams.length + units.length + events.length} {tOr('items' as TranslationKey, 'items')})
+          ({assignments.length + exams.length + units.length + events.length}{' '}
+          {tOr('items' as TranslationKey, 'items')})
         </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
         {/* Assignments Widget */}
-      <MagicCard
-        isLiquidEnhanced
-        className={
-          highlightedDeadlineId &&
-          deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment'
-            ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
-            : ''
-        }
-      >
-        <div
-          className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
-          ref={assignmentsWidgetRef}
+        <MagicCard
+          isLiquidEnhanced
+          className={
+            highlightedDeadlineId &&
+            deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment'
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+              : ''
+          }
         >
-          <Card className="border border-mq-border shadow-sm bg-mq-card-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <FileText className="h-4 w-4" />
-                  {t('assignments')}
-                </span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                    {assignments.filter((a) => !a.completed).length} {t('pending')}
-                  </Badge>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={onAddAssignment}
-                    aria-label={t('addAssignment')}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {assignments.length === 0 ? (
-                <div className="text-center py-6 text-mq-content-tertiary">
-                  <p className="text-xs">{t('noAssignmentsYet')}</p>
-                </div>
-              ) : (
-                <div className="space-y-2 pr-1">
-                  {assignments
-                    .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
-                    .map((assignment) => {
-                      const due = dayjs(assignment.dueDate);
-                      const isOverdue = !assignment.completed && due.isBefore(dayjs());
-                      const isHighlighted =
-                        deadlineHighlightActive && highlightedDeadlineId === assignment.id;
-                      const deadlineColor = getDeadlineColor(assignment, units);
-
-                      return (
-                        <div
-                          key={assignment.id}
-                          className={cn(
-                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
-                            assignment.completed && 'opacity-60 grayscale',
-                            isOverdue && 'bg-red-500/5',
-                            isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
-                          )}
-                          style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
-                          onClick={() => onOpenAssignmentDetail(assignment)}
-                          onKeyDown={(e) =>
-                            handleKeyDown(e, () => onOpenAssignmentDetail(assignment))
-                          }
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleComplete(assignment.id);
-                            }}
-                            className={cn(
-                              'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                              assignment.completed ? 'text-green-600' : '',
-                            )}
-                          >
-                            {assignment.completed ? (
-                              <CheckCircle2 className="h-4 w-4" />
-                            ) : (
-                              <Circle className="h-4 w-4" />
-                            )}
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <h4
-                                className={cn(
-                                  'font-medium text-sm truncate',
-                                  assignment.completed &&
-                                    'line-through decoration-mq-content-tertiary',
-                                )}
-                              >
-                                {assignment.title}
-                              </h4>
-                              <Badge
-                                className={cn(
-                                  PRIORITY_COLORS[assignment.priority],
-                                  'ml-2 text-[10px] h-4 px-1',
-                                )}
-                                variant="neutral"
-                              >
-                                {t(`priority_${assignment.priority}` as TranslationKey)}
-                              </Badge>
-                            </div>
-                            <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
-                              {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
-                            </p>
-                          </div>
-                          <ItemActionButtons
-                            itemType="assignment"
-                            itemId={assignment.id}
-                            itemTitle={assignment.title}
-                            building={getDeadlineBuilding(assignment)}
-                            room={assignment.room}
-                            unitCode={assignment.unitCode}
-                            dateTime={assignment.dueDate}
-                            onEdit={() => onEditAssignment(assignment)}
-                            onDelete={() => onDeleteAssignment(assignment)}
-                            variant="compact"
-                            stopPropagation
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </MagicCard>
-
-      {/* Exams Widget */}
-      <MagicCard isLiquidEnhanced>
-        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-          <Card className="border border-mq-border shadow-sm bg-mq-card-background">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <BookOpen className="h-4 w-4" />
-                  {t('exams')}
-                </span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                    {exams.filter((e) => !e.completed).length} {t('upcoming')}
-                  </Badge>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={onAddExam}
-                    aria-label={t('addExam')}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {exams.length === 0 ? (
-                <div className="text-center py-6 text-mq-content-tertiary">
-                  <p className="text-xs">{t('noExamsYet')}</p>
-                </div>
-              ) : (
-                <div className="space-y-2 pr-1">
-                  {exams
-                    .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
-                    .map((exam) => {
-                      const due = dayjs(exam.dueDate);
-                      const isOverdue = !exam.completed && due.isBefore(dayjs());
-                      const deadlineColor = getDeadlineColor(exam, units);
-
-                      return (
-                        <div
-                          key={exam.id}
-                          className={cn(
-                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
-                            exam.completed && 'opacity-60 grayscale',
-                            isOverdue && 'bg-red-500/5',
-                          )}
-                          style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
-                          onClick={() => onOpenExamDetail(exam)}
-                          onKeyDown={(e) => handleKeyDown(e, () => onOpenExamDetail(exam))}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleComplete(exam.id);
-                            }}
-                            className={cn(
-                              'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                              exam.completed ? 'text-green-600' : '',
-                            )}
-                          >
-                            {exam.completed ? (
-                              <CheckCircle2 className="h-4 w-4" />
-                            ) : (
-                              <Circle className="h-4 w-4" />
-                            )}
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <h4
-                                className={cn(
-                                  'font-medium text-sm truncate',
-                                  exam.completed && 'line-through decoration-mq-content-tertiary',
-                                )}
-                              >
-                                {exam.title}
-                              </h4>
-                              <Badge
-                                className={cn(
-                                  PRIORITY_COLORS[exam.priority],
-                                  'ml-2 text-[10px] h-4 px-1',
-                                )}
-                                variant="neutral"
-                              >
-                                {t(`priority_${exam.priority}` as TranslationKey)}
-                              </Badge>
-                            </div>
-                            <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
-                              {exam.unitCode} • {formatMonthDayTime(due.toDate())}
-                            </p>
-                          </div>
-                          <ItemActionButtons
-                            itemType="exam"
-                            itemId={exam.id}
-                            itemTitle={exam.title}
-                            building={getDeadlineBuilding(exam)}
-                            room={exam.room}
-                            unitCode={exam.unitCode}
-                            dateTime={exam.dueDate}
-                            onEdit={() => onEditExam(exam)}
-                            onDelete={() => onDeleteExam(exam)}
-                            variant="compact"
-                            stopPropagation
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </MagicCard>
-
-      {/* Units Widget */}
-      <MagicCard
-        isLiquidEnhanced
-        className={
-          highlightedWidget === 'units'
-            ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
-            : ''
-        }
-      >
-        <div
-          className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
-          ref={unitsWidgetRef}
-        >
-          <Card
-            variant="glass"
-            className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+          <div
+            className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+            ref={assignmentsWidgetRef}
           >
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <BookOpen className="h-4 w-4" />
-                  {t('myUnits')}
-                </span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                    {units.length}
-                  </Badge>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={onAddUnit}
-                    aria-label={t('addUnit')}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {units.length === 0 ? (
-                <div className="text-center py-6 text-mq-content-tertiary">
-                  <p className="text-xs">{t('noUnitsYet')}</p>
-                </div>
-              ) : (
-                <div className="space-y-2 pr-1">
-                  {units.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className={cn(
-                        'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                        highlightedUnitId === unit.id && 'border-mq-primary bg-mq-primary/5',
-                      )}
-                      style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
-                      onClick={() => onOpenUnitDetail(unit)}
-                      onKeyDown={(e) => handleKeyDown(e, () => onOpenUnitDetail(unit))}
-                      role="button"
-                      tabIndex={0}
+            <Card className="border border-mq-border shadow-sm bg-mq-card-background">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <FileText className="h-4 w-4" />
+                    {t('assignments')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                      {assignments.filter((a) => !a.completed).length} {t('pending')}
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={onAddAssignment}
+                      aria-label={t('addAssignment')}
                     >
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{unit.code}</h4>
-                        <p className="text-[11px] text-mq-content-secondary truncate">
-                          {unit.name}
-                        </p>
-                      </div>
-                      <ItemActionButtons
-                        itemType="unit"
-                        itemId={unit.id}
-                        itemTitle={unit.code}
-                        building={unit.location?.building}
-                        room={unit.location?.room}
-                        unitCode={unit.code}
-                        onEdit={() => onEditUnit(unit)}
-                        onDelete={() => onDeleteUnit(unit)}
-                        variant="compact"
-                        stopPropagation
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </MagicCard>
-
-      {/* Events Widget */}
-      <MagicCard isLiquidEnhanced>
-        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-          <Card
-            variant="glass"
-            className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <PartyPopper className="h-4 w-4" />
-                  {t('events')}
-                </span>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-6 w-6"
-                  onClick={() => onAddEvent()}
-                  aria-label={t('addEvent')}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2 pr-1">
-                {events.length === 0 ? (
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {assignments.length === 0 ? (
                   <div className="text-center py-6 text-mq-content-tertiary">
-                    <p className="text-xs">{t('noEventsYet' as TranslationKey)}</p>
+                    <p className="text-xs">{t('noAssignmentsYet')}</p>
                   </div>
                 ) : (
-                  events.slice(0, 5).map((event) => {
-                    // Get category color
-                    const categoryColors: Record<string, string> = {
-                      Career: '#3B82F6',
-                      Social: '#8B5CF6',
-                      Academic: '#10B981',
-                      'Free Food': '#F59E0B',
-                    };
-                    const eventColor = event.color || categoryColors[event.category] || '#A6192E';
+                  <div className="space-y-2 pr-1">
+                    {assignments
+                      .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
+                      .map((assignment) => {
+                        const due = dayjs(assignment.dueDate);
+                        const isOverdue = !assignment.completed && due.isBefore(dayjs());
+                        const isHighlighted =
+                          deadlineHighlightActive && highlightedDeadlineId === assignment.id;
+                        const deadlineColor = getDeadlineColor(assignment, units);
 
-                    return (
+                        return (
+                          <div
+                            key={assignment.id}
+                            className={cn(
+                              'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                              assignment.completed && 'opacity-60 grayscale',
+                              isOverdue && 'bg-red-500/5',
+                              isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
+                            )}
+                            style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
+                            onClick={() => onOpenAssignmentDetail(assignment)}
+                            onKeyDown={(e) =>
+                              handleKeyDown(e, () => onOpenAssignmentDetail(assignment))
+                            }
+                            role="button"
+                            tabIndex={0}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleComplete(assignment.id);
+                              }}
+                              className={cn(
+                                'text-mq-content-secondary hover:text-mq-primary transition-colors',
+                                assignment.completed ? 'text-green-600' : '',
+                              )}
+                            >
+                              {assignment.completed ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                              ) : (
+                                <Circle className="h-4 w-4" />
+                              )}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <h4
+                                  className={cn(
+                                    'font-medium text-sm truncate',
+                                    assignment.completed &&
+                                      'line-through decoration-mq-content-tertiary',
+                                  )}
+                                >
+                                  {assignment.title}
+                                </h4>
+                                <Badge
+                                  className={cn(
+                                    PRIORITY_COLORS[assignment.priority],
+                                    'ml-2 text-[10px] h-4 px-1',
+                                  )}
+                                  variant="neutral"
+                                >
+                                  {t(`priority_${assignment.priority}` as TranslationKey)}
+                                </Badge>
+                              </div>
+                              <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
+                                {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
+                              </p>
+                            </div>
+                            <ItemActionButtons
+                              itemType="assignment"
+                              itemId={assignment.id}
+                              itemTitle={assignment.title}
+                              building={getDeadlineBuilding(assignment)}
+                              room={assignment.room}
+                              unitCode={assignment.unitCode}
+                              dateTime={assignment.dueDate}
+                              onEdit={() => onEditAssignment(assignment)}
+                              onDelete={() => onDeleteAssignment(assignment)}
+                              variant="compact"
+                              stopPropagation
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
+
+        {/* Exams Widget */}
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card className="border border-mq-border shadow-sm bg-mq-card-background">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <BookOpen className="h-4 w-4" />
+                    {t('exams')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                      {exams.filter((e) => !e.completed).length} {t('upcoming')}
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={onAddExam}
+                      aria-label={t('addExam')}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {exams.length === 0 ? (
+                  <div className="text-center py-6 text-mq-content-tertiary">
+                    <p className="text-xs">{t('noExamsYet')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 pr-1">
+                    {exams
+                      .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
+                      .map((exam) => {
+                        const due = dayjs(exam.dueDate);
+                        const isOverdue = !exam.completed && due.isBefore(dayjs());
+                        const deadlineColor = getDeadlineColor(exam, units);
+
+                        return (
+                          <div
+                            key={exam.id}
+                            className={cn(
+                              'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
+                              exam.completed && 'opacity-60 grayscale',
+                              isOverdue && 'bg-red-500/5',
+                            )}
+                            style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
+                            onClick={() => onOpenExamDetail(exam)}
+                            onKeyDown={(e) => handleKeyDown(e, () => onOpenExamDetail(exam))}
+                            role="button"
+                            tabIndex={0}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleComplete(exam.id);
+                              }}
+                              className={cn(
+                                'text-mq-content-secondary hover:text-mq-primary transition-colors',
+                                exam.completed ? 'text-green-600' : '',
+                              )}
+                            >
+                              {exam.completed ? (
+                                <CheckCircle2 className="h-4 w-4" />
+                              ) : (
+                                <Circle className="h-4 w-4" />
+                              )}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <h4
+                                  className={cn(
+                                    'font-medium text-sm truncate',
+                                    exam.completed && 'line-through decoration-mq-content-tertiary',
+                                  )}
+                                >
+                                  {exam.title}
+                                </h4>
+                                <Badge
+                                  className={cn(
+                                    PRIORITY_COLORS[exam.priority],
+                                    'ml-2 text-[10px] h-4 px-1',
+                                  )}
+                                  variant="neutral"
+                                >
+                                  {t(`priority_${exam.priority}` as TranslationKey)}
+                                </Badge>
+                              </div>
+                              <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
+                                {exam.unitCode} • {formatMonthDayTime(due.toDate())}
+                              </p>
+                            </div>
+                            <ItemActionButtons
+                              itemType="exam"
+                              itemId={exam.id}
+                              itemTitle={exam.title}
+                              building={getDeadlineBuilding(exam)}
+                              room={exam.room}
+                              unitCode={exam.unitCode}
+                              dateTime={exam.dueDate}
+                              onEdit={() => onEditExam(exam)}
+                              onDelete={() => onDeleteExam(exam)}
+                              variant="compact"
+                              stopPropagation
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
+
+        {/* Units Widget */}
+        <MagicCard
+          isLiquidEnhanced
+          className={
+            highlightedWidget === 'units'
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+              : ''
+          }
+        >
+          <div
+            className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+            ref={unitsWidgetRef}
+          >
+            <Card
+              variant="glass"
+              className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <BookOpen className="h-4 w-4" />
+                    {t('myUnits')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                      {units.length}
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={onAddUnit}
+                      aria-label={t('addUnit')}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {units.length === 0 ? (
+                  <div className="text-center py-6 text-mq-content-tertiary">
+                    <p className="text-xs">{t('noUnitsYet')}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 pr-1">
+                    {units.map((unit) => (
                       <div
-                        key={event.id}
-                        className="group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm"
-                        style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
-                        onClick={() => onOpenEventDetail(event)}
-                        onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
+                        key={unit.id}
+                        className={cn(
+                          'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                          highlightedUnitId === unit.id && 'border-mq-primary bg-mq-primary/5',
+                        )}
+                        style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
+                        onClick={() => onOpenUnitDetail(unit)}
+                        onKeyDown={(e) => handleKeyDown(e, () => onOpenUnitDetail(unit))}
                         role="button"
                         tabIndex={0}
                       >
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                          <h4 className="font-medium text-sm truncate">{unit.code}</h4>
                           <p className="text-[11px] text-mq-content-secondary truncate">
-                            {event.time} • {event.location}
+                            {unit.name}
                           </p>
                         </div>
                         <ItemActionButtons
-                          itemType="event"
-                          itemId={event.id}
-                          itemTitle={event.title}
-                          dateTime={event.startAt || event.date}
-                          onEdit={() => onEditEvent(event)}
-                          onDelete={() => onDeleteEvent(event)}
+                          itemType="unit"
+                          itemId={unit.id}
+                          itemTitle={unit.code}
+                          building={unit.location?.building}
+                          room={unit.location?.room}
+                          unitCode={unit.code}
+                          onEdit={() => onEditUnit(unit)}
+                          onDelete={() => onDeleteUnit(unit)}
                           variant="compact"
                           stopPropagation
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
                         />
                       </div>
-                    );
-                  })
+                    ))}
+                  </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </MagicCard>
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
 
-      {/* Todos Widget */}
-      <MagicCard isLiquidEnhanced>
-        <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-          <Card
-            variant="glass"
-            className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-sm font-semibold">
-                  <CheckSquare className="h-4 w-4" />
-                  {t('todos' as TranslationKey)}
-                </span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                    {pendingTodos.length} {t('pending')}
-                  </Badge>
+        {/* Events Widget */}
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card
+              variant="glass"
+              className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <PartyPopper className="h-4 w-4" />
+                    {t('events')}
+                  </span>
                   <Button
                     size="icon"
                     variant="ghost"
                     className="h-6 w-6"
-                    onClick={() => onAddTodo?.()}
-                    aria-label={tOr('addTodo', 'Add Todo')}
+                    onClick={() => onAddEvent()}
+                    aria-label={t('addEvent')}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2 pr-1">
-                {pendingTodos.length === 0 ? (
-                  <div className="text-center py-6 text-mq-content-tertiary">
-                    <p className="text-xs">{t('noTodos' as TranslationKey)}</p>
-                  </div>
-                ) : (
-                  pendingTodos.map((todo) => {
-                    // Priority-based left border color
-                    const priorityColors: Record<string, string> = {
-                      High: '#EF4444',
-                      Medium: '#F59E0B',
-                      Low: '#10B981',
-                    };
-                    const todoColor = priorityColors[todo.priority] || '#6B7280';
-                    const isOverdue = todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed;
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 pr-1">
+                  {events.length === 0 ? (
+                    <div className="text-center py-6 text-mq-content-tertiary">
+                      <p className="text-xs">{t('noEventsYet' as TranslationKey)}</p>
+                    </div>
+                  ) : (
+                    events.slice(0, 5).map((event) => {
+                      // Get category color
+                      const categoryColors: Record<string, string> = {
+                        Career: '#3B82F6',
+                        Social: '#8B5CF6',
+                        Academic: '#10B981',
+                        'Free Food': '#F59E0B',
+                      };
+                      const eventColor = event.color || categoryColors[event.category] || '#A6192E';
 
-                    return (
-                      <div
-                        key={todo.id}
-                        className={cn(
-                          'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                          todo.completed && 'opacity-60 grayscale',
-                          isOverdue && 'bg-red-500/5',
-                        )}
-                        style={{ borderLeftColor: todoColor, borderLeftWidth: '4px' }}
-                        onClick={() => onOpenTodoDetail?.(todo)}
-                        onKeyDown={(e) => handleKeyDown(e, () => onOpenTodoDetail?.(todo))}
-                        role="button"
-                        tabIndex={0}
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleTodoComplete(todo.id);
-                          }}
-                          className={cn(
-                            'text-mq-content-secondary hover:text-mq-primary transition-colors shrink-0',
-                            todo.completed && 'text-green-600',
-                          )}
-                          aria-label={todo.completed ? tOr('markIncomplete', 'Mark incomplete') : tOr('markComplete', 'Mark complete')}
+                      return (
+                        <div
+                          key={event.id}
+                          className="group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm"
+                          style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
+                          onClick={() => onOpenEventDetail(event)}
+                          onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
+                          role="button"
+                          tabIndex={0}
                         >
-                          {todo.completed ? (
-                            <CheckCircle2 className="h-4 w-4" />
-                          ) : (
-                            <Circle className="h-4 w-4" />
-                          )}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <h4
-                              className={cn(
-                                'font-medium text-sm truncate',
-                                todo.completed && 'line-through decoration-mq-content-tertiary',
-                              )}
-                            >
-                              {todo.title}
-                            </h4>
-                            <Badge
-                              className={cn(
-                                PRIORITY_COLORS[todo.priority],
-                                'ml-2 text-[10px] h-4 px-1',
-                              )}
-                              variant="neutral"
-                            >
-                              {t(`priority_${todo.priority}` as TranslationKey)}
-                            </Badge>
-                          </div>
-                          {todo.dueDate && (
-                            <p className={cn(
-                              'text-[11px] text-mq-content-secondary flex items-center gap-1 mt-0.5',
-                              isOverdue && 'text-red-500 font-medium',
-                            )}>
-                              <Clock className="h-3 w-3" />
-                              {`${isOverdue ? `${tOr('overdue', 'Overdue')} • ` : ''}${formatMonthDayTime(new Date(todo.dueDate))}`}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                            <p className="text-[11px] text-mq-content-secondary truncate">
+                              {event.time} • {event.location}
                             </p>
+                          </div>
+                          <ItemActionButtons
+                            itemType="event"
+                            itemId={event.id}
+                            itemTitle={event.title}
+                            dateTime={event.startAt || event.date}
+                            onEdit={() => onEditEvent(event)}
+                            onDelete={() => onDeleteEvent(event)}
+                            variant="compact"
+                            stopPropagation
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
+
+        {/* Todos Widget */}
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card
+              variant="glass"
+              className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <CheckSquare className="h-4 w-4" />
+                    {t('todos' as TranslationKey)}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                      {pendingTodos.length} {t('pending')}
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => onAddTodo?.()}
+                      aria-label={tOr('addTodo', 'Add Todo')}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2 pr-1">
+                  {pendingTodos.length === 0 ? (
+                    <div className="text-center py-6 text-mq-content-tertiary">
+                      <p className="text-xs">{t('noTodos' as TranslationKey)}</p>
+                    </div>
+                  ) : (
+                    pendingTodos.map((todo) => {
+                      // Priority-based left border color
+                      const priorityColors: Record<string, string> = {
+                        High: '#EF4444',
+                        Medium: '#F59E0B',
+                        Low: '#10B981',
+                      };
+                      const todoColor = priorityColors[todo.priority] || '#6B7280';
+                      const isOverdue =
+                        todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed;
+
+                      return (
+                        <div
+                          key={todo.id}
+                          className={cn(
+                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                            todo.completed && 'opacity-60 grayscale',
+                            isOverdue && 'bg-red-500/5',
                           )}
+                          style={{ borderLeftColor: todoColor, borderLeftWidth: '4px' }}
+                          onClick={() => onOpenTodoDetail?.(todo)}
+                          onKeyDown={(e) => handleKeyDown(e, () => onOpenTodoDetail?.(todo))}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTodoComplete(todo.id);
+                            }}
+                            className={cn(
+                              'text-mq-content-secondary hover:text-mq-primary transition-colors shrink-0',
+                              todo.completed && 'text-green-600',
+                            )}
+                            aria-label={
+                              todo.completed
+                                ? tOr('markIncomplete', 'Mark incomplete')
+                                : tOr('markComplete', 'Mark complete')
+                            }
+                          >
+                            {todo.completed ? (
+                              <CheckCircle2 className="h-4 w-4" />
+                            ) : (
+                              <Circle className="h-4 w-4" />
+                            )}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h4
+                                className={cn(
+                                  'font-medium text-sm truncate',
+                                  todo.completed && 'line-through decoration-mq-content-tertiary',
+                                )}
+                              >
+                                {todo.title}
+                              </h4>
+                              <Badge
+                                className={cn(
+                                  PRIORITY_COLORS[todo.priority],
+                                  'ml-2 text-[10px] h-4 px-1',
+                                )}
+                                variant="neutral"
+                              >
+                                {t(`priority_${todo.priority}` as TranslationKey)}
+                              </Badge>
+                            </div>
+                            {todo.dueDate && (
+                              <p
+                                className={cn(
+                                  'text-[11px] text-mq-content-secondary flex items-center gap-1 mt-0.5',
+                                  isOverdue && 'text-red-500 font-medium',
+                                )}
+                              >
+                                <Clock className="h-3 w-3" />
+                                {`${isOverdue ? `${tOr('overdue', 'Overdue')} • ` : ''}${formatMonthDayTime(new Date(todo.dueDate))}`}
+                              </p>
+                            )}
+                          </div>
+                          {/* Action buttons - Bell, Edit, Delete (no Navigate for Todos) */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNotifyTodo?.(todo);
+                              }}
+                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-amber-500"
+                              title={tOr('setReminder', 'Set reminder')}
+                              aria-label={tOr('setReminder', 'Set reminder')}
+                            >
+                              <Bell className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditTodo(todo);
+                              }}
+                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
+                              title={tOr('editTodo', 'Edit')}
+                              aria-label={tOr('editTodo', 'Edit todo')}
+                            >
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (onDeleteTodo) {
+                                  onDeleteTodo(todo);
+                                } else {
+                                  deleteTodo(todo.id);
+                                }
+                              }}
+                              className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded transition-colors text-mq-content-secondary hover:text-red-500"
+                              title={t('delete')}
+                              aria-label={t('delete')}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        {/* Action buttons - Bell, Edit, Delete (no Navigate for Todos) */}
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onNotifyTodo?.(todo);
-                            }}
-                            className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-amber-500"
-                            title={tOr('setReminder', 'Set reminder')}
-                            aria-label={tOr('setReminder', 'Set reminder')}
-                          >
-                            <Bell className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEditTodo(todo);
-                            }}
-                            className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
-                            title={tOr('editTodo', 'Edit')}
-                            aria-label={tOr('editTodo', 'Edit todo')}
-                          >
-                            <Edit2 className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (onDeleteTodo) {
-                                onDeleteTodo(todo);
-                              } else {
-                                deleteTodo(todo.id);
-                              }
-                            }}
-                            className="p-1.5 hover:bg-red-100 dark:hover:bg-red-950/30 rounded transition-colors text-mq-content-secondary hover:text-red-500"
-                            title={t('delete')}
-                            aria-label={t('delete')}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </MagicCard>
+                      );
+                    })
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </MagicCard>
       </div>
     </div>
   );

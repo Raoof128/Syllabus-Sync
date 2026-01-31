@@ -160,7 +160,7 @@ export function searchBuildings(query: string, limit: number = 10): Building[] {
       score = 50;
     }
     // Tags contain query
-    else if (building.tags?.some(tag => tag.toLowerCase().includes(normalizedQuery))) {
+    else if (building.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))) {
       score = 40;
     }
     // Description contains query
@@ -179,7 +179,7 @@ export function searchBuildings(query: string, limit: number = 10): Building[] {
     return a.building.name.localeCompare(b.building.name);
   });
 
-  return matches.slice(0, limit).map(m => m.building);
+  return matches.slice(0, limit).map((m) => m.building);
 }
 
 /**
@@ -198,7 +198,9 @@ export type BuildingValidationResult =
 /**
  * Validate building with detailed result (for forms)
  */
-export function validateBuildingWithResult(building: string | null | undefined): BuildingValidationResult {
+export function validateBuildingWithResult(
+  building: string | null | undefined,
+): BuildingValidationResult {
   if (!building || building.trim() === '') {
     return { valid: false, error: 'Building is required' };
   }

@@ -1180,7 +1180,7 @@ export function getActiveProgramsForDateRange(startDate: Date, endDate: Date): M
     if (keyDate.endDate) {
       const endKd = new Date(keyDate.endDate);
       endKd.setHours(0, 0, 0, 0);
-      if ((kd <= end && endKd >= start)) {
+      if (kd <= end && endKd >= start) {
         programs.add(keyDate.program);
       }
     }

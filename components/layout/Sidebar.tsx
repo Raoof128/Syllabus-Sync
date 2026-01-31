@@ -391,10 +391,7 @@ const Sidebar = memo(() => {
         >
           {/* Logo - bounces in with slight overshoot */}
           <div className="mb-4 sidebar-logo">
-            <Link
-              href="/"
-              className="flex items-center gap-2"
-            >
+            <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/MQ_Logo_Final.png"
                 alt={t('mqLogoAlt')}

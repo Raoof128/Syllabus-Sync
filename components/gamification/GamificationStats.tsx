@@ -115,7 +115,7 @@ export function GamificationStats({
   const { t } = useTranslation();
   const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
   const { currentXP, level, xpToNext, progress } = useXPProgress();
-  const { days } = useStreak();
+  const { days, longest: longestStreak } = useStreak();
 
   // Load profile on mount
   useEffect(() => {
@@ -159,15 +159,14 @@ export function GamificationStats({
           data-testid="level-badge"
         >
           {/* Level text with XP */}
-          <span className="whitespace-nowrap">{t('level')} {level}</span>
+          <span className="whitespace-nowrap">
+            {t('level')} {level}
+          </span>
           <span className="opacity-70">•</span>
           <span className="whitespace-nowrap tabular-nums">{currentXP.toLocaleString()} XP</span>
 
           {/* XP Progress bar */}
-          <span
-            className="h-2 w-12 rounded-full overflow-hidden bg-white/20"
-            aria-hidden="true"
-          >
+          <span className="h-2 w-12 rounded-full overflow-hidden bg-white/20" aria-hidden="true">
             <span
               className="block h-full transition-[width] duration-300 bg-white/80 rounded-full"
               style={{ width: `${progressPercent}%` }}
@@ -178,12 +177,17 @@ export function GamificationStats({
         {/* Streak Badge - polished and consistent */}
         {showStreak && days > 0 && (
           <div
+            data-testid="streak-badge"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md bg-gradient-to-r from-orange-500 to-amber-500 text-white"
-            title={t('streakDayTooltip', { count: days, longest: days })}
+            title={t('streakTooltip', { days, longest: longestStreak })}
             aria-label={t('streakDay', { count: days })}
           >
-            <span className="text-base leading-none" role="img" aria-hidden="true">🔥</span>
-            <span className="tabular-nums">{days} day{days !== 1 ? 's' : ''}</span>
+            <span className="text-base leading-none" role="img" aria-hidden="true">
+              🔥
+            </span>
+            <span className="tabular-nums">
+              {days} day{days !== 1 ? 's' : ''}
+            </span>
           </div>
         )}
 

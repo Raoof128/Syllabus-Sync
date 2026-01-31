@@ -69,7 +69,9 @@ export default function ProgramLegend({
                     style.pattern,
                   )}
                 >
-                  <span className="text-sm" aria-hidden="true">{style.icon}</span>
+                  <span className="text-sm" aria-hidden="true">
+                    {style.icon}
+                  </span>
                   <span>{PROGRAM_LABELS[program]}</span>
                 </div>
               );
@@ -109,7 +111,9 @@ export default function ProgramLegend({
           {/* Help tooltip */}
           <div className="ml-auto flex items-center gap-1 text-xs text-mq-content-tertiary">
             <Info className="h-3 w-3" />
-            <span className="hidden lg:inline">{tOr('allDayLegendHelp', 'All-day items use these styles')}</span>
+            <span className="hidden lg:inline">
+              {tOr('allDayLegendHelp', 'All-day items use these styles')}
+            </span>
           </div>
         </div>
       </div>
@@ -127,11 +131,7 @@ export default function ProgramLegend({
             <Info className="h-4 w-4" />
             {tOr('programLegend', 'Program Legend')}
           </span>
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
+          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
 
         {isExpanded && (
@@ -155,7 +155,9 @@ export default function ProgramLegend({
                         style.pattern,
                       )}
                     >
-                      <span className="text-sm" aria-hidden="true">{style.icon}</span>
+                      <span className="text-sm" aria-hidden="true">
+                        {style.icon}
+                      </span>
                       <span>{PROGRAM_LABELS[program]}</span>
                     </div>
                   );

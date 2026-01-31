@@ -62,13 +62,12 @@ export default function WeekHeatStrip() {
       const deadlineCount = dayDeadlines.length;
 
       // Count events for this day
-      const dayEvents = events.filter(
-        (e) => isSameDay(new Date(e.startAt), date),
-      );
+      const dayEvents = events.filter((e) => isSameDay(new Date(e.startAt), date));
       const eventCount = dayEvents.length;
 
       // Total load (weighted: exams are more significant)
-      const load = classCount + examCount * 2 + assignmentCount * 1.5 + otherDeadlineCount + eventCount;
+      const load =
+        classCount + examCount * 2 + assignmentCount * 1.5 + otherDeadlineCount + eventCount;
 
       // Normalize intensity (0-4 scale for visualization)
       const intensity = load === 0 ? 0 : Math.min(Math.ceil(load / 2), 4);
@@ -172,7 +171,9 @@ export default function WeekHeatStrip() {
             <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/40">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
               {totalAssignments}
-              <span className="hidden md:inline">{totalAssignments === 1 ? 'assignment' : 'assignments'}</span>
+              <span className="hidden md:inline">
+                {totalAssignments === 1 ? 'assignment' : 'assignments'}
+              </span>
             </span>
           )}
           {/* Events */}
@@ -203,11 +204,27 @@ export default function WeekHeatStrip() {
           >
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[160px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
               <p className="font-bold">{day.fullDate}</p>
-              <p>{day.classCount} {day.classCount === 1 ? 'class' : 'classes'}</p>
-              {day.examCount > 0 && <p className="text-red-300">{day.examCount} {day.examCount === 1 ? 'exam' : 'exams'}</p>}
-              {day.assignmentCount > 0 && <p className="text-purple-300">{day.assignmentCount} {day.assignmentCount === 1 ? 'assignment' : 'assignments'}</p>}
-              {day.eventCount > 0 && <p className="text-green-300">{day.eventCount} {day.eventCount === 1 ? 'event' : 'events'}</p>}
-              {day.otherDeadlineCount > 0 && <p className="text-amber-300">{day.otherDeadlineCount} other</p>}
+              <p>
+                {day.classCount} {day.classCount === 1 ? 'class' : 'classes'}
+              </p>
+              {day.examCount > 0 && (
+                <p className="text-red-300">
+                  {day.examCount} {day.examCount === 1 ? 'exam' : 'exams'}
+                </p>
+              )}
+              {day.assignmentCount > 0 && (
+                <p className="text-purple-300">
+                  {day.assignmentCount} {day.assignmentCount === 1 ? 'assignment' : 'assignments'}
+                </p>
+              )}
+              {day.eventCount > 0 && (
+                <p className="text-green-300">
+                  {day.eventCount} {day.eventCount === 1 ? 'event' : 'events'}
+                </p>
+              )}
+              {day.otherDeadlineCount > 0 && (
+                <p className="text-amber-300">{day.otherDeadlineCount} other</p>
+              )}
             </div>
 
             <div className="w-full flex flex-col justify-end flex-grow pb-1">

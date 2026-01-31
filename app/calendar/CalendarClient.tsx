@@ -25,7 +25,12 @@ import { useTranslation } from '@/lib/hooks/useTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 // Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
-import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES, PROGRAM_LABELS } from '@/data/mqKeyDates';
+import {
+  getMQKeyDatesForDay,
+  MQ_DATE_COLORS,
+  PROGRAM_STYLES,
+  PROGRAM_LABELS,
+} from '@/data/mqKeyDates';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { toastUtils } from '@/lib/utils/toast';
@@ -266,7 +271,11 @@ export default function CalendarClient() {
 
   // Handle highlighted unit - open the detail panel when a unit is highlighted via URL
   useEffect(() => {
-    if (highlightedUnitId && highlightedUnit && processedUnitHighlightRef.current !== highlightedUnitId) {
+    if (
+      highlightedUnitId &&
+      highlightedUnit &&
+      processedUnitHighlightRef.current !== highlightedUnitId
+    ) {
       processedUnitHighlightRef.current = highlightedUnitId;
 
       // Use a microtask to avoid the lint warning about setState in effect
@@ -286,12 +295,9 @@ export default function CalendarClient() {
   const effectiveSelectedUnit = selectedUnit;
   const effectiveUnitDetailOpen = unitDetailOpen;
 
-  const handleUnitDetailOpenChange = useCallback(
-    (open: boolean) => {
-      setUnitDetailOpen(open);
-    },
-    [],
-  );
+  const handleUnitDetailOpenChange = useCallback((open: boolean) => {
+    setUnitDetailOpen(open);
+  }, []);
 
   // Highlighted widget derived from URL query parameter (e.g., "units" for My Units widget)
   const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);
@@ -1018,15 +1024,16 @@ export default function CalendarClient() {
                                       const categoryColors = MQ_DATE_COLORS[mqDate.category];
                                       const programStyle = PROGRAM_STYLES[mqDate.program];
                                       // Category short label for badge
-                                      const categoryLabel = {
-                                        exams: 'Exam',
-                                        admin: 'Admin',
-                                        results: 'Results',
-                                        payment: 'Payment',
-                                        enrollment: 'Enroll',
-                                        recess: 'Break',
-                                        classes: 'Class',
-                                      }[mqDate.category] || mqDate.category;
+                                      const categoryLabel =
+                                        {
+                                          exams: 'Exam',
+                                          admin: 'Admin',
+                                          results: 'Results',
+                                          payment: 'Payment',
+                                          enrollment: 'Enroll',
+                                          recess: 'Break',
+                                          classes: 'Class',
+                                        }[mqDate.category] || mqDate.category;
 
                                       return (
                                         <div
@@ -1044,12 +1051,16 @@ export default function CalendarClient() {
                                           }
                                         >
                                           <div className="flex items-center gap-1 mb-0.5">
-                                            <span className="text-sm" aria-hidden="true">{programStyle.icon}</span>
-                                            <span className={cn(
-                                              'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
-                                              categoryColors.bg,
-                                              categoryColors.text,
-                                            )}>
+                                            <span className="text-sm" aria-hidden="true">
+                                              {programStyle.icon}
+                                            </span>
+                                            <span
+                                              className={cn(
+                                                'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                                                categoryColors.bg,
+                                                categoryColors.text,
+                                              )}
+                                            >
                                               {categoryLabel}
                                             </span>
                                           </div>
@@ -1288,7 +1299,10 @@ export default function CalendarClient() {
                                     // Calculate position at exact due time (point-in-time, not duration)
                                     // Use a small fixed height for the marker instead of spanning an hour
                                     const MARKER_HEIGHT = 28; // Fixed height for deadline marker
-                                    const topPosition = (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT + 8;
+                                    const topPosition =
+                                      (hours - START_HOUR) * HOUR_HEIGHT +
+                                      (minutes / 60) * HOUR_HEIGHT +
+                                      8;
 
                                     // Display name: UNIT_CODE – Type or Title
                                     const displayName = `${deadline.unitCode} – ${deadline.title}`;
@@ -1379,9 +1393,16 @@ export default function CalendarClient() {
                                       >
                                         {/* Compact deadline marker */}
                                         <div className="flex items-center gap-1 h-full">
-                                          <Clock className="h-3 w-3 shrink-0 opacity-80" aria-hidden="true" />
-                                          <span className="text-[10px] font-bold shrink-0">{formatTimeShort(dueDate)}</span>
-                                          <span className="text-[10px] truncate opacity-90">{displayName}</span>
+                                          <Clock
+                                            className="h-3 w-3 shrink-0 opacity-80"
+                                            aria-hidden="true"
+                                          />
+                                          <span className="text-[10px] font-bold shrink-0">
+                                            {formatTimeShort(dueDate)}
+                                          </span>
+                                          <span className="text-[10px] truncate opacity-90">
+                                            {displayName}
+                                          </span>
                                         </div>
                                       </button>
                                     );

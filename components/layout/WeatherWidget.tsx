@@ -20,11 +20,11 @@ import {
 const SYDNEY_REGIONS = [
   { id: 'macquarie', name: 'Macquarie Uni', lat: -33.7738, lon: 151.1126 },
   { id: 'sydney-cbd', name: 'Sydney CBD', lat: -33.8688, lon: 151.2093 },
-  { id: 'north-sydney', name: 'North Sydney', lat: -33.8390, lon: 151.2070 },
+  { id: 'north-sydney', name: 'North Sydney', lat: -33.839, lon: 151.207 },
   { id: 'parramatta', name: 'Parramatta', lat: -33.8151, lon: 151.0011 },
   { id: 'chatswood', name: 'Chatswood', lat: -33.7969, lon: 151.1803 },
   { id: 'bondi', name: 'Bondi', lat: -33.8915, lon: 151.2767 },
-  { id: 'manly', name: 'Manly', lat: -33.7970, lon: 151.2870 },
+  { id: 'manly', name: 'Manly', lat: -33.797, lon: 151.287 },
 ] as const;
 
 type SydneyRegion = (typeof SYDNEY_REGIONS)[number];
@@ -54,7 +54,7 @@ const WeatherWidget = memo(() => {
     try {
       const savedRegionId = localStorage.getItem(STORAGE_KEY);
       if (savedRegionId) {
-        const region = SYDNEY_REGIONS.find(r => r.id === savedRegionId);
+        const region = SYDNEY_REGIONS.find((r) => r.id === savedRegionId);
         if (region) {
           setSelectedRegion(region);
         }
@@ -89,7 +89,9 @@ const WeatherWidget = memo(() => {
 
     try {
       // Add timestamp to prevent any browser caching
-      const response = await fetch(`/api/weather?lat=${region.lat}&lon=${region.lon}&_t=${Date.now()}`);
+      const response = await fetch(
+        `/api/weather?lat=${region.lat}&lon=${region.lon}&_t=${Date.now()}`,
+      );
       if (!response.ok) {
         throw new Error('Weather service unreachable');
       }
@@ -272,7 +274,10 @@ const WeatherWidget = memo(() => {
         {/* Location indicator with dropdown chevron */}
         <div className={`flex items-center gap-0.5 ${textClass} opacity-75`}>
           <MapPin className="w-3 h-3" aria-hidden="true" />
-          <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronDown
+            className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+            aria-hidden="true"
+          />
         </div>
 
         {/* Subtle overlay for depth */}

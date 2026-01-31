@@ -87,7 +87,6 @@ const Header = memo(() => {
     setIsClient(true);
   }, []);
 
-
   // Load notifications on mount
   useEffect(() => {
     if (isClient) {

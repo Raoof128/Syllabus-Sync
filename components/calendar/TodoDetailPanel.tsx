@@ -91,8 +91,11 @@ export default function TodoDetailPanel({
       return `${tOr('dueIn', 'Due in')} ${hoursUntil} ${tOr('hours', 'hours')}`;
     }
     if (daysUntil === 1) return tOr('dueTomorrow', 'Due tomorrow');
-    if (daysUntil !== null && daysUntil <= 7) return `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}`;
-    return daysUntil !== null ? `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}` : '';
+    if (daysUntil !== null && daysUntil <= 7)
+      return `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}`;
+    return daysUntil !== null
+      ? `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}`
+      : '';
   };
 
   return (
@@ -100,10 +103,7 @@ export default function TodoDetailPanel({
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <div
-              className="w-3 h-3 rounded-full shrink-0"
-              style={{ backgroundColor: color }}
-            />
+            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
             {todo.title}
           </DialogTitle>
         </DialogHeader>
@@ -116,7 +116,11 @@ export default function TodoDetailPanel({
                 type="button"
                 onClick={() => toggleComplete(todo.id)}
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-mq-hover-background transition-colors"
-                aria-label={todo.completed ? tOr('markIncomplete', 'Mark incomplete') : tOr('markAsCompleted', 'Mark as completed')}
+                aria-label={
+                  todo.completed
+                    ? tOr('markIncomplete', 'Mark incomplete')
+                    : tOr('markAsCompleted', 'Mark as completed')
+                }
               >
                 {todo.completed ? (
                   <CheckCircle2 className="h-6 w-6 text-emerald-600" />
@@ -243,7 +247,8 @@ export default function TodoDetailPanel({
               </p>
               {todo.completedAt && (
                 <p className="text-xs text-mq-content-tertiary mt-1">
-                  {tOr('completedOn', 'Completed on')} {format(new Date(todo.completedAt), 'MMM d, yyyy')}
+                  {tOr('completedOn', 'Completed on')}{' '}
+                  {format(new Date(todo.completedAt), 'MMM d, yyyy')}
                 </p>
               )}
             </div>

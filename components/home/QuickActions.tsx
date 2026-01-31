@@ -14,9 +14,9 @@ export default function QuickActions() {
       <div className="flex flex-col gap-3 w-full">
         <Button
           asChild
-          variant="glass"
+          variant="secondary"
           size="lg"
-          className="rounded-full justify-start px-5 py-3 border border-transparent hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
+          className="rounded-full justify-start px-5 py-3 border border-transparent hover:border-mq-primary/20 hover:shadow-sm transition-all duration-300"
         >
           <Link href="/map" className="gap-2">
             <Map className="h-5 w-5" />

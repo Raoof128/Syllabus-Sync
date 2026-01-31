@@ -55,7 +55,7 @@ export default function BuildingAutocomplete({
   // Find the selected building from the imported buildings array
   const selectedBuilding = useMemo(() => {
     if (!value) return null;
-    return buildings.find(b => b.id === value) || null;
+    return buildings.find((b) => b.id === value) || null;
   }, [value]);
 
   // Search results
@@ -72,11 +72,14 @@ export default function BuildingAutocomplete({
   }, []);
 
   // Handle selection
-  const handleSelect = useCallback((building: Building) => {
-    onChange(building.id);
-    setQuery('');
-    setIsOpen(false);
-  }, [onChange]);
+  const handleSelect = useCallback(
+    (building: Building) => {
+      onChange(building.id);
+      setQuery('');
+      setIsOpen(false);
+    },
+    [onChange],
+  );
 
   // Handle clear
   const handleClear = useCallback(() => {
@@ -86,39 +89,40 @@ export default function BuildingAutocomplete({
   }, [onChange]);
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!isOpen) {
-      if (e.key === 'ArrowDown' || e.key === 'Enter') {
-        setIsOpen(true);
-        e.preventDefault();
-      }
-      return;
-    }
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev < searchResults.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (searchResults[highlightedIndex]) {
-          handleSelect(searchResults[highlightedIndex]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!isOpen) {
+        if (e.key === 'ArrowDown' || e.key === 'Enter') {
+          setIsOpen(true);
+          e.preventDefault();
         }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        setQuery('');
-        break;
-    }
-  }, [isOpen, searchResults, highlightedIndex, handleSelect]);
+        return;
+      }
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setHighlightedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (searchResults[highlightedIndex]) {
+            handleSelect(searchResults[highlightedIndex]);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          setIsOpen(false);
+          setQuery('');
+          break;
+      }
+    },
+    [isOpen, searchResults, highlightedIndex, handleSelect],
+  );
 
   // Close on click outside
   useEffect(() => {
@@ -208,10 +212,7 @@ export default function BuildingAutocomplete({
               onFocus={() => setIsOpen(true)}
               placeholder={placeholder || tOr('searchBuilding', 'Search for a building...')}
               disabled={disabled}
-              className={cn(
-                'pl-10',
-                error && 'border-red-500',
-              )}
+              className={cn('pl-10', error && 'border-red-500')}
             />
           </div>
         )}
@@ -265,9 +266,7 @@ export default function BuildingAutocomplete({
       </div>
 
       {/* Error message */}
-      {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
   );
 }
