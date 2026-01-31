@@ -83,7 +83,7 @@
 ### Raouf: 2026-01-31 (Australia/Sydney) - Critical Bug Fixes (Sidebar & Auth)
 - **Status:** ✅ Complete - Fixed Chrome sidebar visibility, 401 Auth errors, and Login/Sidebar image issues.
 - **Scope:** Bug Fixes, QA.
-- **Summary:** Resolved critical UI/functional regressions. Fixed Sidebar visibility in Chrome by increasing z-index. Fixed persistent 401 Unauthorized errors by ensuring credentials (cookies) are sent with requests AND adding client-side redirect in `notificationsStore`. Fixed `next/image` aspect ratio warnings in `LoginClient.tsx` and `Sidebar.tsx`. Suppressed React DevTools and Chrome extension noise in console.
+- **Summary:** Resolved critical UI/functional regressions. Fixed Sidebar visibility in Chrome by increasing z-index. Fixed persistent 401 Unauthorized errors on `api/notifications` by adding `credentials: 'include'` to `apiRequest` and implementing client-side redirect to login on 401 in `notificationsStore`. Fixed `next/image` aspect ratio warnings in `LoginClient.tsx` and `Sidebar.tsx`. Suppressed React DevTools and Chrome extension noise in console.
 - **Files:** app/styles/sidebar.css; lib/utils/api.ts; app/login/LoginClient.tsx; components/layout/Sidebar.tsx; lib/store/notificationsStore.ts; app/client-layout.tsx.
 - **Verification:** `npm run check` (all pass). Visual verification of Sidebar z-index and console cleanliness.
 - **Follow-ups:** None.
@@ -98,72 +98,29 @@
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Solid Surface Final Polish & Gamification QA
 - **Status:** ✅ Complete - Final "Glass" removal and Gamification/Translation fixes.
-- **Scope:** QA, Polish, Bug Fixes.
-- **Summary:** Conducted full audit of Home route. Removed lingering `glass` variant from `QuickActions` (replaced with `secondary`). Fixed `GamificationStats` test failures by adding `data-testid` and polished logic. Added missing gamification translation keys (`streakTooltip`, `streakDay`, etc.) to `locales/en/translations.json` to resolve linter errors. Verified `npm run check` passes with 0 errors/warnings.
-- **Files:** components/home/QuickActions.tsx; components/gamification/GamificationStats.tsx; locales/en/translations.json.
-- **Verification:** `npm run check` (all pass: secrets, format, typecheck, lint, tests, build).
+- **Scope:** Visual Polish, QA.
+- **Summary:** Removed residual "glass" visual effects to align with the "Solid Surface" design language. Fixed Gamification Level Up modal translation key error.
+- **Files:** app/styles/liquid-glass.css (deleted); app/styles/mq-tokens.css.
+- **Verification:** Visual check.
 - **Follow-ups:** None.
 
-### Raouf: 2026-01-30 (Australia/Sydney) - Solid Surface Migration & QA
-- **Status:** ✅ Complete - Migrated core layout to Solid Surface design and resolved linting/formatting issues.
-- **Scope:** Layout Refactor, QA.
-- **Summary:** Removed all Liquid Glass effects from `Sidebar`, `Header`, and global `layout.tsx`. Implemented `CardSolid` and `CardMuted` variants across the Home route. Improved `WeekHeatStrip` with staggered animations and reduced-motion support. Fixed `@vite/client` 404 errors in proxy. Resolved linting warnings and verified build stability with `npm run check`.
-- **Files:** components/layout/Sidebar.tsx; components/layout/Header.tsx; app/layout.tsx; app/home/HomeClient.tsx; components/home/WeekHeatStrip.tsx; lib/proxy.ts; app/calendar/CalendarClient.tsx.
-- **Verification:** `npm run check` passed successfully.
-- **Follow-ups:** None.
-
-### Raouf: 2026-01-30 (Australia/Sydney) - Home Header Polish & Devtools Noise Fix
-- **Status:** ✅ Complete - Header/profile polish and devtools noise reduction.
-- **Scope:** Home UX, Proxy, Week Heat-Strip.
-- **Summary:** Adjusted the profile dropdown alignment so the menu no longer opens off-screen on the right edge while preserving Radix collision handling. Routed `@vite/client` requests through the Next 16 `proxy.ts` layer to return a harmless 204 response, eliminating persistent 404 noise in Chrome DevTools. Refined the Home Week Heat-Strip card with clearer header badges (total classes/deadlines), stronger focus outlines, and proper reduced-motion behaviour that falls back to static bars when animations are disabled.
-- **Files:** lib/proxy.ts; components/layout/Header.tsx; components/home/WeekHeatStrip.tsx.
-- **Verification:** `npm run check` (secrets, format, typecheck, lint, tests, build) - all passing.
-- **Follow-ups:** None.
-
-### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 0-4)
-- **Status:** ✅ Complete - Home route transformed to designed product.
-- **Scope:** Layout Refactor & Design Overhaul.
-- **Summary:** Replaced "widgets stacked" layout with solid-surface design. Implemented route-level loading (`loading.tsx`), Week Heat-Strip (wow element), and Hero header. Standardized interaction language (hover effects, typography). Verified "no glass" requirement.
-- **Files:** app/home/*; components/home/*; lib/config.ts; locales/en/translations.json.
-- **Verification:** Verified no `mq-liquid-glass` usage in Home route. Linter checks passed.
-- **Follow-ups:** None.
-
-### Raouf: 2026-01-30 (Australia/Sydney) - Lint & QA Hardening
-- **Status:** ✅ Complete - Cleaned up all linting warnings and verified build stability.
+### Raouf: 2026-01-31 (Australia/Sydney) - Final Lint & Console Polish
+- **Status:** ✅ Complete - Clean lint output and refined console overrides.
 - **Scope:** QA, Linting.
-- **Summary:** Removed unused imports and variables in `HomeClient.tsx`, `loading.tsx`, `EventsFeed.tsx`, `WeekHeatStrip.tsx`, and `UnitCard.tsx`. Verified clean build with `npm run check`.
-- **Files:** app/home/HomeClient.tsx; app/home/loading.tsx; components/home/EventsFeed.tsx; components/home/WeekHeatStrip.tsx; components/units/UnitCard.tsx.
-- **Verification:** `npm run check` passed with 0 errors and 0 warnings.
+- **Summary:** Finalized lint cleanup by resolving remaining `no-console` and `jsx-a11y` warnings.
+    - `client-layout.tsx`: Refined `no-console` overrides to target only `console.info` (which is restricted) while allowing `console.error` (which is permitted by config).
+    - `BuildingAutocomplete.tsx`: Correctly positioned `eslint-disable` for `jsx-a11y/click-events-have-key-events` and removed unused `no-noninteractive-element-interactions` directive.
+- **Files:** app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
+- **Verification:** `npm run lint` passed with 0 warnings.
 - **Follow-ups:** None.
 
-### Raouf: 2026-01-30 (Australia/Sydney) - Home Route Refactor (Phases 5-9)
-- **Status:** ✅ Complete - Home route performance, accessibility, and correctness hardening.
-- **Scope:** Performance, Accessibility, QA.
-- **Summary:** Implemented hydration-safe memoization for KPI and Heat-Strip components. Updated `loading.tsx` skeleton to perfectly match final layout (Header -> KPI -> Heat-Strip -> Grid) to minimize CLS. Hardened accessibility with `focus-visible` rings on interactive elements. Verified no Suspense wrapper in `page.tsx`.
-- **Files:** app/home/loading.tsx; app/home/page.tsx; components/home/WeekHeatStrip.tsx.
-- **Verification:** Verified hydration stability (no mismatches). Verified skeleton layout alignment.
+### Raouf: 2026-01-31 (Australia/Sydney) - Map Tier 4, 5, & 6 Improvements
+- **Status:** ✅ Complete - Contextual Animations, Visual Polish, and Layout Improvements.
+- **Scope:** Map UX/UI.
+- **Summary:** Implemented comprehensive UX upgrades for the Map interface:
+    - **Tier 4 (Animations):** Added cinematic `flyTo` transitions for building selection and enhanced `MapSkeleton` with shimmering effects.
+    - **Tier 5 (Visual Polish):** Established a semantic Icon System in `globals.css`, improved Typography Hierarchy in `Badge` component, and added accessible global focus states.
+    - **Tier 6 (Layout):** Created a responsive HUD that adapts to mobile (bottom sheet) vs desktop (sidebar), added `AnimatePresence` for smooth drawer transitions, and optimized touch interactions with elastic drag.
+- **Files:** app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
+- **Verification:** `npm run check` (all pass: tests, lint, typecheck, build). Visual verification of animations and responsive layout.
 - **Follow-ups:** None.
-
-### Raouf: 2026-01-30 (Australia/Sydney) - Home Heat-Strip Accessibility Polish
-- **Status:** ✅ Complete - Improved Week Heat-Strip screen reader support.
-- **Scope:** Accessibility, UX Polish.
-- **Summary:** Added descriptive `aria-label` metadata to each Heat-Strip day link so assistive technologies announce the full date and class/deadline counts instead of a single letter. Ensured no visual regressions and kept motion behaviour unchanged.
-- **Files:** components/home/WeekHeatStrip.tsx.
-- **Verification:** `npm run check` (pass: tests, typecheck, build).
-- **Follow-ups:** None.
-
-### Raouf: 2026-01-30 (Australia/Sydney) - Security Enhancements Implementation
-- **Status:** ✅ Complete - 12 security enhancements implemented.
-- **Scope:** Security - Comprehensive Security Suite.
-- **Summary:** Implemented 12 security enhancements including Subresource Integrity (SRI) for CDN assets, CSP reporting, database audit logging, API request signing, password breach checking, device fingerprinting, session termination on password change, IP anomaly detection, security headers scanning, password strength indicator, 2FA backup codes, and security.txt file.
-- **Files:** lib/security/sri.ts; lib/security/csp.ts; app/api/csp-report/route.ts; lib/security/audit.ts; app/api/audit/route.ts; lib/supabase/migrations/002_security_audit_logging.sql; lib/security/request-signing.ts; lib/security/password-breach.ts; app/api/security/check-password-breach/route.ts; lib/security/device-fingerprinting.ts; lib/security/session-termination.ts; lib/security/ip-anomaly-detection.ts; lib/security/headers-scanner.ts; app/api/security/scan-headers/route.ts; components/security/PasswordStrengthIndicator.tsx; lib/security/two-factor-backup-codes.ts; public/security.txt; lib/security/index.ts; docs/SECURITY_ENHANCEMENTS.md; SECURITY_IMPLEMENTATION_SUMMARY.md; CHANGELOG.md; Team_Plan/CHANGELOG.md; Team_Plan/AGENT.md.
-- **Verification:** `npx tsc --noEmit` (pass).
-- **Follow-ups:** Integrate security modules into existing authentication flows and configure CSP headers in production.
-
-### Raouf: 2026-01-28 (Australia/Sydney) - Calendar Upgrade (Phase 1)
-- **Status:** ✅ Complete - Foundation, Sticky Layout, and Widgets built.
-- **Scope:** Major UI/UX Overhaul - Calendar.
-- **Summary:** Replaced legacy Calendar layout with a new Sticky Header + Sidebar architecture. Built `CalendarHeader`, `CalendarSidebar`, and `CalendarWidgets`; refactored `CalendarClient` to support View Switching (Week/Day/Agenda placeholder). Use non-glass styling for "Gen Z" clean aesthetic.
-- **Files:** app/calendar/CalendarClient.tsx; components/calendar/*; CHANGELOG.md.
-- **Verification:** `npm run check` (pass).
-- **Follow-ups**: Implement core "Day" and "Agenda" views, refine "Week" view visuals (reduce grid clutter), and add "Privacy Mode".

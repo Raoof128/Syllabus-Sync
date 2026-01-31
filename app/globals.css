@@ -98,7 +98,13 @@
   --color-mq-content-tertiary: var(--c-content-tertiary);
   --color-mq-content-faded: var(--c-content-faded);
   --color-mq-border: var(--c-border);
-  --color-mq-border-secondary: var(--c-border-secondary);
+
+  /* Tier 5: Icon System */
+  --icon-primary: var(--c-content);
+  --icon-secondary: var(--c-content-secondary);
+  --icon-accent: var(--c-red);
+  --icon-success: #10b981;
+
   --color-mq-focus: var(--c-focus);
   --color-mq-success: var(--c-success);
   --color-mq-warning: var(--c-warning);

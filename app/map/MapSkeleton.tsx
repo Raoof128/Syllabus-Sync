@@ -27,16 +27,33 @@ export function MapLoadingSkeleton() {
         role="status"
         aria-label={t('loadingMap')}
       >
-        {/* Pulsing background gradient */}
+        {/* Pulsing background gradient (Tier 4: Enhanced Skeleton) */}
         <m.div
           className="absolute inset-0 bg-gradient-to-br from-mq-background-secondary via-mq-background to-mq-background-secondary"
           animate={{
             opacity: [0.5, 0.8, 0.5],
           }}
           transition={{
-            duration: 2,
+            duration: 1.5,
             repeat: Infinity,
             ease: 'easeInOut',
+          }}
+        />
+
+        {/* Shimmer effect overlay (Tier 4: Enhanced Skeleton) */}
+        <div
+          className="absolute inset-0 opacity-30 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 100%
+              )
+            `,
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 2s infinite linear',
           }}
         />
 

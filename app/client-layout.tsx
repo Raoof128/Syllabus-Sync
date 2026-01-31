@@ -52,20 +52,20 @@ if (typeof window !== 'undefined') {
     ) {
       return; // Silently ignore this specific warning
     }
-    // eslint-disable-next-line no-console
     originalConsoleError(...args);
   };
 
   // Override console.info to suppress React DevTools promotion
+  // eslint-disable-next-line no-console
   const originalConsoleInfo = console.info.bind(console);
   const REACT_DEVTOOLS_MSG = 'Download the React DevTools';
 
+  // eslint-disable-next-line no-console
   console.info = (...args: unknown[]) => {
     const firstArg = args[0];
     if (typeof firstArg === 'string' && firstArg.includes(REACT_DEVTOOLS_MSG)) {
       return;
     }
-    // eslint-disable-next-line no-console
     originalConsoleInfo(...args);
   };
 

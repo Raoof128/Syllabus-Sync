@@ -329,7 +329,16 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               selectedBuildingProp.position[0],
               selectedBuildingProp.position[1],
             );
-            map.setView(buildingLatLng, 1);
+
+            // Smooth transition to building (Tier 4: Contextual Animations)
+            map.flyTo(buildingLatLng, 1, {
+              duration: 1.5,
+              easeLinearity: 0.25,
+              paddingTopLeft: [0, 0], // Can adjust based on sidebar
+              paddingBottomRight: [0, 0],
+              animate: true,
+            } as import('leaflet').ZoomPanOptions);
+
             map.eachLayer((layer) => {
               if (layer instanceof leafletModule.Marker) {
                 const marker = layer as import('leaflet').Marker;
@@ -339,7 +348,8 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   typeof popupContent === 'string' &&
                   popupContent.includes(selectedBuildingProp.id)
                 ) {
-                  marker.openPopup();
+                  // Slight delay to allow flyTo to start
+                  setTimeout(() => marker.openPopup(), 800);
                 }
               }
             });

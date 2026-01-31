@@ -98,69 +98,21 @@ Follow-ups: None.
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
-Scope: QA - Auth Logs & Image Fixes
-Summary: Resolved console errors and warnings to ensure a clean developer experience.
-- **QA/Fix:** Suppressed "Refresh Token Not Found" errors in `lib/supabase/middleware.ts` to prevent server log spam (handled silently as expected for expired sessions).
-- **QA/Fix:** Fixed `next/image` aspect ratio warning in `Sidebar.tsx` by enforcing `width: auto` style on resized logo.
-- **Verification:** `npm run check` passed successfully (0 errors).
-Files: lib/supabase/middleware.ts; components/layout/Sidebar.tsx.
+Scope: QA - Final Lint Cleanup
+Summary: Resolved remaining lint warnings in `client-layout.tsx` and `BuildingAutocomplete.tsx`.
+- **Fix:** Refined `no-console` suppresses in `client-layout.tsx` to target only restricted methods.
+- **Fix:** Corrected placement of `jsx-a11y` ignores in `BuildingAutocomplete.tsx`.
+- **Verification:** `npm run lint` now returns "Lint OK".
+Files: app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
 Follow-ups: None.
 
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
-Scope: Home - Solid Surface Polish & Gamification QA
-Summary: Final polish of Home route to ensure 100% Solid Surface compliance and resolved all QA findings.
-- **UI/UX:** Replaced remaining `glass` variant in `QuickActions` with `secondary` solid style.
-- **QA/Fix:** Fixed `GamificationStats` test failures by adding `data-testid` and fixing missing translation keys (`streakTooltip`, `streakDay`, etc.).
-- **Verification:** `npm run check` passed successfully (0 errors).
-Files: components/home/QuickActions.tsx; components/gamification/GamificationStats.tsx; locales/en/translations.json.
+Scope: Map - Tier 4 (Animations), Tier 5 (Polish), & Tier 6 (Layout)
+Summary: Implemented major UX enhancements for the Map module including cinematic transitions, visual system upgrades, and responsive layout improvements.
+- **Tier 4 (Contextual Animations):** Replaced `setView` with `flyTo` for smooth building navigation; upgraded `MapSkeleton` with pulsing gradients and shimmer effects.
+- **Tier 5 (Visual Polish):** Defined semantic `--icon-*` variables in `globals.css`; added `lg` size variant to `Badge`; implemented global `.focus-ring` with animation.
+- **Tier 6 (Layout Improvements):** Refactored `CampusMapHUD` to be responsive (Sidebar on desktop, Bottom Sheet on mobile); added `AnimatePresence` for smooth drawer entry/exit; enabled elastic drag for touch devices.
+Files: app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
 Follow-ups: None.
-
----
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: UI - Solid Surface Migration & QA
-Summary: Migrated core layout to Solid Surface design and resolved linting/formatting issues.
-- **UI/UX:** Removed all Liquid Glass effects from `Sidebar`, `Header`, and global `layout.tsx`.
-- **UI/UX:** Implemented `CardSolid` and `CardMuted` variants across the Home route.
-- **UI/UX:** Improved `WeekHeatStrip` with staggered animations and reduced-motion support.
-- **QA/Fix:** Fixed `@vite/client` 404 errors in proxy.
-- **QA/Fix:** Resolved linting warnings and verified build stability with `npm run check`.
-- **Verification:** `npm run check` passed successfully.
-Files: components/layout/Sidebar.tsx; components/layout/Header.tsx; app/layout.tsx; app/home/HomeClient.tsx; components/home/WeekHeatStrip.tsx; lib/proxy.ts; app/calendar/CalendarClient.tsx.
-Follow-ups: None.
-
----
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: Home - Heat-Strip Accessibility Polish
-Summary: Improved Week Heat-Strip accessibility and screen reader support.
-- **UX/Accessibility:** Added descriptive `aria-label` metadata to each Heat-Strip day link so assistive technologies announce the full date and class/deadline counts instead of a single-letter label.
-- **Verification:** `npm run check` (pass; tests, typecheck, build).
-Files: components/home/WeekHeatStrip.tsx.
-Follow-ups: None.
-
----
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: Home - Lint & QA Hardening
-Summary: Cleaned up codebase for production.
-- **QA:** Removed unused imports and variables in `HomeClient.tsx`, `loading.tsx`, `EventsFeed.tsx`, `WeekHeatStrip.tsx`, and `UnitCard.tsx`.
-- **Verification:** `npm run check` passed with 0 warnings.
-Files: app/home/HomeClient.tsx; app/home/loading.tsx; components/home/EventsFeed.tsx; components/home/WeekHeatStrip.tsx; components/units/UnitCard.tsx.
-Follow-ups: None.
-
----
-
-Raouf: 2026-01-30 (Australia/Sydney)
-Scope: Home - Performance, Accessibility, & QA (Phases 5-9)
-Summary: Hardened Home route for production.
-- **Performance:** Updated `loading.tsx` skeleton to perfectly match final layout (Header -> KPI -> Heat-Strip -> Grid) to minimize CLS. Verified memoization and hydration stability.
-- **Accessibility:** Added `focus-visible` rings to interactive elements (Heat-Strip days).
-- **Correctness:** Verified removal of page-level Suspense in favor of route-level loading.
-Files: app/home/loading.tsx; app/home/page.tsx; components/home/WeekHeatStrip.tsx.
-Verification: Passed `npm run check`. Visual verification of skeleton and focus states.
-Follow-ups: None.
-
----

@@ -232,6 +232,8 @@ export default function BuildingAutocomplete({
               </li>
             ) : (
               searchResults.map((building, index) => (
+                // Keyboard navigation is handled by the input's onKeyDown
+                // eslint-disable-next-line jsx-a11y/click-events-have-key-events
                 <li
                   key={building.id}
                   role="option"
@@ -243,8 +245,6 @@ export default function BuildingAutocomplete({
                       : 'hover:bg-mq-hover-background',
                     selectedBuilding?.id === building.id && 'font-medium',
                   )}
-                  // Keyboard navigation is handled by the input's onKeyDown
-                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
                   onClick={() => handleSelect(building)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >

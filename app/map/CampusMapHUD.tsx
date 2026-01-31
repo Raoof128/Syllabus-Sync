@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
-import { m } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/lib/map/buildings';
@@ -94,6 +94,10 @@ export default function CampusMapHUD({
             className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0"
             initial="hidden"
             animate="visible"
+            // Tier 6: Responsive Layout Improvements - Touch optimized drag
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.2}
             variants={{
               hidden: { opacity: 0 },
               visible: {
@@ -169,71 +173,79 @@ export default function CampusMapHUD({
       </div>
 
       {/* Bottom-right card (Selected Building) */}
-      {selectedBuilding && (
-        <div className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto">
-          <LayeredCard interactive={false} className="rounded-mq-xl border-mq-border p-4">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <h3 className="font-bold text-mq-content text-lg">{selectedBuilding.id}</h3>
-                <p className="text-sm text-mq-content-secondary line-clamp-1">
-                  {t(selectedBuilding.translationKey)}
-                </p>
-              </div>
-              <Link
-                href="/map"
-                className="text-mq-content-tertiary hover:text-mq-content transition-colors p-1 hover:bg-mq-background-secondary rounded-full"
-              >
-                <span className="sr-only">{t('close')}</span>
-                <X className="h-5 w-5" />
-              </Link>
-            </div>
-
-            <div className="space-y-2 mt-3">
-              {selectedBuilding.category && (
-                <Badge variant="neutral" className="bg-mq-background/50 text-xs">
-                  {selectedBuilding.category.charAt(0).toUpperCase() +
-                    selectedBuilding.category.slice(1)}
-                </Badge>
-              )}
-
-              {/* Navigation Buttons */}
-              <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="w-full gap-2"
-                  onClick={() => {
-                    if (onStartNavigation) {
-                      onStartNavigation();
-                    }
-                  }}
+      <AnimatePresence>
+        {selectedBuilding && (
+          <m.div
+            className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <LayeredCard interactive={false} className="rounded-mq-xl border-mq-border p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="font-bold text-mq-content text-lg">{selectedBuilding.id}</h3>
+                  <p className="text-sm text-mq-content-secondary line-clamp-1">
+                    {t(selectedBuilding.translationKey)}
+                  </p>
+                </div>
+                <Link
+                  href="/map"
+                  className="text-mq-content-tertiary hover:text-mq-content transition-colors p-1 hover:bg-mq-background-secondary rounded-full"
                 >
-                  <Navigation className="h-4 w-4" />
-                  {t('navigateOnCampus')}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full gap-2 touch-optimized"
-                  onClick={() => {
-                    const gps = selectedBuilding.location;
-                    if (gps) {
-                      window.open(
-                        `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
-                        '_blank',
-                        'noopener,noreferrer',
-                      );
-                    }
-                  }}
-                >
-                  <Search className="h-4 w-4" />
-                  {t('navigateToGoogleMaps')}
-                </Button>
+                  <span className="sr-only">{t('close')}</span>
+                  <X className="h-5 w-5" />
+                </Link>
               </div>
-            </div>
-          </LayeredCard>
-        </div>
-      )}
+
+              <div className="space-y-2 mt-3">
+                {selectedBuilding.category && (
+                  <Badge variant="neutral" className="bg-mq-background/50 text-xs">
+                    {selectedBuilding.category.charAt(0).toUpperCase() +
+                      selectedBuilding.category.slice(1)}
+                  </Badge>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex flex-col gap-2 pt-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="w-full gap-2"
+                    onClick={() => {
+                      if (onStartNavigation) {
+                        onStartNavigation();
+                      }
+                    }}
+                  >
+                    <Navigation className="h-4 w-4" />
+                    {t('navigateOnCampus')}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full gap-2 touch-optimized"
+                    onClick={() => {
+                      const gps = selectedBuilding.location;
+                      if (gps) {
+                        window.open(
+                          `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
+                          '_blank',
+                          'noopener,noreferrer',
+                        );
+                      }
+                    }}
+                  >
+                    <Search className="h-4 w-4" />
+                    {t('navigateToGoogleMaps')}
+                  </Button>
+                </div>
+              </div>
+            </LayeredCard>
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
