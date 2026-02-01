@@ -79,11 +79,6 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
     }
   }, [pathname, router]);
 
-  // Show skeleton on the server / before hydration
-  if (!isClient) {
-    return <SettingsSkeleton t={t} />;
-  }
-
   const navigateToSection = (path: string) => {
     router.push(path);
   };
@@ -173,7 +168,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
           </aside>
 
           {/* Settings Content Area */}
-          <div className="min-h-[500px]">{children}</div>
+          <div className="min-h-[500px]">{!isClient ? <SettingsSkeleton t={t} /> : children}</div>
         </div>
       </main>
     </div>

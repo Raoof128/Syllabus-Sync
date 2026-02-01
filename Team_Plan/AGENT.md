@@ -154,3 +154,16 @@
 - **Files:** `app/map/MapClient.tsx`, `app/feed/FeedClient.tsx`, `components/ui/KeyboardShortcuts.tsx`, `locales/**/*.json`, `app/settings/components/AccountSettings.tsx`, `app/signup/SignupClient.tsx`, `app/settings/components/PrivacySettings.tsx`, `components/units/UnitDetailPanel.tsx`.
 - **Verification:** `audit_locales.js` reports 0 missing keys. `npm run lint` passes. Git workspace is clean.
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Phase 3 Performance Polish (Final)
+- **Status:** ✅ Complete - Prop drilling fixed, rendering optimized, layout stabilized.
+- **Scope:** Performance & UX Polish.
+- **Summary:** Completed Phase 3 of the "De-chonk" plan.
+    - **Prop Drilling:** Removed page-level fetching of `units` and `deadlines` in `security/page.tsx` (and `PrivacySettings`). `ExportDataDialog` (via `useDataExport`) now fetches state directly from stores.
+    - **Rendering:** `NotificationSettings` uses memoized `NotificationRow`.
+    - **Layout:** `settings/layout.tsx` optimized to only skeleton content area.
+    - **Refactor:** `PrivacySettings` is now a clean composition of atomic sub-components (`ChangePasswordDialog`, `SessionsList`, `DataManagement`).
+    - **Cleanup:** Fixed lint warnings in `PrivacySettings`, `SecuritySettings`, and `ChangePasswordDialog`.
+- **Files:** app/settings/components/privacy/ExportDataDialog.tsx; app/settings/components/PrivacySettings.tsx; lib/hooks/useDataExport.ts; app/settings/components/SecuritySettings.tsx.
+- **Verification:** Verified `useDataExport` implementation, clean component structure, and passed `npm run lint`.
+- **Follow-ups:** None.

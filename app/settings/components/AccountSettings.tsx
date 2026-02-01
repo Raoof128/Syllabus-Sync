@@ -1,6 +1,9 @@
 'use client';
 
 import { memo, useEffect, useState, useSyncExternalStore, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Button } from '@/components/ui/mq/button';
 import { User, Loader2, Pencil, Check, X } from 'lucide-react';
@@ -29,12 +32,32 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
     useProfilesStore();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    studentId: '',
-    course: '',
-    year: '',
+
+  // Zod schema for profile validation
+  const profileSchema = z.object({
+    name: z
+      .string()
+      .min(2, { message: t('nameMinLength') || 'Name must be at least 2 characters' }),
+    studentId: z.string().optional(),
+    course: z.string().optional(),
+    year: z.string().optional(),
+  });
+
+  type ProfileFormValues = z.infer<typeof profileSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: '',
+      studentId: '',
+      course: '',
+      year: '',
+    },
   });
 
   // Fetch profile from database on mount
@@ -49,21 +72,21 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
     ? profiles.find((p) => p.id === currentProfileId) || null
     : null;
 
-  // Initialize form data when profile loads
+  // Initialize form data when profile loads or when entering edit mode
   useEffect(() => {
     if (currentProfile && !isEditing) {
-      setFormData({
+      reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
         year: currentProfile.year || '',
       });
     }
-  }, [currentProfile, isEditing]);
+  }, [currentProfile, isEditing, reset]);
 
   const handleStartEdit = useCallback(() => {
     if (currentProfile) {
-      setFormData({
+      reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
@@ -71,11 +94,11 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
       });
       setIsEditing(true);
     }
-  }, [currentProfile]);
+  }, [currentProfile, reset]);
 
   const handleCancelEdit = useCallback(() => {
     if (currentProfile) {
-      setFormData({
+      reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
@@ -83,25 +106,24 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
       });
     }
     setIsEditing(false);
-  }, [currentProfile]);
+  }, [currentProfile, reset]);
 
-  const handleSaveProfile = useCallback(async () => {
-    if (!currentProfile || !formData.name) return;
+  const onSubmit = async (data: ProfileFormValues) => {
+    if (!currentProfile || !data.name) return;
 
-    setIsSaving(true);
     try {
       // Only include studentId if it's being set for the first time (was empty/null)
       // The database prevents modifying student_id once it's set
       const updates: Parameters<typeof updateProfile>[1] = {
-        name: formData.name,
-        course: formData.course,
-        year: formData.year,
+        name: data.name,
+        course: data.course,
+        year: data.year,
         preferences: currentProfile.preferences,
       };
 
       // Only send studentId if it wasn't previously set
-      if (!currentProfile.studentId && formData.studentId) {
-        updates.studentId = formData.studentId;
+      if (!currentProfile.studentId && data.studentId) {
+        updates.studentId = data.studentId;
       }
 
       const result = await updateProfile(currentProfile.id, updates);
@@ -114,10 +136,8 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
       }
     } catch {
       toastUtils.error(t('error'), t('failedToUpdateProfile'));
-    } finally {
-      setIsSaving(false);
     }
-  }, [currentProfile, formData, updateProfile, t]);
+  };
 
   // Loading state
   if (!isClient || (isLoading && !hasLoaded)) {
@@ -227,34 +247,28 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
 
           {/* Profile Fields */}
           {isEditing ? (
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSaveProfile();
-              }}
-            >
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               <div>
                 <Label htmlFor="account-name">{t('fullName')}</Label>
                 <Input
                   id="account-name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  {...register('name')}
                   placeholder={t('enterFullName')}
                   required
-                  disabled={isSaving}
+                  disabled={isSubmitting}
+                  error={errors.name?.message}
                 />
               </div>
 
               <div>
                 <Label htmlFor="account-student-id">{t('studentId')}</Label>
                 <Input
-                id="account-student-id"
-                value={formData.studentId}
-                onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-                placeholder={t('studentIdPlaceholder')}
-                disabled={isSaving}
-              />
+                  id="account-student-id"
+                  {...register('studentId')}
+                  placeholder={t('studentIdPlaceholder')}
+                  disabled={isSubmitting}
+                  error={errors.studentId?.message}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -262,10 +276,10 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
                   <Label htmlFor="account-course">{t('course')}</Label>
                   <Input
                     id="account-course"
-                    value={formData.course}
-                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                    {...register('course')}
                     placeholder={t('coursePlaceholder')}
-                    disabled={isSaving}
+                    disabled={isSubmitting}
+                    error={errors.course?.message}
                   />
                 </div>
 
@@ -273,10 +287,10 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
                   <Label htmlFor="account-year">{t('year')}</Label>
                   <Input
                     id="account-year"
-                    value={formData.year}
-                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    {...register('year')}
                     placeholder={t('yearPlaceholder')}
-                    disabled={isSaving}
+                    disabled={isSubmitting}
+                    error={errors.year?.message}
                   />
                 </div>
               </div>
@@ -285,15 +299,15 @@ const AccountSettings = memo(({ t }: AccountSettingsProps) => {
                 <Button
                   variant="secondary"
                   type="button"
-                  disabled={isSaving}
+                  disabled={isSubmitting}
                   onClick={handleCancelEdit}
                   size="sm"
                 >
                   <X className="h-4 w-4 mr-1" />
                   {t('cancel')}
                 </Button>
-                <Button type="submit" disabled={isSaving} size="sm">
-                  {isSaving ? (
+                <Button type="submit" disabled={isSubmitting} size="sm">
+                  {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                       {t('saving')}

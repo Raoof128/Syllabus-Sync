@@ -580,10 +580,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   </div>
                 </div>
                 <button
-          onClick={stopNavigation}
-          className="p-1 rounded-full hover:bg-mq-background-secondary text-mq-content-secondary"
-          aria-label={t('stopNavigation')}
-        >
+                  onClick={stopNavigation}
+                  className="p-1 rounded-full hover:bg-mq-background-secondary text-mq-content-secondary"
+                  aria-label={t('stopNavigation')}
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"

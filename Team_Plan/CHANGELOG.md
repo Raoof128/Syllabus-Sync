@@ -55,3 +55,16 @@ Summary: Completed a full repository internationalization audit, replaced all ha
 - **Verification:** `audit_locales.js` confirms 0 missing keys. Workspace is clean and ready for commit.
 Files: `app/map/MapClient.tsx`, `app/feed/FeedClient.tsx`, `locales/**/*.json`, `app/settings/components/AccountSettings.tsx`, `app/signup/SignupClient.tsx`, `app/settings/components/PrivacySettings.tsx`, `components/units/UnitDetailPanel.tsx`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Performance - Phase 3 Complete
+Summary: Finalized "De-chonk" plan with prop drilling fixes and layout optimization.
+- **Refactor:** Completed PrivacySettings decomposition into atomic components.
+- **Perf:** Eliminated prop drilling for export data; now uses direct store access.
+- **UX:** Stabilized settings layout skeleton to prevent sidebar flash.
+- **Cleanup:** Fixed lint warnings in `PrivacySettings`, `SecuritySettings`, and `ChangePasswordDialog`.
+Verification: `npm run lint` passed.
+Files: app/settings/components/privacy/*, app/settings/components/SecuritySettings.tsx.
+Follow-ups: None.

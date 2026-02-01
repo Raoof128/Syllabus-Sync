@@ -1539,6 +1539,7 @@
   "daysOverdue": "{{count}} days overdue",
   "dueInDays": "Due in {{count}} days",
   "copyShareableURL": "Copy shareable URL with current layers",
-    "studentIdPlaceholder": "12345678",
-    "passwordPlaceholder": "••••••••"
+  "studentIdPlaceholder": "12345678",
+  "passwordPlaceholder": "••••••••",
+  "nameMinLength": "Name must be at least 2 characters"
 }

@@ -219,7 +219,7 @@ describe('PrivacySettings', () => {
     expect(screen.getByText('Strong')).toBeInTheDocument();
   });
 
-  it('shows password mismatch error', () => {
+  it('shows password mismatch error', async () => {
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -231,7 +231,9 @@ describe('PrivacySettings', () => {
       target: { value: 'different123' },
     });
 
-    expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
+    });
   });
 
   it('calls API when password form is submitted', async () => {
