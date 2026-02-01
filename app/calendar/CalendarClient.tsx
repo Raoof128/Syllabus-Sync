@@ -814,9 +814,9 @@ export default function CalendarClient() {
             <ScrollReveal delay={0.1}>
               <div className="bg-mq-card-background border border-mq-border rounded-mq-xl shadow-sm overflow-hidden">
                 <div className="p-0 calendar-main-panel overflow-visible">
-                  <div className="overflow-x-auto">
+                  <div className="md:overflow-x-auto overflow-x-hidden">
                     {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
-                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md min-w-[800px] md:min-w-0">
+                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md md:min-w-[800px]">
                       {/* Desktop week navigation REMOVED per user request */}
                       {/* Mobile day navigation */}
                       <div className="flex md:hidden items-center gap-2">
@@ -2254,7 +2254,7 @@ export default function CalendarClient() {
               </div>
             </div>
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 if (editTodoTitle.trim()) {
                   // Build due date if provided
@@ -2270,13 +2270,13 @@ export default function CalendarClient() {
                   }
 
                   if (editingTodo) {
-                    updateTodo(editingTodo.id, {
+                    await updateTodo(editingTodo.id, {
                       title: editTodoTitle.trim(),
                       priority: editTodoPriority,
                       dueDate,
                     });
                   } else {
-                    addTodo({
+                    await addTodo({
                       title: editTodoTitle.trim(),
                       priority: editTodoPriority,
                       dueDate,

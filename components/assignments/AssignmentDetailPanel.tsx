@@ -158,8 +158,6 @@ export default function AssignmentDetailPanel({
               itemType="assignment"
               itemId={assignment.id}
               itemTitle={assignment.title}
-              building={assignment.building}
-              room={assignment.room}
               unitCode={assignment.unitCode}
               dateTime={assignment.dueDate}
               onEdit={onEdit ? () => onEdit(assignment) : undefined}

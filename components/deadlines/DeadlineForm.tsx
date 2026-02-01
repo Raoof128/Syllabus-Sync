@@ -72,9 +72,9 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const performSave = useCallback(
     async (deadlineData: Deadline) => {
       if (editDeadline) {
-        updateDeadline(editDeadline.id, deadlineData);
+        return await updateDeadline(editDeadline.id, deadlineData);
       } else {
-        addDeadline(deadlineData);
+        return await addDeadline(deadlineData);
       }
     },
     [editDeadline, updateDeadline, addDeadline],

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { format, isValid } from 'date-fns';
 import { UNIT_COLORS } from '@/lib/config';
+import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 
 interface EventFormProps {
   open: boolean;
@@ -44,7 +45,7 @@ interface FormState {
   date: string;
   time: string;
   building: string;
-  room: string;
+  room: string; // Optional room field
   category: Event['category'];
   color: string;
   errors: { [key: string]: string };
@@ -74,7 +75,7 @@ function getInitialValues(
       date: isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : '',
       time: editEvent.time,
       building: editEvent.building || '',
-      room: editEvent.room || '',
+      room: editEvent.room || '', // Load optional room
       category: editEvent.category,
       color: editEvent.color || UNIT_COLORS[0].value,
     };
@@ -204,16 +205,19 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     }
     if (!building.trim()) {
       formErrors.building = t('fieldRequired');
-    }
-    if (!room.trim()) {
-      formErrors.room = t('fieldRequired');
+    } else {
+      // Validate building against map data
+      const validatedBuilding = validateBuilding(building);
+      if (!validatedBuilding) {
+        formErrors.building = BUILDING_VALIDATION_ERROR;
+      }
     }
 
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
 
     const [year, month, day] = date.split('-').map(Number);
@@ -249,20 +253,20 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       startAt,
       endAt: undefined, // Could be parsed from "2:00 PM - 4:00 PM" format
       allDay,
-      date: startAt, // Computed for backward compatibility
+      date: startAt, // Computed for backward compatibility in UI (derived from startAt)
       time: timeStr, // Keep original time string for display
       building: building.trim(),
-      room: room.trim(),
-      location: `${building.trim()} ${room.trim()}`.trim(), // Legacy field
+      room: room.trim() || undefined, // Optional room field
+      location: room.trim() ? `${building.trim()} ${room.trim()}` : building.trim(), // Legacy field
       category,
       color,
     };
 
     if (editEvent) {
-      updateEvent(editEvent.id, eventData);
+      await updateEvent(editEvent.id, eventData);
       toastUtils.success(t('eventUpdated'), t('eventUpdatedMsg'));
     } else {
-      addEvent(eventData);
+      await addEvent(eventData);
       toastUtils.success(t('eventCreated'), t('eventCreatedMsg'));
     }
 
@@ -398,24 +402,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="event-room">
-                {t('room')} <span className="text-mq-error">*</span>
-              </Label>
+              <Label htmlFor="event-room">{t('room')}</Label>
               <Input
                 id="event-room"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
                 placeholder={t('roomPlaceholder')}
-                aria-invalid={Boolean(errors.room)}
-                aria-required="true"
-                aria-describedby={errors.room ? 'event-room-error' : undefined}
-                className={errors.room ? 'border-mq-error' : ''}
               />
-              {errors.room && (
-                <p id="event-room-error" className="text-xs text-mq-error" role="alert">
-                  {errors.room}
-                </p>
-              )}
+              <p className="text-xs text-mq-content-tertiary">
+                Optional
+              </p>
             </div>
           </div>
 

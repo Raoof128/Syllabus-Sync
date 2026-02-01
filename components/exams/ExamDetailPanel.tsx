@@ -154,8 +154,6 @@ export default function ExamDetailPanel({
               itemType="exam"
               itemId={exam.id}
               itemTitle={exam.title}
-              building={exam.building}
-              room={exam.room}
               unitCode={exam.unitCode}
               dateTime={exam.dueDate}
               onEdit={onEdit ? () => onEdit(exam) : undefined}

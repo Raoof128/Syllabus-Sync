@@ -33,6 +33,7 @@ import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
 
+
 interface CalendarWidgetsProps {
   onAddAssignment: () => void;
   onEditAssignment: (assignment: Deadline) => void;
@@ -100,22 +101,24 @@ export default function CalendarWidgets({
 
   // Compute pending todos locally to avoid infinite loop from selector returning new references
   const pendingTodos = useMemo(() => {
+    const now = dayjs();
     return todos
       .filter((t) => !t.completed)
       .sort((a, b) => {
-        // Sort overdue items first
-        const now = new Date();
-        const aOverdue = a.dueDate && new Date(a.dueDate) < now;
-        const bOverdue = b.dueDate && new Date(b.dueDate) < now;
+        // Sort overdue items first (using dayjs for consistent comparison)
+        const aDue = a.dueDate ? dayjs(a.dueDate) : null;
+        const bDue = b.dueDate ? dayjs(b.dueDate) : null;
+        const aOverdue = aDue && aDue.isBefore(now);
+        const bOverdue = bDue && bDue.isBefore(now);
 
         if (aOverdue && !bOverdue) return -1;
         if (!aOverdue && bOverdue) return 1;
 
         // Then sort by due date (items with due dates first, earlier dates first)
-        if (a.dueDate && !b.dueDate) return -1;
-        if (!a.dueDate && b.dueDate) return 1;
-        if (a.dueDate && b.dueDate) {
-          const dateDiff = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        if (aDue && !bDue) return -1;
+        if (!aDue && bDue) return 1;
+        if (aDue && bDue) {
+          const dateDiff = aDue.valueOf() - bDue.valueOf();
           if (dateDiff !== 0) return dateDiff;
         }
 
@@ -126,7 +129,7 @@ export default function CalendarWidgets({
         if (pA !== pB) return pA - pB;
 
         // Finally sort by creation date
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return dayjs(a.createdAt).valueOf() - dayjs(b.createdAt).valueOf();
       });
   }, [todos]);
 
@@ -313,8 +316,6 @@ export default function CalendarWidgets({
                               itemType="assignment"
                               itemId={assignment.id}
                               itemTitle={assignment.title}
-                              building={getDeadlineBuilding(assignment)}
-                              room={assignment.room}
                               unitCode={assignment.unitCode}
                               dateTime={assignment.dueDate}
                               onEdit={() => onEditAssignment(assignment)}
@@ -476,7 +477,7 @@ export default function CalendarWidgets({
                   </span>
                   <div className="flex items-center gap-2">
                     <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                      {units.length}
+                      {units.length} {units.length === 1 ? tOr('unit', 'unit') : tOr('unitsLabel', 'units')}
                     </Badge>
                     <Button
                       size="icon"
@@ -520,8 +521,6 @@ export default function CalendarWidgets({
                           itemType="unit"
                           itemId={unit.id}
                           itemTitle={unit.code}
-                          building={unit.location?.building}
-                          room={unit.location?.room}
                           unitCode={unit.code}
                           onEdit={() => onEditUnit(unit)}
                           onDelete={() => onDeleteUnit(unit)}
@@ -551,15 +550,20 @@ export default function CalendarWidgets({
                     <PartyPopper className="h-4 w-4" />
                     {t('events')}
                   </span>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={() => onAddEvent()}
-                    aria-label={t('addEvent')}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
+                      {events.length} {events.length === 1 ? tOr('event', 'event') : tOr('eventsLabel', 'events')}
+                    </Badge>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => onAddEvent()}
+                      aria-label={t('addEvent')}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -660,8 +664,9 @@ export default function CalendarWidgets({
                         Low: '#10B981',
                       };
                       const todoColor = priorityColors[todo.priority] || '#6B7280';
-                      const isOverdue =
-                        todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed;
+                      // Use dayjs for consistent date comparison (same as assignments/exams)
+                      const due = todo.dueDate ? dayjs(todo.dueDate) : null;
+                      const isOverdue = due && !todo.completed && due.isBefore(dayjs());
 
                       return (
                         <div

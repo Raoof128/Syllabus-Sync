@@ -309,8 +309,8 @@ export default function ItemActionButtons({
 
   return (
     <div className={cn('flex items-center gap-1', className)}>
-      {/* Navigate Button */}
-      {navigationUrl ? (
+      {/* Navigate Button - only shown when building is set */}
+      {building && navigationUrl && (
         <Link
           href={navigationUrl}
           onClick={handleNavLinkClick}
@@ -329,17 +329,6 @@ export default function ItemActionButtons({
             <Navigation className={iconSizeClass} aria-hidden="true" />
           </Button>
         </Link>
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn(baseButtonClass, 'opacity-50 cursor-not-allowed')}
-          disabled
-          title={t('noLocationSet' as TranslationKey) || 'No location set'}
-          aria-label={t('noLocationSet' as TranslationKey) || 'No location set'}
-        >
-          <Navigation className={iconSizeClass} aria-hidden="true" />
-        </Button>
       )}
 
       {/* Edit Button */}

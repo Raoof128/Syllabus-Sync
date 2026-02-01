@@ -21,6 +21,7 @@ import { toastUtils } from '@/lib/utils/toast';
 import { useRetry } from '@/lib/hooks/use-retry';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
+import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import {
   Select,
   SelectContent,
@@ -54,7 +55,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [building, setBuilding] = useState('');
-  const [room, setRoom] = useState('');
+  const [room, setRoom] = useState(''); // Optional room field
   const [color, setColor] = useState<string>(UNIT_COLORS[0].value);
   const [schedule, setSchedule] = useState<ClassTime[]>([]);
 
@@ -65,9 +66,9 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const performSave = useCallback(
     async (unitData: Unit) => {
       if (editUnit) {
-        updateUnit(editUnit.id, unitData);
+        return await updateUnit(editUnit.id, unitData);
       } else {
-        addUnit(unitData);
+        return await addUnit(unitData);
       }
     },
     [editUnit, updateUnit, addUnit],
@@ -102,7 +103,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       setCode(editUnit.code);
       setName(editUnit.name);
       setBuilding(editUnit.location.building);
-      setRoom(editUnit.location.room);
+      setRoom(editUnit.location.room || '');
       setColor(editUnit.color);
       setSchedule([...editUnit.schedule]);
     } else {
@@ -150,8 +151,16 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         return null;
       },
       name: validationRules.required(t('unitName')),
-      building: validationRules.required(t('building')),
-      room: validationRules.required(t('room')),
+      building: (value) => {
+        const requiredError = validationRules.required(t('building'))(value);
+        if (requiredError) return requiredError;
+        // Validate building against map data
+        const validatedBuilding = validateBuilding(value as string);
+        if (!validatedBuilding) {
+          return BUILDING_VALIDATION_ERROR;
+        }
+        return null;
+      },
       schedule: (scheduleValue) =>
         !scheduleValue || !Array.isArray(scheduleValue) || scheduleValue.length === 0
           ? t('atLeastOneClass')
@@ -196,7 +205,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     });
 
     const allValidationErrors = [
-      ...validator({ code, name, building, room, schedule }),
+      ...validator({ code, name, building, schedule }),
       ...classTimeErrors,
     ];
     const formErrors = errorHandler.handleValidationError(allValidationErrors);
@@ -215,7 +224,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       color,
       location: {
         building: building.trim(),
-        room: room.trim(),
+        room: room.trim(), // Optional room field
       },
       schedule,
       createdAt: editUnit?.createdAt || new Date(),
@@ -312,7 +321,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             )}
           </div>
 
-          {/* Location */}
+          {/* Location (Building and optional Room) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="building">
@@ -337,26 +346,17 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 </p>
               )}
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="room">
-                {t('roomLabel')} <span className="text-mq-error">*</span>
-              </Label>
+              <Label htmlFor="room">{t('roomLabel')}</Label>
               <Input
                 id="room"
                 placeholder={t('roomPlaceholder')}
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                aria-required="true"
-                aria-invalid={Boolean(errors.room)}
-                aria-describedby={errors.room ? 'unit-room-error' : undefined}
-                className={errors.room ? 'border-mq-error' : ''}
               />
-              {errors.room && (
-                <p id="unit-room-error" className="text-sm text-mq-error" role="alert">
-                  {errors.room}
-                </p>
-              )}
+              <p className="text-xs text-mq-content-tertiary">
+                Optional
+              </p>
             </div>
           </div>
 

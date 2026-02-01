@@ -5,11 +5,13 @@ import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle, Navigation } from 'lucide-react';
+import Link from 'next/link';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
+import { Button } from '@/components/ui/mq/button';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
 interface UnitDetailPanelProps {
@@ -186,8 +188,6 @@ export default function UnitDetailPanel({
                 itemType="unit"
                 itemId={unit.id}
                 itemTitle={unit.code}
-                building={unit.location?.building}
-                room={unit.location?.room}
                 unitCode={unit.code}
                 onEdit={onEditUnit}
                 onDelete={onDeleteUnit}
@@ -203,7 +203,7 @@ export default function UnitDetailPanel({
           </div>
         </DialogHeader>
 
-        {/* Unit Info */}
+        {/* Unit Info Summary */}
         <div className="flex flex-wrap gap-4 py-3 border-b border-mq-border">
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <MapPin className="h-4 w-4" />
@@ -216,6 +216,37 @@ export default function UnitDetailPanel({
             </span>
           </div>
         </div>
+
+        {/* Dedicated Location Section */}
+        {unit.location?.building && (
+          <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
+                <MapPin className="h-3.5 w-3.5" />
+                Unit Location
+              </div>
+              <Link href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-11 min-w-11"
+                  aria-label={`Navigate to ${unit.location.building} on campus map`}
+                >
+                  <Navigation className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
+                </Button>
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: unit.color }} />
+              <div>
+                <p className="font-semibold text-sm">{unit.location.building}</p>
+                {unit.location.room && (
+                  <p className="text-xs text-mq-content-secondary">Room {unit.location.room}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Summary */}
         <div className="grid grid-cols-4 gap-3 py-3">

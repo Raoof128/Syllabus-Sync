@@ -155,15 +155,18 @@ export function formatScheduleTime(time: string, language: Language): string {
 }
 
 /**
- * Formats a location for display
- * Consistently formats building + room, avoiding duplication of "Room" prefix
+ * Format location from building and room
  *
  * @param building - Building code (e.g., "C5C")
- * @param room - Room identifier (e.g., "204" or "Room 204")
+ * @param room - Room identifier (e.g., "204" or "Room 204") - optional, can be empty
  * @param roomLabel - The translated "Room" label
- * @returns Formatted location string (e.g., "C5C Room 204")
+ * @returns Formatted location string (e.g., "C5C" or "C5C Room 204")
  */
-export function formatLocation(building: string, room: string, roomLabel = 'Room'): string {
+export function formatLocation(building: string, room?: string, roomLabel = 'Room'): string {
+  // If room is empty or not provided, just return the building
+  if (!room || room.trim() === '') {
+    return building;
+  }
   // If room already starts with "Room" (case-insensitive), don't add the prefix
   const roomWithPrefix = room.toLowerCase().startsWith('room') ? room : `${roomLabel} ${room}`;
 

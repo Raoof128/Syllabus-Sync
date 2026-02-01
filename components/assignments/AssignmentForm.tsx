@@ -75,9 +75,9 @@ export default function AssignmentForm({
   const performSave = useCallback(
     async (assignmentData: Deadline) => {
       if (editAssignment) {
-        updateDeadline(editAssignment.id, assignmentData);
+        return await updateDeadline(editAssignment.id, assignmentData);
       } else {
-        addDeadline(assignmentData);
+        return await addDeadline(assignmentData);
       }
     },
     [editAssignment, updateDeadline, addDeadline],

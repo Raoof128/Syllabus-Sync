@@ -32,6 +32,7 @@ import { PRIORITY_LEVELS } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
+import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 
 interface ExamFormProps {
   open: boolean;
@@ -47,7 +48,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const [title, setTitle] = useState('');
   const [unitCode, setUnitCode] = useState('');
   const [building, setBuilding] = useState('');
-  const [room, setRoom] = useState('');
+  const [room, setRoom] = useState(''); // Optional room field
   const [color, setColor] = useState<string>(''); // Empty means inherit from unit
   const [useCustomColor, setUseCustomColor] = useState(false);
   const [dueDate, setDueDate] = useState('');
@@ -73,9 +74,9 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const performSave = useCallback(
     async (examData: Deadline) => {
       if (editExam) {
-        updateDeadline(editExam.id, examData);
+        return await updateDeadline(editExam.id, examData);
       } else {
-        addDeadline(examData);
+        return await addDeadline(examData);
       }
     },
     [editExam, updateDeadline, addDeadline],
@@ -106,7 +107,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       setTitle(editExam.title);
       setUnitCode(editExam.unitCode);
       setBuilding(editExam.building || '');
-      setRoom(editExam.room || '');
+      setRoom(editExam.room || ''); // Load optional room
       // If exam has a custom color, use it; otherwise inherit from unit
       if (editExam.color) {
         setColor(editExam.color);
@@ -136,11 +137,19 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       title: validationRules.required(t('title')),
       unitCode: validationRules.required(t('unit')),
       dueDate: validationRules.required(t('dueDate')),
-      building: validationRules.required(t('building' as TranslationKey) || 'Building'),
-      room: validationRules.required(t('room' as TranslationKey) || 'Room'),
+      building: (value) => {
+        const requiredError = validationRules.required(t('building' as TranslationKey) || 'Building')(value);
+        if (requiredError) return requiredError;
+        // Validate building against map data
+        const validatedBuilding = validateBuilding(value as string);
+        if (!validatedBuilding) {
+          return BUILDING_VALIDATION_ERROR;
+        }
+        return null;
+      },
     });
 
-    const validationErrors = validator({ title, unitCode, dueDate, building, room });
+    const validationErrors = validator({ title, unitCode, dueDate, building });
     const formErrors = errorHandler.handleValidationError(validationErrors);
 
     setErrors(formErrors);
@@ -170,7 +179,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       unitCode,
       unitId: selectedUnit?.id,
       building: building.trim(),
-      room: room.trim(),
+      room: room.trim() || undefined, // Optional room field
       color: useCustomColor ? color : undefined, // Only save custom color
       dueDate: dueDateObj,
       priority,
@@ -315,24 +324,16 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exam-room">
-                  {t('room' as TranslationKey) || 'Room'} <span className="text-mq-error">*</span>
-                </Label>
+                <Label htmlFor="exam-room">{t('room' as TranslationKey) || 'Room'}</Label>
                 <Input
                   id="exam-room"
                   placeholder={t('roomPlaceholder')}
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
-                  aria-invalid={Boolean(errors.room)}
-                  aria-required="true"
-                  aria-describedby={errors.room ? 'exam-room-error' : undefined}
-                  className={errors.room ? 'border-mq-error' : ''}
                 />
-                {errors.room && (
-                  <p id="exam-room-error" className="text-sm text-mq-error" role="alert">
-                    {errors.room}
-                  </p>
-                )}
+                <p className="text-xs text-mq-content-tertiary">
+                  Optional
+                </p>
               </div>
             </div>
 
