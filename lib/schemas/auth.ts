@@ -1,12 +1,17 @@
 import * as z from 'zod';
 import { SECURITY_CONFIG } from '@/lib/constants/config';
 
+// Basic HTML tag stripper for client-side XSS prevention (layer 1)
+const stripHtmlTags = (val: string): string => {
+  return val.replace(/<[^>]*>?/gm, '');
+};
+
 // Pass the translation function 't' into the schema generator
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createSignupSchema = (t: (key: any) => string) => {
   return z
     .object({
-      email: z.string().email(t('validation.invalidEmail')),
+      email: z.string().trim().toLowerCase().email(t('validation.invalidEmail')),
       password: z
         .string()
         .min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH, t('validation.passwordTooShort'))
@@ -19,9 +24,9 @@ export const createSignupSchema = (t: (key: any) => string) => {
       // Hidden honeypot field
       _gotcha: z.string().max(0, 'Bot detected'),
 
-      // Profile fields
-      fullName: z.string().min(1, t('validation.fullNameRequired')),
-      studentId: z.string().min(1, t('validation.studentIdRequired')),
+      // Profile fields with sanitization
+      fullName: z.string().trim().min(1, t('validation.fullNameRequired')).transform(stripHtmlTags),
+      studentId: z.string().trim().min(1, t('validation.studentIdRequired')),
       course: z.string().optional(),
       year: z.string().optional(),
     })

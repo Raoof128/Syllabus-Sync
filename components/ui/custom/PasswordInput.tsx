@@ -4,7 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, onCopy, ...props }, ref) => {
     const [show, setShow] = useState(false);
 
     return (
@@ -13,6 +13,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
           type={show ? 'text' : 'password'}
           className={cn('pr-10', className)}
           ref={ref}
+          autoComplete="new-password"
+          onCopy={onCopy}
           {...props}
         />
         <button

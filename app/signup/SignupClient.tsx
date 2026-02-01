@@ -138,6 +138,15 @@ export default function SignupClient() {
         }),
       });
 
+      // Handle Rate Limiting specifically (429 Too Many Requests)
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const seconds = retryAfter ? parseInt(retryAfter, 10) : 60;
+        toastUtils.error('Too Many Requests', `Please try again in ${seconds} seconds`);
+        setServerError('Too many attempts. Please wait before trying again.');
+        return;
+      }
+
       const result = await response.json();
 
       if (!response.ok) {
@@ -319,6 +328,8 @@ export default function SignupClient() {
                       id="confirmPassword"
                       disabled={isSubmitting}
                       maxLength={64}
+                      autoComplete="new-password"
+                      onCopy={(e) => e.preventDefault()}
                       {...register('confirmPassword')}
                     />
                     {errors.confirmPassword && (
