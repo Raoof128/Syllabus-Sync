@@ -214,3 +214,22 @@
 - **Files:** `app/layout.tsx`, `components/providers/QueryProvider.tsx`, `lib/hooks/useBiometrics.ts`, `__tests__/components/ExportDataDialog.test.tsx`.
 - **Verification:** `npm run check` passed (Test: 358 passed, Lint: OK, Build: OK).
 - **Follow-ups:** Consider expanding React Query usage to other data-heavy hooks.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 1 Blueprint: Manage Profiles Refactor
+- **Status:** ✅ Complete - Monolith smashed.
+- **Scope:** Refactor, Architecture.
+- **Summary:** Refactored `manage-profiles` into a modular architecture.
+  - **Logic:** Created `useProfileManager` hook to handle state, fetching, and saving.
+  - **UI:** Decomposed page into `ProfileHeader` (with 2MB limit), `PersonalInfoCard`, `AcademicInfoCard`, `ReminderSettings`.
+  - **Store:** Fixed `ReminderSettings` to correctly select derived state (`currentProfile`) from `useProfilesStore`.
+- **Files:** `app/manage-profiles/*`.
+- **Verification:** `npm run check` passed successfully.
+- **Follow-ups:** Level 2 Blueprint (Zod/Server Actions).
+
+### Raouf: 2026-02-01 (Australia/Sydney) - QA - Profile Hook Lint Fix
+- **Status:** ✅ Complete - Lint warning suppressed by utilization.
+- **Scope:** QA, Linting.
+- **Summary:** Resolved unused `error` variable in `useProfileManager.ts` by integrating structured `logger.error` call.
+- **Files:** `app/manage-profiles/hooks/useProfileManager.ts`.
+- **Verification:** `npm run lint` returns "Lint OK".
+- **Follow-ups:** None.

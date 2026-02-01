@@ -155,3 +155,26 @@ Summary: Modernized data fetching, reinforced testing, and enhanced developer do
 - **Verification:** `npm run check` passed (358 tests passed).
 Files: `app/layout.tsx`, `components/providers/QueryProvider.tsx`, `lib/hooks/*.ts`, `__tests__/*.test.tsx`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Refactor - Level 1 Blueprint (Manage Profiles)
+Summary: Refactored Manage Profiles page from monolith to modular architecture.
+- **Refactor:** Extracted logic to `useProfileManager` hook and decomposed UI into atomic components (`ProfileHeader`, `PersonalInfoCard`, `AcademicInfoCard`, `ReminderSettings`).
+- **Feature:** Implemented 2MB file size safety check for avatar uploads in `ProfileHeader`.
+- **Fix:** Fixed `ReminderSettings` store access by using proper selectors for `currentProfile`.
+- **Architecture:** aligned with "Brain/Face" separation pattern.
+Verification: `npm run check` passed (Test, Lint, Build).
+Files: `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/page.tsx`, `app/manage-profiles/components/*`.
+Follow-ups: Level 2 Blueprint (Zod & Server Actions).
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Profile Hook Lint Fix
+Summary: Resolved lint warning in profile manager hook.
+- **Fix:** Used structured `logger.error` to handle error variable in `saveProfile`.
+- **Verification:** `npm run lint` now returns "Lint OK".
+- **Files:** `app/manage-profiles/hooks/useProfileManager.ts`.
+- **Follow-ups:** None.
