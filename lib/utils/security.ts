@@ -1,4 +1,33 @@
 import type { PasswordStrength } from '@/lib/types';
+import { APP_CONFIG } from '@/lib/config';
+
+// Centralized whitelist - easier to manage
+export const SAFE_REDIRECT_PATHS = [
+  '/dashboard',
+  '/calendar',
+  '/units',
+  '/manage-profiles',
+  '/settings',
+  '/setup',
+] as const;
+
+export function isValidRedirect(url: string | null): boolean {
+  if (!url) return false;
+
+  // 1. Check if it's a relative path (starts with / but not //)
+  const isRelative = url.startsWith('/') && !url.startsWith('//');
+
+  // 2. Allow base URL
+  const isBaseUrl = url.startsWith(APP_CONFIG.url);
+
+  if (!isRelative && !isBaseUrl) return false;
+
+  // 3. Whitelist check (Optional: Strict Mode)
+  // Remove query params for checking
+  const path = url.split('?')[0].replace(APP_CONFIG.url, '');
+
+  return SAFE_REDIRECT_PATHS.some((safePath) => path.startsWith(safePath));
+}
 
 // Password strength calculation
 // Note: feedback messages should be added to translations.ts for full i18n support

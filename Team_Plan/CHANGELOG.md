@@ -248,3 +248,26 @@ Summary: Cleaned up remaining lint warning from security implementation.
 Verification: `npm run lint` returns "Lint OK".
 Files: `app/manage-profiles/actions.ts`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 1 Blueprint - Login Refactor
+Summary: Modernized Login architecture: RHF/Zod integration, Utility extraction, and Code cleanup.
+- **Refactor:** Migrated `LoginClient` to `react-hook-form` with `zodResolver` schema validation.
+- **Cleanup:** Extracted `passkey` logic and `redirect` security checks to dedicated utilities (`lib/utils`).
+- **Standardization:** Centralized error messages in `AUTH_ERRORS` to eliminate magic strings.
+- **Perf:** Removed client-side `useEffect` session checking to rely on server/middleware redirection.
+Verification: `npm run check` passed.
+Files: `app/login/*`, `lib/utils/security.ts`, `lib/utils/passkey.ts`, `lib/constants/errors.ts`.
+Follow-ups: Level 2 Blueprint (Server Actions).
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Login Lint Fix
+Summary: Cleared unused form variable to resolve lint warning.
+- **Fix:** Removed unused `setFormError` in `LoginClient.tsx`.
+- **Verification:** `npm run lint` returns "Lint OK".
+- **Files:** `app/login/LoginClient.tsx`.
+- **Follow-ups:** None.

@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FingerprintButton } from '@/components/auth/FingerprintButton';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
@@ -12,84 +14,60 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { API_ROUTES } from '@/lib/constants/config';
+import { AUTH_ERRORS } from '@/lib/constants/errors';
 import { toastUtils } from '@/lib/utils/toast';
+import { isValidRedirect } from '@/lib/utils/security';
+import { base64UrlToUint8Array, bufferToBase64Url } from '@/lib/utils/passkey';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint } from 'lucide-react';
+import { loginSchema, type LoginFormData } from './schemas/loginSchema';
+import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint, Loader2 } from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTypedTranslation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
-  const [passkeyStatus, setPasskeyStatus] = useState<
-    'idle' | 'checking' | 'available' | 'unavailable' | 'unsupported'
-  >('idle');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // SECURITY: Validate redirect URL to prevent open redirect attacks
-  // Enhanced validation with whitelist and dangerous scheme blocking
-  const isValidRedirect = useCallback((url: string | null): boolean => {
-    if (!url) return false;
-    try {
-      // SECURITY: Decode multiple times to prevent double-encoding attacks
-      let decodedUrl = url;
-      let prevDecoded = '';
-      let decodeAttempts = 0;
-      const maxDecodeAttempts = 3;
+  // Form Management
+  const {
+    register,
+    handleSubmit,
+    watch,
+    trigger,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    mode: 'onSubmit',
+  });
 
-      while (decodedUrl !== prevDecoded && decodeAttempts < maxDecodeAttempts) {
-        prevDecoded = decodedUrl;
-        decodedUrl = decodeURIComponent(decodedUrl);
-        decodeAttempts++;
-      }
+  // Watch email for passkey status check & forgot password
+  const email = watch('email');
 
-      // Must start with a single forward slash (relative path)
-      if (!decodedUrl.startsWith('/')) return false;
+  // UI States
+  const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
-      // Block protocol-relative URLs (//example.com)
-      if (decodedUrl.startsWith('//')) return false;
+  // Specific loading/error states
+  const [isResetting, setIsResetting] = useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-      // Block dangerous URL schemes that could be injected
-      const dangerousSchemes = ['javascript', 'data', 'vbscript', 'file'].map(
-        (scheme) => `${scheme}:`,
-      );
-      const lowerUrl = decodedUrl.toLowerCase();
-      if (dangerousSchemes.some((scheme) => lowerUrl.includes(scheme))) return false;
+  const [passkeyStatus, setPasskeyStatus] = useState<
+    'idle' | 'checking' | 'available' | 'unavailable' | 'unsupported'
+  >('idle');
 
-      // Parse as URL and verify origin matches
-      const parsed = new URL(decodedUrl, window.location.origin);
-      if (parsed.origin !== window.location.origin) return false;
-      if (!parsed.pathname.startsWith('/')) return false;
+  // Computed state for UI
+  const isLoading = isSubmitting || isResetting || isPasskeyLoading;
+  // Consider form errors or general errors as "isError" for the button animation
+  const isError = !!generalError || Object.keys(errors).length > 0;
 
-      // SECURITY: Whitelist of allowed path prefixes
-      const allowedPaths = [
-        '/home',
-        '/dashboard',
-        '/profile',
-        '/settings',
-        '/events',
-        '/courses',
-        '/map',
-        '/study',
-      ];
-      const isAllowedPath =
-        allowedPaths.some((prefix) => parsed.pathname.startsWith(prefix)) ||
-        parsed.pathname === '/';
-
-      return isAllowedPath;
-    } catch {
-      return false;
-    }
-  }, []);
-
+  // Security: Redirect Validation
   const rawRedirect = searchParams.get('redirectTo');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
 
@@ -99,124 +77,67 @@ export default function LoginClient() {
     if (supabaseRef.current) {
       return supabaseRef.current;
     }
-
     const { createBrowserClient } = await import('@/lib/supabase/client');
     const client = createBrowserClient();
     supabaseRef.current = client;
     return client;
   }, []);
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      if (isLoading || isSuccess) return;
-      const client = await getSupabaseClient();
-      const {
-        data: { session },
-      } = await client.auth.getSession();
-      if (session) {
-        router.push(redirectTo);
-      }
-    };
-    checkUser();
-  }, [getSupabaseClient, router, redirectTo, isLoading, isSuccess]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!email || !password) {
-      setError(t('loginErrorMissingFields'));
-      return;
-    }
-
-    setIsLoading(true);
+  // Standard Login Handler
+  const onSubmit = async (data: LoginFormData) => {
+    setGeneralError(null);
     setIsSuccess(false);
-    setIsError(false);
-    setError(null);
 
     try {
       const client = await getSupabaseClient();
-      // Direct Supabase login
-      const { data, error: authError } = await client.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const { data: authData, error: authError } = await client.auth.signInWithPassword({
+        email: data.email.trim(),
+        password: data.password,
       });
 
       if (authError) {
-        setIsError(true);
-
-        // Map Supabase errors to user-friendly messages
-        if (authError.message.includes('Invalid login credentials')) {
-          setError(t('loginErrorInvalidCredentials'));
-        } else if (authError.message.includes('Email not confirmed')) {
-          setError(t('loginErrorEmailNotConfirmed'));
-        } else if (authError.message.includes('Too many requests')) {
-          setError(t('loginErrorTooManyRequests'));
+        if (authError.message.includes(AUTH_ERRORS.INVALID_LOGIN)) {
+          setGeneralError(t('loginErrorInvalidCredentials'));
+        } else if (authError.message.includes(AUTH_ERRORS.EMAIL_NOT_CONFIRMED)) {
+          setGeneralError(t('loginErrorEmailNotConfirmed'));
+        } else if (authError.message.includes(AUTH_ERRORS.TOO_MANY_REQUESTS)) {
+          setGeneralError(t('loginErrorTooManyRequests'));
         } else {
-          setError(t('loginErrorFailed'));
+          setGeneralError(t('loginErrorFailed'));
         }
-
-        setIsLoading(false);
         return;
       }
 
-      if (!data?.session) {
-        setIsError(true);
-        setError(t('loginErrorFailed'));
-        setIsLoading(false);
+      if (!authData?.session) {
+        setGeneralError(t('loginErrorFailed'));
         return;
       }
 
-      // Success!
       setIsSuccess(true);
-      setIsLoading(false);
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
 
-      // Navigate after success animation
       setTimeout(() => {
         router.push(redirectTo);
       }, 800);
     } catch {
-      setIsError(true);
-      setError(t('unexpectedError'));
-      setIsLoading(false);
+      setGeneralError(t('unexpectedError'));
     }
   };
 
-  // Reset error state after animation completes
   const handleAnimationComplete = useCallback(() => {
     if (isError) {
-      setIsError(false);
+      setGeneralError(null);
+      // We don't clear form errors automatically on animation complete
+      // to let user see what's wrong, but general error can clear.
     }
   }, [isError]);
 
-  const base64UrlToUint8Array = useCallback((value: string) => {
-    const padded = value.replace(/-/g, '+').replace(/_/g, '/');
-    const base64 = padded.padEnd(Math.ceil(padded.length / 4) * 4, '=');
-    const binary = window.atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i += 1) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes;
-  }, []);
-
-  const bufferToBase64Url = useCallback((buffer: ArrayBuffer) => {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    const base64 = window.btoa(binary);
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-  }, []);
-
+  // Biometric / Passkey Login
   const handlePasskeyLogin = useCallback(async () => {
-    if (isPasskeyLoading || isLoading || isSuccess) return;
+    if (isLoading || isSuccess) return;
 
     if (!email) {
-      setError(t('emailRequired'));
+      setGeneralError(t('emailRequired'));
       return;
     }
 
@@ -226,7 +147,7 @@ export default function LoginClient() {
     }
 
     setIsPasskeyLoading(true);
-    setError(null);
+    setGeneralError(null);
 
     try {
       const optionsResponse = await fetch(API_ROUTES.AUTH.PASSKEY_OPTIONS, {
@@ -238,7 +159,7 @@ export default function LoginClient() {
       const options = optionsResult?.data?.options;
 
       if (!optionsResponse.ok || !options) {
-        setError(t('loginErrorFailed'));
+        setGeneralError(t('loginErrorFailed'));
         setIsPasskeyLoading(false);
         return;
       }
@@ -259,7 +180,7 @@ export default function LoginClient() {
       })) as PublicKeyCredential | null;
 
       if (!assertion) {
-        setError(t('loginErrorFailed'));
+        setGeneralError(t('loginErrorFailed'));
         setIsPasskeyLoading(false);
         return;
       }
@@ -285,7 +206,7 @@ export default function LoginClient() {
       });
 
       if (!verifyResponse.ok) {
-        setError(t('loginErrorFailed'));
+        setGeneralError(t('loginErrorFailed'));
         setIsPasskeyLoading(false);
         return;
       }
@@ -293,29 +214,15 @@ export default function LoginClient() {
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
       router.push(redirectTo);
     } catch {
-      setError(t('unexpectedError'));
+      setGeneralError(t('unexpectedError'));
     } finally {
       setIsPasskeyLoading(false);
     }
-  }, [
-    isPasskeyLoading,
-    isLoading,
-    isSuccess,
-    email,
-    t,
-    base64UrlToUint8Array,
-    bufferToBase64Url,
-    router,
-    redirectTo,
-  ]);
+  }, [isLoading, isSuccess, email, t, router, redirectTo]);
 
+  // Check Passkey Availability
   useEffect(() => {
-    if (!email) {
-      setPasskeyStatus('idle');
-      return;
-    }
-
-    if (!email.includes('@')) {
+    if (!email || !email.includes('@')) {
       setPasskeyStatus('idle');
       return;
     }
@@ -350,47 +257,46 @@ export default function LoginClient() {
     };
   }, [email]);
 
-  // Handle OAuth login (Placeholder)
-  const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
-    // For now, show a "coming soon" message as these require backend setup
-    // In a real implementation:
-    // const { error } = await supabase.auth.signInWithOAuth({ provider });
-    const providerName = provider === 'google' ? t('loginWithGoogle') : t('loginWithFacebook');
-    toastUtils.info(t('featureComingSoon'), t('oauthComingSoon', { provider: providerName }));
-  };
-
-  // Handle forgot password
+  // Forgot Password Handler
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
-      setError(t('emailRequired'));
-      return;
-    }
 
-    setIsLoading(true);
-    setError(null);
+    // Validate only email for reset
+    const isEmailValid = await trigger('email');
+    if (!isEmailValid) return;
+
+    const emailValue = getValues('email');
+
+    setIsResetting(true);
+    setGeneralError(null);
 
     try {
       const client = await getSupabaseClient();
-      const { error: resetError } = await client.auth.resetPasswordForEmail(email.trim(), {
+      const { error: resetError } = await client.auth.resetPasswordForEmail(emailValue.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (resetError) {
-        if (resetError.message.includes('Too many requests')) {
-          setError(t('loginErrorTooManyRequests'));
+        if (resetError.message.includes(AUTH_ERRORS.TOO_MANY_REQUESTS)) {
+          setGeneralError(t('loginErrorTooManyRequests'));
         } else {
-          setError(t('unexpectedError'));
+          setGeneralError(t('unexpectedError'));
         }
       } else {
         setResetEmailSent(true);
         toastUtils.success(t('resetPasswordSent'), t('resetPasswordSentDesc'));
       }
     } catch {
-      setError(t('unexpectedError'));
+      setGeneralError(t('unexpectedError'));
     } finally {
-      setIsLoading(false);
+      setIsResetting(false);
     }
+  };
+
+  // OAuth Placeholder
+  const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
+    const providerName = provider === 'google' ? t('loginWithGoogle') : t('loginWithFacebook');
+    toastUtils.info(t('featureComingSoon'), t('oauthComingSoon', { provider: providerName }));
   };
 
   return (
@@ -428,10 +334,10 @@ export default function LoginClient() {
             </p>
           </div>
 
-          {error && (
+          {generalError && (
             <Alert variant="error" className="mb-3">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{generalError}</AlertDescription>
             </Alert>
           )}
 
@@ -464,7 +370,7 @@ export default function LoginClient() {
                     onClick={() => {
                       setShowForgotPassword(false);
                       setResetEmailSent(false);
-                      setError(null);
+                      setGeneralError(null);
                     }}
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
@@ -484,20 +390,30 @@ export default function LoginClient() {
                       id="reset-email"
                       type="email"
                       placeholder={t('emailPlaceholder')}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      // Shared registration - validates email rules even here
+                      {...register('email')}
                       autoComplete="email"
                       disabled={isLoading}
                       className="h-12 rounded-xl text-mq-content font-medium"
                     />
+                    {errors.email && (
+                      <p className="text-xs text-red-500 font-medium ml-1">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                   <Button
                     type="submit"
                     className="w-full h-12 rounded-full font-bold"
                     disabled={isLoading}
                   >
-                    {isLoading ? t('loading') : t('sendResetLink')}
+                    {isResetting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('loading')}
+                      </>
+                    ) : (
+                      t('sendResetLink')
+                    )}
                   </Button>
                   <Button
                     type="button"
@@ -505,7 +421,7 @@ export default function LoginClient() {
                     className="w-full font-semibold"
                     onClick={() => {
                       setShowForgotPassword(false);
-                      setError(null);
+                      setGeneralError(null);
                     }}
                     disabled={isLoading}
                   >
@@ -516,7 +432,7 @@ export default function LoginClient() {
               )}
             </div>
           ) : (
-            <form onSubmit={handleLogin} className="space-y-4 flex-1 flex flex-col">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex-1 flex flex-col">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-mq-content font-bold">
                   {t('email')}
@@ -525,13 +441,14 @@ export default function LoginClient() {
                   id="email"
                   type="email"
                   placeholder={t('emailPlaceholder')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  {...register('email')}
                   autoComplete="email"
                   disabled={isLoading || isSuccess}
                   className="h-12 rounded-xl text-mq-content font-medium"
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-500 font-medium ml-1">{errors.email.message}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-mq-content font-bold">
@@ -541,9 +458,7 @@ export default function LoginClient() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                    {...register('password')}
                     autoComplete="current-password"
                     disabled={isLoading || isSuccess}
                     className="pr-10 h-12 rounded-xl text-mq-content font-medium"
@@ -559,6 +474,9 @@ export default function LoginClient() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-xs text-red-500 font-medium ml-1">{errors.password.message}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-end text-sm">
@@ -566,7 +484,7 @@ export default function LoginClient() {
                   type="button"
                   onClick={() => {
                     setShowForgotPassword(true);
-                    setError(null);
+                    setGeneralError(null);
                   }}
                   className="text-mq-primary hover:underline font-bold"
                   disabled={isLoading || isSuccess}
@@ -580,7 +498,7 @@ export default function LoginClient() {
                   type="submit"
                   text={t('signIn')}
                   disabled={isLoading || isSuccess}
-                  isLoading={isLoading}
+                  isLoading={isSubmitting} // Use specific submitting state for this button
                   isSuccess={isSuccess}
                   isError={isError}
                   onAnimationComplete={handleAnimationComplete}
@@ -602,7 +520,7 @@ export default function LoginClient() {
                 variant="outline"
                 className="h-12 rounded-full flex items-center justify-center gap-2 font-bold"
                 onClick={handlePasskeyLogin}
-                disabled={isLoading || isSuccess || isPasskeyLoading}
+                disabled={isLoading || isSuccess}
               >
                 <Fingerprint className="h-4 w-4" aria-hidden="true" />
                 {isPasskeyLoading ? t('loading') : t('biometricLogin')}

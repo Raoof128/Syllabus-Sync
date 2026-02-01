@@ -27,6 +27,8 @@ export const UNIVERSITY_CONFIG = {
 export const APP_CONFIG = {
   // App name displayed in header and title
   name: 'Syllabus Sync',
+  // App base URL (for security checks)
+  url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   // App tagline/description
   description: 'Campus navigation and schedule management',
   // Full description for metadata
