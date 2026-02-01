@@ -127,6 +127,15 @@ const mapWeatherCode = (code: number): string => {
   return WEATHER_CODE_LABELS[code] || 'Windy';
 };
 
+/**
+ * Fetches and caches local weather data based on geolocation or fallback.
+ * Uses localStorage for caching to reduce API calls.
+ *
+ * @returns Object with:
+ * - weatherData: Structured weather info including temp, condition, and "vibe".
+ * - loading: Loading state.
+ * - error: Any error message encountered during fetch.
+ */
 export const useWeather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);

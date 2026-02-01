@@ -142,3 +142,16 @@ Summary: Removed redundant helper scripts and unified test setup.
 - **Verification:** `npm run check` passed (355 tests passed).
 Files: `scripts/refactor-logger.mjs`, `tests/setup.ts`, `scripts/i18n_audit.cjs`, `scripts/i18n_audit.js`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: 95% Blueprint - Reliability & Performance Sprint
+Summary: Modernized data fetching, reinforced testing, and enhanced developer documentation.
+- **Feat:** Integrated `@tanstack/react-query` for robust server state management.
+- **Refactor:** Migrated `useBiometrics` status check from `useEffect` to `useQuery` to handle caching and potential race conditions.
+- **Test:** Added integration tests for `ExportDataDialog` to verify data export flows.
+- **Docs:** Added JSDoc specifications to `useBiometrics`, `useSessionManager`, and `useWeather` hooks.
+- **Verification:** `npm run check` passed (358 tests passed).
+Files: `app/layout.tsx`, `components/providers/QueryProvider.tsx`, `lib/hooks/*.ts`, `__tests__/*.test.tsx`.
+Follow-ups: None.

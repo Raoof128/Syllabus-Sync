@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
@@ -27,6 +28,18 @@ type UseBiometricsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
+/**
+ * Hook for managing biometric authentication methods (WebAuthn/Passkeys).
+ * Handles checking availability, registration, and toggling of biometric access.
+ *
+ * @param props.t - Translation function for localizing error/status messages.
+ * @returns Object containing:
+ * - biometricEnabled: parameters state of biometric preference.
+ * - biometricAvailable: boolean indicating if browser supports WebAuthn.
+ * - platformAuthAvailable: boolean indicating if a platform authenticator (FaceID, etc.) is present.
+ * - enableBiometric: Function to start the WebAuthn registration ceremony.
+ * - disableBiometric: Function to revoke biometric access.
+ */
 export function useBiometrics({ t }: UseBiometricsProps) {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
@@ -61,23 +74,31 @@ export function useBiometrics({ t }: UseBiometricsProps) {
       setBiometricAvailable(isBiometricAvailable());
       const platformAuth = await isPlatformAuthenticatorAvailable();
       setPlatformAuthAvailable(platformAuth);
-
-      try {
-        const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE);
-        const result = await response.json();
-
-        if (response.ok && result?.data) {
-          setBiometricEnabled(Boolean(result.data.enabled) && platformAuth);
-        }
-      } catch (error) {
-        errorHandler.logError(error as Error, 'Biometric status', 'low');
-      } finally {
-        setIsStatusLoading(false);
-      }
     };
-
     checkAvailability();
   }, []);
+
+  const { data: biometricStatus, isLoading: isQueryLoading } = useQuery({
+    queryKey: ['biometricStatus'],
+    queryFn: async () => {
+      const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE);
+      if (!response.ok) throw new Error('Failed to fetch biometric status');
+      return response.json();
+    },
+    enabled: platformAuthAvailable,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  useEffect(() => {
+    if (biometricStatus?.data && platformAuthAvailable) {
+      setBiometricEnabled(Boolean(biometricStatus.data.enabled));
+    }
+  }, [biometricStatus, platformAuthAvailable]);
+
+  // derived state for compatibility
+  useEffect(() => {
+    setIsStatusLoading(isQueryLoading);
+  }, [isQueryLoading]);
 
   const enableBiometric = useCallback(async () => {
     setIsLoading(true);

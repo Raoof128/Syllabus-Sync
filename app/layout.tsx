@@ -4,6 +4,7 @@ import { Work_Sans, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import './mq-tokens.css';
 import ClientLayout from './client-layout';
+import QueryProvider from '@/components/providers/QueryProvider';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { THEME_SCRIPT, RTL_SCRIPT } from '@/lib/security/csp';
 
@@ -91,7 +92,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <ClientLayout>{children}</ClientLayout>
+        <QueryProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -9,6 +9,17 @@ type UseSessionManagerProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
+/**
+ * Manages user sessions across devices.
+ * Allows listing active sessions and remotely revoking them.
+ *
+ * @param props.t - Translation function.
+ * @returns Object containing:
+ * - sessions: List of active sessions.
+ * - fetchSessions: Function to reload session list.
+ * - endSession: Revoke a specific session.
+ * - endAllSessions: Revoke all sessions including current one (global logout).
+ */
 export function useSessionManager({ t }: UseSessionManagerProps) {
   const [sessions, setSessions] = useState<SessionInfo[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
