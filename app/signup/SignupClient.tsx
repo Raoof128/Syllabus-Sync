@@ -18,8 +18,8 @@ import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { useProfilesStore } from '@/lib/store/profilesStore';
-import { AlertTriangle, Check, Loader2 } from 'lucide-react';
+
+import { AlertTriangle, Check, Loader2, Mail } from 'lucide-react';
 import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
@@ -31,7 +31,8 @@ const DRAFT_KEY = 'signup_draft';
 export default function SignupClient() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const addProfile = useProfilesStore((state) => state.addProfile);
+
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Memoize schema if performance is an issue, but usually fine here
   const signupSchema = createSignupSchema(t);
@@ -173,31 +174,43 @@ export default function SignupClient() {
       // Clear the draft on success
       sessionStorage.removeItem(DRAFT_KEY);
 
-      // Create local profile
-      addProfile({
-        name: data.fullName,
-        email: data.email,
-        studentId: data.studentId,
-        course: data.course || '',
-        year: data.year || '',
-        preferences: {
-          notifications: true,
-          emailReminders: true,
-          pushNotifications: false,
-        },
-      });
-
       if (result.data?.session) {
         toastUtils.success(t('accountCreated'), 'You are now signed in!');
         router.push('/home');
       } else {
-        toastUtils.success(t('accountCreated'), t('verifyEmail'));
-        router.push('/login');
+        // Show verification pending UI instead of redirecting
+        setIsSuccess(true);
       }
     } catch {
       setServerError(t('unexpectedError'));
     }
   };
+
+  // Show verification pending UI after successful signup (email confirmation required)
+  if (isSuccess) {
+    return (
+      <div className="signup-page min-h-screen flex items-center justify-center bg-mq-background p-4">
+        <Card className="w-full max-w-md bg-mq-card-background border border-mq-border">
+          <CardContent className="pt-6 pb-6 text-center space-y-6">
+            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-in fade-in zoom-in duration-300">
+              <Mail className="w-8 h-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold">{t('checkInbox')}</h3>
+              <p className="text-muted-foreground max-w-sm mx-auto">
+                {t('sentLinkTo')}{' '}
+                <span className="font-medium text-foreground">{watch('email')}</span>.{' '}
+                {t('clickToVerify')}
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => router.push('/login')} className="w-full">
+              {t('backToLogin')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="signup-page min-h-screen flex items-center justify-center bg-mq-background p-4">

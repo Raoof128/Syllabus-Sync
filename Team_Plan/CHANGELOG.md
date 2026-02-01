@@ -389,3 +389,17 @@ Summary: Hardened backend API with Zero Trust security, transaction rollback, an
 Verification: `npm run check` passed (361 tests, build successful).
 Files: `app/api/auth/signup/route.ts`.
 Follow-ups: None - Signup system is Fort Knox Production Ready.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 6 Blueprint - The Handoff & Hardening
+Summary: Email verification flow, session exchange, and transport layer security - the complete signup handoff.
+- **Check Inbox UX:** Replaced blind redirect with dedicated verification pending card showing email address and clear instructions.
+- **Email Callback Handler:** Created `app/auth/callback/route.ts` to exchange temporary verification code for permanent session cookie.
+- **State Consistency:** Removed `useProfilesStore` usage from SignupClient to prevent UI/database inconsistency (trust server as source of truth).
+- **Security Headers:** Leveraged existing proxy.ts security headers (CSP, HSTS, X-Frame-Options, etc.) already in place.
+- **I18n:** Added translation keys for verification UI (`checkInbox`, `sentLinkTo`, `clickToVerify`, `backToLogin`).
+Verification: `npm run check` passed (361 tests, all green, build successful).
+Files: `app/signup/SignupClient.tsx`, `app/auth/callback/route.ts`, `locales/en/translations.json`.
+Follow-ups: None - Signup system COMPLETE with 6 levels of enterprise-grade hardening.

@@ -1541,5 +1541,9 @@
   "copyShareableURL": "Copy shareable URL with current layers",
   "studentIdPlaceholder": "12345678",
   "passwordPlaceholder": "••••••••",
-  "nameMinLength": "Name must be at least 2 characters"
+  "nameMinLength": "Name must be at least 2 characters",
+  "checkInbox": "Check your inbox!",
+  "sentLinkTo": "We've sent a verification link to",
+  "clickToVerify": "Click the link in the email to verify your account and get started.",
+  "backToLogin": "Back to Login"
 }

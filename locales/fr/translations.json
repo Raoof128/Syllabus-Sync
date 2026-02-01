@@ -1527,5 +1527,8 @@
   "dueInDays": "Due in {{count}} days",
   "copyShareableURL": "Copy shareable URL with current layers",
   "studentIdPlaceholder": "12345678",
-  "passwordPlaceholder": "••••••••"
+  "passwordPlaceholder": "••••••••",
+  "checkInbox": "Check your inbox!",
+  "sentLinkTo": "We've sent a verification link to",
+  "clickToVerify": "Click the link in the email to verify your account and get started."
 }
