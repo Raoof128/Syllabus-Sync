@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import { AUTH_ERRORS } from '@/lib/constants/errors';
 import { toastUtils } from '@/lib/utils/toast';
 import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
@@ -73,23 +72,29 @@ export default function LoginClient() {
       const result = await loginAction(data);
 
       if (result.error) {
-        if (result.error.includes(AUTH_ERRORS.INVALID_LOGIN)) {
+        // Map server codes to translation keys or use default
+        const errorKey = `auth.errors.${result.error}`;
+        // Note: Casting to any to allow dynamic key lookup that might not be in generic T type yet
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const msg = t(errorKey as any) || t('auth.errors.default' as any) || result.error;
+        toastUtils.error(t('loginErrorFailed'), msg);
+
+        // Fallback for specific known errors to maintain current UI behavior
+        if (result.error === 'invalid_credentials') {
           setGeneralError(t('loginErrorInvalidCredentials'));
-        } else if (result.error.includes(AUTH_ERRORS.EMAIL_NOT_CONFIRMED)) {
-          setGeneralError(t('loginErrorEmailNotConfirmed'));
-        } else if (
-          result.error.includes(AUTH_ERRORS.TOO_MANY_REQUESTS) ||
-          result.error.includes('Too many login attempts')
-        ) {
+        } else if (result.error === 'rate_limit_exceeded') {
           setGeneralError(t('loginErrorTooManyRequests'));
         } else {
-          setGeneralError(result.error);
+          setGeneralError(msg);
         }
         return;
       }
 
       setIsSuccess(true);
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
+
+      // 1. Force server to re-render layout (Updates "Guest" -> "User" in navbar)
+      router.refresh();
 
       setTimeout(() => {
         router.push(redirectTo);

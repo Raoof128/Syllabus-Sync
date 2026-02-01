@@ -349,3 +349,15 @@
 - **Files:** `app/login/LoginClient.tsx`.
 - **Verification:** `npm run check` passed (0 warnings, 0 errors).
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Login Flow Final Polish: Reliability & Observability
+- **Status:** ✅ Complete - Production-ready Login Flow.
+- **Scope:** Reliability, Observability, Security, I18n.
+- **Summary:** Finalized the Login module with enterprise-grade monitoring and UX stability.
+  - **Observability:** Integrated `logger` into `loginAction` for tracking attempts, successes, and rate-limit triggers.
+  - **Reliability:** Implemented `router.refresh()` to handle Next.js cache staleness (Login -> User transition in navbar).
+  - **Testing:** Created a Vitest suite in `app/login/__tests__/actions.test.ts` to verify validation, rate limiting, and auth logic.
+  - **I18n:** Standardized error codes and wired them to `useTypedTranslation` for fully localized error toasts.
+- **Files:** `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/login/__tests__/actions.test.ts`.
+- **Verification:** `npm run check` passed (358 tests, 0 lint warnings, successful build).
+- **Follow-ups:** None.
