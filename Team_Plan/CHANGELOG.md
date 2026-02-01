@@ -403,3 +403,16 @@ Summary: Email verification flow, session exchange, and transport layer security
 Verification: `npm run check` passed (361 tests, all green, build successful).
 Files: `app/signup/SignupClient.tsx`, `app/auth/callback/route.ts`, `locales/en/translations.json`.
 Follow-ups: None - Signup system COMPLETE with 6 levels of enterprise-grade hardening.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 7 Blueprint - The "Black Box" & "Kill Switch"
+Summary: Forensic audit logging and emergency kill switch - the ultimate security layer for threat detection and instant response.
+- **Audit Logging:** Created `auth_audit_logs` table with RLS protection. Logs all auth events: signup_success, rate_limit_hit, honeypot_triggered, validation_fail, rollback_executed. Captures IP, user agent, metadata for forensic analysis.
+- **Kill Switch:** Created `app_config` table with feature flags. `signup_enabled` flag acts as master switch - disable signups instantly without deployment. Returns HTTP 503 when disabled.
+- **Supabase Migration:** `20260201084007_add_audit_logging_and_feature_flags.sql` creates both tables with proper indexes, RLS policies, and default values.
+- **Error Codes:** Added SERVICE_UNAVAILABLE to ERROR_CODES for kill switch responses.
+Verification: `npm run check` passed (361 tests, all green, build successful).
+Files: `app/api/auth/signup/route.ts`, `app/api/_lib/response.ts`, `supabase/migrations/20260201084007_add_audit_logging_and_feature_flags.sql`.
+Follow-ups: None - Signup system is FORT KNOX MAXIMUM SECURITY with 7 levels of hardening.

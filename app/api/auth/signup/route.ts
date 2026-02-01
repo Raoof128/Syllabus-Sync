@@ -13,6 +13,35 @@ import { getClientIP } from '@/lib/security/ip';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
 
+// ============================================================================
+// AUDIT LOGGING HELPER
+// ============================================================================
+async function logAuthEvent(
+  supabaseAdmin: ReturnType<typeof createAdminClient>,
+  event: string,
+  meta: Record<string, unknown>,
+  req: NextRequest,
+) {
+  // Skip logging if admin client is not available (graceful degradation)
+  if (!supabaseAdmin) return;
+
+  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown';
+  const ua = req.headers.get('user-agent') ?? 'unknown';
+
+  // Fire and forget (don't await this, don't slow down the user)
+  supabaseAdmin
+    .from('auth_audit_logs')
+    .insert({
+      event_type: event,
+      ip_address: ip,
+      user_agent: ua,
+      metadata: meta,
+    })
+    .then(({ error }) => {
+      if (error) logger.error('Audit Log Failed:', error);
+    });
+}
+
 // Developer emails that can bypass email confirmation in development
 // SECURITY: Load from environment variable to avoid exposing emails in source code
 const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
@@ -50,11 +79,38 @@ const serverT = (key: string): string => {
 };
 
 export async function POST(request: NextRequest) {
+  const adminClient = createAdminClient();
+
+  // ===========================================================================
+  // KILL SWITCH: Check if signups are enabled (only if admin client available)
+  // ===========================================================================
+  if (adminClient) {
+    const { data: config } = await adminClient
+      .from('app_config')
+      .select('value')
+      .eq('key', 'signup_enabled')
+      .single();
+
+    if (config?.value === false) {
+      // Log the blocked attempt for security monitoring
+      logAuthEvent(adminClient, 'signup_blocked_kill_switch', {}, request);
+
+      return jsonError(
+        'Signups are temporarily disabled for maintenance.',
+        503,
+        ERROR_CODES.SERVICE_UNAVAILABLE,
+      );
+    }
+  }
+
   // SECURITY: Rate limit by IP using distributed store (works in serverless)
   const clientIP = getClientIP(request);
   const { allowed, remaining, resetIn, limit } = await signupLimiter(clientIP);
 
   if (!allowed) {
+    // AUDIT: Log rate limit hit for security monitoring
+    logAuthEvent(adminClient, 'rate_limit_hit', { ip: clientIP, reset_in: resetIn }, request);
+
     const response = jsonError(
       `Too many signup attempts. Please try again later.`,
       429,
@@ -83,6 +139,9 @@ export async function POST(request: NextRequest) {
       const firstError = parsed.error.issues[0];
       const field = firstError.path[0]?.toString();
 
+      // AUDIT: Log validation failure
+      logAuthEvent(adminClient, 'signup_validation_fail', { target: field, ip: clientIP }, request);
+
       // Return specific validation errors with target field
       return jsonError(firstError.message, 400, ERROR_CODES.VALIDATION_ERROR, {
         target: field,
@@ -96,13 +155,22 @@ export async function POST(request: NextRequest) {
     if (_gotcha && _gotcha.length > 0) {
       // Lie to the bot - return generic success so they leave
       logger.warn('Honeypot triggered - bot detected', { ip: clientIP });
+
+      // AUDIT: Log honeypot trigger
+      logAuthEvent(
+        adminClient,
+        'honeypot_triggered',
+        { ip: clientIP, gotcha_value: _gotcha },
+        request,
+      );
+
       return jsonSuccess({
         message: GENERIC_SIGNUP_SUCCESS,
       });
     }
 
     const supabase = await createServerClient();
-    const adminClient = createAdminClient();
+    // adminClient already initialized at top for kill switch check
 
     // Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -173,6 +241,14 @@ export async function POST(request: NextRequest) {
           });
         } else {
           logger.info('Rollback successful - deleted orphaned auth user:', { userId });
+
+          // AUDIT: Log rollback execution
+          logAuthEvent(
+            adminClient,
+            'rollback_executed',
+            { user_id: userId, reason: 'profile_creation_failed' },
+            request,
+          );
         }
 
         return jsonError(
@@ -251,6 +327,19 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    // AUDIT: Log successful signup
+    logAuthEvent(
+      adminClient,
+      'signup_success',
+      {
+        user_id: userId,
+        email_domain: email.split('@')[1],
+        has_session: !!session,
+        ip: clientIP,
+      },
+      request,
+    );
 
     // SECURITY: Always return generic success to prevent account enumeration
     const response = jsonSuccess({
