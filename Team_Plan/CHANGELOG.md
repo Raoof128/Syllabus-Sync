@@ -335,3 +335,17 @@ Summary: Modernized Signup architecture with React Hook Form, Zod, and zxcvbn in
 Verification: `npm run check` passed.
 Files: `lib/utils/security.ts`, `app/signup/SignupClient.tsx`.
 Follow-ups: Level 2 Blueprint (Server Actions).
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 2 Blueprint - Signup Architecture
+Summary: Refined Signup flow with Polyglot Validation, Atomic Components, and Bot Protection.
+- **Architecture:** Extracted `PasswordInput` atomic component to encapsulate visibility state.
+- **Validation:** Created `lib/schemas/auth.ts` with injected translation function for multi-lingual Zod validation.
+- **Security:** Added "Honeypot" (`_gotcha`) field to trap bots without captcha friction.
+- **A11y:** Implemented manual focus management to ensure keyboard users land on the right field after step transitions.
+- **Cleanup:** Removed unused `useEffect` import in `SignupClient.tsx`.
+Verification: `npm run check` passed.
+Files: `lib/schemas/auth.ts`, `components/ui/custom/PasswordInput.tsx`, `app/signup/SignupClient.tsx`.
+Follow-ups: Level 3 Blueprint (Server Actions).

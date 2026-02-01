@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,58 +8,35 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/mq/input';
+import { PasswordInput } from '@/components/ui/custom/PasswordInput';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
+import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import { Eye, EyeOff, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { AlertTriangle, Check, Loader2 } from 'lucide-react';
 import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
+import { createSignupSchema } from '@/lib/schemas/auth';
 
-// Schema Validation
-const signupSchema = z
-  .object({
-    email: z.string().email('Invalid email address'),
-    password: z
-      .string()
-      .min(
-        SECURITY_CONFIG.MIN_PASSWORD_LENGTH,
-        `Must be at least ${SECURITY_CONFIG.MIN_PASSWORD_LENGTH} chars`,
-      )
-      .regex(/[A-Z]/, 'Needs an uppercase letter')
-      .regex(/[0-9]/, 'Needs a number'),
-    confirmPassword: z.string(),
-    agreedToTerms: z.literal(true, {
-      message: 'You must agree to the terms',
-    }),
-    // Profile fields are optional initially, but required for the second step
-    // We can refine them or just use simple checks.
-    // For a unified schema, we make them required strings, but valid initially as empty if we only trigger partial validation.
-    fullName: z.string().min(1, 'Full name is required'),
-    studentId: z.string().min(1, 'Student ID is required'),
-    course: z.string().optional(),
-    year: z.string().optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
-type SignupFormData = z.infer<typeof signupSchema>;
+type SignupFormData = z.infer<ReturnType<typeof createSignupSchema>>;
 
 export default function SignupClient() {
   const { t } = useTypedTranslation();
   const router = useRouter();
   const addProfile = useProfilesStore((state) => state.addProfile);
 
+  // Memoize schema if performance is an issue, but usually fine here
+  const signupSchema = createSignupSchema(t);
+
   const [step, setStep] = useState<'auth' | 'profile'>('auth');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  // Focus management
+  const fullNameRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -79,7 +56,8 @@ export default function SignupClient() {
       studentId: '',
       course: '',
       year: '',
-    } as unknown as SignupFormData, // Initial value for agreedToTerms is false, which conflicts with literal true in schema
+      _gotcha: '',
+    } as unknown as SignupFormData,
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -89,10 +67,18 @@ export default function SignupClient() {
 
   const handleNextStep = async () => {
     // Validate only auth fields
-    const isValid = await trigger(['email', 'password', 'confirmPassword', 'agreedToTerms']);
+    const isValid = await trigger([
+      'email',
+      'password',
+      'confirmPassword',
+      'agreedToTerms',
+      '_gotcha',
+    ]);
     if (isValid) {
       setStep('profile');
       setServerError(null);
+      // Wait for render, then focus
+      setTimeout(() => fullNameRef.current?.focus(), 100);
     }
   };
 
@@ -222,6 +208,15 @@ export default function SignupClient() {
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Honeypot field - Hidden from real users */}
+            <input
+              {...register('_gotcha')}
+              style={{ display: 'none' }}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
+
             {/* Step 1: Authentication */}
             <div className={clsx('space-y-4', step !== 'auth' && 'hidden')}>
               <div className="space-y-2">
@@ -238,26 +233,12 @@ export default function SignupClient() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">{t('password')}</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    disabled={isSubmitting}
-                    maxLength={64}
-                    // minLength={SECURITY_CONFIG.MIN_PASSWORD_LENGTH} // Handled by Zod
-                    className="pr-10"
-                    {...register('password')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-secondary hover:text-mq-content-primary transition-colors"
-                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
-                    disabled={isSubmitting}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="password"
+                  disabled={isSubmitting}
+                  maxLength={64}
+                  {...register('password')}
+                />
                 {errors.password && (
                   <p className="text-xs text-red-500">{errors.password.message}</p>
                 )}
@@ -298,29 +279,12 @@ export default function SignupClient() {
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    disabled={isSubmitting}
-                    maxLength={64}
-                    className="pr-10"
-                    {...register('confirmPassword')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content-secondary hover:text-mq-content-primary transition-colors"
-                    aria-label={showConfirmPassword ? t('hidePassword') : t('showPassword')}
-                    disabled={isSubmitting}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="confirmPassword"
+                  disabled={isSubmitting}
+                  maxLength={64}
+                  {...register('confirmPassword')}
+                />
                 {errors.confirmPassword && (
                   <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
                 )}
@@ -378,6 +342,19 @@ export default function SignupClient() {
                   placeholder={t('enterFullName')}
                   disabled={isSubmitting}
                   {...register('fullName')}
+                  // Use merge refs logic or just ref if register ref is enough,
+                  // but we need to focus it manually.
+                  // register returns { ref, ... }
+                  // We can use a callback ref or compose refs.
+                  // Simpler: use the ref from register and set autoFocus (which works for mount).
+                  // But we are hiding/showing div, not mounting/unmounting?
+                  // If just hiding, autoFocus won't trigger again.
+                  // So we use the ref we created: fullNameRef.
+                  // We need to merge it with register's ref.
+                  ref={(e) => {
+                    register('fullName').ref(e);
+                    fullNameRef.current = e;
+                  }}
                 />
                 {errors.fullName && (
                   <p className="text-xs text-red-500">{errors.fullName.message}</p>
