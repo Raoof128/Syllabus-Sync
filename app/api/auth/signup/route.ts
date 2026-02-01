@@ -10,32 +10,8 @@ import {
 } from '@/app/api/_lib/response';
 import { signupLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
-import { z } from 'zod';
+import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
-
-// SECURITY: Stronger password policy - min 12 chars for better security
-const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(12, 'Password must be at least 12 characters'),
-  // Direct fields (legacy format)
-  fullName: z.string().min(1).optional(),
-  studentId: z.string().optional(),
-  course: z.string().optional(),
-  year: z.string().optional(),
-  // Nested options format (from frontend)
-  options: z
-    .object({
-      data: z
-        .object({
-          full_name: z.string().optional(),
-          student_id: z.string().optional(),
-          course: z.string().optional(),
-          year: z.string().optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-});
 
 // Developer emails that can bypass email confirmation in development
 // SECURITY: Load from environment variable to avoid exposing emails in source code
@@ -44,9 +20,6 @@ const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
   : [];
 
 // SECURITY: Stricter production detection
-// - VERCEL_ENV is set by Vercel and cannot be spoofed
-// - NODE_ENV alone can be manipulated in local environments
-// This ensures dev features are NEVER enabled on Vercel production
 const isRealProduction =
   process.env.VERCEL_ENV === 'production' ||
   (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
@@ -60,18 +33,40 @@ function isDevEmail(email: string): boolean {
 const GENERIC_SIGNUP_SUCCESS =
   'If this email is not already registered, you will receive a confirmation email shortly.';
 
+// Server-side translation stub (returns key or basic English)
+const serverT = (key: string): string => {
+  // Basic translations for server-side error messages
+  const translations: Record<string, string> = {
+    'validation.invalidEmail': 'Invalid email address',
+    'validation.passwordTooShort': 'Password must be at least 12 characters',
+    'validation.passwordUppercase': 'Password must contain at least one uppercase letter',
+    'validation.passwordNumber': 'Password must contain at least one number',
+    'validation.termsRequired': 'You must agree to the terms',
+    'validation.fullNameRequired': 'Full name is required',
+    'validation.studentIdRequired': 'Student ID is required',
+    'validation.passwordsMismatch': 'Passwords do not match',
+  };
+  return translations[key] || key;
+};
+
 export async function POST(request: NextRequest) {
   // SECURITY: Rate limit by IP using distributed store (works in serverless)
   const clientIP = getClientIP(request);
-  const { allowed, remaining, resetIn } = await signupLimiter(clientIP);
+  const { allowed, remaining, resetIn, limit } = await signupLimiter(clientIP);
 
   if (!allowed) {
-    return jsonError(
+    const response = jsonError(
       `Too many signup attempts. Please try again later.`,
       429,
       ERROR_CODES.RATE_LIMITED,
       { retryAfter: resetIn },
     );
+    // Add rate limit headers for client visibility
+    response.headers.set('X-RateLimit-Limit', limit.toString());
+    response.headers.set('X-RateLimit-Remaining', '0');
+    response.headers.set('X-RateLimit-Reset', resetIn.toString());
+    response.headers.set('Retry-After', resetIn.toString());
+    return response;
   }
 
   try {
@@ -79,54 +74,170 @@ export async function POST(request: NextRequest) {
     const { data: body, error: bodyError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
     if (bodyError) return bodyError;
 
-    const parsed = signupSchema.safeParse(body);
+    // Use shared schema with server-side translation
+    const schema = createSignupSchema(serverT);
+    const parsed = schema.safeParse(body);
 
     if (!parsed.success) {
-      // Return specific validation errors for password length (helps UX)
-      const passwordError = parsed.error.issues.find((i) => i.path.includes('password'));
-      if (passwordError) {
-        return jsonError(passwordError.message, 400, ERROR_CODES.VALIDATION_ERROR);
-      }
-      return jsonError('Invalid signup data', 400, ERROR_CODES.VALIDATION_ERROR);
+      // Map validation errors to field-specific format for frontend
+      const firstError = parsed.error.issues[0];
+      const field = firstError.path[0]?.toString();
+
+      // Return specific validation errors with target field
+      return jsonError(firstError.message, 400, ERROR_CODES.VALIDATION_ERROR, {
+        target: field,
+        details: parsed.error.flatten(),
+      });
+    }
+
+    const { email, password, fullName, studentId, course, year, _gotcha } = parsed.data;
+
+    // SECURITY: Server-side honeypot check
+    if (_gotcha && _gotcha.length > 0) {
+      // Lie to the bot - return generic success so they leave
+      logger.warn('Honeypot triggered - bot detected', { ip: clientIP });
+      return jsonSuccess({
+        message: GENERIC_SIGNUP_SUCCESS,
+      });
     }
 
     const supabase = await createServerClient();
-    const { email, password, fullName, studentId, course, year, options } = parsed.data;
+    const adminClient = createAdminClient();
 
-    // Extract profile data from either direct fields or nested options.data format
-    const profileFullName = fullName || options?.data?.full_name || null;
-    const profileStudentId = studentId || options?.data?.student_id || null;
-    const profileCourse = course || options?.data?.course || null;
-    const profileYear = year || options?.data?.year || null;
-
-    const { data, error } = await supabase.auth.signUp({
+    // Create auth user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: profileFullName,
-          // SECURITY: Don't store studentId in auth metadata, only in profiles table with RLS
+          full_name: fullName,
+          // SECURITY: Don't store sensitive data in auth metadata
         },
         emailRedirectTo: undefined,
       },
     });
 
+    // Handle auth errors with specific field mapping
+    if (authError) {
+      logger.warn('Signup auth error:', {
+        email: `${email.substring(0, 3)}***`,
+        code: authError.status,
+        message: authError.message,
+      });
+
+      // Map auth errors to specific fields
+      const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
+      const target = isAlreadyRegistered ? 'email' : 'root';
+
+      return jsonError(
+        authError.message,
+        isAlreadyRegistered ? 409 : 400,
+        isAlreadyRegistered ? ERROR_CODES.CONFLICT : ERROR_CODES.BAD_REQUEST,
+        { target },
+      );
+    }
+
+    if (!authData.user) {
+      throw new Error('User creation failed silently');
+    }
+
+    const userId = authData.user.id;
+    let profileCreated = false;
+
+    // Create profile atomically using admin client
+    if (adminClient) {
+      const { error: profileError } = await adminClient.from('profiles').upsert(
+        {
+          id: userId,
+          email,
+          full_name: fullName,
+          student_id: studentId,
+          course: course || null,
+          year: year || null,
+        },
+        { onConflict: 'id' },
+      );
+
+      if (profileError) {
+        logger.error('Profile creation failed - initiating rollback:', {
+          userId,
+          error: profileError.message,
+        });
+
+        // CRITICAL: Rollback auth user to prevent orphaned accounts
+        const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId);
+        if (deleteError) {
+          logger.error('CRITICAL: Rollback failed - orphaned auth user:', {
+            userId,
+            error: deleteError.message,
+          });
+        } else {
+          logger.info('Rollback successful - deleted orphaned auth user:', { userId });
+        }
+
+        return jsonError(
+          'Failed to create student profile. Please try again.',
+          500,
+          ERROR_CODES.INTERNAL_ERROR,
+          { target: 'root' },
+        );
+      }
+
+      profileCreated = true;
+
+      // Create gamification profile
+      const { error: gamError } = await adminClient.from('gamification_profiles').upsert(
+        {
+          user_id: userId,
+          xp: 0,
+          streak_days: 0,
+          longest_streak: 0,
+          last_activity_date: null,
+        },
+        { onConflict: 'user_id' },
+      );
+
+      if (gamError) {
+        logger.warn('Gamification profile creation failed:', gamError.message);
+        // Non-critical - don't rollback for this
+      }
+    }
+
+    // Fallback: Try with regular client if admin client not available
+    if (!profileCreated) {
+      const { error: profileError } = await supabase.from('profiles').upsert(
+        {
+          id: userId,
+          email,
+          full_name: fullName,
+          student_id: studentId,
+          course: course || null,
+          year: year || null,
+        },
+        { onConflict: 'id' },
+      );
+
+      if (profileError) {
+        logger.error('Profile creation failed (non-admin):', {
+          userId,
+          error: profileError.message,
+        });
+        // Can't rollback without admin client - log for manual cleanup
+      }
+    }
+
     // Auto-confirm ONLY in development AND only for developer emails
-    // Requires SUPABASE_SERVICE_ROLE_KEY to be configured
-    if (data.user && !data.session && !error && isDevelopment && isDevEmail(email)) {
-      const adminClient = createAdminClient();
-
+    let session = null;
+    if (authData.user && !authData.session && isDevelopment && isDevEmail(email)) {
       if (adminClient) {
-        console.warn(`Development mode: auto-confirming developer email`);
+        logger.info(`Development mode: auto-confirming developer email`);
 
-        const { error: confirmError } = await adminClient.auth.admin.updateUserById(data.user.id, {
+        const { error: confirmError } = await adminClient.auth.admin.updateUserById(userId, {
           email_confirm: true,
         });
 
-        if (confirmError) {
-          console.warn('Auto-confirmation failed:', confirmError.message);
-        } else {
-          // Try to create a session using the regular client
+        if (!confirmError) {
+          // Create session for auto-confirmed user
           const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword(
             {
               email,
@@ -135,112 +246,16 @@ export async function POST(request: NextRequest) {
           );
 
           if (!sessionError && sessionData.session) {
-            const response = jsonSuccess({
-              user: sessionData.user,
-              session: sessionData.session,
-              message: 'Signup successful (auto-confirmed for development)',
-            });
-            response.headers.set('X-RateLimit-Remaining', remaining.toString());
-            return response;
-          }
-        }
-      } else {
-        console.warn(
-          'Dev email auto-confirm skipped: SUPABASE_SERVICE_ROLE_KEY not configured.\n' +
-            'Add the service role key to .env.local for auto-confirmation to work.',
-        );
-      }
-    }
-
-    // SECURITY: Always return success-like message to prevent account enumeration
-    // Log actual errors server-side for debugging (sanitized)
-    if (error) {
-      console.warn('Signup error:', { email: `${email.substring(0, 3)}***`, code: error.status });
-      // Return generic message to prevent enumeration
-      const response = jsonSuccess({
-        message: GENERIC_SIGNUP_SUCCESS,
-      });
-      response.headers.set('X-RateLimit-Remaining', remaining.toString());
-      return response;
-    }
-
-    // Create profile as backup (auth trigger should have done this, but upsert ensures it exists)
-    // The database has a trigger on auth.users that auto-creates profiles and gamification_profiles
-    // This is a backup in case the trigger fails or is disabled
-    if (data.user) {
-      const adminClient = createAdminClient();
-      if (adminClient) {
-        const { error: profileError } = await adminClient.from('profiles').upsert(
-          {
-            id: data.user.id,
-            email: data.user.email,
-            full_name: profileFullName,
-            student_id: profileStudentId,
-            course: profileCourse,
-            year: profileYear,
-          },
-          { onConflict: 'id' },
-        );
-
-        if (profileError) {
-          console.warn('Profile creation failed:', profileError.message);
-          // Don't fail signup - user can still use the app, profile will be created on first access
-        } else {
-          // Also create gamification_profile for the new user
-          const { error: gamError } = await adminClient.from('gamification_profiles').upsert(
-            {
-              user_id: data.user.id,
-              xp: 0,
-              streak_days: 0,
-              longest_streak: 0,
-              last_activity_date: null,
-            },
-            { onConflict: 'user_id' },
-          );
-
-          if (gamError) {
-            console.warn('Gamification profile creation failed:', gamError.message);
-          }
-        }
-      } else {
-        // Fallback: Try to create profile with regular client (relies on RLS INSERT policy)
-        const { error: profileError } = await supabase.from('profiles').upsert(
-          {
-            id: data.user.id,
-            email: data.user.email,
-            full_name: profileFullName,
-            student_id: profileStudentId,
-            course: profileCourse,
-            year: profileYear,
-          },
-          { onConflict: 'id' },
-        );
-
-        if (profileError) {
-          console.warn('Profile creation (non-admin) failed:', profileError.message);
-        } else {
-          // Also create gamification_profile for the new user (non-admin fallback)
-          const { error: gamError } = await supabase.from('gamification_profiles').upsert(
-            {
-              user_id: data.user.id,
-              xp: 0,
-              streak_days: 0,
-              longest_streak: 0,
-              last_activity_date: null,
-            },
-            { onConflict: 'user_id' },
-          );
-
-          if (gamError) {
-            console.warn('Gamification profile creation (non-admin) failed:', gamError.message);
+            session = sessionData.session;
           }
         }
       }
     }
 
-    // SECURITY: Always return success-like message to prevent account enumeration
+    // SECURITY: Always return generic success to prevent account enumeration
     const response = jsonSuccess({
       message: GENERIC_SIGNUP_SUCCESS,
+      data: session ? { session, user: authData.user } : undefined,
     });
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;

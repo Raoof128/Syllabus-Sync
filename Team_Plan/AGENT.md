@@ -195,3 +195,33 @@
     - Copy prevention on confirm password field (forces manual entry)
 - **Files:** `lib/schemas/auth.ts`, `__tests__/utils/security.test.ts`, `app/signup/SignupClient.tsx`, `components/ui/custom/PasswordInput.tsx`.
 - **Verification:** `npm run check` passed (361 tests, all security tests green, build successful).
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 5 Blueprint: The Backend Vault
+- **Status:** ✅ Complete - Backend API route fortified with Zero Trust security, transaction safety, and comprehensive error handling.
+- **Scope:** Backend Security, API Hardening, Transaction Rollback, Zero Trust Architecture.
+- **Summary:** Implemented "Level 5 Blueprint" upgrades - the backend "Controller" now enforces the same strict validation as the frontend, preventing any client-side bypass attempts. Following the security principle "Never trust the client" (even your own).
+  - **Shared Zod Schema:** API route now imports and uses the exact same `createSignupSchema` from `lib/schemas/auth.ts`:
+    - Server-side validation mirrors client-side rules exactly
+    - Prevents cURL/script bypass attempts
+    - Field-specific error mapping with `target` field for frontend surgical error handling
+  - **Server-Side Honeypot:** Enhanced bot detection:
+    - Checks `_gotcha` field server-side (in addition to client-side)
+    - Returns generic success to bots (deceptive response)
+    - Logs bot detection with IP for monitoring
+  - **Transaction Rollback (Compensating Transaction):** Critical safety mechanism:
+    - If profile creation fails after auth user creation, automatically deletes the orphaned auth user
+    - Prevents "ghost" accounts (auth user without profile)
+    - Uses admin client for atomic rollback operations
+    - Logs critical failures for manual intervention if rollback fails
+  - **Enhanced Rate Limiting:** Improved 429 responses:
+    - Added standard rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`
+    - Proper status code (429) with detailed error messages
+    - Works with distributed Redis/Upstash in production
+  - **Security Hardening:**
+    - Service Role Key properly isolated (never exposed to client)
+    - Generic success messages to prevent account enumeration attacks
+    - Comprehensive audit logging for security monitoring
+    - Dev email auto-confirmation (development only, never production)
+- **Files:** `app/api/auth/signup/route.ts`.
+- **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful).
+- **Status:** Signup system is now FORT KNOX - Production Ready 🏰

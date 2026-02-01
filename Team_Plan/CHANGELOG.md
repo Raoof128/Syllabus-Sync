@@ -375,3 +375,17 @@ Summary: Hardened signup module with enterprise-grade security following Zero Tr
 Verification: `npm run check` passed (361 tests, build successful).
 Files: `lib/schemas/auth.ts`, `__tests__/utils/security.test.ts`, `app/signup/SignupClient.tsx`, `components/ui/custom/PasswordInput.tsx`.
 Follow-ups: None - Frontend is Production Ready.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 5 Blueprint - The Backend Vault
+Summary: Hardened backend API with Zero Trust security, transaction rollback, and comprehensive error handling.
+- **Security:** API route now uses shared Zod schema for server-side validation matching client rules exactly - prevents any bypass attempts.
+- **Honeypot:** Added server-side bot detection with deceptive success responses to trap automated attacks.
+- **Transaction Safety:** Implemented compensating transaction rollback - if profile creation fails, orphaned auth users are automatically deleted.
+- **Rate Limiting:** Enhanced 429 responses with standard headers (X-RateLimit-Limit, Retry-After, etc.) for client visibility.
+- **Audit Logging:** Comprehensive security logging for monitoring bot detection, rollback events, and auth failures.
+Verification: `npm run check` passed (361 tests, build successful).
+Files: `app/api/auth/signup/route.ts`.
+Follow-ups: None - Signup system is Fort Knox Production Ready.
