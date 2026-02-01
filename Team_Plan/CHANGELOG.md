@@ -320,4 +320,18 @@ Summary: Fortified login flow with logging, automated testing, and cache revalid
 - **UX Fix:** Added `router.refresh()` to fix stale layout cache after successful authentication.
 Verification: `npm run check` passed.
 Files: `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/login/__tests__/actions.test.ts`.
-Follow-ups: None.
+- **Follow-ups:** None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 1 Blueprint - Signup Refactor
+Summary: Modernized Signup architecture with React Hook Form, Zod, and zxcvbn integration.
+- **Form Architecture:** Migrated to `react-hook-form` + `zod` resolver for unified validation and reduced re-renders.
+- **Security:** Integrated `zxcvbn` into `lib/utils/security.ts` for realistic password strength scoring.
+- **UX:** Implemented 2-step signup (Auth -> Profile) with immediate validation feedback and visual password strength indicators.
+- **Hardening:** Applied security constants (min/max length) and improved input protection.
+- **QA:** Resolved all lint/type errors and verified with a clean build.
+Verification: `npm run check` passed.
+Files: `lib/utils/security.ts`, `app/signup/SignupClient.tsx`.
+Follow-ups: Level 2 Blueprint (Server Actions).

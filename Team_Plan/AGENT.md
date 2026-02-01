@@ -361,3 +361,16 @@
 - **Files:** `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/login/__tests__/actions.test.ts`.
 - **Verification:** `npm run check` passed (358 tests, 0 lint warnings, successful build).
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 1 Blueprint: Signup Refactor
+- **Status:** ✅ Complete - Signup module modernized and hardened.
+- **Scope:** Architecture, Security, Forms.
+- **Summary:** Implemented "Level 1 Blueprint" for the Signup module.
+  - **Dependencies:** Added `react-hook-form`, `zod`, and `zxcvbn` for enterprise-grade form management.
+  - **Security:** Refactored `lib/utils/security.ts` to use `zxcvbn` for realistic password strength scoring.
+  - **Refactor:** Migrated `SignupClient.tsx` to RHF + Zod architecture. Implemented 2-step validation (Auth -> Profile).
+  - **Hardening:** Applied `SECURITY_CONFIG` constants, added `maxLength` protection, and enforced strict password complexity rules.
+  - **UX:** Added immediate validation feedback, password strength visualizers, and submission loading states.
+- **Files:** `lib/utils/security.ts`, `app/signup/SignupClient.tsx`.
+- **Verification:** `npm run check` passed (358 tests, 0 lint warnings, successful build).
+- **Follow-ups:** Level 2 Blueprint (Server Actions for Signup).
