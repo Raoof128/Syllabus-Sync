@@ -23,6 +23,7 @@ export interface ReactLeafletModule {
   Marker: typeof import('react-leaflet').Marker;
   Popup: typeof import('react-leaflet').Popup;
   Polyline: typeof import('react-leaflet').Polyline;
+  ImageOverlay: typeof import('react-leaflet').ImageOverlay;
   useMap: typeof import('react-leaflet').useMap;
   useMapEvents: typeof import('react-leaflet').useMapEvents;
 }
@@ -79,6 +80,7 @@ export function useLeafletLoader(): UseLeafletLoaderResult {
           Marker: RL.Marker,
           Popup: RL.Popup,
           Polyline: RL.Polyline,
+          ImageOverlay: RL.ImageOverlay,
           useMap: RL.useMap,
           useMapEvents: RL.useMapEvents,
         });

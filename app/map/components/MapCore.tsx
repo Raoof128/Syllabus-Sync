@@ -1,24 +1,40 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  memo,
+} from 'react';
 import type { Building } from '@/lib/map/buildings';
 import type { MapOverlayId } from '@/lib/map/mapOverlays';
 import { useLeafletLoader } from '@/lib/hooks/useLeafletLoader';
 import { useMapLocation } from '../hooks/useMapLocation';
 import { useMapNavigation } from '../hooks/useMapNavigation';
 import { useMapSimulation } from '../hooks/useMapSimulation';
-import { MapController } from './MapController';
-import { MapOverlays } from './MapOverlays';
+import { useMapController } from '../hooks/useMapController';
+import { useMapOverlays } from '../hooks/useMapOverlays';
+import { MapOverlays as MapOverlaysComponent } from '../components/MapOverlays';
 import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
 import { pixelToCrsSimple } from '@/lib/map/buildings';
 import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import { NavigationStateManager } from '@/lib/map/realtimeNavigation';
-import { CAMPUS_CENTER_PIXEL } from '@/lib/map/constants';
-import { useRef, useEffect } from 'react';
-
-import type { LocationStatus, CampusMapRef } from '../CampusMap';
-import { forwardRef, useImperativeHandle } from 'react';
+import { CAMPUS_CENTER_PIXEL, CAMPUS_IMAGE_URL, PIXEL_BOUNDS } from '@/lib/map/constants';
+import { useMap } from 'react-leaflet';
 import type { Map as LeafletMap } from 'leaflet';
+
+// Import shared types from CampusMap to avoid duplication
+import type { LocationStatus, CampusMapRef } from '../CampusMap';
+
+interface MapCoreProps {
+  selectedBuilding?: Building;
+  activeOverlays?: MapOverlayId[];
+  onLocationStatusChange?: (status: LocationStatus) => void;
+}
 
 interface MapCoreProps {
   selectedBuilding?: Building;
@@ -27,15 +43,95 @@ interface MapCoreProps {
 }
 
 /**
- * MapCore - Pure Leaflet wrapper component
+ * Internal MapController component using hooks
+ * Renders inside MapContainer to access useMap hook
+ */
+const MapControllerInternal = memo(
+  ({
+    selectedBuilding,
+    setMapInstance,
+    isMapReady,
+  }: {
+    selectedBuilding?: Building;
+    setMapInstance: (map: LeafletMap) => void;
+    isMapReady: (map: LeafletMap | null) => boolean;
+  }) => {
+    const map = useMap();
+    const [isReady, setIsReady] = useState(false);
+
+    // Use the extracted hook for map control logic
+    const { isInitialized } = useMapController({
+      map,
+      selectedBuilding,
+      isReady,
+      onMapReady: setMapInstance,
+    });
+
+    // Initial setup
+    useEffect(() => {
+      if (!map) return;
+
+      const checkReady = () => {
+        if (isMapReady(map)) {
+          setIsReady(true);
+        }
+      };
+
+      checkReady();
+      map.once('load', checkReady);
+
+      return () => {
+        map.off('load', checkReady);
+      };
+    }, [map, isMapReady]);
+
+    // Handle popup opening for selected building
+    useEffect(() => {
+      if (!isInitialized || !selectedBuilding || !map) return;
+
+      // Open popup if marker exists for this building
+      // Use feature detection instead of instanceof for dynamically loaded Leaflet
+      map.eachLayer((layer) => {
+        // Check if layer is a marker by looking for marker-specific methods
+        const marker = layer as unknown as {
+          getPopup?: () => { getContent: () => string | HTMLElement | undefined } | null;
+          openPopup?: () => void;
+          getLatLng?: () => { lat: number; lng: number };
+        };
+
+        if (typeof marker.getPopup === 'function' && typeof marker.openPopup === 'function') {
+          const popupContent = marker.getPopup?.()?.getContent?.();
+          const contentStr =
+            typeof popupContent === 'string'
+              ? popupContent
+              : popupContent instanceof HTMLElement
+                ? popupContent.outerHTML
+                : '';
+
+          if (contentStr && contentStr.includes(selectedBuilding.id)) {
+            setTimeout(() => marker.openPopup?.(), 800);
+          }
+        }
+      });
+    }, [isInitialized, selectedBuilding, map]);
+
+    return null;
+  },
+);
+
+MapControllerInternal.displayName = 'MapControllerInternal';
+
+/**
+ * MapCore - Optimized Leaflet wrapper component
  *
- * This is a "dumb" component that only cares about receiving props and rendering Leaflet.
- * All logic is handled through custom hooks:
+ * A pure composition-based component using custom hooks:
+ * - useMapController: Map initialization and view control
+ * - useMapOverlays: Dynamic overlay layer management
  * - useMapLocation: GPS location tracking
  * - useMapNavigation: Route calculation and navigation
  * - useMapSimulation: Dev-only GPS simulation (tree-shaken in prod)
  *
- * The MapController component handles map view, zoom, and bounds.
+ * All hooks are composable and can be used independently.
  *
  * @example
  * <MapCore
@@ -134,7 +230,7 @@ const MapCore = forwardRef<CampusMapRef, MapCoreProps>(
       isNavigating,
     }));
 
-    // 3. Dev-only simulation (tree-shaken in prod if set up right)
+    // 3. Dev-only simulation (tree-shaken in prod)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { startSimulation, stopSimulation } = useMapSimulation({
       enabled: process.env.NODE_ENV === 'development',
@@ -166,6 +262,14 @@ const MapCore = forwardRef<CampusMapRef, MapCoreProps>(
     }, [mapInstance, isMapReady, isMountedRef]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
+    // Use the new useMapOverlays hook for overlay management
+    useMapOverlays({
+      map: mapInstance,
+      leafletModule,
+      activeOverlays,
+      isReady: overlaysReady,
+    });
+
     // ============================================
     // RENDER
     // ============================================
@@ -177,7 +281,7 @@ const MapCore = forwardRef<CampusMapRef, MapCoreProps>(
       );
     }
 
-    const { MapContainer, Marker, Popup, Polyline } = reactLeafletModule;
+    const { MapContainer, Marker, Popup, Polyline, ImageOverlay } = reactLeafletModule;
 
     return (
       <MapContainer
@@ -192,15 +296,17 @@ const MapCore = forwardRef<CampusMapRef, MapCoreProps>(
         maxBoundsViscosity={0.5}
         style={{ height: '100%', width: '100%' }}
       >
-        <MapController
-          selectedBuildingProp={selectedBuilding}
-          setMapInstanceProp={setMapInstance}
+        <MapControllerInternal
+          selectedBuilding={selectedBuilding}
+          setMapInstance={setMapInstance}
           isMapReady={isMapReady}
-          leafletModule={leafletModule}
         />
 
+        {/* Base Campus Layer */}
+        <ImageOverlay url={CAMPUS_IMAGE_URL} bounds={PIXEL_BOUNDS} />
+
         {/* Overlays */}
-        <MapOverlays
+        <MapOverlaysComponent
           mapInstance={mapInstance}
           leafletModule={leafletModule}
           activeOverlays={activeOverlays}
@@ -243,3 +349,4 @@ const MapCore = forwardRef<CampusMapRef, MapCoreProps>(
 MapCore.displayName = 'MapCore';
 
 export default MapCore;
+export type { MapCoreProps };

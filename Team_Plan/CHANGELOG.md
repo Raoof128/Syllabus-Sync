@@ -1,4 +1,20 @@
 Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 2 Blueprint - Component Implementation & Type Safety
+Summary: Implemented Level 2 of the Map Architecture Blueprint focusing on type safety, hook extraction, and code quality. Eliminated `@ts-expect-error` hacks and isolated Leaflet side-effects.
+- **Type Safety:** Created `lib/hooks/useSafeTranslation.ts` - type-safe translation hook with fallback support that eliminates `@ts-expect-error` hacks in CampusMap.tsx.
+- **Hook Extraction:** Created `app/map/hooks/useMapController.ts` - extracted all map view logic (initialization, bounds, flyTo transitions) from UI components into a reusable hook.
+- **Hook Extraction:** Created `app/map/hooks/useMapOverlays.ts` - extracted overlay layer management (add/remove parking, water, accessibility layers) into a dedicated hook with imperative API.
+- **Code Quality:** Updated `CampusMap.tsx` to use `useSafeTranslation` instead of inline `safeT` helper - removed `@ts-expect-error` directive.
+- **Code Quality:** Updated `MapCore.tsx` to use new hooks, removed unused imports, added proper displayName to memo component.
+- **Code Quality:** Updated `app/map/hooks/index.ts` barrel exports to include new hooks.
+- **Code Quality:** Updated `lib/hooks/useLeafletLoader.ts` to export `ImageOverlay` component.
+- **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful). No `@ts-expect-error` directives remain in map module.
+Files: lib/hooks/useSafeTranslation.ts; app/map/hooks/useMapController.ts; app/map/hooks/useMapOverlays.ts; app/map/components/MapCore.tsx; app/map/CampusMap.tsx; app/map/hooks/index.ts; lib/hooks/useLeafletLoader.ts.
+Follow-ups: Level 3 Blueprint (Performance optimizations: memoization, virtualization, bundle analysis).
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
 Scope: Level 1 Blueprint - Map Architecture Refactor
 Summary: Migrated Map module from "God Component" to Modular Composition architecture. Extracted simulation logic, view controller, and core map rendering into separate components/hooks.
 - **Architecture:** Created `useMapSimulation.ts` hook - dev-only GPS simulation logic (tree-shaken in production).
