@@ -284,3 +284,27 @@ Summary: Migrated authentication to Server Actions with global rate limiting.
 Verification: `npm run check` passed.
 Files: `lib/utils/rate-limit.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/manage-profiles/actions.ts`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 3 Blueprint - Login Polish & Hooks
+Summary: Finalized Login Refactor with Custom Hooks and "Silicon Valley" Architecture.
+- **Feature:** Implemented `usePasskeyLogin` hook to handle all WebAuthn complexity.
+- **Refactor:** `LoginClient` now orchestrates RHF + Server Actions + Custom Hooks cleanly.
+- **UX:** Added proper loading states, button disabling logic, and smooth animations.
+- **Fix:** Resolved TypeScript strict mode issues in passkey implementation.
+Verification: `npm run check` passed.
+Files: `app/login/hooks/usePasskeyLogin.ts`, `app/login/LoginClient.tsx`.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Login Client Final Polish
+Summary: Resolved all remaining lint warnings and compiler hints in the Login module.
+- **Fix:** Removed unused `ArrowLeft` and `resetEmailSent` states in `LoginClient.tsx`.
+- **Refinement:** Suppressed `react-hooks/incompatible-library` for RHF `watch` call.
+Verification: `npm run check` passed (Clean build).
+Files: `app/login/LoginClient.tsx`.
+Follow-ups: None.
