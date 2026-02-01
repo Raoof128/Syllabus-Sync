@@ -1,3 +1,19 @@
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 1 Blueprint - Map Architecture Refactor
+Summary: Migrated Map module from "God Component" to Modular Composition architecture. Extracted simulation logic, view controller, and core map rendering into separate components/hooks.
+- **Architecture:** Created `useMapSimulation.ts` hook - dev-only GPS simulation logic (tree-shaken in production).
+- **Architecture:** Created `MapController.tsx` - handles map view, zoom, bounds, and building fly-to transitions.
+- **Architecture:** Created `MapCore.tsx` - pure Leaflet wrapper component following "dumb component" pattern.
+- **Architecture:** Created `hooks/index.ts` barrel export for clean imports.
+- **Performance:** Updated `MapClient.tsx` to remove IntersectionObserver blocking - map now loads immediately with `<Suspense>` for better LCP (Largest Contentful Paint).
+- **Refactor:** Updated `CampusMap.tsx` to use new `useMapSimulation` hook instead of inline simulation logic.
+- **Bundle:** Simulation logic is now conditionally included only in development builds.
+- **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful). All map functionality preserved.
+Files: app/map/hooks/useMapSimulation.ts; app/map/components/MapController.tsx; app/map/components/MapCore.tsx; app/map/hooks/index.ts; app/map/MapClient.tsx; app/map/CampusMap.tsx.
+Follow-ups: Level 2 Blueprint (Server Actions for map features if needed).
+
+---
+
 Raouf: 2026-01-31 (Australia/Sydney)
 Scope: QA - Final Lint Cleanup
 Summary: Resolved remaining lint warnings in `client-layout.tsx` and `BuildingAutocomplete.tsx`.

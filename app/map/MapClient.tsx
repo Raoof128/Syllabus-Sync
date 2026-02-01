@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
@@ -43,8 +43,11 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
   exam: GraduationCap,
 };
 
-// Dynamically import the entire map component
-const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
+// Dynamic import for the heavy map lib with Suspense
+const CampusMap = dynamic(() => import('./CampusMap'), {
+  ssr: false,
+  loading: () => <MapLoadingSkeleton />,
+});
 
 // Import LocationStatus type
 import type { LocationStatus, CampusMapRef } from './CampusMap';
@@ -52,7 +55,6 @@ import type { LocationStatus, CampusMapRef } from './CampusMap';
 export default function MapClient() {
   const { t } = useTypedTranslation();
   const searchParams = useSearchParams();
-  const [shouldRenderMap, setShouldRenderMap] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
 
@@ -161,26 +163,8 @@ export default function MapClient() {
     }
   }, []);
 
-  useEffect(() => {
-    if (shouldRenderMap) return;
-    const node = mapContainerRef.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setShouldRenderMap(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setShouldRenderMap(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '200px' },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shouldRenderMap]);
+  // NOTE: No IntersectionObserver - map loads immediately for better LCP
+  // The map component is loaded with Suspense for progressive enhancement
 
   return (
     <LazyMotion features={domAnimation}>
@@ -336,20 +320,19 @@ export default function MapClient() {
                   ref={mapContainerRef}
                   className="relative h-[50vh] md:h-[500px] lg:h-[600px] rounded-mq-lg overflow-hidden border border-mq-border"
                 >
-                  {shouldRenderMap ? (
-                    <MapErrorBoundary>
+                  {/* Map loads immediately in parallel with Suspense */}
+                  <MapErrorBoundary>
+                    <Suspense fallback={<MapLoadingSkeleton />}>
                       <CampusMap
                         ref={campusMapRef}
                         selectedBuilding={selectedBuilding}
                         activeOverlays={activeOverlays}
                         onLocationStatusChange={setLocationStatus}
                       />
-                    </MapErrorBoundary>
-                  ) : (
-                    <MapLoadingSkeleton />
-                  )}
+                    </Suspense>
+                  </MapErrorBoundary>
 
-                  {/* HUD overlays */}
+                  {/* HUD overlays - loaded immediately, sits on top */}
                   <CampusMapHUD
                     selectedBuilding={selectedBuilding}
                     buildings={sidebarBuildings}

@@ -27,6 +27,7 @@ import { CAMPUS_CENTER_PIXEL, PIXEL_BOUNDS, CAMPUS_IMAGE_URL } from '@/lib/map/c
 import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import { useMapLocation } from './hooks/useMapLocation';
 import { useMapNavigation } from './hooks/useMapNavigation';
+import { useMapSimulation } from './hooks/useMapSimulation';
 import { MapOverlays } from './components/MapOverlays';
 import { DebugControls } from './components/DebugControls';
 import { useReducedMotion } from 'framer-motion';
@@ -171,66 +172,20 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       isNavigating,
     }));
 
-    // Simulation Logic
-    const simulationRef = useRef<NodeJS.Timeout | null>(null);
+    // Simulation Logic - Extracted to custom hook
+    const { startSimulation, stopSimulation } = useMapSimulation({
+      enabled: process.env.NODE_ENV === 'development',
+      routeCoordinates: navState?.routeCoordinates,
+      onUpdate: simulatePosition,
+    });
 
     const handleSimulate = useCallback(() => {
-      if (simulationRef.current) {
-        clearInterval(simulationRef.current);
-        simulationRef.current = null;
-        return;
+      if (startSimulation) {
+        startSimulation();
+      } else {
+        stopSimulation();
       }
-
-      const mockRoute: [number, number][] = [
-        [151.1131306, -33.7756994],
-        [151.1135164, -33.7738842],
-        [151.1134919, -33.7734389],
-        [151.1131306, -33.7756994],
-      ];
-
-      const points =
-        (navState?.routeCoordinates?.length ?? 0) > 0 ? navState!.routeCoordinates : mockRoute;
-      let segmentIndex = 0;
-      let progress = 0;
-      const stepSize = 0.00004;
-
-      simulationRef.current = setInterval(() => {
-        if (segmentIndex >= points.length - 1) {
-          if (simulationRef.current) {
-            clearInterval(simulationRef.current);
-            simulationRef.current = null;
-          }
-          return;
-        }
-
-        const [lng1, lat1] = points[segmentIndex];
-        const [lng2, lat2] = points[segmentIndex + 1];
-        const dx = lng2 - lng1;
-        const dy = lat2 - lat1;
-        const len = Math.sqrt(dx * dx + dy * dy);
-
-        progress += stepSize / (len || 1);
-
-        if (progress >= 1) {
-          progress = 0;
-          segmentIndex++;
-          return;
-        }
-
-        const curLng = lng1 + dx * progress;
-        const curLat = lat1 + dy * progress;
-        const heading = (Math.atan2(dx, dy) * 180) / Math.PI;
-
-        simulatePosition?.(curLat, curLng, heading >= 0 ? heading : heading + 360, 1.4);
-      }, 50);
-    }, [navState, simulatePosition]);
-
-    useEffect(
-      () => () => {
-        if (simulationRef.current) clearInterval(simulationRef.current);
-      },
-      [],
-    );
+    }, [startSimulation, stopSimulation]);
 
     // Notify parent of location status
     useEffect(() => {
