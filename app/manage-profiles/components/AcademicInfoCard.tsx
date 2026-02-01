@@ -1,12 +1,9 @@
 'use client';
 
+import { UseFormReturn } from 'react-hook-form';
+import { ProfileFormValues } from '../schema';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
-import { MagicCard } from '@/components/ui/MagicCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { GraduationCap } from 'lucide-react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { TranslationKey } from '@/lib/i18n/translations';
 import {
   Select,
   SelectContent,
@@ -14,6 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { GraduationCap } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { MagicCard } from '@/components/ui/MagicCard';
+import { TranslationKey } from '@/lib/i18n/translations';
 
 // Academic year options
 const ACADEMIC_YEARS = [
@@ -26,17 +28,20 @@ const ACADEMIC_YEARS = [
   { value: 'PhD', labelKey: 'academicYear_phd' },
 ];
 
-interface AcademicInfoCardProps {
-  data: {
-    course: string;
-    year: string;
-  };
-  onChange: (field: string, value: string) => void;
-  disabled: boolean;
+interface Props {
+  form: UseFormReturn<ProfileFormValues>;
+  disabled?: boolean;
 }
 
-export function AcademicInfoCard({ data, onChange, disabled }: AcademicInfoCardProps) {
+export function AcademicInfoCard({ form, disabled }: Props) {
   const { t } = useTypedTranslation();
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
+  const currentYear = watch('year'); // Subscribe to year changes
 
   return (
     <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
@@ -44,32 +49,33 @@ export function AcademicInfoCard({ data, onChange, disabled }: AcademicInfoCardP
         <Card className="border border-mq-border bg-mq-card-background">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
-              {t('academicInfo')}
+              <GraduationCap className="h-5 w-5" /> {t('academicInfo')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Course/Major */}
+            {/* Course */}
             <div className="space-y-2">
-              <Label htmlFor="profile-course">{t('course')}</Label>
+              <Label htmlFor="course">{t('course')}</Label>
               <Input
-                id="profile-course"
-                value={data.course}
-                onChange={(e) => onChange('course', e.target.value)}
+                id="course"
+                {...register('course')}
                 placeholder={t('coursePlaceholder')}
                 disabled={disabled}
+                className={errors.course ? 'border-red-500' : ''}
+                aria-invalid={!!errors.course}
               />
+              {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
             </div>
 
-            {/* Academic Year */}
+            {/* Year Select - Connecting UI to RHF */}
             <div className="space-y-2">
-              <Label htmlFor="profile-year">{t('year')}</Label>
+              <Label>{t('year')}</Label>
               <Select
-                value={data.year}
-                onValueChange={(value) => onChange('year', value)}
+                value={currentYear}
+                onValueChange={(val) => setValue('year', val, { shouldValidate: true })}
                 disabled={disabled}
               >
-                <SelectTrigger id="profile-year">
+                <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
                   <SelectValue placeholder={t('yearPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -80,6 +86,7 @@ export function AcademicInfoCard({ data, onChange, disabled }: AcademicInfoCardP
                   ))}
                 </SelectContent>
               </Select>
+              {errors.year && <p className="text-red-500 text-xs">{errors.year.message}</p>}
             </div>
           </CardContent>
         </Card>

@@ -1,14 +1,18 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
+import { profileSchema, ProfileFormValues } from '../schema';
+import { updateProfileAction } from '../actions';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { logger } from '@/lib/logger';
 
 export function useProfileManager() {
   const { t } = useTypedTranslation();
 
-  // Use selector to get current profile
+  // Use selector to get current profile safely
   const currentProfile = useProfilesStore((state) =>
     state.currentProfileId
       ? state.profiles.find((p) => p.id === state.currentProfileId) || null
@@ -16,20 +20,24 @@ export function useProfileManager() {
   );
 
   const {
-    updateProfile,
+    updateProfile: updateStoreProfile,
     fetchProfile,
     isLoading: isProfileLoading,
     hasLoaded,
   } = useProfilesStore();
   const { initialize: initializeNotifications } = useNotificationPreferencesStore();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    studentId: '',
-    course: '',
-    year: '',
+  // Setup React Hook Form with Zod
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: '',
+      studentId: '',
+      course: '',
+      year: '',
+    },
+    mode: 'onChange', // Validate as they type
   });
-  const [isSaving, setIsSaving] = useState(false);
 
   // Initial Data Fetching
   useEffect(() => {
@@ -39,43 +47,57 @@ export function useProfileManager() {
     initializeNotifications();
   }, [hasLoaded, isProfileLoading, fetchProfile, initializeNotifications]);
 
-  // Initialize form
+  // Load data into form when profile is fetched
   useEffect(() => {
     if (currentProfile) {
-      setFormData({
+      form.reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
         year: currentProfile.year || '',
       });
     }
-  }, [currentProfile]);
+  }, [currentProfile, form]);
 
-  const handleFieldChange = useCallback((field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
-
-  const saveProfile = useCallback(async () => {
+  const onSubmit = async (data: ProfileFormValues) => {
     if (!currentProfile) return;
-    setIsSaving(true);
+
+    let result;
     try {
-      await updateProfile(currentProfile.id, formData);
-      toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
+      // Call Server Action
+      result = await updateProfileAction(currentProfile.id, data);
     } catch (error) {
-      logger.error('Failed to save profile:', error);
-      toastUtils.error(t('error'), t('failedToUpdateProfile'));
-    } finally {
-      setIsSaving(false);
+      logger.error('Failed to update profile in server action:', error);
+      toastUtils.error(t('error'), 'Database connection failed');
+      return; // Exit early if server action call fails
     }
-  }, [currentProfile, formData, updateProfile, t]);
+
+    if (result.success) {
+      // Update local store to reflect changes immediately
+      await updateStoreProfile(currentProfile.id, data);
+      toastUtils.success('Saved', t('profileUpdatedMsg') || 'Profile updated successfully');
+    } else {
+      // Handle both validation errors and generic messages
+      let errorMessage = 'Validation failed';
+
+      if ('error' in result && result.error) {
+        errorMessage = 'Please check the form for errors';
+      } else if ('message' in result) {
+        errorMessage = result.message;
+      }
+
+      toastUtils.error(t('error'), errorMessage);
+    }
+  };
 
   return {
     currentProfile,
-    formData,
-    isSaving,
+    form, // Expose the form methods
+    isSaving: form.formState.isSubmitting,
+    saveProfile: form.handleSubmit(onSubmit),
+    isValid: form.formState.isValid,
+    isDirty: form.formState.isDirty, // True if user changed something
     isProfileLoading,
     hasLoaded,
-    handleFieldChange,
-    saveProfile,
   };
 }

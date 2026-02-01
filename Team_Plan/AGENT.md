@@ -241,3 +241,26 @@
 - **Files:** `app/manage-profiles/page.tsx`.
 - **Verification:** `npm run check` (Lint/Build) passed.
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 2 Blueprint: Zod & Server Actions
+- **Status:** ✅ Complete - Secure validation architecture implemented.
+- **Scope:** Architecture, Security, Forms.
+- **Summary:** Implemented "Bulletproof Server Validation" for `manage-profiles`.
+  - **Schema:** Defined `profileSchema` with Zod (name, studentId, course, year).
+  - **Server Action:** Created `updateProfileAction` for secure backend updates.
+  - **Forms:** Migrated `useProfileManager` to `react-hook-form` + `zodResolver`.
+  - **UI:** Refactored `PersonalInfoCard` and `AcademicInfoCard` to use RHF `register` and `watch`.
+  - **UX:** Save button now only appears when form is dirty (`isDirty` check).
+- **Files:** `app/manage-profiles/*` (schema.ts, actions.ts, hooks, components).
+- **Verification:** `npm run check` passed successfully.
+- **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - QA - Profile Architecture Lint Cleanup
+- **Status:** ✅ Complete - Clean build restored.
+- **Scope:** QA, Linting.
+- **Summary:** Fixed remaining lint warnings from the Level 2 Blueprint refactor.
+  - **Actions:** Replaced `console.log` with structured `logger.info` and used caught error in `updateProfileAction`.
+  - **Hook:** Removed unused `useState` import in `useProfileManager.ts`.
+- **Files:** `app/manage-profiles/actions.ts`, `app/manage-profiles/hooks/useProfileManager.ts`.
+- **Verification:** `npm run lint` returns "Lint OK".
+- **Follow-ups:** None.

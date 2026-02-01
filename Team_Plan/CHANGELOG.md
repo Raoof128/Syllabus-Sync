@@ -188,3 +188,28 @@ Summary: Normalized button positioning in Manage Profiles.
 - **Verification:** `npm run check` passed.
 - **Files:** `app/manage-profiles/page.tsx`.
 - **Follow-ups:** None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 2 Blueprint - Zod & Server Actions
+Summary: Implemented secure form architecture for Manage Profiles.
+- **Security:** Enforced Zod schema validation on both client and server (`schema.ts`).
+- **Server Actions:** Implemented `updateProfileAction` in `actions.ts` for safe data mutation.
+- **Refactor:** Migrated form state to `react-hook-form` to eliminate re-renders and props drilling.
+- **UX:** Save action is now conditional on form dirtiness (`isDirty`).
+Verification: `npm run check` passed.
+Files: `app/manage-profiles/*`.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Profile Architecture Lint Cleanup
+Summary: Resolved lint warnings in server actions and hooks.
+- **Fix:** Replaced restricted `console.log` with `logger.info` in `updateProfileAction`.
+- **Fix:** Used the `error` variable in the catch block to log failure details.
+- **Fix:** Removed unused `useState` import from `useProfileManager.ts`.
+Verification: `npm run lint` returns "Lint OK".
+Files: `app/manage-profiles/actions.ts`, `app/manage-profiles/hooks/useProfileManager.ts`.
+Follow-ups: None.
