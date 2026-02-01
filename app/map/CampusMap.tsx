@@ -49,10 +49,21 @@ interface CampusMapProps {
   activeOverlays?: MapOverlayId[];
   /** Callback when location status changes */
   onLocationStatusChange?: (status: LocationStatus) => void;
+  /** Callback when navigation state changes (for RouteAnnouncer) */
+  onNavStateChange?: (state: {
+    isNavigating: boolean;
+    remainingDistance?: number;
+    status?: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating' | 'error';
+  }) => void;
+  /** Callback when map is fully ready (for smooth loading transitions) */
+  onMapReady?: () => void;
 }
 
 const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
-  ({ selectedBuilding, activeOverlays = [], onLocationStatusChange }, ref) => {
+  (
+    { selectedBuilding, activeOverlays = [], onLocationStatusChange, onNavStateChange, onMapReady },
+    ref,
+  ) => {
     const { t, safeT } = useSafeTranslation();
 
     const { hapticFeedbackEnabled } = useMapStore();
@@ -182,6 +193,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       onLocationStatusChange?.(locationStatus);
     }, [locationStatus, onLocationStatusChange]);
 
+    // Notify parent of navigation state changes (for RouteAnnouncer)
+    useEffect(() => {
+      onNavStateChange?.({
+        isNavigating,
+        remainingDistance: navState?.remainingDistance,
+        status: navState?.status,
+      });
+    }, [isNavigating, navState, onNavStateChange]);
+
     // ============================================
     // OVERLAYS READY EFFECT
     // ============================================
@@ -194,13 +214,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         if (isMountedRef.current && isMapReady(mapInstance)) {
           mapLog.log('Map stable, enabling overlays');
           setOverlaysReady(true);
+          // Notify parent that map is ready (for smooth loading transitions)
+          onMapReady?.();
         }
       }, 100);
       return () => {
         clearTimeout(timer);
         setOverlaysReady(false);
       };
-    }, [mapInstance, isMapReady, isMountedRef]);
+    }, [mapInstance, isMapReady, isMountedRef, onMapReady]);
 
     // Base Layer Effect
     useEffect(() => {

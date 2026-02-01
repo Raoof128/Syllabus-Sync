@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import ReactDOM from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import '@/app/styles/leaflet.css';
 import {
@@ -19,6 +20,7 @@ import {
 import { MapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
 import CampusMapHUD from './CampusMapHUD';
+import { RouteAnnouncer } from './components/RouteAnnouncer';
 import { APP_CONFIG } from '@/lib/config';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -28,9 +30,11 @@ import { buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings
 import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
+import { CAMPUS_IMAGE_URL } from '@/lib/map/constants';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -54,12 +58,29 @@ import type { LocationStatus, CampusMapRef } from './CampusMap';
 
 export default function MapClient() {
   const { t } = useTypedTranslation();
+  const { safeT } = useSafeTranslation();
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
 
+  // Preload critical map image for better LCP (Largest Contentful Paint)
+  // This tells the browser to fetch the image as high priority
+  if (typeof window !== 'undefined') {
+    ReactDOM.preload(CAMPUS_IMAGE_URL, { as: 'image' });
+  }
+
   // Location status from CampusMap
-  const [, setLocationStatus] = useState<LocationStatus>('idle');
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
+
+  // Navigation state for RouteAnnouncer
+  const [navState, setNavState] = useState<{
+    isNavigating: boolean;
+    remainingDistance?: number;
+    status?: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating' | 'error';
+  } | null>(null);
+
+  // Smooth loading transition state
+  const [isMapReady, setIsMapReady] = useState(false);
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
@@ -168,10 +189,25 @@ export default function MapClient() {
 
   return (
     <LazyMotion features={domAnimation}>
+      {/* Skip Link - Keyboard Accessibility */}
+      <a
+        href="#map-search-input"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[2000] px-4 py-2 bg-mq-primary text-white font-bold rounded-mq-lg shadow-lg transition-all"
+      >
+        {safeT('skipToSearch', 'Skip to Search')}
+      </a>
+
       <section
         className="container mx-auto p-4 max-w-7xl map-page"
         aria-label={t('campusMapLabel')}
       >
+        {/* Route Announcer for Screen Readers */}
+        <RouteAnnouncer
+          navState={navState}
+          locationStatus={locationStatus}
+          selectedBuildingName={selectedBuilding?.id}
+        />
+
         {/* Header */}
         <header className="mb-6">
           <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('map')}</h1>
@@ -320,17 +356,37 @@ export default function MapClient() {
                   ref={mapContainerRef}
                   className="relative h-[50vh] md:h-[500px] lg:h-[600px] rounded-mq-lg overflow-hidden border border-mq-border"
                 >
-                  {/* Map loads immediately in parallel with Suspense */}
-                  <MapErrorBoundary>
-                    <Suspense fallback={<MapLoadingSkeleton />}>
-                      <CampusMap
-                        ref={campusMapRef}
-                        selectedBuilding={selectedBuilding}
-                        activeOverlays={activeOverlays}
-                        onLocationStatusChange={setLocationStatus}
-                      />
-                    </Suspense>
-                  </MapErrorBoundary>
+                  {/* Real Map (with smooth fade-in when ready) */}
+                  <div
+                    className={`transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
+                  >
+                    <MapErrorBoundary>
+                      <Suspense fallback={null}>
+                        <CampusMap
+                          ref={campusMapRef}
+                          selectedBuilding={selectedBuilding}
+                          activeOverlays={activeOverlays}
+                          onLocationStatusChange={setLocationStatus}
+                          onNavStateChange={setNavState}
+                          onMapReady={() => setIsMapReady(true)}
+                        />
+                      </Suspense>
+                    </MapErrorBoundary>
+                  </div>
+
+                  {/* Skeleton Overlay (fades out when map is ready) */}
+                  <AnimatePresence>
+                    {!isMapReady && (
+                      <m.div
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute inset-0 z-10"
+                      >
+                        <MapLoadingSkeleton />
+                      </m.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* HUD overlays - loaded immediately, sits on top */}
                   <CampusMapHUD

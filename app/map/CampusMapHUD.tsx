@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
@@ -34,6 +34,23 @@ export default function CampusMapHUD({
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
+
+  // Cmd/Ctrl+K keyboard shortcut to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('map-search-input');
+        if (searchInput) {
+          searchInput.focus();
+          triggerHaptic('tap', 'light');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const topSlice = useMemo(() => buildings.slice(0, 15), [buildings]);
 
@@ -83,12 +100,18 @@ export default function CampusMapHUD({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
               <input
+                id="map-search-input"
                 value={buildingSearch}
                 onChange={(e) => setBuildingSearch(e.target.value)}
                 placeholder={t('filterBuildings')}
                 aria-label={t('filterBuildings')}
-                className="w-full pl-10 pr-3 py-2 bg-mq-background border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
+                className="w-full pl-10 pr-16 py-2 bg-mq-background border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
               />
+              {/* Keyboard shortcut hint */}
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono text-mq-content-tertiary bg-mq-background-secondary rounded border border-mq-border">
+                <span className="text-[10px]">⌘</span>
+                <span>K</span>
+              </kbd>
             </div>
           </div>
 

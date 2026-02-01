@@ -1,3 +1,19 @@
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Level 3 Blueprint - Accessibility (A11y) & UX Polish
+Summary: Implemented Level 3 of the Map Architecture Blueprint focusing on accessibility features and UX polish. Made the map usable for everyone including screen reader users and keyboard power users.
+- **Accessibility:** Created `RouteAnnouncer.tsx` component - screen reader announcements for navigation updates with throttling to prevent overwhelming users.
+- **Keyboard Navigation:** Added Cmd/Ctrl+K keyboard shortcut in `CampusMapHUD.tsx` to instantly focus the search bar.
+- **Keyboard Navigation:** Added visual ⌘K hint badge next to search input for power users.
+- **Keyboard Navigation:** Added "Skip to Search" link in `MapClient.tsx` - allows keyboard users to skip past map markers (fixes tab trap issue).
+- **UX Polish:** Added smooth loading transitions with `AnimatePresence` - map fades in while skeleton fades out for native app feel.
+- **Performance:** Added `ReactDOM.preload` for critical map image asset (`CAMPUS_IMAGE_URL`) to improve LCP (Largest Contentful Paint).
+- **Type Safety:** Added `onNavStateChange` and `onMapReady` callbacks to `CampusMap.tsx` props for proper state synchronization.
+- **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful).
+Files: app/map/components/RouteAnnouncer.tsx; app/map/CampusMapHUD.tsx; app/map/MapClient.tsx; app/map/CampusMap.tsx.
+Follow-ups: Level 4 Blueprint (Advanced accessibility: focus management, high contrast mode, screen reader testing).
+
+---
+
 Raouf: 2026-02-01 (Australia/Sydney)
 Scope: Level 2 Blueprint - Component Implementation & Type Safety
 Summary: Implemented Level 2 of the Map Architecture Blueprint focusing on type safety, hook extraction, and code quality. Eliminated `@ts-expect-error` hacks and isolated Leaflet side-effects.
