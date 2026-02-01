@@ -175,3 +175,11 @@
 - **Files:** `lib/constants/config.ts`, `lib/constants/index.ts`, `lib/hooks/use-toast.ts`, `lib/utils/toast.ts`, `components/units/UnitForm.tsx`, `app/manage-profiles/page.tsx`, `components/dashboard/ItemActionButtons.tsx`, `app/calendar/CalendarClient.tsx`.
 - **Verification:** `npm run check` passed successfully.
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Workspace Cleanup & Git Sync
+- **Status:** ✅ Complete - Repository maintenance and deployment preparation.
+- **Scope:** QA, DevOps.
+- **Summary:** Cleaned up redundant scripts (`audit_locales.cjs`, `sync_locales.cjs`), removed tracked log audit files, and cleared temporary workspace artifacts (`supabase/.temp`, `playwright-report/`). Committed and pushed all recent refactoring and maintenance changes to the main branch.
+- **Files:** Root directory, `logs/`, `supabase/`, `Team_Plan/*`.
+- **Verification:** `git status` clean, successful push to remote.
+- **Follow-ups:** None.

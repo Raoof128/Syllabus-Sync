@@ -105,3 +105,15 @@ Summary: Centralized API routes and security config to remove magic strings, and
 - **Verification:** `npm run check` passed successfully.
 Files: `lib/constants/config.ts`, `lib/constants/index.ts`, `lib/hooks/use-toast.ts`, `lib/utils/toast.ts`, `components/units/UnitForm.tsx`, `app/manage-profiles/page.tsx`, `components/dashboard/ItemActionButtons.tsx`, `app/calendar/CalendarClient.tsx`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA & DevOps - Workspace Cleanup & Git Sync
+Summary: Performed repository maintenance by removing redundant files and syncing the codebase.
+- **Cleanup:** Deleted root-level scripts `audit_locales.cjs` and `sync_locales.cjs`.
+- **Cleanup:** Removed tracked log audit files and cleared `logs/`, `supabase/.temp`, and `playwright-report/`.
+- **Git:** Staged all pending changes, committed with a descriptive message, and pushed to the main branch.
+- **Verification:** Verified workspace cleanliness with `git status` and confirmed successful remote push.
+Files: Root directory, `logs/`, `supabase/`, `Team_Plan/*`.
+Follow-ups: None.
