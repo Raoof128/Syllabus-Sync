@@ -521,6 +521,8 @@ export default function CalendarWidgets({
                           itemType="unit"
                           itemId={unit.id}
                           itemTitle={unit.code}
+                          building={unit.location?.building}
+                          room={unit.location?.room}
                           unitCode={unit.code}
                           onEdit={() => onEditUnit(unit)}
                           onDelete={() => onDeleteUnit(unit)}
@@ -603,6 +605,8 @@ export default function CalendarWidgets({
                             itemType="event"
                             itemId={event.id}
                             itemTitle={event.title}
+                            building={event.building}
+                            room={event.room}
                             dateTime={event.startAt || event.date}
                             onEdit={() => onEditEvent(event)}
                             onDelete={() => onDeleteEvent(event)}
@@ -735,7 +739,7 @@ export default function CalendarWidgets({
                               </p>
                             )}
                           </div>
-                          {/* Action buttons - Bell, Edit, Delete (no Navigate for Todos) */}
+                          {/* Action buttons - Bell, Trash, Edit order as per requirements */}
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                             <button
                               onClick={(e) => {
@@ -751,17 +755,6 @@ export default function CalendarWidgets({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onEditTodo(todo);
-                              }}
-                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
-                              title={tOr('editTodo', 'Edit')}
-                              aria-label={tOr('editTodo', 'Edit todo')}
-                            >
-                              <Edit2 className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
                                 if (onDeleteTodo) {
                                   onDeleteTodo(todo);
                                 } else {
@@ -773,6 +766,17 @@ export default function CalendarWidgets({
                               aria-label={t('delete')}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditTodo(todo);
+                              }}
+                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
+                              title={tOr('editTodo', 'Edit')}
+                              aria-label={tOr('editTodo', 'Edit todo')}
+                            >
+                              <Edit2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </div>

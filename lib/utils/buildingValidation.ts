@@ -54,6 +54,7 @@ export function getBuildingOptions(): { value: string; label: string; descriptio
 
 /**
  * Validate a building ID or name against the campus building list
+ * Uses fuzzy matching for user-friendly input
  *
  * @param building - Building ID or name to validate
  * @returns The validated Building object, or null if not found
@@ -77,16 +78,21 @@ export function validateBuilding(building: string | null | undefined): Building 
     return buildingNameMap!.get(normalizedInput)!;
   }
 
-  // Try partial match on ID
+  // Try partial match on ID - but require the input to START WITH a valid ID
+  // This prevents "19WW" from matching "12WW"
   for (const [id, b] of buildingMap!.entries()) {
-    if (id.includes(normalizedInput) || normalizedInput.includes(id)) {
+    // Only match if the ID starts with the normalized input OR vice versa
+    // AND they share significant overlap (at least 2 characters)
+    if (id === normalizedInput ||
+        (normalizedInput.length >= 2 && id.startsWith(normalizedInput)) ||
+        (id.length >= 2 && normalizedInput.startsWith(id))) {
       return b;
     }
   }
 
-  // Try partial match on name
+  // Try partial match on name - more permissive for names
   for (const [name, b] of buildingNameMap!.entries()) {
-    if (name.includes(normalizedInput)) {
+    if (name.includes(normalizedInput) && normalizedInput.length >= 3) {
       return b;
     }
   }
@@ -95,13 +101,43 @@ export function validateBuilding(building: string | null | undefined): Building 
 }
 
 /**
+ * STRICT validation - only exact match on ID or name
+ * Use this for backend validation where we need certainty
+ *
+ * @param building - Building ID or name to validate
+ * @returns The validated Building object, or null if not found
+ */
+export function validateBuildingStrict(building: string | null | undefined): Building | null {
+  if (!building || building.trim() === '') {
+    return null;
+  }
+
+  ensureBuildingMaps();
+
+  const normalizedInput = building.trim().toLowerCase();
+
+  // Only exact ID match
+  if (buildingMap!.has(normalizedInput)) {
+    return buildingMap!.get(normalizedInput)!;
+  }
+
+  // Only exact name match
+  if (buildingNameMap!.has(normalizedInput)) {
+    return buildingNameMap!.get(normalizedInput)!;
+  }
+
+  return null;
+}
+
+/**
  * Check if a building is valid (exists in the campus list)
+ * Uses STRICT matching - exact ID or name only
  *
  * @param building - Building ID or name to check
  * @returns true if the building exists, false otherwise
  */
 export function isValidBuilding(building: string | null | undefined): boolean {
-  return validateBuilding(building) !== null;
+  return validateBuildingStrict(building) !== null;
 }
 
 /**

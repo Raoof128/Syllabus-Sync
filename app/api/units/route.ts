@@ -13,6 +13,7 @@ import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
 import { withCSRFProtection } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
+import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -289,6 +290,17 @@ export async function POST(_request: Request) {
         try {
           const supabase = await createServerClient();
           const { schedule, location, ...unitData } = validatedData;
+
+          // VALIDATION: Check building against the 118 supported buildings
+          const building = location?.building;
+          if (building && building.trim() !== '' && !isValidBuilding(building)) {
+            return jsonError(
+              'Building not found in the campus list. Please select a valid building.',
+              400,
+              ERROR_CODES.VALIDATION_ERROR,
+              { field: 'location.building', value: building }
+            );
+          }
 
           // 1. Insert Unit
           const unitId = unitData.id || crypto.randomUUID();

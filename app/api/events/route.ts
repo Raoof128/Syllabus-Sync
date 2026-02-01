@@ -5,6 +5,7 @@ import { mapEventRow, serializeEvent } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import type { Event } from '@/lib/types';
 import { logger } from '@/lib/logger';
+import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
 // Schema matching the database: start_at, end_at, all_day
 const eventSchema = z.object({
@@ -89,6 +90,17 @@ export async function POST(request: Request) {
         return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: parsed.error.issues,
         });
+      }
+
+      // VALIDATION: Check building against the 118 supported buildings
+      const building = parsed.data.building;
+      if (building && building.trim() !== '' && !isValidBuilding(building)) {
+        return jsonError(
+          'Building not found in the campus list. Please select a valid building.',
+          400,
+          ERROR_CODES.VALIDATION_ERROR,
+          { field: 'building', value: building }
+        );
       }
 
       const supabase = await createServerClient();

@@ -101,6 +101,7 @@ export default function CalendarClient() {
   const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
+  const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
   const userEvents = useEventsStore((state) => state.events);
   const removeEvent = useEventsStore((state) => state.removeEvent);
   const units = useUnitsStore((state) => state.units);
@@ -656,6 +657,9 @@ export default function CalendarClient() {
 
   const confirmDeleteUnit = () => {
     if (unitToDelete) {
+      // Cascade delete: remove all deadlines associated with this unit locally
+      removeDeadlinesByUnit(unitToDelete.id, unitToDelete.code);
+      // Then delete the unit (which also cascades on the backend)
       removeUnit(unitToDelete.id);
       setDeleteConfirmOpen(false);
       setUnitToDelete(null);

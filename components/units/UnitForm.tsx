@@ -21,7 +21,7 @@ import { toastUtils } from '@/lib/utils/toast';
 import { useRetry } from '@/lib/hooks/use-retry';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
-import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import {
   Select,
   SelectContent,
@@ -154,8 +154,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       building: (value) => {
         const requiredError = validationRules.required(t('building'))(value);
         if (requiredError) return requiredError;
-        // Validate building against map data
-        const validatedBuilding = validateBuilding(value as string);
+        // Validate building strictly against map data - exact match only
+        const validatedBuilding = validateBuildingStrict(value as string);
         if (!validatedBuilding) {
           return BUILDING_VALIDATION_ERROR;
         }

@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 import { format, isValid } from 'date-fns';
 import { UNIT_COLORS } from '@/lib/config';
-import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 
 interface EventFormProps {
   open: boolean;
@@ -206,8 +206,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     if (!building.trim()) {
       formErrors.building = t('fieldRequired');
     } else {
-      // Validate building against map data
-      const validatedBuilding = validateBuilding(building);
+      // Validate building strictly against map data - exact match only
+      const validatedBuilding = validateBuildingStrict(building);
       if (!validatedBuilding) {
         formErrors.building = BUILDING_VALIDATION_ERROR;
       }

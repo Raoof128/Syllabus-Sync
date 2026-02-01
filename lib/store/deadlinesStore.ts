@@ -15,6 +15,7 @@ interface DeadlinesState {
   loadDeadlines: () => Promise<void>;
   addDeadline: (deadline: Deadline) => Promise<Deadline | null>;
   removeDeadline: (id: string) => Promise<void>;
+  removeDeadlinesByUnit: (unitId: string, unitCode: string) => void;
   updateDeadline: (id: string, deadline: Partial<Deadline>) => Promise<Deadline | null>;
   toggleComplete: (id: string) => Promise<void>;
   getUpcoming: (limit?: number) => Deadline[];
@@ -176,6 +177,15 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             'high',
           );
         }
+      },
+
+      // Remove all deadlines associated with a deleted unit (cascade delete)
+      removeDeadlinesByUnit: (unitId: string, unitCode: string) => {
+        set((state) => ({
+          deadlines: state.deadlines.filter(
+            (d) => d.unitId !== unitId && d.unitCode !== unitCode
+          ),
+        }));
       },
 
       updateDeadline: async (id, updatedDeadline) => {

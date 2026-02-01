@@ -32,7 +32,7 @@ import { PRIORITY_LEVELS } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
-import { validateBuilding, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 
 interface ExamFormProps {
   open: boolean;
@@ -140,8 +140,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       building: (value) => {
         const requiredError = validationRules.required(t('building' as TranslationKey) || 'Building')(value);
         if (requiredError) return requiredError;
-        // Validate building against map data
-        const validatedBuilding = validateBuilding(value as string);
+        // Validate building strictly against map data - exact match only
+        const validatedBuilding = validateBuildingStrict(value as string);
         if (!validatedBuilding) {
           return BUILDING_VALIDATION_ERROR;
         }

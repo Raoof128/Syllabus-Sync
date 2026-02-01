@@ -85,10 +85,18 @@ export const useUnitsStore = create<UnitsState>()(
         });
 
         try {
-          // Use Atomic Sync Endpoint
-          const apiPayload = { ...normalized };
+          // Use standard POST endpoint for creating new units
+          const apiPayload = {
+            id: normalized.id,
+            code: normalized.code,
+            name: normalized.name,
+            color: normalized.color,
+            location: normalized.location,
+            schedule: normalized.schedule,
+            createdAt: normalized.createdAt,
+          };
 
-          const created = await apiRequest<Unit>('/api/units/sync', {
+          const created = await apiRequest<Unit>('/api/units', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(apiPayload),
@@ -117,6 +125,7 @@ export const useUnitsStore = create<UnitsState>()(
       removeUnit: async (id) => {
         // Store the unit before removing for potential rollback
         const unitToRestore = get().units.find((u) => u.id === id);
+        const unitCode = unitToRestore?.code;
 
         // Remove from local state immediately
         set((state) => ({
@@ -124,7 +133,18 @@ export const useUnitsStore = create<UnitsState>()(
         }));
 
         try {
-          await apiRequest<{ id: string }>(`/api/units/${id}`, { method: 'DELETE' });
+          const response = await apiRequest<{ id: string; code?: string; cascadeDeleted?: boolean }>(`/api/units/${id}`, { method: 'DELETE' });
+
+          // If cascade delete was successful, also remove related deadlines from local state
+          // This is handled by subscribing stores or manual refresh
+          if (response.cascadeDeleted && unitCode) {
+            // Dispatch a custom event that the deadlines store can listen to
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('unit-deleted', {
+                detail: { unitId: id, unitCode }
+              }));
+            }
+          }
         } catch (error) {
           // On error, restore the unit to local state
           if (unitToRestore) {
@@ -149,12 +169,17 @@ export const useUnitsStore = create<UnitsState>()(
         }));
 
         try {
-          // Use Atomic Sync Endpoint for robust updates
-          // This handles both creation (if missing) and update in one transaction
-          const updated = await apiRequest<Unit>('/api/units/sync', {
-            method: 'POST',
+          // Use PUT endpoint for updates - this properly updates existing units
+          const updated = await apiRequest<Unit>(`/api/units/${id}`, {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(optimisticUpdate),
+            body: JSON.stringify({
+              code: optimisticUpdate.code,
+              name: optimisticUpdate.name,
+              color: optimisticUpdate.color,
+              location: optimisticUpdate.location,
+              schedule: optimisticUpdate.schedule,
+            }),
           });
 
           const normalized = normalizeUnit(updated);

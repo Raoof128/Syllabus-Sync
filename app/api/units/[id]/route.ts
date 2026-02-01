@@ -4,6 +4,7 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
+import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
 // Helper to generate UUID v4 - with fallback for environments where crypto.randomUUID() is not available
 function generateUUID(): string {
@@ -83,6 +84,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       if (!parsed.success) {
         return jsonError('Invalid unit payload.', 400, ERROR_CODES.VALIDATION_ERROR);
+      }
+
+      // VALIDATION: Check building against the 118 supported buildings
+      const building = parsed.data.location?.building;
+      if (building && building.trim() !== '' && !isValidBuilding(building)) {
+        return jsonError(
+          'Building not found in the campus list. Please select a valid building.',
+          400,
+          ERROR_CODES.VALIDATION_ERROR,
+          { field: 'location.building', value: building }
+        );
       }
 
       const supabase = await createServerClient();
@@ -313,6 +325,36 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       const supabase = await createServerClient();
 
+      // First, get the unit to find its code (for cascade delete of deadlines)
+      const { data: unitData, error: fetchError } = await supabase
+        .from('units')
+        .select('id, code')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchError || !unitData) {
+        if (fetchError?.code === 'PGRST116' || !unitData) {
+          return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
+        }
+        logger.error('Error fetching unit for delete:', fetchError);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
+      }
+
+      // CASCADE DELETE: Soft-delete all deadlines that reference this unit
+      // This includes both unit_id FK and unit_code soft reference
+      const { error: cascadeError } = await supabase
+        .from('deadlines')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .or(`unit_id.eq.${id},unit_code.eq.${unitData.code}`);
+
+      if (cascadeError) {
+        logger.error('Error cascade deleting deadlines:', cascadeError);
+        // Continue with unit deletion even if cascade fails
+        // The deadlines will be orphaned but can be cleaned up later
+      }
+
       // SOFT DELETE: Set deleted_at instead of hard delete
       const { error } = await supabase
         .from('units')
@@ -326,7 +368,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
-      return jsonSuccess({ id });
+      // Return deleted unit id and code so client can cascade delete locally
+      return jsonSuccess({ id, code: unitData.code, cascadeDeleted: true });
     } catch (error) {
       logger.error('Error deleting unit:', error);
       return jsonError('Failed to delete unit', 500, ERROR_CODES.INTERNAL_ERROR);

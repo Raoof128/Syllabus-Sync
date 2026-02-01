@@ -5,6 +5,7 @@ import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapDeadlineRow, serializeDeadline } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
+import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
@@ -73,6 +74,17 @@ export async function POST(request: Request) {
         return jsonError('Invalid deadline payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: error.issues,
         });
+      }
+
+      // VALIDATION: Check building against the 118 supported buildings (for Exams)
+      const building = parsed.data.building;
+      if (building && building.trim() !== '' && !isValidBuilding(building)) {
+        return jsonError(
+          'Building not found in the campus list. Please select a valid building.',
+          400,
+          ERROR_CODES.VALIDATION_ERROR,
+          { field: 'building', value: building }
+        );
       }
 
       // Resolve unit_id logic:
