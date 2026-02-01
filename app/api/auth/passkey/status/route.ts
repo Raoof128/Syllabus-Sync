@@ -10,6 +10,7 @@ import {
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const statusSchema = z.object({
   email: z.string().email(),
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     return jsonSuccess({ available });
   } catch (error) {
-    console.error('Passkey status error:', error);
+    logger.error('Passkey status error:', error);
     return jsonError('Failed to check passkey status', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

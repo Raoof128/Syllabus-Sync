@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // SCHEMAS
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
         });
 
         if (error) {
-          console.error('RPC Sync Error:', error);
+          logger.error('RPC Sync Error:', error);
           return jsonError('Failed to sync unit', 500, ERROR_CODES.DATABASE_ERROR, {
             details: error.message,
           });
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
 
         return jsonSuccess(data, 200);
       } catch (error) {
-        console.error('Sync Endpoint Error:', error);
+        logger.error('Sync Endpoint Error:', error);
         return jsonError('Internal sync error', 500, ERROR_CODES.INTERNAL_ERROR);
       }
     });

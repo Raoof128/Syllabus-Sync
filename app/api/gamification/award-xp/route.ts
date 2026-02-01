@@ -10,6 +10,7 @@ import { requireAuth, parseJsonBody } from '@/app/api/_lib/middleware';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Failed to award XP:', error);
+      logger.error('Failed to award XP:', error);
       return jsonError('Failed to award XP', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
@@ -183,7 +184,7 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       // XP was awarded but failed to fetch profile - still return success
-      console.error('Failed to fetch updated profile:', profileError);
+      logger.error('Failed to fetch updated profile:', profileError);
       return jsonSuccess({
         message: `Earned ${awardResult.xpAwarded} XP for ${eventType}!`,
         result: awardResult,

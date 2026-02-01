@@ -12,6 +12,8 @@
  */
 
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -403,7 +405,7 @@ export async function cacheFingerprintLocally(): Promise<void> {
     const fingerprint = await generateClientFingerprint();
     localStorage.setItem('device-fingerprint', JSON.stringify(fingerprint));
   } catch (error) {
-    console.error('Failed to cache fingerprint:', error);
+    logger.error('Failed to cache fingerprint:', error);
   }
 }
 
@@ -417,7 +419,7 @@ export function getCachedFingerprint(): DeviceFingerprint | null {
       return JSON.parse(cached);
     }
   } catch (error) {
-    console.error('Failed to get cached fingerprint:', error);
+    logger.error('Failed to get cached fingerprint:', error);
   }
   return null;
 }

@@ -14,6 +14,8 @@
 
 import crypto from 'crypto';
 
+
+
 // ============================================================================
 // SRI HASH REGISTRY - Pre-computed hashes for common CDN resources
 // ============================================================================
@@ -315,7 +317,7 @@ async function updateHashes() {
       const hash = await generateSRIHashFromURL(url);
       console.log(\`\${name}: \${hash}\`);
     } catch (error) {
-      console.error(\`Failed to generate hash for \${name}:\`, error.message);
+      logger.error(\`Failed to generate hash for \${name}:\`, error.message);
     }
   }
   

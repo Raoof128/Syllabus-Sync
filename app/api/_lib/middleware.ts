@@ -7,6 +7,7 @@ import {
   mutationLimiter,
 } from '@/lib/services/rateLimitService';
 import { validateOrigin } from '@/lib/security/csrf';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // AUTHENTICATION MIDDLEWARE
@@ -54,7 +55,7 @@ export const requireAuth = async (
 
     return await handler(user.id);
   } catch (error) {
-    console.error(
+    logger.error(
       'Authentication middleware error:',
       error instanceof Error ? error.message : 'Unknown error',
     );
@@ -92,7 +93,7 @@ export const optionalAuth = async (
     const isRefreshError =
       error instanceof Error && error.message.includes('Refresh Token Not Found');
     if (!isRefreshError) {
-      console.error(
+      logger.error(
         'Optional auth middleware error:',
         error instanceof Error ? error.message : 'Unknown error',
       );
@@ -176,7 +177,7 @@ export const requireAuthWithRateLimit = async (
 
     return newResponse;
   } catch (error) {
-    console.error(
+    logger.error(
       'Auth/RateLimit middleware error:',
       error instanceof Error ? error.message : 'Unknown error',
     );
@@ -474,8 +475,8 @@ export const validateRequest = <T>(
       if (!result.success) {
         const zodError = result.error as { errors?: unknown[] };
         // Log validation errors server-side for debugging
-        console.error('Validation failed:', JSON.stringify(zodError.errors ?? [], null, 2));
-        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
+        logger.error('Validation failed:', JSON.stringify(zodError.errors ?? [], null, 2));
+        logger.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
         return jsonError('Request validation failed', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: zodError.errors ?? [],
         });
@@ -483,7 +484,7 @@ export const validateRequest = <T>(
 
       return await handler(result.data!);
     } catch (error) {
-      console.error('Validation middleware error:', error);
+      logger.error('Validation middleware error:', error);
       return jsonError('Request processing failed', 400, ERROR_CODES.BAD_REQUEST);
     }
   };
@@ -523,7 +524,7 @@ export const logRequest = (level: 'warn' | 'error' = 'warn') => {
       return response;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`[${method}] ${url} - ERROR - ${duration}ms:`, error);
+      logger.error(`[${method}] ${url} - ERROR - ${duration}ms:`, error);
       throw error;
     }
   };

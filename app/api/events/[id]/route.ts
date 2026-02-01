@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // More permissive UUID validation - accepts any valid UUID format
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -59,7 +60,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       const parsed = eventUpdateSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
-        console.error('Event update validation failed:', parsed.error.issues);
+        logger.error('Event update validation failed:', parsed.error.issues);
         return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR);
       }
 
@@ -95,7 +96,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
-        console.error('Database error updating event:', error.code, error.message);
+        logger.error('Database error updating event:', error.code, error.message);
         if (error.code === 'PGRST116') {
           return jsonError('Event not found', 404, ERROR_CODES.NOT_FOUND);
         }
@@ -104,7 +105,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       return jsonSuccess(mapEventRow(data));
     } catch (error) {
-      console.error('Error updating event:', error);
+      logger.error('Error updating event:', error);
       return jsonError('Failed to update event', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -133,13 +134,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
-        console.error('Database error deleting event:', error.code, error.message);
+        logger.error('Database error deleting event:', error.code, error.message);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({ id });
     } catch (error) {
-      console.error('Error deleting event:', error);
+      logger.error('Error deleting event:', error);
       return jsonError('Failed to delete event', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

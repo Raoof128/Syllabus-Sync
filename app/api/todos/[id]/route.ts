@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import type { Todo } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // More permissive UUID validation
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -95,7 +96,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
         // Check if the error is related to missing table
         if (error.message?.includes('schema cache') || error.code === '42P01') {
-          console.error(
+          logger.error(
             'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
           );
           return jsonError(
@@ -110,7 +111,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       return jsonSuccess(mapTodoRow(data));
     } catch (error) {
-      console.error('Error updating todo:', error);
+      logger.error('Error updating todo:', error);
       return jsonError('Failed to update todo', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -132,7 +133,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       if (error) {
         // Check if the error is related to missing table
         if (error.message?.includes('schema cache') || error.code === '42P01') {
-          console.error(
+          logger.error(
             'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
           );
           return jsonError(
@@ -147,7 +148,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       return jsonSuccess({ id });
     } catch (error) {
-      console.error('Error deleting todo:', error);
+      logger.error('Error deleting todo:', error);
       return jsonError('Failed to delete todo', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

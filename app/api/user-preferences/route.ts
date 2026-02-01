@@ -12,6 +12,7 @@ import {
   BODY_SIZE_LIMITS,
 } from '@/app/api/_lib/response';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const UpdatePreferencesSchema = z.object({
   notifications_enabled: z.boolean().optional(),
@@ -56,7 +57,7 @@ export async function GET() {
 
     return jsonSuccess(data);
   } catch (error) {
-    console.error('User preferences GET error:', error);
+    logger.error('User preferences GET error:', error);
     return jsonError('Internal server error', 500);
   }
 }
@@ -129,13 +130,13 @@ export async function PUT(request: Request) {
     }
 
     if (error) {
-      console.error('User preferences update/insert error:', error);
+      logger.error('User preferences update/insert error:', error);
       return jsonError('Failed to update user preferences', 500);
     }
 
     return jsonSuccess(data);
   } catch (error) {
-    console.error('User preferences PUT error:', error);
+    logger.error('User preferences PUT error:', error);
     return jsonError('Internal server error', 500);
   }
 }

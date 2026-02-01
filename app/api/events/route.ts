@@ -4,6 +4,7 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapEventRow, serializeEvent } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import type { Event } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 // Schema matching the database: start_at, end_at, all_day
 const eventSchema = z.object({
@@ -55,13 +56,13 @@ export async function GET(request: Request) {
 
       if (error) {
         // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error fetching events:', error.code, error.message);
+        logger.error('Database error fetching events:', error.code, error.message);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(data?.map(mapEventRow) ?? []);
     } catch (error) {
-      console.error(
+      logger.error(
         'Error fetching events:',
         error instanceof Error ? error.message : 'Unknown error',
       );
@@ -83,8 +84,8 @@ export async function POST(request: Request) {
       const parsed = eventSchema.safeParse(bodyResult.data);
 
       if (!parsed.success) {
-        console.error('Event validation failed:', JSON.stringify(parsed.error.issues, null, 2));
-        console.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
+        logger.error('Event validation failed:', JSON.stringify(parsed.error.issues, null, 2));
+        logger.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
         return jsonError('Invalid event payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: parsed.error.issues,
         });
@@ -134,7 +135,7 @@ export async function POST(request: Request) {
 
       if (error) {
         // SECURITY: Don't expose internal database error messages to clients
-        console.error('Database error creating event:', {
+        logger.error('Database error creating event:', {
           code: error.code,
           message: error.message,
           details: error.details,
@@ -145,7 +146,7 @@ export async function POST(request: Request) {
 
       return jsonSuccess(mapEventRow(data), 201);
     } catch (error) {
-      console.error(
+      logger.error(
         'Error creating event:',
         error instanceof Error ? error.message : 'Unknown error',
       );

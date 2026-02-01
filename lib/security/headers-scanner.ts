@@ -12,6 +12,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -348,7 +350,7 @@ export async function scanURLHeaders(url: string): Promise<SecurityScanResult> {
     const results = checkAllSecurityHeaders(response.headers);
     return calculateSecurityScore(results);
   } catch (error) {
-    console.error('URL scan error:', error);
+    logger.error('URL scan error:', error);
     return {
       score: 0,
       grade: 'F',
@@ -501,7 +503,7 @@ export async function handleHeaderScan(request: Request): Promise<Response> {
       report: generateSecurityReport(result, url),
     });
   } catch (error) {
-    console.error('Header scan error:', error);
+    logger.error('Header scan error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to scan headers' } },
       { status: 500 }
@@ -527,7 +529,7 @@ export async function handleSelfScan(request: Request): Promise<Response> {
       report: generateSecurityReport(result, baseUrl),
     });
   } catch (error) {
-    console.error('Self scan error:', error);
+    logger.error('Self scan error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to scan application' } },
       { status: 500 }

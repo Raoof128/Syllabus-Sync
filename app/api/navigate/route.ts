@@ -4,6 +4,7 @@ import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { createHash } from 'crypto';
+import { logger } from '@/lib/logger';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
 // The API key should only be set via ORS_API_KEY on the server
@@ -306,7 +307,7 @@ export async function POST(request: NextRequest) {
 
     if (!orsResponse.ok) {
       const errText = await orsResponse.text();
-      console.error('ORS Upstream Error:', {
+      logger.error('ORS Upstream Error:', {
         status: orsResponse.status,
         statusText: orsResponse.statusText,
         body: errText.substring(0, 200), // Log first 200 chars
@@ -331,7 +332,7 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
 
-    console.error('Navigate Proxy error:', {
+    logger.error('Navigate Proxy error:', {
       message: errorMessage,
       stack: errorStack,
       clientIP: clientIP !== 'unknown' ? clientIP : undefined, // Log IP if available for debugging abuse

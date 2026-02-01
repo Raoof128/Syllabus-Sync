@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapDeadlineRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // More permissive UUID validation - accepts any valid UUID format
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -88,7 +89,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       return jsonSuccess(mapDeadlineRow(data));
     } catch (error) {
-      console.error('Error updating deadline:', error);
+      logger.error('Error updating deadline:', error);
       return jsonError('Failed to update deadline', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -121,7 +122,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       return jsonSuccess({ id });
     } catch (error) {
-      console.error('Error deleting deadline:', error);
+      logger.error('Error deleting deadline:', error);
       return jsonError('Failed to delete deadline', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

@@ -12,6 +12,7 @@ import {
   BODY_SIZE_LIMITS,
 } from '@/app/api/_lib/response';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // VALIDATION SCHEMAS
@@ -67,20 +68,20 @@ export async function GET() {
           .single();
 
         if (createError) {
-          console.error('Auto-create profile failed:', createError);
+          logger.error('Auto-create profile failed:', createError);
           // Return null instead of erroring - let client handle it
           return jsonSuccess(null);
         }
 
         return jsonSuccess(newProfile);
       }
-      console.error('Profile fetch error:', profileError);
+      logger.error('Profile fetch error:', profileError);
       return jsonError('Failed to fetch profile', 500);
     }
 
     return jsonSuccess(profile);
   } catch (error) {
-    console.error('Profile GET error:', error);
+    logger.error('Profile GET error:', error);
     return jsonError('Internal server error', 500);
   }
 }
@@ -134,7 +135,7 @@ export async function PUT(request: Request) {
       .single();
 
     if (updateError) {
-      console.error('Profile update error:', updateError);
+      logger.error('Profile update error:', updateError);
       // Check for protected field modification
       if (updateError.message?.includes('Cannot modify')) {
         return jsonError(updateError.message, 403);
@@ -144,7 +145,7 @@ export async function PUT(request: Request) {
 
     return jsonSuccess(profile);
   } catch (error) {
-    console.error('Profile PUT error:', error);
+    logger.error('Profile PUT error:', error);
     return jsonError('Internal server error', 500);
   }
 }
@@ -174,7 +175,7 @@ export async function DELETE() {
 
     return jsonSuccess({ id: user.id });
   } catch (error) {
-    console.error('Profile DELETE error:', error);
+    logger.error('Profile DELETE error:', error);
     return jsonError('Internal server error', 500);
   }
 }

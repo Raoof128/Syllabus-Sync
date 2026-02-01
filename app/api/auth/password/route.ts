@@ -4,6 +4,7 @@ import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { passwordResetLimiter } from '@/lib/services/rateLimitService';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // SECURITY: Stronger password policy - min 12 chars
 const passwordChangeSchema = z.object({
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       // SECURITY: Don't expose internal Supabase error messages to client
-      console.error('Password update failed:', updateError.message);
+      logger.error('Password update failed:', updateError.message);
       return jsonError(
         'Failed to update password. Please try again.',
         400,
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
       message: 'Password changed successfully',
     });
   } catch (error) {
-    console.error('Password change error:', error);
+    logger.error('Password change error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

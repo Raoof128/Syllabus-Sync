@@ -1,6 +1,7 @@
 // import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
     if (error) {
       // SECURITY: Don't expose database error details in production
       // Log the actual error server-side for debugging
-      console.error('Health check DB error:', error.message, error.code);
+      logger.error('Health check DB error:', error.message, error.code);
 
       return jsonError(
         'Service temporarily unavailable',
@@ -53,7 +54,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     // SECURITY: Log detailed error server-side only
-    console.error('Health check error:', error);
+    logger.error('Health check error:', error);
 
     return jsonError(
       'Service temporarily unavailable',

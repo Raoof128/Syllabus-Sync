@@ -12,6 +12,7 @@ import {
 } from '@/lib/map/realtimeNavigation';
 import type { LocationStatus } from '../CampusMap';
 import type { Map as LeafletMap, Marker, Circle, Icon } from 'leaflet';
+import { logger } from '@/lib/logger';
 
 // Constants
 const LOCATION_TIMEOUT = 15000;
@@ -456,7 +457,7 @@ export function useMapLocation({
           }
         }
       } catch (error) {
-        console.error('Simulation error:', error);
+        logger.error('Simulation error:', error);
       }
     },
     [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef],

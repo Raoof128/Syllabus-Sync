@@ -14,6 +14,8 @@
 import crypto from 'crypto';
 import { createServerClient } from '@/lib/supabase/server';
 import { logAuditServer } from '@/lib/security/audit';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // CONSTANTS
@@ -111,7 +113,7 @@ export async function generateBackupCodes(
         .single();
 
       if (error) {
-        console.error('Failed to store backup code:', error);
+        logger.error('Failed to store backup code:', error);
         throw new Error('Failed to generate backup codes');
       }
 
@@ -133,7 +135,7 @@ export async function generateBackupCodes(
       generatedAt: new Date(),
     };
   } catch (error) {
-    console.error('Backup code generation error:', error);
+    logger.error('Backup code generation error:', error);
     throw error;
   }
 }
@@ -198,7 +200,7 @@ export async function validateBackupCode(
       codeId: backupCode.id,
     };
   } catch (error) {
-    console.error('Backup code validation error:', error);
+    logger.error('Backup code validation error:', error);
     return {
       valid: false,
       alreadyUsed: false,
@@ -232,7 +234,7 @@ export async function consumeBackupCode(
       .eq('used', false);
 
     if (error) {
-      console.error('Failed to consume backup code:', error);
+      logger.error('Failed to consume backup code:', error);
       return false;
     }
 
@@ -247,7 +249,7 @@ export async function consumeBackupCode(
 
     return true;
   } catch (error) {
-    console.error('Backup code consumption error:', error);
+    logger.error('Backup code consumption error:', error);
     return false;
   }
 }
@@ -276,7 +278,7 @@ export async function getBackupCodes(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Failed to fetch backup codes:', error);
+      logger.error('Failed to fetch backup codes:', error);
       return [];
     }
 
@@ -298,7 +300,7 @@ export async function getBackupCodes(
       createdAt: new Date(code.created_at),
     }));
   } catch (error) {
-    console.error('Get backup codes error:', error);
+    logger.error('Get backup codes error:', error);
     return [];
   }
 }
@@ -320,13 +322,13 @@ export async function getBackupCodeCount(userId: string): Promise<number> {
       .eq('used', false);
 
     if (error) {
-      console.error('Failed to count backup codes:', error);
+      logger.error('Failed to count backup codes:', error);
       return 0;
     }
 
     return count || 0;
   } catch (error) {
-    console.error('Count backup codes error:', error);
+    logger.error('Count backup codes error:', error);
     return 0;
   }
 }
@@ -351,14 +353,14 @@ export async function regenerateBackupCodes(
       .eq('user_id', userId);
 
     if (deleteError) {
-      console.error('Failed to delete old backup codes:', deleteError);
+      logger.error('Failed to delete old backup codes:', deleteError);
       throw new Error('Failed to regenerate backup codes');
     }
 
     // Generate new codes
     return await generateBackupCodes(userId);
   } catch (error) {
-    console.error('Backup code regeneration error:', error);
+    logger.error('Backup code regeneration error:', error);
     throw error;
   }
 }
@@ -379,7 +381,7 @@ export async function deleteBackupCodes(userId: string): Promise<boolean> {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Failed to delete backup codes:', error);
+      logger.error('Failed to delete backup codes:', error);
       return false;
     }
 
@@ -392,7 +394,7 @@ export async function deleteBackupCodes(userId: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error('Delete backup codes error:', error);
+    logger.error('Delete backup codes error:', error);
     return false;
   }
 }
@@ -419,7 +421,7 @@ export async function handleGenerateBackupCodes(
       generatedAt: result.generatedAt,
     });
   } catch (error) {
-    console.error('Generate backup codes error:', error);
+    logger.error('Generate backup codes error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to generate backup codes' } },
       { status: 500 }
@@ -468,7 +470,7 @@ export async function handleValidateBackupCode(
       message: 'Backup code validated successfully',
     });
   } catch (error) {
-    console.error('Validate backup code error:', error);
+    logger.error('Validate backup code error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to validate backup code' } },
       { status: 500 }
@@ -498,7 +500,7 @@ export async function handleGetBackupCodes(
       remaining: count,
     });
   } catch (error) {
-    console.error('Get backup codes error:', error);
+    logger.error('Get backup codes error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch backup codes' } },
       { status: 500 }
@@ -525,7 +527,7 @@ export async function handleRegenerateBackupCodes(
       message: 'Backup codes regenerated successfully',
     });
   } catch (error) {
-    console.error('Regenerate backup codes error:', error);
+    logger.error('Regenerate backup codes error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to regenerate backup codes' } },
       { status: 500 }

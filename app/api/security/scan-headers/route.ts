@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scanURLHeaders, generateSecurityReport } from '@/lib/security/headers-scanner';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { logger } from '@/lib/logger';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +36,7 @@ export async function POST(request: NextRequest) {
       report: generateSecurityReport(result, url),
     });
   } catch (error) {
-    console.error('Header scan error:', error);
+    logger.error('Header scan error:', error);
     return jsonError('Failed to scan headers', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

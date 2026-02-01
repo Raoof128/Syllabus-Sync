@@ -15,6 +15,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Shield, AlertCircle, Check, X } from 'lucide-react';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -173,7 +175,7 @@ export function PasswordStrengthIndicator({
         }
       }
     } catch (error) {
-      console.error('Breach check error:', error);
+      logger.error('Breach check error:', error);
     } finally {
       setIsCheckingBreaches(false);
     }

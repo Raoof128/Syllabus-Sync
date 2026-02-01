@@ -12,6 +12,8 @@
  */
 
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // CONSTANTS
@@ -207,7 +209,7 @@ export async function checkPasswordBreach(
 
     return result;
   } catch (error) {
-    console.error('Password breach check error:', error);
+    logger.error('Password breach check error:', error);
     // Return safe default on error
     return {
       isBreached: false,
@@ -427,7 +429,7 @@ export async function handlePasswordBreachCheck(request: Request): Promise<Respo
 
     return Response.json({ result });
   } catch (error) {
-    console.error('Password breach check error:', error);
+    logger.error('Password breach check error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to check password' } },
       { status: 500 }

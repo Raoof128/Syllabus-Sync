@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkPasswordBreach } from '@/lib/security/password-breach';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { logger } from '@/lib/logger';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
       result,
     });
   } catch (error) {
-    console.error('Password breach check error:', error);
+    logger.error('Password breach check error:', error);
     return jsonError('Failed to check password breach', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

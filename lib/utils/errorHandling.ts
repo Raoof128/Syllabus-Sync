@@ -1,6 +1,7 @@
 // lib/utils/errorHandling.ts
 import { AppError, ValidationError, FormErrors, ErrorSeverity } from '@/lib/types';
 import { withRetry, RetryError, type RetryOptions } from './retry';
+import { logger } from '@/lib/logger';
 
 export class AppErrorHandler {
   private static instance: AppErrorHandler;
@@ -51,7 +52,7 @@ export class AppErrorHandler {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.error(`[${severity.toUpperCase()}] ${context || 'App'}:`, appError.message, appError);
+      logger.error(`[${severity.toUpperCase()}] ${context || 'App'}:`, appError.message, appError);
     }
 
     // Send to error tracking service (Sentry is configured in next.config.ts)
@@ -131,7 +132,7 @@ export class AppErrorHandler {
 
     // In production, log high-severity errors to console (picked up by Vercel logs)
     if (isProduction && severity === 'high') {
-      console.error(
+      logger.error(
         '[ERROR_REPORT]',
         JSON.stringify({
           code: error.code,

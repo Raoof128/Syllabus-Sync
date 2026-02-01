@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 /**
  * Weather API Proxy Endpoint
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Open-Meteo API error:', {
+      logger.error('Open-Meteo API error:', {
         status: response.status,
         statusText: response.statusText,
       });
@@ -131,7 +132,7 @@ export async function GET(request: NextRequest) {
 
     return jsonSuccess(sanitizedData);
   } catch (error) {
-    console.error('Weather API fetch error:', error);
+    logger.error('Weather API fetch error:', error);
     return jsonError('Failed to fetch weather data', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
   }
 }

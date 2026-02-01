@@ -12,6 +12,7 @@ import {
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
 import { withCSRFProtection } from '@/lib/security/csrf';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -242,7 +243,7 @@ export async function GET(request: Request) {
       if (error instanceof z.ZodError) {
         return handleValidationError(error);
       }
-      console.error(
+      logger.error(
         'GET /api/units error:',
         error instanceof Error ? error.message : 'Unknown error',
       );
@@ -316,7 +317,7 @@ export async function POST(_request: Request) {
             .single();
 
           if (unitError) {
-            console.error(
+            logger.error(
               'Unit insert error:',
               unitError.code,
               unitError.message,
@@ -378,7 +379,7 @@ export async function POST(_request: Request) {
 
           return jsonSuccess(responseData, 201);
         } catch (error) {
-          console.error(
+          logger.error(
             'POST /api/units error:',
             error instanceof Error ? error.message : 'Unknown error',
           );

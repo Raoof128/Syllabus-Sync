@@ -1,6 +1,7 @@
 // import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -31,7 +32,7 @@ export async function GET() {
       profile: profile || null,
     });
   } catch (error) {
-    console.error('User fetch error:', error);
+    logger.error('User fetch error:', error);
     return jsonError('Internal server error', 500);
   }
 }

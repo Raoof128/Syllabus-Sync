@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 // Weather code type definitions for consistency
 export enum WeatherCode {
@@ -257,7 +258,7 @@ export const useWeather = () => {
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load weather.';
         setError(message);
-        console.error('Weather fetch error:', err);
+        logger.error('Weather fetch error:', err);
       } finally {
         setLoading(false);
       }

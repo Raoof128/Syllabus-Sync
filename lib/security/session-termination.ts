@@ -13,6 +13,8 @@
 
 import { createServerClient } from '@/lib/supabase/server';
 import { logAuditServer } from '@/lib/security/audit';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -73,7 +75,7 @@ export async function terminateAllOtherSessions(
       .order('created_at', { ascending: false });
 
     if (fetchError) {
-      console.error('Failed to fetch sessions:', fetchError);
+      logger.error('Failed to fetch sessions:', fetchError);
       throw new Error('Failed to fetch sessions');
     }
 
@@ -119,7 +121,7 @@ export async function terminateAllOtherSessions(
       auditLogId,
     };
   } catch (error) {
-    console.error('Session termination error:', error);
+    logger.error('Session termination error:', error);
     throw error;
   }
 }
@@ -147,7 +149,7 @@ export async function terminateSession(
       .single();
 
     if (fetchError || !session) {
-      console.error('Session not found or access denied');
+      logger.error('Session not found or access denied');
       return false;
     }
 
@@ -158,7 +160,7 @@ export async function terminateSession(
       .eq('id', sessionId);
 
     if (deleteError) {
-      console.error('Failed to terminate session:', deleteError);
+      logger.error('Failed to terminate session:', deleteError);
       return false;
     }
 
@@ -175,7 +177,7 @@ export async function terminateSession(
 
     return true;
   } catch (error) {
-    console.error('Session termination error:', error);
+    logger.error('Session termination error:', error);
     return false;
   }
 }
@@ -200,7 +202,7 @@ export async function terminateAllSessions(
       .eq('user_id', userId);
 
     if (fetchError) {
-      console.error('Failed to fetch sessions:', fetchError);
+      logger.error('Failed to fetch sessions:', fetchError);
       throw new Error('Failed to fetch sessions');
     }
 
@@ -213,7 +215,7 @@ export async function terminateAllSessions(
       .eq('user_id', userId);
 
     if (deleteError) {
-      console.error('Failed to terminate sessions:', deleteError);
+      logger.error('Failed to terminate sessions:', deleteError);
       throw new Error('Failed to terminate sessions');
     }
 
@@ -233,7 +235,7 @@ export async function terminateAllSessions(
       auditLogId,
     };
   } catch (error) {
-    console.error('Session termination error:', error);
+    logger.error('Session termination error:', error);
     throw error;
   }
 }
@@ -261,7 +263,7 @@ export async function getUserSessions(
       .order('last_activity_at', { ascending: false });
 
     if (error) {
-      console.error('Failed to fetch sessions:', error);
+      logger.error('Failed to fetch sessions:', error);
       return [];
     }
 
@@ -286,7 +288,7 @@ export async function getUserSessions(
       isCurrent: false, // Would need to compare with current session
     }));
   } catch (error) {
-    console.error('Get sessions error:', error);
+    logger.error('Get sessions error:', error);
     return [];
   }
 }
@@ -314,13 +316,13 @@ export async function cleanupExpiredSessions(
       .select('id');
 
     if (error) {
-      console.error('Failed to cleanup expired sessions:', error);
+      logger.error('Failed to cleanup expired sessions:', error);
       return 0;
     }
 
     return data?.length || 0;
   } catch (error) {
-    console.error('Session cleanup error:', error);
+    logger.error('Session cleanup error:', error);
     return 0;
   }
 }
@@ -356,7 +358,7 @@ export async function handlePasswordChange(
 
     return result;
   } catch (error) {
-    console.error('Password change handling error:', error);
+    logger.error('Password change handling error:', error);
     throw error;
   }
 }
@@ -398,7 +400,7 @@ export async function handleSessionTermination(
       );
     }
   } catch (error) {
-    console.error('Session termination API error:', error);
+    logger.error('Session termination API error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to terminate session' } },
       { status: 500 }
@@ -421,7 +423,7 @@ export async function handleGetSessions(
       count: sessions.length,
     });
   } catch (error) {
-    console.error('Get sessions API error:', error);
+    logger.error('Get sessions API error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch sessions' } },
       { status: 500 }

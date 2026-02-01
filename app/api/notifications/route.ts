@@ -9,6 +9,7 @@ import {
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
 import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -97,7 +98,7 @@ export async function GET(request: Request) {
       if (error instanceof z.ZodError) {
         return handleValidationError(error);
       }
-      console.error('GET /api/notifications error:', error);
+      logger.error('GET /api/notifications error:', error);
       return jsonError('Failed to fetch notifications', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -155,7 +156,7 @@ export async function POST(request: Request) {
 
         return jsonSuccess(mapNotificationRow(data), 201);
       } catch (error) {
-        console.error('POST /api/notifications error:', error);
+        logger.error('POST /api/notifications error:', error);
         return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
       }
     });

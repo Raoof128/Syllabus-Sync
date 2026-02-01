@@ -11,6 +11,7 @@ import {
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const signinSchema = z.object({
   email: z.string().email(),
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;
   } catch (error) {
-    console.error('Signin error:', error);
+    logger.error('Signin error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

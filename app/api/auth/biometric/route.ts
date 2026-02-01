@@ -9,6 +9,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const biometricSchema = z.object({
   enabled: z.boolean(),
@@ -50,7 +51,7 @@ export async function GET() {
       updatedAt: metadata.biometric_updated_at ?? null,
     });
   } catch (error) {
-    console.error('Biometric GET error:', error);
+    logger.error('Biometric GET error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      console.error('Biometric update failed:', updateError.message);
+      logger.error('Biometric update failed:', updateError.message);
       return jsonError('Failed to update biometric settings', 400, ERROR_CODES.BAD_REQUEST);
     }
 
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
       transports: enabled ? (transports ?? null) : null,
     });
   } catch (error) {
-    console.error('Biometric POST error:', error);
+    logger.error('Biometric POST error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

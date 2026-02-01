@@ -23,6 +23,7 @@ import {
   base64UrlToBuffer,
 } from '@/app/api/auth/passkey/_lib';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const verifySchema = z.object({
   credential: z.record(z.string(), z.unknown()),
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      console.error('Passkey counter update failed:', updateError.message);
+      logger.error('Passkey counter update failed:', updateError.message);
     }
 
     const serverClient = await createServerClient();
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
     clearPasskeyCookies(response);
     return response;
   } catch (error) {
-    console.error('Passkey verify error:', error);
+    logger.error('Passkey verify error:', error);
     return jsonError('Failed to verify passkey', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

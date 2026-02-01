@@ -20,6 +20,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // CRITICAL SECURITY: HARD PRODUCTION BLOCK
@@ -400,7 +401,7 @@ export async function POST(request: NextRequest) {
 
     return jsonSuccess(summary);
   } catch (error) {
-    console.error('Error updating building positions:', error);
+    logger.error('Error updating building positions:', error);
 
     // SECURITY: Don't leak error details even in dev
     return jsonError('Failed to update building positions', 500, ERROR_CODES.INTERNAL_ERROR);

@@ -7,6 +7,8 @@
  */
 
 import { createServerClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -87,14 +89,14 @@ export async function logAudit(entry: AuditLogEntry): Promise<string | null> {
     });
 
     if (!response.ok) {
-      console.error('Failed to log audit event:', await response.text());
+      logger.error('Failed to log audit event:', await response.text());
       return null;
     }
 
     const data = await response.json();
     return data.logId || null;
   } catch (error) {
-    console.error('Audit logging error:', error);
+    logger.error('Audit logging error:', error);
     return null;
   }
 }
@@ -241,13 +243,13 @@ export async function logAuditServer(
     });
 
     if (error) {
-      console.error('Server audit logging error:', error);
+      logger.error('Server audit logging error:', error);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error('Server audit logging exception:', error);
+    logger.error('Server audit logging exception:', error);
     return null;
   }
 }
@@ -283,14 +285,14 @@ export async function fetchAuditLogs(options: {
     const response = await fetch(`/api/audit/logs?${params.toString()}`);
 
     if (!response.ok) {
-      console.error('Failed to fetch audit logs:', await response.text());
+      logger.error('Failed to fetch audit logs:', await response.text());
       return [];
     }
 
     const data = await response.json();
     return data.logs || [];
   } catch (error) {
-    console.error('Fetch audit logs error:', error);
+    logger.error('Fetch audit logs error:', error);
     return [];
   }
 }

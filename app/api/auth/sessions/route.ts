@@ -9,6 +9,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const signOutSchema = z.object({
   scope: z.enum(['local', 'others', 'global']),
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       ],
     });
   } catch (error) {
-    console.error('Sessions GET error:', error);
+    logger.error('Sessions GET error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     return jsonSuccess({ scope });
   } catch (error) {
-    console.error('Sessions POST error:', error);
+    logger.error('Sessions POST error:', error);
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

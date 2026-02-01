@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Request Logging Utility
  *
@@ -65,7 +66,7 @@ export class RequestLogger {
     // Use appropriate console method based on level
     switch (level) {
       case 'error':
-        console.error(JSON.stringify(logEntry));
+        logger.error(JSON.stringify(logEntry));
         break;
       case 'warn':
         console.warn(JSON.stringify(logEntry));

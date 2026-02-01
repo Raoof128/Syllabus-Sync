@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
     const isEnforced = report.disposition === 'enforce';
 
     if (isEnforced) {
-      console.error('CSP Violation Report:', {
+      logger.error('CSP Violation Report:', {
         ...sanitizedReport,
         timestamp: new Date().toISOString(),
         ip: `${clientIP.substring(0, 7)}***`, // Partial IP for privacy
@@ -154,14 +155,14 @@ export async function POST(request: NextRequest) {
           }),
         });
       } catch (webhookError) {
-        console.error('Failed to send CSP report to webhook:', webhookError);
+        logger.error('Failed to send CSP report to webhook:', webhookError);
       }
     }
 
     // Return 204 No Content (browsers don't need a response body)
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('CSP report processing error:', error);
+    logger.error('CSP report processing error:', error);
     return jsonError('Failed to process report', 400, ERROR_CODES.BAD_REQUEST);
   }
 }

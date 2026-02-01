@@ -3,6 +3,7 @@
 // Only the current language is loaded to reduce bundle size
 
 import en from '@/locales/en/translations.json';
+import { logger } from '@/lib/logger';
 
 // English is always loaded (default fallback)
 export type TranslationKey = keyof typeof en;
@@ -155,7 +156,7 @@ export async function loadTranslations(lang: Language): Promise<TranslationData>
     translationsCache.set(lang, translations);
     return translations;
   } catch (error) {
-    console.error(`Failed to load translations for ${lang}:`, error);
+    logger.error(`Failed to load translations for ${lang}:`, error);
     // Fall back to English on error
     return en;
   }

@@ -10,6 +10,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth } from '@/app/api/_lib/middleware';
 import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -109,7 +110,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (error) {
-        console.error('Failed to fetch audit logs:', error);
+        logger.error('Failed to fetch audit logs:', error);
         return jsonError('Failed to fetch audit logs', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
         .eq('user_id', userId);
 
       if (countError) {
-        console.error('Failed to count audit logs:', countError);
+        logger.error('Failed to count audit logs:', countError);
       }
 
       return NextResponse.json({
@@ -133,7 +134,7 @@ export async function GET(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('Audit logs API error:', error);
+      logger.error('Audit logs API error:', error);
       return jsonError('Failed to process request', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (error) {
-        console.error('Failed to log audit event:', error);
+        logger.error('Failed to log audit event:', error);
         return jsonError('Failed to log audit event', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
@@ -220,7 +221,7 @@ export async function POST(request: NextRequest) {
         logId,
       });
     } catch (error) {
-      console.error('Audit log API error:', error);
+      logger.error('Audit log API error:', error);
       return jsonError('Failed to process request', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

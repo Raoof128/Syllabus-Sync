@@ -4,6 +4,7 @@ import { Component, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { logger } from '@/lib/logger';
 
 interface MapErrorBoundaryProps {
   children: ReactNode;
@@ -121,8 +122,8 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
 
     // In development, also log to console for debugging
     if (process.env.NODE_ENV === 'development') {
-      console.error('MapErrorBoundary caught an error:', error);
-      console.error('Component stack:', errorInfo.componentStack);
+      logger.error('MapErrorBoundary caught an error:', error);
+      logger.error('Component stack:', errorInfo.componentStack);
     }
   }
 

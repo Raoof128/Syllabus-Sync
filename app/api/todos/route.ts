@@ -4,6 +4,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
 import type { Todo } from '@/lib/types';
+import { logger } from '@/lib/logger';
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
       if (error) {
         // Check if the error is related to missing table
         if (error.message?.includes('schema cache') || error.code === '42P01') {
-          console.error(
+          logger.error(
             'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
           );
           return jsonError(
@@ -80,7 +81,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json(data?.map(mapTodoRow) ?? []);
     } catch (error) {
-      console.error('Todos GET error:', error);
+      logger.error('Todos GET error:', error);
       return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
 
       if (!parsed.success) {
         const error: z.ZodError = parsed.error;
-        console.error('Todo validation failed:', JSON.stringify(error.issues, null, 2));
+        logger.error('Todo validation failed:', JSON.stringify(error.issues, null, 2));
         return jsonError('Invalid todo payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
           errors: error.issues,
         });
@@ -121,10 +122,10 @@ export async function POST(request: Request) {
         .single();
 
       if (error) {
-        console.error('Database error creating todo:', error.code, error.message, error.details);
+        logger.error('Database error creating todo:', error.code, error.message, error.details);
         // Check if the error is related to missing table
         if (error.message?.includes('schema cache') || error.code === '42P01') {
-          console.error(
+          logger.error(
             'Todos table not found. Please run the migration: supabase/migrations/20260124000000_create_todos_table.sql',
           );
           return jsonError(
@@ -143,7 +144,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json(mapTodoRow(data));
     } catch (error) {
-      console.error('Todos POST error:', error);
+      logger.error('Todos POST error:', error);
       return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

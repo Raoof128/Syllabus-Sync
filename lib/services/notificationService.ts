@@ -2,6 +2,7 @@
 'use client';
 
 import { STORAGE_KEYS } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 
 export type NotificationPermissionStatus = 'granted' | 'denied' | 'default' | 'unsupported';
 
@@ -43,7 +44,7 @@ class NotificationService {
             }
           });
         } catch (error) {
-          console.error('Failed to register service worker message listener:', error);
+          logger.error('Failed to register service worker message listener:', error);
         }
       }
     }
@@ -81,7 +82,7 @@ class NotificationService {
       const permission = await Notification.requestPermission();
       return permission as NotificationPermissionStatus;
     } catch (error) {
-      console.error('Failed to request notification permission:', error);
+      logger.error('Failed to request notification permission:', error);
       return 'denied';
     }
   }
@@ -148,7 +149,7 @@ class NotificationService {
 
       return true;
     } catch (error) {
-      console.error('Failed to send notification:', error);
+      logger.error('Failed to send notification:', error);
       return false;
     }
   }

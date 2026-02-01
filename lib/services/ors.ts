@@ -1,4 +1,5 @@
 import { RoutePreview } from '@/lib/map/navigationHelpers';
+import { logger } from '@/lib/logger';
 
 interface ORSFeature {
   geometry: {
@@ -87,7 +88,7 @@ export async function fetchORSRoute(
 
     return { coordinates: coords, preview };
   } catch (error) {
-    console.error('Error fetching ORS route:', error);
+    logger.error('Error fetching ORS route:', error);
     return { coordinates: [], preview: null, error: 'Network Error' };
   }
 }

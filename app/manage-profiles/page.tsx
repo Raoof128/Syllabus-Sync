@@ -30,6 +30,8 @@ import { apiRequest } from '@/lib/utils/api';
 import { cn } from '@/lib/utils';
 import { BRAND_COLORS } from '@/lib/config';
 import Image from 'next/image';
+import { logger } from '@/lib/logger';
+
 import {
   Select,
   SelectContent,
@@ -156,7 +158,7 @@ export default function ManageProfilesPage() {
       await refreshProfile();
     } catch (error) {
       if (error instanceof Error && !error.message.includes('already awarded')) {
-        console.error('Failed to award profile completion XP:', error);
+        logger.error('Failed to award profile completion XP:', error);
       }
     }
   }, [isDemo, settings.showXPNotifications, language, refreshProfile]);

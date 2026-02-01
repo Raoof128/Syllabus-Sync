@@ -15,6 +15,7 @@ import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { getRpId, setPasskeyCookies } from '@/app/api/auth/passkey/_lib';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const optionsSchema = z.object({
   email: z.string().email(),
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     setPasskeyCookies(response, options.challenge, userRecord.id);
     return response;
   } catch (error) {
-    console.error('Passkey options error:', error);
+    logger.error('Passkey options error:', error);
     return jsonError('Failed to create passkey options', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

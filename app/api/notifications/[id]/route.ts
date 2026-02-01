@@ -14,6 +14,7 @@ import {
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
 import { requireAuth } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // SCHEMAS
@@ -58,7 +59,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
       return jsonSuccess(mapNotificationRow(data));
     } catch (error) {
-      console.error('GET /api/notifications/[id] error:', error);
+      logger.error('GET /api/notifications/[id] error:', error);
       return jsonError('Failed to fetch notification', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -125,7 +126,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       if (error instanceof z.ZodError) {
         return handleValidationError(error);
       }
-      console.error('PUT /api/notifications/[id] error:', error);
+      logger.error('PUT /api/notifications/[id] error:', error);
       return jsonError('Failed to update notification', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
@@ -160,7 +161,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       return jsonSuccess({ deleted: true, id });
     } catch (error) {
-      console.error('DELETE /api/notifications/[id] error:', error);
+      logger.error('DELETE /api/notifications/[id] error:', error);
       return jsonError('Failed to delete notification', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

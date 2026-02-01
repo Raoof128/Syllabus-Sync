@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { getCSP } from '@/lib/security/csp';
 import { setCSRFCookie } from '@/lib/security/csrf';
+import { logger } from '@/lib/logger';
 
 /**
  * Next.js 16 Proxy handler (formerly Middleware)
@@ -132,7 +133,7 @@ export async function proxy(request: NextRequest) {
     // Only log unexpected catastrophic errors, not common refresh failures
     const isRefreshError = err instanceof Error && err.message.includes('Refresh Token Not Found');
     if (!isRefreshError) {
-      console.error('Proxy auth exception:', err);
+      logger.error('Proxy auth exception:', err);
     }
   }
 

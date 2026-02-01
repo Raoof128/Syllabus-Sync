@@ -3,6 +3,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { AlertTriangle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -30,7 +31,7 @@ export class SettingsSectionBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(
+    logger.error(
       `SettingsSectionBoundary caught an error in ${this.props.sectionName || 'section'}:`,
       error,
       errorInfo,

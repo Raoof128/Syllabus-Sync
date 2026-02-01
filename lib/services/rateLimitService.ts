@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Distributed Rate Limiting Service
  *
@@ -193,7 +194,7 @@ function getStore(): RateLimitStore {
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
 
   if (isRealProduction && !allowMemoryStore) {
-    console.error(
+    logger.error(
       '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
         'In-memory rate limiting does NOT work across serverless instances.\n' +
         'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for proper rate limiting.\n' +
@@ -250,7 +251,7 @@ export async function checkRateLimit(
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints
   // This prevents bypass attacks when Redis is not configured
   if (isProduction && isMemoryStore && config.failClosed) {
-    console.error(
+    logger.error(
       `SECURITY: Blocking ${config.prefix} request - no distributed rate limiting in production`,
     );
     return {
@@ -276,7 +277,7 @@ export async function checkRateLimit(
     };
   } catch (error) {
     // SECURITY: Behavior on store failure depends on endpoint criticality
-    console.error('Rate limit store error:', error);
+    logger.error('Rate limit store error:', error);
 
     if (config.failClosed) {
       // For security-critical endpoints, deny the request when we can't verify the rate limit

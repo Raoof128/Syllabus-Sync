@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { verifyRegistrationResponse, type RegistrationResponseJSON } from '@simplewebauthn/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
+
 import {
   jsonSuccess,
   jsonError,
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      console.error('Passkey registration update failed:', updateError.message);
+      logger.error('Passkey registration update failed:', updateError.message);
       return jsonError('Failed to save passkey', 400, ERROR_CODES.BAD_REQUEST);
     }
 
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
     clearPasskeyCookies(response);
     return response;
   } catch (error) {
-    console.error('Passkey register error:', error);
+    logger.error('Passkey register error:', error);
     return jsonError('Failed to register passkey', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

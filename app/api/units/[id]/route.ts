@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // Helper to generate UUID v4 - with fallback for environments where crypto.randomUUID() is not available
 function generateUUID(): string {
@@ -100,7 +101,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         if (checkError?.code === 'PGRST116' || !existingUnit) {
           return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
         }
-        console.error('Error verifying unit ownership:', checkError);
+        logger.error('Error verifying unit ownership:', checkError);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
@@ -128,7 +129,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           .eq('unit_id', id);
 
         if (deleteError) {
-          console.error('Error deleting class times:', {
+          logger.error('Error deleting class times:', {
             code: deleteError.code,
             message: deleteError.message,
             details: deleteError.details,
@@ -158,7 +159,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             .insert(classTimesPayload);
 
           if (insertError) {
-            console.error('Error inserting class times:', {
+            logger.error('Error inserting class times:', {
               code: insertError.code,
               message: insertError.message,
               details: insertError.details,
@@ -189,7 +190,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           if (error.code === 'PGRST116') {
             return jsonError('Unit not found', 404, ERROR_CODES.NOT_FOUND);
           }
-          console.error('Database error fetching unit after update:', {
+          logger.error('Database error fetching unit after update:', {
             code: error.code,
             message: error.message,
             details: error.details,
@@ -240,7 +241,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
-        console.error('Database error updating unit:', {
+        logger.error('Database error updating unit:', {
           code: error.code,
           message: error.message,
           details: error.details,
@@ -287,7 +288,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         schedule: unitSchedule,
       });
     } catch (error) {
-      console.error('Error updating unit:', {
+      logger.error('Error updating unit:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         unitId: id,
@@ -321,13 +322,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
-        console.error('Database error deleting unit:', error.code, error.message);
+        logger.error('Database error deleting unit:', error.code, error.message);
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({ id });
     } catch (error) {
-      console.error('Error deleting unit:', error);
+      logger.error('Error deleting unit:', error);
       return jsonError('Failed to delete unit', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });

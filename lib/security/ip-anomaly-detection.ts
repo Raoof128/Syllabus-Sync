@@ -13,6 +13,8 @@
 
 import { NextRequest } from 'next/server';
 import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
+
 
 // ============================================================================
 // TYPES
@@ -111,7 +113,7 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
       timestamp: new Date(),
     };
   } catch (error) {
-    console.error('IP geolocation error:', error);
+    logger.error('IP geolocation error:', error);
     // Return minimal info on error
     return {
       ip,
@@ -430,7 +432,7 @@ export async function handleIPAnomalyCheck(
       riskAssessment,
     });
   } catch (error) {
-    console.error('IP anomaly check error:', error);
+    logger.error('IP anomaly check error:', error);
     return Response.json(
       { error: { code: 'INTERNAL_ERROR', message: 'Failed to check IP anomaly' } },
       { status: 500 }

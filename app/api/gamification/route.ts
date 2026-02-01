@@ -6,6 +6,7 @@ import { requireAuth, optionalAuth } from '@/app/api/_lib/middleware';
 import { withCSRFProtection } from '@/lib/security/csrf';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -190,13 +191,13 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (createError) {
-        console.error('Failed to create gamification profile:', createError);
+        logger.error('Failed to create gamification profile:', createError);
         return jsonError('Failed to create profile', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
       profileData = newProfile;
     } else if (profileError) {
-      console.error('Failed to fetch gamification profile:', profileError);
+      logger.error('Failed to fetch gamification profile:', profileError);
       return jsonError('Failed to fetch profile', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
@@ -235,7 +236,7 @@ export async function GET(request: NextRequest) {
         .limit(eventsLimit);
 
       if (eventsError) {
-        console.error('Failed to fetch XP events:', eventsError);
+        logger.error('Failed to fetch XP events:', eventsError);
         // Don't fail the whole request, just don't include events
       } else {
         response.events = (eventsData ?? []).map(
@@ -289,7 +290,7 @@ export async function POST(_request: NextRequest) {
       const { error } = await supabase.rpc('update_streak', { p_user_id: userId });
 
       if (error) {
-        console.error('Failed to update streak:', error);
+        logger.error('Failed to update streak:', error);
         return jsonError('Failed to record activity', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
@@ -301,7 +302,7 @@ export async function POST(_request: NextRequest) {
         .single();
 
       if (profileError) {
-        console.error('Failed to fetch updated profile:', profileError);
+        logger.error('Failed to fetch updated profile:', profileError);
         return jsonError(
           'Activity recorded but failed to fetch profile',
           500,

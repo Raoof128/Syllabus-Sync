@@ -11,6 +11,7 @@ import {
 import { signupLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // SECURITY: Stronger password policy - min 12 chars for better security
 const signupSchema = z.object({
@@ -244,7 +245,7 @@ export async function POST(request: NextRequest) {
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;
   } catch (error) {
-    console.error('Signup error:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Signup error:', error instanceof Error ? error.message : 'Unknown error');
     return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

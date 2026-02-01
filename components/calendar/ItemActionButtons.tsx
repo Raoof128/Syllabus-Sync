@@ -9,6 +9,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import { logger } from '@/lib/logger';
 
 export type ItemType = 'assignment' | 'exam' | 'event' | 'unit';
 
@@ -212,7 +213,7 @@ export default function ItemActionButtons({
           id: `reminder-set-${itemId}`,
         });
       } catch (error) {
-        console.error('Failed to schedule reminder:', error);
+        logger.error('Failed to schedule reminder:', error);
         toastUtils.error(
           t('reminderFailed' as TranslationKey) || 'Failed to Set Reminder',
           t('eventReminderFailedMsg' as TranslationKey) ||

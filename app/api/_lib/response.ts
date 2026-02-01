@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // API RESPONSE HELPERS
@@ -73,7 +74,7 @@ export const jsonSuccess = <T = unknown>(
   } catch (error) {
     // SECURITY: If data contains circular references, JSON.stringify (used by NextResponse.json) will fail.
     // Return a generic internal error instead of letting it crash the process.
-    console.error('Response serialization error:', error);
+    logger.error('Response serialization error:', error);
     return jsonError('Response serialization failed', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 };
@@ -128,7 +129,7 @@ export const handleValidationError = (error: ZodError): NextResponse<ApiResponse
 export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<never>> => {
   // Log detailed error information server-side
   const err = error as { code?: string; message?: string; details?: string; hint?: string };
-  console.error('Database error:', {
+  logger.error('Database error:', {
     code: err.code,
     message: err.message,
     details: err.details,
