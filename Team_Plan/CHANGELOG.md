@@ -178,3 +178,13 @@ Summary: Resolved lint warning in profile manager hook.
 - **Verification:** `npm run lint` now returns "Lint OK".
 - **Files:** `app/manage-profiles/hooks/useProfileManager.ts`.
 - **Follow-ups:** None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: UI - Remove Sticky Save Button
+Summary: Normalized button positioning in Manage Profiles.
+- **UI:** Removed `sticky bottom-6` from the save action wrapper to keep it in the natural document flow.
+- **Verification:** `npm run check` passed.
+- **Files:** `app/manage-profiles/page.tsx`.
+- **Follow-ups:** None.

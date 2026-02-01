@@ -233,3 +233,11 @@
 - **Files:** `app/manage-profiles/hooks/useProfileManager.ts`.
 - **Verification:** `npm run lint` returns "Lint OK".
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - UI - Remove Sticky Save Button
+- **Status:** ✅ Complete - Button positioning normalized.
+- **Scope:** UI, UX.
+- **Summary:** Removed `sticky bottom-6` positioning from the "Save Changes" button in `manage-profiles` as per user request to prevent it from overlaying content when scrolling.
+- **Files:** `app/manage-profiles/page.tsx`.
+- **Verification:** `npm run check` (Lint/Build) passed.
+- **Follow-ups:** None.

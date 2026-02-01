@@ -76,8 +76,8 @@ export default function ManageProfilesPage() {
       {/* 3. Notifications */}
       <ReminderSettings disabled={isSaving} />
 
-      {/* 4. Sticky Save Action */}
-      <div className="sticky bottom-6 flex justify-center">
+      {/* 4. Save Action */}
+      <div className="flex justify-center pt-2">
         <Button
           onClick={saveProfile}
           disabled={isSaving}
