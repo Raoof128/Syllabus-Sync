@@ -160,3 +160,14 @@
 - **Files:** `lib/schemas/auth.ts`, `components/ui/custom/PasswordInput.tsx`, `app/signup/SignupClient.tsx`.
 - **Verification:** `npm run check` passed (358 tests, 0 lint warnings, successful build).
 - **Follow-ups:** Level 3 Blueprint (Server Actions).
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 3 Blueprint: Resilient & Polished Signup
+- **Status:** ✅ Complete - Signup module upgraded to production-grade with draft persistence, surgical errors, and fluid transitions.
+- **Scope:** Resilience, UX, Security.
+- **Summary:** Implemented "Level 3 Blueprint" upgrades for the Signup module to address "Rage Quit" factors and elevate UX from functional to polished.
+  - **Draft Persistence (Anti-Ragequit):** Added automatic `sessionStorage` save/restore for form data. Excludes sensitive fields (password, confirmPassword, _gotcha) per security protocol. Data survives accidental refreshes.
+  - **Surgical Error Handling:** Enhanced `onSubmit` to map backend errors directly to specific form fields (email, studentId). Auto-focuses problematic fields and switches steps as needed.
+  - **Fluid Transitions:** Integrated `framer-motion` with `AnimatePresence` for smooth sliding transitions between Auth and Profile steps. Eliminates jarring instant cuts.
+  - **Visual Password Meter:** Created reusable `StrengthMeter` component with segmented progress bar and color-coded strength levels (red → yellow → blue → green).
+- **Files:** `app/signup/SignupClient.tsx`, `components/ui/custom/StrengthMeter.tsx`.
+- **Verification:** `npm run check` passed (358 tests, 0 errors, build successful).

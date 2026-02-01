@@ -349,3 +349,16 @@ Summary: Refined Signup flow with Polyglot Validation, Atomic Components, and Bo
 Verification: `npm run check` passed.
 Files: `lib/schemas/auth.ts`, `components/ui/custom/PasswordInput.tsx`, `app/signup/SignupClient.tsx`.
 Follow-ups: Level 3 Blueprint (Server Actions).
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 3 Blueprint - Resilient & Polished Signup
+Summary: Production-grade signup with draft persistence, surgical error handling, and fluid animations.
+- **Resilience:** Implemented `sessionStorage` draft persistence ("Anti-Ragequit"). Form data auto-saves and restores on page refresh, excluding sensitive fields (password, confirmPassword, _gotcha).
+- **Error Handling:** Added surgical error mapping to link backend errors directly to specific form fields (email, studentId). Auto-focuses and switches steps for contextual feedback.
+- **UX:** Integrated `framer-motion` with `AnimatePresence` for smooth slide transitions between Auth and Profile steps.
+- **Components:** Created reusable `StrengthMeter` component with segmented progress visualization.
+Verification: `npm run check` passed (358 tests, build successful).
+Files: `app/signup/SignupClient.tsx`, `components/ui/custom/StrengthMeter.tsx`.
+Follow-ups: None.

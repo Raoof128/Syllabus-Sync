@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Input } from '@/components/ui/mq/input';
 import { PasswordInput } from '@/components/ui/custom/PasswordInput';
+import { StrengthMeter } from '@/components/ui/custom/StrengthMeter';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
@@ -23,6 +25,8 @@ import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
 
 type SignupFormData = z.infer<ReturnType<typeof createSignupSchema>>;
+
+const DRAFT_KEY = 'signup_draft';
 
 export default function SignupClient() {
   const { t } = useTypedTranslation();
@@ -43,6 +47,9 @@ export default function SignupClient() {
     handleSubmit,
     trigger,
     watch,
+    setValue,
+    setError,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -51,7 +58,7 @@ export default function SignupClient() {
       email: '',
       password: '',
       confirmPassword: '',
-      agreedToTerms: false, // Initial value must be false, user must check it
+      agreedToTerms: false,
       fullName: '',
       studentId: '',
       course: '',
@@ -60,13 +67,40 @@ export default function SignupClient() {
     } as unknown as SignupFormData,
   });
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const password = watch('password');
-  // Calculate strength strictly for UI feedback
   const passwordStrength = password ? calculatePasswordStrength(password) : null;
 
+  // 1. Load draft on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem(DRAFT_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        // Only restore safe fields (never password/confirmPassword)
+        if (data.email) setValue('email', data.email);
+        if (data.fullName) setValue('fullName', data.fullName);
+        if (data.studentId) setValue('studentId', data.studentId);
+        if (data.course) setValue('course', data.course);
+        if (data.year) setValue('year', data.year);
+      } catch {
+        console.error('Corrupt draft data');
+      }
+    }
+  }, [setValue]);
+
+  // 2. Save draft on change (excluding sensitive fields)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/incompatible-library
+    const subscription = watch((value) => {
+      // Destructure to ISOLATE unsafe fields - intentionally not storing password fields
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, confirmPassword, _gotcha, ...safeData } = value;
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(safeData));
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   const handleNextStep = async () => {
-    // Validate only auth fields
     const isValid = await trigger([
       'email',
       'password',
@@ -77,7 +111,6 @@ export default function SignupClient() {
     if (isValid) {
       setStep('profile');
       setServerError(null);
-      // Wait for render, then focus
       setTimeout(() => fullNameRef.current?.focus(), 100);
     }
   };
@@ -86,7 +119,6 @@ export default function SignupClient() {
     setServerError(null);
 
     try {
-      // Call the API route to create the user
       const response = await fetch(API_ROUTES.AUTH.SIGNUP, {
         method: 'POST',
         headers: {
@@ -109,9 +141,28 @@ export default function SignupClient() {
       const result = await response.json();
 
       if (!response.ok) {
-        setServerError(result.error || t('unexpectedError'));
+        // Surgical Error Handling: Map backend errors to specific fields
+        if (result.target && ['email', 'studentId'].includes(result.target)) {
+          setError(result.target as 'email' | 'studentId', {
+            type: 'server',
+            message: result.error,
+          });
+          // Automatically focus the bad field
+          if (result.target === 'email') {
+            setStep('auth');
+            setTimeout(() => setFocus('email'), 50);
+          } else if (result.target === 'studentId') {
+            setStep('profile');
+            setTimeout(() => setFocus('studentId'), 50);
+          }
+        } else {
+          setServerError(result.error || t('unexpectedError'));
+        }
         return;
       }
+
+      // Clear the draft on success
+      sessionStorage.removeItem(DRAFT_KEY);
 
       // Create local profile
       addProfile({
@@ -127,7 +178,6 @@ export default function SignupClient() {
         },
       });
 
-      // Check if we got a session back
       if (result.data?.session) {
         toastUtils.success(t('accountCreated'), 'You are now signed in!');
         router.push('/home');
@@ -217,202 +267,190 @@ export default function SignupClient() {
               aria-hidden="true"
             />
 
-            {/* Step 1: Authentication */}
-            <div className={clsx('space-y-4', step !== 'auth' && 'hidden')}>
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t('emailPlaceholder')}
-                  disabled={isSubmitting}
-                  {...register('email')}
-                />
-                {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-              </div>
+            <AnimatePresence mode="wait">
+              {step === 'auth' ? (
+                <motion.div
+                  key="auth"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4"
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="email">{t('email')}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder={t('emailPlaceholder')}
+                      disabled={isSubmitting}
+                      {...register('email')}
+                    />
+                    {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
-                <PasswordInput
-                  id="password"
-                  disabled={isSubmitting}
-                  maxLength={64}
-                  {...register('password')}
-                />
-                {errors.password && (
-                  <p className="text-xs text-red-500">{errors.password.message}</p>
-                )}
+                  <div className="space-y-2">
+                    <Label htmlFor="password">{t('password')}</Label>
+                    <PasswordInput
+                      id="password"
+                      disabled={isSubmitting}
+                      maxLength={64}
+                      {...register('password')}
+                    />
+                    {errors.password && (
+                      <p className="text-xs text-red-500">{errors.password.message}</p>
+                    )}
 
-                {/* Visual Password Feedback */}
-                {passwordStrength && !errors.password && (
-                  <div className="space-y-1 mt-2">
-                    <div className="flex gap-1 h-1">
-                      {[0, 1, 2, 3, 4].map((idx) => (
-                        <div
-                          key={idx}
-                          className={clsx(
-                            'flex-1 rounded-full transition-colors',
-                            idx <= passwordStrength.score ? passwordStrength.color : 'bg-mq-border',
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p
-                        className={clsx(
-                          'text-xs font-medium',
-                          passwordStrength.score < 2 ? 'text-red-500' : 'text-green-600',
-                        )}
+                    {/* Visual Password Feedback with StrengthMeter */}
+                    {passwordStrength && !errors.password && (
+                      <StrengthMeter
+                        score={passwordStrength.score}
+                        label={passwordStrength.label}
+                      />
+                    )}
+                    <p className="text-xs text-mq-content-secondary mt-1">
+                      {t('passwordMinLength')}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
+                    <PasswordInput
+                      id="confirmPassword"
+                      disabled={isSubmitting}
+                      maxLength={64}
+                      {...register('confirmPassword')}
+                    />
+                    {errors.confirmPassword && (
+                      <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      className="mt-1 h-4 w-4 rounded border-mq-border text-mq-primary focus:ring-mq-primary"
+                      disabled={isSubmitting}
+                      {...register('agreedToTerms')}
+                    />
+                    <label htmlFor="terms" className="text-sm text-mq-content-secondary">
+                      {t('agreeToTerms')}{' '}
+                      <a
+                        href="/terms"
+                        className="text-mq-primary hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        {passwordStrength.label}
-                      </p>
-                      {passwordStrength.feedback?.[0] && (
-                        <p className="text-xs text-mq-content-secondary">
-                          {passwordStrength.feedback[0]}
-                        </p>
-                      )}
+                        {t('termsOfService')}
+                      </a>{' '}
+                      {t('and')}{' '}
+                      <a
+                        href="/privacy"
+                        className="text-mq-primary hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {t('privacyPolicy')}
+                      </a>
+                    </label>
+                  </div>
+                  {errors.agreedToTerms && (
+                    <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
+                  )}
+
+                  <Button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {t('next')}
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="profile"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4"
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">{t('fullName')}</Label>
+                    <Input
+                      id="fullName"
+                      placeholder={t('enterFullName')}
+                      disabled={isSubmitting}
+                      {...register('fullName')}
+                      ref={(e) => {
+                        register('fullName').ref(e);
+                        fullNameRef.current = e;
+                      }}
+                    />
+                    {errors.fullName && (
+                      <p className="text-xs text-red-500">{errors.fullName.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="studentId">{t('studentId')}</Label>
+                    <Input
+                      id="studentId"
+                      placeholder={t('studentIdPlaceholder')}
+                      disabled={isSubmitting}
+                      {...register('studentId')}
+                    />
+                    {errors.studentId && (
+                      <p className="text-xs text-red-500">{errors.studentId.message}</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="course">{t('course')}</Label>
+                      <Input
+                        id="course"
+                        placeholder={t('coursePlaceholder')}
+                        disabled={isSubmitting}
+                        {...register('course')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="year">{t('year')}</Label>
+                      <Input
+                        id="year"
+                        placeholder={t('yearPlaceholder')}
+                        disabled={isSubmitting}
+                        {...register('year')}
+                      />
                     </div>
                   </div>
-                )}
-                <p className="text-xs text-mq-content-secondary mt-1">{t('passwordMinLength')}</p>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
-                <PasswordInput
-                  id="confirmPassword"
-                  disabled={isSubmitting}
-                  maxLength={64}
-                  {...register('confirmPassword')}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-
-              <div className="flex items-start gap-2">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  className="mt-1 h-4 w-4 rounded border-mq-border text-mq-primary focus:ring-mq-primary"
-                  disabled={isSubmitting}
-                  {...register('agreedToTerms')}
-                />
-                <label htmlFor="terms" className="text-sm text-mq-content-secondary">
-                  {t('agreeToTerms')}{' '}
-                  <a
-                    href="/terms"
-                    className="text-mq-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t('termsOfService')}
-                  </a>{' '}
-                  {t('and')}{' '}
-                  <a
-                    href="/privacy"
-                    className="text-mq-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t('privacyPolicy')}
-                  </a>
-                </label>
-              </div>
-              {errors.agreedToTerms && (
-                <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setStep('auth')}
+                      disabled={isSubmitting}
+                    >
+                      {t('back')}
+                    </Button>
+                    <Button
+                      type="submit"
+                      className={clsx(
+                        'flex-1',
+                        isSubmitting ? 'opacity-50 cursor-not-allowed' : '',
+                      )}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+                      {isSubmitting ? t('creatingAccount') : t('createAccount')}
+                    </Button>
+                  </div>
+                </motion.div>
               )}
-
-              <Button
-                type="button"
-                onClick={handleNextStep}
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {t('next')}
-              </Button>
-            </div>
-
-            {/* Step 2: Profile */}
-            <div className={clsx('space-y-4', step !== 'profile' && 'hidden')}>
-              <div className="space-y-2">
-                <Label htmlFor="fullName">{t('fullName')}</Label>
-                <Input
-                  id="fullName"
-                  placeholder={t('enterFullName')}
-                  disabled={isSubmitting}
-                  {...register('fullName')}
-                  // Use merge refs logic or just ref if register ref is enough,
-                  // but we need to focus it manually.
-                  // register returns { ref, ... }
-                  // We can use a callback ref or compose refs.
-                  // Simpler: use the ref from register and set autoFocus (which works for mount).
-                  // But we are hiding/showing div, not mounting/unmounting?
-                  // If just hiding, autoFocus won't trigger again.
-                  // So we use the ref we created: fullNameRef.
-                  // We need to merge it with register's ref.
-                  ref={(e) => {
-                    register('fullName').ref(e);
-                    fullNameRef.current = e;
-                  }}
-                />
-                {errors.fullName && (
-                  <p className="text-xs text-red-500">{errors.fullName.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="studentId">{t('studentId')}</Label>
-                <Input
-                  id="studentId"
-                  placeholder={t('studentIdPlaceholder')}
-                  disabled={isSubmitting}
-                  {...register('studentId')}
-                />
-                {errors.studentId && (
-                  <p className="text-xs text-red-500">{errors.studentId.message}</p>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="course">{t('course')}</Label>
-                  <Input
-                    id="course"
-                    placeholder={t('coursePlaceholder')}
-                    disabled={isSubmitting}
-                    {...register('course')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">{t('year')}</Label>
-                  <Input
-                    id="year"
-                    placeholder={t('yearPlaceholder')}
-                    disabled={isSubmitting}
-                    {...register('year')}
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setStep('auth')}
-                  disabled={isSubmitting}
-                >
-                  {t('back')}
-                </Button>
-                <Button
-                  type="submit"
-                  className={clsx('flex-1', isSubmitting ? 'opacity-50 cursor-not-allowed' : '')}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-                  {isSubmitting ? t('creatingAccount') : t('createAccount')}
-                </Button>
-              </div>
-            </div>
+            </AnimatePresence>
           </form>
 
           <div className="text-center text-sm text-mq-content-secondary">
