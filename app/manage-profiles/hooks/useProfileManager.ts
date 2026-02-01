@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useOptimistic, startTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -27,14 +27,28 @@ export function useProfileManager() {
   } = useProfilesStore();
   const { initialize: initializeNotifications } = useNotificationPreferencesStore();
 
+  // 1. Setup Optimistic State
+  // This hook holds the "truth" + any pending changes
+  const [optimisticProfile, addOptimisticUpdate] = useOptimistic(
+    currentProfile,
+    (state, newValues: Partial<ProfileFormValues>) => {
+      if (!state) return null; // Should ideally ensure state is not null
+      return {
+        ...state,
+        ...newValues,
+        // Keep existing ID/Email/etc, just overwrite form fields
+      };
+    },
+  );
+
   // Setup React Hook Form with Zod
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: '',
-      studentId: '',
-      course: '',
-      year: '',
+      name: currentProfile?.name || '',
+      studentId: currentProfile?.studentId || '',
+      course: currentProfile?.course || '',
+      year: currentProfile?.year || '',
     },
     mode: 'onChange', // Validate as they type
   });
@@ -62,22 +76,36 @@ export function useProfileManager() {
   const onSubmit = async (data: ProfileFormValues) => {
     if (!currentProfile) return;
 
+    // 2. OPTIMISTIC UPDATE: Update UI instantly (0ms latency)
+    startTransition(() => {
+      addOptimisticUpdate(data);
+    });
+
     let result;
     try {
-      // Call Server Action
+      // 3. SERVER UPDATE: Do the real work
       result = await updateProfileAction(currentProfile.id, data);
     } catch (error) {
       logger.error('Failed to update profile in server action:', error);
       toastUtils.error(t('error'), 'Database connection failed');
-      return; // Exit early if server action call fails
+      // Revert optimistic state roughly handled by re-render, but resetting form is good
+      form.reset({
+        name: currentProfile.name || '',
+        studentId: currentProfile.studentId || '',
+        course: currentProfile.course || '',
+        year: currentProfile.year || '',
+      });
+      return;
     }
 
     if (result.success) {
-      // Update local store to reflect changes immediately
+      // Sync the permanent store
       await updateStoreProfile(currentProfile.id, data);
       toastUtils.success('Saved', t('profileUpdatedMsg') || 'Profile updated successfully');
+      // Reset form to clean "dirty" state
+      form.reset(data);
     } else {
-      // Handle both validation errors and generic messages
+      // Handle server validation failures or messages
       let errorMessage = 'Validation failed';
 
       if ('error' in result && result.error) {
@@ -87,11 +115,17 @@ export function useProfileManager() {
       }
 
       toastUtils.error(t('error'), errorMessage);
+
+      // Reset form to previous valid server state to undo optimistic UI if we want strict consistency
+      // Or keep user input to let them fix it. Keeping user input is usually better UX for form errors.
+      // However, if the error is "server totally failed", maybe revert.
+      // For now, we leave the form state as is so they can fix errors.
     }
   };
 
   return {
-    currentProfile,
+    // Return the OPTIMISTIC profile to the UI, not the raw store profile
+    currentProfile: optimisticProfile,
     form, // Expose the form methods
     isSaving: form.formState.isSubmitting,
     saveProfile: form.handleSubmit(onSubmit),
