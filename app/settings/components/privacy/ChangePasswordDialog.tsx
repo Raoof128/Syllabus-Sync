@@ -55,6 +55,7 @@ export function ChangePasswordDialog({ open, onOpenChange, t }: ChangePasswordDi
     mode: 'onChange',
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const newPassword = watch('newPassword');
 
   const onSubmit = async (data: FormData) => {

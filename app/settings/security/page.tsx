@@ -1,12 +1,10 @@
 'use client';
 
 import { useTranslation } from '@/lib/hooks/useTranslation';
-import { useThemeStore } from '@/lib/store/themeStore';
 import { PrivacySettings, SecuritySettings } from '../components';
 
 export default function SecuritySettingsPage() {
   const { t, language } = useTranslation();
-  const { theme } = useThemeStore();
 
   return (
     <div className="space-y-6">

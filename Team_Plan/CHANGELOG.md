@@ -59,6 +59,17 @@ Follow-ups: None.
 ---
 
 Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Lint & Cleanup
+Summary: Resolved remaining lint warnings in security settings and dialogs.
+- **Fix:** Removed unused `theme` state and store import in `security/page.tsx`.
+- **Fix:** Suppressed `incompatible-library` warning for `watch` in `ChangePasswordDialog.tsx` to enable real-time password strength updates.
+- **Verification:** `npm run lint` now returns "Lint OK".
+Files: app/settings/security/page.tsx; app/settings/components/privacy/ChangePasswordDialog.tsx.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
 Scope: Performance - Phase 3 Complete
 Summary: Finalized "De-chonk" plan with prop drilling fixes and layout optimization.
 - **Refactor:** Completed PrivacySettings decomposition into atomic components.

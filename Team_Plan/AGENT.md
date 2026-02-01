@@ -155,6 +155,16 @@
 - **Verification:** `audit_locales.js` reports 0 missing keys. `npm run lint` passes. Git workspace is clean.
 - **Follow-ups:** None.
 
+### Raouf: 2026-02-01 (Australia/Sydney) - Lint & QA Cleanup
+- **Status:** ✅ Complete - Codebase linting clean.
+- **Scope:** QA, Linting.
+- **Summary:** Resolved final lint warnings across the settings and security pages.
+    - `page.tsx` (Security): Removed unused `theme` variable and `useThemeStore` import.
+    - `ChangePasswordDialog.tsx`: Added `eslint-disable` for `react-hooks/incompatible-library` on the `watch` function to allow password strength calculation while acknowledging React Compiler limitations.
+- **Files:** app/settings/security/page.tsx; app/settings/components/privacy/ChangePasswordDialog.tsx.
+- **Verification:** `npm run lint` returns "Lint OK".
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-01 (Australia/Sydney) - Phase 3 Performance Polish (Final)
 - **Status:** ✅ Complete - Prop drilling fixed, rendering optimized, layout stabilized.
 - **Scope:** Performance & UX Polish.
