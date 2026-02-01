@@ -6,6 +6,11 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }));
 
+// Mock headers
+vi.mock('next/headers', () => ({
+  headers: () => Promise.resolve({ get: () => '127.0.0.1' }),
+}));
+
 describe('Profile Server Actions', () => {
   it('should reject invalid student IDs', async () => {
     const invalidData = {

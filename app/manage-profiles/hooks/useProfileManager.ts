@@ -111,7 +111,7 @@ export function useProfileManager() {
       if ('error' in result && result.error) {
         errorMessage = 'Please check the form for errors';
       } else if ('message' in result) {
-        errorMessage = result.message;
+        errorMessage = result.message || 'Unknown error';
       }
 
       toastUtils.error(t('error'), errorMessage);

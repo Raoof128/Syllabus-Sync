@@ -226,3 +226,25 @@ Summary: Implemented Optimistic UI, Error Boundaries, and Unit Testing for Manag
 Verification: `npm run check` passed.
 Files: `app/manage-profiles/*`, `app/manage-profiles/__tests__/actions.test.ts`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Security - Rate Limiting (DDoS Protection)
+Summary: Added request rate limits to secure server actions.
+- **Protection:** Enforced a limit of 20 requests/minute per IP address on `updateProfileAction`.
+- **Implementation:** Utilized `next/headers` to track `x-forwarded-for` IPs in an in-memory map.
+- **Tests:** Updated `vitest` mocks to handle `next/headers` dependency.
+Verification: `npm run check` passed.
+Files: `app/manage-profiles/actions.ts`, `app/manage-profiles/__tests__/actions.test.ts`.
+Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: QA - Actions Lint Fix
+Summary: Cleaned up remaining lint warning from security implementation.
+- **Fix:** Removed unused `error` variable in `actions.ts`.
+Verification: `npm run lint` returns "Lint OK".
+Files: `app/manage-profiles/actions.ts`.
+Follow-ups: None.

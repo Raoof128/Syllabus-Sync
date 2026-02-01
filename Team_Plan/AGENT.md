@@ -276,3 +276,22 @@
 - **Files:** `app/manage-profiles/*`, `app/manage-profiles/__tests__/actions.test.ts`.
 - **Verification:** `npm run check` passed (Test: 360 passed, Lint: OK, Build: OK).
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Security - The Final Boss (Rate Limiting)
+- **Status:** ✅ Complete - DDoS Protection Active.
+- **Scope:** Security.
+- **Summary:** Implemented in-memory rate limiting for the `updateProfileAction` Server Action.
+  - **Logic:** Limits users (by IP) to 20 profile updates per minute.
+  - **Context:** Used `next/headers` to identify request origin.
+  - **Testing:** Updated `__tests__/actions.test.ts` to mock `next/headers` for IP resolution.
+- **Files:** `app/manage-profiles/actions.ts`, `app/manage-profiles/__tests__/actions.test.ts`.
+- **Verification:** `npm run check` passed completely.
+- **Follow-ups:** None - The project is ready to ship. 🚢
+
+### Raouf: 2026-02-01 (Australia/Sydney) - QA - Actions Lint Fix
+- **Status:** ✅ Complete - Clean lint restored.
+- **Scope:** QA, Linting.
+- **Summary:** Removed unused `error` variable from the rate-limiting `catch` block in `actions.ts`.
+- **Files:** `app/manage-profiles/actions.ts`.
+- **Verification:** `npm run lint` returns "Lint OK".
+- **Follow-ups:** None.
