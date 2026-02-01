@@ -22,6 +22,7 @@ interface EventsState {
   getEventsByDate: (date: Date) => Event[];
   getUpcomingEvents: (days?: number) => Event[];
   clearEvents: () => void;
+  reset: () => void;
 }
 
 // Normalize event dates from API response
@@ -250,9 +251,8 @@ export const useEventsStore = create<EventsState>()(
           .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
       },
 
-      clearEvents: () => {
-        set({ events: [], hasLoaded: false, isLoading: false });
-      },
+      clearEvents: () => set({ events: [], hasLoaded: false }),
+      reset: () => set({ events: [], hasLoaded: false, isLoading: false }),
     }),
     {
       name: 'events-storage',

@@ -1,11 +1,11 @@
 'use client';
 
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { AppearanceSettings } from '../components';
 
 export default function AppearanceSettingsPage() {
-  const { t, language, setLanguage } = useTranslation();
+  const { t, language, setLanguage } = useTypedTranslation();
   const { theme, resolvedTheme, setTheme } = useThemeStore();
 
   return (

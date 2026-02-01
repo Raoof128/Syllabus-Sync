@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatLocation } from '@/lib/utils/locale';
 import { cn } from '@/lib/utils';
 import { PRIORITY_COLORS } from '@/lib/constants';
@@ -43,7 +43,7 @@ const DAYS_OF_WEEK: DayOfWeek[] = [
 ];
 
 export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: WeeklyCalendarProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const units = useUnitsStore((state) => state.units);
   const [currentWeekStart, setCurrentWeekStart] = useState(() =>

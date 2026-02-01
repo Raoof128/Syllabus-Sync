@@ -4,11 +4,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { Map, Calendar } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { CardSolid } from '@/components/home/HomeCard';
 
 export default function QuickActions() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   return (
     <CardSolid className="h-auto p-4 items-center justify-center">
       <div className="flex flex-col gap-3 w-full">

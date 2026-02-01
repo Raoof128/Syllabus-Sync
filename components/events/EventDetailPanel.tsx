@@ -8,7 +8,7 @@ import { MapPin, Clock, CalendarDays, Navigation, Tag, PartyPopper } from 'lucid
 import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -29,7 +29,7 @@ export default function EventDetailPanel({
   onEdit,
   onDelete,
 }: EventDetailPanelProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Get the color (from event custom color or category default)
   const color = useMemo(() => {

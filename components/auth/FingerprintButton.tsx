@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 type AnimationState = 'idle' | 'scanning' | 'success' | 'error';
 
@@ -28,7 +28,7 @@ export function FingerprintButton({
   ...props
 }: FingerprintButtonProps) {
   const containerRef = useRef<HTMLButtonElement>(null);
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Compute animation state directly from props (no internal state needed)
   const animationState: AnimationState = useMemo(() => {

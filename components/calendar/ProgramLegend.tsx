@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   MQProgram,
@@ -38,7 +38,7 @@ export default function ProgramLegend({
   showCategories = true,
   className,
 }: ProgramLegendProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const tOr = (key: TranslationKey | string, fallback: string) => {

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/mq/input';
 import { Button } from '@/components/ui/mq/button';
 import { buildings, type Building } from '@/lib/map/buildings';
 import { searchBuildings } from '@/lib/utils/buildingValidation';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface BuildingAutocompleteProps {
@@ -39,7 +39,7 @@ export default function BuildingAutocomplete({
   className,
   label,
 }: BuildingAutocompleteProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);

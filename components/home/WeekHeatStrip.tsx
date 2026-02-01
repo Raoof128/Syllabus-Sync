@@ -8,13 +8,13 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import Link from 'next/link';
 import { CardSolid } from './HomeCard';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useHydration } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import { motion, useReducedMotion } from 'framer-motion';
 
 export default function WeekHeatStrip() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
   const deadlines = useDeadlinesStore((state) => state.deadlines);

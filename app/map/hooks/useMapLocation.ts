@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { toastUtils } from '@/lib/utils/toast';
 import { devLog } from '@/lib/utils/devLog';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { GPS_CAMPUS_BOUNDS } from '@/lib/map/constants';
 import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import {
@@ -39,7 +39,7 @@ export function useMapLocation({
   isNavigating,
   navManagerRef,
 }: UseMapLocationProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   const safeT = useCallback(
     (key: string, fallback: string) => {

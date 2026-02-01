@@ -2,8 +2,9 @@
 
 import { useSyncExternalStore, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { SettingsSectionBoundary } from './components/SettingsSectionBoundary';
 import { cn } from '@/lib/utils';
 import { Palette, Shield, Layout, Settings, Sparkles, LifeBuoy } from 'lucide-react';
 import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
@@ -66,7 +67,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
   const isClient = useIsClient();
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Determine active section based on current path
   const activeSectionId =
@@ -168,7 +169,15 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
           </aside>
 
           {/* Settings Content Area */}
-          <div className="min-h-[500px]">{!isClient ? <SettingsSkeleton t={t} /> : children}</div>
+          <div className="min-h-[500px]">
+            {!isClient ? (
+              <SettingsSkeleton t={t} />
+            ) : (
+              <SettingsSectionBoundary sectionName={activeSectionId}>
+                {children}
+              </SettingsSectionBoundary>
+            )}
+          </div>
         </div>
       </main>
     </div>

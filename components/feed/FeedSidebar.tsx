@@ -1,7 +1,7 @@
 import { TrendingUp, Calendar, Users, Megaphone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
@@ -14,7 +14,7 @@ interface FeedSidebarProps {
 }
 
 export function FeedSidebar({ stats }: FeedSidebarProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   return (
     <aside

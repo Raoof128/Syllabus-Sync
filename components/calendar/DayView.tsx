@@ -15,7 +15,7 @@ import {
 } from '@/lib/calendar-utils';
 import { Unit, Deadline, Event, ClassTime } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
 import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
@@ -40,7 +40,7 @@ export default function DayView({
   onDeadlineClick,
   onEventClick,
 }: DayViewProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const dayDate = dayjs(date);
   const isToday = dayDate.isSame(dayjs(), 'day');
 

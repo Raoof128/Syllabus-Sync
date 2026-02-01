@@ -26,6 +26,7 @@ interface GamificationState {
   updateSettings: (settings: Partial<GamificationSettings>) => void;
   resetSettings: () => void;
   resetProgress: () => void;
+  reset: () => void;
 
   // Computed helpers
   getLevelTitle: () => string;
@@ -195,6 +196,17 @@ export const useGamificationStore = create<GamificationState>()(
             levelProgress: 0,
           },
           recentEvents: [],
+        });
+      },
+
+      reset: () => {
+        set({
+          profile: null,
+          recentEvents: [],
+          hasLoaded: false,
+          isLoading: false,
+          error: null,
+          settings: DEFAULT_GAMIFICATION_SETTINGS,
         });
       },
 

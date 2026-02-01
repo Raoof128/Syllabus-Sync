@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { X } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 import { cn } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
 >(({ className, ...props }, ref) => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   return (
     <ToastPrimitives.Viewport
       ref={ref}
@@ -83,7 +83,7 @@ const ToastClose = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Close>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
 >(({ className, ...props }, ref) => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   return (
     <ToastPrimitives.Close
       ref={ref}

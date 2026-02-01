@@ -12,11 +12,11 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint } from 'lucide-react';
 
 export default function LoginClient() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

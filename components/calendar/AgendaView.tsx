@@ -4,7 +4,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { Unit, Deadline, Event, ClassTime } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatLocalizedDate } from '@/lib/utils/locale';
 import { Card, CardContent } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
@@ -32,7 +32,7 @@ export default function AgendaView({
   onDeadlineClick,
   onEventClick,
 }: AgendaViewProps) {
-  const { language } = useTranslation();
+  const { language } = useTypedTranslation();
   const startDate = dayjs(date);
 
   // Generate array of days to show

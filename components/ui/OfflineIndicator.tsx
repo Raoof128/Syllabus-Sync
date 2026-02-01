@@ -3,7 +3,7 @@
 
 import { useState, useSyncExternalStore, useRef } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useHydration } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
@@ -61,7 +61,7 @@ function useNetworkStatus() {
  * and a brief notification when they come back online.
  */
 export function OfflineIndicator() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { isOnline, showOnlineMessage } = useNetworkStatus();
   // Use the existing hydration hook from lib/hooks
   const isHydrated = useHydration();

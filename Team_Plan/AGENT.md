@@ -177,3 +177,15 @@
 - **Files:** app/settings/components/privacy/ExportDataDialog.tsx; app/settings/components/PrivacySettings.tsx; lib/hooks/useDataExport.ts; app/settings/components/SecuritySettings.tsx.
 - **Verification:** Verified `useDataExport` implementation, clean component structure, and passed `npm run lint`.
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 2 Blueprint: Reset, Types, Boundaries
+- **Status:** ✅ Complete - Soft Reset, Type-Safe Translations, Granular Error Boundaries.
+- **Scope:** Architecture, DX, Stability.
+- **Summary:** Implemented the Level 2 Blueprint for improved application stability and developer experience.
+    - **Soft Reset:** Replaced `window.location.reload()` with a seamless Zustand store reset pattern (`reset()` action added to all 11 stores) and updated `ClearDataDialog` to use it.
+    - **Type-Safe Translations:** Created `useTypedTranslation` hook to enforce build-time validation of translation keys. Replaced `useTranslation` across the entire codebase (components, hooks, layouts).
+    - **Error Boundaries:** Implemented `SettingsSectionBoundary` to isolate crashes in individual settings tabs, preventing full page failures.
+    - **QA:** Resolved all remaining lint warnings and fixed `typecheck` errors in `SocialButtons.tsx`. Fixed `PrivacySettings.test.tsx` failure by mocking `useRouter`.
+- **Files:** `lib/store/*.ts` (11 files), `lib/hooks/useTypedTranslation.ts`, `app/settings/layout.tsx`, `app/settings/components/SettingsSectionBoundary.tsx`, `app/settings/components/privacy/ClearDataDialog.tsx`, `components/layout/SocialButtons.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+- **Verification:** `npm run check` passed successfully (secrets, format, typecheck, lint, tests, build).
+- **Follow-ups:** None.

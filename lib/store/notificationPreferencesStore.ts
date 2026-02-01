@@ -72,6 +72,7 @@ interface NotificationPreferencesState extends NotificationPreferences {
   ) => void;
   cancelReminder: (id: string) => void;
   clearAllReminders: () => void;
+  reset: () => void;
 }
 
 export const useNotificationPreferencesStore = create<NotificationPreferencesState>()(
@@ -349,9 +350,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       },
 
       clearAllReminders: () => {
-        const state = get();
-        Object.values(state.scheduledReminders).forEach((timeoutId) => {
-          clearTimeout(timeoutId);
+        Object.values(get().scheduledReminders).forEach((id) => {
+          if (typeof window !== 'undefined') clearTimeout(id);
         });
         set({ scheduledReminders: {}, pendingReminders: {} });
       },
@@ -428,9 +428,29 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           }));
         });
       },
+
+      reset: () => {
+        // Clear timeouts first
+        Object.values(get().scheduledReminders).forEach((id) => {
+          if (typeof window !== 'undefined') clearTimeout(id);
+        });
+
+        set({
+          permissionStatus: 'default',
+          deadlinesEnabled: true,
+          classesEnabled: true,
+          eventsEnabled: true,
+          deadlineReminderTiming: 1440,
+          classReminderTiming: 15,
+          eventReminderTiming: 60,
+          pushEnabled: true,
+          scheduledReminders: {},
+          pendingReminders: {},
+        });
+      },
     }),
     {
-      name: 'notification-preferences-storage',
+      name: 'notification-prefs',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         deadlinesEnabled: state.deadlinesEnabled,

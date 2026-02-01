@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import { toastUtils } from '@/lib/utils/toast';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
@@ -60,7 +60,7 @@ const REMINDER_TIMINGS = [
 ];
 
 export default function ManageProfilesPage() {
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
   const router = useRouter();
 
   // Profile store

@@ -4,10 +4,10 @@
 import Link from 'next/link';
 import { Home } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function NotFound() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
       <div className="text-center">

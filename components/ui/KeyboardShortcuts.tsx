@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/mq/button';
 
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export function KeyboardShortcuts() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   const shortcuts = [
     { id: 'add-unit', description: t('addUnit'), keys: ['U'], highlight: true },

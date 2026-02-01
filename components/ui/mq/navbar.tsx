@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from './button';
 import { MQLink } from './link';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface NavbarProps {
   title?: string;
@@ -17,7 +17,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ title, navItems, onAction, actionLabel }) => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   const defaultTitle = t('macquarieUniversity');
   const defaultNavItems = [

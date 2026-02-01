@@ -8,7 +8,7 @@ import { Clock, MapPin, CalendarDays, Zap, CheckCircle2 } from 'lucide-react';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import Link from 'next/link';
 import { CardSolid } from '@/components/home/HomeCard';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
@@ -49,7 +49,7 @@ interface ClassWithStatus {
 const TodaySchedule = memo(() => {
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
   const [currentMinutes, setCurrentMinutes] = useState(() => {
     const now = new Date();
     return now.getHours() * 60 + now.getMinutes();

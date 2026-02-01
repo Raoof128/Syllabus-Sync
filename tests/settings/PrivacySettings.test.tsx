@@ -4,6 +4,17 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import PrivacySettings from '@/app/settings/components/PrivacySettings';
 
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    refresh: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+  }),
+}));
+
 // Mock toast utils
 vi.mock('@/lib/utils/toast', () => ({
   toastUtils: {

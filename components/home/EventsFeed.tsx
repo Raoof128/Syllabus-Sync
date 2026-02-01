@@ -10,7 +10,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { isToday } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/components/home/HomeCard';
 import { Event } from '@/lib/types';
@@ -24,7 +24,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const EventsFeed = memo(() => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const router = useRouter();
   const events = useEventsStore((state) => state.events);
   const isHydrated = useHydration();

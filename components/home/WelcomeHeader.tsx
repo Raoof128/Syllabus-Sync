@@ -20,7 +20,7 @@
 'use client';
 
 import { useMemo, ReactNode } from 'react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { GamificationStats } from '@/components/gamification';
 
 // ============================================
@@ -111,7 +111,7 @@ export function WelcomeHeader({
   showGamification = true,
   children,
 }: WelcomeHeaderProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Format the display name, with fallback chain: name -> fallbackName -> null
   const displayName = useMemo(() => {

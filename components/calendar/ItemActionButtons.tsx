@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -53,7 +53,7 @@ export default function ItemActionButtons({
   className,
   stopPropagation = true,
 }: ItemActionButtonsProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Notification store hooks
   const permissionStatus = useNotificationPreferencesStore((s) => s.permissionStatus);

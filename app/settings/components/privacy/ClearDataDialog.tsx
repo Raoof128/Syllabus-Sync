@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import {
   Dialog,
@@ -16,6 +17,15 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { clearAllApplicationData } from '@/lib/utils/clientStorage';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useThemeStore } from '@/lib/store/themeStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
+import { useMapStore } from '@/lib/store/mapStore';
+import { useProfilesStore } from '@/lib/store/profilesStore';
+import { useTodosStore } from '@/lib/store/todosStore';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
+import { useLanguageStore } from '@/lib/store/languageStore';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 type ClearDataDialogProps = {
@@ -50,8 +60,21 @@ function ClearDataInfo({
 }
 
 export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps) {
+  const router = useRouter();
   const [clearDataConfirmation, setClearDataConfirmation] = useState('');
   const [isClearingData, setIsClearingData] = useState(false);
+
+  const resetUnits = useUnitsStore((s) => s.reset);
+  const resetDeadlines = useDeadlinesStore((s) => s.reset);
+  const resetNotifications = useNotificationsStore((s) => s.reset);
+  const resetTheme = useThemeStore((s) => s.reset);
+  const resetEvents = useEventsStore((s) => s.reset);
+  const resetGamification = useGamificationStore((s) => s.reset);
+  const resetMap = useMapStore((s) => s.reset);
+  const resetProfiles = useProfilesStore((s) => s.reset);
+  const resetTodos = useTodosStore((s) => s.reset);
+  const resetNotifPrefs = useNotificationPreferencesStore((s) => s.reset);
+  const resetLanguage = useLanguageStore((s) => s.reset);
 
   const handleClearAllData = useCallback(async () => {
     if (clearDataConfirmation !== t('clearConfirm')) {
@@ -70,10 +93,21 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
       setClearDataConfirmation('');
       toastUtils.success(t('clearAllData'), t('preferenceUpdated'));
 
-      // Reload the page to reset all stores
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // Soft Reset: Reset all stores to initial state
+      resetUnits();
+      resetDeadlines();
+      resetNotifications();
+      resetTheme();
+      resetEvents();
+      resetGamification();
+      resetMap();
+      resetProfiles();
+      resetTodos();
+      resetNotifPrefs();
+      resetLanguage();
+
+      // Refresh server components
+      router.refresh();
     } catch (error) {
       errorHandler.logError(
         error instanceof Error ? error : new Error('Failed to clear data'),
@@ -84,7 +118,23 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
     } finally {
       setIsClearingData(false);
     }
-  }, [clearDataConfirmation, t, onOpenChange]);
+  }, [
+    clearDataConfirmation,
+    t,
+    onOpenChange,
+    resetUnits,
+    resetDeadlines,
+    resetNotifications,
+    resetTheme,
+    resetEvents,
+    resetGamification,
+    resetMap,
+    resetProfiles,
+    resetTodos,
+    resetNotifPrefs,
+    resetLanguage,
+    router,
+  ]);
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {

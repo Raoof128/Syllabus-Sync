@@ -72,6 +72,7 @@ export interface ProfilesState {
   getCurrentProfile: () => UserProfile | null;
   updateCurrentProfile: (updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   clearProfiles: () => void;
+  reset: () => void;
 }
 
 // ============================================================================
@@ -461,6 +462,15 @@ export const useProfilesStore = create<ProfilesState>()(
           profiles: [],
           currentProfileId: null,
           hasLoaded: false,
+        });
+      },
+
+      reset: () => {
+        set({
+          profiles: [],
+          currentProfileId: null,
+          hasLoaded: false,
+          isLoading: false,
         });
       },
     }),

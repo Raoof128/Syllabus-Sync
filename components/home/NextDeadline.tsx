@@ -12,14 +12,14 @@ import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/components/home/HomeCard';
 
 const NextDeadline = memo(() => {
   const isHydrated = useHydration();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
 
   const currentLocale = useMemo(() => {
     switch (language) {

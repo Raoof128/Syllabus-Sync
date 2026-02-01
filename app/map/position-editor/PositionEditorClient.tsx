@@ -25,7 +25,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 
 import { buildings, type Building, MAP_CONFIG } from '@/lib/map/buildings';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 // ============================================================================
 // Types
@@ -180,7 +180,7 @@ function DraggableMarker({
 // ============================================================================
 
 export default function PositionEditorClient() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   // State
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
   const [positionChanges, setPositionChanges] = useState<Map<string, PositionChange>>(new Map());

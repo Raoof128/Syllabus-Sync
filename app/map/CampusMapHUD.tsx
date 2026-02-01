@@ -7,7 +7,7 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/lib/map/buildings';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -32,7 +32,7 @@ export default function CampusMapHUD({
   onCopyShare,
   onStartNavigation,
 }: Props) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
 
   const topSlice = useMemo(() => buildings.slice(0, 15), [buildings]);

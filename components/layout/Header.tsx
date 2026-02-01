@@ -26,7 +26,7 @@ import React, { useEffect, useRef, useState, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import {
   Bell,
   Check,
@@ -64,7 +64,7 @@ const notificationIcons = {
 };
 
 const Header = memo(() => {
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
 

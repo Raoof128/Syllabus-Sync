@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'lucide-react';
 import { UserProfile } from '@/lib/store/profilesStore';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { LiquidGlassCard, SubCard } from '@/components/ui/LiquidGlassCard';
 
 interface ProfileCardProps {
@@ -23,7 +23,7 @@ interface ProfileCardProps {
 
 const ProfileCard = React.memo(
   ({ profile, isCurrent, onEdit, onDelete, onSetCurrent, onUpdate }: ProfileCardProps) => {
-    const { t } = useTranslation();
+    const { t } = useTypedTranslation();
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];

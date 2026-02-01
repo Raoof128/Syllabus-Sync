@@ -6,7 +6,7 @@ import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function Error({
   error,
@@ -15,7 +15,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   useEffect(() => {
     // Log to local error handler

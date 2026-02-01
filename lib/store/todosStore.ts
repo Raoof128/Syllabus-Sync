@@ -19,6 +19,7 @@ interface TodosState {
   getCompletedToday: () => Todo[];
   getPendingTodos: () => Todo[];
   clearTodos: () => void;
+  reset: () => void;
 }
 
 const normalizeTodo = (todo: Todo): Todo => ({
@@ -340,6 +341,9 @@ export const useTodosStore = create<TodosState>()(
       },
 
       clearTodos: () => {
+        set({ todos: [], hasLoaded: false, isLoading: false });
+      },
+      reset: () => {
         set({ todos: [], hasLoaded: false, isLoading: false });
       },
     }),

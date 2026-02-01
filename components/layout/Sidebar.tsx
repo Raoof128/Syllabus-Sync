@@ -24,7 +24,7 @@ import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { Home, MapPin, Calendar, MessageSquare, Menu, X, Sparkles, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import SocialButtons from './SocialButtons';
@@ -58,7 +58,7 @@ const navigation: {
  * only depends on pathname and translation state.
  */
 const Sidebar = memo(() => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const pathname = usePathname();
 
   // Gamification profile for XP badge

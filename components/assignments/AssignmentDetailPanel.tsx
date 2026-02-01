@@ -19,7 +19,7 @@ import {
 import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -42,7 +42,7 @@ export default function AssignmentDetailPanel({
 }: AssignmentDetailPanelProps) {
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const units = useUnitsStore((state) => state.units);
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Find the associated unit for color and additional info
   const unit = useMemo(() => {

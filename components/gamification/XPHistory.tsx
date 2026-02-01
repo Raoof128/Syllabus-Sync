@@ -17,7 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { useGamificationStore, type XPEvent } from '@/lib/store/gamificationStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -215,7 +215,7 @@ interface XPHistoryProps {
 
 export const XPHistory = memo(
   ({ maxEvents = 10, showHeader = true, className }: XPHistoryProps) => {
-    const { t, language } = useTranslation();
+    const { t, language } = useTypedTranslation();
     const recentEvents = useGamificationStore((state) => state.recentEvents);
     const isLoading = useGamificationStore((state) => state.isLoading);
 
@@ -322,7 +322,7 @@ interface XPHistoryCompactProps {
 }
 
 export const XPHistoryCompact = memo(({ maxEvents = 5, className }: XPHistoryCompactProps) => {
-  const { language } = useTranslation();
+  const { language } = useTypedTranslation();
   const recentEvents = useGamificationStore((state) => state.recentEvents);
 
   const locale = useMemo(() => LOCALE_MAP[language] || DEFAULT_LOCALE, [language]);

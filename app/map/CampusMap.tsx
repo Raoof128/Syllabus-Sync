@@ -18,7 +18,7 @@ import {
   NavigationStateManager,
 } from '@/lib/map/realtimeNavigation';
 import { setHapticEnabledGetter } from '@/lib/utils/haptics';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useLeafletLoader } from '@/lib/hooks/useLeafletLoader';
 import { devLog } from '@/lib/utils/devLog';
 import type { MapOverlayId } from '@/lib/map/mapOverlays';
@@ -52,7 +52,7 @@ interface CampusMapProps {
 
 const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
   ({ selectedBuilding, activeOverlays = [], onLocationStatusChange }, ref) => {
-    const { t } = useTranslation();
+    const { t } = useTypedTranslation();
 
     // Safe translation helper
     const safeT = useCallback(

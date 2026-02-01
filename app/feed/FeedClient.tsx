@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { Plus, Trash2, Rss, Info } from 'lucide-react';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
@@ -37,7 +37,7 @@ const REMINDER_TIMING_OPTIONS: { labelKey: TranslationKey; value: number }[] = [
 ];
 
 const FeedClient = memo(() => {
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
   const searchParams = useSearchParams();
   const highlightEventId = searchParams.get('highlight');
 

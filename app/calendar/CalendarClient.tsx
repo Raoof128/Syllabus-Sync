@@ -21,7 +21,7 @@ import { useTodosStore } from '@/lib/store/todosStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import { useHydration } from '@/lib/hooks';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 // Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
@@ -111,7 +111,7 @@ export default function CalendarClient() {
   const updateTodo = useTodosStore((state) => state.updateTodo);
 
   const hasHydrated = useHydration();
-  const { language, t } = useTranslation();
+  const { language, t } = useTypedTranslation();
   const tOr = (key: TranslationKey, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;

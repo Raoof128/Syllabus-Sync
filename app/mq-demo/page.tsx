@@ -12,10 +12,10 @@ import { Navbar } from '@/components/ui/mq/navbar';
 import { Hero } from '@/components/ui/mq/hero';
 import { SectionHeading } from '@/components/ui/mq/section-heading';
 import { hoverLift, fadeIn } from '@/components/ui/mq/animations';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function MQStyleGuidePage() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {

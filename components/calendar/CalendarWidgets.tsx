@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useMemo } from 'react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -80,7 +80,7 @@ export default function CalendarWidgets({
   onDeleteTodo,
   onNotifyTodo,
 }: CalendarWidgetsProps) {
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
   const tOr = (key: TranslationKey | string, fallback: string) => {
     const value = t(key as TranslationKey);
     return value === key ? fallback : value;

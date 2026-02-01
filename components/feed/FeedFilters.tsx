@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +38,7 @@ export function FeedFilters({
   onSortModeChange,
   counts,
 }: FeedFiltersProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   const filters: CategoryFilter[] = ['All', 'Academic', 'Career', 'Social', 'Free Food'];
 

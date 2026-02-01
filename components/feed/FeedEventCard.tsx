@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Calendar, Clock, MapPin, Navigation, Bell, Check, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 import { Event } from '@/lib/types';
@@ -44,7 +44,7 @@ export const FeedEventCard = memo(
     onDelete,
     getLocaleString,
   }: FeedEventCardProps) => {
-    const { t } = useTranslation();
+    const { t } = useTypedTranslation();
 
     return (
       <MagicCard isLiquidEnhanced className="h-full">

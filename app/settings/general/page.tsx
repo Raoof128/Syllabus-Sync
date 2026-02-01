@@ -1,10 +1,10 @@
 'use client';
 
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { NotificationSettings } from '../components';
 
 export default function GeneralSettingsPage() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   return (
     <div className="space-y-6">

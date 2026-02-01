@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useStreak } from '@/lib/store/gamificationStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface StreakIndicatorProps {
   /** Size variant */
@@ -26,7 +26,7 @@ export function StreakIndicator({
   showLabel = false,
   className,
 }: StreakIndicatorProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { loadProfile, hasLoaded, isLoading } = useGamificationStore();
   const { days, longest, emoji, isActive } = useStreak();
 
@@ -122,7 +122,7 @@ interface StreakBadgeProps {
  * Compact streak badge for profile headers
  */
 export function StreakBadge({ className }: StreakBadgeProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { days, isActive, longest } = useStreak();
 
   if (days === 0) return null;
@@ -157,7 +157,7 @@ interface StreakCardProps {
  * Full streak card with more details
  */
 export function StreakCard({ className }: StreakCardProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { loadProfile, hasLoaded } = useGamificationStore();
   const { days, longest, isActive } = useStreak();
 

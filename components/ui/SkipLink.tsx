@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface SkipLinkProps {
   targetId?: string;
@@ -10,7 +10,7 @@ interface SkipLinkProps {
 }
 
 export function SkipLink({ targetId = 'main-content', className }: SkipLinkProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   return (
     <a

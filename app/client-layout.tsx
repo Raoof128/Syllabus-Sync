@@ -17,7 +17,7 @@ import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { apiRequest } from '@/lib/utils/api';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
@@ -93,7 +93,7 @@ const scheduleIdleTask = (callback: () => void) => {
 // V3.1: Wrapped with React.memo to prevent unnecessary re-renders
 // Using named function for better debugging in React DevTools
 function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const router = useRouter();
   const pathname = usePathname();

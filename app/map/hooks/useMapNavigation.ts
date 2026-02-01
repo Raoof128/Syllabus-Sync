@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toastUtils } from '@/lib/utils/toast';
 import { devLog } from '@/lib/utils/devLog';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { fetchORSRoute } from '@/lib/services/ors';
 import {
   parseRouteInstructions,
@@ -31,7 +31,7 @@ export function useMapNavigation({
   gpsToCrsSimple,
   getBuildingLatLng,
 }: UseMapNavigationProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // State
   const [isNavigating, setIsNavigating] = useState(false);

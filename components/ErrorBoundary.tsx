@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface Props {
   children: ReactNode;
@@ -39,7 +39,7 @@ function ErrorBoundaryUI({
   onReset: () => void;
   showErrorDetails?: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const canRetry = retryCount < maxRetries;
 
   return (

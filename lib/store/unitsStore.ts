@@ -20,6 +20,7 @@ interface UnitsState {
   getUnitByCode: (code: string) => Unit | undefined;
   getTodayClasses: () => (Unit & ClassTime)[];
   clearUnits: () => void;
+  reset: () => void;
 }
 
 const normalizeUnit = (unit: Unit): Unit => ({
@@ -206,6 +207,7 @@ export const useUnitsStore = create<UnitsState>()(
       clearUnits: () => {
         set({ units: [], hasLoaded: false, isLoading: false });
       },
+      reset: () => set({ units: [], hasLoaded: false, isLoading: false }),
     }),
     {
       name: 'units-storage',

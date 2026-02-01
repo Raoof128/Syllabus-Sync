@@ -1,10 +1,10 @@
 'use client';
 
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { PrivacySettings, SecuritySettings } from '../components';
 
 export default function SecuritySettingsPage() {
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
 
   return (
     <div className="space-y-6">

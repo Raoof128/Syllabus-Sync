@@ -6,7 +6,7 @@ import { CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { CardSolid } from '@/components/home/HomeCard';
 import { formatScheduleTime } from '@/lib/utils/locale';
 
@@ -28,7 +28,7 @@ const UnitCard = React.memo(
     showActions = true,
     isHighlighted = false,
   }: UnitCardProps) => {
-    const { t, language } = useTranslation();
+    const { t, language } = useTypedTranslation();
 
     const DAY_SHORT: { [key: string]: string } = {
       Monday: t('mon'),

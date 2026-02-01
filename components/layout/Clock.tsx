@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { Language } from '@/lib/i18n/translations';
 
 // Map language codes to locale strings
@@ -37,7 +37,7 @@ const localeMap: Record<Language, string> = {
  * - Date rendered on server (stable, no hydration errors)
  */
 export function Clock() {
-  const { language } = useTranslation();
+  const { language } = useTypedTranslation();
   const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {

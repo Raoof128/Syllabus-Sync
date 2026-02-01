@@ -8,6 +8,7 @@ interface LanguageState {
   isRTL: boolean;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
+  reset: () => void;
 }
 
 export const useLanguageStore = create<LanguageState>()(
@@ -21,6 +22,11 @@ export const useLanguageStore = create<LanguageState>()(
         set({
           language,
           isRTL: language === 'fa' || language === 'ar' || language === 'ur' || language === 'he',
+        }),
+      reset: () =>
+        set({
+          language: 'en',
+          isRTL: false,
         }),
     }),
     {

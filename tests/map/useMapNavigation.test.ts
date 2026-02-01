@@ -6,8 +6,8 @@ import * as orsService from '@/lib/services/ors';
 import { toastUtils } from '@/lib/utils/toast';
 
 // Mock dependencies
-vi.mock('@/lib/hooks/useTranslation', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+vi.mock('@/lib/hooks/useTypedTranslation', () => ({
+  useTypedTranslation: () => ({ t: (key: string) => key }),
 }));
 
 vi.mock('@/lib/utils/toast', () => ({

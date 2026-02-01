@@ -7,7 +7,7 @@ import UpcomingDeadlines from '@/components/home/UpcomingDeadlines';
 import EventsFeed from '@/components/home/EventsFeed';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
 import { LazyMotion, m, domAnimation } from 'framer-motion';
 
@@ -37,7 +37,7 @@ interface HomeClientProps {
 }
 
 export default function HomeClient({ initialUser = null }: HomeClientProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const router = useRouter();
 
   // -- HOOKS MUST BE DECLARED BEFORE ANY RETURNS --

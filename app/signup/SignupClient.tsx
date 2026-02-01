@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { Eye, EyeOff, AlertTriangle, Check } from 'lucide-react';
 
@@ -31,7 +31,7 @@ function getPasswordStrength(password: string): { score: number; label: string; 
 }
 
 export default function SignupClient() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   // Basic auth fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

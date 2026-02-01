@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useXPProgress, useStreak } from '@/lib/store/gamificationStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { LevelBadge } from './LevelBadge';
 import { XPProgressBar } from './XPProgressBar';
 
@@ -112,7 +112,7 @@ export function GamificationStats({
   showStreak = true,
   className,
 }: GamificationStatsProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
   const { currentXP, level, xpToNext, progress } = useXPProgress();
   const { days, longest: longestStreak } = useStreak();
@@ -282,7 +282,7 @@ export function GamificationStats({
  * Minimal XP indicator for navbar/headers
  */
 export function XPIndicator({ className }: { className?: string }) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { profile, loadProfile, hasLoaded } = useGamificationStore();
   const { days, longest } = useStreak();
 

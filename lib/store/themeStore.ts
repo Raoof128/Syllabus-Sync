@@ -48,6 +48,8 @@ export interface ThemeState {
   // Glass settings
   glass: GlassSettings;
   setGlassMode: (mode: GlassMode) => void;
+  reset: () => void;
+
   setGlassIntensity: (intensity: number) => void;
   setGlassRefraction: (enabled: boolean) => void;
   setGlassSpringAnimations: (enabled: boolean) => void;
@@ -102,6 +104,12 @@ export const useThemeStore = create<ThemeState>()(
           set((state) => ({ glass: { ...state.glass, enableRefraction: enabled } })),
         setGlassSpringAnimations: (enabled) =>
           set((state) => ({ glass: { ...state.glass, enableSpringAnimations: enabled } })),
+        reset: () =>
+          set({
+            theme: 'system',
+            resolvedTheme: 'light',
+            glass: DEFAULT_GLASS_SETTINGS,
+          }),
         resetGlassSettings: () => set({ glass: DEFAULT_GLASS_SETTINGS }),
       };
     },

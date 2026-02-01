@@ -13,7 +13,7 @@ import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/components/home/HomeCard';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ const UpcomingDeadlines = memo(() => {
   const router = useRouter();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
 
   const currentLocale = useMemo(() => {
     switch (language) {

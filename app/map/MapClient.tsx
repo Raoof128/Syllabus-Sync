@@ -27,7 +27,7 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings';
 import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
@@ -50,7 +50,7 @@ const CampusMap = dynamic(() => import('./CampusMap'), { ssr: false });
 import type { LocationStatus, CampusMapRef } from './CampusMap';
 
 export default function MapClient() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const searchParams = useSearchParams();
   const [shouldRenderMap, setShouldRenderMap] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);

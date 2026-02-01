@@ -4,7 +4,7 @@
 import { memo } from 'react';
 import { Linkedin } from 'lucide-react';
 import { SOCIAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -98,7 +98,7 @@ const socialLinks: SocialLink[] = [
 ];
 
 const SocialButtons = memo(() => {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   return (
     <ul className="social-buttons">

@@ -5,7 +5,7 @@ import { useEffect, useReducer, useCallback } from 'react';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
@@ -108,7 +108,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
 }
 
 export default function EventForm({ open, onOpenChange, editEvent }: EventFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const addEvent = useEventsStore((state) => state.addEvent);
   const updateEvent = useEventsStore((state) => state.updateEvent);
   const removeEvent = useEventsStore((state) => state.removeEvent);

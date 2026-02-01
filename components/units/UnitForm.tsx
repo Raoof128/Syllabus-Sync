@@ -5,7 +5,7 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
 import { UNIT_COLORS } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
@@ -47,7 +47,7 @@ const DAYS: DayOfWeek[] = [
 ];
 
 export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { addUnit, updateUnit } = useUnitsStore();
 
   // Form state

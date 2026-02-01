@@ -32,6 +32,7 @@ export interface MapState {
   hapticFeedbackEnabled: boolean;
   setHapticFeedbackEnabled: (enabled: boolean) => void;
   toggleHapticFeedback: () => void;
+  reset: () => void;
 }
 
 type MapPersistedState = Pick<
@@ -76,6 +77,15 @@ export const useMapStore = create<MapState>()(
 
       toggleHapticFeedback: () =>
         set((state) => ({ hapticFeedbackEnabled: !state.hapticFeedbackEnabled })),
+
+      reset: () =>
+        set({
+          activeOverlays: [],
+          selectedBuildingId: null,
+          showOverlayPanel: false,
+          lastPosition: null,
+          hapticFeedbackEnabled: true,
+        }),
     }),
     {
       name: 'map-storage',

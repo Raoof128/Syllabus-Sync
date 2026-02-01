@@ -6,7 +6,7 @@ import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Deadline } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
@@ -44,7 +44,7 @@ export default function AssignmentForm({
   onOpenChange,
   editAssignment,
 }: AssignmentFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 

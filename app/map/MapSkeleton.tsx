@@ -2,14 +2,14 @@
 
 import { LazyMotion, m, domAnimation } from 'framer-motion';
 import { MapPin } from 'lucide-react';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 /**
  * MapLoadingSkeleton - Animated skeleton loader for map component
  * Shows a pulsing map placeholder with animated "dropping" pins
  */
 export function MapLoadingSkeleton() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   // Animated pin positions (relative percentages)
   const pinPositions = [
     { x: 25, y: 30, delay: 0 },
@@ -150,7 +150,7 @@ export function MapLoadingSkeleton() {
  * Used when filtering/searching buildings
  */
 export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   return (
     <LazyMotion features={domAnimation}>
       <div className="space-y-3" role="status" aria-label={t('loadingBuildings')}>
@@ -202,7 +202,7 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
  * CategoryFilterSkeleton - Skeleton for category filter pills
  */
 export function CategoryFilterSkeleton() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   // Pre-computed widths for deterministic rendering
   const widths = [70, 85, 65, 90, 75, 80, 72, 88, 68];
 

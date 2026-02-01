@@ -20,6 +20,7 @@ interface DeadlinesState {
   getUpcoming: (limit?: number) => Deadline[];
   getStressLevel: () => StressLevel;
   clearDeadlines: () => void;
+  reset: () => void;
 }
 
 const normalizeDeadline = (deadline: Deadline): Deadline => ({
@@ -304,9 +305,8 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         }
       },
 
-      clearDeadlines: () => {
-        set({ deadlines: [], hasLoaded: false, isLoading: false });
-      },
+      clearDeadlines: () => set({ deadlines: [], hasLoaded: false }),
+      reset: () => set({ deadlines: [], hasLoaded: false, isLoading: false }),
     }),
     {
       name: 'deadlines-storage',

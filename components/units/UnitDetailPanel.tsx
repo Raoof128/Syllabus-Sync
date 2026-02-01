@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { BookOpen, FileText, Clock, MapPin, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 
@@ -31,7 +31,7 @@ export default function UnitDetailPanel({
 }: UnitDetailPanelProps) {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
-  const { t, language } = useTranslation();
+  const { t, language } = useTypedTranslation();
 
   // Filter deadlines for this unit
   const unitDeadlines = useMemo(() => {

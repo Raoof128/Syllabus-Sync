@@ -4,14 +4,14 @@ import React, { useMemo } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { CardSolid } from '@/components/home/HomeCard';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useHydration } from '@/lib/hooks';
 import { BookOpen, Clock, TrendingUp } from 'lucide-react';
 import { formatDistanceToNow, isValid } from 'date-fns';
 import { enAU } from 'date-fns/locale';
 
 export default function HomeKpiStrip() {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
   const isHydrated = useHydration();
 
   const units = useUnitsStore((state) => state.units);

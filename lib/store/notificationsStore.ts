@@ -27,6 +27,7 @@ interface NotificationsState {
   clearAll: () => Promise<void>;
   getUnreadCount: () => number;
   clearNotifications: () => void;
+  reset: () => void;
 }
 
 const normalizeNotification = (notification: Notification): Notification => ({
@@ -270,6 +271,10 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
   },
 
   clearNotifications: () => {
+    set({ notifications: [], hasLoaded: false, isLoading: false, lastLoadedAt: null });
+  },
+
+  reset: () => {
     set({ notifications: [], hasLoaded: false, isLoading: false, lastLoadedAt: null });
   },
 }));

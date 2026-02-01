@@ -4,7 +4,7 @@ import React from 'react';
 import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/lib/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { format } from 'date-fns';
 
 export type CalendarView = 'week' | 'day' | 'agenda';
@@ -28,7 +28,7 @@ export default function CalendarHeader({
   onToggleFilters,
   isFiltersOpen,
 }: CalendarHeaderProps) {
-  const { t } = useTranslation();
+  const { t } = useTypedTranslation();
 
   // Navigation handlers
   const handlePrev = () => {

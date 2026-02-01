@@ -79,3 +79,16 @@ Summary: Finalized "De-chonk" plan with prop drilling fixes and layout optimizat
 Verification: `npm run lint` passed.
 Files: app/settings/components/privacy/*, app/settings/components/SecuritySettings.tsx.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 2 Blueprint - Architecture & DX
+Summary: Implemented Soft Reset Pattern, Type-Safe Translations, and Granular Error Boundaries.
+- **Feature:** Soft Reset - Replaced page reload with Zustand store `reset()` actions for seamless data clearing.
+- **Feature:** Type-Safe Translations - Introduced `useTypedTranslation` hook and replaced `useTranslation` globally.
+- **Feature:** Error Boundaries - Added `SettingsSectionBoundary` to isolate settings tab crashes.
+- **QA:** Resolved all lint warnings and fixed `typecheck` errors in `SocialButtons.tsx`. Fixed `PrivacySettings.test.tsx` failure by mocking `useRouter`.
+Verification: `npm run check` passed successfully (secrets, format, typecheck, lint, tests, build). Store resets verified in `ClearDataDialog`.
+Files: `lib/store/*.ts`, `lib/hooks/useTypedTranslation.ts`, `app/settings/layout.tsx`, `app/settings/components/SettingsSectionBoundary.tsx`, `app/settings/components/privacy/ClearDataDialog.tsx`, `components/layout/SocialButtons.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+Follow-ups: None.
