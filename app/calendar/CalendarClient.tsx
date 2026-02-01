@@ -727,11 +727,13 @@ export default function CalendarClient() {
       toastUtils.success(
         t('reminderSet' as TranslationKey) || 'Reminder Set',
         `${todo.title} - ${dueDate.toLocaleDateString()}`,
+        { id: `todo-reminder-set-${todo.id}` },
       );
     } else {
       toastUtils.info(
         t('noDateForReminder' as TranslationKey) || 'No Due Date',
         t('todoNeedsDueDate' as TranslationKey) || 'Add a due date to set a reminder',
+        { id: `todo-reminder-no-date-${todo.id}` },
       );
     }
   };

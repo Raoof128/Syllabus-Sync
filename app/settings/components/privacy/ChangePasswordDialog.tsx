@@ -17,6 +17,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { calculatePasswordStrength } from '@/lib/utils/security';
+import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import type { PasswordStrength } from '@/lib/types';
 
@@ -34,7 +35,7 @@ export function ChangePasswordDialog({ open, onOpenChange, t }: ChangePasswordDi
   const schema = z
     .object({
       currentPassword: z.string().min(1, t('allFieldsRequired')),
-      newPassword: z.string().min(12, t('passwordTooShort')),
+      newPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH, t('passwordTooShort')),
       confirmPassword: z.string().min(1, t('allFieldsRequired')),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
@@ -60,7 +61,7 @@ export function ChangePasswordDialog({ open, onOpenChange, t }: ChangePasswordDi
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch('/api/auth/password', {
+      const response = await fetch(API_ROUTES.AUTH.PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

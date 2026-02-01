@@ -2,6 +2,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { API_ROUTES } from '@/lib/constants/config';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
@@ -55,7 +56,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
 
     set({ isLoading: true });
     try {
-      const data = await apiRequest<Notification[]>('/api/notifications', { noRetry: true });
+      const data = await apiRequest<Notification[]>(API_ROUTES.NOTIFICATIONS.BASE, {
+        noRetry: true,
+      });
       const normalized = data
         .map(normalizeNotification)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -62,7 +63,7 @@ export function useBiometrics({ t }: UseBiometricsProps) {
       setPlatformAuthAvailable(platformAuth);
 
       try {
-        const response = await fetch('/api/auth/biometric');
+        const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE);
         const result = await response.json();
 
         if (response.ok && result?.data) {
@@ -86,7 +87,7 @@ export function useBiometrics({ t }: UseBiometricsProps) {
         return false;
       }
 
-      const optionsResponse = await fetch('/api/auth/passkey/register-options', {
+      const optionsResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER_OPTIONS, {
         method: 'POST',
       });
       const optionsResult = await optionsResponse.json();
@@ -136,7 +137,7 @@ export function useBiometrics({ t }: UseBiometricsProps) {
         clientExtensionResults: credential.getClientExtensionResults(),
       };
 
-      const saveResponse = await fetch('/api/auth/passkey/register', {
+      const saveResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -164,7 +165,7 @@ export function useBiometrics({ t }: UseBiometricsProps) {
   const disableBiometric = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/biometric', {
+      const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: false }),

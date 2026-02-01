@@ -169,6 +169,7 @@ export default function ItemActionButtons({
         toastUtils.info(
           t('reminderCancelled' as TranslationKey) || 'Reminder Cancelled',
           `${itemTitle}`,
+          { id: `reminder-cancelled-${itemId}` },
         );
         return;
       }
@@ -178,6 +179,7 @@ export default function ItemActionButtons({
         toastUtils.error(
           t('reminderFailed' as TranslationKey) || 'Cannot Set Reminder',
           t('noDateForReminder' as TranslationKey) || 'This item has no date set',
+          { id: `reminder-failed-nodate-${itemId}` },
         );
         return;
       }
@@ -206,13 +208,16 @@ export default function ItemActionButtons({
             return;
         }
 
-        toastUtils.success(t('reminderSet' as TranslationKey) || 'Reminder Set', `${itemTitle}`);
+        toastUtils.success(t('reminderSet' as TranslationKey) || 'Reminder Set', `${itemTitle}`, {
+          id: `reminder-set-${itemId}`,
+        });
       } catch (error) {
         console.error('Failed to schedule reminder:', error);
         toastUtils.error(
           t('reminderFailed' as TranslationKey) || 'Failed to Set Reminder',
           t('eventReminderFailedMsg' as TranslationKey) ||
             'Could not set reminder. Please try again.',
+          { id: `reminder-failed-${itemId}` },
         );
       }
     },

@@ -219,16 +219,22 @@ export default function ManageProfilesPage() {
 
       if (result) {
         setHasChanges(false);
-        toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'));
+        toastUtils.success(t('profileUpdated'), t('profileUpdatedMsg'), {
+          id: 'profile-updated-toast',
+        });
 
         if (shouldAwardXP) {
           await awardProfileCompletionXP();
         }
       } else {
-        toastUtils.error(t('error'), t('failedToUpdateProfile'));
+        toastUtils.error(t('error'), t('failedToUpdateProfile'), {
+          id: 'profile-update-error-toast',
+        });
       }
     } catch {
-      toastUtils.error(t('error'), t('failedToUpdateProfile'));
+      toastUtils.error(t('error'), t('failedToUpdateProfile'), {
+        id: 'profile-update-error-toast',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -248,10 +254,14 @@ export default function ManageProfilesPage() {
       try {
         const result = await updateProfile(currentProfile.id, { preferences: newPreferences });
         if (!result) {
-          toastUtils.error(t('error'), t('failedToUpdateProfile'));
+          toastUtils.error(t('error'), t('failedToUpdateProfile'), {
+            id: 'preference-toggle-error-toast',
+          });
         }
       } catch {
-        toastUtils.error(t('error'), t('failedToUpdateProfile'));
+        toastUtils.error(t('error'), t('failedToUpdateProfile'), {
+          id: 'preference-toggle-error-toast',
+        });
       } finally {
         setIsTogglingPreference(false);
       }

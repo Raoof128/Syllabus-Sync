@@ -92,3 +92,16 @@ Summary: Implemented Soft Reset Pattern, Type-Safe Translations, and Granular Er
 Verification: `npm run check` passed successfully (secrets, format, typecheck, lint, tests, build). Store resets verified in `ClearDataDialog`.
 Files: `lib/store/*.ts`, `lib/hooks/useTypedTranslation.ts`, `app/settings/layout.tsx`, `app/settings/components/SettingsSectionBoundary.tsx`, `app/settings/components/privacy/ClearDataDialog.tsx`, `components/layout/SocialButtons.tsx`, `tests/settings/PrivacySettings.test.tsx`.
 Follow-ups: None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Refactor & UX - Centralized Constants & Idempotent Toasts
+Summary: Centralized API routes and security config to remove magic strings, and implemented idempotent toasts to prevent duplicate notifications.
+- **Refactor:** Created `lib/constants/config.ts` and updated `lib/constants/index.ts` to export constants correctly.
+- **Feature:** Implemented idempotent toasts in `use-toast.ts` and updated `toastUtils`.
+- **Refactor:** Updated core components (`UnitForm`, `ManageProfiles`, `ItemActionButtons`, `CalendarClient`) to use unique toast IDs.
+- **Refactor:** Updated `LoginClient`, `SignupClient`, `useSessionManager`, `notificationsStore` to use centralized constants.
+- **Verification:** `npm run check` passed successfully.
+Files: `lib/constants/config.ts`, `lib/constants/index.ts`, `lib/hooks/use-toast.ts`, `lib/utils/toast.ts`, `components/units/UnitForm.tsx`, `app/manage-profiles/page.tsx`, `components/dashboard/ItemActionButtons.tsx`, `app/calendar/CalendarClient.tsx`.
+Follow-ups: None.

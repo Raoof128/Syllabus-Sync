@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -19,7 +20,7 @@ function getPasswordStrength(password: string): { score: number; label: string; 
   let score = 0;
 
   if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
+  if (password.length >= SECURITY_CONFIG.MIN_PASSWORD_LENGTH) score++;
   if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
   if (/\d/.test(password)) score++;
   if (/[^a-zA-Z0-9]/.test(password)) score++;
@@ -65,7 +66,7 @@ export default function SignupClient() {
       return;
     }
 
-    if (password.length < 12) {
+    if (password.length < SECURITY_CONFIG.MIN_PASSWORD_LENGTH) {
       setError(t('passwordTooShort'));
       return;
     }
@@ -86,7 +87,7 @@ export default function SignupClient() {
 
     try {
       // Call the API route to create the user
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(API_ROUTES.AUTH.SIGNUP, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

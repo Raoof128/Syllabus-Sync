@@ -1,11 +1,11 @@
 // lib/constants.ts
 
 // Re-export app configuration from config.ts to maintain single source of truth
-export { APP_CONFIG, UNIT_COLORS } from './config';
+export { APP_CONFIG, UNIT_COLORS } from '../config';
 
 // Derive APP_NAME and APP_DESCRIPTION from config for backward compatibility
-import { APP_CONFIG, UNIVERSITY_CONFIG } from './config';
-import type { DayOfWeek, Deadline, Event } from './types';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '../config';
+import type { DayOfWeek, Deadline, Event } from '../types';
 export const APP_NAME = APP_CONFIG.name;
 export const APP_DESCRIPTION = `${APP_CONFIG.description} for ${UNIVERSITY_CONFIG.name}`;
 

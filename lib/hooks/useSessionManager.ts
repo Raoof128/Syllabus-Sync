@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import type { SessionInfo } from '@/lib/types';
@@ -15,7 +16,7 @@ export function useSessionManager({ t }: UseSessionManagerProps) {
   const fetchSessions = useCallback(async () => {
     setIsLoadingSessions(true);
     try {
-      const response = await fetch('/api/auth/sessions');
+      const response = await fetch(API_ROUTES.AUTH.SESSIONS);
       const result = await response.json();
 
       if (!response.ok || !result?.data?.sessions) {
@@ -36,7 +37,7 @@ export function useSessionManager({ t }: UseSessionManagerProps) {
   const endSession = useCallback(
     async (session: SessionInfo) => {
       try {
-        const response = await fetch('/api/auth/sessions', {
+        const response = await fetch(API_ROUTES.AUTH.SESSIONS, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scope: session.current ? 'local' : 'others' }),
@@ -65,7 +66,7 @@ export function useSessionManager({ t }: UseSessionManagerProps) {
 
   const endAllSessions = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/sessions', {
+      const response = await fetch(API_ROUTES.AUTH.SESSIONS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scope: 'global' }),

@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint } from 'lucide-react';
@@ -228,7 +229,7 @@ export default function LoginClient() {
     setError(null);
 
     try {
-      const optionsResponse = await fetch('/api/auth/passkey/options', {
+      const optionsResponse = await fetch(API_ROUTES.AUTH.PASSKEY_OPTIONS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -277,7 +278,7 @@ export default function LoginClient() {
         clientExtensionResults: assertion.getClientExtensionResults(),
       };
 
-      const verifyResponse = await fetch('/api/auth/passkey/verify', {
+      const verifyResponse = await fetch(API_ROUTES.AUTH.PASSKEY_VERIFY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialPayload }),
