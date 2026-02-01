@@ -271,3 +271,16 @@ Summary: Cleared unused form variable to resolve lint warning.
 - **Verification:** `npm run lint` returns "Lint OK".
 - **Files:** `app/login/LoginClient.tsx`.
 - **Follow-ups:** None.
+
+---
+
+Raouf: 2026-02-01 (Australia/Sydney)
+Scope: Level 2 Blueprint - Server Actions & Security
+Summary: Migrated authentication to Server Actions with global rate limiting.
+- **Feature:** Implemented `loginAction` in `app/login/actions.ts` for secure server-side login.
+- **Security:** Created `lib/utils/rate-limit.ts` (Global Rate Limiter) and applied it to Login (5/min) and Profiles (20/min).
+- **Refactor:** Wired `LoginClient.tsx` to use server actions, removing client-side auth logic.
+- **Cleanup:** Refactored `manage-profiles/actions.ts` to use the shared rate limiter.
+Verification: `npm run check` passed.
+Files: `lib/utils/rate-limit.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/manage-profiles/actions.ts`.
+Follow-ups: None.

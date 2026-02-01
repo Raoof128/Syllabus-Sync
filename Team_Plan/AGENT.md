@@ -315,3 +315,15 @@
 - **Files:** `app/login/LoginClient.tsx`.
 - **Verification:** `npm run lint` now returns "Lint OK".
 - **Follow-ups:** None.
+
+### Raouf: 2026-02-01 (Australia/Sydney) - Level 2 Blueprint: Server Actions & Fort Knox Security
+- **Status:** ✅ Complete - Authentication Logic moved to Server.
+- **Scope:** Architecture, Security, Server Actions.
+- **Summary:** Implemented "Level 2 Blueprint" for secure, server-side authentication.
+  - **Global Rate Limiter:** Created `lib/utils/rate-limit.ts` handling `x-forwarded-for` based limits, and refactored `manage-profiles` to use it.
+  - **Server Action:** Created `app/login/actions.ts` handling validation (Zod), rate limiting (5/min), and Supabase auth on the server.
+  - **Client Wire-up:** Updated `LoginClient.tsx` to consume the server action, removing client-side Supabase logic.
+  - **Security:** Implemented brute-force protection (5 attempts/min) and "Face/Brain" separation.
+- **Files:** `lib/utils/rate-limit.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/manage-profiles/actions.ts`.
+- **Verification:** `npm run check` passed (All tests, lint, typecheck, build).
+- **Follow-ups:** None.

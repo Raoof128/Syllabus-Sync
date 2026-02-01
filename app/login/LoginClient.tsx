@@ -20,6 +20,7 @@ import { isValidRedirect } from '@/lib/utils/security';
 import { base64UrlToUint8Array, bufferToBase64Url } from '@/lib/utils/passkey';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { loginSchema, type LoginFormData } from './schemas/loginSchema';
+import { loginAction } from './actions';
 import { AlertTriangle, Eye, EyeOff, ArrowLeft, Fingerprint, Loader2 } from 'lucide-react';
 
 export default function LoginClient() {
@@ -83,33 +84,28 @@ export default function LoginClient() {
     return client;
   }, []);
 
-  // Standard Login Handler
+  // Standard Login Handler (Server Action)
   const onSubmit = async (data: LoginFormData) => {
     setGeneralError(null);
     setIsSuccess(false);
 
     try {
-      const client = await getSupabaseClient();
-      const { data: authData, error: authError } = await client.auth.signInWithPassword({
-        email: data.email.trim(),
-        password: data.password,
-      });
+      const result = await loginAction(data);
 
-      if (authError) {
-        if (authError.message.includes(AUTH_ERRORS.INVALID_LOGIN)) {
+      if (result.error) {
+        // Map common errors or use returned string
+        if (result.error.includes(AUTH_ERRORS.INVALID_LOGIN)) {
           setGeneralError(t('loginErrorInvalidCredentials'));
-        } else if (authError.message.includes(AUTH_ERRORS.EMAIL_NOT_CONFIRMED)) {
+        } else if (result.error.includes(AUTH_ERRORS.EMAIL_NOT_CONFIRMED)) {
           setGeneralError(t('loginErrorEmailNotConfirmed'));
-        } else if (authError.message.includes(AUTH_ERRORS.TOO_MANY_REQUESTS)) {
+        } else if (
+          result.error.includes(AUTH_ERRORS.TOO_MANY_REQUESTS) ||
+          result.error.includes('Too many login attempts')
+        ) {
           setGeneralError(t('loginErrorTooManyRequests'));
         } else {
-          setGeneralError(t('loginErrorFailed'));
+          setGeneralError(result.error);
         }
-        return;
-      }
-
-      if (!authData?.session) {
-        setGeneralError(t('loginErrorFailed'));
         return;
       }
 
@@ -127,8 +123,6 @@ export default function LoginClient() {
   const handleAnimationComplete = useCallback(() => {
     if (isError) {
       setGeneralError(null);
-      // We don't clear form errors automatically on animation complete
-      // to let user see what's wrong, but general error can clear.
     }
   }, [isError]);
 
