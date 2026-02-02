@@ -26,22 +26,24 @@ const classTimeSchema = z.object({
   endTime: z.string(),
 });
 
-const unitSyncSchema = z.object({
-  id: z.string().uuid().optional(),
-  code: z.string().min(1),
-  name: z.string().min(1),
-  color: z.string().optional(),
-  description: z.string().optional().nullable(),
-  location: z
-    .object({
-      building: z.string().optional().default(''),
-      room: z.string().optional().default(''),
-    })
-    .optional()
-    .nullable(),
-  schedule: z.array(classTimeSchema).optional().default([]),
-  createdAt: z.union([z.string(), z.date()]).optional(), // Accept both string and Date
-}).passthrough(); // Allow extra fields to pass through
+const unitSyncSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    code: z.string().min(1),
+    name: z.string().min(1),
+    color: z.string().optional(),
+    description: z.string().optional().nullable(),
+    location: z
+      .object({
+        building: z.string().optional().default(''),
+        room: z.string().optional().default(''),
+      })
+      .optional()
+      .nullable(),
+    schedule: z.array(classTimeSchema).optional().default([]),
+    createdAt: z.union([z.string(), z.date()]).optional(), // Accept both string and Date
+  })
+  .passthrough(); // Allow extra fields to pass through
 
 /**
  * POST /api/units/sync
@@ -59,16 +61,17 @@ export async function POST(request: Request) {
             'Building not found in the campus list. Please select a valid building.',
             400,
             ERROR_CODES.VALIDATION_ERROR,
-            { field: 'location.building', value: building }
+            { field: 'location.building', value: building },
           );
         }
 
         const supabase = await createServerClient();
 
         // Normalize createdAt to ISO string if it's a Date
-        const createdAt = validatedData.createdAt instanceof Date
-          ? validatedData.createdAt.toISOString()
-          : validatedData.createdAt;
+        const createdAt =
+          validatedData.createdAt instanceof Date
+            ? validatedData.createdAt.toISOString()
+            : validatedData.createdAt;
 
         // Prepare payloads for RPC
         const unitPayload = {

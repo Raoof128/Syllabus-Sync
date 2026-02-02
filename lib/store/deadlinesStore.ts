@@ -182,9 +182,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       // Remove all deadlines associated with a deleted unit (cascade delete)
       removeDeadlinesByUnit: (unitId: string, unitCode: string) => {
         set((state) => ({
-          deadlines: state.deadlines.filter(
-            (d) => d.unitId !== unitId && d.unitCode !== unitCode
-          ),
+          deadlines: state.deadlines.filter((d) => d.unitId !== unitId && d.unitCode !== unitCode),
         }));
       },
 

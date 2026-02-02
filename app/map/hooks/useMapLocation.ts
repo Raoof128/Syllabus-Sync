@@ -63,6 +63,12 @@ export function useMapLocation({
   const lastPositionRef = useRef<{ lat: number; lng: number; time: number } | null>(null);
   const positionSmootherRef = useRef<GpsPositionSmoother | null>(null);
   const offCampusToastShown = useRef(false);
+  const safeTRef = useRef(safeT);
+
+  // Update refs
+  useEffect(() => {
+    safeTRef.current = safeT;
+  }, [safeT]);
 
   // Initialize Smoother
   useEffect(() => {
@@ -219,8 +225,8 @@ export function useMapLocation({
         if (!isInBounds && !offCampusToastShown.current) {
           offCampusToastShown.current = true;
           toastUtils.warning(
-            safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
-            safeT(
+            safeTRef.current('locationOutsideCampusTitle', 'Outside campus boundary'),
+            safeTRef.current(
               'locationOutsideCampusMessage',
               'You appear to be outside campus bounds. Navigation is disabled until you return to campus.',
             ),
@@ -329,8 +335,8 @@ export function useMapLocation({
         if (isPermissionDenied) {
           setLocationStatus('denied');
           toastUtils.warning(
-            safeT('locationAccessDenied', 'Location Denied'),
-            safeT('locationDeniedDesc', 'Please enable location access.'),
+            safeTRef.current('locationAccessDenied', 'Location Denied'),
+            safeTRef.current('locationDeniedDesc', 'Please enable location access.'),
           );
         } else if (isTimeout) {
           // Retry automatically? For now just log
@@ -346,7 +352,7 @@ export function useMapLocation({
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [mapInstance, leafletModule, isMapReady, userIcon, isNavigating, navManagerRef, safeT]);
+  }, [mapInstance, leafletModule, isMapReady, userIcon, isNavigating, navManagerRef]);
 
   // Center on user function
   const centerOnUser = () => {
@@ -364,8 +370,8 @@ export function useMapLocation({
       mapLog.log('Centering map on user location');
     } else {
       toastUtils.info(
-        safeT('locationNotAvailable', 'Location Not Available'),
-        safeT('waitLocation', 'Please wait for your location to be found.'),
+        safeTRef.current('locationNotAvailable', 'Location Not Available'),
+        safeTRef.current('waitLocation', 'Please wait for your location to be found.'),
       );
     }
   };

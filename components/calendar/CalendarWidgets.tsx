@@ -33,7 +33,6 @@ import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import ItemActionButtons from '@/components/calendar/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
 
-
 interface CalendarWidgetsProps {
   onAddAssignment: () => void;
   onEditAssignment: (assignment: Deadline) => void;
@@ -477,7 +476,8 @@ export default function CalendarWidgets({
                   </span>
                   <div className="flex items-center gap-2">
                     <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                      {units.length} {units.length === 1 ? tOr('unit', 'unit') : tOr('unitsLabel', 'units')}
+                      {units.length}{' '}
+                      {units.length === 1 ? tOr('unit', 'unit') : tOr('unitsLabel', 'units')}
                     </Badge>
                     <Button
                       size="icon"
@@ -554,7 +554,8 @@ export default function CalendarWidgets({
                   </span>
                   <div className="flex items-center gap-2">
                     <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                      {events.length} {events.length === 1 ? tOr('event', 'event') : tOr('eventsLabel', 'events')}
+                      {events.length}{' '}
+                      {events.length === 1 ? tOr('event', 'event') : tOr('eventsLabel', 'events')}
                     </Badge>
                     <Button
                       size="icon"

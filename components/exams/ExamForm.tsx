@@ -138,7 +138,9 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       unitCode: validationRules.required(t('unit')),
       dueDate: validationRules.required(t('dueDate')),
       building: (value) => {
-        const requiredError = validationRules.required(t('building' as TranslationKey) || 'Building')(value);
+        const requiredError = validationRules.required(
+          t('building' as TranslationKey) || 'Building',
+        )(value);
         if (requiredError) return requiredError;
         // Validate building strictly against map data - exact match only
         const validatedBuilding = validateBuildingStrict(value as string);
@@ -331,9 +333,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
                 />
-                <p className="text-xs text-mq-content-tertiary">
-                  Optional
-                </p>
+                <p className="text-xs text-mq-content-tertiary">Optional</p>
               </div>
             </div>
 

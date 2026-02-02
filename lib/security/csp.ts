@@ -94,7 +94,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "img-src 'self' data: blob: https:",
 
     // Fonts: self and data URIs
-    "font-src 'self' data:",
+    "font-src 'self' data: https://r2cdn.perplexity.ai https://apps.rokt.com",
 
     // Connect: API endpoints, Supabase, routing services
     `connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
@@ -142,7 +142,7 @@ export function buildDevCSP(): string {
     // Images
     "img-src 'self' data: blob: https:",
     // Fonts
-    "font-src 'self' data:",
+    "font-src 'self' data: https://r2cdn.perplexity.ai",
     // Connect: API endpoints, Supabase, HMR websockets
     "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
     // Frame ancestors

@@ -409,9 +409,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 onChange={(e) => setRoom(e.target.value)}
                 placeholder={t('roomPlaceholder')}
               />
-              <p className="text-xs text-mq-content-tertiary">
-                Optional
-              </p>
+              <p className="text-xs text-mq-content-tertiary">Optional</p>
             </div>
           </div>
 

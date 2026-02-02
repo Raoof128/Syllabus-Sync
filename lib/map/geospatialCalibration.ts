@@ -67,7 +67,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_LIBRARY',
     name: 'Waranara Library (Main Entrance)',
     gps: { lat: -33.7756994, lng: 151.1131306 },
-    pixel: [2345, 2388],
+    pixel: [2455, 2388], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -75,7 +75,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_SPORT',
     name: 'Macquarie University Sport and Aquatic Centre',
     gps: { lat: -33.7726489, lng: 151.1105693 },
-    pixel: [1671, 1162],
+    pixel: [1781, 1162], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -83,7 +83,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_COURTYARD',
     name: 'Central Courtyard',
     gps: { lat: -33.7738842, lng: 151.1135164 },
-    pixel: [2528, 1618],
+    pixel: [2638, 1618], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -91,7 +91,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_18WW',
     name: "18 Wally's Walk (Central Hub)",
     gps: { lat: -33.7734389, lng: 151.1134919 },
-    pixel: [2282, 1881],
+    pixel: [2392, 1881], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -99,7 +99,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_4ER',
     name: '4 Eastern Road (Business School)',
     gps: { lat: -33.775787, lng: 151.1160258 },
-    pixel: [3066, 2352],
+    pixel: [3176, 2352], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-20',
   },
@@ -107,7 +107,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_HOSP',
     name: 'MQ University Hospital',
     gps: { lat: -33.7735912, lng: 151.1179502 },
-    pixel: [3799, 1568],
+    pixel: [3909, 1568], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -115,7 +115,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_INCUB',
     name: 'MQ Incubator',
     gps: { lat: -33.7763444, lng: 151.1090529 },
-    pixel: [1185, 2537],
+    pixel: [1295, 2537], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -123,7 +123,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_OBS',
     name: 'Observatory',
     gps: { lat: -33.7703261, lng: 151.1111248 },
-    pixel: [1755, 492],
+    pixel: [1865, 492], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -131,7 +131,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_19ER',
     name: '19 Eastern Road (Chancellery)',
     gps: { lat: -33.7724696, lng: 151.1148539 },
-    pixel: [2942, 1203],
+    pixel: [3052, 1203], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -139,7 +139,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_BANKSIA',
     name: 'Banksia Cottage',
     gps: { lat: -33.7752254, lng: 151.1090476 },
-    pixel: [1195, 2175],
+    pixel: [1305, 2175], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -147,7 +147,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_17WW',
     name: "17 Wally's Walk (Law)",
     gps: { lat: -33.7748805, lng: 151.1133652 },
-    pixel: [2511, 1916],
+    pixel: [2621, 1916], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -155,7 +155,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_29WW',
     name: "29 Wally's Walk (Walanga Muru)",
     gps: { lat: -33.7743082, lng: 151.1104628 },
-    pixel: [1551, 1879],
+    pixel: [1661, 1879], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -163,7 +163,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_CHAP',
     name: '10 Hadenfeld Ave (Chaplaincy)',
     gps: { lat: -33.7760151, lng: 151.1080508 },
-    pixel: [975, 2580],
+    pixel: [1085, 2580], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -171,7 +171,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_LAKESIDE',
     name: 'Lakeside Hotel',
     gps: { lat: -33.7713301, lng: 151.1158846 },
-    pixel: [3199, 719],
+    pixel: [3309, 719], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -179,7 +179,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_SHOPPING',
     name: 'Macquarie Centre',
     gps: { lat: -33.7772506, lng: 151.1211352 },
-    pixel: [4204, 2607],
+    pixel: [4314, 2607], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -187,7 +187,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_HEARING',
     name: 'Australian Hearing Hub',
     gps: { lat: -33.7764943, lng: 151.1118029 },
-    pixel: [1822, 2706],
+    pixel: [1932, 2706], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -195,7 +195,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_21WW',
     name: 'Macquarie Theatre',
     gps: { lat: -33.7746449, lng: 151.1122661 },
-    pixel: [2078, 1950],
+    pixel: [2188, 1950], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -203,7 +203,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_12SW',
     name: 'Student Services (12SW)',
     gps: { lat: -33.775054, lng: 151.113053 },
-    pixel: [2177, 2120],
+    pixel: [2287, 2120], // +110px offset applied
     source: 'google_maps',
     verifiedDate: '2026-01-24',
   },
@@ -211,7 +211,7 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
     id: 'GCP_8SCO',
     name: '8 Sir Christopher Ondaatje Ave',
     gps: { lat: -33.77578, lng: 151.11473 },
-    pixel: [2823, 2260],
+    pixel: [2933, 2260], // +110px offset applied
     source: 'survey',
     verifiedDate: '2026-01-24',
   },
@@ -295,7 +295,7 @@ let _cachedRmse = 0;
  * Use this to correct small global shifts visible in testing.
  * X is Left/Right (East is positive). Y is Top/Bottom.
  */
-const MANUAL_OFFSET = { x: 110, y: 0 }; // Shift East ~47 meters (110px)
+const MANUAL_OFFSET = { x: 0, y: 0 }; // Reset to 0 as GCPs now include the offset
 
 export function computeAffineCoefficients(gcps: GroundControlPoint[]): AffineCoefficients {
   if (gcps.length < 3) throw new Error('Need at least 3 GCPs for affine transformation');

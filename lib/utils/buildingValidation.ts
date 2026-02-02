@@ -83,9 +83,11 @@ export function validateBuilding(building: string | null | undefined): Building 
   for (const [id, b] of buildingMap!.entries()) {
     // Only match if the ID starts with the normalized input OR vice versa
     // AND they share significant overlap (at least 2 characters)
-    if (id === normalizedInput ||
-        (normalizedInput.length >= 2 && id.startsWith(normalizedInput)) ||
-        (id.length >= 2 && normalizedInput.startsWith(id))) {
+    if (
+      id === normalizedInput ||
+      (normalizedInput.length >= 2 && id.startsWith(normalizedInput)) ||
+      (id.length >= 2 && normalizedInput.startsWith(id))
+    ) {
       return b;
     }
   }

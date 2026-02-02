@@ -133,16 +133,22 @@ export const useUnitsStore = create<UnitsState>()(
         }));
 
         try {
-          const response = await apiRequest<{ id: string; code?: string; cascadeDeleted?: boolean }>(`/api/units/${id}`, { method: 'DELETE' });
+          const response = await apiRequest<{
+            id: string;
+            code?: string;
+            cascadeDeleted?: boolean;
+          }>(`/api/units/${id}`, { method: 'DELETE' });
 
           // If cascade delete was successful, also remove related deadlines from local state
           // This is handled by subscribing stores or manual refresh
           if (response.cascadeDeleted && unitCode) {
             // Dispatch a custom event that the deadlines store can listen to
             if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('unit-deleted', {
-                detail: { unitId: id, unitCode }
-              }));
+              window.dispatchEvent(
+                new CustomEvent('unit-deleted', {
+                  detail: { unitId: id, unitCode },
+                }),
+              );
             }
           }
         } catch (error) {

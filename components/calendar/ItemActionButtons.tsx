@@ -40,7 +40,7 @@ interface ItemActionButtonsProps {
 }
 
 export default function ItemActionButtons({
-  itemType,
+  itemType: _itemType,
   itemId,
   itemTitle,
   building,

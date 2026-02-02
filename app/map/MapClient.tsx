@@ -96,6 +96,22 @@ export default function MapClient() {
     setShowOverlayPanel,
   } = useMapStore();
 
+  const overlaysContainerRef = useRef<HTMLDivElement>(null);
+
+  // Focus management for overlay panel
+  useEffect(() => {
+    if (showOverlayPanel && overlaysContainerRef.current) {
+      // Small timeout to allow animation/rendering to start
+      const timer = setTimeout(() => {
+        const firstButton = overlaysContainerRef.current?.querySelector('button');
+        if (firstButton) {
+          (firstButton as HTMLElement).focus();
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [showOverlayPanel]);
+
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
   const autoNavigate = searchParams.get('autonav') === 'true';
@@ -238,6 +254,8 @@ export default function MapClient() {
                     variant={showOverlayPanel ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setShowOverlayPanel(!showOverlayPanel)}
+                    aria-expanded={showOverlayPanel}
+                    aria-controls="map-overlays-panel"
                     className="gap-2"
                   >
                     <Layers className="h-4 w-4" />
@@ -248,7 +266,11 @@ export default function MapClient() {
 
               {/* Overlay Toggle Buttons */}
               {showOverlayPanel && (
-                <div className="space-y-3 pt-3 border-t border-mq-border">
+                <div
+                  id="map-overlays-panel"
+                  ref={overlaysContainerRef}
+                  className="space-y-3 pt-3 border-t border-mq-border"
+                >
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {mapOverlays.map((overlay) => {
                       const Icon = OVERLAY_ICONS[overlay.id];

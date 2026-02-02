@@ -93,7 +93,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           'Building not found in the campus list. Please select a valid building.',
           400,
           ERROR_CODES.VALIDATION_ERROR,
-          { field: 'location.building', value: building }
+          { field: 'location.building', value: building },
         );
       }
 

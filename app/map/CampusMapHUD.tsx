@@ -22,7 +22,7 @@ type Props = {
 import { triggerHaptic } from '@/lib/utils/haptics';
 import { LayeredCard } from './components/LayeredCard';
 
-const MotionLink = m(Link);
+const MotionLink = m.create(Link);
 
 export default function CampusMapHUD({
   selectedBuilding,
@@ -82,6 +82,10 @@ export default function CampusMapHUD({
 
       {/* Left sidebar */}
       <div className="absolute top-3 left-3 w-[280px] sm:w-[320px] max-w-[calc(100vw-24px)] pointer-events-auto flex flex-col max-h-[calc(100%-24px)] sm:max-h-[500px]">
+        {/* Screen reader announcement for search results */}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {buildingSearch ? `${buildings.length} buildings found` : ''}
+        </div>
         <LayeredCard
           interactive={false}
           className="rounded-mq-xl border-mq-border overflow-hidden flex flex-col"
@@ -147,10 +151,6 @@ export default function CampusMapHUD({
                       ? {}
                       : {
                           scale: 1.02,
-                          borderColor: 'var(--mq-primary)',
-                          backgroundColor: isSelected
-                            ? 'rgba(var(--mq-primary), 0.15)'
-                            : 'var(--mq-background-secondary)',
                         }
                   }
                   whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}

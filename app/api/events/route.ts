@@ -99,7 +99,7 @@ export async function POST(request: Request) {
           'Building not found in the campus list. Please select a valid building.',
           400,
           ERROR_CODES.VALIDATION_ERROR,
-          { field: 'building', value: building }
+          { field: 'building', value: building },
         );
       }
 

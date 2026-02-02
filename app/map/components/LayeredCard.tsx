@@ -17,6 +17,9 @@ export const LayeredCard = forwardRef<HTMLDivElement, LayeredCardProps>(
           'bg-mq-card-background/85 backdrop-blur-xl',
           'border border-white/20 dark:border-white/10',
 
+          // High Contrast Mode Overrides
+          'contrast-more:bg-mq-card-background contrast-more:backdrop-blur-none contrast-more:border-2 contrast-more:border-mq-border contrast-more:shadow-none',
+
           // Soft elevation - Multi-layered shadows for 3D feel
           'shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_32px_rgba(0,0,0,0.12)]',
 
