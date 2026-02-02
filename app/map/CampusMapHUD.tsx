@@ -16,6 +16,7 @@ type Props = {
   buildingSearch: string;
   setBuildingSearch: (v: string) => void;
   onCopyShare: () => void;
+  onExport?: () => void;
   onStartNavigation?: () => void;
 };
 
@@ -30,6 +31,7 @@ export default function CampusMapHUD({
   buildingSearch,
   setBuildingSearch,
   onCopyShare,
+  onExport,
   onStartNavigation,
 }: Props) {
   const { t } = useTypedTranslation();
@@ -52,7 +54,9 @@ export default function CampusMapHUD({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const topSlice = useMemo(() => buildings.slice(0, 15), [buildings]);
+  const visibleBuildings = useMemo(() => {
+    return buildingSearch.trim() ? buildings : buildings.slice(0, 15);
+  }, [buildings, buildingSearch]);
 
   return (
     <div className="absolute inset-0 z-[1100] pointer-events-none">
@@ -73,6 +77,8 @@ export default function CampusMapHUD({
             variant="ghost"
             size="sm"
             className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
+            onClick={onExport}
+            disabled={!onExport}
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline font-medium">{t('export')}</span>
@@ -135,7 +141,7 @@ export default function CampusMapHUD({
               },
             }}
           >
-            {topSlice.map((b) => {
+            {visibleBuildings.map((b) => {
               const isSelected = selectedBuilding?.id === b.id;
               return (
                 <MotionLink

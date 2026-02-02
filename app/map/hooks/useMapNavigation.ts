@@ -7,6 +7,7 @@ import {
   parseRouteInstructions,
   NavigationStateManager,
   type NavigationState,
+  type RouteInstruction,
 } from '@/lib/map/realtimeNavigation';
 import { formatDistance, formatDuration, type RoutePreview } from '@/lib/map/navigationHelpers';
 import { getBuildingGps, type Building } from '@/lib/map/buildings';
@@ -41,6 +42,7 @@ export function useMapNavigation({
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [navState, setNavState] = useState<NavigationState | null>(null);
+  const [routeInstructions, setRouteInstructions] = useState<RouteInstruction[]>([]);
 
   // Subscribe to navigation manager state
   useEffect(() => {
@@ -74,8 +76,8 @@ export function useMapNavigation({
       return;
     }
 
-    // Parse instructions
-    const instructions = parseRouteInstructions({ features: [] }); // ORS response needed here really
+    // Parse instructions from the last ORS response (if any)
+    const instructions = routeInstructions.length > 0 ? routeInstructions : [];
 
     // Pass REAL GPS coordinates to navigation manager
     // gpsRouteCoords are already [lng, lat] from ORS
@@ -111,6 +113,7 @@ export function useMapNavigation({
         setPreview(null);
         setRouteCoords([]);
         setGpsRouteCoords([]);
+        setRouteInstructions([]);
         if (isNavigating) stopNavigation();
         return;
       }
@@ -124,7 +127,10 @@ export function useMapNavigation({
       }
 
       setRouteError(null);
-      const { coordinates, preview: routeData, error } = await fetchORSRoute(origin, destGps);
+      const { coordinates, preview: routeData, error, orsData } = await fetchORSRoute(
+        origin,
+        destGps,
+      );
 
       if (!active) return;
 
@@ -144,11 +150,13 @@ export function useMapNavigation({
 
         setRouteCoords(pixelCoords);
         setPreview(routeData);
+        setRouteInstructions(orsData ? parseRouteInstructions(orsData) : []);
       } else {
         setRouteError(error || 'Unknown error');
         setRouteCoords([]);
         setGpsRouteCoords([]);
         setPreview(null);
+        setRouteInstructions([]);
       }
       setIsLoadingRoute(false);
     }

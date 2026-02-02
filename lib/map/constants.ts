@@ -15,11 +15,15 @@ export const CAMPUS_CENTRE_GPS = { lat: -33.7742, lng: 151.1127 };
 // Map dimensions from VRT file (4678x3307 pixels)
 export const MAP_DIMS = { width: 4678, height: 3307 };
 
-// Pixel-based bounds for CRS.Simple: [[minY, minX], [maxY, maxX]]
-// In CRS.Simple, bounds are [y, x] format
+// Pixel-based bounds for CRS.Simple: [[south, west], [north, east]]
+// CRS.Simple: Y increases UPWARD from bottom-left origin
+// Image: Y increases DOWNWARD from top-left origin
+// Bounds are [lat, lng] where lat=Y, lng=X
+// South-West corner: image [0, height] → CRS.Simple [height - height, 0] = [0, 0]
+// North-East corner: image [width, 0] → CRS.Simple [height - 0, width] = [height, width]
 export const PIXEL_BOUNDS: [[number, number], [number, number]] = [
-  [0, 0], // Bottom-left corner (origin)
-  [MAP_DIMS.height, MAP_DIMS.width], // Top-right corner
+  [0, 0], // South-West corner [lat=0, lng=0]
+  [MAP_DIMS.height, MAP_DIMS.width], // North-East corner [lat=height, lng=width]
 ];
 
 // Campus center in pixel coordinates (for initial view)

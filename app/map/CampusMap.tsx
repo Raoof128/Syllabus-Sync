@@ -226,9 +226,23 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
     // Base Layer Effect
     useEffect(() => {
-      if (!mapInstance || !leafletModule || !overlaysReady) return;
+      if (!mapInstance || !leafletModule || !overlaysReady) {
+        return;
+      }
       try {
-        const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, PIXEL_BOUNDS);
+        const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, PIXEL_BOUNDS, {
+          opacity: 1,
+          interactive: false,
+        });
+
+        // Add error handling for image load
+        campusOverlay.on('error', () => {
+          console.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
+        });
+        campusOverlay.on('load', () => {
+          mapLog.log('Campus map image loaded successfully');
+        });
+
         campusOverlay.addTo(mapInstance);
         return () => {
           try {
@@ -406,7 +420,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             />
 
             {/* Route Polyline */}
-            {overlaysReady && routeCoords.length > 0 && (
+            {overlaysReady && routeCoords.length >= 2 && (
               <reactLeafletModule.Polyline
                 positions={routeCoords}
                 color="#4285F4"

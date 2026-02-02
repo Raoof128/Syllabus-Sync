@@ -5,6 +5,7 @@ import { getClientIP } from '@/lib/security/ip';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { createHash } from 'crypto';
 import { logger } from '@/lib/logger';
+import { GPS_CAMPUS_BOUNDS } from '@/lib/map/constants';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
 // The API key should only be set via ORS_API_KEY on the server
@@ -18,10 +19,10 @@ const ORS_BASE_URL =
 // Prevents abuse by rejecting requests for routes outside campus area
 // Only enforced when using real ORS API (to protect API quota)
 const CAMPUS_BOUNDS = {
-  minLat: -33.785, // South boundary
-  maxLat: -33.765, // North boundary
-  minLng: 151.105, // West boundary
-  maxLng: 151.135, // East boundary
+  minLat: GPS_CAMPUS_BOUNDS.south,
+  maxLat: GPS_CAMPUS_BOUNDS.north,
+  minLng: GPS_CAMPUS_BOUNDS.west,
+  maxLng: GPS_CAMPUS_BOUNDS.east,
 };
 
 // Very generous buffer (50km) around campus for demo/testing from anywhere in Sydney

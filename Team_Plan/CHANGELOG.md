@@ -1,4 +1,27 @@
 Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Audit Fixes (Navigation, UX, Cleanup)
+Summary: Fixed navigation instructions, aligned geofence bounds, improved overlay panel accessibility, enabled export, adjusted search behavior and map hint, reduced debug noise, and removed unused map controller variants.
+- **Navigation:** Wired ORS instructions parsing and corrected coordinate order for navigation routes.
+- **Security/Consistency:** Centralized geofence bounds via shared GPS constants.
+- **Accessibility:** Added Escape handling and focus return for overlay panel.
+- **UX:** Enabled export (download base map), adjusted search list to show full results on search, updated map hint text.
+- **Quality:** Removed noisy debug logs and deleted unused MapCore/MapController/useMapController variants.
+- **Stability:** Route polyline now requires >= 2 points.
+- **Files:** `lib/services/ors.ts`, `app/map/hooks/useMapNavigation.ts`, `app/api/navigate/route.ts`, `app/map/MapClient.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/CampusMap.tsx`, `app/map/hooks/index.ts`, deleted `app/map/components/MapCore.tsx`, `app/map/components/MapController.tsx`, `app/map/hooks/useMapController.ts`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** None.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Campus Image Bounds Fix (Verified)
+Summary: Fixed campus map image not displaying (blank screen issue). Verified PIXEL_BOUNDS are correctly mapped between image coordinates and CRS.Simple coordinate system. Browser testing confirmed image overlay now displays properly.
+- **Fix:** Verified `PIXEL_BOUNDS` in `lib/map/constants.ts` correctly maps image to CRS.Simple: SW=[0, 0], NE=[height, width].
+- **Fix:** Updated comments to clarify coordinate transformation logic for future maintainers.
+- **Enhancement:** Added image load error handling in `CampusMap.tsx` with 'error' and 'load' event listeners for debugging.
+- **Verification:** Browser MCP testing confirmed campus image displays with building markers overlayed correctly.
+- **Files:** `lib/map/constants.ts`, `app/map/CampusMap.tsx`.
+- **Follow-ups:** Monitor for any zoom level display issues.
+
+Raouf: 2026-02-02 (Australia/Sydney)
 Scope: QA - Lint Cleanup
 Summary: Resolved a linting warning in `ItemActionButtons.tsx` regarding an unused variable.
 - **Fix:** Prefixed unused `itemType` prop with an underscore to satisfy the `@typescript-eslint/no-unused-vars` rule while maintaining the API.

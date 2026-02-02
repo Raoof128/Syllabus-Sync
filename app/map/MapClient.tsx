@@ -62,6 +62,8 @@ export default function MapClient() {
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
+  const overlayToggleButtonRef = useRef<HTMLButtonElement | null>(null);
+  const wasOverlayOpenRef = useRef(false);
 
   // Preload critical map image for better LCP (Largest Contentful Paint)
   // This tells the browser to fetch the image as high priority
@@ -111,6 +113,44 @@ export default function MapClient() {
       return () => clearTimeout(timer);
     }
   }, [showOverlayPanel]);
+
+  useEffect(() => {
+    if (wasOverlayOpenRef.current && !showOverlayPanel) {
+      overlayToggleButtonRef.current?.focus();
+    }
+    wasOverlayOpenRef.current = showOverlayPanel;
+  }, [showOverlayPanel]);
+
+  const handleOverlayPanelKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setShowOverlayPanel(false);
+        overlayToggleButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const focusable = overlaysContainerRef.current?.querySelectorAll('button');
+      if (!focusable || focusable.length === 0) return;
+
+      const first = focusable[0] as HTMLElement;
+      const last = focusable[focusable.length - 1] as HTMLElement;
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey) {
+        if (active === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    },
+    [setShowOverlayPanel],
+  );
 
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
@@ -185,6 +225,19 @@ export default function MapClient() {
     }
   }, [activeOverlays, selectedBuildingId, t]);
 
+  const handleExport = useCallback(() => {
+    try {
+      const link = document.createElement('a');
+      link.href = CAMPUS_IMAGE_URL;
+      link.download = 'campus-map.png';
+      link.rel = 'noopener';
+      link.click();
+      toastUtils.success(safeT('export', 'Export'), safeT('downloadStarted', 'Download started'));
+    } catch {
+      toastUtils.error(t('error'), t('tryAgain'));
+    }
+  }, [safeT, t]);
+
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
     // Use searchBuildings from buildings.ts to avoid duplicating filter logic
@@ -254,6 +307,7 @@ export default function MapClient() {
                     variant={showOverlayPanel ? 'primary' : 'secondary'}
                     size="sm"
                     onClick={() => setShowOverlayPanel(!showOverlayPanel)}
+                    ref={overlayToggleButtonRef}
                     aria-expanded={showOverlayPanel}
                     aria-controls="map-overlays-panel"
                     className="gap-2"
@@ -269,6 +323,7 @@ export default function MapClient() {
                 <div
                   id="map-overlays-panel"
                   ref={overlaysContainerRef}
+                  onKeyDown={handleOverlayPanelKeyDown}
                   className="space-y-3 pt-3 border-t border-mq-border"
                 >
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -369,7 +424,7 @@ export default function MapClient() {
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('interactiveCampusMap')}</CardTitle>
                   <p className="text-xs text-mq-content-tertiary hidden md:block">
-                    Use arrow keys to pan, +/- to zoom
+                    Drag to pan, use +/- to zoom
                   </p>
                 </div>
               </CardHeader>
@@ -417,6 +472,7 @@ export default function MapClient() {
                     buildingSearch={buildingSearch}
                     setBuildingSearch={setBuildingSearch}
                     onCopyShare={copyShareableURL}
+                    onExport={handleExport}
                     onStartNavigation={() => campusMapRef.current?.startNavigation()}
                   />
                 </div>

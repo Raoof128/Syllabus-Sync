@@ -37,7 +37,12 @@ interface ApiResponse {
 export async function fetchORSRoute(
   start: { lat: number; lng: number },
   end: { lat: number; lng: number },
-): Promise<{ coordinates: [number, number][]; preview: RoutePreview | null; error?: string }> {
+): Promise<{
+  coordinates: [number, number][];
+  preview: RoutePreview | null;
+  orsData?: ORSResponse;
+  error?: string;
+}> {
   // API key is handled server-side in /api/navigate route
   // No need to check for NEXT_PUBLIC_ORS_API_KEY on the client
 
@@ -69,7 +74,8 @@ export async function fetchORSRoute(
     }
 
     const feature = data.features[0];
-    const coords = feature.geometry.coordinates.map((c) => [c[1], c[0]] as [number, number]);
+    // Keep ORS native coordinate order: [lng, lat]
+    const coords = feature.geometry.coordinates as [number, number][];
 
     // Parse preview data
     const summary = feature.properties.summary;
@@ -86,7 +92,7 @@ export async function fetchORSRoute(
       steps: steps,
     };
 
-    return { coordinates: coords, preview };
+    return { coordinates: coords, preview, orsData: data };
   } catch (error) {
     logger.error('Error fetching ORS route:', error);
     return { coordinates: [], preview: null, error: 'Network Error' };
