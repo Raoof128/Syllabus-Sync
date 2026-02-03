@@ -12,6 +12,68 @@ Summary: Fixed navigation instructions, aligned geofence bounds, improved overla
 - **Follow-ups:** None.
 
 Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Campus Image Load Reliability
+Summary: Reworked campus image overlay to use React-Leaflet `ImageOverlay` for more reliable loading and built-in lifecycle handling.
+- **Fix:** Removed manual Leaflet overlay effect and rendered base layer via `ImageOverlay` with load/error handlers.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** None.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Load Diagnostics
+Summary: Added readiness fallback and image-load failure overlay to help diagnose blank map screens.
+- **Fix:** Ensured `onMapReady` fires when map instance becomes ready (not tied to overlays).
+- **Fix:** Added 2.5s readiness fallback to avoid perpetual opacity-0 map.
+- **Fix:** Displayed in-map diagnostic when base image fails to load.
+- **Files:** `app/map/CampusMap.tsx`, `app/map/MapClient.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Confirm whether image overlay now renders in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Cache Busting for Campus Image
+Summary: Versioned campus map image URL to bypass stale caches and aligned position editor with shared map constant.
+- **Fix:** Added `MAP_ASSET_VERSION` and versioned `CAMPUS_IMAGE_URL`.
+- **Fix:** Updated position editor to use shared `CAMPUS_IMAGE_URL`.
+- **Fix:** Precached versioned campus image in service worker.
+- **Files:** `lib/map/constants.ts`, `app/map/position-editor/PositionEditorClient.tsx`, `public/sw.js`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Validate image loads in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Load Timeout Diagnostics
+Summary: Added a timeout fallback to surface when the base map image never fires a load/error event.
+- **Fix:** Added a 3.5s timeout to mark image load failure and surface diagnostics.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Confirm if timeout overlay appears in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Fetch Diagnostic + Blob Fallback
+Summary: Added a no-store fetch for campus image and fallback to blob URL when load failures occur; surfaced HTTP status in diagnostics.
+- **Fix:** Fetch campus image with `cache: 'no-store'` and use object URL for overlay.
+- **Fix:** Display fetch status in image failure overlay.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Check diagnostic for HTTP status to pinpoint root cause.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Diagnostics (Content-Type + Preview)
+Summary: Added content-type/size diagnostics and an inline image preview to determine if Leaflet or the asset pipeline is failing.
+- **Fix:** Displayed response content-type and size for the campus image fetch.
+- **Fix:** Rendered a debug `<img>` preview using the fetched blob URL when load fails.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Verify whether the debug preview renders.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Overlay Mount Fix
+Summary: Ensured Leaflet `ImageOverlay` only renders after blob URL is ready and remounts on URL change.
+- **Fix:** Deferred overlay rendering until blob URL exists and forced remount on URL changes.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** Not run (not requested).
+- **Follow-ups:** Confirm campus image renders on map.
+
+Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Campus Image Bounds Fix (Verified)
 Summary: Fixed campus map image not displaying (blank screen issue). Verified PIXEL_BOUNDS are correctly mapped between image coordinates and CRS.Simple coordinate system. Browser testing confirmed image overlay now displays properly.
 - **Fix:** Verified `PIXEL_BOUNDS` in `lib/map/constants.ts` correctly maps image to CRS.Simple: SW=[0, 0], NE=[height, width].

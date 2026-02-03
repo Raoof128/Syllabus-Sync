@@ -6,8 +6,9 @@ export const GPS_CAMPUS_BOUNDS = {
   east: 151.1251,
 };
 
-// Campus image path
-export const CAMPUS_IMAGE_URL = '/maps/raster/mq-campus.png';
+// Campus image path (versioned to bust stale caches)
+export const MAP_ASSET_VERSION = '2026-02-02-1';
+export const CAMPUS_IMAGE_URL = `/maps/raster/mq-campus.png?v=${MAP_ASSET_VERSION}`;
 
 // Real GPS coordinates for campus center (used ONLY for geolocation comparison)
 export const CAMPUS_CENTRE_GPS = { lat: -33.7742, lng: 151.1127 };

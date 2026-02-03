@@ -84,8 +84,17 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
     const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
     const [overlaysReady, setOverlaysReady] = useState(false);
+    const [imageLoadFailed, setImageLoadFailed] = useState(false);
+    const [imageFetchStatus, setImageFetchStatus] = useState<string | null>(null);
+    const [imageFetchMeta, setImageFetchMeta] = useState<{
+      contentType?: string | null;
+      sizeBytes?: number | null;
+    } | null>(null);
+    const [overlayUrl, setOverlayUrl] = useState<string | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const navManagerRef = useRef<NavigationStateManager | null>(null);
+    const hasNotifiedReadyRef = useRef(false);
+    const imageLoadTimeoutRef = useRef<number | null>(null);
 
     // Initialize Navigation Manager
     useEffect(() => {
@@ -210,12 +219,14 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         setOverlaysReady(false);
         return;
       }
+      if (!hasNotifiedReadyRef.current) {
+        hasNotifiedReadyRef.current = true;
+        onMapReady?.();
+      }
       const timer = setTimeout(() => {
         if (isMountedRef.current && isMapReady(mapInstance)) {
           mapLog.log('Map stable, enabling overlays');
           setOverlaysReady(true);
-          // Notify parent that map is ready (for smooth loading transitions)
-          onMapReady?.();
         }
       }, 100);
       return () => {
@@ -223,40 +234,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         setOverlaysReady(false);
       };
     }, [mapInstance, isMapReady, isMountedRef, onMapReady]);
-
-    // Base Layer Effect
-    useEffect(() => {
-      if (!mapInstance || !leafletModule || !overlaysReady) {
-        return;
-      }
-      try {
-        const campusOverlay = leafletModule.imageOverlay(CAMPUS_IMAGE_URL, PIXEL_BOUNDS, {
-          opacity: 1,
-          interactive: false,
-        });
-
-        // Add error handling for image load
-        campusOverlay.on('error', () => {
-          console.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
-        });
-        campusOverlay.on('load', () => {
-          mapLog.log('Campus map image loaded successfully');
-        });
-
-        campusOverlay.addTo(mapInstance);
-        return () => {
-          try {
-            if (mapInstance && mapInstance.hasLayer(campusOverlay)) {
-              mapInstance.removeLayer(campusOverlay);
-            }
-          } catch {
-            /* ignore */
-          }
-        };
-      } catch (error) {
-        mapLog.log('Error adding base layer:', error);
-      }
-    }, [mapInstance, leafletModule, overlaysReady]);
 
     // ============================================
     // MAP CONTROLLER
@@ -350,6 +327,50 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
     // RENDER
     // ============================================
+    useEffect(() => {
+      let revokedUrl: string | null = null;
+      let active = true;
+
+      const fetchImage = async () => {
+        try {
+          setImageFetchStatus('checking');
+          const response = await fetch(CAMPUS_IMAGE_URL, { cache: 'no-store' });
+          if (!active) return;
+          if (!response.ok) {
+            setImageFetchStatus(`http ${response.status}`);
+            return;
+          }
+          const blob = await response.blob();
+          if (!active) return;
+          const contentType = response.headers.get('content-type');
+          setImageFetchMeta({
+            contentType,
+            sizeBytes: blob.size,
+          });
+          if (contentType && !contentType.startsWith('image/')) {
+            setImageFetchStatus(`bad content-type: ${contentType}`);
+          }
+          const objectUrl = URL.createObjectURL(blob);
+          revokedUrl = objectUrl;
+          setOverlayUrl(objectUrl);
+          setImageFetchStatus('ok');
+        } catch (error) {
+          if (!active) return;
+          setImageFetchStatus('network error');
+          mapLog.log('Campus image fetch failed:', error);
+        }
+      };
+
+      fetchImage();
+
+      return () => {
+        active = false;
+        if (revokedUrl) {
+          URL.revokeObjectURL(revokedUrl);
+        }
+      };
+    }, []);
+
     return (
       <div
         ref={mapContainerRef}
@@ -410,6 +431,34 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               selectedBuildingProp={selectedBuilding}
               setMapInstanceProp={setMapInstance}
             />
+
+            {/* Base Campus Layer */}
+            {overlayUrl && (
+              <reactLeafletModule.ImageOverlay
+                key={overlayUrl}
+                url={overlayUrl}
+                bounds={PIXEL_BOUNDS}
+                opacity={1}
+                eventHandlers={{
+                  load: () => {
+                    setImageLoadFailed(false);
+                    mapLog.log('Campus map image loaded successfully');
+                    if (imageLoadTimeoutRef.current) {
+                      window.clearTimeout(imageLoadTimeoutRef.current);
+                      imageLoadTimeoutRef.current = null;
+                    }
+                  },
+                  error: () => {
+                    setImageLoadFailed(true);
+                    console.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
+                    if (imageLoadTimeoutRef.current) {
+                      window.clearTimeout(imageLoadTimeoutRef.current);
+                      imageLoadTimeoutRef.current = null;
+                    }
+                  },
+                }}
+              />
+            )}
 
             {/* Overlays */}
             <MapOverlays
@@ -497,6 +546,45 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">
             <span className="animate-pulse text-mq-content-secondary">Loading Map...</span>
+          </div>
+        )}
+
+        {!imageLoadFailed && overlayUrl && (
+          <MapImageLoadTimeout
+            onTimeout={() => setImageLoadFailed(true)}
+            timeoutRef={imageLoadTimeoutRef}
+          />
+        )}
+
+        {imageLoadFailed && (
+          <div className="absolute inset-0 z-[900] flex items-center justify-center bg-mq-background/70">
+            <div className="max-w-md rounded-mq-lg border border-mq-border bg-mq-card-background p-4 text-sm text-mq-content shadow-lg">
+              <div className="font-semibold">Campus map image failed to load</div>
+              <div className="mt-1 text-mq-content-secondary">
+                Please check your network or hard refresh. If the issue persists, the image URL may
+                be blocked by a caching layer.
+              </div>
+              <div className="mt-2 text-xs text-mq-content-tertiary font-mono">
+                {CAMPUS_IMAGE_URL}
+                {imageFetchStatus ? ` • ${imageFetchStatus}` : ''}
+                {imageFetchMeta?.contentType ? ` • ${imageFetchMeta.contentType}` : ''}
+                {typeof imageFetchMeta?.sizeBytes === 'number'
+                  ? ` • ${Math.round(imageFetchMeta.sizeBytes / 1024)}KB`
+                  : ''}
+              </div>
+              {overlayUrl && (
+                <div className="mt-3 rounded border border-mq-border bg-mq-background p-2">
+                  <div className="text-xs text-mq-content-tertiary mb-2">
+                    Debug image preview:
+                  </div>
+                  <img
+                    src={overlayUrl}
+                    alt="Campus map debug preview"
+                    className="max-h-40 w-full object-contain"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -597,6 +685,32 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     );
   },
 );
+
+function MapImageLoadTimeout({
+  onTimeout,
+  timeoutRef,
+}: {
+  onTimeout: () => void;
+  timeoutRef: React.MutableRefObject<number | null>;
+}) {
+  useEffect(() => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = window.setTimeout(() => {
+      onTimeout();
+      timeoutRef.current = null;
+    }, 3500);
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [onTimeout, timeoutRef]);
+
+  return null;
+}
 
 CampusMap.displayName = 'CampusMap';
 

@@ -83,6 +83,7 @@ export default function MapClient() {
 
   // Smooth loading transition state
   const [isMapReady, setIsMapReady] = useState(false);
+  const mapReadyTimeoutRef = useRef<number | null>(null);
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
@@ -252,6 +253,24 @@ export default function MapClient() {
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    if (!isMapReady) {
+      if (mapReadyTimeoutRef.current) {
+        window.clearTimeout(mapReadyTimeoutRef.current);
+      }
+      mapReadyTimeoutRef.current = window.setTimeout(() => {
+        setIsMapReady(true);
+      }, 2500);
+    }
+
+    return () => {
+      if (mapReadyTimeoutRef.current) {
+        window.clearTimeout(mapReadyTimeoutRef.current);
+        mapReadyTimeoutRef.current = null;
+      }
+    };
+  }, [isMapReady]);
 
   // NOTE: No IntersectionObserver - map loads immediately for better LCP
   // The map component is loaded with Suspense for progressive enhancement

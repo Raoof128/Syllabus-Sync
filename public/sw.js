@@ -20,6 +20,7 @@ const STATIC_ASSETS = [
 // Map assets to precache for offline support (non-sensitive public data)
 const MAP_ASSETS = [
   '/maps/raster/mq-campus.png',
+  '/maps/raster/mq-campus.png?v=2026-02-02-1',
   '/maps/overlays/Campus-Map_parking.png',
   '/maps/overlays/Drinking-water.png',
   '/maps/overlays/map_accessibility.png',

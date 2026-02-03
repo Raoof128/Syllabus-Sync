@@ -25,6 +25,7 @@ import {
 import 'leaflet/dist/leaflet.css';
 
 import { buildings, type Building, MAP_CONFIG } from '@/lib/map/buildings';
+import { CAMPUS_IMAGE_URL } from '@/lib/map/constants';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 // ============================================================================
@@ -585,7 +586,7 @@ export default function PositionEditorClient() {
           style={{ background: '#1a1a2e' }}
         >
           {/* Campus Map Image */}
-          <ImageOverlay url="/maps/raster/mq-campus.png" bounds={PIXEL_BOUNDS} />
+          <ImageOverlay url={CAMPUS_IMAGE_URL} bounds={PIXEL_BOUNDS} />
 
           {/* Map Controller */}
           <MapController selectedBuilding={selectedBuilding} onMapClick={handleMapClick} />

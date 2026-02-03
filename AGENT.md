@@ -79,3 +79,52 @@ Summary: Fixed navigation instructions and ORS coordinate handling, aligned geof
 Files: `lib/services/ors.ts`, `app/map/hooks/useMapNavigation.ts`, `app/api/navigate/route.ts`, `app/map/MapClient.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/CampusMap.tsx`, `app/map/hooks/index.ts`, deleted `app/map/components/MapCore.tsx`, `app/map/components/MapController.tsx`, `app/map/hooks/useMapController.ts`.
 Verification: Not run (not requested).
 Follow-ups: None.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Campus Image Load Reliability
+Summary: Reworked campus image overlay to use React-Leaflet `ImageOverlay` for more reliable loading and built-in lifecycle handling.
+Files: `app/map/CampusMap.tsx`.
+Verification: Not run (not requested).
+Follow-ups: None.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Load Diagnostics
+Summary: Added readiness fallback and image-load failure overlay to help diagnose blank map screens.
+Files: `app/map/CampusMap.tsx`, `app/map/MapClient.tsx`.
+Verification: Not run (not requested).
+Follow-ups: Confirm whether image overlay now renders in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Cache Busting for Campus Image
+Summary: Versioned campus map image URL to bypass stale caches and aligned position editor with shared map constant.
+Files: `lib/map/constants.ts`, `app/map/position-editor/PositionEditorClient.tsx`, `public/sw.js`.
+Verification: Not run (not requested).
+Follow-ups: Validate image loads in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Load Timeout Diagnostics
+Summary: Added a timeout fallback to surface when the base map image never fires a load/error event.
+Files: `app/map/CampusMap.tsx`.
+Verification: Not run (not requested).
+Follow-ups: Confirm if timeout overlay appears in affected environment.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Fetch Diagnostic + Blob Fallback
+Summary: Added a no-store fetch for campus image and fallback to blob URL when load failures occur; surfaced HTTP status in diagnostics.
+Files: `app/map/CampusMap.tsx`.
+Verification: Not run (not requested).
+Follow-ups: Check diagnostic for HTTP status to pinpoint root cause.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Diagnostics (Content-Type + Preview)
+Summary: Added content-type/size diagnostics and an inline image preview to determine if Leaflet or the asset pipeline is failing.
+Files: `app/map/CampusMap.tsx`.
+Verification: Not run (not requested).
+Follow-ups: Verify whether the debug preview renders.
+
+Raouf: 2026-02-02 (Australia/Sydney)
+Scope: Map - Image Overlay Mount Fix
+Summary: Ensured Leaflet `ImageOverlay` only renders after blob URL is ready and remounts on URL change.
+Files: `app/map/CampusMap.tsx`.
+Verification: Not run (not requested).
+Follow-ups: Confirm campus image renders on map.
