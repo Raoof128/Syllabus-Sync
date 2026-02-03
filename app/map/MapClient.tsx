@@ -343,6 +343,9 @@ export default function MapClient() {
                   id="map-overlays-panel"
                   ref={overlaysContainerRef}
                   onKeyDown={handleOverlayPanelKeyDown}
+                  role="group"
+                  aria-label="Map overlay options"
+                  tabIndex={-1}
                   className="space-y-3 pt-3 border-t border-mq-border"
                 >
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -454,7 +457,7 @@ export default function MapClient() {
                 >
                   {/* Real Map (with smooth fade-in when ready) */}
                   <div
-                    className={`transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
                   >
                     <MapErrorBoundary>
                       <Suspense fallback={null}>

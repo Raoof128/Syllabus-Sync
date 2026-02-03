@@ -7,6 +7,7 @@ import {
   useImperativeHandle,
   forwardRef,
 } from 'react';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { Building, BUILDING_CATEGORY_LABELS, pixelToCrsSimple } from '@/lib/map/buildings';
@@ -352,6 +353,18 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           }
           const objectUrl = URL.createObjectURL(blob);
           revokedUrl = objectUrl;
+
+          // Preload the image to ensure it's fully decoded before passing to Leaflet
+          // This helps the ImageOverlay load event fire reliably
+          await new Promise<void>((resolve, reject) => {
+            // Use globalThis.Image to avoid conflict with next/image Image
+            const img = new globalThis.Image();
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error('Image preload failed'));
+            img.src = objectUrl;
+          });
+
+          if (!active) return;
           setOverlayUrl(objectUrl);
           setImageFetchStatus('ok');
         } catch (error) {
@@ -577,10 +590,13 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   <div className="text-xs text-mq-content-tertiary mb-2">
                     Debug image preview:
                   </div>
-                  <img
+                  <Image
                     src={overlayUrl}
                     alt="Campus map debug preview"
                     className="max-h-40 w-full object-contain"
+                    width={400}
+                    height={160}
+                    unoptimized
                   />
                 </div>
               )}
@@ -700,7 +716,7 @@ function MapImageLoadTimeout({
     timeoutRef.current = window.setTimeout(() => {
       onTimeout();
       timeoutRef.current = null;
-    }, 3500);
+    }, 8000);
     return () => {
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);

@@ -1,5 +1,4 @@
 // import { NextRequest } from 'next/server';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import {

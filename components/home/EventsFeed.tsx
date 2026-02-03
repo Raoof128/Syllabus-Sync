@@ -1,19 +1,19 @@
 // components/home/EventsFeed.tsx
-// Events are loaded from Supabase via eventsStore
+// Shows PUBLIC university events (not user-owned) - read-only announcement board
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useEffect } from 'react';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, ExternalLink, Calendar } from 'lucide-react';
-import { useEventsStore } from '@/lib/store/eventsStore';
+import { usePublicEventsStore } from '@/lib/store/publicEventsStore';
 import { isToday } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/components/home/HomeCard';
-import { Event } from '@/lib/types';
+import { PublicEvent } from '@/lib/types/publicEvents';
 import { useHydration } from '@/lib/hooks';
 
 const categoryColors: Record<string, string> = {
@@ -26,15 +26,20 @@ const categoryColors: Record<string, string> = {
 const EventsFeed = memo(() => {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const events = useEventsStore((state) => state.events);
+  const { events, isLoading, fetchPublicEvents } = usePublicEventsStore();
   const isHydrated = useHydration();
+
+  // Fetch public events on mount
+  useEffect(() => {
+    if (isHydrated) {
+      fetchPublicEvents();
+    }
+  }, [isHydrated, fetchPublicEvents]);
 
   // Filter events to today only - use startAt as source of truth
   const todayEvents = useMemo(() => {
     return events.filter((event) => {
-      // Use startAt (source of truth) or fall back to date for backward compatibility
-      const eventDate = event.startAt || event.date;
-      return isToday(new Date(eventDate));
+      return isToday(new Date(event.startAt));
     });
   }, [events]);
 
@@ -42,9 +47,26 @@ const EventsFeed = memo(() => {
     router.push('/feed');
   };
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = (event: PublicEvent) => {
     // Navigate to feed page with highlight
     router.push(`/feed?highlight=${event.id}`);
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-AU', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  const getTimeRange = (event: PublicEvent) => {
+    if (event.allDay) return 'All Day';
+    const start = formatTime(event.startAt);
+    if (event.endAt) {
+      const end = formatTime(event.endAt);
+      return `${start} - ${end}`;
+    }
+    return start;
   };
 
   return (
@@ -63,7 +85,7 @@ const EventsFeed = memo(() => {
         </Button>
       </CardHeader>
       <CardContent>
-        {!isHydrated ? (
+        {!isHydrated || isLoading ? (
           <div className="space-y-3 p-2">
             <div className="animate-pulse">
               <div className="h-4 bg-mq-background-tertiary rounded w-3/4 mb-3" />
@@ -81,17 +103,10 @@ const EventsFeed = memo(() => {
         ) : (
           <div className="space-y-3">
             {todayEvents.map((event) => {
-              // Get translated title if translationKey exists, otherwise use the original title
-              const displayTitle = event.translationKey
-                ? t(event.translationKey as TranslationKey)
-                : event.title;
-              // If translation returned the key itself, use original title
-              const finalTitle = displayTitle === event.translationKey ? event.title : displayTitle;
-
               const eventContent = (
                 <>
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-mq-content line-clamp-2">{finalTitle}</h3>
+                    <h3 className="font-semibold text-mq-content line-clamp-2">{event.title}</h3>
                     <Badge
                       className={`${categoryColors[event.category]} alabaster-readable shrink-0`}
                     >
@@ -101,7 +116,7 @@ const EventsFeed = memo(() => {
                   <div className="flex items-center gap-4 mt-2 text-sm text-mq-content-secondary">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4 shrink-0" />
-                      <span>{event.time}</span>
+                      <span>{getTimeRange(event)}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4 shrink-0" />

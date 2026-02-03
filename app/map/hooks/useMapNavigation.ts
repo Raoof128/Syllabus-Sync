@@ -93,7 +93,7 @@ export function useMapNavigation({
       t('navigationStarted' as TranslationKey) || 'Navigation started',
       `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
     );
-  }, [isOffCampus, gpsRouteCoords, preview, navManagerRef, t]);
+  }, [isOffCampus, gpsRouteCoords, preview, navManagerRef, t, routeInstructions]);
 
   const stopNavigation = useCallback(() => {
     if (navManagerRef.current) {
