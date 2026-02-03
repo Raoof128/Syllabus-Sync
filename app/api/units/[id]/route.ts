@@ -347,11 +347,11 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
-      // CASCADE DELETE: Soft-delete all deadlines that reference this unit
+      // CASCADE DELETE: Hard-delete all deadlines that reference this unit
       // This includes both unit_id FK and unit_code soft reference
       const { error: cascadeError } = await supabase
         .from('deadlines')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('user_id', userId)
         .or(`unit_id.eq.${id},unit_code.eq.${unitData.code}`);
 
@@ -361,10 +361,22 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         // The deadlines will be orphaned but can be cleaned up later
       }
 
-      // SOFT DELETE: Set deleted_at instead of hard delete
+      // Delete class_times first (they have FK to units)
+      const { error: classTimesError } = await supabase
+        .from('class_times')
+        .delete()
+        .eq('unit_id', id);
+
+      if (classTimesError) {
+        logger.error('Error deleting class_times:', classTimesError);
+        // Continue - the FK cascade should handle this anyway
+      }
+
+      // HARD DELETE: Actually remove the unit from database
+      // This allows the user to re-add a unit with the same code later
       const { error } = await supabase
         .from('units')
-        .update({ deleted_at: new Date().toISOString() })
+        .delete()
         .eq('id', id)
         .eq('user_id', userId);
 

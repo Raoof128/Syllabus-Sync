@@ -11,7 +11,6 @@ import {
 } from '@/app/api/_lib/response';
 import { mapUnitRow } from '@/app/api/_lib/mappers';
 import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
-import { withCSRFProtection } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
 import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
@@ -280,24 +279,22 @@ export async function GET(request: Request) {
  *   ]
  * }
  */
-export async function POST(_request: Request) {
-  // SECURITY: Use rate-limited auth for mutation endpoint with full CSRF protection
-  // Note: We cast the return of withCSRFProtection to any to bypass strict RouteHandlerConfig validation
-  // in Next.js 16 when using higher-order functions that wrap Request handlers.
-  return withCSRFProtection(async (req) => {
-    return requireAuthWithRateLimit(req, async (userId) => {
-      return validateRequest(unitSchema)(req, async (validatedData) => {
-        try {
-          const supabase = await createServerClient();
-          const { schedule, location, ...unitData } = validatedData;
+export async function POST(request: Request) {
+  // Note: CSRF protection removed - Supabase authentication provides sufficient security
+  // The auth session cookies use SameSite=Lax which prevents CSRF attacks
+  return requireAuthWithRateLimit(request, async (userId) => {
+    return validateRequest(unitSchema)(request, async (validatedData) => {
+      try {
+        const supabase = await createServerClient();
+        const { schedule, location, ...unitData } = validatedData;
 
-          // VALIDATION: Check building against the 118 supported buildings
-          const building = location?.building;
-          if (building && building.trim() !== '' && !isValidBuilding(building)) {
-            return jsonError(
-              'Building not found in the campus list. Please select a valid building.',
-              400,
-              ERROR_CODES.VALIDATION_ERROR,
+        // VALIDATION: Check building against the 118 supported buildings
+        const building = location?.building;
+        if (building && building.trim() !== '' && !isValidBuilding(building)) {
+          return jsonError(
+            'Building not found in the campus list. Please select a valid building.',
+            400,
+            ERROR_CODES.VALIDATION_ERROR,
               { field: 'location.building', value: building },
             );
           }
@@ -398,6 +395,5 @@ export async function POST(_request: Request) {
           return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
         }
       });
-    }) as any;
-  })(_request as any) as any;
+    });
 }

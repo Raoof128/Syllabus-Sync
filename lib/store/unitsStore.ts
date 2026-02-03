@@ -14,6 +14,7 @@ interface UnitsState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadUnits: () => Promise<void>;
+  forceRefresh: () => Promise<void>;
   addUnit: (unit: Unit) => Promise<Unit | null>;
   removeUnit: (id: string) => Promise<void>;
   updateUnit: (id: string, unit: Partial<Unit>) => Promise<Unit | null>;
@@ -42,8 +43,9 @@ export const useUnitsStore = create<UnitsState>()(
         set({ isLoading: true });
         try {
           const data = await apiRequest<Unit[]>('/api/units', { noRetry: true });
-          // Use database data directly - no sample data fallback for authenticated users
-          // This ensures proper user isolation and data ownership
+          // IMPORTANT: Always use database data as source of truth
+          // This ensures IDs are correct and in sync with the server
+          // Persisted localStorage data is only for offline caching, not the source of truth
           set({ units: data.map(normalizeUnit), hasLoaded: true });
         } catch (error) {
           // Check if this is an auth error
@@ -58,9 +60,24 @@ export const useUnitsStore = create<UnitsState>()(
             set({ units: [], hasLoaded: true });
           } else {
             // Non-auth error: keep persisted data but mark as loaded
+            // NOTE: This can cause ID mismatches - users should retry or refresh
             console.warn('Failed to load units from API, using persisted data:', error);
             set({ hasLoaded: true });
           }
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // Force refresh from database - clears local state and reloads
+      forceRefresh: async () => {
+        set({ isLoading: true, hasLoaded: false });
+        try {
+          const data = await apiRequest<Unit[]>('/api/units', { noRetry: true });
+          set({ units: data.map(normalizeUnit), hasLoaded: true });
+        } catch (error) {
+          console.error('Failed to force refresh units:', error);
+          set({ hasLoaded: true });
         } finally {
           set({ isLoading: false });
         }
@@ -109,9 +126,24 @@ export const useUnitsStore = create<UnitsState>()(
           }));
           return serverNormalized;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // 409: Unit with this code already exists in DB
+          // This can happen if localStorage is out of sync with DB
+          // Force refresh to get the correct state and return the existing unit
+          if (errorMessage.includes('409') || errorMessage.includes('already exists')) {
+            console.warn(`Unit code ${normalized.code} already exists, refreshing from database...`);
+            await get().forceRefresh();
+            // Find the existing unit by code (case-insensitive)
+            const searchCode = normalized.code.toUpperCase();
+            const existingUnit = get().units.find(
+              (u) => u.code.toUpperCase() === searchCode
+            );
+            return existingUnit || null;
+          }
+
           // Silently handle API errors - stores work with local data
           // Only log unexpected errors, not auth failures
-          const errorMessage = error instanceof Error ? error.message : String(error);
           if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
             errorHandler.logError(
               error instanceof Error ? error : new Error('Failed to add unit'),
@@ -218,35 +250,95 @@ export const useUnitsStore = create<UnitsState>()(
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
 
-          // 404: Unit doesn't exist on server, try to create it instead
+          // 404: Unit doesn't exist on server with this ID
+          // This could mean: 1) unit was never synced, or 2) unit exists with different ID
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-            console.warn(`Unit ${id} not found on server during update, attempting to create it...`);
-            // Create the unit on server with current data
-            try {
-              const created = await apiRequest<Unit>('/api/units', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  id: optimisticUpdate.id,
-                  code: optimisticUpdate.code,
-                  name: optimisticUpdate.name,
-                  color: optimisticUpdate.color,
-                  location: optimisticUpdate.location,
-                  schedule: optimisticUpdate.schedule,
-                  notificationEnabled: optimisticUpdate.notificationEnabled,
-                }),
-              });
-              const normalized = normalizeUnit(created);
-              set((state) => ({
-                units: state.units.map((u) => (u.id === id ? normalized : u)),
-              }));
-              return normalized;
-            } catch (createError) {
-              // If create also fails, revert and throw
-              set((state) => ({
-                units: state.units.map((u) => (u.id === id ? currentUnit : u)),
-              }));
-              throw createError;
+            console.warn(`Unit ${id} not found on server, syncing state from database...`);
+
+            // Force refresh to get the actual state from DB
+            // This will replace local units with the correct DB data (including correct IDs)
+            await get().forceRefresh();
+
+            // After refresh, find the unit by code (case-insensitive since DB normalizes to uppercase)
+            const searchCode = optimisticUpdate.code.toUpperCase();
+            const refreshedUnit = get().units.find(
+              (u) => u.code.toUpperCase() === searchCode
+            );
+
+            console.log('After refresh, looking for code:', searchCode);
+            console.log('Available units:', get().units.map((u) => ({ id: u.id, code: u.code })));
+            console.log('Found refreshedUnit:', refreshedUnit ? { id: refreshedUnit.id, code: refreshedUnit.code } : null);
+
+            if (refreshedUnit) {
+              // Unit exists in DB - now update it with the correct ID
+              try {
+                console.log('Updating existing unit with ID:', refreshedUnit.id);
+                const updated = await apiRequest<Unit>(`/api/units/${refreshedUnit.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    code: optimisticUpdate.code,
+                    name: optimisticUpdate.name,
+                    color: optimisticUpdate.color,
+                    location: optimisticUpdate.location,
+                    schedule: optimisticUpdate.schedule,
+                    notificationEnabled: optimisticUpdate.notificationEnabled,
+                  }),
+                });
+
+                const normalized = normalizeUnit(updated);
+                set((state) => ({
+                  units: state.units.map((u) => (u.id === refreshedUnit.id ? normalized : u)),
+                }));
+                return normalized;
+              } catch (retryError) {
+                console.error('Failed to update unit after refresh:', retryError);
+                // Return the refreshed unit as-is
+                return refreshedUnit;
+              }
+            } else {
+              // Unit doesn't exist in DB at all - try to create it
+              console.log('Unit not found in DB, attempting to create...');
+              try {
+                const created = await apiRequest<Unit>('/api/units', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    code: optimisticUpdate.code,
+                    name: optimisticUpdate.name,
+                    color: optimisticUpdate.color,
+                    location: optimisticUpdate.location,
+                    schedule: optimisticUpdate.schedule,
+                    notificationEnabled: optimisticUpdate.notificationEnabled,
+                  }),
+                });
+                const normalized = normalizeUnit(created);
+                // Add the newly created unit to state
+                set((state) => ({
+                  units: [...state.units.filter((u) => u.code.toUpperCase() !== optimisticUpdate.code.toUpperCase()), normalized],
+                }));
+                return normalized;
+              } catch (createError) {
+                const createErrorMsg = createError instanceof Error ? createError.message : String(createError);
+                console.error('Failed to create unit:', createError);
+
+                // If 409, the unit exists - refresh and find it
+                if (createErrorMsg.includes('409') || createErrorMsg.includes('already exists')) {
+                  console.log('Unit already exists (409), refreshing to find it...');
+                  await get().forceRefresh();
+                  const searchCode = optimisticUpdate.code.toUpperCase();
+                  const found = get().units.find((u) => u.code.toUpperCase() === searchCode);
+                  if (found) {
+                    console.log('Found existing unit after 409:', found.id, found.code);
+                    return found;
+                  }
+                }
+
+                // Force another refresh and try to find by code
+                await get().forceRefresh();
+                const searchCode = optimisticUpdate.code.toUpperCase();
+                return get().units.find((u) => u.code.toUpperCase() === searchCode) || null;
+              }
             }
           }
 
@@ -306,7 +398,7 @@ export const useUnitsStore = create<UnitsState>()(
     {
       name: 'units-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3, // Bumped to invalidate stale data with incorrect IDs
       // Only persist units array, not loading state flags
       // This ensures hasLoaded is always false on page reload, forcing fresh API fetch
       partialize: (state) => ({ units: state.units }),
@@ -318,6 +410,11 @@ export const useUnitsStore = create<UnitsState>()(
         }
       },
       migrate: (persistedState: unknown, version: number) => {
+        // Version 3: Clear all cached data to fix ID mismatch issues
+        if (version < 3) {
+          // Return empty state to force fresh load from database
+          return { state: { units: [] } };
+        }
         if (version < 2) {
           // Migration from version 1 to 2: Convert old non-UUID string IDs to UUIDs
           // This migration handles legacy data that used string IDs like 'unit-comp2310'

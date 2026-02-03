@@ -57,7 +57,11 @@ function SelectContent({
         data-slot="select-content"
         className={cn(
           // Position fixed is critical for proper scroll behavior - ensures menu stays anchored to trigger
-          'fixed text-mq-content shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-select-content-available-height) min-w-32 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-mq border border-mq-border bg-[#edeade]! dark:bg-[#373a36]! opacity-100',
+          'fixed shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-select-content-available-height) min-w-32 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-mq border border-mq-border opacity-100',
+          // Light mode: white background with dark text
+          'bg-white text-[#1a1a1a]',
+          // Dark mode: charcoal background with light text
+          'dark:bg-[#373a36] dark:text-[#e8e9e7]',
           position === 'popper' &&
             'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
           className,
@@ -105,7 +109,14 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-mq-hover-background focus:text-mq-content [&_svg:not([class*='text-'])]:text-mq-content-tertiary relative flex w-full cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // Base styles
+        "relative flex w-full cursor-default items-center gap-2 rounded-mq-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // Light mode text colors
+        "text-[#1a1a1a] [&_svg:not([class*='text-'])]:text-[#4a4a44]",
+        // Dark mode text colors
+        "dark:text-[#e8e9e7] dark:[&_svg:not([class*='text-'])]:text-[#a0a29c]",
+        // Hover states
+        "focus:bg-[#d6d2c4] focus:text-[#1a1a1a] dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]",
         className,
       )}
       {...props}
