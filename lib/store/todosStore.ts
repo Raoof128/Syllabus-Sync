@@ -15,6 +15,7 @@ interface TodosState {
   removeTodo: (id: string) => Promise<void>;
   updateTodo: (id: string, todo: Partial<Todo>) => Promise<Todo | null>;
   toggleComplete: (id: string) => Promise<void>;
+  toggleNotification: (id: string) => Promise<void>;
   reorderTodos: (todos: Todo[]) => void;
   getCompletedToday: () => Todo[];
   getPendingTodos: () => Todo[];
@@ -170,6 +171,7 @@ export const useTodosStore = create<TodosState>()(
         }
 
         const todoToRemove = get().todos.find((t) => t.id === id);
+        // Optimistic delete
         set((state) => ({
           todos: state.todos.filter((t) => t.id !== id),
         }));
@@ -177,38 +179,31 @@ export const useTodosStore = create<TodosState>()(
         try {
           const canSync = await shouldSyncTodos();
           if (!canSync) {
+            // Not syncing - local delete is final
             return;
           }
 
           await apiRequest<{ id: string }>(`/api/todos/${id}`, { method: 'DELETE' });
+          // SUCCESS: Delete persisted to DB
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
-          const isExpectedError =
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('unauthorized') ||
-            errorMessage.includes('CSRF') ||
-            errorMessage.includes('403') ||
-            errorMessage.includes('401') ||
-            errorMessage.includes('404') || // Already deleted on server
-            errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch') ||
-            errorMessage.includes('schema cache') ||
-            errorMessage.includes('table') ||
-            errorMessage.includes('500');
 
-          if (!isExpectedError) {
-            // Only restore if it's an unexpected error
-            if (todoToRemove) {
-              set((state) => ({ todos: [...state.todos, todoToRemove] }));
-            }
-            errorHandler.logError(
-              error instanceof Error ? error : new Error(`Failed to remove todo ${id}`),
-              'TodosStore.removeTodo',
-              'high',
-            );
+          // 404 means already deleted on server - that's fine, keep local deletion
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            return;
           }
-          // For expected errors (CSRF, auth, etc.), keep the local deletion
+
+          // FAILURE: Restore the todo to local state
+          if (todoToRemove) {
+            set((state) => ({ todos: [...state.todos, todoToRemove] }));
+          }
+          errorHandler.logError(
+            error instanceof Error ? error : new Error(`Failed to remove todo ${id}`),
+            'TodosStore.removeTodo',
+            'high',
+          );
+          // Rethrow so UI can show error feedback
+          throw error;
         }
       },
 
@@ -249,39 +244,24 @@ export const useTodosStore = create<TodosState>()(
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
 
+          // 404: Todo doesn't exist on server, try to create it
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
             console.warn(`Todo ${id} not found on server, attempting to create it...`);
             const fullTodo = { ...currentTodo, ...updatedTodo };
             return get().addTodo(fullTodo);
           }
 
-          // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
-          const isExpectedError =
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('unauthorized') ||
-            errorMessage.includes('CSRF') ||
-            errorMessage.includes('403') ||
-            errorMessage.includes('401') ||
-            errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch') ||
-            errorMessage.includes('schema cache') ||
-            errorMessage.includes('table') ||
-            errorMessage.includes('500');
-
-          if (!isExpectedError) {
-            set((state) => ({
-              todos: state.todos.map((t) => (t.id === id ? currentTodo : t)),
-            }));
-            errorHandler.logError(
-              error instanceof Error ? error : new Error(`Failed to update todo ${id}`),
-              'TodosStore.updateTodo',
-              'high',
-            );
-            return null;
-          }
-
-          // For expected errors (CSRF, auth, etc.), keep the local update
-          return optimisticUpdate;
+          // FAILURE: Revert to original state
+          set((state) => ({
+            todos: state.todos.map((t) => (t.id === id ? currentTodo : t)),
+          }));
+          errorHandler.logError(
+            error instanceof Error ? error : new Error(`Failed to update todo ${id}`),
+            'TodosStore.updateTodo',
+            'high',
+          );
+          // Rethrow so UI can show error feedback
+          throw error;
         }
       },
 
@@ -292,6 +272,12 @@ export const useTodosStore = create<TodosState>()(
           completed: !existing.completed,
           completedAt: !existing.completed ? new Date() : undefined,
         });
+      },
+
+      toggleNotification: async (id) => {
+        const existing = get().todos.find((todo) => todo.id === id);
+        if (!existing) return;
+        await get().updateTodo(id, { notificationEnabled: !existing.notificationEnabled });
       },
 
       reorderTodos: (todos) => {
@@ -351,6 +337,15 @@ export const useTodosStore = create<TodosState>()(
       name: 'todos-storage',
       storage: createJSONStorage(() => localStorage),
       version: 1,
+      // Only persist todos array, not loading state flags
+      partialize: (state) => ({ todos: state.todos }),
+      // When rehydrating, ensure hasLoaded stays false so we fetch fresh data
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasLoaded = false;
+          state.isLoading = false;
+        }
+      },
     },
   ),
 );

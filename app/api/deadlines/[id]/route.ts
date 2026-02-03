@@ -28,6 +28,7 @@ const deadlineUpdateSchema = z.object({
   priority: z.enum(['Low', 'Medium', 'High', 'Urgent']).optional(),
   type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']).optional(),
   completed: z.boolean().optional(),
+  notificationEnabled: z.boolean().optional(), // Whether notifications are enabled
   createdAt: dateSchema.optional(),
 });
 
@@ -70,6 +71,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       if (parsed.data.createdAt) {
         updatePayload.created_at = parsed.data.createdAt.toISOString();
         delete updatePayload.createdAt;
+      }
+      if (parsed.data.notificationEnabled !== undefined) {
+        updatePayload.notification_enabled = parsed.data.notificationEnabled;
+        delete updatePayload.notificationEnabled;
       }
 
       const { data, error } = await supabase

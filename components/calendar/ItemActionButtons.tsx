@@ -6,7 +6,6 @@ import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { useItemNotificationsStore } from '@/lib/store/itemNotificationsStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
@@ -27,10 +26,14 @@ interface ItemActionButtonsProps {
   unitCode?: string;
   /** Due date/start time for notification scheduling */
   dateTime?: Date | string | null;
+  /** Whether notification is currently enabled for this item */
+  notificationEnabled?: boolean;
   /** Callback when edit is clicked */
   onEdit?: () => void;
   /** Callback when delete is clicked */
   onDelete?: () => void;
+  /** Callback when notification toggle is clicked - receives new state */
+  onToggleNotification?: (enabled: boolean) => void;
   /** Visual variant - 'compact' for list cards, 'detail' for detail panels */
   variant?: 'compact' | 'detail';
   /** Additional class names */
@@ -45,22 +48,15 @@ export default function ItemActionButtons({
   itemTitle,
   building,
   room,
+  notificationEnabled = false,
   onEdit,
   onDelete,
+  onToggleNotification,
   variant = 'compact',
   className,
   stopPropagation = true,
 }: ItemActionButtonsProps) {
   const { t } = useTypedTranslation();
-
-  // Simple notification toggle store - fully manual, persisted to localStorage
-  const isNotificationEnabled = useItemNotificationsStore((s) => s.isNotificationEnabled);
-  const toggleNotification = useItemNotificationsStore((s) => s.toggleNotification);
-
-  // Check if notification is enabled for this item
-  const hasNotification = useMemo(() => {
-    return isNotificationEnabled(itemId);
-  }, [isNotificationEnabled, itemId]);
 
   // Navigation URL
   const navigationUrl = useMemo(() => {
@@ -72,12 +68,15 @@ export default function ItemActionButtons({
     return `/map?${params.toString()}`;
   }, [building, room]);
 
-  // Handle notify button click - simple toggle ON/OFF
+  // Handle notify button click - toggle and sync with DB via callback
   const handleNotifyClick = useCallback(
     (e: React.MouseEvent) => {
       if (stopPropagation) e.stopPropagation();
 
-      const newState = toggleNotification(itemId);
+      const newState = !notificationEnabled;
+
+      // Call the callback to update the database
+      onToggleNotification?.(newState);
 
       if (newState) {
         toastUtils.success(
@@ -93,7 +92,7 @@ export default function ItemActionButtons({
         );
       }
     },
-    [stopPropagation, toggleNotification, itemId, itemTitle, t],
+    [stopPropagation, notificationEnabled, onToggleNotification, itemId, itemTitle, t],
   );
 
   // Click handlers that optionally stop propagation
@@ -186,22 +185,22 @@ export default function ItemActionButtons({
         onClick={handleNotifyClick}
         className={cn(
           baseButtonClass,
-          hasNotification
+          notificationEnabled
             ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-900/40'
             : 'hover:bg-mq-hover-background',
         )}
         title={
-          hasNotification
+          notificationEnabled
             ? t('cancelReminder' as TranslationKey) || 'Click to disable notification'
             : t('setReminder' as TranslationKey) || 'Click to enable notification'
         }
         aria-label={
-          hasNotification
+          notificationEnabled
             ? t('cancelReminder' as TranslationKey) || 'Disable notification'
             : t('setReminder' as TranslationKey) || 'Enable notification'
         }
       >
-        {hasNotification ? (
+        {notificationEnabled ? (
           <Bell className={cn(iconSizeClass, 'fill-current')} aria-hidden="true" />
         ) : (
           <Bell className={iconSizeClass} aria-hidden="true" />

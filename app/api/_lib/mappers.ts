@@ -36,6 +36,7 @@ export const mapUnitRow = (row: Row): Unit => {
     color: String(row.color ?? ''),
     location,
     schedule: [], // Will be populated separately from class_times table
+    notificationEnabled: Boolean(row.notification_enabled ?? row.notificationEnabled ?? false),
     createdAt: parseDate(row.created_at ?? row.createdAt),
   };
 };
@@ -52,6 +53,7 @@ export const mapDeadlineRow = (row: Row): Deadline => ({
   priority: row.priority as Deadline['priority'],
   type: row.type as Deadline['type'],
   completed: Boolean(row.completed),
+  notificationEnabled: Boolean(row.notification_enabled ?? row.notificationEnabled ?? false),
   createdAt: parseDate(row.created_at ?? row.createdAt),
 });
 
@@ -76,6 +78,7 @@ export const mapEventRow = (row: Row): Event => {
     category: row.category as Event['category'],
     color: row.color ? String(row.color) : undefined,
     imageUrl: row.image_url ? String(row.image_url) : undefined,
+    notificationEnabled: Boolean(row.notification_enabled ?? row.notificationEnabled ?? false),
     // Primary time fields
     startAt,
     endAt: row.end_at ? parseDate(row.end_at) : undefined,

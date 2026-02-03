@@ -19,6 +19,7 @@ export interface Unit {
     room: string; // "204"
   };
   schedule: ClassTime[];
+  notificationEnabled?: boolean; // Whether notifications are enabled for this unit
   createdAt: Date;
 }
 
@@ -41,6 +42,7 @@ export type Deadline = {
   priority: 'Low' | 'Medium' | 'High' | 'Urgent';
   type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
   completed: boolean;
+  notificationEnabled?: boolean; // Whether notifications are enabled for this deadline
   createdAt: Date;
 };
 
@@ -57,6 +59,7 @@ export type Event = {
   imageUrl?: string;
   translationKey?: string;
   descriptionKey?: string;
+  notificationEnabled?: boolean; // Whether notifications are enabled for this event
   // Time fields - startAt is the source of truth
   startAt: Date; // Full timestamp for event start (required)
   endAt?: Date; // Full timestamp for event end (optional)
@@ -89,6 +92,7 @@ export type Todo = {
   priority: TodoPriority;
   completed: boolean;
   dueDate?: Date; // Optional due date
+  notificationEnabled?: boolean; // Whether notifications are enabled for this todo
   createdAt: Date;
   completedAt?: Date; // When the task was completed
 };

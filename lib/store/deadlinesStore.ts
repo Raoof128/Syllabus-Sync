@@ -18,6 +18,7 @@ interface DeadlinesState {
   removeDeadlinesByUnit: (unitId: string, unitCode: string) => void;
   updateDeadline: (id: string, deadline: Partial<Deadline>) => Promise<Deadline | null>;
   toggleComplete: (id: string) => Promise<void>;
+  toggleNotification: (id: string) => Promise<void>;
   getUpcoming: (limit?: number) => Deadline[];
   getStressLevel: () => StressLevel;
   clearDeadlines: () => void;
@@ -156,6 +157,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         }
 
         const deadlineToRemove = get().deadlines.find((d) => d.id === id);
+        // Optimistic delete
         set((state) => ({
           deadlines: state.deadlines.filter((d) => d.id !== id),
         }));
@@ -163,11 +165,14 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         try {
           const canSync = await shouldSyncDeadlines();
           if (!canSync) {
+            // Not syncing - local delete is final
             return;
           }
 
           await apiRequest<{ id: string }>(`/api/deadlines/${id}`, { method: 'DELETE' });
+          // SUCCESS: Delete persisted to DB
         } catch (error) {
+          // FAILURE: Restore the deadline to local state
           if (deadlineToRemove) {
             set((state) => ({ deadlines: [...state.deadlines, deadlineToRemove] }));
           }
@@ -176,6 +181,8 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             'DeadlinesStore.removeDeadline',
             'high',
           );
+          // Rethrow so UI can show error feedback
+          throw error;
         }
       },
 
@@ -241,6 +248,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             return get().addDeadline(fullDeadline);
           }
 
+          // FAILURE: Revert to original state
           set((state) => ({
             deadlines: state.deadlines.map((d) => (d.id === id ? currentDeadline : d)),
           }));
@@ -249,7 +257,8 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             'DeadlinesStore.updateDeadline',
             'high',
           );
-          return null;
+          // Rethrow so UI can show error feedback
+          throw error;
         }
       },
 
@@ -257,6 +266,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         const existing = get().deadlines.find((deadline) => deadline.id === id);
         if (!existing) return;
         await get().updateDeadline(id, { completed: !existing.completed });
+      },
+
+      toggleNotification: async (id) => {
+        const existing = get().deadlines.find((deadline) => deadline.id === id);
+        if (!existing) return;
+        await get().updateDeadline(id, { notificationEnabled: !existing.notificationEnabled });
       },
 
       getUpcoming: (limit = 5) => {
@@ -320,6 +335,16 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       name: 'deadlines-storage',
       storage: createJSONStorage(() => localStorage),
       version: 4,
+      // Only persist deadlines array, not loading state flags
+      // This ensures hasLoaded is always false on page reload, forcing fresh API fetch
+      partialize: (state) => ({ deadlines: state.deadlines }),
+      // When rehydrating, ensure hasLoaded stays false so we fetch fresh data
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasLoaded = false;
+          state.isLoading = false;
+        }
+      },
       migrate: (persistedState: unknown, version: number) => {
         const state = persistedState as { state: { deadlines: Partial<Deadline>[] } };
         if (version < 4) {

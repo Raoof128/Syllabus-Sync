@@ -78,7 +78,7 @@ export default function CalendarWidgets({
   onAddTodo,
   onOpenTodoDetail,
   onDeleteTodo,
-  onNotifyTodo,
+  onNotifyTodo: _onNotifyTodo,
 }: CalendarWidgetsProps) {
   const { t, language } = useTypedTranslation();
   const tOr = (key: TranslationKey | string, fallback: string) => {
@@ -90,13 +90,17 @@ export default function CalendarWidgets({
   // Stores
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
+  const toggleDeadlineNotification = useDeadlinesStore((state) => state.toggleNotification);
   const units = useUnitsStore((state) => state.units);
+  const toggleUnitNotification = useUnitsStore((state) => state.toggleNotification);
   const events = useEventsStore((state) => state.events);
+  const toggleEventNotification = useEventsStore((state) => state.toggleNotification);
 
   // Todo Store
   const todos = useTodosStore((state) => state.todos);
   const toggleTodoComplete = useTodosStore((state) => state.toggleComplete);
   const deleteTodo = useTodosStore((state) => state.removeTodo);
+  const toggleTodoNotification = useTodosStore((state) => state.toggleNotification);
 
   // Compute pending todos locally to avoid infinite loop from selector returning new references
   const pendingTodos = useMemo(() => {
@@ -317,8 +321,10 @@ export default function CalendarWidgets({
                               itemTitle={assignment.title}
                               unitCode={assignment.unitCode}
                               dateTime={assignment.dueDate}
+                              notificationEnabled={assignment.notificationEnabled}
                               onEdit={() => onEditAssignment(assignment)}
                               onDelete={() => onDeleteAssignment(assignment)}
+                              onToggleNotification={() => toggleDeadlineNotification(assignment.id)}
                               variant="compact"
                               stopPropagation
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -435,8 +441,10 @@ export default function CalendarWidgets({
                               room={exam.room}
                               unitCode={exam.unitCode}
                               dateTime={exam.dueDate}
+                              notificationEnabled={exam.notificationEnabled}
                               onEdit={() => onEditExam(exam)}
                               onDelete={() => onDeleteExam(exam)}
+                              onToggleNotification={() => toggleDeadlineNotification(exam.id)}
                               variant="compact"
                               stopPropagation
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -524,8 +532,10 @@ export default function CalendarWidgets({
                           building={unit.location?.building}
                           room={unit.location?.room}
                           unitCode={unit.code}
+                          notificationEnabled={unit.notificationEnabled}
                           onEdit={() => onEditUnit(unit)}
                           onDelete={() => onDeleteUnit(unit)}
+                          onToggleNotification={() => toggleUnitNotification(unit.id)}
                           variant="compact"
                           stopPropagation
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -609,8 +619,10 @@ export default function CalendarWidgets({
                             building={event.building}
                             room={event.room}
                             dateTime={event.startAt || event.date}
+                            notificationEnabled={event.notificationEnabled}
                             onEdit={() => onEditEvent(event)}
                             onDelete={() => onDeleteEvent(event)}
+                            onToggleNotification={() => toggleEventNotification(event.id)}
                             variant="compact"
                             stopPropagation
                             className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -740,18 +752,18 @@ export default function CalendarWidgets({
                               </p>
                             )}
                           </div>
-                          {/* Action buttons - Bell, Trash, Edit order as per requirements */}
+                          {/* Action buttons - Edit, Trash, Bell order to match other cards */}
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onNotifyTodo?.(todo);
+                                onEditTodo(todo);
                               }}
-                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-amber-500"
-                              title={tOr('setReminder', 'Set reminder')}
-                              aria-label={tOr('setReminder', 'Set reminder')}
+                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
+                              title={tOr('editTodo', 'Edit')}
+                              aria-label={tOr('editTodo', 'Edit todo')}
                             >
-                              <Bell className="h-3.5 w-3.5" />
+                              <Edit2 className="h-3.5 w-3.5" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -771,13 +783,18 @@ export default function CalendarWidgets({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onEditTodo(todo);
+                                toggleTodoNotification(todo.id);
                               }}
-                              className="p-1.5 hover:bg-mq-hover-background rounded transition-colors text-mq-content-secondary hover:text-mq-primary"
-                              title={tOr('editTodo', 'Edit')}
-                              aria-label={tOr('editTodo', 'Edit todo')}
+                              className={cn(
+                                'p-1.5 rounded transition-colors',
+                                todo.notificationEnabled
+                                  ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-900/40'
+                                  : 'hover:bg-mq-hover-background text-mq-content-secondary hover:text-amber-500',
+                              )}
+                              title={todo.notificationEnabled ? tOr('cancelReminder', 'Disable notification') : tOr('setReminder', 'Set reminder')}
+                              aria-label={todo.notificationEnabled ? tOr('cancelReminder', 'Disable notification') : tOr('setReminder', 'Set reminder')}
                             >
-                              <Edit2 className="h-3.5 w-3.5" />
+                              <Bell className={cn('h-3.5 w-3.5', todo.notificationEnabled && 'fill-current')} />
                             </button>
                           </div>
                         </div>

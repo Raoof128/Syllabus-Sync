@@ -9,7 +9,6 @@ import { Event } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
 import { v4 as uuidv4 } from 'uuid';
-import { sampleEvents } from '@/data/sampleEvents';
 
 interface EventsState {
   events: Event[];
@@ -19,6 +18,7 @@ interface EventsState {
   addEvent: (event: Omit<Event, 'id' | 'date' | 'time'> & { id?: string }) => Promise<Event | null>;
   updateEvent: (id: string, updates: Partial<Event>) => Promise<Event | null>;
   removeEvent: (id: string) => Promise<void>;
+  toggleNotification: (id: string) => Promise<void>;
   getEventsByDate: (date: Date) => Event[];
   getUpcomingEvents: (days?: number) => Event[];
   clearEvents: () => void;
@@ -57,10 +57,10 @@ export const useEventsStore = create<EventsState>()(
         try {
           const data = await apiRequest<Event[]>('/api/events', { noRetry: true });
           const normalizedApi = data.map(normalizeEvent);
-          const normalizedSample = sampleEvents.map(normalizeEvent);
-          // If API returns nothing, seed with sample events for local testing
+          // Use database data directly - no sample data fallback for authenticated users
+          // This ensures proper user isolation and data ownership
           set({
-            events: normalizedApi.length > 0 ? normalizedApi : normalizedSample,
+            events: normalizedApi,
             hasLoaded: true,
           });
         } catch (error) {
@@ -72,12 +72,14 @@ export const useEventsStore = create<EventsState>()(
               error.message.includes('Unauthorized'));
 
           if (isAuthError) {
-            // Auth failure: fall back to sample events for demo/testing
-            set({ events: sampleEvents.map(normalizeEvent), hasLoaded: true });
+            // Auth failure: clear persisted data to prevent showing stale user data
+            // Do NOT fall back to sample data - this causes "ghost" events
+            set({ events: [], hasLoaded: true });
           } else {
-            // Non-auth error: use sample events as fallback
-            console.warn('Failed to load events from API, using sample data:', error);
-            set({ events: sampleEvents.map(normalizeEvent), hasLoaded: true });
+            // Non-auth error: keep persisted data but mark as loaded
+            // Do NOT fall back to sample data - this causes "ghost" events
+            console.warn('Failed to load events from API, using persisted data:', error);
+            set({ hasLoaded: true });
           }
         } finally {
           set({ isLoading: false });
@@ -171,6 +173,8 @@ export const useEventsStore = create<EventsState>()(
           if (updates.category !== undefined) updatePayload.category = updates.category;
           if (updates.color !== undefined) updatePayload.color = updates.color;
           if (updates.imageUrl !== undefined) updatePayload.imageUrl = updates.imageUrl;
+          if (updates.notificationEnabled !== undefined)
+            updatePayload.notificationEnabled = updates.notificationEnabled;
           if (updates.startAt !== undefined)
             updatePayload.startAt =
               updates.startAt instanceof Date ? updates.startAt.toISOString() : updates.startAt;
@@ -190,7 +194,16 @@ export const useEventsStore = create<EventsState>()(
           }));
           return serverNormalized;
         } catch (error) {
-          // Revert to original state on error
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // 404: Event doesn't exist on server, try to create it
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            console.warn(`Event ${id} not found on server during update, attempting to create it...`);
+            const fullEvent = { ...currentEvent, ...updates };
+            return get().addEvent(fullEvent);
+          }
+
+          // FAILURE: Revert to original state
           set((state) => ({
             events: state.events.map((e) => (e.id === id ? currentEvent : e)),
           }));
@@ -199,7 +212,8 @@ export const useEventsStore = create<EventsState>()(
             'EventsStore.updateEvent',
             'high',
           );
-          return null;
+          // Rethrow so UI can show error feedback
+          throw error;
         }
       },
 
@@ -213,8 +227,16 @@ export const useEventsStore = create<EventsState>()(
 
         try {
           await apiRequest<{ id: string }>(`/api/events/${id}`, { method: 'DELETE' });
+          // SUCCESS: Delete persisted to DB
         } catch (error) {
-          // On error, restore the event to local state
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // 404 means event doesn't exist on server - that's fine, local delete succeeded
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            return; // Delete successful (event was local-only or already deleted)
+          }
+
+          // FAILURE: Restore the event to local state for real errors
           if (eventToRestore) {
             set((state) => ({ events: [...state.events, eventToRestore] }));
           }
@@ -223,7 +245,15 @@ export const useEventsStore = create<EventsState>()(
             'EventsStore.removeEvent',
             'high',
           );
+          // Rethrow so UI can show error feedback
+          throw error;
         }
+      },
+
+      toggleNotification: async (id) => {
+        const existing = get().events.find((event) => event.id === id);
+        if (!existing) return;
+        await get().updateEvent(id, { notificationEnabled: !existing.notificationEnabled });
       },
 
       getEventsByDate: (date) => {
@@ -258,6 +288,13 @@ export const useEventsStore = create<EventsState>()(
       name: 'events-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ events: state.events }),
+      // When rehydrating, ensure hasLoaded stays false so we fetch fresh data
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasLoaded = false;
+          state.isLoading = false;
+        }
+      },
     },
   ),
 );

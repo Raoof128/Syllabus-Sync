@@ -12,9 +12,12 @@ interface ORSFeature {
     };
     segments: {
       steps: {
+        type: number;
+        instruction: string;
         distance: number;
         duration: number;
-        instruction: string;
+        way_points: number[];
+        name?: string;
       }[];
     }[];
   };

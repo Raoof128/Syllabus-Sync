@@ -52,6 +52,7 @@ const unitUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   color: z.string().min(1).optional(),
   description: z.string().max(500).optional(),
+  notificationEnabled: z.boolean().optional(),
   location: z
     .object({
       building: z.string().default(''),
@@ -118,11 +119,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
 
       // Destructure to handle special fields - schedule is stored in class_times table, not units
-      const { location, schedule, ...rest } = parsed.data;
+      const { location, schedule, notificationEnabled, ...rest } = parsed.data;
 
       const updatePayload: Record<string, unknown> = {
         ...rest,
       };
+
+      // Map notificationEnabled to snake_case column
+      if (notificationEnabled !== undefined) {
+        updatePayload.notification_enabled = notificationEnabled;
+      }
 
       // Map location object to JSONB column (not flat columns)
       if (location) {

@@ -17,6 +17,7 @@ interface UnitsState {
   addUnit: (unit: Unit) => Promise<Unit | null>;
   removeUnit: (id: string) => Promise<void>;
   updateUnit: (id: string, unit: Partial<Unit>) => Promise<Unit | null>;
+  toggleNotification: (id: string) => Promise<void>;
   getUnitByCode: (code: string) => Unit | undefined;
   getTodayClasses: () => (Unit & ClassTime)[];
   clearUnits: () => void;
@@ -127,7 +128,7 @@ export const useUnitsStore = create<UnitsState>()(
         const unitToRestore = get().units.find((u) => u.id === id);
         const unitCode = unitToRestore?.code;
 
-        // Remove from local state immediately
+        // Remove from local state immediately (optimistic)
         set((state) => ({
           units: state.units.filter((u) => u.id !== id),
         }));
@@ -151,16 +152,36 @@ export const useUnitsStore = create<UnitsState>()(
               );
             }
           }
+          // SUCCESS: Delete succeeded - state already updated optimistically
         } catch (error) {
-          // On error, restore the unit to local state
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // 404 means unit doesn't exist on server - that's fine, local delete succeeded
+          // This happens when deleting units that were never synced to DB
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            // Dispatch event to clean up related deadlines locally
+            if (unitCode && typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('unit-deleted', {
+                  detail: { unitId: id, unitCode },
+                }),
+              );
+            }
+            return; // Delete successful (unit was local-only)
+          }
+
+          // FAILURE: Restore the unit to local state for real errors
           if (unitToRestore) {
             set((state) => ({ units: [...state.units, unitToRestore] }));
           }
+          // Always log and rethrow to let UI show error toast
           errorHandler.logError(
             error instanceof Error ? error : new Error(`Failed to remove unit ${id}`),
             'UnitsStore.removeUnit',
             'high',
           );
+          // Rethrow so calling code knows delete failed
+          throw error;
         }
       },
 
@@ -185,6 +206,7 @@ export const useUnitsStore = create<UnitsState>()(
               color: optimisticUpdate.color,
               location: optimisticUpdate.location,
               schedule: optimisticUpdate.schedule,
+              notificationEnabled: optimisticUpdate.notificationEnabled,
             }),
           });
 
@@ -194,7 +216,41 @@ export const useUnitsStore = create<UnitsState>()(
           }));
           return normalized;
         } catch (error) {
-          // Revert to original state on error
+          const errorMessage = error instanceof Error ? error.message : String(error);
+
+          // 404: Unit doesn't exist on server, try to create it instead
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            console.warn(`Unit ${id} not found on server during update, attempting to create it...`);
+            // Create the unit on server with current data
+            try {
+              const created = await apiRequest<Unit>('/api/units', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id: optimisticUpdate.id,
+                  code: optimisticUpdate.code,
+                  name: optimisticUpdate.name,
+                  color: optimisticUpdate.color,
+                  location: optimisticUpdate.location,
+                  schedule: optimisticUpdate.schedule,
+                  notificationEnabled: optimisticUpdate.notificationEnabled,
+                }),
+              });
+              const normalized = normalizeUnit(created);
+              set((state) => ({
+                units: state.units.map((u) => (u.id === id ? normalized : u)),
+              }));
+              return normalized;
+            } catch (createError) {
+              // If create also fails, revert and throw
+              set((state) => ({
+                units: state.units.map((u) => (u.id === id ? currentUnit : u)),
+              }));
+              throw createError;
+            }
+          }
+
+          // FAILURE: Revert to original state
           set((state) => ({
             units: state.units.map((u) => (u.id === id ? currentUnit : u)),
           }));
@@ -203,8 +259,15 @@ export const useUnitsStore = create<UnitsState>()(
             'UnitsStore.updateUnit',
             'high',
           );
-          return null;
+          // Rethrow so calling code knows update failed
+          throw error;
         }
+      },
+
+      toggleNotification: async (id) => {
+        const existing = get().units.find((unit) => unit.id === id);
+        if (!existing) return;
+        await get().updateUnit(id, { notificationEnabled: !existing.notificationEnabled });
       },
 
       getUnitByCode: (code) => {
@@ -244,6 +307,16 @@ export const useUnitsStore = create<UnitsState>()(
       name: 'units-storage',
       storage: createJSONStorage(() => localStorage),
       version: 2,
+      // Only persist units array, not loading state flags
+      // This ensures hasLoaded is always false on page reload, forcing fresh API fetch
+      partialize: (state) => ({ units: state.units }),
+      // When rehydrating, ensure hasLoaded stays false so we fetch fresh data
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasLoaded = false;
+          state.isLoading = false;
+        }
+      },
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
           // Migration from version 1 to 2: Convert old non-UUID string IDs to UUIDs

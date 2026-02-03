@@ -23,6 +23,7 @@ const todoUpdateSchema = z.object({
   description: z.string().max(1000).optional().nullable(),
   priority: z.enum(['Low', 'Medium', 'High']).optional(),
   completed: z.boolean().optional(),
+  notificationEnabled: z.boolean().optional(),
   dueDate: dateSchema.optional().nullable(),
   completedAt: dateSchema.optional().nullable(),
 });
@@ -34,6 +35,7 @@ const mapTodoRow = (row: Record<string, unknown>): Todo => ({
   description: row.description ? String(row.description) : undefined,
   priority: row.priority as Todo['priority'],
   completed: Boolean(row.completed),
+  notificationEnabled: Boolean(row.notification_enabled ?? false),
   dueDate: row.due_date ? new Date(row.due_date as string) : undefined,
   createdAt: new Date((row.created_at as string) ?? new Date()),
   completedAt: row.completed_at ? new Date(row.completed_at as string) : undefined,
@@ -74,6 +76,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
       if (parsed.data.completed !== undefined) {
         updatePayload.completed = parsed.data.completed;
+      }
+      if (parsed.data.notificationEnabled !== undefined) {
+        updatePayload.notification_enabled = parsed.data.notificationEnabled;
       }
       if (parsed.data.dueDate !== undefined) {
         updatePayload.due_date = parsed.data.dueDate?.toISOString() || null;
