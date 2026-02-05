@@ -133,13 +133,13 @@ export function MapLoadingSkeleton() {
               }}
             />
             <span className="text-mq-sm text-mq-content-secondary font-medium">
-              Loading campus map...
+              {t('loadingMap')}
             </span>
           </m.div>
         </div>
 
         {/* Screen reader text */}
-        <span className="sr-only">Loading interactive campus map, please wait...</span>
+        <span className="sr-only">{t('loadingMap')}</span>
       </div>
     </LazyMotion>
   );
@@ -192,7 +192,7 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
             </div>
           </m.div>
         ))}
-        <span className="sr-only">Loading building list...</span>
+        <span className="sr-only">{t('loadingBuildings')}</span>
       </div>
     </LazyMotion>
   );
@@ -218,7 +218,7 @@ export function CategoryFilterSkeleton() {
             transition={{ duration: 1.5, repeat: Infinity, delay: index * 0.05 }}
           />
         ))}
-        <span className="sr-only">Loading category filters...</span>
+        <span className="sr-only">{t('loadingFilters')}</span>
       </div>
     </LazyMotion>
   );

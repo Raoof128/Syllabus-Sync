@@ -27,10 +27,7 @@ interface FeaturedEventsBannerProps {
   onEventClick: (event: PublicEvent) => void;
 }
 
-export const FeaturedEventsBanner = memo(({
-  events,
-  onEventClick,
-}: FeaturedEventsBannerProps) => {
+export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEventsBannerProps) => {
   const { t, language } = useTypedTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -67,8 +64,13 @@ export const FeaturedEventsBanner = memo(({
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
-        <h2 className="text-xl font-bold text-mq-content">{t('featuredEvents') || 'Featured Events'}</h2>
-        <Badge variant="secondary" className="ml-2 bg-mq-primary/10 text-mq-primary border-mq-primary/20">
+        <h2 className="text-xl font-bold text-mq-content">
+          {t('featuredEvents') || 'Featured Events'}
+        </h2>
+        <Badge
+          variant="secondary"
+          className="ml-2 bg-mq-primary/10 text-mq-primary border-mq-primary/20"
+        >
           {events.length} {t('upcoming') || 'upcoming'}
         </Badge>
       </div>
@@ -80,7 +82,7 @@ export const FeaturedEventsBanner = memo(({
           onClick={() => onEventClick(currentEvent)}
           className={cn(
             'w-full text-left relative overflow-hidden bg-linear-to-r p-6 md:p-8 min-h-50 md:min-h-60 transition-all duration-500 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50',
-            categoryGradients[currentEvent.category]
+            categoryGradients[currentEvent.category],
           )}
         >
           {/* Decorative Pattern */}
@@ -182,9 +184,7 @@ export const FeaturedEventsBanner = memo(({
                 }}
                 className={cn(
                   'w-2 h-2 rounded-full transition-all duration-300',
-                  index === currentIndex
-                    ? 'bg-white w-6'
-                    : 'bg-white/40 hover:bg-white/60'
+                  index === currentIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60',
                 )}
                 aria-label={`Go to event ${index + 1}`}
               />
@@ -197,4 +197,3 @@ export const FeaturedEventsBanner = memo(({
 });
 
 FeaturedEventsBanner.displayName = 'FeaturedEventsBanner';
-

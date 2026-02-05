@@ -191,6 +191,8 @@ export default function PositionEditorClient() {
   const [showOnlyChanged, setShowOnlyChanged] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [saveMessage, setSaveMessage] = useState<string>('');
+  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveStatusResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get current position for a building (changed or original)
   const getCurrentPosition = useCallback(
@@ -348,9 +350,18 @@ export default function PositionEditorClient() {
   // Copy to clipboard
   const copyToClipboard = useCallback(async () => {
     const code = generateExportCode();
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      if (copyResetTimerRef.current) clearTimeout(copyResetTimerRef.current);
+      copyResetTimerRef.current = setTimeout(() => {
+        setCopied(false);
+        copyResetTimerRef.current = null;
+      }, 2000);
+    } catch (error) {
+      setSaveStatus('error');
+      setSaveMessage(error instanceof Error ? error.message : 'Failed to copy changes');
+    }
   }, [generateExportCode]);
 
   // Download as file
@@ -399,18 +410,22 @@ export default function PositionEditorClient() {
       setPositionChanges(new Map());
 
       // Auto-reset status after 5 seconds
-      setTimeout(() => {
+      if (saveStatusResetTimerRef.current) clearTimeout(saveStatusResetTimerRef.current);
+      saveStatusResetTimerRef.current = setTimeout(() => {
         setSaveStatus('idle');
         setSaveMessage('');
+        saveStatusResetTimerRef.current = null;
       }, 5000);
     } catch (error) {
       setSaveStatus('error');
       setSaveMessage(error instanceof Error ? error.message : 'Failed to save changes');
 
       // Auto-reset error status after 10 seconds
-      setTimeout(() => {
+      if (saveStatusResetTimerRef.current) clearTimeout(saveStatusResetTimerRef.current);
+      saveStatusResetTimerRef.current = setTimeout(() => {
         setSaveStatus('idle');
         setSaveMessage('');
+        saveStatusResetTimerRef.current = null;
       }, 10000);
     }
   }, [positionChanges]);
@@ -418,7 +433,12 @@ export default function PositionEditorClient() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      )
+        return;
 
       switch (e.key) {
         case 'ArrowLeft':
@@ -430,12 +450,32 @@ export default function PositionEditorClient() {
         case 'Escape':
           setSelectedBuilding(null);
           break;
+        case 'r':
+        case 'R':
+          if (selectedBuilding) {
+            resetBuilding(selectedBuilding.id);
+          }
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigateBuilding, selectedBuilding, resetBuilding]);
+
+  // Cleanup pending timers
+  useEffect(() => {
+    return () => {
+      if (copyResetTimerRef.current) {
+        clearTimeout(copyResetTimerRef.current);
+        copyResetTimerRef.current = null;
+      }
+      if (saveStatusResetTimerRef.current) {
+        clearTimeout(saveStatusResetTimerRef.current);
+        saveStatusResetTimerRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex h-screen w-full">

@@ -7,10 +7,12 @@ import { FeedSkeletons } from '@/components/feed/FeedSkeletons';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - University Events & Announcements`,
-  description: 'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized and never miss what matters.',
+  description:
+    'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized and never miss what matters.',
   openGraph: {
     title: `${APP_CONFIG.name} - University Events & Announcements`,
-    description: 'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized.',
+    description:
+      'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized.',
     type: 'website',
     images: [
       {

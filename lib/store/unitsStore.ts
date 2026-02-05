@@ -132,13 +132,13 @@ export const useUnitsStore = create<UnitsState>()(
           // This can happen if localStorage is out of sync with DB
           // Force refresh to get the correct state and return the existing unit
           if (errorMessage.includes('409') || errorMessage.includes('already exists')) {
-            console.warn(`Unit code ${normalized.code} already exists, refreshing from database...`);
+            console.warn(
+              `Unit code ${normalized.code} already exists, refreshing from database...`,
+            );
             await get().forceRefresh();
             // Find the existing unit by code (case-insensitive)
             const searchCode = normalized.code.toUpperCase();
-            const existingUnit = get().units.find(
-              (u) => u.code.toUpperCase() === searchCode
-            );
+            const existingUnit = get().units.find((u) => u.code.toUpperCase() === searchCode);
             return existingUnit || null;
           }
 
@@ -261,13 +261,17 @@ export const useUnitsStore = create<UnitsState>()(
 
             // After refresh, find the unit by code (case-insensitive since DB normalizes to uppercase)
             const searchCode = optimisticUpdate.code.toUpperCase();
-            const refreshedUnit = get().units.find(
-              (u) => u.code.toUpperCase() === searchCode
-            );
+            const refreshedUnit = get().units.find((u) => u.code.toUpperCase() === searchCode);
 
             console.log('After refresh, looking for code:', searchCode);
-            console.log('Available units:', get().units.map((u) => ({ id: u.id, code: u.code })));
-            console.log('Found refreshedUnit:', refreshedUnit ? { id: refreshedUnit.id, code: refreshedUnit.code } : null);
+            console.log(
+              'Available units:',
+              get().units.map((u) => ({ id: u.id, code: u.code })),
+            );
+            console.log(
+              'Found refreshedUnit:',
+              refreshedUnit ? { id: refreshedUnit.id, code: refreshedUnit.code } : null,
+            );
 
             if (refreshedUnit) {
               // Unit exists in DB - now update it with the correct ID
@@ -315,11 +319,17 @@ export const useUnitsStore = create<UnitsState>()(
                 const normalized = normalizeUnit(created);
                 // Add the newly created unit to state
                 set((state) => ({
-                  units: [...state.units.filter((u) => u.code.toUpperCase() !== optimisticUpdate.code.toUpperCase()), normalized],
+                  units: [
+                    ...state.units.filter(
+                      (u) => u.code.toUpperCase() !== optimisticUpdate.code.toUpperCase(),
+                    ),
+                    normalized,
+                  ],
                 }));
                 return normalized;
               } catch (createError) {
-                const createErrorMsg = createError instanceof Error ? createError.message : String(createError);
+                const createErrorMsg =
+                  createError instanceof Error ? createError.message : String(createError);
                 console.error('Failed to create unit:', createError);
 
                 // If 409, the unit exists - refresh and find it

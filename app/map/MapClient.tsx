@@ -4,7 +4,7 @@ import { Suspense, useEffect, useCallback, useMemo, useRef, useState } from 'rea
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import ReactDOM from 'react-dom';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import '@/app/styles/leaflet.css';
 import {
   X,
@@ -59,17 +59,25 @@ import type { LocationStatus, CampusMapRef } from './CampusMap';
 export default function MapClient() {
   const { t } = useTypedTranslation();
   const { safeT } = useSafeTranslation();
+  const prefersReducedMotion = useReducedMotion();
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
   const overlayToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const wasOverlayOpenRef = useRef(false);
 
-  // Preload critical map image for better LCP (Largest Contentful Paint)
-  // This tells the browser to fetch the image as high priority
-  if (typeof window !== 'undefined') {
-    ReactDOM.preload(CAMPUS_IMAGE_URL, { as: 'image' });
-  }
+  // Preload critical map image for better LCP (Largest Contentful Paint).
+  // Keep this in an effect to avoid side effects during render.
+  const hasPreloadedCampusImageRef = useRef(false);
+  useEffect(() => {
+    if (hasPreloadedCampusImageRef.current) return;
+    hasPreloadedCampusImageRef.current = true;
+    try {
+      ReactDOM.preload(CAMPUS_IMAGE_URL, { as: 'image' });
+    } catch {
+      // Ignore: preload is a progressive enhancement.
+    }
+  }, []);
 
   // Location status from CampusMap
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
@@ -360,8 +368,8 @@ export default function MapClient() {
                             triggerHaptic('tap', 'light');
                           }}
                           aria-pressed={isActive}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
+                          whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
+                          whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                           className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
                             isActive
                               ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
@@ -369,7 +377,7 @@ export default function MapClient() {
                           }`}
                         >
                           {/* Ripple Effect */}
-                          {isActive && (
+                          {isActive && !prefersReducedMotion && (
                             <m.div
                               className="absolute inset-0 bg-mq-primary/5 rounded-mq-lg pointer-events-none"
                               initial={{ scale: 0, opacity: 0.5 }}
@@ -380,14 +388,14 @@ export default function MapClient() {
 
                           <m.div
                             animate={
-                              isActive
+                              isActive && !prefersReducedMotion
                                 ? {
                                     scale: [1, 1.2, 1],
                                     rotate: [0, 5, -5, 0],
                                   }
-                                : {}
+                                : undefined
                             }
-                            transition={{ duration: 0.4 }}
+                            transition={prefersReducedMotion ? undefined : { duration: 0.4 }}
                           >
                             <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
                           </m.div>
@@ -446,7 +454,7 @@ export default function MapClient() {
                 <div className="flex items-center justify-between">
                   <CardTitle>{t('interactiveCampusMap')}</CardTitle>
                   <p className="text-xs text-mq-content-tertiary hidden md:block">
-                    Drag to pan, use +/- to zoom
+                    {t('mapPanZoomHint')}
                   </p>
                 </div>
               </CardHeader>

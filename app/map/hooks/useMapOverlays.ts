@@ -66,13 +66,27 @@ export function useMapOverlays({
   // Sync active overlays with map layers
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (!map || !leafletModule || !isReady) {
+    const currentLayers = layersRef.current;
+    const clearLayers = () => {
+      currentLayers.forEach((layer) => {
+        try {
+          if (map && map.hasLayer(layer)) {
+            map.removeLayer(layer);
+          }
+        } catch {
+          // Silently ignore cleanup errors during HMR
+        }
+      });
+      currentLayers.clear();
       setIsManaging(false);
+    };
+
+    if (!map || !leafletModule || !isReady) {
+      clearLayers();
       return;
     }
 
     setIsManaging(true);
-    const currentLayers = layersRef.current;
 
     try {
       // Remove layers that are no longer active
@@ -108,8 +122,12 @@ export function useMapOverlays({
     } catch (error) {
       mapLog.log('Error managing overlays:', error);
     }
+  }, [map, leafletModule, activeOverlays, isReady]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-    // Cleanup on unmount or dependency change
+  // Cleanup all overlays on unmount
+  useEffect(() => {
+    const currentLayers = layersRef.current;
     return () => {
       currentLayers.forEach((layer) => {
         try {
@@ -123,8 +141,7 @@ export function useMapOverlays({
       currentLayers.clear();
       setIsManaging(false);
     };
-  }, [map, leafletModule, activeOverlays, isReady]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [map]);
 
   // Manual add overlay
   const addOverlay = (overlayId: MapOverlayId) => {

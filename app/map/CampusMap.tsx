@@ -272,10 +272,12 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         useEffect(() => {
           if (!isReady || !isMapReady(map)) return;
           try {
-            map.setView(CAMPUS_CENTER_PIXEL, 0);
             map.setMaxBounds(PIXEL_BOUNDS);
-            map.setMinZoom(-2);
             map.setMaxZoom(2);
+            // Fit image to container on first load so the campus fills the viewport.
+            map.fitBounds(PIXEL_BOUNDS, { padding: [20, 20] });
+            // Lock min zoom to the fitted view to prevent the map from starting tiny.
+            map.setMinZoom(map.getZoom());
           } catch (error) {
             mapLog.log('Map setup error:', error);
           }
@@ -283,6 +285,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
         useEffect(() => {
           if (!isReady || !isMapReady(map) || !selectedBuildingProp) return;
+          let popupTimeout: ReturnType<typeof setTimeout> | null = null;
           try {
             const buildingLatLng = pixelToCrsSimple(
               selectedBuildingProp.position[0],
@@ -301,23 +304,34 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               animate: shouldAnimate,
             } as import('leaflet').ZoomPanOptions);
 
-            map.eachLayer((layer) => {
-              if (layer instanceof leafletModule.Marker) {
-                const marker = layer as import('leaflet').Marker;
-                const popupContent = marker.getPopup()?.getContent();
-                if (
-                  popupContent &&
-                  typeof popupContent === 'string' &&
-                  popupContent.includes(selectedBuildingProp.id)
-                ) {
-                  // Slight delay to allow flyTo to start
-                  setTimeout(() => marker.openPopup(), 800);
-                }
+            const openPopupForBuilding = () => {
+              try {
+                map.eachLayer((layer) => {
+                  if (layer instanceof leafletModule.Marker) {
+                    const marker = layer as import('leaflet').Marker;
+                    const popupContent = marker.getPopup()?.getContent();
+                    if (
+                      popupContent &&
+                      typeof popupContent === 'string' &&
+                      popupContent.includes(selectedBuildingProp.id)
+                    ) {
+                      marker.openPopup();
+                    }
+                  }
+                });
+              } catch {
+                // ignore popup open errors during rapid state changes/HMR
               }
-            });
+            };
+
+            // Slight delay to allow flyTo to start (skip delay when reduced motion is preferred)
+            popupTimeout = setTimeout(openPopupForBuilding, shouldAnimate ? 800 : 0);
           } catch (error) {
             mapLog.log('Building nav error:', error);
           }
+          return () => {
+            if (popupTimeout) clearTimeout(popupTimeout);
+          };
         }, [selectedBuildingProp, map, isReady, prefersReducedMotion]);
 
         return null;
@@ -388,7 +402,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       <div
         ref={mapContainerRef}
         className="relative w-full h-full"
-        role="application"
+        role="region"
         aria-label={t('interactiveCampusMap')}
       >
         {/* Screen Reader Announcements */}
@@ -401,11 +415,13 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           )}
           {isNavigating && navState && (
             <span>
-              Remaining: {formatDistance(navState.remainingDistance)}. Arrival:{' '}
-              {formatETA(navState.eta)}.
+              {t('navigationProgressAnnouncement', {
+                distance: formatDistance(navState.remainingDistance),
+                eta: formatETA(navState.eta),
+              })}
             </span>
           )}
-          {navState?.status === 'arrived' && <span>You have arrived at your destination.</span>}
+          {navState?.status === 'arrived' && <span>{t('navigationArrived')}</span>}
           {isOffCampus && (
             <span>{safeT('locationOutsideCampusTitle', 'Outside campus boundary')}</span>
           )}
@@ -558,7 +574,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </reactLeafletModule.MapContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">
-            <span className="animate-pulse text-mq-content-secondary">Loading Map...</span>
+            <span className="animate-pulse text-mq-content-secondary">{t('loadingMap')}</span>
           </div>
         )}
 
@@ -587,9 +603,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               </div>
               {overlayUrl && (
                 <div className="mt-3 rounded border border-mq-border bg-mq-background p-2">
-                  <div className="text-xs text-mq-content-tertiary mb-2">
-                    Debug image preview:
-                  </div>
+                  <div className="text-xs text-mq-content-tertiary mb-2">Debug image preview:</div>
                   <Image
                     src={overlayUrl}
                     alt="Campus map debug preview"
@@ -660,8 +674,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                     )}
                   </div>
                   <div className="text-sm text-mq-content-secondary">
-                    Next:{' '}
-                    {navState.instructions[navState.currentInstructionIndex + 1]?.text || 'Arrive'}
+                    {t('next')}:{' '}
+                    {navState.instructions[navState.currentInstructionIndex + 1]?.text ||
+                      t('arrive')}
                   </div>
                 </div>
                 <button

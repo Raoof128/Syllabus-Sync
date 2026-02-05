@@ -791,10 +791,23 @@ export default function CalendarWidgets({
                                   ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-900/40'
                                   : 'hover:bg-mq-hover-background text-mq-content-secondary hover:text-amber-500',
                               )}
-                              title={todo.notificationEnabled ? tOr('cancelReminder', 'Disable notification') : tOr('setReminder', 'Set reminder')}
-                              aria-label={todo.notificationEnabled ? tOr('cancelReminder', 'Disable notification') : tOr('setReminder', 'Set reminder')}
+                              title={
+                                todo.notificationEnabled
+                                  ? tOr('cancelReminder', 'Disable notification')
+                                  : tOr('setReminder', 'Set reminder')
+                              }
+                              aria-label={
+                                todo.notificationEnabled
+                                  ? tOr('cancelReminder', 'Disable notification')
+                                  : tOr('setReminder', 'Set reminder')
+                              }
                             >
-                              <Bell className={cn('h-3.5 w-3.5', todo.notificationEnabled && 'fill-current')} />
+                              <Bell
+                                className={cn(
+                                  'h-3.5 w-3.5',
+                                  todo.notificationEnabled && 'fill-current',
+                                )}
+                              />
                             </button>
                           </div>
                         </div>

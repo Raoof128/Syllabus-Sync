@@ -7,14 +7,12 @@ interface EventCardSkeletonProps {
   className?: string;
 }
 
-export const EventCardSkeleton = memo(({
-  className,
-}: EventCardSkeletonProps) => {
+export const EventCardSkeleton = memo(({ className }: EventCardSkeletonProps) => {
   return (
     <div
       className={cn(
         'flex flex-col h-full bg-mq-card-background rounded-2xl border border-mq-border overflow-hidden',
-        className
+        className,
       )}
     >
       {/* Category Strip */}
@@ -117,4 +115,3 @@ export const FeedSkeletons = memo(() => {
 });
 
 FeedSkeletons.displayName = 'FeedSkeletons';
-

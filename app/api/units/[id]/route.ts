@@ -374,11 +374,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       // HARD DELETE: Actually remove the unit from database
       // This allows the user to re-add a unit with the same code later
-      const { error } = await supabase
-        .from('units')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+      const { error } = await supabase.from('units').delete().eq('id', id).eq('user_id', userId);
 
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client

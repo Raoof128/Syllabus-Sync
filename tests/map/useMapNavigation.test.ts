@@ -123,8 +123,8 @@ describe('useMapNavigation', () => {
 
     expect(result.current.isNavigating).toBe(false);
     expect(toastUtils.warning).toHaveBeenCalledWith(
-      'locationOutsideCampusTitle',
-      'locationOutsideCampusMessage',
+      'Outside campus boundary',
+      'Navigation is disabled while you are outside campus.',
     );
   });
 

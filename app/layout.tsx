@@ -1,26 +1,11 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
-import { Work_Sans, Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import './mq-tokens.css';
 import ClientLayout from './client-layout';
 import QueryProvider from '@/components/providers/QueryProvider';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { THEME_SCRIPT, RTL_SCRIPT } from '@/lib/security/csp';
-
-const workSans = Work_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-work-sans',
-  display: 'swap',
-});
-
-const sourceSerif4 = Source_Serif_4({
-  subsets: ['latin'],
-  weight: ['300', '400', '600'],
-  variable: '--font-source-serif-4',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: {
@@ -70,11 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html
-      lang="en"
-      className={`${workSans.variable} ${sourceSerif4.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Theme and RTL scripts - minified and hash-validated by CSP */}
         {/* SECURITY: These scripts are validated via SHA-256 hashes in the CSP header */}

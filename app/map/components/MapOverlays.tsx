@@ -23,9 +23,24 @@ export function MapOverlays({
 
   // Active overlay layers (parking, water, etc.)
   useEffect(() => {
-    if (!mapInstance || !leafletModule || !overlaysReady) return;
-
     const currentOverlays = activeOverlayRefs.current;
+    const clearAllOverlays = () => {
+      currentOverlays.forEach((overlay) => {
+        try {
+          if (mapInstance && mapInstance.hasLayer(overlay)) {
+            mapInstance.removeLayer(overlay);
+          }
+        } catch {
+          // Silently ignore cleanup errors during HMR
+        }
+      });
+      currentOverlays.clear();
+    };
+
+    if (!mapInstance || !leafletModule || !overlaysReady) {
+      clearAllOverlays();
+      return;
+    }
 
     try {
       // Remove overlays that are no longer active
@@ -60,9 +75,12 @@ export function MapOverlays({
     } catch (error) {
       mapLog.log('Error managing active overlays:', error);
     }
+  }, [mapInstance, leafletModule, overlaysReady, activeOverlays]);
 
+  // Ensure overlays are cleaned up when component unmounts.
+  useEffect(() => {
+    const currentOverlays = activeOverlayRefs.current;
     return () => {
-      // Cleanup all active overlays
       currentOverlays.forEach((overlay) => {
         try {
           if (mapInstance && mapInstance.hasLayer(overlay)) {
@@ -74,7 +92,7 @@ export function MapOverlays({
       });
       currentOverlays.clear();
     };
-  }, [mapInstance, leafletModule, overlaysReady, activeOverlays]);
+  }, [mapInstance]);
 
   return null;
 }

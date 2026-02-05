@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { toastUtils } from '@/lib/utils/toast';
 import { devLog } from '@/lib/utils/devLog';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { GPS_CAMPUS_BOUNDS } from '@/lib/map/constants';
 import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import {
@@ -23,6 +23,9 @@ const MOVEMENT_THRESHOLD = 0.2; // m/s
 // Logger
 const mapLog = devLog.map;
 
+const NAVIGATION_ACTIVE_STATUSES: Array<ReturnType<NavigationStateManager['getState']>['status']> =
+  ['navigating', 'off-route', 'recalculating'];
+
 interface UseMapLocationProps {
   mapInstance: LeafletMap | null;
   leafletModule: typeof import('leaflet') | null;
@@ -40,16 +43,7 @@ export function useMapLocation({
   isNavigating,
   navManagerRef,
 }: UseMapLocationProps) {
-  const { t } = useTypedTranslation();
-
-  const safeT = useCallback(
-    (key: string, fallback: string) => {
-      // @ts-expect-error - allow string
-      const result = t(key);
-      return result === key ? fallback : result;
-    },
-    [t],
-  );
+  const { safeT } = useSafeTranslation();
 
   // State
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
@@ -101,7 +95,7 @@ export function useMapLocation({
   useEffect(() => {
     if (typeof window === 'undefined' || !window.DeviceMotionEvent) return;
 
-    let motionTimeout: NodeJS.Timeout;
+    let motionTimeout: ReturnType<typeof setTimeout>;
 
     const handleMotion = (event: DeviceMotionEvent) => {
       const { acceleration } = event;
@@ -202,8 +196,15 @@ export function useMapLocation({
           setSmoothedPosition(smoothed);
 
           // Update navigation manager
-          if (isNavigating && navManagerRef.current) {
-            navManagerRef.current.updatePosition({
+          const navManager = navManagerRef.current;
+          const navigationActive =
+            isNavigating ??
+            (navManager
+              ? NAVIGATION_ACTIVE_STATUSES.includes(navManager.getState().status)
+              : false);
+
+          if (navigationActive && navManager) {
+            navManager.updatePosition({
               lat: gpsLat,
               lng: gpsLng,
               accuracy: pos.coords.accuracy,

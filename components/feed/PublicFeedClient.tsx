@@ -80,7 +80,7 @@ export default function PublicFeedClient() {
           e.title.toLowerCase().includes(query) ||
           e.description.toLowerCase().includes(query) ||
           e.location.toLowerCase().includes(query) ||
-          (e.building && e.building.toLowerCase().includes(query))
+          (e.building && e.building.toLowerCase().includes(query)),
       );
     }
 
@@ -147,24 +147,21 @@ export default function PublicFeedClient() {
 
       if (result.success) {
         if (result.alreadyAdded) {
-          toastUtils.info(
-            'Already Added',
-            'This event is already in your calendar.'
-          );
+          toastUtils.info('Already Added', 'This event is already in your calendar.');
         } else {
           toastUtils.success(
             t('addedToCalendar') || 'Added to Calendar',
-            'Event has been added to your personal calendar.'
+            'Event has been added to your personal calendar.',
           );
         }
       } else {
         toastUtils.error(
           t('error') || 'Error',
-          'Failed to add event to calendar. Please try again.'
+          'Failed to add event to calendar. Please try again.',
         );
       }
     },
-    [addToCalendar, t]
+    [addToCalendar, t],
   );
 
   // Handle event click
@@ -189,173 +186,173 @@ export default function PublicFeedClient() {
               {t('eventFeed') || 'University Events & Announcements'}
             </h1>
             <p className="text-mq-content-secondary mt-1">
-              {t('feedDescription') || 'Browse campus events and add them to your personal calendar'}
+              {t('feedDescription') ||
+                'Browse campus events and add them to your personal calendar'}
             </p>
           </div>
         </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left Column - Events */}
-        <div className="flex-1 min-w-0">
-          {/* Loading State */}
-          {isLoading && <FeedSkeletons />}
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Column - Events */}
+          <div className="flex-1 min-w-0">
+            {/* Loading State */}
+            {isLoading && <FeedSkeletons />}
 
-          {/* Error State */}
-          {error && !isLoading && (
-            <MagicCard className="p-8 text-center">
-              <p className="text-mq-error mb-4">{error}</p>
-              <Button onClick={() => fetchPublicEvents()}>
-                {t('tryAgain') || 'Try Again'}
-              </Button>
-            </MagicCard>
-          )}
-
-          {/* Content */}
-          {!isLoading && !error && (
-            <>
-              {/* Featured Events Banner */}
-              {featuredEvents.length > 0 && (
-                <FeaturedEventsBanner
-                  events={featuredEvents}
-                  onEventClick={handleEventClick}
-                />
-              )}
-
-              {/* Search and Filters */}
-              <MagicCard isLiquidEnhanced className="mb-6">
-                <div className="p-4 space-y-4">
-                  {/* Search */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
-                    <Input
-                      type="search"
-                      placeholder="Search events..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-
-                  {/* Filters Row */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    {/* Category Pills */}
-                    <div className="flex flex-wrap gap-2">
-                      {categoryFilters.map((cat) => (
-                        <Button
-                          key={cat.value}
-                          variant={categoryFilter === cat.value ? 'primary' : 'outline'}
-                          size="sm"
-                          onClick={() => setCategoryFilter(cat.value)}
-                          className="gap-1.5"
-                        >
-                          <span>{cat.icon}</span>
-                          {cat.value}
-                          {cat.value !== 'All' && (
-                            <Badge
-                              variant="secondary"
-                              className={cn(
-                                'ml-1 text-[10px] min-w-4.5 h-4.5 flex items-center justify-center',
-                                categoryFilter === cat.value
-                                  ? 'bg-white/20 text-white'
-                                  : 'bg-mq-background-secondary'
-                              )}
-                            >
-                              {categoryCounts[cat.value]}
-                            </Badge>
-                          )}
-                        </Button>
-                      ))}
-                    </div>
-
-                    {/* Sort & Time Filter */}
-                    <div className="flex items-center gap-2 ml-auto">
-                      <Select value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
-                        <SelectTrigger className="w-30">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Time</SelectItem>
-                          <SelectItem value="today">{t('today') || 'Today'}</SelectItem>
-                          <SelectItem value="week">{t('thisWeek') || 'This Week'}</SelectItem>
-                          <SelectItem value="month">This Month</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <Select value={sortOption} onValueChange={(v) => setSortOption(v as SortOption)}>
-                        <SelectTrigger className="w-32.5">
-                          <SlidersHorizontal className="h-4 w-4 mr-2" />
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="date">By Date</SelectItem>
-                          <SelectItem value="priority">By Priority</SelectItem>
-                          <SelectItem value="category">By Category</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
+            {/* Error State */}
+            {error && !isLoading && (
+              <MagicCard className="p-8 text-center">
+                <p className="text-mq-error mb-4">{error}</p>
+                <Button onClick={() => fetchPublicEvents()}>{t('tryAgain') || 'Try Again'}</Button>
               </MagicCard>
+            )}
 
-              {/* Events Grid */}
-              {gridEvents.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {gridEvents.map((event) => (
-                    <PublicEventCard
-                      key={event.id}
-                      event={event}
-                      isAdded={addedToCalendar.has(event.id)}
-                      isAdding={isAddingToCalendar.has(event.id)}
-                      onAddToCalendar={() => handleAddToCalendar(event.id)}
-                      onClick={() => handleEventClick(event)}
-                      locale={locale}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <MagicCard className="p-12 text-center">
-                  <div className="text-4xl mb-4">🔍</div>
-                  <h3 className="text-lg font-semibold text-mq-content mb-2">
-                    No Events Found
-                  </h3>
-                  <p className="text-mq-content-secondary">
-                    Try adjusting your search or filters
-                  </p>
+            {/* Content */}
+            {!isLoading && !error && (
+              <>
+                {/* Featured Events Banner */}
+                {featuredEvents.length > 0 && (
+                  <FeaturedEventsBanner events={featuredEvents} onEventClick={handleEventClick} />
+                )}
+
+                {/* Search and Filters */}
+                <MagicCard isLiquidEnhanced className="mb-6">
+                  <div className="p-4 space-y-4">
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
+                      <Input
+                        type="search"
+                        placeholder="Search events..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {/* Filters Row */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Category Pills */}
+                      <div className="flex flex-wrap gap-2">
+                        {categoryFilters.map((cat) => (
+                          <Button
+                            key={cat.value}
+                            variant={categoryFilter === cat.value ? 'primary' : 'outline'}
+                            size="sm"
+                            onClick={() => setCategoryFilter(cat.value)}
+                            className="gap-1.5"
+                          >
+                            <span>{cat.icon}</span>
+                            {cat.value}
+                            {cat.value !== 'All' && (
+                              <Badge
+                                variant="secondary"
+                                className={cn(
+                                  'ml-1 text-[10px] min-w-4.5 h-4.5 flex items-center justify-center',
+                                  categoryFilter === cat.value
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-mq-background-secondary',
+                                )}
+                              >
+                                {categoryCounts[cat.value]}
+                              </Badge>
+                            )}
+                          </Button>
+                        ))}
+                      </div>
+
+                      {/* Sort & Time Filter */}
+                      <div className="flex items-center gap-2 ml-auto">
+                        <Select
+                          value={timeFilter}
+                          onValueChange={(v) => setTimeFilter(v as TimeFilter)}
+                        >
+                          <SelectTrigger className="w-30">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Time</SelectItem>
+                            <SelectItem value="today">{t('today') || 'Today'}</SelectItem>
+                            <SelectItem value="week">{t('thisWeek') || 'This Week'}</SelectItem>
+                            <SelectItem value="month">This Month</SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Select
+                          value={sortOption}
+                          onValueChange={(v) => setSortOption(v as SortOption)}
+                        >
+                          <SelectTrigger className="w-32.5">
+                            <SlidersHorizontal className="h-4 w-4 mr-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="date">By Date</SelectItem>
+                            <SelectItem value="priority">By Priority</SelectItem>
+                            <SelectItem value="category">By Category</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
                 </MagicCard>
-              )}
-            </>
-          )}
+
+                {/* Events Grid */}
+                {gridEvents.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {gridEvents.map((event) => (
+                      <PublicEventCard
+                        key={event.id}
+                        event={event}
+                        isAdded={addedToCalendar.has(event.id)}
+                        isAdding={isAddingToCalendar.has(event.id)}
+                        onAddToCalendar={() => handleAddToCalendar(event.id)}
+                        onClick={() => handleEventClick(event)}
+                        locale={locale}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <MagicCard className="p-12 text-center">
+                    <div className="text-4xl mb-4">🔍</div>
+                    <h3 className="text-lg font-semibold text-mq-content mb-2">No Events Found</h3>
+                    <p className="text-mq-content-secondary">
+                      Try adjusting your search or filters
+                    </p>
+                  </MagicCard>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Right Sidebar */}
+          <aside className="w-full lg:w-80 shrink-0 space-y-6">
+            {/* Quick Stats */}
+            <MagicCard isLiquidEnhanced>
+              <div className="p-4">
+                <QuickStats events={events} />
+              </div>
+            </MagicCard>
+
+            {/* Announcements */}
+            <MagicCard isLiquidEnhanced>
+              <div className="p-4">
+                <AnnouncementsSection />
+              </div>
+            </MagicCard>
+          </aside>
         </div>
 
-        {/* Right Sidebar */}
-        <aside className="w-full lg:w-80 shrink-0 space-y-6">
-          {/* Quick Stats */}
-          <MagicCard isLiquidEnhanced>
-            <div className="p-4">
-              <QuickStats events={events} />
-            </div>
-          </MagicCard>
-
-          {/* Announcements */}
-          <MagicCard isLiquidEnhanced>
-            <div className="p-4">
-              <AnnouncementsSection />
-            </div>
-          </MagicCard>
-        </aside>
-      </div>
-
-      {/* Event Detail Modal */}
-      <EventDetailModal
-        event={selectedEvent}
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        isAdded={selectedEvent ? addedToCalendar.has(selectedEvent.id) : false}
-        isAdding={selectedEvent ? isAddingToCalendar.has(selectedEvent.id) : false}
-        onAddToCalendar={() => selectedEvent && handleAddToCalendar(selectedEvent.id)}
-        locale={locale}
-      />
+        {/* Event Detail Modal */}
+        <EventDetailModal
+          event={selectedEvent}
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          isAdded={selectedEvent ? addedToCalendar.has(selectedEvent.id) : false}
+          isAdding={selectedEvent ? isAddingToCalendar.has(selectedEvent.id) : false}
+          onAddToCalendar={() => selectedEvent && handleAddToCalendar(selectedEvent.id)}
+          locale={locale}
+        />
       </div>
     </section>
   );

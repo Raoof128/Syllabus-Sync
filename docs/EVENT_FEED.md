@@ -7,11 +7,13 @@ The Event Feed is a public university announcement board that displays campus-wi
 ## Features
 
 ### 📢 Public Event Board
+
 - **Global Visibility**: All events are visible to every user (authenticated and anonymous)
 - **Read-Only**: Users cannot edit or delete public events
 - **Official Content**: Events are managed by university administrators only
 
 ### 📅 Personal Calendar Integration
+
 - **One-Click Add**: Users can add any public event to their personal calendar
 - **Instant Sync**: Added events appear immediately in the Calendar tab
 - **User Control**: Once added, users can:
@@ -21,6 +23,7 @@ The Event Feed is a public university announcement board that displays campus-wi
   - View event details
 
 ### 🎨 Modern Design
+
 - **Category Colors**: Visual distinction by event type (Career, Academic, Social, Free Food)
 - **Featured Events**: Highlighted priority events with special badges
 - **Responsive Layout**: Works seamlessly on mobile, tablet, and desktop
@@ -31,6 +34,7 @@ The Event Feed is a public university announcement board that displays campus-wi
 ### Database Tables
 
 #### 1. `public_events` (Global Events)
+
 ```sql
 CREATE TABLE public.public_events (
   id uuid PRIMARY KEY,
@@ -53,12 +57,14 @@ CREATE TABLE public.public_events (
 ```
 
 **Key Points:**
+
 - No `user_id` - these are global events
 - Only service role can INSERT/UPDATE/DELETE
 - Everyone can SELECT (including anonymous users)
 - `is_featured` and `priority` control visibility
 
 #### 2. `events` (User Calendar Events)
+
 ```sql
 CREATE TABLE public.events (
   id uuid PRIMARY KEY,
@@ -82,6 +88,7 @@ CREATE TABLE public.events (
 ```
 
 **Key Points:**
+
 - Each event has a `user_id` (user-owned)
 - `source_public_event_id` tracks which public event was copied
 - Users have full CRUD permissions on their own events
@@ -90,12 +97,14 @@ CREATE TABLE public.events (
 ### Database Function
 
 #### `add_public_event_to_calendar(p_public_event_id)`
+
 ```sql
 CREATE FUNCTION add_public_event_to_calendar(p_public_event_id uuid)
 RETURNS uuid  -- Returns the new event ID
 ```
 
 **Behavior:**
+
 1. Checks authentication (must be logged in)
 2. Checks if user already added this event (prevents duplicates)
 3. Copies public event to user's calendar table
@@ -104,7 +113,9 @@ RETURNS uuid  -- Returns the new event ID
 ### Components
 
 #### 1. `PublicFeedClient`
+
 Main feed page component
+
 - Fetches public events from `publicEventsStore`
 - Displays search and filters
 - Shows featured events banner
@@ -114,7 +125,9 @@ Main feed page component
 **Location:** `/components/feed/PublicFeedClient.tsx`
 
 #### 2. `PublicEventCard`
+
 Individual event card
+
 - Displays event title, description, date, time, location
 - Category badge with color coding
 - "Add to Calendar" button with loading states
@@ -124,7 +137,9 @@ Individual event card
 **Location:** `/components/feed/PublicEventCard.tsx`
 
 #### 3. `EventDetailModal`
+
 Full event details in a modal
+
 - Gradient header with category styling
 - Complete event information
 - Location details with building info
@@ -134,7 +149,9 @@ Full event details in a modal
 **Location:** `/components/feed/EventDetailModal.tsx`
 
 #### 4. `EventsFeed` (Home Page)
+
 Today's events widget on home page
+
 - Shows public events happening TODAY
 - Quick preview of 3-5 events
 - "View All" button links to full feed
@@ -144,7 +161,9 @@ Today's events widget on home page
 ### State Management
 
 #### `publicEventsStore`
+
 Zustand store for public events
+
 - `events`: Array of all public events
 - `featuredEvents`: Filtered featured events
 - `isLoading`: Loading state
@@ -156,7 +175,9 @@ Zustand store for public events
 **Location:** `/lib/store/publicEventsStore.ts`
 
 #### `eventsStore`
+
 Zustand store for user's personal calendar events
+
 - Manages user-owned events in `events` table
 - Automatically loads on calendar page
 - Shows events added from public feed
@@ -166,12 +187,14 @@ Zustand store for user's personal calendar events
 ## User Flow
 
 ### Viewing Events
+
 1. User navigates to `/feed` (Event Feed page)
 2. `PublicFeedClient` loads and fetches public events
 3. Events are displayed with filters and search
 4. User can browse, filter by category, search, and sort
 
 ### Adding to Calendar
+
 1. User clicks "Add to Calendar" button on an event card
 2. `publicEventsStore.addToCalendar(eventId)` is called
 3. Backend function `add_public_event_to_calendar` executes:
@@ -182,6 +205,7 @@ Zustand store for user's personal calendar events
 5. Event immediately appears in user's Calendar tab
 
 ### Managing Added Events
+
 1. User navigates to `/calendar`
 2. `eventsStore` loads user's personal events
 3. Events from public feed are included (have `source_public_event_id`)
@@ -194,12 +218,14 @@ Zustand store for user's personal calendar events
 ## Rules & Permissions
 
 ### Public Events
+
 - ✅ Anyone can VIEW (even anonymous)
 - ❌ Regular users CANNOT edit
 - ❌ Regular users CANNOT delete
 - ✅ Admin/service role can manage
 
 ### User Calendar Events
+
 - ✅ Users can CREATE (by adding from feed or manually)
 - ✅ Users can READ (only their own)
 - ✅ Users can UPDATE (only their own)
@@ -209,6 +235,7 @@ Zustand store for user's personal calendar events
 ## RLS (Row Level Security)
 
 ### `public_events`
+
 ```sql
 -- Everyone can read (not deleted)
 CREATE POLICY "Anyone can read public events"
@@ -217,6 +244,7 @@ USING (deleted_at IS NULL);
 ```
 
 ### `events`
+
 ```sql
 -- Users can only see their own events
 CREATE POLICY "Users can read own events"
@@ -242,6 +270,7 @@ USING (user_id = auth.uid());
 ## Styling & Design
 
 ### Category Colors
+
 ```typescript
 Career:      Blue   (💼)
 Social:      Purple (🎉)
@@ -250,12 +279,14 @@ Free Food:   Amber  (🍕)
 ```
 
 ### Featured Events
+
 - Gradient amber/orange badge "✨ Featured"
 - Higher priority in sorting
 - Displayed in banner carousel
 - More prominent styling
 
 ### Responsive Design
+
 - Mobile: Single column grid
 - Tablet: 2 column grid
 - Desktop: 3 column grid
@@ -264,13 +295,17 @@ Free Food:   Amber  (🍕)
 ## API Endpoints
 
 ### GET `/api/public-events`
+
 Fetches all public events (used by store)
+
 - No authentication required
 - Returns events with `deleted_at IS NULL`
 - Sorted by priority and date
 
 ### POST `/api/events`
+
 Creates a user calendar event
+
 - Requires authentication
 - Used when manually creating events
 - Can also be used by `add_public_event_to_calendar` function
@@ -278,6 +313,7 @@ Creates a user calendar event
 ## Sample Events
 
 The migration `20260203000000_public_events.sql` includes 15+ sample events:
+
 - Career Fair 2026
 - O-Week Welcome Festival
 - Free Pizza Friday
@@ -293,6 +329,7 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Future Enhancements
 
 ### Potential Features
+
 - [ ] Event registration/RSVP
 - [ ] Event reminders via email/push notifications
 - [ ] Event categories customization
@@ -307,6 +344,7 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Testing
 
 ### Manual Testing Checklist
+
 - [ ] View events on feed page without login
 - [ ] Search and filter events
 - [ ] Sort events by date/priority/category
@@ -322,18 +360,21 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Troubleshooting
 
 ### Events Not Showing
+
 1. Check if migration ran: `supabase migration list`
 2. Verify RLS policies: `SELECT * FROM public_events` (should be visible)
 3. Check browser console for errors
 4. Verify `publicEventsStore.fetchPublicEvents()` is called
 
 ### "Add to Calendar" Not Working
+
 1. Verify user is authenticated
 2. Check database function exists: `add_public_event_to_calendar`
 3. Check `events` table has proper RLS policies
 4. Verify `source_public_event_id` column exists
 
 ### Events Not in Calendar
+
 1. Check `eventsStore` loaded data
 2. Verify `user_id` matches authenticated user
 3. Check `deleted_at IS NULL`
@@ -342,17 +383,20 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Deployment
 
 ### Required Environment Variables
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (for admin operations)
 
 ### Database Setup
+
 1. Run migration: `supabase migration up`
 2. Verify tables created
 3. Verify sample data inserted
 4. Test RLS policies
 
 ### Production Considerations
+
 - Public events should be managed via admin panel (not included yet)
 - Consider caching for better performance
 - Monitor database query performance
@@ -362,6 +406,7 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Related Files
 
 ### Components
+
 - `/components/feed/PublicFeedClient.tsx`
 - `/components/feed/PublicEventCard.tsx`
 - `/components/feed/EventDetailModal.tsx`
@@ -372,18 +417,22 @@ All events are dynamically dated relative to NOW() + intervals.
 - `/components/home/EventsFeed.tsx`
 
 ### State Management
+
 - `/lib/store/publicEventsStore.ts`
 - `/lib/store/eventsStore.ts`
 
 ### Types
+
 - `/lib/types/publicEvents.ts`
 - `/lib/types/index.ts`
 
 ### Database
+
 - `/supabase/migrations/20260203000002_public_events.sql`
 - `/database-schema.sql`
 
 ### Pages
+
 - `/app/feed/page.tsx`
 - `/app/calendar/page.tsx`
 - `/app/calendar/CalendarClient.tsx`
@@ -391,6 +440,7 @@ All events are dynamically dated relative to NOW() + intervals.
 ## Support
 
 For questions or issues:
+
 1. Check this documentation
 2. Review database schema
 3. Check browser console for errors

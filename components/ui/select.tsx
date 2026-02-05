@@ -116,7 +116,7 @@ function SelectItem({
         // Dark mode text colors
         "dark:text-[#e8e9e7] dark:[&_svg:not([class*='text-'])]:text-[#a0a29c]",
         // Hover states
-        "focus:bg-[#d6d2c4] focus:text-[#1a1a1a] dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]",
+        'focus:bg-[#d6d2c4] focus:text-[#1a1a1a] dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]',
         className,
       )}
       {...props}

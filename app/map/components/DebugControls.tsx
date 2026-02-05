@@ -28,6 +28,7 @@ export function DebugControls({
     if (!isOpen) return;
     let lastTime = performance.now();
     let frames = 0;
+    let frameId = 0;
     const loop = () => {
       const now = performance.now();
       frames++;
@@ -36,10 +37,12 @@ export function DebugControls({
         frames = 0;
         lastTime = now;
       }
-      requestAnimationFrame(loop);
+      frameId = requestAnimationFrame(loop);
     };
-    const id = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(id);
+    frameId = requestAnimationFrame(loop);
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [isOpen]);
 
   if (!isOpen) {
@@ -49,6 +52,7 @@ export function DebugControls({
         size="sm"
         className="absolute top-24 left-4 z-[1000] bg-white/90 backdrop-blur shadow-md border-mq-border h-8 w-8 p-0"
         onClick={() => setIsOpen(true)}
+        aria-label="Open map developer tools"
       >
         <Settings2 className="h-4 w-4 text-mq-content-secondary" />
       </Button>
@@ -67,6 +71,7 @@ export function DebugControls({
           size="sm"
           className="h-6 w-6 p-0 hover:bg-mq-background-secondary"
           onClick={() => setIsOpen(false)}
+          aria-label="Close map developer tools"
         >
           ✕
         </Button>

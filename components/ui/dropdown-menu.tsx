@@ -91,11 +91,11 @@ function DropdownMenuItem({
         // Dark mode colors
         "dark:text-[#e8e9e7] dark:[&_svg:not([class*='text-'])]:text-[#a0a29c]",
         // Hover/focus states - light mode
-        "focus:bg-[#f5f5f5] focus:text-[#1a1a1a]",
+        'focus:bg-[#f5f5f5] focus:text-[#1a1a1a]',
         // Hover/focus states - dark mode
-        "dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]",
+        'dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]',
         // Destructive variant
-        "data-[variant=destructive]:text-[#ef4444] data-[variant=destructive]:focus:bg-[#ef4444]/10 data-[variant=destructive]:focus:text-[#ef4444] data-[variant=destructive]:*:[svg]:text-[#ef4444]!",
+        'data-[variant=destructive]:text-[#ef4444] data-[variant=destructive]:focus:bg-[#ef4444]/10 data-[variant=destructive]:focus:text-[#ef4444] data-[variant=destructive]:*:[svg]:text-[#ef4444]!',
         className,
       )}
       {...props}

@@ -96,6 +96,9 @@
   /* Typography - --f-[family] format */
   --f-primary: 'Work Sans', sans-serif;
   --f-secondary: 'Source Serif Pro', serif;
+  /* Tailwind uses these next/font-compatible variables (see tailwind.config.ts). */
+  --font-work-sans: var(--f-primary);
+  --font-source-serif-pro: var(--f-secondary);
 
   /* Font Sizes - --fs-[size] format */
   --fs-small: 0.875rem;

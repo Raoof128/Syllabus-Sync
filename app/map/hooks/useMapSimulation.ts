@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { devLog } from '@/lib/utils/devLog';
 
 const mapLog = devLog.map;
@@ -36,8 +36,8 @@ export function useMapSimulation({
   routeCoordinates = [],
   onUpdate,
 }: UseMapSimulationProps): UseMapSimulationReturn {
-  const simulationRef = useRef<NodeJS.Timeout | null>(null);
-  const isSimulatingRef = useRef(false);
+  const simulationRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   // Mock route for when no real route is available
   const mockRoute: [number, number][] = [
@@ -51,7 +51,7 @@ export function useMapSimulation({
     if (simulationRef.current) {
       clearInterval(simulationRef.current);
       simulationRef.current = null;
-      isSimulatingRef.current = false;
+      setIsSimulating(false);
       mapLog.log('Simulation stopped');
     }
   }, []);
@@ -68,7 +68,7 @@ export function useMapSimulation({
     let progress = 0;
     const stepSize = 0.00004;
 
-    isSimulatingRef.current = true;
+    setIsSimulating(true);
     mapLog.log(`Simulation started with ${points.length} points`);
 
     simulationRef.current = setInterval(() => {
@@ -110,6 +110,7 @@ export function useMapSimulation({
         clearInterval(simulationRef.current);
         simulationRef.current = null;
       }
+      setIsSimulating(false);
     };
   }, []);
 
@@ -119,7 +120,7 @@ export function useMapSimulation({
   }
 
   return {
-    isSimulating: isSimulatingRef.current,
+    isSimulating,
     startSimulation,
     stopSimulation,
   };

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toastUtils } from '@/lib/utils/toast';
 import { devLog } from '@/lib/utils/devLog';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { fetchORSRoute } from '@/lib/services/ors';
 import {
   parseRouteInstructions,
@@ -11,7 +11,6 @@ import {
 } from '@/lib/map/realtimeNavigation';
 import { formatDistance, formatDuration, type RoutePreview } from '@/lib/map/navigationHelpers';
 import { getBuildingGps, type Building } from '@/lib/map/buildings';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
 const mapLog = devLog.map;
 
@@ -32,7 +31,7 @@ export function useMapNavigation({
   gpsToCrsSimple,
   getBuildingLatLng,
 }: UseMapNavigationProps) {
-  const { t } = useTypedTranslation();
+  const { safeT } = useSafeTranslation();
 
   // State
   const [isNavigating, setIsNavigating] = useState(false);
@@ -51,28 +50,27 @@ export function useMapNavigation({
         setNavState(state);
         if (state.status === 'arrived' && isNavigating) {
           mapLog.log('User arrived at destination!');
-          toastUtils.success(
-            t('arrived' as TranslationKey) || 'Arrived!',
-            selectedBuilding?.name || '',
-          );
+          toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuilding?.name || '');
           setIsNavigating(false);
         }
       });
     }
-  }, [navManagerRef, isNavigating, selectedBuilding, t]);
+  }, [navManagerRef, isNavigating, selectedBuilding, safeT]);
 
   // Start Navigation
   const startNavigation = useCallback(() => {
     if (isOffCampus) {
       toastUtils.warning(
-        t('locationOutsideCampusTitle' as TranslationKey) || 'Outside campus boundary',
-        t('locationOutsideCampusMessage' as TranslationKey) ||
+        safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
+        safeT(
+          'locationOutsideCampusMessage',
           'Navigation is disabled while you are outside campus.',
+        ),
       );
       return;
     }
     if (!gpsRouteCoords.length || !preview || !navManagerRef.current) {
-      toastUtils.warning(t('noRouteAvailable' as TranslationKey) || 'No route available');
+      toastUtils.warning(safeT('noRouteAvailable', 'No route available'));
       return;
     }
 
@@ -90,10 +88,10 @@ export function useMapNavigation({
     });
 
     toastUtils.success(
-      t('navigationStarted' as TranslationKey) || 'Navigation started',
+      safeT('navigationStarted', 'Navigation started'),
       `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
     );
-  }, [isOffCampus, gpsRouteCoords, preview, navManagerRef, t, routeInstructions]);
+  }, [isOffCampus, gpsRouteCoords, preview, navManagerRef, routeInstructions, safeT]);
 
   const stopNavigation = useCallback(() => {
     if (navManagerRef.current) {
@@ -127,10 +125,12 @@ export function useMapNavigation({
       }
 
       setRouteError(null);
-      const { coordinates, preview: routeData, error, orsData } = await fetchORSRoute(
-        origin,
-        destGps,
-      );
+      const {
+        coordinates,
+        preview: routeData,
+        error,
+        orsData,
+      } = await fetchORSRoute(origin, destGps);
 
       if (!active) return;
 

@@ -198,7 +198,9 @@ export const useEventsStore = create<EventsState>()(
 
           // 404: Event doesn't exist on server, try to create it
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-            console.warn(`Event ${id} not found on server during update, attempting to create it...`);
+            console.warn(
+              `Event ${id} not found on server during update, attempting to create it...`,
+            );
             const fullEvent = { ...currentEvent, ...updates };
             return get().addEvent(fullEvent);
           }

@@ -1,14 +1,16 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useCallback } from 'react';
 import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/lib/map/buildings';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
+import { triggerHaptic } from '@/lib/utils/haptics';
 
 type Props = {
   selectedBuilding?: Building;
@@ -20,7 +22,6 @@ type Props = {
   onStartNavigation?: () => void;
 };
 
-import { triggerHaptic } from '@/lib/utils/haptics';
 import { LayeredCard } from './components/LayeredCard';
 
 const MotionLink = m.create(Link);
@@ -36,6 +37,20 @@ export default function CampusMapHUD({
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
+  const searchParams = useSearchParams();
+  const layersParam = searchParams.get('layers');
+
+  const buildMapHref = useCallback(
+    (buildingId?: string) => {
+      const params = new URLSearchParams();
+      if (layersParam) params.set('layers', layersParam);
+      if (buildingId) params.set('building', buildingId);
+
+      const qs = params.toString();
+      return qs ? `/map?${qs}` : '/map';
+    },
+    [layersParam],
+  );
 
   // Cmd/Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
@@ -90,7 +105,7 @@ export default function CampusMapHUD({
       <div className="absolute top-3 left-3 w-[280px] sm:w-[320px] max-w-[calc(100vw-24px)] pointer-events-auto flex flex-col max-h-[calc(100%-24px)] sm:max-h-[500px]">
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {buildingSearch ? `${buildings.length} buildings found` : ''}
+          {buildingSearch ? t('buildingsFound', { count: buildings.length }) : ''}
         </div>
         <LayeredCard
           interactive={false}
@@ -146,7 +161,7 @@ export default function CampusMapHUD({
               return (
                 <MotionLink
                   key={b.id}
-                  href={isSelected ? '/map' : `/map?building=${b.id}`}
+                  href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
                   onClick={() => triggerHaptic('tap', 'medium')}
                   variants={{
                     hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -10 },
@@ -226,7 +241,7 @@ export default function CampusMapHUD({
                   </p>
                 </div>
                 <Link
-                  href="/map"
+                  href={buildMapHref(undefined)}
                   className="text-mq-content-tertiary hover:text-mq-content transition-colors p-1 hover:bg-mq-background-secondary rounded-full"
                 >
                   <span className="sr-only">{t('close')}</span>

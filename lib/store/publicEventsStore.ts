@@ -8,11 +8,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createBrowserClient } from '@/lib/supabase/client';
-import {
-  PublicEvent,
-  PublicEventFromDB,
-  transformPublicEvent,
-} from '@/lib/types/publicEvents';
+import { PublicEvent, PublicEventFromDB, transformPublicEvent } from '@/lib/types/publicEvents';
 
 interface PublicEventsState {
   // Data
@@ -29,7 +25,9 @@ interface PublicEventsState {
 
   // Actions
   fetchPublicEvents: () => Promise<void>;
-  addToCalendar: (eventId: string) => Promise<{ success: boolean; userEventId?: string; alreadyAdded?: boolean }>;
+  addToCalendar: (
+    eventId: string,
+  ) => Promise<{ success: boolean; userEventId?: string; alreadyAdded?: boolean }>;
   checkUserEvents: () => Promise<void>;
   reset: () => void;
 }
@@ -110,7 +108,7 @@ export const usePublicEventsStore = create<PublicEventsState>()(
             const addedIds = new Set<string>(
               data
                 .map((e: { source_public_event_id: string | null }) => e.source_public_event_id)
-                .filter((id: string | null): id is string => id !== null)
+                .filter((id: string | null): id is string => id !== null),
             );
             set({ addedToCalendar: addedIds });
           }
@@ -192,6 +190,6 @@ export const usePublicEventsStore = create<PublicEventsState>()(
         });
       },
     }),
-    { name: 'public-events-store' }
-  )
+    { name: 'public-events-store' },
+  ),
 );

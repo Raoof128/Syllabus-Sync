@@ -10,7 +10,10 @@ import { PublicEvent } from '@/lib/types/publicEvents';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 
-const categoryColors: Record<string, { bg: string; text: string; border: string; icon: string; gradient: string }> = {
+const categoryColors: Record<
+  string,
+  { bg: string; text: string; border: string; icon: string; gradient: string }
+> = {
   Career: {
     bg: 'bg-blue-50 dark:bg-blue-950/30',
     text: 'text-blue-700 dark:text-blue-400',
@@ -84,7 +87,7 @@ export const PublicEventCard = memo(function PublicEventCard({
         className={cn(
           'group relative flex flex-col h-full bg-mq-card-background rounded-2xl border transition-all duration-300',
           'border-mq-border hover:border-mq-primary/40 hover:shadow-xl hover:shadow-mq-primary/10 cursor-pointer',
-          'overflow-hidden'
+          'overflow-hidden',
         )}
         onClick={onClick}
         onKeyDown={(e) => e.key === 'Enter' && onClick()}
@@ -92,10 +95,20 @@ export const PublicEventCard = memo(function PublicEventCard({
         tabIndex={0}
       >
         {/* Gradient Background Overlay */}
-        <div className={cn('absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300', categoryStyle.gradient)} />
+        <div
+          className={cn(
+            'absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+            categoryStyle.gradient,
+          )}
+        />
 
         {/* Category Strip */}
-        <div className={cn('h-1.5 rounded-t-2xl relative z-10', categoryStyle.bg.replace('bg-', 'bg-').replace('/30', ''))} />
+        <div
+          className={cn(
+            'h-1.5 rounded-t-2xl relative z-10',
+            categoryStyle.bg.replace('bg-', 'bg-').replace('/30', ''),
+          )}
+        />
 
         {/* Content */}
         <div className="p-5 flex-1 flex flex-col relative z-10">
@@ -106,7 +119,7 @@ export const PublicEventCard = memo(function PublicEventCard({
                 'px-2.5 py-1 text-xs font-medium rounded-lg border',
                 categoryStyle.bg,
                 categoryStyle.text,
-                categoryStyle.border
+                categoryStyle.border,
               )}
             >
               <span className="mr-1.5">{categoryStyle.icon}</span>
@@ -177,7 +190,7 @@ export const PublicEventCard = memo(function PublicEventCard({
             disabled={isAdding || isAdded}
             className={cn(
               'flex-1 gap-2 transition-all font-medium',
-              isAdded && 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white'
+              isAdded && 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white',
             )}
           >
             {isAdding ? (

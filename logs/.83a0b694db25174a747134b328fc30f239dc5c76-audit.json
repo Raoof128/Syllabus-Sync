@@ -1,15 +1,15 @@
 {
-    "keep": {
-        "days": true,
-        "amount": 14
-    },
-    "auditLog": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json",
-    "files": [
-        {
-            "date": 1770014356226,
-            "name": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/mcp-puppeteer-2026-02-02.log",
-            "hash": "df14688522518f2e3b281080da8739ead3286654ee9278968fcd2a5f2a51bab6"
-        }
-    ],
-    "hashType": "sha256"
+  "keep": {
+    "days": true,
+    "amount": 14
+  },
+  "auditLog": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json",
+  "files": [
+    {
+      "date": 1770014356226,
+      "name": "/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/logs/mcp-puppeteer-2026-02-02.log",
+      "hash": "df14688522518f2e3b281080da8739ead3286654ee9278968fcd2a5f2a51bab6"
+    }
+  ],
+  "hashType": "sha256"
 }
