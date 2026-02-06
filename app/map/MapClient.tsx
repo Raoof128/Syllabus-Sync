@@ -352,7 +352,7 @@ export default function MapClient() {
                   ref={overlaysContainerRef}
                   onKeyDown={handleOverlayPanelKeyDown}
                   role="group"
-                  aria-label="Map overlay options"
+                  aria-label={t('mapLayers')}
                   tabIndex={-1}
                   className="space-y-3 pt-3 border-t border-mq-border"
                 >

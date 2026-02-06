@@ -1,5 +1,61 @@
 # Agent Rules
 
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Check pipeline formatting fix
+Summary: Ran Prettier on `PublicFeedClient.tsx` to resolve `format:check` failure in the `npm run check` pipeline.
+Files: `components/feed/PublicFeedClient.tsx`.
+Verification: Pending full `npm run check` rerun.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Lint warning cleanup
+Summary: Removed remaining lint warnings by converting memoized function expressions to arrow callbacks and replacing debug `console.log` usage with `console.warn` in units store.
+Files: `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`, `lib/store/unitsStore.ts`.
+Verification: Pending full `npm run check` rerun.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: PublicEventCard syntax fix
+Summary: Fixed arrow-function syntax in `PublicEventCard` memo callback after callback-style refactor.
+Files: `components/feed/PublicEventCard.tsx`.
+Verification: Pending full `npm run check` rerun.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: PublicEventCard formatting
+Summary: Applied Prettier formatting to `PublicEventCard.tsx` to satisfy `format:check`.
+Files: `components/feed/PublicEventCard.tsx`.
+Verification: Pending full `npm run check` rerun.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Memo component display names
+Summary: Added explicit `displayName` properties for memoized arrow components to satisfy `react/display-name` lint rules.
+Files: `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`.
+Verification: Pending full `npm run check` rerun.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Repo-wide i18n audit and parity fix
+Summary: Completed full locale parity against English, added missing translation coverage across all locales, fixed placeholder mismatches, and replaced hardcoded public-feed/map aria strings with translation keys.
+Files: `components/feed/PublicFeedClient.tsx`, `app/map/MapClient.tsx`, `app/map/components/DebugControls.tsx`, `locales/*/translations.json`.
+Verification: Locale parity script reports zero missing/empty/placeholder-mismatch keys for all locales vs English.
+Follow-ups: Run full lint/typecheck after broader workspace formatting changes settle.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Public feed i18n callback polish
+Summary: Corrected callback indentation in add-to-calendar success branch to keep control flow readable and consistent.
+Files: `components/feed/PublicFeedClient.tsx`.
+Verification: `npm run typecheck` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Position editor title attributes i18n
+Summary: Replaced remaining hardcoded `title` attributes in position editor controls with translation keys and propagated translations across all locales.
+Files: `app/map/position-editor/PositionEditorClient.tsx`, `locales/*/translations.json`.
+Verification: `npm run check:i18n` ✅; `npm run typecheck` ✅.
+Follow-ups: Remaining literal placeholder is numeric-only (`"12345678"`), not user-facing copy.
+
 ## Project Context
 
 - Next.js 15 + React 19 + TypeScript

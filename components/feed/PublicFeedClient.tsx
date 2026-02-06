@@ -42,6 +42,13 @@ const categoryFilters: { value: CategoryFilter; icon: string }[] = [
 export default function PublicFeedClient() {
   const { t, language } = useTypedTranslation();
   const locale = language === 'en' ? 'en-AU' : language;
+  const categoryLabelByValue: Record<CategoryFilter, string> = {
+    All: t('all'),
+    Academic: t('academic'),
+    Career: t('career'),
+    Social: t('social'),
+    'Free Food': t('freeFood'),
+  };
 
   // Store
   const {
@@ -147,18 +154,12 @@ export default function PublicFeedClient() {
 
       if (result.success) {
         if (result.alreadyAdded) {
-          toastUtils.info('Already Added', 'This event is already in your calendar.');
+          toastUtils.info(t('alreadyAdded'), t('eventAlreadyInCalendar'));
         } else {
-          toastUtils.success(
-            t('addedToCalendar') || 'Added to Calendar',
-            'Event has been added to your personal calendar.',
-          );
+          toastUtils.success(t('addedToCalendar'), t('eventAddedSuccess'));
         }
       } else {
-        toastUtils.error(
-          t('error') || 'Error',
-          'Failed to add event to calendar. Please try again.',
-        );
+        toastUtils.error(t('error'), t('failedToAddEvent'));
       }
     },
     [addToCalendar, t],
@@ -182,13 +183,8 @@ export default function PublicFeedClient() {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-mq-content">
-              {t('eventFeed') || 'University Events & Announcements'}
-            </h1>
-            <p className="text-mq-content-secondary mt-1">
-              {t('feedDescription') ||
-                'Browse campus events and add them to your personal calendar'}
-            </p>
+            <h1 className="text-2xl md:text-3xl font-bold text-mq-content">{t('eventFeed')}</h1>
+            <p className="text-mq-content-secondary mt-1">{t('feedDescription')}</p>
           </div>
         </div>
 
@@ -203,7 +199,7 @@ export default function PublicFeedClient() {
             {error && !isLoading && (
               <MagicCard className="p-8 text-center">
                 <p className="text-mq-error mb-4">{error}</p>
-                <Button onClick={() => fetchPublicEvents()}>{t('tryAgain') || 'Try Again'}</Button>
+                <Button onClick={() => fetchPublicEvents()}>{t('tryAgain')}</Button>
               </MagicCard>
             )}
 
@@ -223,7 +219,7 @@ export default function PublicFeedClient() {
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
                       <Input
                         type="search"
-                        placeholder="Search events..."
+                        placeholder={t('searchEventsPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10"
@@ -243,7 +239,7 @@ export default function PublicFeedClient() {
                             className="gap-1.5"
                           >
                             <span>{cat.icon}</span>
-                            {cat.value}
+                            {categoryLabelByValue[cat.value]}
                             {cat.value !== 'All' && (
                               <Badge
                                 variant="secondary"
@@ -271,10 +267,10 @@ export default function PublicFeedClient() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all">All Time</SelectItem>
-                            <SelectItem value="today">{t('today') || 'Today'}</SelectItem>
-                            <SelectItem value="week">{t('thisWeek') || 'This Week'}</SelectItem>
-                            <SelectItem value="month">This Month</SelectItem>
+                            <SelectItem value="all">{t('allTime')}</SelectItem>
+                            <SelectItem value="today">{t('today')}</SelectItem>
+                            <SelectItem value="week">{t('thisWeek')}</SelectItem>
+                            <SelectItem value="month">{t('thisMonth')}</SelectItem>
                           </SelectContent>
                         </Select>
 
@@ -287,9 +283,9 @@ export default function PublicFeedClient() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="date">By Date</SelectItem>
-                            <SelectItem value="priority">By Priority</SelectItem>
-                            <SelectItem value="category">By Category</SelectItem>
+                            <SelectItem value="date">{t('sortByDate')}</SelectItem>
+                            <SelectItem value="priority">{t('sortByPriority')}</SelectItem>
+                            <SelectItem value="category">{t('sortByCategory')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -315,10 +311,10 @@ export default function PublicFeedClient() {
                 ) : (
                   <MagicCard className="p-12 text-center">
                     <div className="text-4xl mb-4">🔍</div>
-                    <h3 className="text-lg font-semibold text-mq-content mb-2">No Events Found</h3>
-                    <p className="text-mq-content-secondary">
-                      Try adjusting your search or filters
-                    </p>
+                    <h3 className="text-lg font-semibold text-mq-content mb-2">
+                      {t('noEventsFound')}
+                    </h3>
+                    <p className="text-mq-content-secondary">{t('tryDifferentFilters')}</p>
                   </MagicCard>
                 )}
               </>

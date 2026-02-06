@@ -1,4 +1,60 @@
 Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Check pipeline formatting fix
+Summary: Fixed `prettier --check` failure by formatting `PublicFeedClient.tsx`.
+- **Files:** `components/feed/PublicFeedClient.tsx`.
+- **Verification:** Pending full `npm run check` rerun.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Lint warning cleanup
+Summary: Cleared remaining lint warnings by using arrow callbacks in memoized feed components and replacing debug `console.log` calls with `console.warn` in units store.
+- **Files:** `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`, `lib/store/unitsStore.ts`.
+- **Verification:** Pending full `npm run check` rerun.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: PublicEventCard syntax correction
+Summary: Corrected memo callback arrow syntax in `PublicEventCard` after lint-cleanup refactor.
+- **Files:** `components/feed/PublicEventCard.tsx`.
+- **Verification:** Pending full `npm run check` rerun.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: PublicEventCard formatting
+Summary: Ran Prettier on `PublicEventCard.tsx` after syntax correction to pass repository format checks.
+- **Files:** `components/feed/PublicEventCard.tsx`.
+- **Verification:** Pending full `npm run check` rerun.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Memo displayName lint fix
+Summary: Added explicit `displayName` fields for memoized feed components to resolve `react/display-name` lint errors.
+- **Files:** `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`.
+- **Verification:** Pending full `npm run check` rerun.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Public feed i18n formatting follow-up
+Summary: Applied formatting-only cleanup in `handleAddToCalendar` to keep nested i18n toast branches readable after translation refactor.
+- **Files:** `components/feed/PublicFeedClient.tsx`.
+- **Verification:** `npm run typecheck` ✅.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Position editor attribute i18n cleanup
+Summary: Replaced remaining hardcoded `title` attributes in position editor controls with translation keys and synchronized those keys to every locale.
+- **Files:** `app/map/position-editor/PositionEditorClient.tsx`, `locales/*/translations.json`.
+- **Verification:** `npm run check:i18n` ✅; `npm run typecheck` ✅.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-06 (Australia/Sydney)
+Scope: Repository-wide i18n parity + hardcoded text cleanup
+Summary: Performed full locale audit using English as canonical source, filled missing keys in all non-English locales, fixed placeholder mismatches, and removed hardcoded user-facing feed/map aria strings in favor of i18n keys.
+- **Files:** `locales/ar/translations.json`, `locales/bn/translations.json`, `locales/es/translations.json`, `locales/fa/translations.json`, `locales/fr/translations.json`, `locales/he/translations.json`, `locales/hi/translations.json`, `locales/id/translations.json`, `locales/it/translations.json`, `locales/ja/translations.json`, `locales/ko/translations.json`, `locales/ms/translations.json`, `locales/ru/translations.json`, `locales/ta/translations.json`, `locales/th/translations.json`, `locales/ur/translations.json`, `locales/vi/translations.json`, `locales/zh/translations.json`, `locales/en/translations.json`, `components/feed/PublicFeedClient.tsx`, `app/map/MapClient.tsx`, `app/map/components/DebugControls.tsx`.
+- **Verification:** Locale parity script (keys/empties/placeholders) reports zero missing keys and zero placeholder mismatches for every locale.
+- **Follow-ups:** Optional deeper pass on position-editor-only copy if it becomes part of non-admin user flow.
+
+Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Audit - Verification Pass
 Summary: Completed verification for the map audit fixes. Typecheck, lint, map test suite, and production build (webpack mode) all pass.
 - **Verification:** `npm run typecheck` ✅; `npm run lint` ✅ (only pre-existing non-map warnings remain); `npx vitest run tests/map` ✅ (52/52); `npx next build --webpack` ✅.

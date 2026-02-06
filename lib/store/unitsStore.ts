@@ -263,12 +263,12 @@ export const useUnitsStore = create<UnitsState>()(
             const searchCode = optimisticUpdate.code.toUpperCase();
             const refreshedUnit = get().units.find((u) => u.code.toUpperCase() === searchCode);
 
-            console.log('After refresh, looking for code:', searchCode);
-            console.log(
+            console.warn('After refresh, looking for code:', searchCode);
+            console.warn(
               'Available units:',
               get().units.map((u) => ({ id: u.id, code: u.code })),
             );
-            console.log(
+            console.warn(
               'Found refreshedUnit:',
               refreshedUnit ? { id: refreshedUnit.id, code: refreshedUnit.code } : null,
             );
@@ -276,7 +276,7 @@ export const useUnitsStore = create<UnitsState>()(
             if (refreshedUnit) {
               // Unit exists in DB - now update it with the correct ID
               try {
-                console.log('Updating existing unit with ID:', refreshedUnit.id);
+                console.warn('Updating existing unit with ID:', refreshedUnit.id);
                 const updated = await apiRequest<Unit>(`/api/units/${refreshedUnit.id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
@@ -302,7 +302,7 @@ export const useUnitsStore = create<UnitsState>()(
               }
             } else {
               // Unit doesn't exist in DB at all - try to create it
-              console.log('Unit not found in DB, attempting to create...');
+              console.warn('Unit not found in DB, attempting to create...');
               try {
                 const created = await apiRequest<Unit>('/api/units', {
                   method: 'POST',
@@ -334,12 +334,12 @@ export const useUnitsStore = create<UnitsState>()(
 
                 // If 409, the unit exists - refresh and find it
                 if (createErrorMsg.includes('409') || createErrorMsg.includes('already exists')) {
-                  console.log('Unit already exists (409), refreshing to find it...');
+                  console.warn('Unit already exists (409), refreshing to find it...');
                   await get().forceRefresh();
                   const searchCode = optimisticUpdate.code.toUpperCase();
                   const found = get().units.find((u) => u.code.toUpperCase() === searchCode);
                   if (found) {
-                    console.log('Found existing unit after 409:', found.id, found.code);
+                    console.warn('Found existing unit after 409:', found.id, found.code);
                     return found;
                   }
                 }

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { Play, Settings2, Activity } from 'lucide-react';
 import type { NavigationState } from '@/lib/map/realtimeNavigation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface DebugControlsProps {
   onSimulate: () => void;
@@ -20,6 +21,7 @@ export function DebugControls({
   locationStatus,
   isOffCampus,
 }: DebugControlsProps) {
+  const { t } = useTypedTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [fps, setFps] = useState(0);
 
@@ -52,7 +54,7 @@ export function DebugControls({
         size="sm"
         className="absolute top-24 left-4 z-[1000] bg-white/90 backdrop-blur shadow-md border-mq-border h-8 w-8 p-0"
         onClick={() => setIsOpen(true)}
-        aria-label="Open map developer tools"
+        aria-label={t('openMapDeveloperTools')}
       >
         <Settings2 className="h-4 w-4 text-mq-content-secondary" />
       </Button>
@@ -71,7 +73,7 @@ export function DebugControls({
           size="sm"
           className="h-6 w-6 p-0 hover:bg-mq-background-secondary"
           onClick={() => setIsOpen(false)}
-          aria-label="Close map developer tools"
+          aria-label={t('closeMapDeveloperTools')}
         >
           ✕
         </Button>

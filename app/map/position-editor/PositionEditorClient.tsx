@@ -525,7 +525,7 @@ export default function PositionEditorClient() {
                   ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
                   : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
               }`}
-              title="Show only changed buildings"
+              title={t('showOnlyChangedBuildingsTitle')}
             >
               <Filter className="h-4 w-4" />
             </button>
@@ -785,7 +785,7 @@ export default function PositionEditorClient() {
               <button
                 onClick={downloadChanges}
                 className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                title="Download as file"
+                title={t('downloadAsFileTitle')}
               >
                 <Download className="h-4 w-4" />
               </button>

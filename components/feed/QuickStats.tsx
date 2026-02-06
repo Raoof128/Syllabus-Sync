@@ -11,7 +11,7 @@ interface QuickStatsProps {
   className?: string;
 }
 
-export const QuickStats = memo(function QuickStats({ events, className }: QuickStatsProps) {
+export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
   const { t } = useTypedTranslation();
 
   const stats = useMemo(() => {
@@ -107,6 +107,8 @@ export const QuickStats = memo(function QuickStats({ events, className }: QuickS
     </div>
   );
 });
+
+QuickStats.displayName = 'QuickStats';
 
 interface StatCardProps {
   icon: React.ElementType;
