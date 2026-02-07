@@ -5,11 +5,25 @@ import { loginSchema, LoginFormData } from './schemas/loginSchema';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { logger } from '@/lib/logger';
 
-export async function loginAction(data: LoginFormData) {
+export interface MFAFactorInfo {
+  id: string;
+  type: 'totp' | 'phone';
+  name?: string;
+  phone?: string;
+}
+
+export interface LoginResult {
+  success?: boolean;
+  error?: string;
+  mfaRequired?: boolean;
+  availableFactors?: MFAFactorInfo[];
+}
+
+export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   // 1. Validate Input (Zod)
   const result = loginSchema.safeParse(data);
   if (!result.success) {
-    return { error: 'validation_error' }; // Return code, not string
+    return { error: 'validation_error' };
   }
 
   // Log the attempt (Security)
@@ -32,6 +46,44 @@ export async function loginAction(data: LoginFormData) {
   if (error) {
     logger.error('Login failed', { error: error.message, email: data.email });
     return { error: 'invalid_credentials' };
+  }
+
+  // 4. Check MFA status — if user has enrolled MFA factors, require aal2
+  try {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+    if (aal && aal.nextLevel === 'aal2' && aal.currentLevel === 'aal1') {
+      // User has MFA enabled — get factor list
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      const allFactors = factorsData?.all ?? [];
+      const verifiedFactors = allFactors.filter((f: { status: string }) => f.status === 'verified');
+
+      if (verifiedFactors.length > 0) {
+        logger.info('MFA challenge required', { email: data.email });
+        return {
+          mfaRequired: true,
+          availableFactors: verifiedFactors.map(
+            (f: {
+              id: string;
+              factor_type: string;
+              friendly_name?: string | null;
+              phone?: string;
+            }) => ({
+              id: f.id,
+              type: f.factor_type as 'totp' | 'phone',
+              name: f.friendly_name ?? undefined,
+              phone: f.phone ?? undefined,
+            }),
+          ),
+        };
+      }
+    }
+  } catch (mfaError) {
+    // MFA check failed — log but don't block login (fail-open for AAL check only)
+    logger.warn('MFA status check failed', {
+      email: data.email,
+      error: mfaError,
+    });
   }
 
   logger.info('Login success', { email: data.email });

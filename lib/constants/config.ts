@@ -13,6 +13,20 @@ export const API_ROUTES = {
     PASSKEY_REGISTER: '/api/auth/passkey/register',
     PASSKEY_OPTIONS: '/api/auth/passkey/options',
     PASSKEY_VERIFY: '/api/auth/passkey/verify',
+    // MFA routes
+    MFA_STATUS: '/api/auth/mfa/status',
+    MFA_ENROLL: '/api/auth/mfa/enroll',
+    MFA_VERIFY: '/api/auth/mfa/verify',
+    MFA_CHALLENGE_VERIFY: '/api/auth/mfa/challenge-verify',
+    MFA_UNENROLL: '/api/auth/mfa/unenroll',
+    MFA_SMS_ENROLL: '/api/auth/mfa/sms/enroll',
+    MFA_SMS_VERIFY: '/api/auth/mfa/sms/verify',
+    // WebAuthn routes (enhanced, DB-backed)
+    WEBAUTHN_REGISTER_OPTIONS: '/api/webauthn/register/options',
+    WEBAUTHN_REGISTER_VERIFY: '/api/webauthn/register/verify',
+    WEBAUTHN_AUTH_OPTIONS: '/api/webauthn/authenticate/options',
+    WEBAUTHN_AUTH_VERIFY: '/api/webauthn/authenticate/verify',
+    WEBAUTHN_CREDENTIALS: '/api/webauthn/credentials',
   },
   USER: {
     EXPORT: '/api/user/export',

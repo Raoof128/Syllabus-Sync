@@ -1,18 +1,44 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Badge } from '@/components/ui/mq/badge';
-import { Shield, Info } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 import { MagicCard } from '@/components/ui/MagicCard';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { BiometricToggle } from './security/BiometricToggle';
+import { TOTPSetup } from './security/TOTPSetup';
+import { SMSSetup } from './security/SMSSetup';
+import { PasskeyManager } from './security/PasskeyManager';
+import { API_ROUTES } from '@/lib/constants/config';
+import type { MFAFactor } from '@/lib/security/mfa';
 
 type SecuritySettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
 const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
+  const [factors, setFactors] = useState<MFAFactor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchMFAStatus = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(API_ROUTES.AUTH.MFA_STATUS);
+      if (res.ok) {
+        const json = await res.json();
+        setFactors(json.data?.factors ?? []);
+      }
+    } catch {
+      // silently fail — settings page should not crash
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMFAStatus();
+  }, [fetchMFAStatus]);
+
   return (
     <MagicCard data-testid="security-settings">
       <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
@@ -22,25 +48,26 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
             <span id="security-heading">{t('security')}</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3" role="region" aria-labelledby="security-heading">
-          {/* Biometric Authentication Section */}
-          <BiometricToggle t={t} />
-
-          {/* Coming Soon: More Security Features */}
-          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-mq-info/10 rounded-full">
-                <Info className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-mq-content">{t('moreSecurityFeatures')}</h3>
-                <p className="text-mq-sm text-mq-content-secondary">
-                  {t('moreSecurityFeaturesDesc')}
-                </p>
-                <Badge className="mt-2 bg-mq-info/20 text-mq-info">{t('comingSoon')}</Badge>
-              </div>
+        <CardContent className="space-y-6" role="region" aria-labelledby="security-heading">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-mq-primary" />
             </div>
-          </div>
+          ) : (
+            <>
+              {/* TOTP Authenticator App */}
+              <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
+
+              {/* SMS Verification */}
+              <SMSSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
+
+              {/* Passkey / WebAuthn Management */}
+              <PasskeyManager t={t} />
+
+              {/* Legacy Biometric Toggle (backwards compatibility) */}
+              <BiometricToggle t={t} />
+            </>
+          )}
         </CardContent>
       </Card>
     </MagicCard>

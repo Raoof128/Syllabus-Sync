@@ -16,8 +16,9 @@ import { toastUtils } from '@/lib/utils/toast';
 import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { loginSchema, type LoginFormData } from './schemas/loginSchema';
-import { loginAction } from './actions';
+import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
+import { MFAChallenge } from './components/MFAChallenge';
 import { AlertTriangle, Eye, EyeOff, Fingerprint, Loader2 } from 'lucide-react';
 
 export default function LoginClient() {
@@ -50,6 +51,12 @@ export default function LoginClient() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // MFA Challenge State
+  const [mfaState, setMfaState] = useState<{
+    required: boolean;
+    factors: MFAFactorInfo[];
+  } | null>(null);
 
   // Passkey availability check (could be in the hook too, but kept simple here for now)
   const [passkeyStatus, setPasskeyStatus] = useState<
@@ -87,6 +94,15 @@ export default function LoginClient() {
         } else {
           setGeneralError(msg);
         }
+        return;
+      }
+
+      // MFA required — show challenge instead of redirecting
+      if (result.mfaRequired && result.availableFactors?.length) {
+        setMfaState({
+          required: true,
+          factors: result.availableFactors,
+        });
         return;
       }
 
@@ -198,7 +214,26 @@ export default function LoginClient() {
             </Alert>
           )}
 
-          {showForgotPassword ? (
+          {/* MFA Challenge Screen */}
+          {mfaState?.required ? (
+            <MFAChallenge
+              t={t}
+              factors={mfaState.factors}
+              onSuccess={() => {
+                setMfaState(null);
+                setIsSuccess(true);
+                toastUtils.success(t('welcomeBack'), t('loginSuccess'));
+                router.refresh();
+                setTimeout(() => {
+                  router.push(redirectTo);
+                }, 800);
+              }}
+              onCancel={() => {
+                setMfaState(null);
+                setGeneralError(null);
+              }}
+            />
+          ) : showForgotPassword ? (
             <div className="space-y-4">
               {/* Simplified Forgot Password UI Placeholder since we are focusing on Login Refactor */}
               <div className="text-center">
