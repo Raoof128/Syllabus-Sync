@@ -290,6 +290,32 @@
   isolation: isolate;
 }
 
+/* ============================================
+   MAP IMAGE SHARPNESS
+   Force crisp rendering for the campus raster
+   overlay so it isn't blurred by CSS scaling.
+   ============================================ */
+.leaflet-image-layer,
+.leaflet-overlay-pane img {
+  image-rendering: -webkit-optimize-contrast; /* Safari/Chrome */
+  image-rendering: crisp-edges; /* Firefox/spec  */
+}
+
+/* ============================================
+   TOUCH ISOLATION
+   Prevent page scroll while interacting with
+   the map on touch devices.
+   ============================================ */
+.leaflet-container {
+  touch-action: none;
+}
+
+/* Keep map interactive area from causing body overscroll */
+.leaflet-container:focus {
+  outline: 2px solid var(--mq-primary);
+  outline-offset: -2px;
+}
+
 /* Popup styling - clean, no blur */
 .leaflet-popup-content-wrapper {
   background: var(--mq-card-background) !important;

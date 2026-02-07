@@ -485,7 +485,7 @@ export default function MapClient() {
               <CardContent>
                 <div
                   ref={mapContainerRef}
-                  className="relative h-[56svh] min-h-[340px] sm:h-[60vh] md:h-[500px] lg:h-[600px] rounded-mq-lg overflow-hidden border border-mq-border"
+                  className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border"
                 >
                   {/* Real Map (with smooth fade-in when ready) */}
                   <div

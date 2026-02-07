@@ -258,7 +258,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           try {
             map.zoomControl.setPosition('bottomright');
             map.setMaxBounds(PIXEL_BOUNDS);
-            map.setMaxZoom(2);
+            map.setMaxZoom(3);
             // Fit image to container on first load so the campus fills the viewport.
             map.fitBounds(PIXEL_BOUNDS, { padding: [20, 20] });
             // Lock min zoom to the fitted view to prevent the map from starting tiny.
@@ -416,8 +416,12 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             center={CAMPUS_CENTER_PIXEL}
             zoom={0}
             zoomControl
-            scrollWheelZoom={false}
+            scrollWheelZoom
             doubleClickZoom="center"
+            touchZoom
+            dragging
+            zoomSnap={0.5}
+            zoomDelta={0.5}
             inertia
             inertiaDeceleration={3000}
             maxBoundsViscosity={0.5}
