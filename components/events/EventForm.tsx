@@ -30,6 +30,8 @@ import { format, isValid } from 'date-fns';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import { cn } from '@/lib/utils';
+import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
+import { CalendarDays, Clock } from 'lucide-react';
 
 interface EventFormProps {
   open: boolean;
@@ -341,16 +343,22 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-date">
                 {t('date')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="event-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                aria-invalid={Boolean(errors.date)}
-                aria-required="true"
-                aria-describedby={errors.date ? 'event-date-error' : undefined}
-                className={errors.date ? 'border-mq-error' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="event-date"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  aria-invalid={Boolean(errors.date)}
+                  aria-required="true"
+                  aria-describedby={errors.date ? 'event-date-error' : undefined}
+                  className={`pr-10 ${errors.date ? 'border-mq-error' : ''}`}
+                />
+                <CalendarDays
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
               {errors.date && (
                 <p id="event-date-error" className="text-xs text-mq-error" role="alert">
                   {errors.date}
@@ -361,17 +369,23 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-time">
                 {t('time')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="event-time"
-                type="text"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                placeholder={t('exampleTime')}
-                aria-invalid={Boolean(errors.time)}
-                aria-required="true"
-                aria-describedby={errors.time ? 'event-time-error' : undefined}
-                className={errors.time ? 'border-mq-error' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="event-time"
+                  type="text"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  placeholder={t('exampleTime')}
+                  aria-invalid={Boolean(errors.time)}
+                  aria-required="true"
+                  aria-describedby={errors.time ? 'event-time-error' : undefined}
+                  className={`pr-10 ${errors.time ? 'border-mq-error' : ''}`}
+                />
+                <Clock
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
               {errors.time && (
                 <p id="event-time-error" className="text-xs text-mq-error" role="alert">
                   {errors.time}
@@ -386,21 +400,13 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-building">
                 {t('building')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="event-building"
+              <BuildingAutocomplete
                 value={building}
-                onChange={(e) => setBuilding(e.target.value.toUpperCase())}
+                onChange={setBuilding}
+                error={errors.building}
+                required
                 placeholder={t('buildingPlaceholder')}
-                aria-invalid={Boolean(errors.building)}
-                aria-required="true"
-                aria-describedby={errors.building ? 'event-building-error' : undefined}
-                className={errors.building ? 'border-mq-error' : ''}
               />
-              {errors.building && (
-                <p id="event-building-error" className="text-xs text-mq-error" role="alert">
-                  {errors.building}
-                </p>
-              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-room">{t('room')}</Label>

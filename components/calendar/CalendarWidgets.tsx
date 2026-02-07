@@ -143,21 +143,34 @@ export default function CalendarWidgets({
   // Highlight Refs
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
   const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
+  const examsWidgetRef = useRef<HTMLDivElement>(null);
+  const eventsWidgetRef = useRef<HTMLDivElement>(null);
+  const todosWidgetRef = useRef<HTMLDivElement>(null);
 
   // URL Highlights
   const highlightedDeadlineId = searchParams.get('highlightDeadline');
   const highlightedUnitId = searchParams.get('highlightUnit');
+  const highlightedTodoId = searchParams.get('highlightTodo');
+  const highlightedEventId = searchParams.get('highlightEvent');
   const highlightedWidget = searchParams.get('highlightWidget');
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
+  const todoHighlightActive = Boolean(highlightedTodoId);
+  const eventHighlightActive = Boolean(highlightedEventId);
 
   // Scroll Effects
   useEffect(() => {
     if (highlightedDeadlineId && assignmentsWidgetRef.current) {
+      // Check if it's an exam or assignment to scroll to correct widget
+      const deadline = deadlines.find((d) => d.id === highlightedDeadlineId);
+      const targetRef = (deadline?.type === 'Exam' || deadline?.type === 'Quiz')
+        ? examsWidgetRef.current
+        : assignmentsWidgetRef.current;
+
       setTimeout(() => {
-        assignmentsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     }
-  }, [highlightedDeadlineId]);
+  }, [highlightedDeadlineId, deadlines]);
 
   useEffect(() => {
     if ((highlightedUnitId || highlightedWidget === 'units') && unitsWidgetRef.current) {
@@ -166,6 +179,22 @@ export default function CalendarWidgets({
       }, 100);
     }
   }, [highlightedUnitId, highlightedWidget]);
+
+  useEffect(() => {
+    if (highlightedTodoId && todosWidgetRef.current) {
+      setTimeout(() => {
+        todosWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [highlightedTodoId]);
+
+  useEffect(() => {
+    if (highlightedEventId && eventsWidgetRef.current) {
+      setTimeout(() => {
+        eventsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [highlightedEventId]);
 
   // Format Helpers
   const formatMonthDayTime = (date: Date) =>
@@ -341,7 +370,7 @@ export default function CalendarWidgets({
 
         {/* Exams Widget */}
         <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={examsWidgetRef}>
             <Card className="border border-mq-border shadow-sm bg-mq-card-background">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between">
@@ -511,7 +540,7 @@ export default function CalendarWidgets({
                         key={unit.id}
                         className={cn(
                           'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                          highlightedUnitId === unit.id && 'border-mq-primary bg-mq-primary/5',
+                          highlightedUnitId === unit.id && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse bg-mq-primary/5',
                         )}
                         style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
                         onClick={() => onOpenUnitDetail(unit)}
@@ -550,8 +579,15 @@ export default function CalendarWidgets({
         </MagicCard>
 
         {/* Events Widget */}
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+        <MagicCard
+          isLiquidEnhanced
+          className={
+            eventHighlightActive
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+              : ''
+          }
+        >
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={eventsWidgetRef}>
             <Card
               variant="glass"
               className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -598,11 +634,15 @@ export default function CalendarWidgets({
 
                       // Events from public feed (have sourcePublicEventId) can be deleted but not edited
                       const isFromPublicFeed = Boolean(event.sourcePublicEventId);
+                      const isHighlighted = eventHighlightActive && highlightedEventId === event.id;
 
                       return (
                         <div
                           key={event.id}
-                          className="group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm"
+                          className={cn(
+                            'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                            isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
+                          )}
                           style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
                           onClick={() => onOpenEventDetail(event)}
                           onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
@@ -641,8 +681,15 @@ export default function CalendarWidgets({
         </MagicCard>
 
         {/* Todos Widget */}
-        <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+        <MagicCard
+          isLiquidEnhanced
+          className={
+            todoHighlightActive
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+              : ''
+          }
+        >
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={todosWidgetRef}>
             <Card
               variant="glass"
               className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -687,6 +734,7 @@ export default function CalendarWidgets({
                       // Use dayjs for consistent date comparison (same as assignments/exams)
                       const due = todo.dueDate ? dayjs(todo.dueDate) : null;
                       const isOverdue = due && !todo.completed && due.isBefore(dayjs());
+                      const isHighlighted = todoHighlightActive && highlightedTodoId === todo.id;
 
                       return (
                         <div
@@ -695,6 +743,7 @@ export default function CalendarWidgets({
                             'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
                             todo.completed && 'opacity-60 grayscale',
                             isOverdue && 'bg-red-500/5',
+                            isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                           )}
                           style={{ borderLeftColor: todoColor, borderLeftWidth: '4px' }}
                           onClick={() => onOpenTodoDetail?.(todo)}

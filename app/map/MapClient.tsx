@@ -16,6 +16,7 @@ import {
   BadgeCheck,
   GraduationCap,
   Link as LinkIcon,
+  Footprints,
 } from 'lucide-react';
 import { MapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
@@ -51,6 +52,7 @@ const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: stri
   accessibility: Accessibility,
   permits: BadgeCheck,
   exam: GraduationCap,
+  walk: Footprints,
 };
 
 // Dynamic import for the heavy map lib with Suspense
@@ -424,9 +426,14 @@ export default function MapClient() {
                             <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
                           </m.div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-mq-sm font-medium truncate">
-                              {t(`overlay_${overlay.id}_name` as TranslationKey)}
-                            </p>
+                            <div className="flex items-center gap-1">
+                              <p className="text-mq-sm font-medium truncate">
+                                {t(`overlay_${overlay.id}_name` as TranslationKey)}
+                              </p>
+                              {!overlay.alignsWithBaseMap && (
+                                <span className="text-[10px] text-amber-500" title="May appear stretched">⚠</span>
+                              )}
+                            </div>
                             <p className="text-mq-xs text-mq-content-secondary truncate">
                               {t(`overlay_${overlay.id}_desc` as TranslationKey)}
                             </p>

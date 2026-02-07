@@ -33,7 +33,9 @@ import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { CalendarDays, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
 
 interface ExamFormProps {
   open: boolean;
@@ -311,21 +313,13 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   {t('building' as TranslationKey) || 'Building'}{' '}
                   <span className="text-mq-error">*</span>
                 </Label>
-                <Input
-                  id="exam-building"
-                  placeholder={t('buildingPlaceholder')}
+                <BuildingAutocomplete
                   value={building}
-                  onChange={(e) => setBuilding(e.target.value.toUpperCase())}
-                  aria-invalid={Boolean(errors.building)}
-                  aria-required="true"
-                  aria-describedby={errors.building ? 'exam-building-error' : undefined}
-                  className={errors.building ? 'border-mq-error' : ''}
+                  onChange={setBuilding}
+                  error={errors.building}
+                  required
+                  placeholder={t('buildingPlaceholder')}
                 />
-                {errors.building && (
-                  <p id="exam-building-error" className="text-sm text-mq-error" role="alert">
-                    {errors.building}
-                  </p>
-                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-room">{t('room' as TranslationKey) || 'Room'}</Label>
@@ -346,16 +340,22 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   {t('examDate' as TranslationKey) || 'Exam Date'}{' '}
                   <span className="text-mq-error">*</span>
                 </Label>
-                <Input
-                  id="exam-date"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  aria-invalid={Boolean(errors.dueDate)}
-                  aria-required="true"
-                  aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
-                  className={errors.dueDate ? 'border-mq-error' : ''}
-                />
+                <div className="relative">
+                  <Input
+                    id="exam-date"
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    aria-invalid={Boolean(errors.dueDate)}
+                    aria-required="true"
+                    aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
+                    className={`pr-10 ${errors.dueDate ? 'border-mq-error' : ''}`}
+                  />
+                  <CalendarDays
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                    aria-hidden="true"
+                  />
+                </div>
                 {errors.dueDate && (
                   <p id="exam-date-error" className="text-sm text-mq-error" role="alert">
                     {errors.dueDate}
@@ -367,15 +367,21 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   {t('examTime' as TranslationKey) || 'Exam Time'}{' '}
                   <span className="text-mq-error">*</span>
                 </Label>
-                <Input
-                  id="exam-time"
-                  type="time"
-                  value={dueTime}
-                  onChange={(e) => setDueTime(e.target.value)}
-                  aria-invalid={Boolean(errors.dueTime)}
-                  aria-required="true"
-                  className={errors.dueTime ? 'border-mq-error' : ''}
-                />
+                <div className="relative">
+                  <Input
+                    id="exam-time"
+                    type="time"
+                    value={dueTime}
+                    onChange={(e) => setDueTime(e.target.value)}
+                    aria-invalid={Boolean(errors.dueTime)}
+                    aria-required="true"
+                    className={`pr-10 ${errors.dueTime ? 'border-mq-error' : ''}`}
+                  />
+                  <Clock
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                    aria-hidden="true"
+                  />
+                </div>
                 {errors.dueTime && (
                   <p className="text-sm text-mq-error" role="alert">
                     {errors.dueTime}

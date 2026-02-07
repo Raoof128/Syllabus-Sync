@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { CalendarDays, Clock } from 'lucide-react';
 import { PRIORITY_LEVELS, DEADLINE_TYPES } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
@@ -294,16 +295,22 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               <Label htmlFor="dueDate">
                 {t('dueDate')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="dueDate"
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                aria-describedby={dateDescribedBy}
-                aria-invalid={Boolean(errors.dueDate)}
-                aria-required="true"
-                className={errors.dueDate ? 'border-mq-error' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  aria-describedby={dateDescribedBy}
+                  aria-invalid={Boolean(errors.dueDate)}
+                  aria-required="true"
+                  className={`pr-10 ${errors.dueDate ? 'border-mq-error' : ''}`}
+                />
+                <CalendarDays
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
               <p id="deadline-date-help" className="text-xs text-mq-content-tertiary">
                 {t('dateHelp')}
               </p>
@@ -318,12 +325,19 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
               <Label htmlFor="dueTime">
                 {t('dueTime')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="dueTime"
-                type="time"
-                value={dueTime}
-                onChange={(e) => setDueTime(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="dueTime"
+                  type="time"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                  className="pr-10"
+                />
+                <Clock
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

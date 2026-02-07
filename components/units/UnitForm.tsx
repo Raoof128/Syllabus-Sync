@@ -29,8 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
 
 interface UnitFormProps {
   open: boolean;
@@ -260,9 +261,6 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const codeDescribedBy = [errors.code ? 'unit-code-error' : '', 'unit-code-help']
     .filter(Boolean)
     .join(' ');
-  const buildingDescribedBy = [errors.building ? 'unit-building-error' : '', 'unit-building-help']
-    .filter(Boolean)
-    .join(' ');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -328,24 +326,16 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               <Label htmlFor="building">
                 {t('buildingLabel')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="building"
-                placeholder={t('buildingPlaceholder')}
+              <BuildingAutocomplete
                 value={building}
-                onChange={(e) => setBuilding(e.target.value)}
-                aria-describedby={buildingDescribedBy}
-                aria-invalid={Boolean(errors.building)}
-                aria-required="true"
-                className={errors.building ? 'border-mq-error' : ''}
+                onChange={setBuilding}
+                error={errors.building}
+                required
+                placeholder={t('buildingPlaceholder')}
               />
               <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
                 {t('buildingHelp')}
               </p>
-              {errors.building && (
-                <p id="unit-building-error" className="text-sm text-mq-error">
-                  {errors.building}
-                </p>
-              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="room">{t('roomLabel')}</Label>
@@ -431,23 +421,35 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         {/* Start Time */}
                         <div className="space-y-1">
                           <Label className="text-xs">{t('start')}</Label>
-                          <Input
-                            type="time"
-                            value={ct.startTime}
-                            onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
-                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
-                          />
+                          <div className="relative">
+                            <Input
+                              type="time"
+                              value={ct.startTime}
+                              onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
+                              className={`h-9 pr-10 ${hasTimeError ? 'border-mq-error' : ''}`}
+                            />
+                            <Clock
+                              className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-mq-content-tertiary pointer-events-none"
+                              aria-hidden="true"
+                            />
+                          </div>
                         </div>
 
                         {/* End Time */}
                         <div className="space-y-1">
                           <Label className="text-xs">{t('end')}</Label>
-                          <Input
-                            type="time"
-                            value={ct.endTime}
-                            onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
-                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
-                          />
+                          <div className="relative">
+                            <Input
+                              type="time"
+                              value={ct.endTime}
+                              onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
+                              className={`h-9 pr-10 ${hasTimeError ? 'border-mq-error' : ''}`}
+                            />
+                            <Clock
+                              className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-mq-content-tertiary pointer-events-none"
+                              aria-hidden="true"
+                            />
+                          </div>
                         </div>
                       </div>
 

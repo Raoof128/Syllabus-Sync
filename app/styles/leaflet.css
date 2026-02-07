@@ -6,6 +6,7 @@
  * 1. Map container background gradients
  * 2. Zoom control styling
  * 3. User location "blue dot" with pulse animation
+ * 4. Map overlay layer quality
  */
 
 /* ============================================
@@ -30,6 +31,80 @@
     radial-gradient(circle at 80% 30%, rgba(100, 116, 139, 0.06), transparent 45%),
     var(--mq-background) !important;
   /* MQ background */
+}
+
+/* ============================================
+   MAP OVERLAY LAYER QUALITY SETTINGS
+   ============================================ */
+
+/* Ensure overlay images render with high quality */
+.map-overlay-layer,
+.leaflet-image-layer {
+  /* High quality image rendering - use auto for better upscaling */
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  /* Hardware acceleration for smooth transitions */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Force GPU rendering layer */
+  transform: translateZ(0);
+  -webkit-transform: translate3d(0, 0, 0);
+  /* Smooth transitions when changing layers */
+  transition: opacity 0.3s ease-in-out;
+  /* Prevent subpixel rendering issues */
+  will-change: opacity, transform;
+}
+
+/* Base map and overlay layers - highest quality */
+.leaflet-tile-pane img,
+.leaflet-overlay-pane img {
+  /* Use auto for better interpolation on upscale */
+  image-rendering: auto;
+  /* Smooth text/edges */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent flicker during layer changes */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Ensure overlays scale smoothly when zooming */
+.leaflet-overlay-pane {
+  /* GPU acceleration */
+  transform: translateZ(0);
+  will-change: transform, contents;
+  /* Smooth layer stacking */
+  isolation: isolate;
+}
+
+/* Prevent blur on transform/zoom */
+.leaflet-zoom-animated {
+  will-change: transform;
+  /* Smooth zoom transition */
+  transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
+}
+
+/* Handle overlays with different aspect ratios */
+.overlay-different-aspect {
+  /* Lower opacity to indicate imperfect fit */
+  filter: contrast(1.02) brightness(1.01);
+}
+
+/* Fix pixelation on high-DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .leaflet-overlay-pane img,
+  .map-overlay-layer {
+    /* Auto gives better results on Retina displays */
+    image-rendering: auto;
+    /* Slightly crisper on high DPI */
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Ensure base map remains sharp when overlays are added */
+.leaflet-image-layer:first-child {
+  z-index: 1;
+  image-rendering: auto;
 }
 
 /* ============================================

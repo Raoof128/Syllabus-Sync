@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/components/home/TodaySchedule';
 import UpcomingDeadlines from '@/components/home/UpcomingDeadlines';
-import EventsFeed from '@/components/home/EventsFeed';
+import TodosWidget from '@/components/home/TodosWidget';
+import UserEventsWidget from '@/components/home/UserEventsWidget';
 import { WelcomeHeader } from '@/components/home/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
@@ -13,6 +14,8 @@ import { LazyMotion, m, domAnimation } from 'framer-motion';
 
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useTodosStore } from '@/lib/store/todosStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
@@ -56,6 +59,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const addUnit = useUnitsStore((state) => state.addUnit);
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
+  const loadTodos = useTodosStore((state) => state.loadTodos);
+  const loadEvents = useEventsStore((state) => state.loadEvents);
   const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
   const profiles = useProfilesStore((state) => state.profiles);
   const currentProfileId = useProfilesStore((state) => state.currentProfileId);
@@ -68,8 +73,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     if (hasHydrated) {
       loadUnits();
       loadDeadlines();
+      loadTodos();
+      loadEvents();
     }
-  }, [hasHydrated, loadUnits, loadDeadlines]);
+  }, [hasHydrated, loadUnits, loadDeadlines, loadTodos, loadEvents]);
 
   // Keep user state in sync with auth endpoint
   useEffect(() => {
@@ -378,7 +385,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           </ScrollReveal>
         )}
 
-        {/* Main Dashboard Grid (rendered inside page-level main) */}
+        {/* Main Dashboard Grid - Today's Classes and Deadlines */}
         <section
           className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
           aria-label={t('dashboardOverview')}
@@ -392,7 +399,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </section>
 
         {/* My Units Section - READ ONLY on Home page */}
-        <ScrollReveal delay={0.3} staggerChildren={0.1}>
+        <ScrollReveal delay={0.25} staggerChildren={0.1}>
           <section aria-labelledby="units-section-heading" className="mb-6">
             <CardSolid>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -506,15 +513,18 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           </section>
         </ScrollReveal>
 
-        {/* Events Section */}
-        <ScrollReveal delay={0.4}>
-          <section aria-labelledby="events-section-heading" className="mb-8">
-            <h2 id="events-section-heading" className="sr-only">
-              {t('todaysEvents')}
-            </h2>
-            <EventsFeed />
-          </section>
-        </ScrollReveal>
+        {/* Events and Todo Grid */}
+        <section
+          className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
+          aria-label={t('dashboardOverview')}
+        >
+          <ScrollReveal delay={0.35}>
+            <UserEventsWidget />
+          </ScrollReveal>
+          <ScrollReveal delay={0.4}>
+            <TodosWidget />
+          </ScrollReveal>
+        </section>
 
         {/* Floating Action Button (FAB) for Quick Actions */}
         <div className="fixed bottom-6 right-6 z-50 md:hidden">

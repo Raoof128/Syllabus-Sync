@@ -7,7 +7,7 @@ export const GPS_CAMPUS_BOUNDS = {
 };
 
 // Campus image path (versioned to bust stale caches)
-export const MAP_ASSET_VERSION = '2026-02-02-1';
+export const MAP_ASSET_VERSION = '2026-02-07-1';
 export const CAMPUS_IMAGE_URL = `/maps/raster/mq-campus.png?v=${MAP_ASSET_VERSION}`;
 
 // Real GPS coordinates for campus center (used ONLY for geolocation comparison)

@@ -33,6 +33,7 @@ import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 import { cn } from '@/lib/utils';
+import { CalendarDays, Clock } from 'lucide-react';
 
 interface AssignmentFormProps {
   open: boolean;
@@ -297,16 +298,22 @@ export default function AssignmentForm({
                 <Label htmlFor="assignment-date">
                   {t('dueDate')} <span className="text-mq-error">*</span>
                 </Label>
-                <Input
-                  id="assignment-date"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  aria-invalid={Boolean(errors.dueDate)}
-                  aria-required="true"
-                  aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
-                  className={errors.dueDate ? 'border-mq-error' : ''}
-                />
+                <div className="relative">
+                  <Input
+                    id="assignment-date"
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    aria-invalid={Boolean(errors.dueDate)}
+                    aria-required="true"
+                    aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
+                    className={`pr-10 ${errors.dueDate ? 'border-mq-error' : ''}`}
+                  />
+                  <CalendarDays
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                    aria-hidden="true"
+                  />
+                </div>
                 {errors.dueDate && (
                   <p id="assignment-date-error" className="text-sm text-mq-error" role="alert">
                     {errors.dueDate}
@@ -315,12 +322,19 @@ export default function AssignmentForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="assignment-time">{t('dueTime')}</Label>
-                <Input
-                  id="assignment-time"
-                  type="time"
-                  value={dueTime}
-                  onChange={(e) => setDueTime(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="assignment-time"
+                    type="time"
+                    value={dueTime}
+                    onChange={(e) => setDueTime(e.target.value)}
+                    className="pr-10"
+                  />
+                  <Clock
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
             </div>
 

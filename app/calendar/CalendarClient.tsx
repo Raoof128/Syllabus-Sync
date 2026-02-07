@@ -111,6 +111,7 @@ export default function CalendarClient() {
   const addTodo = useTodosStore((state) => state.addTodo);
   const removeTodo = useTodosStore((state) => state.removeTodo);
   const updateTodo = useTodosStore((state) => state.updateTodo);
+  const todos = useTodosStore((state) => state.todos);
 
   const hasHydrated = useHydration();
   const { language, t } = useTypedTranslation();
@@ -252,10 +253,15 @@ export default function CalendarClient() {
         }, 400);
       }
 
-      // Open the assignment detail panel
+      // Open the correct detail panel based on deadline type
       if (highlightedDeadline) {
-        setSelectedAssignment(highlightedDeadline);
-        setAssignmentDetailOpen(true);
+        if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
+          setSelectedExam(highlightedDeadline);
+          setExamDetailOpen(true);
+        } else {
+          setSelectedAssignment(highlightedDeadline);
+          setAssignmentDetailOpen(true);
+        }
       }
 
       // Clear the URL parameter after capturing state (panel will stay open)
@@ -269,29 +275,111 @@ export default function CalendarClient() {
     };
   }, [highlightedDeadlineId, deadlines]);
 
+  // Highlighted todo derived from URL query parameter
+  const highlightedTodoId = useMemo(
+    () => searchParams.get('highlightTodo'),
+    [searchParams],
+  );
+
+  // Handle highlighted todo side effects (open detail panel)
+  useEffect(() => {
+    if (!highlightedTodoId) {
+      return;
+    }
+
+    // Find the highlighted todo
+    const highlightedTodo = todos.find((t) => t.id === highlightedTodoId);
+
+    // Open the todo detail panel
+    const timer = window.setTimeout(() => {
+      if (highlightedTodo) {
+        setSelectedTodo(highlightedTodo);
+        setTodoDetailOpen(true);
+      }
+
+      // Clear the URL parameter after capturing state (panel will stay open)
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightTodo');
+      window.history.replaceState({}, '', url.toString());
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [highlightedTodoId, todos]);
+
+  // Highlighted event derived from URL query parameter
+  const highlightedEventId = useMemo(
+    () => searchParams.get('highlightEvent'),
+    [searchParams],
+  );
+
+  // Handle highlighted event side effects (open detail panel)
+  useEffect(() => {
+    if (!highlightedEventId) {
+      return;
+    }
+
+    // Find the highlighted event
+    const highlightedEvent = userEvents.find((e) => e.id === highlightedEventId);
+
+    // Open the event detail panel
+    const timer = window.setTimeout(() => {
+      if (highlightedEvent) {
+        setSelectedEvent(highlightedEvent);
+        setEventDetailOpen(true);
+      }
+
+      // Clear the URL parameter after capturing state (panel will stay open)
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightEvent');
+      window.history.replaceState({}, '', url.toString());
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [highlightedEventId, userEvents]);
+
   // Track if we've already opened the unit panel for this highlight (to prevent re-opening)
   const processedUnitHighlightRef = useRef<string | null>(null);
 
+  // Reset the processed ref when URL changes (new highlight request)
+  useEffect(() => {
+    if (highlightedUnitId && processedUnitHighlightRef.current !== highlightedUnitId) {
+      // New highlight request, reset to allow processing
+      processedUnitHighlightRef.current = null;
+    }
+  }, [highlightedUnitId]);
+
   // Handle highlighted unit - open the detail panel when a unit is highlighted via URL
   useEffect(() => {
-    if (
-      highlightedUnitId &&
-      highlightedUnit &&
-      processedUnitHighlightRef.current !== highlightedUnitId
-    ) {
-      processedUnitHighlightRef.current = highlightedUnitId;
-
-      // Use a microtask to avoid the lint warning about setState in effect
-      queueMicrotask(() => {
-        setSelectedUnit(highlightedUnit);
-        setUnitDetailOpen(true);
-
-        // Clear the URL parameter immediately (we've captured the state)
-        const url = new URL(window.location.href);
-        url.searchParams.delete('highlightUnit');
-        window.history.replaceState({}, '', url.toString());
-      });
+    // Wait for units to be loaded before trying to find the highlighted unit
+    if (!highlightedUnitId || !highlightedUnit) {
+      return;
     }
+
+    // Prevent re-opening if we've already processed this highlight
+    if (processedUnitHighlightRef.current === highlightedUnitId) {
+      return;
+    }
+
+    processedUnitHighlightRef.current = highlightedUnitId;
+
+    // Open detail panel with small delay to allow scroll to happen first
+    const timer = window.setTimeout(() => {
+      setSelectedUnit(highlightedUnit);
+      setUnitDetailOpen(true);
+
+      // Clear the URL parameter after capturing state (panel will stay open)
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlightUnit');
+      window.history.replaceState({}, '', url.toString());
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [highlightedUnitId, highlightedUnit]);
 
   // Use selectedUnit for the panel (no longer depends on URL)

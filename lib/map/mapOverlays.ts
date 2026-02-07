@@ -1,7 +1,7 @@
 // lib/map/mapOverlays.ts
 // Map Overlay Layers Configuration
 
-export type MapOverlayId = 'parking' | 'water' | 'accessibility' | 'permits' | 'exam';
+export type MapOverlayId = 'parking' | 'water' | 'accessibility' | 'permits' | 'exam' | 'walk';
 
 export interface MapOverlay {
   id: MapOverlayId;
@@ -16,6 +16,10 @@ export interface MapOverlay {
   source: string; // Data source attribution
   lastUpdated: string; // When the data was last updated
   legend?: string[]; // What the overlay shows (icons/colors meaning)
+  // Image dimensions for proper scaling (width x height in pixels)
+  dimensions?: { width: number; height: number };
+  // Whether overlay aligns with base map bounds (true) or needs special positioning
+  alignsWithBaseMap: boolean;
 }
 
 export const mapOverlays: MapOverlay[] = [
@@ -36,6 +40,8 @@ export const mapOverlays: MapOverlay[] = [
       'Yellow: EV charging stations',
       'Purple: Accessible bays',
     ],
+    dimensions: { width: 1684, height: 1191 },
+    alignsWithBaseMap: true,
   },
   {
     id: 'water',
@@ -49,6 +55,8 @@ export const mapOverlays: MapOverlay[] = [
     source: 'MQ Sustainability Office',
     lastUpdated: 'June 2024',
     legend: ['Blue drops: Water fountains', 'Refill stations marked'],
+    dimensions: { width: 1684, height: 1191 },
+    alignsWithBaseMap: true,
   },
   {
     id: 'accessibility',
@@ -66,6 +74,8 @@ export const mapOverlays: MapOverlay[] = [
       'Wheelchair icons: Accessible toilets',
       'Lift icons: Elevator locations',
     ],
+    dimensions: { width: 1684, height: 1191 },
+    alignsWithBaseMap: true,
   },
   {
     id: 'permits',
@@ -79,6 +89,8 @@ export const mapOverlays: MapOverlay[] = [
     source: 'MQ Security & Transport',
     lastUpdated: 'August 2024',
     legend: ['Orange zones: Service vehicles only', 'Special permit areas marked'],
+    dimensions: { width: 1684, height: 1191 },
+    alignsWithBaseMap: true,
   },
   {
     id: 'exam',
@@ -92,6 +104,23 @@ export const mapOverlays: MapOverlay[] = [
     source: 'MQ Examinations Office',
     lastUpdated: 'Semester 2, 2024',
     legend: ['Red markers: Exam venues', 'Numbers: Building codes', 'Check iLearn for your venue'],
+    dimensions: { width: 1410, height: 1760 },
+    alignsWithBaseMap: false, // Portrait orientation, different aspect ratio
+  },
+  {
+    id: 'walk',
+    name: 'Loop Walk',
+    description: 'Campus walking trails and exercise routes',
+    imagePath: '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
+    icon: 'Footprints',
+    color: 'text-green-500',
+    category: 'recreation',
+    enabled: false,
+    source: 'MQ Campus Services',
+    lastUpdated: 'June 2024',
+    legend: ['Green route: Main loop', 'Distance markers shown', 'Accessible paths highlighted'],
+    dimensions: { width: 1191, height: 1684 },
+    alignsWithBaseMap: false, // Portrait orientation, different aspect ratio
   },
 ];
 
@@ -121,4 +150,5 @@ export const DEFAULT_OVERLAY_PREFERENCES: MapOverlayPreferences = {
   accessibility: false,
   permits: false,
   exam: false,
+  walk: false,
 };

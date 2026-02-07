@@ -1,14 +1,13 @@
-// components/home/UpcomingDeadlines.tsx
 'use client';
 
 import React, { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useTodosStore } from '@/lib/store/todosStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Clock, AlertCircle, ExternalLink, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
-import { format, isValid, isPast, endOfMonth } from 'date-fns';
+import { CheckSquare, ExternalLink, CheckCircle2, Circle, Clock, Eye } from 'lucide-react';
+import { format, isValid, isPast } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
@@ -17,13 +16,19 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/components/home/HomeCard';
 import { cn } from '@/lib/utils';
+import dayjs from 'dayjs';
 
-const UpcomingDeadlines = memo(() => {
+const TodosWidget = memo(() => {
   const isHydrated = useHydration();
   const router = useRouter();
-  const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
+  const todos = useTodosStore((state) => state.todos);
+  const toggleComplete = useTodosStore((state) => state.toggleComplete);
   const { t, language } = useTypedTranslation();
+
+  const tOr = (key: TranslationKey | string, fallback: string) => {
+    const value = t(key as TranslationKey);
+    return value === key ? fallback : value;
+  };
 
   const currentLocale = useMemo(() => {
     switch (language) {
@@ -36,32 +41,45 @@ const UpcomingDeadlines = memo(() => {
     }
   }, [language]);
 
-  // Get upcoming deadlines due by end of current month, sorted by date
-  const upcomingDeadlines = useMemo(() => {
-    const now = new Date();
-    const monthEnd = endOfMonth(now);
+  // Get ALL pending todos sorted by due date and priority
+  const pendingTodos = useMemo(() => {
+    const now = dayjs();
+    return todos
+      .filter((todo) => !todo.completed)
+      .sort((a, b) => {
+        // Sort overdue items first
+        const aDue = a.dueDate ? dayjs(a.dueDate) : null;
+        const bDue = b.dueDate ? dayjs(b.dueDate) : null;
+        const aOverdue = aDue && aDue.isBefore(now);
+        const bOverdue = bDue && bDue.isBefore(now);
 
-    return deadlines
-      .filter((deadline) => {
-        if (deadline.completed) return false;
-        const dueDate = new Date(deadline.dueDate);
-        if (!isValid(dueDate)) return false;
-        // Show deadlines that are overdue OR due by end of current month
-        return isPast(dueDate) || dueDate <= monthEnd;
-      })
-      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-  }, [deadlines]);
+        if (aOverdue && !bOverdue) return -1;
+        if (!aOverdue && bOverdue) return 1;
 
-  const pendingCount = deadlines.filter((d) => !d.completed).length;
+        // Then sort by due date
+        if (aDue && !bDue) return -1;
+        if (!aDue && bDue) return 1;
+        if (aDue && bDue) {
+          const dateDiff = aDue.valueOf() - bDue.valueOf();
+          if (dateDiff !== 0) return dateDiff;
+        }
 
-  const getDeadlineTypeLabel = (type: string) => {
-    return t(`type_${type}` as TranslationKey) || type;
-  };
+        // Then sort by priority
+        const priorityOrder = { High: 0, Medium: 1, Low: 2 };
+        const pA = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 3;
+        const pB = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 3;
+        return pA - pB;
+      });
+  }, [todos]);
+
+  const totalPending = todos.filter((t) => !t.completed).length;
 
   const formatDueDate = (date: Date) => {
     const d = new Date(date);
+    if (!isValid(d)) return '';
     return format(d, 'EEE, MMM d • h:mm a', { locale: currentLocale });
   };
+
 
   return (
     <CardSolid className="h-full flex flex-col">
@@ -71,20 +89,30 @@ const UpcomingDeadlines = memo(() => {
       >
         <div className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5" />
-            {t('upcomingDeadlines')}
+            <CheckSquare className="h-5 w-5" />
+            {tOr('todos', 'To-Do List')}
           </CardTitle>
-          {isHydrated && pendingCount > 0 && (
+          {isHydrated && totalPending > 0 && (
             <Badge
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {pendingCount} {t('pending')}
+              {totalPending} {t('pending')}
+            </Badge>
+          )}
+          {/* View Only Badge */}
+          {isHydrated && todos.length > 0 && (
+            <Badge
+              variant="neutral"
+              className="ml-1 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
+            >
+              <Eye className="h-3 w-3" aria-hidden="true" />
+              {t('viewOnly')}
             </Badge>
           )}
         </div>
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
-          <Link href="/calendar" aria-label={`${t('viewAll')} ${t('upcomingDeadlines')}`}>
+          <Link href="/calendar" aria-label={`${t('viewAll')} ${tOr('todos', 'Todos')}`}>
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t('viewAll')}</span>
           </Link>
@@ -105,7 +133,7 @@ const UpcomingDeadlines = memo(() => {
               {t('loading')}
             </p>
           </div>
-        ) : upcomingDeadlines.length === 0 ? (
+        ) : pendingTodos.length === 0 ? (
           <div
             className="text-center py-8 alabaster-readable"
             style={{
@@ -115,47 +143,46 @@ const UpcomingDeadlines = memo(() => {
               mixBlendMode: 'normal',
             }}
           >
-            <Clock className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
-            <p className="text-mq-content-tertiary">{t('noUpcomingDeadlines')}</p>
-            <p className="text-mq-content-tertiary text-sm mt-1">{t('noDeadlinesDesc')}</p>
+            <CheckSquare className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
+            <p className="text-mq-content-tertiary">{tOr('noTodos', 'No to-do items')}</p>
+            <p className="text-mq-content-tertiary text-sm mt-1">
+              {tOr('addTodosInCalendar', 'Add to-do items in the Calendar tab')}
+            </p>
           </div>
         ) : (
           <div className="space-y-2">
-            {upcomingDeadlines.map((deadline) => {
-              const dueDate = new Date(deadline.dueDate);
-              const isOverdue = isPast(dueDate);
+            {pendingTodos.map((todo) => {
+              const dueDate = todo.dueDate ? new Date(todo.dueDate) : null;
+              const isOverdue = dueDate && isPast(dueDate);
 
               return (
                 <div
-                  key={deadline.id}
+                  key={todo.id}
                   className={cn(
                     'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
-                    isOverdue
-                      ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
-                      : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
+                    'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
-                  onClick={() => router.push(`/calendar?highlightDeadline=${deadline.id}`)}
+                  onClick={() => router.push(`/calendar?highlightTodo=${todo.id}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(`/calendar?highlightDeadline=${deadline.id}`);
+                      router.push(`/calendar?highlightTodo=${todo.id}`);
                     }
                   }}
                 >
-                  {/* Color indicator based on deadline type */}
+                  {/* Color indicator based on priority */}
                   <div
                     className={cn(
                       'w-1.5 self-stretch rounded-full shrink-0',
-                      deadline.type === 'Assignment' && 'bg-blue-500',
-                      deadline.type === 'Exam' && 'bg-red-500',
-                      deadline.type === 'Presentation' && 'bg-purple-500',
-                      deadline.type === 'Quiz' && 'bg-amber-500',
+                      todo.priority === 'High' && 'bg-red-500',
+                      todo.priority === 'Medium' && 'bg-amber-500',
+                      todo.priority === 'Low' && 'bg-green-500',
                     )}
                   />
 
-                  {/* Deadline info */}
+                  {/* Todo info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2 min-w-0">
@@ -163,14 +190,12 @@ const UpcomingDeadlines = memo(() => {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            toggleComplete(deadline.id);
+                            toggleComplete(todo.id);
                           }}
                           className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
-                          aria-label={
-                            deadline.completed ? t('markIncomplete') : t('markAsCompleted')
-                          }
+                          aria-label={todo.completed ? tOr('markIncomplete', 'Mark incomplete') : tOr('markComplete', 'Mark complete')}
                         >
-                          {deadline.completed ? (
+                          {todo.completed ? (
                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                           ) : (
                             <Circle className="h-5 w-5 text-mq-content-tertiary hover:text-mq-primary" />
@@ -178,35 +203,30 @@ const UpcomingDeadlines = memo(() => {
                         </button>
                         <h4
                           className={cn(
-                            'font-semibold text-mq-content truncate',
-                            deadline.completed && 'line-through text-mq-content-tertiary',
+                            'text-mq-sm font-medium text-mq-content truncate',
+                            todo.completed && 'line-through text-mq-content-tertiary',
                           )}
-                          title={deadline.title}
+                          title={todo.title}
                         >
-                          {deadline.title}
+                          {todo.title}
                         </h4>
                       </div>
                       <Badge
-                        className={cn(
-                          PRIORITY_COLORS[deadline.priority],
-                          'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
-                        )}
+                        className={cn(PRIORITY_COLORS[todo.priority], 'text-[10px] px-1.5 py-0.5 font-medium shrink-0')}
                         variant="neutral"
                       >
-                        {t(`priority_${deadline.priority}` as TranslationKey)}
+                        {t(`priority_${todo.priority}` as TranslationKey)}
                       </Badge>
                     </div>
-
-                    <p className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1">
-                      {deadline.unitCode} • {getDeadlineTypeLabel(deadline.type)}
-                    </p>
-
-                    <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
-                      {isOverdue && <AlertCircle className="h-3.5 w-3.5 text-red-600 shrink-0" />}
-                      <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                        {formatDueDate(dueDate)}
-                      </span>
-                    </div>
+                    {dueDate && (
+                      <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
+                        <Clock className="h-3.5 w-3.5 shrink-0" />
+                        <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                          {isOverdue && `${tOr('overdue', 'Overdue')} • `}
+                          {formatDueDate(dueDate)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -218,6 +238,7 @@ const UpcomingDeadlines = memo(() => {
   );
 });
 
-UpcomingDeadlines.displayName = 'UpcomingDeadlines';
+TodosWidget.displayName = 'TodosWidget';
 
-export default UpcomingDeadlines;
+export default TodosWidget;
+
