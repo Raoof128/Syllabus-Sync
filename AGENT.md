@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map dark/light mode polish, pin rendering fix, responsive improvements
+Summary: (1) **Fixed red pins not rendering** — root cause was CSS `animate-marker-drop-in` animation using `transform` with `forwards` fill mode, which overrode Leaflet's inline `transform: translate3d()` positioning. Fixed by removing transform from keyframes (opacity-only animation), removing `forwards` fill mode, and switching hover/active from `transform: scale()` to standalone `scale` property. (2) **Dark/light mode unified** — replaced hardcoded `bg-white`/`hover:bg-gray-50` with `bg-mq-card-background`/`hover:bg-mq-hover-background` on center-on-user button; updated Leaflet popup backgrounds from raw CSS vars (`--c-background`/`--c-charcoal-800`) to `--mq-card-background` token; added popup tip styling and text color; added dark mode zoom control hover state. (3) **Responsive** — limited HUD sidebar max-height to 50% on mobile to prevent it from eating the entire map view. (4) `npm run check` all passed.
+Files: `app/styles/animations.css`, `app/map/CampusMap.tsx`, `app/styles/leaflet.css`, `app/map/CampusMapHUD.tsx`.
+Verification: `npm run check` ✅ (exit code 0).
+Follow-ups: None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin alignment fix, navigation audit, API verification
 Summary: (1) Fixed building pins misaligned by 110px — building.position[] values lacked the GCP-calibrated X offset. Added `BUILDING_PIXEL_OFFSET_X = 110` constant to buildings.ts and updated `getBuildingCrsCoords()` to apply it. Updated CampusMap.tsx to use `getBuildingCrsCoords` instead of raw `pixelToCrsSimple`. (2) Audited navigation pipeline end-to-end: ORS route fetching, GPS→CRS.Simple coordinate conversion, Kalman smoothing, off-route detection, turn-by-turn instructions — all correct. (3) Verified map API endpoints: `/api/health` ✅, `/api/navigate` correctly requires auth + rate limiting + geofence + ORS proxy. (4) `npm run check` all passed.
 Files: `lib/map/buildings.ts`, `app/map/CampusMap.tsx`.

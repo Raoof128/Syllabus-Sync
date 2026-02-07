@@ -556,7 +556,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         <button
           onClick={centerOnUser}
           className={cn(
-            'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-white dark:bg-mq-card-background text-mq-primary hover:bg-gray-50 dark:hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
+            'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
             selectedBuilding
               ? 'bottom-[220px] right-4 sm:bottom-6 sm:right-[320px]'
               : 'bottom-6 right-4',

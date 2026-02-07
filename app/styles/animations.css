@@ -63,11 +63,9 @@
 @keyframes marker-drop-in {
   from {
     opacity: 0;
-    transform: translate3d(0, -50px, 0) scale(0.3);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -115,10 +113,7 @@
 }
 
 .animate-marker-drop-in {
-  animation: marker-drop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  transform-origin: bottom center;
-  /* Ensure hover/active states work smoothly */
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: marker-drop-in 0.4s ease-out;
 }
 
 /* Tier 5: Focus States */
@@ -135,12 +130,12 @@
 }
 
 .animate-marker-drop-in:hover {
-  transform: scale(1.15) !important; /* Override animation final state */
+  scale: 1.15;
   z-index: 1000 !important;
 }
 
 .animate-marker-drop-in:active {
-  transform: scale(0.95) !important;
+  scale: 0.95;
 }
 
 .animate-route-dash {

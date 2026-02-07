@@ -102,7 +102,7 @@ export default function CampusMapHUD({
       </div>
 
       {/* Left sidebar */}
-      <div className="absolute top-3 left-3 w-[280px] sm:w-[320px] max-w-[calc(100vw-24px)] pointer-events-auto flex flex-col max-h-[calc(100%-24px)] sm:max-h-[500px]">
+      <div className="absolute top-3 left-3 w-[280px] sm:w-[320px] max-w-[calc(100vw-24px)] pointer-events-auto flex flex-col max-h-[50%] sm:max-h-[500px]">
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {buildingSearch ? t('buildingsFound', { count: buildings.length }) : ''}

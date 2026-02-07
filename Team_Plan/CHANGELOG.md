@@ -1,4 +1,11 @@
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map dark/light mode polish, pin rendering fix, responsive improvements
+Summary: Fixed red pins not rendering (CSS animation transform conflicting with Leaflet positioning). Unified dark/light mode across map components (center-on-user button, popup backgrounds, zoom controls). Improved mobile responsive sidebar height. `npm run check` all passed.
+- **Files:** `app/styles/animations.css`, `app/map/CampusMap.tsx`, `app/styles/leaflet.css`, `app/map/CampusMapHUD.tsx`.
+- **Verification:** `npm run check` ✅.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin alignment fix, navigation audit, API verification
 Summary: Fixed 110px X-axis misalignment between building positions and GCP-calibrated map image. Added `BUILDING_PIXEL_OFFSET_X` constant, updated `getBuildingCrsCoords()` to apply offset, refactored CampusMap.tsx to use it. Audited navigation pipeline (ORS routing, Kalman smoothing, off-route detection). Verified `/api/navigate` and `/api/health` endpoints.
 - **Files:** `lib/map/buildings.ts`, `app/map/CampusMap.tsx`.

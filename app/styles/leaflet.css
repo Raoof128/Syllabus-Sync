@@ -57,6 +57,11 @@
   border: 1px solid var(--mq-border) !important;
 }
 
+.dark .leaflet-control-zoom-in:hover,
+.dark .leaflet-control-zoom-out:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* ============================================
    USER LOCATION - DOT & FLASH BEAM
    ============================================ */
@@ -227,11 +232,16 @@
 
 /* Popup styling - clean, no blur */
 .leaflet-popup-content-wrapper {
-  background: var(--c-background, #edeade) !important;
+  background: var(--mq-card-background) !important;
+  color: var(--mq-content) !important;
   border-radius: var(--c-radius-lg, 0.5rem) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
+.leaflet-popup-tip {
+  background: var(--mq-card-background) !important;
+}
+
 .dark .leaflet-popup-content-wrapper {
-  background: var(--c-charcoal-800, #373a36) !important;
+  background: var(--mq-card-background) !important;
 }
