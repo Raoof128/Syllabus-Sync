@@ -50,11 +50,11 @@ export default function ProgramLegend({
     <div className={cn('w-full', className)}>
       {/* Desktop: Always visible inline legend */}
       <div className="hidden md:block bg-mq-background-secondary/50 border border-mq-border rounded-lg px-4 py-3">
-        <div className="flex items-center gap-6 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
           {/* Program Legend */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-mq-content-secondary mr-1">
-              {tOr('programKey', 'Program Key')}:
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-medium text-mq-content-secondary">
+              {tOr('programKey', 'Program')}:
             </span>
             {programs.map((program) => {
               const style = PROGRAM_STYLES[program];
@@ -78,43 +78,29 @@ export default function ProgramLegend({
             })}
           </div>
 
-          {/* Divider */}
+          {/* Category Legend */}
           {showCategories && (
-            <>
-              <div className="h-6 w-px bg-mq-border" aria-hidden="true" />
-
-              {/* Category Legend */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-medium text-mq-content-secondary mr-1">
-                  {tOr('categoryKey', 'Category')}:
-                </span>
-                {(Object.keys(MQ_DATE_COLORS) as MQDateCategory[]).slice(0, 4).map((category) => {
-                  const colors = MQ_DATE_COLORS[category];
-                  return (
-                    <div
-                      key={category}
-                      className={cn(
-                        'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase',
-                        colors.bg,
-                        colors.text,
-                      )}
-                    >
-                      {CATEGORY_LABELS[category]}
-                    </div>
-                  );
-                })}
-                <span className="text-[10px] text-mq-content-tertiary">+more</span>
-              </div>
-            </>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-medium text-mq-content-secondary">
+                {tOr('categoryKey', 'Category')}:
+              </span>
+              {(Object.keys(MQ_DATE_COLORS) as MQDateCategory[]).map((category) => {
+                const colors = MQ_DATE_COLORS[category];
+                return (
+                  <div
+                    key={category}
+                    className={cn(
+                      'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase',
+                      colors.bg,
+                      colors.text,
+                    )}
+                  >
+                    {CATEGORY_LABELS[category]}
+                  </div>
+                );
+              })}
+            </div>
           )}
-
-          {/* Help tooltip */}
-          <div className="ml-auto flex items-center gap-1 text-xs text-mq-content-tertiary">
-            <Info className="h-3 w-3" />
-            <span className="hidden lg:inline">
-              {tOr('allDayLegendHelp', 'All-day items use these styles')}
-            </span>
-          </div>
         </div>
       </div>
 

@@ -33,6 +33,7 @@ import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { cn } from '@/lib/utils';
 
 interface ExamFormProps {
   open: boolean;
@@ -137,6 +138,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       title: validationRules.required(t('title')),
       unitCode: validationRules.required(t('unit')),
       dueDate: validationRules.required(t('dueDate')),
+      dueTime: validationRules.required(t('time' as TranslationKey) || 'Time'),
       building: (value) => {
         const requiredError = validationRules.required(
           t('building' as TranslationKey) || 'Building',
@@ -151,7 +153,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       },
     });
 
-    const validationErrors = validator({ title, unitCode, dueDate, building });
+    const validationErrors = validator({ title, unitCode, dueDate, dueTime, building });
     const formErrors = errorHandler.handleValidationError(validationErrors);
 
     setErrors(formErrors);
@@ -361,13 +363,23 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exam-time">{t('examTime' as TranslationKey) || 'Exam Time'}</Label>
+                <Label htmlFor="exam-time">
+                  {t('examTime' as TranslationKey) || 'Exam Time'} <span className="text-mq-error">*</span>
+                </Label>
                 <Input
                   id="exam-time"
                   type="time"
                   value={dueTime}
                   onChange={(e) => setDueTime(e.target.value)}
+                  aria-invalid={Boolean(errors.dueTime)}
+                  aria-required="true"
+                  className={errors.dueTime ? 'border-mq-error' : ''}
                 />
+                {errors.dueTime && (
+                  <p className="text-sm text-mq-error" role="alert">
+                    {errors.dueTime}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -393,12 +405,12 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label htmlFor="exam-color">{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
                 <div
-                  className="w-6 h-6 rounded-full border-2 border-mq-border flex-shrink-0"
+                  className="w-6 h-6 rounded-full border-2 border-mq-border shrink-0"
                   style={{ backgroundColor: effectiveColor }}
                 />
                 <div className="flex-1 min-w-0">
@@ -407,12 +419,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
-                      ? UNIT_COLORS.find((c) => c.value === color)?.translationKey
-                        ? t(
-                            UNIT_COLORS.find((c) => c.value === color)!
-                              .translationKey as TranslationKey,
-                          )
-                        : color
+                      ? UNIT_COLORS.find((c) => c.value === color)?.name || color
                       : selectedUnit
                         ? `From ${selectedUnit.code}`
                         : 'Select a unit first'}
@@ -432,28 +439,26 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 </button>
               </div>
 
-              {/* Custom Color Picker */}
+              {/* Custom Color Picker - Scrollable */}
               {useCustomColor && (
-                <Select value={color} onValueChange={setColor}>
-                  <SelectTrigger id="exam-color">
-                    <SelectValue
-                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                  {UNIT_COLORS.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setColor(c.value)}
+                      className={cn(
+                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        color === c.value
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          : 'border-transparent hover:border-mq-border',
+                      )}
+                      style={{ backgroundColor: c.value }}
+                      title={t(c.translationKey as TranslationKey)}
+                      aria-label={t(c.translationKey as TranslationKey)}
                     />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNIT_COLORS.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full border border-mq-border"
-                            style={{ backgroundColor: c.value }}
-                          />
-                          <span>{t(c.translationKey as TranslationKey)}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  ))}
+                </div>
               )}
             </div>
           </div>

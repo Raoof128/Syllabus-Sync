@@ -596,6 +596,9 @@ export default function CalendarWidgets({
                       };
                       const eventColor = event.color || categoryColors[event.category] || '#A6192E';
 
+                      // Events from public feed (have sourcePublicEventId) can be deleted but not edited
+                      const isFromPublicFeed = Boolean(event.sourcePublicEventId);
+
                       return (
                         <div
                           key={event.id}
@@ -620,7 +623,7 @@ export default function CalendarWidgets({
                             room={event.room}
                             dateTime={event.startAt || event.date}
                             notificationEnabled={event.notificationEnabled}
-                            onEdit={() => onEditEvent(event)}
+                            onEdit={isFromPublicFeed ? undefined : () => onEditEvent(event)}
                             onDelete={() => onDeleteEvent(event)}
                             onToggleNotification={() => toggleEventNotification(event.id)}
                             variant="compact"

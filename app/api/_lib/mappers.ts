@@ -70,6 +70,7 @@ export const mapEventRow = (row: Row): Event => {
   return {
     id: String(row.id ?? ''),
     userId: row.user_id ? String(row.user_id) : null, // null for public events
+    sourcePublicEventId: row.source_public_event_id ? String(row.source_public_event_id) : null, // Track if from public feed
     title: String(row.title ?? ''),
     description: String(row.description ?? ''),
     location: String(row.location ?? ''),

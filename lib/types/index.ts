@@ -49,6 +49,7 @@ export type Deadline = {
 export type Event = {
   id: string;
   userId?: string | null; // null for public/campus events, user ID for personal events
+  sourcePublicEventId?: string | null; // If this event was copied from public events, this is the source ID
   title: string;
   description: string;
   building?: string; // Building code (e.g., "C5C") - optional for map navigation
@@ -92,6 +93,7 @@ export type Todo = {
   priority: TodoPriority;
   completed: boolean;
   dueDate?: Date; // Optional due date
+  color?: string; // Custom color for calendar display
   notificationEnabled?: boolean; // Whether notifications are enabled for this todo
   createdAt: Date;
   completedAt?: Date; // When the task was completed

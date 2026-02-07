@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface UnitFormProps {
   open: boolean;
@@ -358,27 +359,27 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             </div>
           </div>
 
-          {/* Color Selection */}
+          {/* Color Selection - Scrollable */}
           <div className="space-y-2">
-            <Label htmlFor="color">{t('unitColor')}</Label>
-            <Select value={color} onValueChange={setColor}>
-              <SelectTrigger id="color">
-                <SelectValue placeholder={t('selectColor')} />
-              </SelectTrigger>
-              <SelectContent>
-                {UNIT_COLORS.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full border border-mq-border"
-                        style={{ backgroundColor: c.value }}
-                      />
-                      <span>{t(c.translationKey as TranslationKey)}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>{t('unitColor')}</Label>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+              {UNIT_COLORS.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setColor(c.value)}
+                  className={cn(
+                    'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                    color === c.value
+                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                      : 'border-transparent hover:border-mq-border',
+                  )}
+                  style={{ backgroundColor: c.value }}
+                  title={t(c.translationKey as TranslationKey)}
+                  aria-label={t(c.translationKey as TranslationKey)}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Class Times */}

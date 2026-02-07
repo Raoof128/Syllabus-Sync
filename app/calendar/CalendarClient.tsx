@@ -31,6 +31,7 @@ import {
   PROGRAM_STYLES,
   PROGRAM_LABELS,
 } from '@/data/mqKeyDates';
+import { UNIT_COLORS } from '@/lib/config';
 import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { toastUtils } from '@/lib/utils/toast';
@@ -191,6 +192,7 @@ export default function CalendarClient() {
   const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
   const [editTodoDueDate, setEditTodoDueDate] = useState('');
   const [editTodoDueTime, setEditTodoDueTime] = useState('');
+  const [editTodoColor, setEditTodoColor] = useState<string>('#10b981'); // Default green
 
   // Assignment detail panel state
   const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
@@ -606,6 +608,7 @@ export default function CalendarClient() {
     setEditTodoPriority('Medium');
     setEditTodoDueDate('');
     setEditTodoDueTime('');
+    setEditTodoColor('#10b981');
     setTodoDialogOpen(true);
   };
 
@@ -613,6 +616,7 @@ export default function CalendarClient() {
     setEditingTodo(todo);
     setEditTodoTitle(todo.title);
     setEditTodoPriority(todo.priority);
+    setEditTodoColor(todo.color || '#10b981');
     if (todo.dueDate) {
       const date = new Date(todo.dueDate);
       setEditTodoDueDate(dayjs(date).format('YYYY-MM-DD'));
@@ -782,6 +786,9 @@ export default function CalendarClient() {
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
+      {/* Program Legend - on top to help users understand the calendar colors */}
+      <ProgramLegend className="mb-4" />
+
       <CalendarHeader
         currentDate={currentWeekStart}
         view={view}
@@ -799,8 +806,6 @@ export default function CalendarClient() {
         onFilterChange={setFilters}
       />
 
-      {/* Program Legend - helps users understand All-Day items by program/stream */}
-      <ProgramLegend className="mt-4" />
 
       <div className="flex flex-col lg:flex-row gap-6 mt-4">
         {/* Main Calendar Area */}
@@ -908,13 +913,6 @@ export default function CalendarClient() {
                             aria-hidden="true"
                           />
                           {weekDays.map((day) => {
-                            const dayMQDates = getMQKeyDatesForDay(day)
-                              .filter((d) => d.category !== 'classes')
-                              .sort((a, b) => {
-                                const isEnroll = (event: string) =>
-                                  /last date to enrol/i.test(event) ? 0 : 1;
-                                return isEnroll(a.event) - isEnroll(b.event);
-                              });
                             const dayName = formatWeekdayLong(day);
                             const dayDate = formatDayNumber(day);
                             const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
@@ -953,36 +951,6 @@ export default function CalendarClient() {
                                 >
                                   {formatDayNumber(day)}
                                 </div>
-                                {/* MQ Key Dates badges in header - only show important alerts */}
-                                {dayMQDates.filter((d) => /last date to enrol/i.test(d.event))
-                                  .length > 0 && (
-                                  <div className="mt-1 flex flex-col gap-1">
-                                    {dayMQDates
-                                      .filter((d) => /last date to enrol/i.test(d.event))
-                                      .slice(0, 1)
-                                      .map((mqDate) => {
-                                        return (
-                                          <div
-                                            key={mqDate.id}
-                                            className="text-[11px] px-2 py-1 uppercase tracking-wide ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background shadow-md bg-red-600 border-red-700 text-white rounded-md font-semibold"
-                                            title={
-                                              mqDate.description
-                                                ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                                : `${mqDate.event} - ${mqDate.term}`
-                                            }
-                                          >
-                                            <span className="flex items-center justify-center gap-1">
-                                              <AlertTriangle
-                                                className="h-3 w-3"
-                                                aria-hidden="true"
-                                              />
-                                              {mqDate.event}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                  </div>
-                                )}
                               </div>
                             );
                           })}
@@ -1012,9 +980,7 @@ export default function CalendarClient() {
                               {/* Full-day events for each day */}
                               {weekDays.map((day) => {
                                 const dayMQDates = getMQKeyDatesForDay(day).filter(
-                                  (d) =>
-                                    d.category !== 'classes' &&
-                                    !/last date to enrol/i.test(d.event),
+                                  (d) => d.category !== 'classes',
                                 );
                                 const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
 
@@ -1070,8 +1036,11 @@ export default function CalendarClient() {
                                               {categoryLabel}
                                             </span>
                                           </div>
-                                          <span className={cn('line-clamp-2', programStyle.text)}>
+                                          <span className={cn('line-clamp-1', programStyle.text)}>
                                             {mqDate.event}
+                                          </span>
+                                          <span className={cn('text-[9px] opacity-70 line-clamp-1', programStyle.text)}>
+                                            {mqDate.term}
                                           </span>
                                         </div>
                                       );
@@ -1563,30 +1532,53 @@ export default function CalendarClient() {
                             {dayMQDates.length > 0 && (
                               <div className="flex flex-wrap gap-2 mb-2">
                                 {dayMQDates.map((mqDate) => {
-                                  const colors = MQ_DATE_COLORS[mqDate.category];
-                                  const isAlert = /last date to enrol/i.test(mqDate.event);
+                                  const categoryColors = MQ_DATE_COLORS[mqDate.category];
+                                  const programStyle = PROGRAM_STYLES[mqDate.program];
+                                  const categoryLabel =
+                                    {
+                                      exams: 'Exam',
+                                      admin: 'Admin',
+                                      results: 'Results',
+                                      payment: 'Payment',
+                                      enrollment: 'Enroll',
+                                      recess: 'Break',
+                                      classes: 'Class',
+                                    }[mqDate.category] || mqDate.category;
                                   return (
                                     <div
                                       key={mqDate.id}
                                       className={cn(
-                                        'px-2 py-1 rounded-md text-xs font-bold shadow-md ring-1 ring-inset ring-white/20',
-                                        isAlert
-                                          ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background bg-red-600 text-white'
-                                          : cn(colors.bg, colors.text, colors.border, 'border-2'),
+                                        'px-2 py-1.5 rounded-md text-xs font-semibold shadow-sm border-l-4 flex flex-col',
+                                        programStyle.bgLight,
+                                        programStyle.border,
+                                        programStyle.pattern,
                                       )}
                                       title={
                                         mqDate.description
-                                          ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                          : `${mqDate.event} - ${mqDate.term}`
+                                          ? `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                                          : `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}`
                                       }
                                     >
-                                      {isAlert && (
-                                        <AlertTriangle
-                                          className="inline h-3 w-3 mr-1"
-                                          aria-hidden="true"
-                                        />
-                                      )}
-                                      <span className="drop-shadow-sm">{mqDate.event}</span>
+                                      <div className="flex items-center gap-1 mb-0.5">
+                                        <span className="text-sm" aria-hidden="true">
+                                          {programStyle.icon}
+                                        </span>
+                                        <span
+                                          className={cn(
+                                            'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                                            categoryColors.bg,
+                                            categoryColors.text,
+                                          )}
+                                        >
+                                          {categoryLabel}
+                                        </span>
+                                      </div>
+                                      <span className={cn('line-clamp-1', programStyle.text)}>
+                                        {mqDate.event}
+                                      </span>
+                                      <span className={cn('text-[9px] opacity-70', programStyle.text)}>
+                                        {mqDate.term}
+                                      </span>
                                     </div>
                                   );
                                 })}
@@ -2260,17 +2252,14 @@ export default function CalendarClient() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
-                if (editTodoTitle.trim()) {
-                  // Build due date if provided
-                  let dueDate: Date | undefined = undefined;
-                  if (editTodoDueDate) {
-                    dueDate = new Date(editTodoDueDate);
-                    if (editTodoDueTime) {
-                      const [hours, minutes] = editTodoDueTime.split(':').map(Number);
-                      dueDate.setHours(hours, minutes, 0, 0);
-                    } else {
-                      dueDate.setHours(23, 59, 59, 999);
-                    }
+                if (editTodoTitle.trim() && editTodoDueDate) {
+                  // Build due date (required)
+                  const dueDate = new Date(editTodoDueDate);
+                  if (editTodoDueTime) {
+                    const [hours, minutes] = editTodoDueTime.split(':').map(Number);
+                    dueDate.setHours(hours, minutes, 0, 0);
+                  } else {
+                    dueDate.setHours(23, 59, 59, 999);
                   }
 
                   if (editingTodo) {
@@ -2278,12 +2267,14 @@ export default function CalendarClient() {
                       title: editTodoTitle.trim(),
                       priority: editTodoPriority,
                       dueDate,
+                      color: editTodoColor,
                     });
                   } else {
                     await addTodo({
                       title: editTodoTitle.trim(),
                       priority: editTodoPriority,
                       dueDate,
+                      color: editTodoColor,
                     });
                   }
 
@@ -2293,16 +2284,18 @@ export default function CalendarClient() {
                   setEditTodoPriority('Medium');
                   setEditTodoDueDate('');
                   setEditTodoDueTime('');
+                  setEditTodoColor('#10b981');
                 }
               }}
               className="space-y-4"
             >
+              {/* Task Title - Required */}
               <div>
                 <label
                   htmlFor="edit-todo-title"
                   className="block text-sm font-medium text-mq-content mb-1"
                 >
-                  {tOr('taskTitle', 'Task Title')}
+                  {tOr('taskTitle', 'Task Title')} <span className="text-mq-error">*</span>
                 </label>
                 <input
                   id="edit-todo-title"
@@ -2312,8 +2305,11 @@ export default function CalendarClient() {
                   placeholder={tOr('enterTaskTitle', 'Enter task title...')}
                   className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   autoFocus
+                  required
                 />
               </div>
+
+              {/* Priority */}
               <div>
                 <label
                   htmlFor="edit-todo-priority"
@@ -2337,51 +2333,62 @@ export default function CalendarClient() {
                   <option value="Low">{tOr('priorityLow', 'Low')}</option>
                 </select>
               </div>
-              {/* Due Date and Time */}
+
+              {/* Due Date and Time - Required */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-mq-content">
-                  {tOr('dueDateTime', 'Due Date & Time')}
+                  {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex items-center gap-2 flex-1">
-                    <Calendar className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                    <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
                     <input
                       type="date"
                       value={editTodoDueDate}
                       onChange={(e) => setEditTodoDueDate(e.target.value)}
                       className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
                       aria-label={tOr('selectDueDate', 'Select due date')}
+                      required
                     />
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                    <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
                     <input
                       type="time"
                       value={editTodoDueTime}
                       onChange={(e) => setEditTodoDueTime(e.target.value)}
-                      disabled={!editTodoDueDate}
-                      className={cn(
-                        'px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]',
-                        !editTodoDueDate && 'opacity-50 cursor-not-allowed',
-                      )}
+                      className="px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]"
                       aria-label={tOr('selectDueTime', 'Select due time')}
                     />
                   </div>
                 </div>
-                {(editTodoDueDate || editTodoDueTime) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditTodoDueDate('');
-                      setEditTodoDueTime('');
-                    }}
-                    className="text-sm text-mq-content-secondary hover:text-mq-content transition-colors underline"
-                    aria-label={tOr('clearDueDate', 'Clear due date')}
-                  >
-                    {tOr('clearDueDate', 'Clear due date')}
-                  </button>
-                )}
               </div>
+
+              {/* Color Selection - Scrollable */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-mq-content">
+                  {tOr('color', 'Color')}
+                </label>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                  {UNIT_COLORS.map((colorOption) => (
+                    <button
+                      key={colorOption.value}
+                      type="button"
+                      onClick={() => setEditTodoColor(colorOption.value)}
+                      className={cn(
+                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        editTodoColor === colorOption.value
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          : 'border-transparent hover:border-mq-border',
+                      )}
+                      style={{ backgroundColor: colorOption.value }}
+                      title={colorOption.name}
+                      aria-label={colorOption.name}
+                    />
+                  ))}
+                </div>
+              </div>
+
               <div className="flex justify-end gap-3 pt-2">
                 <Button
                   type="button"
@@ -2393,13 +2400,14 @@ export default function CalendarClient() {
                     setEditTodoPriority('Medium');
                     setEditTodoDueDate('');
                     setEditTodoDueTime('');
+                    setEditTodoColor('#10b981');
                   }}
                 >
                   {t('cancelAction')}
                 </Button>
                 <Button
                   type="submit"
-                  disabled={!editTodoTitle.trim()}
+                  disabled={!editTodoTitle.trim() || !editTodoDueDate}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
                 >
                   {tOr('saveChanges', editingTodo ? 'Save Changes' : 'Add Task')}
@@ -2445,7 +2453,7 @@ export default function CalendarClient() {
         event={selectedEvent}
         open={eventDetailOpen}
         onOpenChange={setEventDetailOpen}
-        onEdit={(event) => {
+        onEdit={selectedEvent?.sourcePublicEventId ? undefined : (event) => {
           setEventDetailOpen(false);
           openEditEvent(event);
         }}

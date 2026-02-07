@@ -29,6 +29,7 @@ import {
 import { format, isValid } from 'date-fns';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+import { cn } from '@/lib/utils';
 
 interface EventFormProps {
   open: boolean;
@@ -420,7 +421,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <SelectTrigger id="event-category">
                 <SelectValue placeholder={t('selectCategory')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[200px] overflow-y-auto">
                 {EVENT_CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {t(`category_${cat.replace(/ /g, '')}` as TranslationKey)}
@@ -430,27 +431,27 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </Select>
           </div>
 
-          {/* Color Selection */}
+          {/* Color Selection - Scrollable horizontal buttons */}
           <div className="space-y-2">
-            <Label htmlFor="event-color">{t('color')}</Label>
-            <Select value={color} onValueChange={setColor}>
-              <SelectTrigger id="event-color">
-                <SelectValue placeholder={t('selectColor')} />
-              </SelectTrigger>
-              <SelectContent>
-                {UNIT_COLORS.map((colorOption) => (
-                  <SelectItem key={colorOption.value} value={colorOption.value}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full border border-mq-border"
-                        style={{ backgroundColor: colorOption.value }}
-                      />
-                      <span>{t(colorOption.translationKey as TranslationKey)}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>{t('color')}</Label>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+              {UNIT_COLORS.map((colorOption) => (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={() => setColor(colorOption.value)}
+                  className={cn(
+                    'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                    color === colorOption.value
+                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                      : 'border-transparent hover:border-mq-border',
+                  )}
+                  style={{ backgroundColor: colorOption.value }}
+                  title={t(colorOption.translationKey as TranslationKey)}
+                  aria-label={t(colorOption.translationKey as TranslationKey)}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

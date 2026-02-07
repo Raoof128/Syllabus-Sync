@@ -9,6 +9,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { PublicEvent, PublicEventFromDB, transformPublicEvent } from '@/lib/types/publicEvents';
+import { useEventsStore } from '@/lib/store/eventsStore';
 
 interface PublicEventsState {
   // Data
@@ -164,6 +165,11 @@ export const usePublicEventsStore = create<PublicEventsState>()(
             addedToCalendar: newAdded,
             isAddingToCalendar: newLoading,
           });
+
+          // Refresh the events store so calendar widget updates immediately
+          // Reset hasLoaded to force a fresh fetch from the database
+          useEventsStore.getState().reset();
+          useEventsStore.getState().loadEvents();
 
           return { success: true, userEventId: data as string };
         } catch (error) {

@@ -72,7 +72,7 @@ export const sampleEvents: Event[] = [
     2,
     '10:00 AM - 4:00 PM',
     'Campus Hub, Main Hall',
-    'C7A',
+    '18WW',
     'Career',
   ),
   createEvent(
@@ -84,7 +84,7 @@ export const sampleEvents: Event[] = [
     getNextDayOfWeek(5), // Always schedule on next Friday (5 = Friday)
     '12:00 PM - 2:00 PM',
     'Library Courtyard',
-    'C3C',
+    'LIB',
     'Free Food',
   ),
   createEvent(
@@ -96,7 +96,7 @@ export const sampleEvents: Event[] = [
     1,
     '2:00 PM - 4:00 PM',
     'Library Room 204',
-    'C3C',
+    'LIB',
     'Academic',
   ),
   createEvent(
@@ -108,7 +108,7 @@ export const sampleEvents: Event[] = [
     3,
     '11:00 AM - 3:00 PM',
     'Campus Hub Courtyard',
-    'C7A',
+    '18WW',
     'Free Food',
   ),
   createEvent(
@@ -120,7 +120,7 @@ export const sampleEvents: Event[] = [
     5,
     '6:00 PM - 8:00 PM',
     'Engineering Building, Room E101',
-    'E7A',
+    '9WW',
     'Career',
   ),
   createEvent(
@@ -132,7 +132,7 @@ export const sampleEvents: Event[] = [
     0,
     '10:00 AM - 3:00 PM',
     'Campus Hub',
-    'C7A',
+    '18WW',
     'Social',
   ),
   createEvent(
@@ -144,7 +144,7 @@ export const sampleEvents: Event[] = [
     4,
     '3:00 PM - 5:00 PM',
     'Wallumattagal Building, Lecture Hall',
-    'W6A',
+    'WALU',
     'Academic',
   ),
   createEvent(
@@ -156,7 +156,7 @@ export const sampleEvents: Event[] = [
     6,
     '7:00 PM - 11:00 PM',
     'Campus Hub Theatre',
-    'C7A',
+    '18WW',
     'Social',
   ),
   createEvent(
@@ -168,7 +168,7 @@ export const sampleEvents: Event[] = [
     7,
     '1:00 PM - 3:00 PM',
     'Careers Centre',
-    'W3A',
+    '18WW',
     'Career',
   ),
   createEvent(
@@ -180,7 +180,7 @@ export const sampleEvents: Event[] = [
     1,
     '8:00 AM - 10:00 AM',
     'Library Café',
-    'C3C',
+    'LIBCAFE',
     'Free Food',
   ),
   createEvent(

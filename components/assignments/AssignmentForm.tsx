@@ -32,6 +32,7 @@ import { PRIORITY_LEVELS } from '@/lib/constants';
 import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
+import { cn } from '@/lib/utils';
 
 interface AssignmentFormProps {
   open: boolean;
@@ -345,12 +346,12 @@ export default function AssignmentForm({
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label htmlFor="assignment-color">{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
                 <div
-                  className="w-6 h-6 rounded-full border-2 border-mq-border flex-shrink-0"
+                  className="w-6 h-6 rounded-full border-2 border-mq-border shrink-0"
                   style={{ backgroundColor: effectiveColor }}
                 />
                 <div className="flex-1 min-w-0">
@@ -359,12 +360,7 @@ export default function AssignmentForm({
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
-                      ? UNIT_COLORS.find((c) => c.value === color)?.translationKey
-                        ? t(
-                            UNIT_COLORS.find((c) => c.value === color)!
-                              .translationKey as TranslationKey,
-                          )
-                        : color
+                      ? UNIT_COLORS.find((c) => c.value === color)?.name || color
                       : selectedUnit
                         ? `From ${selectedUnit.code}`
                         : 'Select a unit first'}
@@ -384,31 +380,26 @@ export default function AssignmentForm({
                 </button>
               </div>
 
-              {/* Custom Color Picker */}
+              {/* Custom Color Picker - Scrollable */}
               {useCustomColor && (
-                <Select value={color} onValueChange={setColor}>
-                  <SelectTrigger
-                    id="assignment-color"
-                    className="*:data-[slot=select-value]:justify-center"
-                  >
-                    <SelectValue
-                      placeholder={t('selectColor' as TranslationKey) || 'Select a color'}
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                  {UNIT_COLORS.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setColor(c.value)}
+                      className={cn(
+                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        color === c.value
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          : 'border-transparent hover:border-mq-border',
+                      )}
+                      style={{ backgroundColor: c.value }}
+                      title={t(c.translationKey as TranslationKey)}
+                      aria-label={t(c.translationKey as TranslationKey)}
                     />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNIT_COLORS.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full border border-mq-border"
-                            style={{ backgroundColor: c.value }}
-                          />
-                          <span>{t(c.translationKey as TranslationKey)}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  ))}
+                </div>
               )}
             </div>
           </div>

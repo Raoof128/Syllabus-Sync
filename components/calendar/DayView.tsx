@@ -18,8 +18,7 @@ import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
-import { getMQKeyDatesForDay, MQ_DATE_COLORS } from '@/data/mqKeyDates';
-import { AlertTriangle } from 'lucide-react';
+import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES } from '@/data/mqKeyDates';
 
 interface DayViewProps {
   date: Date;
@@ -146,20 +145,53 @@ export default function DayView({
           <div className="p-3 border-b border-mq-border bg-mq-background-secondary/30 sticky top-0 z-20 backdrop-blur-sm">
             <div className="flex flex-wrap gap-2">
               {mqKeyDates.map((mqDate) => {
-                const colors = MQ_DATE_COLORS[mqDate.category];
-                const isAlert = /last date to enrol/i.test(mqDate.event);
+                const categoryColors = MQ_DATE_COLORS[mqDate.category];
+                const programStyle = PROGRAM_STYLES[mqDate.program];
+                const categoryLabel =
+                  {
+                    exams: 'Exam',
+                    admin: 'Admin',
+                    results: 'Results',
+                    payment: 'Payment',
+                    enrollment: 'Enroll',
+                    recess: 'Break',
+                    classes: 'Class',
+                  }[mqDate.category] || mqDate.category;
                 return (
                   <div
                     key={mqDate.id}
                     className={cn(
-                      'px-2 py-1 rounded-md text-xs font-bold shadow-sm ring-1 ring-inset ring-white/10',
-                      isAlert
-                        ? 'ring-2 ring-red-500 ring-offset-1 ring-offset-mq-background bg-red-600 text-white'
-                        : cn(colors.bg, colors.text, colors.border, 'border'),
+                      'px-2 py-1.5 rounded-md text-xs font-semibold shadow-sm border-l-4 flex flex-col',
+                      programStyle.bgLight,
+                      programStyle.border,
+                      programStyle.pattern,
                     )}
+                    title={
+                      mqDate.description
+                        ? `${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
+                        : `${mqDate.event} - ${mqDate.term}`
+                    }
                   >
-                    {isAlert && <AlertTriangle className="inline h-3 w-3 mr-1" />}
-                    {mqDate.event}
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-sm" aria-hidden="true">
+                        {programStyle.icon}
+                      </span>
+                      <span
+                        className={cn(
+                          'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                          categoryColors.bg,
+                          categoryColors.text,
+                        )}
+                      >
+                        {categoryLabel}
+                      </span>
+                    </div>
+                    <span className={cn('line-clamp-1', programStyle.text)}>
+                      {mqDate.event}
+                    </span>
+                    <span className={cn('text-[9px] opacity-70', programStyle.text)}>
+                      {mqDate.term}
+                    </span>
                   </div>
                 );
               })}
