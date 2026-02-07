@@ -3,6 +3,7 @@
  *
  * Tests GET /api/webauthn/credentials (list passkeys)
  * and DELETE /api/webauthn/credentials (remove passkey)
+ * including rate limiting (security audit fix)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -17,10 +18,16 @@ vi.mock('@/lib/supabase/server', () => ({
 
 const mockGetCredentialsForUser = vi.fn();
 const mockDeleteCredential = vi.fn();
+const mockWebauthnCredentialsLimiter = vi.fn();
 
 vi.mock('@/lib/security/webauthn', () => ({
   getCredentialsForUser: (...args: unknown[]) => mockGetCredentialsForUser(...args),
   deleteCredential: (...args: unknown[]) => mockDeleteCredential(...args),
+  webauthnCredentialsLimiter: (...args: unknown[]) => mockWebauthnCredentialsLimiter(...args),
+}));
+
+vi.mock('@/lib/security/ip', () => ({
+  getClientIP: () => '127.0.0.1',
 }));
 
 // Helper to create a GET request
@@ -32,6 +39,30 @@ describe('WebAuthn Credentials API', () => {
     createServerClientMock.mockReset();
     mockGetCredentialsForUser.mockReset();
     mockDeleteCredential.mockReset();
+    mockWebauthnCredentialsLimiter.mockReset();
+    mockWebauthnCredentialsLimiter.mockResolvedValue({ allowed: true, resetIn: 0 });
+  });
+
+  describe('Rate Limiting (Security Audit Fix)', () => {
+    it('returns 429 on GET when rate limited', async () => {
+      mockWebauthnCredentialsLimiter.mockResolvedValue({ allowed: false, resetIn: 300 });
+
+      const response = await GET(makeGetRequest());
+      expect(response.status).toBe(429);
+    });
+
+    it('returns 429 on DELETE when rate limited', async () => {
+      mockWebauthnCredentialsLimiter.mockResolvedValue({ allowed: false, resetIn: 300 });
+
+      const request = new NextRequest('http://localhost/api/webauthn/credentials', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'content-length': '60' },
+        body: JSON.stringify({ credentialDbId: '550e8400-e29b-41d4-a716-446655440000' }),
+      });
+
+      const response = await DELETE(request);
+      expect(response.status).toBe(429);
+    });
   });
 
   describe('GET /api/webauthn/credentials', () => {

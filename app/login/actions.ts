@@ -79,11 +79,14 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
       }
     }
   } catch (mfaError) {
-    // MFA check failed — log but don't block login (fail-open for AAL check only)
-    logger.warn('MFA status check failed', {
+    // SECURITY: MFA check failed — fail-closed to prevent MFA bypass.
+    // If we can't verify MFA status, deny login rather than allowing
+    // an attacker to bypass MFA via a service/network error.
+    logger.error('MFA status check failed — blocking login (fail-closed)', {
       email: data.email,
       error: mfaError,
     });
+    return { error: 'mfa_check_failed' };
   }
 
   logger.info('Login success', { email: data.email });

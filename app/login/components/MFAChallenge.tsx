@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/mq/input';
 import { Shield, Loader2, AlertTriangle, Smartphone, ArrowLeft } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { toastUtils } from '@/lib/utils/toast';
-import { createBrowserClient } from '@/lib/supabase/client';
+import { API_ROUTES } from '@/lib/constants/config';
 
 export interface MFAFactorInfo {
   id: string;
@@ -53,39 +53,35 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     setError(null);
 
     try {
-      const supabase = createBrowserClient();
-
-      // Create challenge
-      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
-        factorId: selectedFactor.id,
+      // SECURITY: Route through server-side API to enforce server-side rate
+      // limiting (5 attempts / 15 min) instead of calling Supabase MFA API
+      // directly from the browser which bypasses our rate limiter.
+      const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          factorId: selectedFactor.id,
+          code: code.trim(),
+        }),
       });
 
-      if (challengeError || !challenge) {
-        setError('Failed to create verification challenge. Please try again.');
-        return;
-      }
+      const result = await res.json();
 
-      // Verify code
-      const { error: verifyError } = await supabase.auth.mfa.verify({
-        factorId: selectedFactor.id,
-        challengeId: challenge.id,
-        code: code.trim(),
-      });
-
-      if (verifyError) {
+      if (!res.ok || !result?.data?.verified) {
         setAttemptsLeft((prev) => prev - 1);
         if (attemptsLeft <= 1) {
           setError('Too many failed attempts. Please sign in again.');
           setTimeout(onCancel, 2000);
         } else {
           setError(
-            `Invalid code. ${attemptsLeft - 1} attempt${attemptsLeft - 1 === 1 ? '' : 's'} remaining.`,
+            result?.error?.message ??
+              `Invalid code. ${attemptsLeft - 1} attempt${attemptsLeft - 1 === 1 ? '' : 's'} remaining.`,
           );
         }
         return;
       }
 
-      // Success — session upgraded to aal2
+      // Success — session upgraded to aal2 via server-side cookies
       toastUtils.success(t('welcomeBack'), 'Identity verified.');
       onSuccess();
     } catch {
@@ -111,9 +107,20 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     if (!selectedFactor || selectedFactor.type !== 'phone' || resendCooldown > 0) return;
 
     try {
-      const supabase = createBrowserClient();
-      await supabase.auth.mfa.challenge({ factorId: selectedFactor.id });
-      toastUtils.success(t('security'), 'New code sent!');
+      // Use server-side challenge-verify endpoint to trigger SMS resend
+      // by creating a new challenge for the phone factor
+      const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ factorId: selectedFactor.id, code: '000000' }),
+      });
+      // We expect this to fail (wrong code), but it triggers the SMS send
+      // via the challenge creation step. The error is expected.
+      if (res.status !== 429) {
+        toastUtils.success(t('security'), 'New code sent!');
+      } else {
+        setError('Too many attempts. Please wait before retrying.');
+      }
 
       // Start cooldown
       setResendCooldown(60);

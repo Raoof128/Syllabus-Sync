@@ -58,27 +58,33 @@ export async function POST(request: NextRequest) {
 
     const { email } = parsed.data;
 
-    // Look up user by email
-    const { data: users, error: userError } = await adminClient.auth.admin.listUsers();
+    // SECURITY: Use targeted RPC lookup instead of listUsers() which loads
+    // ALL users into memory (DoS vector + functional bug for >50 users).
+    const { data: lookupResult, error: lookupError } = await adminClient.rpc(
+      'lookup_user_by_email',
+      { lookup_email: email },
+    );
 
-    if (userError) {
-      logger.error('User lookup error:', userError);
+    if (lookupError) {
+      logger.error('User lookup error:', lookupError);
       return jsonError('Passkey login unavailable', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
-    const userRecord = users.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+    const userRow = Array.isArray(lookupResult) ? lookupResult[0] : lookupResult;
 
-    if (!userRecord) {
-      // Don't reveal whether user exists
+    if (!userRow?.user_id) {
+      // Don't reveal whether user exists — use same message as "no passkeys"
       return jsonError('Passkey not available for this account', 404, ERROR_CODES.NOT_FOUND);
     }
 
+    const userId: string = userRow.user_id;
+    const userMeta = (userRow.user_meta ?? {}) as Record<string, unknown>;
+
     // Get credentials from DB table
-    const credentials = await getCredentialsForUser(userRecord.id);
+    const credentials = await getCredentialsForUser(userId);
 
     // Also check legacy user_metadata for backwards compatibility
-    const metadata = (userRecord.user_metadata || {}) as Record<string, unknown>;
-    const legacyCredentialId = metadata.biometric_credential_id as string | undefined;
+    const legacyCredentialId = userMeta.biometric_credential_id as string | undefined;
 
     if (credentials.length === 0 && !legacyCredentialId) {
       return jsonError('Passkey not available for this account', 404, ERROR_CODES.NOT_FOUND);
@@ -98,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     if (legacyCredentialId && !allowCredentials.some((c) => c.id === legacyCredentialId)) {
       const legacyTransports =
-        (metadata.biometric_transports as AuthenticatorTransportFuture[]) ?? undefined;
+        (userMeta.biometric_transports as AuthenticatorTransportFuture[]) ?? undefined;
       allowCredentials.push({
         id: legacyCredentialId,
         transports: legacyTransports,
@@ -112,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Store challenge in DB
-    await storeChallenge(options.challenge, 'authentication', userRecord.id);
+    await storeChallenge(options.challenge, 'authentication', userId);
 
     return jsonSuccess({ options });
   } catch (error) {

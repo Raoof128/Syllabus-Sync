@@ -8,7 +8,12 @@ import {
   BODY_SIZE_LIMITS,
   ERROR_CODES,
 } from '@/app/api/_lib/response';
-import { getCredentialsForUser, deleteCredential } from '@/lib/security/webauthn';
+import {
+  getCredentialsForUser,
+  deleteCredential,
+  webauthnCredentialsLimiter,
+} from '@/lib/security/webauthn';
+import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
@@ -16,7 +21,18 @@ import { z } from 'zod';
  * GET /api/webauthn/credentials
  * List all passkeys for the authenticated user.
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  const { allowed, resetIn } = await webauthnCredentialsLimiter(clientIP);
+
+  if (!allowed) {
+    return jsonError(
+      `Too many requests. Try again in ${Math.ceil(resetIn / 60)} minutes.`,
+      429,
+      ERROR_CODES.RATE_LIMITED,
+    );
+  }
+
   try {
     const supabase = await createServerClient();
     const {
@@ -55,6 +71,17 @@ const deleteSchema = z.object({
  * Remove a passkey by database ID.
  */
 export async function DELETE(request: NextRequest) {
+  const clientIP = getClientIP(request);
+  const { allowed, resetIn } = await webauthnCredentialsLimiter(clientIP);
+
+  if (!allowed) {
+    return jsonError(
+      `Too many requests. Try again in ${Math.ceil(resetIn / 60)} minutes.`,
+      429,
+      ERROR_CODES.RATE_LIMITED,
+    );
+  }
+
   try {
     const supabase = await createServerClient();
     const {

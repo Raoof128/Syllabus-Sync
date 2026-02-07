@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { toastUtils } from '@/lib/utils/toast';
+import { API_ROUTES } from '@/lib/constants/config';
 
 interface PasskeyCredential {
   id: string;
@@ -51,7 +52,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
   const fetchCredentials = useCallback(async () => {
     setIsFetching(true);
     try {
-      const res = await fetch('/api/webauthn/credentials');
+      const res = await fetch(API_ROUTES.AUTH.WEBAUTHN_CREDENTIALS);
       if (res.ok) {
         const result = await res.json();
         setCredentials(result?.data?.credentials ?? []);
@@ -77,7 +78,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
     setAddError(null);
     try {
       // 1. Get registration options
-      const optionsRes = await fetch('/api/webauthn/register/options', {
+      const optionsRes = await fetch(API_ROUTES.AUTH.WEBAUTHN_REGISTER_OPTIONS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceName: deviceName || 'Passkey' }),
@@ -123,7 +124,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
         credential.response as AuthenticatorAttestationResponse;
       const transports = attestation.getTransports?.() ?? [];
 
-      const verifyRes = await fetch('/api/webauthn/register/verify', {
+      const verifyRes = await fetch(API_ROUTES.AUTH.WEBAUTHN_REGISTER_VERIFY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -168,7 +169,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
 
     setIsLoading(true);
     try {
-      const res = await fetch('/api/webauthn/credentials', {
+      const res = await fetch(API_ROUTES.AUTH.WEBAUTHN_CREDENTIALS, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credentialDbId: deleteTarget.id }),

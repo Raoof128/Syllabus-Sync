@@ -39,6 +39,13 @@ export const webauthnAuthLimiter = createRateLimiter({
   failClosed: true,
 });
 
+export const webauthnCredentialsLimiter = createRateLimiter({
+  prefix: 'webauthn-creds',
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 20,
+  failClosed: true,
+});
+
 // ============================================================================
 // TYPES
 // ============================================================================

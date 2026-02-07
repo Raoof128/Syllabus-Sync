@@ -42,12 +42,16 @@ export async function POST(request: NextRequest) {
       return jsonError('Failed to start authenticator setup', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    return jsonSuccess({
+    // SECURITY: Prevent proxy caching of TOTP secrets
+    const response = jsonSuccess({
       factorId: data.id,
       qrCode: data.totp.qr_code,
       secret: data.totp.secret,
       uri: data.totp.uri,
     });
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    return response;
   } catch (error) {
     logger.error('MFA enroll error:', error);
     return jsonError('Failed to set up authenticator', 500, ERROR_CODES.INTERNAL_ERROR);
