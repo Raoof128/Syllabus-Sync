@@ -490,6 +490,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                     key={b.id}
                     position={getBuildingLatLng(b)}
                     icon={isSelected && selectedIcon ? selectedIcon : defaultIcon}
+                    riseOnHover
+                    riseOffset={isSelected ? 420 : 260}
+                    zIndexOffset={isSelected ? 1000 : 0}
                   >
                     <reactLeafletModule.Popup>
                       <div className="p-3 min-w-[260px] max-w-[320px]">

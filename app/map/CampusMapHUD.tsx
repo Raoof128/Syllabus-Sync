@@ -102,7 +102,7 @@ export default function CampusMapHUD({
       </div>
 
       {/* Left sidebar */}
-      <div className="absolute top-3 left-3 w-[280px] sm:w-[320px] max-w-[calc(100vw-24px)] pointer-events-auto flex flex-col max-h-[50%] sm:max-h-[500px]">
+      <div className="absolute top-3 left-3 w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[52svh] sm:max-h-[500px]">
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {buildingSearch ? t('buildingsFound', { count: buildings.length }) : ''}
@@ -141,7 +141,7 @@ export default function CampusMapHUD({
           </div>
 
           <m.div
-            className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0"
+            className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain"
             initial="hidden"
             animate="visible"
             // Tier 6: Responsive Layout Improvements - Touch optimized drag
@@ -204,7 +204,7 @@ export default function CampusMapHUD({
                     >
                       {b.id}
                     </span>
-                    <span className="text-xs text-mq-content-secondary truncate max-w-[180px]">
+                    <span className="text-xs text-mq-content-secondary truncate max-w-[58vw] sm:max-w-[180px]">
                       {t(b.translationKey)}
                     </span>
                   </div>

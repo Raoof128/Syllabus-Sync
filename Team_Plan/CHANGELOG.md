@@ -1,4 +1,11 @@
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map pin stability + responsive light/dark polish
+Summary: Strengthened map marker behavior (selected marker z-index/rise handling), removed marker hover/active scale transforms that can conflict with Leaflet positioning, improved mobile responsiveness with `svh`-based map/HUD sizing and safer sidebar text constraints, and enlarged Leaflet zoom controls for touch usage in both light and dark mode.
+- **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.
+- **Verification:** `npm run check` ✅.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map dark/light mode polish, pin rendering fix, responsive improvements
 Summary: Fixed red pins not rendering (CSS animation transform conflicting with Leaflet positioning). Unified dark/light mode across map components (center-on-user button, popup backgrounds, zoom controls). Improved mobile responsive sidebar height. `npm run check` all passed.
 - **Files:** `app/styles/animations.css`, `app/map/CampusMap.tsx`, `app/styles/leaflet.css`, `app/map/CampusMapHUD.tsx`.

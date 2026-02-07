@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-07 (Australia/Sydney) - Map Pin Stability + Responsive Polish
+- **Status:** ✅ Complete - Pins and responsive behavior improved for light/dark mode.
+- **Scope:** Map Markers, Responsive UI, Theme Consistency.
+- **Summary:** Added explicit marker stacking behavior for selected pins (`riseOnHover`, `riseOffset`, `zIndexOffset`) to avoid "bugged" marker overlap behavior, removed marker hover/active scale transforms to avoid transform interference on Leaflet-managed markers, tuned map container and HUD sizing for smaller screens using `svh`, and increased Leaflet zoom control touch target size across light and dark mode.
+- **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.
+- **Verification:** `npm run check` passed (format, typecheck, lint, tests, build).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-06 (Australia/Sydney) - Repository-wide i18n Coverage
 - **Status:** ✅ Complete - Locale parity achieved across all shipped languages.
 - **Scope:** Internationalization, Translation Completeness, Accessibility Labels.

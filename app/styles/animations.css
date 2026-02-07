@@ -22,6 +22,12 @@
   will-change: transform, opacity;
 }
 
+/* Leaflet controls marker placement via inline transform.
+   Keep marker icon animation opacity-only so pin positions remain stable. */
+.leaflet-marker-icon.animate-marker-drop-in {
+  will-change: opacity;
+}
+
 /* ============================================
    KEYFRAME DEFINITIONS
    ============================================ */
@@ -130,12 +136,11 @@
 }
 
 .animate-marker-drop-in:hover {
-  scale: 1.15;
-  z-index: 1000 !important;
+  opacity: 0.95;
 }
 
 .animate-marker-drop-in:active {
-  scale: 0.95;
+  opacity: 0.85;
 }
 
 .animate-route-dash {

@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map pin stability + responsive light/dark polish
+Summary: (1) Hardened Leaflet marker behavior so selected pins reliably stay on top and hover interactions no longer interfere with map placement (`riseOnHover`, `riseOffset`, `zIndexOffset`). (2) Removed marker hover/active scale transforms from the pin animation class to prevent transform-related marker jitter/position issues. (3) Improved map responsiveness on small screens with `svh`-based map/HUD sizing and better sidebar text truncation. (4) Increased zoom control touch target sizing for mobile in both light and dark themes. (5) Ran full validation via `npm run check` — all stages passed.
+Files: `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.
+Verification: `npm run check` ✅ (format, typecheck, lint, tests, build all pass).
+Follow-ups: None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map dark/light mode polish, pin rendering fix, responsive improvements
 Summary: (1) **Fixed red pins not rendering** — root cause was CSS `animate-marker-drop-in` animation using `transform` with `forwards` fill mode, which overrode Leaflet's inline `transform: translate3d()` positioning. Fixed by removing transform from keyframes (opacity-only animation), removing `forwards` fill mode, and switching hover/active from `transform: scale()` to standalone `scale` property. (2) **Dark/light mode unified** — replaced hardcoded `bg-white`/`hover:bg-gray-50` with `bg-mq-card-background`/`hover:bg-mq-hover-background` on center-on-user button; updated Leaflet popup backgrounds from raw CSS vars (`--c-background`/`--c-charcoal-800`) to `--mq-card-background` token; added popup tip styling and text color; added dark mode zoom control hover state. (3) **Responsive** — limited HUD sidebar max-height to 50% on mobile to prevent it from eating the entire map view. (4) `npm run check` all passed.
 Files: `app/styles/animations.css`, `app/map/CampusMap.tsx`, `app/styles/leaflet.css`, `app/map/CampusMapHUD.tsx`.
