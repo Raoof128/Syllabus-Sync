@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import {
   Building,
   BUILDING_CATEGORY_LABELS,
-  pixelToCrsSimple,
+  getBuildingCrsCoords,
   buildings,
 } from '@/lib/map/buildings';
 import { formatDistance, formatDuration } from '@/lib/map/navigationHelpers';
@@ -138,9 +138,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       [],
     );
 
-    // Get building coordinates helper (Pixel -> CRS.Simple)
+    // Get building coordinates helper (uses GCP-calibrated offset)
     const getBuildingLatLng = useCallback((building: Building): { lat: number; lng: number } => {
-      return pixelToCrsSimple(building.position[0], building.position[1]);
+      return getBuildingCrsCoords(building);
     }, []);
 
     // ============================================
@@ -285,10 +285,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           if (!isReady || !isMapReady(map) || !selectedBuildingProp) return;
           let popupTimeout: ReturnType<typeof setTimeout> | null = null;
           try {
-            const buildingLatLng = pixelToCrsSimple(
-              selectedBuildingProp.position[0],
-              selectedBuildingProp.position[1],
-            );
+            const buildingLatLng = getBuildingCrsCoords(selectedBuildingProp);
 
             // Smooth transition to building (Tier 4: Contextual Animations)
             // Tier 7: Reduced Motion Respect

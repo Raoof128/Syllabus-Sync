@@ -1,4 +1,11 @@
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map pin alignment fix, navigation audit, API verification
+Summary: Fixed 110px X-axis misalignment between building positions and GCP-calibrated map image. Added `BUILDING_PIXEL_OFFSET_X` constant, updated `getBuildingCrsCoords()` to apply offset, refactored CampusMap.tsx to use it. Audited navigation pipeline (ORS routing, Kalman smoothing, off-route detection). Verified `/api/navigate` and `/api/health` endpoints.
+- **Files:** `lib/map/buildings.ts`, `app/map/CampusMap.tsx`.
+- **Verification:** `npm run check` ✅, 52/52 map tests passed.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map page cleanup — debug overlay removal, red pin markers, live-location verification
 Summary: Removed debug image-failed overlay and MapImageLoadTimeout from CampusMap.tsx (including Image import, 4 state vars, fetch-status tracking). Added red pin markers for all buildings with popups. Verified live-location pipeline (geolocation watch → Kalman → gpsToCrsSimple → marker). Ran `npm run check` — all passed.
 - **Files:** `app/map/CampusMap.tsx`.

@@ -74,6 +74,14 @@ export const MAP_CONFIG = {
 } as const;
 
 // =============================================================================
+// PIXEL OFFSET – aligns building.position[] with GCP-calibrated map image
+// =============================================================================
+// The GCP anchors in geospatialCalibration.ts carry a +110 px X offset that
+// building.position values do not.  Apply this when converting positions to
+// CRS.Simple so markers land on the correct spots on the raster.
+export const BUILDING_PIXEL_OFFSET_X = 110;
+
+// =============================================================================
 // CRS.Simple Coordinate Conversion Functions
 // =============================================================================
 
@@ -172,12 +180,13 @@ export function getBuildingPosition(building: Building): [number, number] {
 /**
  * Get CRS.Simple coordinates for a building (for Leaflet marker placement).
  * This is the PRIMARY function for placing building markers on the map.
+ * Applies the GCP-calibrated pixel offset so pins align with the raster.
  *
  * @param building - The building object
  * @returns CRS.Simple coordinates { lat, lng }
  */
 export function getBuildingCrsCoords(building: Building): { lat: number; lng: number } {
-  return pixelToCrsSimple(building.position[0], building.position[1]);
+  return pixelToCrsSimple(building.position[0] + BUILDING_PIXEL_OFFSET_X, building.position[1]);
 }
 
 /**
