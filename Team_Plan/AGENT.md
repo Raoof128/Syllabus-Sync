@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-07 (Australia/Sydney) - Selected-Pin Indicator + Search/Zoom Polish
+- **Status:** ✅ Complete - Selection visibility and search UX improved.
+- **Scope:** Map Marker UX, Dark Mode Search, Map Controls.
+- **Summary:** Added a selected-building pulse indicator rendered at the chosen building location, enabled zoom controls and moved them to bottom-right to avoid HUD overlap, and improved building search behavior by matching normalized translated names + metadata fields. Also polished search UI in dark mode with a clear-search action and accurate visible result counts.
+- **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/leaflet.css`.
+- **Verification:** `npm run check` passed (format, typecheck, lint, tests, build).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-07 (Australia/Sydney) - Map Pin Stability + Responsive Polish
 - **Status:** ✅ Complete - Pins and responsive behavior improved for light/dark mode.
 - **Scope:** Map Markers, Responsive UI, Theme Consistency.

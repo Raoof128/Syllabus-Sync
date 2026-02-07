@@ -105,7 +105,7 @@ export default function CampusMapHUD({
       <div className="absolute top-3 left-3 w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[52svh] sm:max-h-[500px]">
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {buildingSearch ? t('buildingsFound', { count: buildings.length }) : ''}
+          {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}
         </div>
         <LayeredCard
           interactive={false}
@@ -117,7 +117,7 @@ export default function CampusMapHUD({
               <span className="font-semibold text-mq-content">{t('places')}</span>
             </div>
             <Badge variant="secondary" className="text-xs">
-              {buildings.length}
+              {visibleBuildings.length}
             </Badge>
           </div>
 
@@ -130,13 +130,26 @@ export default function CampusMapHUD({
                 onChange={(e) => setBuildingSearch(e.target.value)}
                 placeholder={t('filterBuildings')}
                 aria-label={t('filterBuildings')}
-                className="w-full pl-10 pr-16 py-2 bg-mq-background border border-mq-border rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/30 focus:border-mq-primary transition-all"
+                className="w-full pl-10 pr-20 py-2 bg-mq-card-background/95 border border-mq-border/80 rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
               />
+              {buildingSearch.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setBuildingSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
+                  aria-label={t('clearSearch')}
+                  title={t('clearSearch')}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
               {/* Keyboard shortcut hint */}
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono text-mq-content-tertiary bg-mq-background-secondary rounded border border-mq-border">
-                <span className="text-[10px]">⌘</span>
-                <span>K</span>
-              </kbd>
+              {!buildingSearch.trim() && (
+                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono text-mq-content-tertiary bg-mq-background-secondary rounded border border-mq-border">
+                  <span className="text-[10px]">⌘</span>
+                  <span>K</span>
+                </kbd>
+              )}
             </div>
           </div>
 
@@ -212,7 +225,7 @@ export default function CampusMapHUD({
                 </MotionLink>
               );
             })}
-            {buildings.length === 0 && (
+            {visibleBuildings.length === 0 && (
               <div className="p-8 text-center text-sm text-mq-content-tertiary">
                 <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
                 {t('noMatchingBuildings')}

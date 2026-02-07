@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Selected-pin indicator, dark-mode search polish, zoom controls
+Summary: (1) Added a dedicated selected-building location indicator (animated pulse ring) rendered on top of the selected building pin so selection is immediately visible after choosing from the buildings list. (2) Improved map search quality by filtering against normalized translated building names plus id/name/tags/address fields, and polished dark-mode search UX with clearer input styling, result-count badge sync, and a clear-search button. (3) Enabled map zoom controls and moved them to bottom-right to avoid overlap with the left HUD panel. (4) Ran full validation with `npm run check` and fixed formatting issue by applying Prettier.
+Files: `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/leaflet.css`.
+Verification: `npm run check` ✅ (format, typecheck, lint, tests, build all pass).
+Follow-ups: None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin stability + responsive light/dark polish
 Summary: (1) Hardened Leaflet marker behavior so selected pins reliably stay on top and hover interactions no longer interfere with map placement (`riseOnHover`, `riseOffset`, `zIndexOffset`). (2) Removed marker hover/active scale transforms from the pin animation class to prevent transform-related marker jitter/position issues. (3) Improved map responsiveness on small screens with `svh`-based map/HUD sizing and better sidebar text truncation. (4) Increased zoom control touch target sizing for mobile in both light and dark themes. (5) Ran full validation via `npm run check` — all stages passed.
 Files: `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.

@@ -26,7 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
-import { buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings';
+import { buildings, getBuildingById } from '@/lib/map/buildings';
 import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
@@ -37,6 +37,12 @@ import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/lib/map/constants';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
+
+const normalizeForSearch = (value: string): string =>
+  value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
 
 // Map overlay icons
 const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
@@ -249,9 +255,27 @@ export default function MapClient() {
 
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
-    // Use searchBuildings from buildings.ts to avoid duplicating filter logic
-    return buildingSearch.trim() ? searchBuildings(buildingSearch) : [...buildings];
-  }, [buildingSearch]);
+    const query = buildingSearch.trim();
+    if (!query) return [...buildings];
+
+    const normalizedQuery = normalizeForSearch(query);
+
+    return buildings.filter((building) => {
+      const searchableFields = [
+        building.id,
+        building.name,
+        t(building.translationKey),
+        building.description,
+        building.gridRef,
+        building.address,
+        ...(building.tags ?? []),
+      ]
+        .filter(Boolean)
+        .map((value) => normalizeForSearch(String(value)));
+
+      return searchableFields.some((field) => field.includes(normalizedQuery));
+    });
+  }, [buildingSearch, t]);
 
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {

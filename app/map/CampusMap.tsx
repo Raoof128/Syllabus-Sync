@@ -122,6 +122,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
     const selectedIcon = useMemo(() => getMarkerIcon(true), [getMarkerIcon]);
     const defaultIcon = useMemo(() => getMarkerIcon(false), [getMarkerIcon]);
+    const selectedIndicatorIcon = useMemo(() => {
+      if (!leafletModule) return null;
+      return leafletModule.divIcon({
+        className: 'selected-building-indicator-wrapper',
+        html: '<span class="selected-building-indicator"></span>',
+        iconSize: [44, 44],
+        iconAnchor: [22, 22],
+      });
+    }, [leafletModule]);
 
     const isMapReady = useCallback(
       (map: import('leaflet').Map | null | undefined): map is import('leaflet').Map => {
@@ -270,6 +279,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         useEffect(() => {
           if (!isReady || !isMapReady(map)) return;
           try {
+            map.zoomControl.setPosition('bottomright');
             map.setMaxBounds(PIXEL_BOUNDS);
             map.setMaxZoom(2);
             // Fit image to container on first load so the campus fills the viewport.
@@ -428,7 +438,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             crs={leafletModule.CRS.Simple}
             center={CAMPUS_CENTER_PIXEL}
             zoom={0}
-            zoomControl={false}
+            zoomControl
             scrollWheelZoom={false}
             doubleClickZoom="center"
             inertia
@@ -548,6 +558,17 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   </reactLeafletModule.Marker>
                 );
               })}
+
+            {/* Selected building location indicator */}
+            {overlaysReady && selectedBuilding && selectedIndicatorIcon && (
+              <reactLeafletModule.Marker
+                position={getBuildingLatLng(selectedBuilding)}
+                icon={selectedIndicatorIcon}
+                interactive={false}
+                keyboard={false}
+                zIndexOffset={900}
+              />
+            )}
           </reactLeafletModule.MapContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">

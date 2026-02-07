@@ -1,4 +1,11 @@
 Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Selected-pin indicator, map search polish, zoom controls
+Summary: Added an explicit selected-building pulse indicator on the map, improved search behavior by matching normalized translated building names and related metadata, polished search input usability in dark mode (clear button, better field contrast, accurate result count), and enabled/repositioned zoom controls to bottom-right.
+- **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/leaflet.css`.
+- **Verification:** `npm run check` ✅.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin stability + responsive light/dark polish
 Summary: Strengthened map marker behavior (selected marker z-index/rise handling), removed marker hover/active scale transforms that can conflict with Leaflet positioning, improved mobile responsiveness with `svh`-based map/HUD sizing and safer sidebar text constraints, and enlarged Leaflet zoom controls for touch usage in both light and dark mode.
 - **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.
