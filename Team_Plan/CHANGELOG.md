@@ -1,3 +1,10 @@
+Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map page cleanup — debug overlay removal, red pin markers, live-location verification
+Summary: Removed debug image-failed overlay and MapImageLoadTimeout from CampusMap.tsx (including Image import, 4 state vars, fetch-status tracking). Added red pin markers for all buildings with popups. Verified live-location pipeline (geolocation watch → Kalman → gpsToCrsSimple → marker). Ran `npm run check` — all passed.
+- **Files:** `app/map/CampusMap.tsx`.
+- **Verification:** `npm run check` ✅.
+- **Follow-ups:** None.
+
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Check pipeline formatting fix
 Summary: Fixed `prettier --check` failure by formatting `PublicFeedClient.tsx`.
@@ -53,6 +60,13 @@ Summary: Performed full locale audit using English as canonical source, filled m
 - **Files:** `locales/ar/translations.json`, `locales/bn/translations.json`, `locales/es/translations.json`, `locales/fa/translations.json`, `locales/fr/translations.json`, `locales/he/translations.json`, `locales/hi/translations.json`, `locales/id/translations.json`, `locales/it/translations.json`, `locales/ja/translations.json`, `locales/ko/translations.json`, `locales/ms/translations.json`, `locales/ru/translations.json`, `locales/ta/translations.json`, `locales/th/translations.json`, `locales/ur/translations.json`, `locales/vi/translations.json`, `locales/zh/translations.json`, `locales/en/translations.json`, `components/feed/PublicFeedClient.tsx`, `app/map/MapClient.tsx`, `app/map/components/DebugControls.tsx`.
 - **Verification:** Locale parity script (keys/empties/placeholders) reports zero missing keys and zero placeholder mismatches for every locale.
 - **Follow-ups:** Optional deeper pass on position-editor-only copy if it becomes part of non-admin user flow.
+
+Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map Page Full Audit + Supabase Connectivity Verification
+Summary: File-by-file audit of all 17 map module files. Verified TypeScript (0 errors), ESLint (0 errors), 52/52 tests pass. Linked Supabase CLI, verified REST API, Auth, and Storage endpoints. Data flows end-to-end (queried `public_events` successfully). No code changes needed.
+- **Files:** None modified (audit-only).
+- **Verification:** `npm run typecheck` ✅; `npx eslint app/map/` ✅; `npx vitest run tests/map` ✅ (52/52); Supabase REST ✅; Supabase Auth ✅; Supabase Storage ✅; `supabase migration list` ✅.
+- **Follow-ups:** (1) Run `supabase db push` to sync migration drift. (2) Docker needed for `supabase status` locally.
 
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Audit - Verification Pass

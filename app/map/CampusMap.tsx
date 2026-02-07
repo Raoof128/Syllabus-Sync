@@ -7,10 +7,14 @@ import {
   useImperativeHandle,
   forwardRef,
 } from 'react';
-import Image from 'next/image';
 import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
-import { Building, BUILDING_CATEGORY_LABELS, pixelToCrsSimple } from '@/lib/map/buildings';
+import {
+  Building,
+  BUILDING_CATEGORY_LABELS,
+  pixelToCrsSimple,
+  buildings,
+} from '@/lib/map/buildings';
 import { formatDistance, formatDuration } from '@/lib/map/navigationHelpers';
 import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
 import {
@@ -85,17 +89,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
     const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
     const [overlaysReady, setOverlaysReady] = useState(false);
-    const [imageLoadFailed, setImageLoadFailed] = useState(false);
-    const [imageFetchStatus, setImageFetchStatus] = useState<string | null>(null);
-    const [imageFetchMeta, setImageFetchMeta] = useState<{
-      contentType?: string | null;
-      sizeBytes?: number | null;
-    } | null>(null);
     const [overlayUrl, setOverlayUrl] = useState<string | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const navManagerRef = useRef<NavigationStateManager | null>(null);
     const hasNotifiedReadyRef = useRef(false);
-    const imageLoadTimeoutRef = useRef<number | null>(null);
 
     // Initialize Navigation Manager
     useEffect(() => {
@@ -124,6 +121,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     }, [leafletModule]);
 
     const selectedIcon = useMemo(() => getMarkerIcon(true), [getMarkerIcon]);
+    const defaultIcon = useMemo(() => getMarkerIcon(false), [getMarkerIcon]);
 
     const isMapReady = useCallback(
       (map: import('leaflet').Map | null | undefined): map is import('leaflet').Map => {
@@ -348,30 +346,17 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
       const fetchImage = async () => {
         try {
-          setImageFetchStatus('checking');
           const response = await fetch(CAMPUS_IMAGE_URL, { cache: 'no-store' });
           if (!active) return;
-          if (!response.ok) {
-            setImageFetchStatus(`http ${response.status}`);
-            return;
-          }
+          if (!response.ok) return;
           const blob = await response.blob();
           if (!active) return;
-          const contentType = response.headers.get('content-type');
-          setImageFetchMeta({
-            contentType,
-            sizeBytes: blob.size,
-          });
-          if (contentType && !contentType.startsWith('image/')) {
-            setImageFetchStatus(`bad content-type: ${contentType}`);
-          }
+
           const objectUrl = URL.createObjectURL(blob);
           revokedUrl = objectUrl;
 
           // Preload the image to ensure it's fully decoded before passing to Leaflet
-          // This helps the ImageOverlay load event fire reliably
           await new Promise<void>((resolve, reject) => {
-            // Use globalThis.Image to avoid conflict with next/image Image
             const img = new globalThis.Image();
             img.onload = () => resolve();
             img.onerror = () => reject(new Error('Image preload failed'));
@@ -380,10 +365,8 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
           if (!active) return;
           setOverlayUrl(objectUrl);
-          setImageFetchStatus('ok');
         } catch (error) {
           if (!active) return;
-          setImageFetchStatus('network error');
           mapLog.log('Campus image fetch failed:', error);
         }
       };
@@ -470,20 +453,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 opacity={1}
                 eventHandlers={{
                   load: () => {
-                    setImageLoadFailed(false);
                     mapLog.log('Campus map image loaded successfully');
-                    if (imageLoadTimeoutRef.current) {
-                      window.clearTimeout(imageLoadTimeoutRef.current);
-                      imageLoadTimeoutRef.current = null;
-                    }
                   },
                   error: () => {
-                    setImageLoadFailed(true);
                     console.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
-                    if (imageLoadTimeoutRef.current) {
-                      window.clearTimeout(imageLoadTimeoutRef.current);
-                      imageLoadTimeoutRef.current = null;
-                    }
                   },
                 }}
               />
@@ -510,111 +483,75 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               />
             )}
 
-            {/* Building Marker */}
-            {overlaysReady && selectedBuilding && selectedIcon && (
-              <reactLeafletModule.Marker
-                key={selectedBuilding.id}
-                position={getBuildingLatLng(selectedBuilding)}
-                icon={selectedIcon}
-              >
-                <reactLeafletModule.Popup>
-                  {/* Popup Content */}
-                  <div className="p-3 min-w-[260px] max-w-[320px]">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-bold text-base leading-tight text-mq-content flex-1">
-                        {t(selectedBuilding.translationKey)}
-                      </h3>
-                      {selectedBuilding.category && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
-                        >
-                          {BUILDING_CATEGORY_LABELS[selectedBuilding.category]}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="text-xs font-mono">
-                        {selectedBuilding.id}
-                      </Badge>
-                      {selectedBuilding.gridRef && (
-                        <span className="text-xs text-mq-content-tertiary font-mono">
-                          Grid: {selectedBuilding.gridRef}
-                        </span>
-                      )}
-                    </div>
-                    {selectedBuilding.address && (
-                      <div className="flex items-center gap-1.5 text-xs text-mq-content-secondary mb-2">
-                        <svg
-                          className="w-3.5 h-3.5 shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        <span className="line-clamp-2">{selectedBuilding.address}</span>
+            {/* Building Markers — red pins for all buildings */}
+            {overlaysReady &&
+              defaultIcon &&
+              buildings.map((b) => {
+                const isSelected = selectedBuilding?.id === b.id;
+                return (
+                  <reactLeafletModule.Marker
+                    key={b.id}
+                    position={getBuildingLatLng(b)}
+                    icon={isSelected && selectedIcon ? selectedIcon : defaultIcon}
+                  >
+                    <reactLeafletModule.Popup>
+                      <div className="p-3 min-w-[260px] max-w-[320px]">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="font-bold text-base leading-tight text-mq-content flex-1">
+                            {t(b.translationKey)}
+                          </h3>
+                          {b.category && (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
+                            >
+                              {BUILDING_CATEGORY_LABELS[b.category]}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary" className="text-xs font-mono">
+                            {b.id}
+                          </Badge>
+                          {b.gridRef && (
+                            <span className="text-xs text-mq-content-tertiary font-mono">
+                              Grid: {b.gridRef}
+                            </span>
+                          )}
+                        </div>
+                        {b.address && (
+                          <div className="flex items-center gap-1.5 text-xs text-mq-content-secondary mb-2">
+                            <svg
+                              className="w-3.5 h-3.5 shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            <span className="line-clamp-2">{b.address}</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </reactLeafletModule.Popup>
-              </reactLeafletModule.Marker>
-            )}
+                    </reactLeafletModule.Popup>
+                  </reactLeafletModule.Marker>
+                );
+              })}
           </reactLeafletModule.MapContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">
             <span className="animate-pulse text-mq-content-secondary">{t('loadingMap')}</span>
-          </div>
-        )}
-
-        {!imageLoadFailed && overlayUrl && (
-          <MapImageLoadTimeout
-            onTimeout={() => setImageLoadFailed(true)}
-            timeoutRef={imageLoadTimeoutRef}
-          />
-        )}
-
-        {imageLoadFailed && (
-          <div className="absolute inset-0 z-[900] flex items-center justify-center bg-mq-background/70">
-            <div className="max-w-md rounded-mq-lg border border-mq-border bg-mq-card-background p-4 text-sm text-mq-content shadow-lg">
-              <div className="font-semibold">Campus map image failed to load</div>
-              <div className="mt-1 text-mq-content-secondary">
-                Please check your network or hard refresh. If the issue persists, the image URL may
-                be blocked by a caching layer.
-              </div>
-              <div className="mt-2 text-xs text-mq-content-tertiary font-mono">
-                {CAMPUS_IMAGE_URL}
-                {imageFetchStatus ? ` • ${imageFetchStatus}` : ''}
-                {imageFetchMeta?.contentType ? ` • ${imageFetchMeta.contentType}` : ''}
-                {typeof imageFetchMeta?.sizeBytes === 'number'
-                  ? ` • ${Math.round(imageFetchMeta.sizeBytes / 1024)}KB`
-                  : ''}
-              </div>
-              {overlayUrl && (
-                <div className="mt-3 rounded border border-mq-border bg-mq-background p-2">
-                  <div className="text-xs text-mq-content-tertiary mb-2">Debug image preview:</div>
-                  <Image
-                    src={overlayUrl}
-                    alt="Campus map debug preview"
-                    className="max-h-40 w-full object-contain"
-                    width={400}
-                    height={160}
-                    unoptimized
-                  />
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -716,32 +653,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     );
   },
 );
-
-function MapImageLoadTimeout({
-  onTimeout,
-  timeoutRef,
-}: {
-  onTimeout: () => void;
-  timeoutRef: React.MutableRefObject<number | null>;
-}) {
-  useEffect(() => {
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = window.setTimeout(() => {
-      onTimeout();
-      timeoutRef.current = null;
-    }, 8000);
-    return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, [onTimeout, timeoutRef]);
-
-  return null;
-}
 
 CampusMap.displayName = 'CampusMap';
 

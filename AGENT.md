@@ -1,5 +1,12 @@
 # Agent Rules
 
+Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map page cleanup — debug overlay removal, red pin markers, live-location verification
+Summary: (1) Removed debug image-failed overlay, MapImageLoadTimeout component, and 4 related state variables from CampusMap.tsx. (2) Added red pin markers for ALL buildings (not just selected) using getMarkerIcon with popups showing name/category/grid/address. (3) Verified live-location logic in useMapLocation.ts — Kalman smoothing, campus bounds, GPS→CRS.Simple transform, and NavigationStateManager feeding are all correct. (4) Ran npm run check — all passed (secrets, formatting, typecheck, lint, tests, build).
+Files: `app/map/CampusMap.tsx`.
+Verification: `npm run check` ✅ (exit code 0).
+Follow-ups: None.
+
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Check pipeline formatting fix
 Summary: Ran Prettier on `PublicFeedClient.tsx` to resolve `format:check` failure in the `npm run check` pipeline.
@@ -338,3 +345,10 @@ Summary: Fit campus image bounds to the viewport on initial load to prevent a ti
 Files: `app/map/CampusMap.tsx`.
 Verification: Not run (not requested).
 Follow-ups: Confirm map fills the container on first render.
+
+Raouf: 2026-02-07 (Australia/Sydney)
+Scope: Map Page Full Audit + Supabase Connectivity Verification
+Summary: Completed file-by-file audit of every map page file (17 files across app/map/, app/map/components/, app/map/hooks/, app/map/position-editor/, lib/store/mapStore.ts, lib/map/constants.ts, app/api/navigate/route.ts). All files pass TypeScript strict-mode typecheck (0 errors), ESLint (0 errors), and all 52 map tests pass. Linked Supabase CLI to project ref `cxsqlgvbwtevkkljzolg`, verified REST API (PostgREST v14.1), Auth endpoint, and Storage endpoint all respond correctly. Queried `public_events` table successfully — data flows end-to-end. Migration list shows expected local/remote drift but no blockers. No code changes required — map module is in a clean, healthy state.
+Files: No files modified (audit-only).
+Verification: `npm run typecheck` ✅ (0 errors); `npx eslint app/map/` ✅ (0 errors); `npx vitest run tests/map` ✅ (52/52 passed); Supabase REST API ✅; Supabase Auth ✅; Supabase Storage ✅; `supabase migration list` ✅.
+Follow-ups: (1) Some local migrations exist only remotely and vice versa — run `supabase db push` when ready to sync. (2) Docker Desktop required for `supabase db dump`/`supabase status` locally. (3) Storage buckets are empty — no map assets stored in Supabase Storage (map raster served from `/public/maps/`).
