@@ -36,10 +36,16 @@
    LEAFLET ZOOM CONTROLS DARK MODE STYLING
    ============================================ */
 
+/* Zoom control container positioning - bottom right with proper spacing */
+.leaflet-control-zoom {
+  margin-bottom: 20px !important;
+  margin-right: 10px !important;
+}
+
 /* Light theme zoom controls (default) */
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
-  background-color: rgba(255, 255, 255, 0.8) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
   color: var(--mq-content) !important;
   border: 1px solid var(--mq-border) !important;
   width: 38px !important;
@@ -50,23 +56,28 @@
 
 .leaflet-control-zoom-in:hover,
 .leaflet-control-zoom-out:hover {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+  background-color: rgba(255, 255, 255, 1) !important;
 }
 
 /* Dark theme zoom controls */
 .dark .leaflet-control-zoom-in,
 .dark .leaflet-control-zoom-out {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--mq-card-background) !important;
   color: var(--mq-content) !important;
   border: 1px solid var(--mq-border) !important;
 }
 
 .dark .leaflet-control-zoom-in:hover,
 .dark .leaflet-control-zoom-out:hover {
-  background-color: rgba(255, 255, 255, 0.2) !important;
+  background-color: var(--mq-hover-background) !important;
 }
 
 @media (max-width: 640px) {
+  .leaflet-control-zoom {
+    margin-bottom: 16px !important;
+    margin-right: 8px !important;
+  }
+
   .leaflet-control-zoom-in,
   .leaflet-control-zoom-out {
     width: 42px !important;

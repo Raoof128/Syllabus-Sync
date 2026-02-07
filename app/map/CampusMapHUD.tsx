@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useEffect, useCallback } from 'react';
-import { Search, Share2, Download, Building2, X, Navigation } from 'lucide-react';
+import { useMemo, useEffect, useCallback, useState } from 'react';
+import { Search, Share2, Download, Building2, X, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
@@ -40,6 +40,9 @@ export default function CampusMapHUD({
   const searchParams = useSearchParams();
   const layersParam = searchParams.get('layers');
 
+  // Mobile: Places panel is collapsed by default, expanded on desktop
+  const [isPlacesPanelExpanded, setIsPlacesPanelExpanded] = useState(true);
+
   const buildMapHref = useCallback(
     (buildingId?: string) => {
       const params = new URLSearchParams();
@@ -60,6 +63,7 @@ export default function CampusMapHUD({
         const searchInput = document.getElementById('map-search-input');
         if (searchInput) {
           searchInput.focus();
+          setIsPlacesPanelExpanded(true);
           triggerHaptic('tap', 'light');
         }
       }
@@ -102,7 +106,7 @@ export default function CampusMapHUD({
       </div>
 
       {/* Left sidebar */}
-      <div className="absolute top-3 left-3 w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[52svh] sm:max-h-[500px]">
+      <div className="absolute top-3 left-3 w-[min(280px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]">
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}
@@ -111,127 +115,149 @@ export default function CampusMapHUD({
           interactive={false}
           className="rounded-mq-xl border-mq-border overflow-hidden flex flex-col"
         >
-          <div className="px-4 py-3 flex items-center justify-between border-b border-mq-border/50">
+          {/* Header - clickable on mobile to toggle */}
+          <button
+            type="button"
+            onClick={() => setIsPlacesPanelExpanded(!isPlacesPanelExpanded)}
+            className="w-full px-4 py-3 flex items-center justify-between border-b border-mq-border/50 sm:cursor-default hover:bg-mq-hover-background sm:hover:bg-transparent transition-colors"
+            aria-expanded={isPlacesPanelExpanded}
+            aria-controls="places-panel-content"
+          >
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-mq-content-tertiary" />
               <span className="font-semibold text-mq-content">{t('places')}</span>
             </div>
-            <Badge variant="secondary" className="text-xs">
-              {visibleBuildings.length}
-            </Badge>
-          </div>
-
-          <div className="px-4 py-3 border-b border-mq-border/50 bg-mq-background-secondary/50">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
-              <input
-                id="map-search-input"
-                value={buildingSearch}
-                onChange={(e) => setBuildingSearch(e.target.value)}
-                placeholder={t('filterBuildings')}
-                aria-label={t('filterBuildings')}
-                className="w-full pl-10 pr-20 py-2 bg-mq-card-background/95 border border-mq-border/80 rounded-mq-lg text-mq-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
-              />
-              {buildingSearch.trim() && (
-                <button
-                  type="button"
-                  onClick={() => setBuildingSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
-                  aria-label={t('clearSearch')}
-                  title={t('clearSearch')}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-              {/* Keyboard shortcut hint */}
-              {!buildingSearch.trim() && (
-                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono text-mq-content-tertiary bg-mq-background-secondary rounded border border-mq-border">
-                  <span className="text-[10px]">⌘</span>
-                  <span>K</span>
-                </kbd>
-              )}
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                {visibleBuildings.length}
+              </Badge>
+              <span className="sm:hidden text-mq-content-tertiary">
+                {isPlacesPanelExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </span>
             </div>
-          </div>
+          </button>
 
-          <m.div
-            className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain"
-            initial="hidden"
-            animate="visible"
-            // Tier 6: Responsive Layout Improvements - Touch optimized drag
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={0.2}
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: { staggerChildren: prefersReducedMotion ? 0 : 0.05 },
-              },
-            }}
-          >
-            {visibleBuildings.map((b) => {
-              const isSelected = selectedBuilding?.id === b.id;
-              return (
-                <MotionLink
-                  key={b.id}
-                  href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
-                  onClick={() => triggerHaptic('tap', 'medium')}
-                  variants={{
-                    hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -10 },
-                    visible: { opacity: 1, x: 0 },
-                  }}
-                  whileHover={
-                    prefersReducedMotion
-                      ? {}
-                      : {
-                          scale: 1.02,
-                        }
-                  }
-                  whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
-                  animate={
-                    isSelected
-                      ? {
-                          borderLeftWidth: '4px',
-                          borderLeftColor: 'var(--mq-primary)',
-                          backgroundColor: 'var(--mq-primary-alpha-5)',
-                          x: prefersReducedMotion ? 0 : 4,
-                        }
-                      : {
-                          borderLeftWidth: '1px',
-                          x: 0,
-                        }
-                  }
-                  className={cn(
-                    'flex items-center justify-between p-2.5 rounded-mq-lg transition-colors duration-200',
-                    isSelected
-                      ? 'bg-mq-primary/10 border border-mq-primary/20 text-mq-primary shadow-sm'
-                      : 'hover:bg-mq-background-secondary text-mq-content border border-transparent',
-                  )}
-                >
-                  <div className="flex flex-col min-w-0">
-                    <span
-                      className={cn(
-                        'text-sm font-medium truncate',
-                        isSelected ? 'text-mq-primary' : 'text-mq-content',
-                      )}
-                    >
-                      {b.id}
-                    </span>
-                    <span className="text-xs text-mq-content-secondary truncate max-w-[58vw] sm:max-w-[180px]">
-                      {t(b.translationKey)}
-                    </span>
+          {/* Collapsible content */}
+          <AnimatePresence initial={false}>
+            {isPlacesPanelExpanded && (
+              <m.div
+                id="places-panel-content"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
+                className="overflow-hidden flex flex-col"
+              >
+                <div className="px-4 py-3 border-b border-mq-border/50 bg-mq-background-secondary/50">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
+                    <input
+                      id="map-search-input"
+                      value={buildingSearch}
+                      onChange={(e) => setBuildingSearch(e.target.value)}
+                      placeholder={t('filterBuildings')}
+                      aria-label={t('filterBuildings')}
+                      className="w-full pl-10 pr-12 py-2 bg-mq-card-background border border-mq-border rounded-mq-lg text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
+                    />
+                    {buildingSearch.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => setBuildingSearch('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
+                        aria-label={t('clearSearch')}
+                        title={t('clearSearch')}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    {/* Keyboard shortcut hint */}
+                    {!buildingSearch.trim() && (
+                      <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-mono text-mq-content-tertiary bg-mq-background-secondary rounded border border-mq-border">
+                        <span className="text-[10px]">⌘</span>
+                        <span>K</span>
+                      </kbd>
+                    )}
                   </div>
-                  {isSelected && <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />}
-                </MotionLink>
-              );
-            })}
-            {visibleBuildings.length === 0 && (
-              <div className="p-8 text-center text-sm text-mq-content-tertiary">
-                <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                {t('noMatchingBuildings')}
-              </div>
+                </div>
+
+                <m.div
+                  className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain bg-mq-card-background max-h-[200px] sm:max-h-[280px]"
+                  initial="hidden"
+                  animate="visible"
+                  // Tier 6: Responsive Layout Improvements - Touch optimized drag
+                  drag="y"
+                  dragConstraints={{ top: 0, bottom: 0 }}
+                  dragElastic={0.2}
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                      opacity: 1,
+                      transition: { staggerChildren: prefersReducedMotion ? 0 : 0.05 },
+                    },
+                  }}
+                >
+                  {visibleBuildings.map((b) => {
+                    const isSelected = selectedBuilding?.id === b.id;
+                    return (
+                      <MotionLink
+                        key={b.id}
+                        href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
+                        onClick={() => triggerHaptic('tap', 'medium')}
+                        variants={{
+                          hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -10 },
+                          visible: { opacity: 1, x: 0 },
+                        }}
+                        whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                        whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                        animate={
+                          isSelected
+                            ? {
+                                borderLeftWidth: '4px',
+                                borderLeftColor: 'var(--mq-primary)',
+                                backgroundColor: 'var(--mq-primary-alpha-5)',
+                                x: prefersReducedMotion ? 0 : 4,
+                              }
+                            : {
+                                borderLeftWidth: '1px',
+                                borderLeftColor: 'transparent',
+                                backgroundColor: 'transparent',
+                                x: 0,
+                              }
+                        }
+                        className={cn(
+                          'flex items-center justify-between p-2.5 rounded-mq-lg transition-colors duration-200',
+                          isSelected
+                            ? 'bg-mq-primary/10 border border-mq-primary/20 shadow-sm'
+                            : 'hover:bg-mq-hover-background border border-transparent',
+                        )}
+                      >
+                        <div className="flex flex-col min-w-0">
+                          <span
+                            className={cn(
+                              'text-sm font-medium truncate',
+                              isSelected ? 'text-mq-primary' : 'text-mq-content',
+                            )}
+                          >
+                            {b.id}
+                          </span>
+                          <span className="text-xs text-mq-content-secondary truncate max-w-[48vw] sm:max-w-[180px]">
+                            {t(b.translationKey)}
+                          </span>
+                        </div>
+                        {isSelected && <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />}
+                      </MotionLink>
+                    );
+                  })}
+                  {visibleBuildings.length === 0 && (
+                    <div className="p-8 text-center text-sm text-mq-content-tertiary">
+                      <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                      {t('noMatchingBuildings')}
+                    </div>
+                  )}
+                </m.div>
+              </m.div>
             )}
-          </m.div>
+          </AnimatePresence>
         </LayeredCard>
       </div>
 

@@ -13,7 +13,6 @@ import {
   Building,
   BUILDING_CATEGORY_LABELS,
   getBuildingCrsCoords,
-  buildings,
 } from '@/lib/map/buildings';
 import { formatDistance, formatDuration } from '@/lib/map/navigationHelpers';
 import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
@@ -121,7 +120,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     }, [leafletModule]);
 
     const selectedIcon = useMemo(() => getMarkerIcon(true), [getMarkerIcon]);
-    const defaultIcon = useMemo(() => getMarkerIcon(false), [getMarkerIcon]);
     const selectedIndicatorIcon = useMemo(() => {
       if (!leafletModule) return null;
       return leafletModule.divIcon({
@@ -490,74 +488,69 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               />
             )}
 
-            {/* Building Markers — red pins for all buildings */}
-            {overlaysReady &&
-              defaultIcon &&
-              buildings.map((b) => {
-                const isSelected = selectedBuilding?.id === b.id;
-                return (
-                  <reactLeafletModule.Marker
-                    key={b.id}
-                    position={getBuildingLatLng(b)}
-                    icon={isSelected && selectedIcon ? selectedIcon : defaultIcon}
-                    riseOnHover
-                    riseOffset={isSelected ? 420 : 260}
-                    zIndexOffset={isSelected ? 1000 : 0}
-                  >
-                    <reactLeafletModule.Popup>
-                      <div className="p-3 min-w-[260px] max-w-[320px]">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h3 className="font-bold text-base leading-tight text-mq-content flex-1">
-                            {t(b.translationKey)}
-                          </h3>
-                          {b.category && (
-                            <Badge
-                              variant="secondary"
-                              className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
-                            >
-                              {BUILDING_CATEGORY_LABELS[b.category]}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="secondary" className="text-xs font-mono">
-                            {b.id}
-                          </Badge>
-                          {b.gridRef && (
-                            <span className="text-xs text-mq-content-tertiary font-mono">
-                              Grid: {b.gridRef}
-                            </span>
-                          )}
-                        </div>
-                        {b.address && (
-                          <div className="flex items-center gap-1.5 text-xs text-mq-content-secondary mb-2">
-                            <svg
-                              className="w-3.5 h-3.5 shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
-                            <span className="line-clamp-2">{b.address}</span>
-                          </div>
-                        )}
+            {/* Building Markers — only show marker for selected building */}
+            {overlaysReady && selectedBuilding && selectedIcon && (
+              <reactLeafletModule.Marker
+                key={selectedBuilding.id}
+                position={getBuildingLatLng(selectedBuilding)}
+                icon={selectedIcon}
+                riseOnHover
+                riseOffset={420}
+                zIndexOffset={1000}
+              >
+                <reactLeafletModule.Popup>
+                  <div className="p-3 min-w-[260px] max-w-[320px]">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-bold text-base leading-tight text-mq-content flex-1">
+                        {t(selectedBuilding.translationKey)}
+                      </h3>
+                      {selectedBuilding.category && (
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
+                        >
+                          {BUILDING_CATEGORY_LABELS[selectedBuilding.category]}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="secondary" className="text-xs font-mono">
+                        {selectedBuilding.id}
+                      </Badge>
+                      {selectedBuilding.gridRef && (
+                        <span className="text-xs text-mq-content-tertiary font-mono">
+                          Grid: {selectedBuilding.gridRef}
+                        </span>
+                      )}
+                    </div>
+                    {selectedBuilding.address && (
+                      <div className="flex items-center gap-1.5 text-xs text-mq-content-secondary mb-2">
+                        <svg
+                          className="w-3.5 h-3.5 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <span className="line-clamp-2">{selectedBuilding.address}</span>
                       </div>
-                    </reactLeafletModule.Popup>
-                  </reactLeafletModule.Marker>
-                );
-              })}
+                    )}
+                  </div>
+                </reactLeafletModule.Popup>
+              </reactLeafletModule.Marker>
+            )}
 
             {/* Selected building location indicator */}
             {overlaysReady && selectedBuilding && selectedIndicatorIcon && (
@@ -576,14 +569,17 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </div>
         )}
 
-        {/* Floating Action Button - Center on User */}
+        {/* Floating Action Button - Center on User - Positioned above zoom controls */}
         <button
           onClick={centerOnUser}
           className={cn(
             'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
+            // Position above zoom controls (which are at bottom-right)
+            // On mobile: above the selected building card if present
+            // On desktop: always in bottom-right corner above zoom
             selectedBuilding
-              ? 'bottom-[220px] right-4 sm:bottom-6 sm:right-[320px]'
-              : 'bottom-6 right-4',
+              ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
+              : 'bottom-[140px] right-4',
           )}
           aria-label={safeT('centerOnLocation', 'Center on my location')}
         >
