@@ -1557,8 +1557,6 @@
   "important": "중요한",
   "adding": "첨가...",
   "nameMinLength": "이름은 2자 이상이어야 합니다.",
-  "openMapDeveloperTools": "지도 개발자 도구 열기",
-  "closeMapDeveloperTools": "지도 개발자 도구 닫기",
   "all": "모두",
   "showOnlyChangedBuildingsTitle": "변경된 건물만 표시",
   "downloadAsFileTitle": "파일로 다운로드"

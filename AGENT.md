@@ -1,5 +1,12 @@
 # Agent Rules
 
+Raouf: 2026-02-08 (Australia/Sydney)
+Scope: Dev tools removal, HUD badge removal, dark-mode search input fix
+Summary: (1) Removed the dev-mode map developer tools button (`DebugControls` component), its file, the `useMapSimulation` hook, and the `handleSimulate` callback from `CampusMap.tsx`. Cleaned up barrel export from `app/map/hooks/index.ts` and removed `openMapDeveloperTools`/`closeMapDeveloperTools` i18n keys from all 19 locale files. (2) Removed the buildings-count `<Badge variant="secondary">` from the HUD Places header. (3) Fixed dark-mode search card: changed search input background from `bg-mq-card-background` (same as card = invisible) to `bg-mq-input-background` (#151515 in dark mode for proper contrast), and replaced undefined `var(--mq-primary-alpha-5)` inline animation color with `color-mix(in srgb, var(--mq-primary) 10%, transparent)` for correct selected-item background in both themes. (4) Applied Prettier to 5 unformatted files. (5) `npm run check` all passed.
+Files: `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/hooks/index.ts`, `locales/*/translations.json`, `app/calendar/CalendarClient.tsx`, `components/calendar/DayView.tsx`, `components/exams/ExamForm.tsx`. Deleted: `app/map/components/DebugControls.tsx`, `app/map/hooks/useMapSimulation.ts`.
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 367/367 tests, build all pass).
+Follow-ups: None.
+
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Selected-pin indicator, dark-mode search polish, zoom controls
 Summary: (1) Added a dedicated selected-building location indicator (animated pulse ring) rendered on top of the selected building pin so selection is immediately visible after choosing from the buildings list. (2) Improved map search quality by filtering against normalized translated building names plus id/name/tags/address fields, and polished dark-mode search UX with clearer input styling, result-count badge sync, and a clear-search button. (3) Enabled map zoom controls and moved them to bottom-right to avoid overlap with the left HUD panel. (4) Ran full validation with `npm run check` and fixed formatting issue by applying Prettier.

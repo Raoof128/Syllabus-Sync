@@ -806,7 +806,6 @@ export default function CalendarClient() {
         onFilterChange={setFilters}
       />
 
-
       <div className="flex flex-col lg:flex-row gap-6 mt-4">
         {/* Main Calendar Area */}
         <div className="flex-1 min-w-0">
@@ -1039,7 +1038,12 @@ export default function CalendarClient() {
                                           <span className={cn('line-clamp-1', programStyle.text)}>
                                             {mqDate.event}
                                           </span>
-                                          <span className={cn('text-[9px] opacity-70 line-clamp-1', programStyle.text)}>
+                                          <span
+                                            className={cn(
+                                              'text-[9px] opacity-70 line-clamp-1',
+                                              programStyle.text,
+                                            )}
+                                          >
                                             {mqDate.term}
                                           </span>
                                         </div>
@@ -1576,7 +1580,9 @@ export default function CalendarClient() {
                                       <span className={cn('line-clamp-1', programStyle.text)}>
                                         {mqDate.event}
                                       </span>
-                                      <span className={cn('text-[9px] opacity-70', programStyle.text)}>
+                                      <span
+                                        className={cn('text-[9px] opacity-70', programStyle.text)}
+                                      >
                                         {mqDate.term}
                                       </span>
                                     </div>
@@ -2453,10 +2459,14 @@ export default function CalendarClient() {
         event={selectedEvent}
         open={eventDetailOpen}
         onOpenChange={setEventDetailOpen}
-        onEdit={selectedEvent?.sourcePublicEventId ? undefined : (event) => {
-          setEventDetailOpen(false);
-          openEditEvent(event);
-        }}
+        onEdit={
+          selectedEvent?.sourcePublicEventId
+            ? undefined
+            : (event) => {
+                setEventDetailOpen(false);
+                openEditEvent(event);
+              }
+        }
         onDelete={(event) => {
           setEventDetailOpen(false);
           handleDeleteEvent(event);

@@ -1,7 +1,16 @@
 'use client';
 
 import { useMemo, useEffect, useCallback, useState } from 'react';
-import { Search, Share2, Download, Building2, X, Navigation, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Search,
+  Share2,
+  Download,
+  Building2,
+  X,
+  Navigation,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
@@ -127,14 +136,13 @@ export default function CampusMapHUD({
               <Building2 className="h-4 w-4 text-mq-content-tertiary" />
               <span className="font-semibold text-mq-content">{t('places')}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                {visibleBuildings.length}
-              </Badge>
-              <span className="sm:hidden text-mq-content-tertiary">
-                {isPlacesPanelExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </span>
-            </div>
+            <span className="sm:hidden text-mq-content-tertiary">
+              {isPlacesPanelExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </span>
           </button>
 
           {/* Collapsible content */}
@@ -157,7 +165,7 @@ export default function CampusMapHUD({
                       onChange={(e) => setBuildingSearch(e.target.value)}
                       placeholder={t('filterBuildings')}
                       aria-label={t('filterBuildings')}
-                      className="w-full pl-10 pr-12 py-2 bg-mq-card-background border border-mq-border rounded-mq-lg text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
+                      className="w-full pl-10 pr-12 py-2 bg-mq-input-background border border-mq-border rounded-mq-lg text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
                     />
                     {buildingSearch.trim() && (
                       <button
@@ -214,7 +222,8 @@ export default function CampusMapHUD({
                             ? {
                                 borderLeftWidth: '4px',
                                 borderLeftColor: 'var(--mq-primary)',
-                                backgroundColor: 'var(--mq-primary-alpha-5)',
+                                backgroundColor:
+                                  'color-mix(in srgb, var(--mq-primary) 10%, transparent)',
                                 x: prefersReducedMotion ? 0 : 4,
                               }
                             : {
@@ -244,7 +253,9 @@ export default function CampusMapHUD({
                             {t(b.translationKey)}
                           </span>
                         </div>
-                        {isSelected && <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />}
+                        {isSelected && (
+                          <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />
+                        )}
                       </MotionLink>
                     );
                   })}

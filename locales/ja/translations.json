@@ -1557,8 +1557,6 @@
   "important": "重要",
   "adding": "追加中...",
   "nameMinLength": "名前は少なくとも 2 文字である必要があります",
-  "openMapDeveloperTools": "マップ開発ツールを開く",
-  "closeMapDeveloperTools": "マップ開発ツールを閉じる",
   "all": "全て",
   "showOnlyChangedBuildingsTitle": "変更された建物のみを表示",
   "downloadAsFileTitle": "ファイルとしてダウンロード"

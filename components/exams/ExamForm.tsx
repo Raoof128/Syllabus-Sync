@@ -364,7 +364,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-time">
-                  {t('examTime' as TranslationKey) || 'Exam Time'} <span className="text-mq-error">*</span>
+                  {t('examTime' as TranslationKey) || 'Exam Time'}{' '}
+                  <span className="text-mq-error">*</span>
                 </Label>
                 <Input
                   id="exam-time"

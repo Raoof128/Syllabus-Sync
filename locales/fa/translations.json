@@ -1557,8 +1557,6 @@
   "important": "مهم است",
   "adding": "در حال افزودن...",
   "nameMinLength": "نام باید حداقل 2 کاراکتر باشد",
-  "openMapDeveloperTools": "ابزارهای توسعه دهنده نقشه را باز کنید",
-  "closeMapDeveloperTools": "ابزارهای توسعه دهنده نقشه را ببندید",
   "all": "همه",
   "showOnlyChangedBuildingsTitle": "فقط ساختمان های تغییر یافته را نشان دهید",
   "downloadAsFileTitle": "دانلود به صورت فایل"

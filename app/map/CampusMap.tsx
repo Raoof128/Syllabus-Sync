@@ -9,11 +9,7 @@ import {
 } from 'react';
 import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
-import {
-  Building,
-  BUILDING_CATEGORY_LABELS,
-  getBuildingCrsCoords,
-} from '@/lib/map/buildings';
+import { Building, BUILDING_CATEGORY_LABELS, getBuildingCrsCoords } from '@/lib/map/buildings';
 import { formatDistance, formatDuration } from '@/lib/map/navigationHelpers';
 import { createMarkerIcon, createUserLocationIcon } from '@/lib/map/mapUtils';
 import {
@@ -31,9 +27,7 @@ import { CAMPUS_CENTER_PIXEL, PIXEL_BOUNDS, CAMPUS_IMAGE_URL } from '@/lib/map/c
 import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import { useMapLocation } from './hooks/useMapLocation';
 import { useMapNavigation } from './hooks/useMapNavigation';
-import { useMapSimulation } from './hooks/useMapSimulation';
 import { MapOverlays } from './components/MapOverlays';
-import { DebugControls } from './components/DebugControls';
 import { useReducedMotion } from 'framer-motion';
 
 // Map-specific logger
@@ -155,7 +149,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
 
     // 1. Location Logic
-    const { locationStatus, origin, isOffCampus, centerOnUser, simulatePosition } = useMapLocation({
+    const { locationStatus, origin, isOffCampus, centerOnUser } = useMapLocation({
       mapInstance,
       leafletModule,
       isMapReady,
@@ -187,21 +181,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       stopNavigation,
       isNavigating,
     }));
-
-    // Simulation Logic - Extracted to custom hook
-    const { startSimulation, stopSimulation } = useMapSimulation({
-      enabled: process.env.NODE_ENV === 'development',
-      routeCoordinates: navState?.routeCoordinates,
-      onUpdate: simulatePosition,
-    });
-
-    const handleSimulate = useCallback(() => {
-      if (startSimulation) {
-        startSimulation();
-      } else {
-        stopSimulation();
-      }
-    }, [startSimulation, stopSimulation]);
 
     // Notify parent of location status
     useEffect(() => {
@@ -654,17 +633,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               </div>
             </div>
           </div>
-        )}
-
-        {/* Developer Tools */}
-        {process.env.NODE_ENV === 'development' && (
-          <DebugControls
-            onSimulate={handleSimulate}
-            isNavigating={isNavigating}
-            navState={navState}
-            locationStatus={locationStatus}
-            isOffCampus={isOffCampus}
-          />
         )}
       </div>
     );

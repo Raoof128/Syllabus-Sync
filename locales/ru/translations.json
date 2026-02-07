@@ -1557,8 +1557,6 @@
   "important": "Важный",
   "adding": "Добавление...",
   "nameMinLength": "Имя должно содержать не менее 2 символов.",
-  "openMapDeveloperTools": "Открыть инструменты разработчика карт",
-  "closeMapDeveloperTools": "Закрыть инструменты разработчика карт",
   "all": "Все",
   "showOnlyChangedBuildingsTitle": "Показать только измененные здания",
   "downloadAsFileTitle": "Скачать как файл"

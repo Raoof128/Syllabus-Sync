@@ -1557,8 +1557,6 @@
   "important": "Importante",
   "adding": "Añadiendo...",
   "nameMinLength": "El nombre debe tener al menos 2 caracteres.",
-  "openMapDeveloperTools": "Abrir herramientas de desarrollo de mapas",
-  "closeMapDeveloperTools": "Cerrar herramientas de desarrollo de mapas",
   "all": "Todo",
   "showOnlyChangedBuildingsTitle": "Mostrar solo edificios modificados",
   "downloadAsFileTitle": "Descargar como archivo"

@@ -1557,8 +1557,6 @@
   "important": "สำคัญ",
   "adding": "กำลังเพิ่ม...",
   "nameMinLength": "ชื่อต้องมีอย่างน้อย 2 ตัวอักษร",
-  "openMapDeveloperTools": "เปิดเครื่องมือสำหรับนักพัฒนาแผนที่",
-  "closeMapDeveloperTools": "ปิดเครื่องมือสำหรับนักพัฒนาแผนที่",
   "all": "ทั้งหมด",
   "showOnlyChangedBuildingsTitle": "แสดงเฉพาะอาคารที่เปลี่ยนแปลง",
   "downloadAsFileTitle": "ดาวน์โหลดเป็นไฟล์"

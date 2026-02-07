@@ -1557,8 +1557,6 @@
   "important": "مهم",
   "adding": "جارٍ الإضافة...",
   "nameMinLength": "يجب أن يتكون الاسم من حرفين على الأقل",
-  "openMapDeveloperTools": "افتح أدوات مطور الخرائط",
-  "closeMapDeveloperTools": "أغلق أدوات مطور الخريطة",
   "all": "الجميع",
   "showOnlyChangedBuildingsTitle": "إظهار المباني التي تم تغييرها فقط",
   "downloadAsFileTitle": "تحميل كملف"

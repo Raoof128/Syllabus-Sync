@@ -186,9 +186,7 @@ export default function DayView({
                         {categoryLabel}
                       </span>
                     </div>
-                    <span className={cn('line-clamp-1', programStyle.text)}>
-                      {mqDate.event}
-                    </span>
+                    <span className={cn('line-clamp-1', programStyle.text)}>{mqDate.event}</span>
                     <span className={cn('text-[9px] opacity-70', programStyle.text)}>
                       {mqDate.term}
                     </span>
