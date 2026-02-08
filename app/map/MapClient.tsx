@@ -311,18 +311,18 @@ export default function MapClient() {
 
   return (
     <LazyMotion features={domAnimation}>
-      {/* Skip Link - Keyboard Accessibility */}
-      <a
-        href="#map-search-input"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[2000] px-4 py-2 bg-mq-primary text-white font-bold rounded-mq-lg shadow-lg transition-all"
-      >
-        {safeT('skipToSearch', 'Skip to Search')}
-      </a>
-
       <section
-        className="container mx-auto p-4 max-w-7xl map-page"
+        className="container mx-auto p-4 max-w-7xl map-page relative"
         aria-label={t('campusMapLabel')}
       >
+        {/* Skip Link - Keyboard Accessibility (only visible when focused) */}
+        <a
+          href="#map-search-input"
+          className="absolute -top-[9999px] -left-[9999px] focus:top-2 focus:left-2 focus:z-[2000] px-4 py-2 bg-mq-primary text-white font-bold rounded-mq-lg shadow-lg transition-all focus:outline-none"
+        >
+          {safeT('skipToSearch', 'Skip to Search')}
+        </a>
+
         {/* Route Announcer for Screen Readers */}
         <RouteAnnouncer
           navState={navState}

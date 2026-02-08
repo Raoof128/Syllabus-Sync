@@ -27,6 +27,7 @@ interface UnitDetailPanelProps {
   unit: Unit | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Called when a deadline is clicked - shows detail panel (naming preserved for compatibility) */
   onEditDeadline?: (deadline: Deadline) => void;
   onEditUnit?: () => void;
   onDeleteUnit?: () => void;

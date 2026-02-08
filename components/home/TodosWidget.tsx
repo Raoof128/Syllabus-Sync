@@ -154,6 +154,7 @@ const TodosWidget = memo(() => {
             {pendingTodos.map((todo) => {
               const dueDate = todo.dueDate ? new Date(todo.dueDate) : null;
               const isOverdue = dueDate && isPast(dueDate);
+              const todoDateStr = dueDate && isValid(dueDate) ? format(dueDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
 
               return (
                 <div
@@ -162,13 +163,13 @@ const TodosWidget = memo(() => {
                     'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
-                  onClick={() => router.push(`/calendar?highlightTodo=${todo.id}`)}
+                  onClick={() => router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(`/calendar?highlightTodo=${todo.id}`);
+                      router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`);
                     }
                   }}
                 >

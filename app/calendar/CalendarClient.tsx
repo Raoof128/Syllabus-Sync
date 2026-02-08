@@ -101,17 +101,21 @@ import {
 export default function CalendarClient() {
   const searchParams = useSearchParams();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
   const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
   const userEvents = useEventsStore((state) => state.events);
+  const loadEvents = useEventsStore((state) => state.loadEvents);
   const removeEvent = useEventsStore((state) => state.removeEvent);
   const units = useUnitsStore((state) => state.units);
+  const loadUnits = useUnitsStore((state) => state.loadUnits);
   const removeUnit = useUnitsStore((state) => state.removeUnit);
 
   const addTodo = useTodosStore((state) => state.addTodo);
   const removeTodo = useTodosStore((state) => state.removeTodo);
   const updateTodo = useTodosStore((state) => state.updateTodo);
   const todos = useTodosStore((state) => state.todos);
+  const loadTodos = useTodosStore((state) => state.loadTodos);
 
   const hasHydrated = useHydration();
   const { language, t } = useTypedTranslation();
@@ -119,6 +123,16 @@ export default function CalendarClient() {
     const value = t(key);
     return value === key ? fallback : value;
   };
+
+  // Load all data from database on mount
+  useEffect(() => {
+    if (hasHydrated) {
+      loadUnits();
+      loadDeadlines();
+      loadEvents();
+      loadTodos();
+    }
+  }, [hasHydrated, loadUnits, loadDeadlines, loadEvents, loadTodos]);
 
   // Calendar View State
   const [view, setView] = useState<CalendarView>('week');
@@ -214,6 +228,25 @@ export default function CalendarClient() {
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
   const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
 
+  // Helper function to check if element is visible in viewport
+  const isElementInViewport = useCallback((el: HTMLElement | null): boolean => {
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }, []);
+
+  // Helper function to scroll only if element is not visible
+  const scrollIfNotVisible = useCallback((el: HTMLElement | null, block: ScrollLogicalPosition = 'center') => {
+    if (el && !isElementInViewport(el)) {
+      el.scrollIntoView({ behavior: 'smooth', block });
+    }
+  }, [isElementInViewport]);
+
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
   const highlightedUnit = useMemo(() => {
@@ -238,18 +271,16 @@ export default function CalendarClient() {
     // Find the highlighted deadline
     const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
 
-    // Scroll to assignments widget and open detail panel
+    // Scroll to assignments widget (only if not visible) and open detail panel
     const scrollTimer = window.setTimeout(() => {
-      // First scroll to the assignments widget
-      if (assignmentsWidgetRef.current) {
-        assignmentsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      // First scroll to the assignments widget only if not already visible
+      scrollIfNotVisible(assignmentsWidgetRef.current, 'start');
 
       // Then scroll to the specific deadline item if it exists in calendar view
       const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
       if (deadlineElement) {
         setTimeout(() => {
-          deadlineElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(deadlineElement, 'center');
         }, 400);
       }
 
@@ -273,7 +304,7 @@ export default function CalendarClient() {
     return () => {
       clearTimeout(scrollTimer);
     };
-  }, [highlightedDeadlineId, deadlines]);
+  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible]);
 
   // Highlighted todo derived from URL query parameter
   const highlightedTodoId = useMemo(
@@ -354,8 +385,8 @@ export default function CalendarClient() {
 
   // Handle highlighted unit - open the detail panel when a unit is highlighted via URL
   useEffect(() => {
-    // Wait for units to be loaded before trying to find the highlighted unit
-    if (!highlightedUnitId || !highlightedUnit) {
+    // Wait for hydration and units to be loaded before trying to find the highlighted unit
+    if (!hasHydrated || !highlightedUnitId || !highlightedUnit) {
       return;
     }
 
@@ -380,7 +411,7 @@ export default function CalendarClient() {
     return () => {
       clearTimeout(timer);
     };
-  }, [highlightedUnitId, highlightedUnit]);
+  }, [highlightedUnitId, highlightedUnit, hasHydrated]);
 
   // Use selectedUnit for the panel (no longer depends on URL)
   const effectiveSelectedUnit = selectedUnit;
@@ -399,7 +430,7 @@ export default function CalendarClient() {
 
     const scrollTimer = window.setTimeout(() => {
       if (highlightedWidget === 'units') {
-        unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIfNotVisible(unitsWidgetRef.current);
       }
     }, 100);
 
@@ -414,20 +445,20 @@ export default function CalendarClient() {
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedWidget]);
+  }, [highlightedWidget, scrollIfNotVisible]);
 
   // Scroll to units widget when highlighted via URL (URL clearing is handled in the panel open effect)
   useEffect(() => {
     if (!highlightedUnitId) return;
 
     const scrollTimer = window.setTimeout(() => {
-      unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollIfNotVisible(unitsWidgetRef.current);
     }, 100);
 
     return () => {
       clearTimeout(scrollTimer);
     };
-  }, [highlightedUnitId]);
+  }, [highlightedUnitId, scrollIfNotVisible]);
 
   // Get date from URL parameter if provided
   const urlDate = useMemo(() => {
@@ -855,11 +886,17 @@ export default function CalendarClient() {
     setUnitDetailOpen(true);
   };
 
-  // Handle editing deadline from unit detail panel
+  // Handle viewing deadline detail from unit detail panel
   const handleEditDeadlineFromPanel = (deadline: Deadline) => {
     setUnitDetailOpen(false);
-    setEditDeadline(deadline);
-    setDeadlineDialogOpen(true);
+    // Open the appropriate detail panel based on deadline type
+    if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
+      setSelectedExam(deadline);
+      setExamDetailOpen(true);
+    } else {
+      setSelectedAssignment(deadline);
+      setAssignmentDetailOpen(true);
+    }
   };
 
   // Filter deadlines by type
@@ -896,7 +933,7 @@ export default function CalendarClient() {
 
       <div className="flex flex-col lg:flex-row gap-6 mt-4">
         {/* Main Calendar Area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-x-auto">
           {!hasHydrated && (
             <p className="mb-4 text-xs text-mq-content-secondary" role="status" aria-live="polite">
               {t('loading')}
@@ -908,11 +945,11 @@ export default function CalendarClient() {
           {view === 'week' && (
             // Apple/Google Calendar Style Weekly View
             <ScrollReveal delay={0.1}>
-              <div className="bg-mq-card-background border border-mq-border rounded-mq-xl shadow-sm overflow-hidden">
-                <div className="p-0 calendar-main-panel overflow-visible">
-                  <div className="md:overflow-x-auto overflow-x-hidden">
+              <div className="bg-mq-card-background border border-mq-border rounded-mq-xl shadow-sm overflow-x-auto scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
+                <div className="p-0 calendar-main-panel">
+                  <div className="min-w-[1000px]">
                     {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
-                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md md:min-w-[800px]">
+                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md">
                       {/* Desktop week navigation REMOVED per user request */}
                       {/* Mobile day navigation */}
                       <div className="flex md:hidden items-center gap-2">
@@ -989,7 +1026,7 @@ export default function CalendarClient() {
                       aria-label={t('calendarWeeklyGridLabel')}
                       aria-roledescription={t('calendarWeeklyGridDescription')}
                     >
-                      <div className="min-w-[800px] overflow-visible">
+                      <div className="w-full">
                         {/* Day Headers - Sticky with MQ Key Dates */}
                         <div
                           className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-[73px] bg-mq-background/95 backdrop-blur-md z-30"

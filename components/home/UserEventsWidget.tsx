@@ -73,15 +73,6 @@ const UserEventsWidget = memo(() => {
       });
   }, [events]);
 
-  // Count today's events
-  const todayEventCount = useMemo(() => {
-    return monthEndEvents.filter((event) => {
-      const eventDate = event.startAt
-        ? (event.startAt instanceof Date ? event.startAt : new Date(event.startAt))
-        : (event.date instanceof Date ? event.date : new Date(event.date));
-      return isToday(eventDate);
-    }).length;
-  }, [monthEndEvents]);
 
   const formatEventTime = (event: { startAt: Date; date: Date; time?: string }) => {
     const startDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
@@ -112,7 +103,7 @@ const UserEventsWidget = memo(() => {
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {todayEventCount} {tOr('today', 'today')}
+              {monthEndEvents.length} {tOr('upcoming', 'upcoming')}
             </Badge>
           )}
           {/* View Only Badge */}
@@ -156,6 +147,7 @@ const UserEventsWidget = memo(() => {
                   ? (event.date instanceof Date ? event.date : new Date(event.date))
                   : null;
               const eventIsToday = eventStartDate ? isToday(eventStartDate) : false;
+              const eventDateStr = eventStartDate ? format(eventStartDate, 'yyyy-MM-dd') : '';
 
               return (
                 <div
@@ -165,13 +157,13 @@ const UserEventsWidget = memo(() => {
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
                   style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
-                  onClick={() => router.push(`/calendar?highlightEvent=${event.id}`)}
+                  onClick={() => router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(`/calendar?highlightEvent=${event.id}`);
+                      router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`);
                     }
                   }}
                 >

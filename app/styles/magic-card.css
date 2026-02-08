@@ -148,10 +148,12 @@ html:not(.dark) .mq-magic-card .text-mq-sm.text-mq-content-secondary {
 
 /* Additional aggressive fallback to cover variations in DOM */
 html:not(.dark) .mq-magic-card .p-3.rounded-mq-lg.bg-mq-background-secondary,
+html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary {
+  background-color: var(--c-background-secondary) !important;
+}
+
 html:not(.dark) .mq-magic-card .p-3.rounded-mq-lg.bg-mq-background-secondary *,
-html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary,
 html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
-  background-color: #ffffff !important;
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
   opacity: 1 !important;

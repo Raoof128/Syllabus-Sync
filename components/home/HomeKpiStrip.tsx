@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { CardSolid } from '@/components/home/HomeCard';
@@ -15,8 +15,18 @@ export default function HomeKpiStrip() {
   const isHydrated = useHydration();
 
   const units = useUnitsStore((state) => state.units);
+  const loadUnits = useUnitsStore((state) => state.loadUnits);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const getStressLevel = useDeadlinesStore((state) => state.getStressLevel);
+
+  // Load data from database on mount
+  useEffect(() => {
+    if (isHydrated) {
+      loadUnits();
+      loadDeadlines();
+    }
+  }, [isHydrated, loadUnits, loadDeadlines]);
 
   // 1. Classes Today Count
   const todayClassesCount = useMemo(() => {

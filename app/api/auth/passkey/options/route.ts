@@ -49,18 +49,28 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = parsed.data;
-    const { data: userRecord, error: userError } = await adminClient
-      .from('auth.users')
-      .select('id,email,user_metadata')
-      .eq('email', email)
-      .limit(1)
-      .single();
 
-    if (userError || !userRecord) {
+    // SECURITY: Use targeted RPC lookup instead of from('auth.users') which
+    // doesn't work with Supabase JS client for system tables.
+    const { data: lookupResult, error: lookupError } = await adminClient.rpc(
+      'lookup_user_by_email',
+      { lookup_email: email },
+    );
+
+    if (lookupError) {
+      logger.error('User lookup error:', lookupError);
+      return jsonError('Passkey login unavailable', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    const userRow = Array.isArray(lookupResult) ? lookupResult[0] : lookupResult;
+
+    if (!userRow?.user_id) {
+      // Don't reveal whether user exists — use same message as "no passkeys"
       return jsonError('Passkey not available for this account', 404, ERROR_CODES.NOT_FOUND);
     }
 
-    const metadata = (userRecord.user_metadata || {}) as Record<string, unknown>;
+    const userId: string = userRow.user_id;
+    const metadata = (userRow.user_meta ?? {}) as Record<string, unknown>;
     const credentialId = metadata.biometric_credential_id as string | undefined;
 
     if (!credentialId) {
@@ -82,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     const response = jsonSuccess({ options });
-    setPasskeyCookies(response, options.challenge, userRecord.id);
+    setPasskeyCookies(response, options.challenge, userId);
     return response;
   } catch (error) {
     logger.error('Passkey options error:', error);

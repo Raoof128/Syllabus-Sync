@@ -5,6 +5,7 @@ import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
 
@@ -265,7 +266,16 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       toggleComplete: async (id) => {
         const existing = get().deadlines.find((deadline) => deadline.id === id);
         if (!existing) return;
-        await get().updateDeadline(id, { completed: !existing.completed });
+        const newCompletedState = !existing.completed;
+        await get().updateDeadline(id, { completed: newCompletedState });
+
+        // Refresh gamification profile after completion toggle (XP may have been awarded)
+        if (newCompletedState) {
+          // Small delay to allow database trigger to complete
+          setTimeout(() => {
+            useGamificationStore.getState().refreshProfile();
+          }, 500);
+        }
       },
 
       toggleNotification: async (id) => {

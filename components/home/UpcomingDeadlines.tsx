@@ -4,7 +4,9 @@
 import React, { useMemo, memo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useUnitsStore } from '@/lib/store/unitsStore';
 import { PRIORITY_COLORS } from '@/lib/constants';
+import { getDeadlineColor } from '@/lib/calendar-utils';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Clock, AlertCircle, ExternalLink, CalendarDays, CheckCircle2, Circle } from 'lucide-react';
@@ -23,6 +25,7 @@ const UpcomingDeadlines = memo(() => {
   const router = useRouter();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
+  const units = useUnitsStore((state) => state.units);
   const { t, language } = useTypedTranslation();
 
   const currentLocale = useMemo(() => {
@@ -52,7 +55,8 @@ const UpcomingDeadlines = memo(() => {
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
   }, [deadlines]);
 
-  const pendingCount = deadlines.filter((d) => !d.completed).length;
+  // Use the count of displayed deadlines for consistency
+  const pendingCount = upcomingDeadlines.length;
 
   const getDeadlineTypeLabel = (type: string) => {
     return t(`type_${type}` as TranslationKey) || type;
@@ -124,6 +128,8 @@ const UpcomingDeadlines = memo(() => {
             {upcomingDeadlines.map((deadline) => {
               const dueDate = new Date(deadline.dueDate);
               const isOverdue = isPast(dueDate);
+              const deadlineColor = getDeadlineColor(deadline, units);
+              const deadlineDateStr = format(dueDate, 'yyyy-MM-dd');
 
               return (
                 <div
@@ -134,25 +140,20 @@ const UpcomingDeadlines = memo(() => {
                       ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
                       : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
-                  onClick={() => router.push(`/calendar?highlightDeadline=${deadline.id}`)}
+                  onClick={() => router.push(`/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(`/calendar?highlightDeadline=${deadline.id}`);
+                      router.push(`/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`);
                     }
                   }}
                 >
-                  {/* Color indicator based on deadline type */}
+                  {/* Color indicator using unit color */}
                   <div
-                    className={cn(
-                      'w-1.5 self-stretch rounded-full shrink-0',
-                      deadline.type === 'Assignment' && 'bg-blue-500',
-                      deadline.type === 'Exam' && 'bg-red-500',
-                      deadline.type === 'Presentation' && 'bg-purple-500',
-                      deadline.type === 'Quiz' && 'bg-amber-500',
-                    )}
+                    className="w-1.5 self-stretch rounded-full shrink-0"
+                    style={{ backgroundColor: deadlineColor }}
                   />
 
                   {/* Deadline info */}

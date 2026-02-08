@@ -382,6 +382,29 @@ const FeedClient = memo(() => {
     };
   }, [storeEvents]);
 
+  // Category stats for sidebar
+  const categoryStats = useMemo(() => {
+    const counts = {
+      Academic: 0,
+      Career: 0,
+      Social: 0,
+      'Free Food': 0,
+    };
+
+    storeEvents.forEach((event) => {
+      if (event.category in counts) {
+        counts[event.category as keyof typeof counts]++;
+      }
+    });
+
+    return counts;
+  }, [storeEvents]);
+
+  // Handler for category click from sidebar
+  const handleCategoryClick = useCallback((category: string) => {
+    setActiveFilter(category as CategoryFilter);
+  }, []);
+
   return (
     <section
       className="container mx-auto p-4 sm:p-6 max-w-7xl feed-page"
@@ -533,7 +556,11 @@ const FeedClient = memo(() => {
         </div>
 
         {/* Sidebar - 1 column */}
-        <FeedSidebar stats={stats} />
+        <FeedSidebar
+          stats={stats}
+          categoryStats={categoryStats}
+          onCategoryClick={handleCategoryClick}
+        />
       </div>
 
       {/* Event Form Dialog */}

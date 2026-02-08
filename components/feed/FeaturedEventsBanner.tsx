@@ -67,12 +67,6 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
         <h2 className="text-xl font-bold text-mq-content">
           {t('featuredEvents') || 'Featured Events'}
         </h2>
-        <Badge
-          variant="secondary"
-          className="ml-2 bg-mq-primary/10 text-mq-primary border-mq-primary/20"
-        >
-          {events.length} {t('upcoming') || 'upcoming'}
-        </Badge>
       </div>
 
       {/* Carousel Container */}

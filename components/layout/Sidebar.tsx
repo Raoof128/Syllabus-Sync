@@ -305,7 +305,10 @@ const Sidebar = memo(() => {
         {/* Navigation Links */}
         <nav className="space-y-2 flex-1" role="navigation" aria-label={t('mainNavigation')}>
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            // Use startsWith for settings to match sub-routes like /settings/general
+            const isActive = item.href === '/settings'
+              ? pathname?.startsWith('/settings')
+              : pathname === item.href;
             const Icon = item.icon;
 
             return (
@@ -441,7 +444,10 @@ const Sidebar = memo(() => {
           {/* Navigation Links - staggered slide-in animation */}
           <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              // Use startsWith for settings to match sub-routes like /settings/general
+              const isActive = item.href === '/settings'
+                ? pathname?.startsWith('/settings')
+                : pathname === item.href;
               const Icon = item.icon;
 
               return (

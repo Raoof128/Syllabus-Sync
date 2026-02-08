@@ -17,6 +17,7 @@ export default function WeekHeatStrip() {
   const { t } = useTypedTranslation();
   const isHydrated = useHydration();
   const units = useUnitsStore((state) => state.units);
+  const loadUnits = useUnitsStore((state) => state.loadUnits);
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const events = useEventsStore((state) => state.events);
@@ -26,10 +27,11 @@ export default function WeekHeatStrip() {
   // Load data from database on mount
   useEffect(() => {
     if (isHydrated) {
+      loadUnits();
       loadDeadlines();
       loadEvents();
     }
-  }, [isHydrated, loadDeadlines, loadEvents]);
+  }, [isHydrated, loadUnits, loadDeadlines, loadEvents]);
 
   const weekData = useMemo(() => {
     if (!isHydrated) return [];

@@ -2,42 +2,59 @@ import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { format } from 'date-fns';
-import CalendarPage from '@/app/calendar/page';
 import translations from '@/locales/en/translations.json';
 
-const deadlinesState = {
-  deadlines: [
-    {
-      id: 'deadline-1',
-      title: 'Assignment 1',
-      unitCode: 'COMP2310',
-      dueDate: new Date(2026, 0, 15, 14, 30),
-      priority: 'High',
-      type: 'Assignment',
-      completed: false,
-      createdAt: new Date(),
-    },
-  ],
-  toggleComplete: vi.fn(),
-  getStressLevel: vi.fn(() => 'Low'),
-  addDeadline: vi.fn(),
-  updateDeadline: vi.fn(),
-  removeDeadline: vi.fn(),
-};
-
-const unitsState = {
-  units: [
-    {
-      id: 'unit-comp2310',
-      code: 'COMP2310',
-      name: 'Networking',
-      color: '#A6192E',
-      location: { building: 'C5C', room: '204' },
-      schedule: [],
-      createdAt: new Date(),
-    },
-  ],
-};
+// Use vi.hoisted to ensure mock state is available when vi.mock factories run
+const { deadlinesState, unitsState, eventsState, todosState } = vi.hoisted(() => ({
+  deadlinesState: {
+    deadlines: [
+      {
+        id: 'deadline-1',
+        title: 'Assignment 1',
+        unitCode: 'COMP2310',
+        dueDate: new Date(2026, 0, 15, 14, 30),
+        priority: 'High',
+        type: 'Assignment',
+        completed: false,
+        createdAt: new Date(),
+      },
+    ],
+    toggleComplete: vi.fn(),
+    getStressLevel: vi.fn(() => 'Low'),
+    addDeadline: vi.fn(),
+    updateDeadline: vi.fn(),
+    removeDeadline: vi.fn(),
+    removeDeadlinesByUnit: vi.fn(),
+    loadDeadlines: vi.fn(),
+  },
+  unitsState: {
+    units: [
+      {
+        id: 'unit-comp2310',
+        code: 'COMP2310',
+        name: 'Networking',
+        color: '#A6192E',
+        location: { building: 'C5C', room: '204' },
+        schedule: [],
+        createdAt: new Date(),
+      },
+    ],
+    loadUnits: vi.fn(),
+    removeUnit: vi.fn(),
+  },
+  eventsState: {
+    events: [],
+    loadEvents: vi.fn(),
+    removeEvent: vi.fn(),
+  },
+  todosState: {
+    todos: [],
+    loadTodos: vi.fn(),
+    addTodo: vi.fn(),
+    removeTodo: vi.fn(),
+    updateTodo: vi.fn(),
+  },
+}));
 
 vi.mock('@/lib/store/deadlinesStore', () => ({
   useDeadlinesStore: (selector?: (state: typeof deadlinesState) => unknown) =>
@@ -46,6 +63,14 @@ vi.mock('@/lib/store/deadlinesStore', () => ({
 
 vi.mock('@/lib/store/unitsStore', () => ({
   useUnitsStore: (selector: (state: typeof unitsState) => unknown) => selector(unitsState),
+}));
+
+vi.mock('@/lib/store/eventsStore', () => ({
+  useEventsStore: (selector: (state: typeof eventsState) => unknown) => selector(eventsState),
+}));
+
+vi.mock('@/lib/store/todosStore', () => ({
+  useTodosStore: (selector: (state: typeof todosState) => unknown) => selector(todosState),
 }));
 
 vi.mock('@/lib/hooks', () => ({
@@ -65,6 +90,9 @@ vi.mock('next/navigation', () => ({
     refresh: vi.fn(),
   }),
 }));
+
+// Import component AFTER mocks are defined
+import CalendarPage from '@/app/calendar/page';
 
 describe('CalendarPage', () => {
   afterEach(() => {

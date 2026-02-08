@@ -157,6 +157,25 @@ export default function CalendarWidgets({
   const todoHighlightActive = Boolean(highlightedTodoId);
   const eventHighlightActive = Boolean(highlightedEventId);
 
+  // Helper function to check if element is visible in viewport
+  const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }, []);
+
+  // Helper function to scroll only if element is not visible
+  const scrollIfNotVisible = React.useCallback((el: HTMLElement | null) => {
+    if (el && !isElementInViewport(el)) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isElementInViewport]);
+
   // Scroll Effects
   useEffect(() => {
     if (highlightedDeadlineId && assignmentsWidgetRef.current) {
@@ -167,34 +186,34 @@ export default function CalendarWidgets({
         : assignmentsWidgetRef.current;
 
       setTimeout(() => {
-        targetRef?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIfNotVisible(targetRef);
       }, 100);
     }
-  }, [highlightedDeadlineId, deadlines]);
+  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible]);
 
   useEffect(() => {
     if ((highlightedUnitId || highlightedWidget === 'units') && unitsWidgetRef.current) {
       setTimeout(() => {
-        unitsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIfNotVisible(unitsWidgetRef.current);
       }, 100);
     }
-  }, [highlightedUnitId, highlightedWidget]);
+  }, [highlightedUnitId, highlightedWidget, scrollIfNotVisible]);
 
   useEffect(() => {
     if (highlightedTodoId && todosWidgetRef.current) {
       setTimeout(() => {
-        todosWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIfNotVisible(todosWidgetRef.current);
       }, 100);
     }
-  }, [highlightedTodoId]);
+  }, [highlightedTodoId, scrollIfNotVisible]);
 
   useEffect(() => {
     if (highlightedEventId && eventsWidgetRef.current) {
       setTimeout(() => {
-        eventsWidgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollIfNotVisible(eventsWidgetRef.current);
       }, 100);
     }
-  }, [highlightedEventId]);
+  }, [highlightedEventId, scrollIfNotVisible]);
 
   // Format Helpers
   const formatMonthDayTime = (date: Date) =>
@@ -652,7 +671,14 @@ export default function CalendarWidgets({
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm truncate">{event.title}</h4>
                             <p className="text-[11px] text-mq-content-secondary truncate">
-                              {event.time} • {event.location}
+                              {event.startAt
+                                ? formatMonthDayTime(
+                                    event.startAt instanceof Date
+                                      ? event.startAt
+                                      : new Date(event.startAt),
+                                  )
+                                : event.time}{' '}
+                              • {event.location}
                             </p>
                           </div>
                           <ItemActionButtons
