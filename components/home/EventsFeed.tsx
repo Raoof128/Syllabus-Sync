@@ -106,7 +106,9 @@ const EventsFeed = memo(() => {
               const eventContent = (
                 <>
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-mq-sm font-medium text-mq-content line-clamp-2">{event.title}</h3>
+                    <h3 className="text-mq-sm font-medium text-mq-content line-clamp-2">
+                      {event.title}
+                    </h3>
                     <Badge
                       className={`${categoryColors[event.category]} alabaster-readable shrink-0`}
                     >

@@ -15,7 +15,7 @@ interface NavState {
 
 interface RouteAnnouncerProps {
   navState: NavState | null;
-  locationStatus: 'idle' | 'searching' | 'found' | 'denied' | 'error' | 'arrived';
+  locationStatus: 'idle' | 'searching' | 'found' | 'denied' | 'error';
   selectedBuildingName?: string;
 }
 
@@ -58,7 +58,7 @@ export function RouteAnnouncer({
     let shouldAnnounce = false;
 
     // Priority 1: Arrived at destination
-    if (locationStatus === 'arrived' || navState?.status === 'arrived') {
+    if (navState?.status === 'arrived') {
       newAnnouncement = safeT('navigationArrived', 'You have arrived at your destination.');
       shouldAnnounce = true;
     }

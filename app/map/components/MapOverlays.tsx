@@ -60,6 +60,8 @@ export function MapOverlays({
   // Active overlay layers (parking, water, etc.)
   useEffect(() => {
     const currentOverlays = activeOverlayRefs.current;
+    let aborted = false;
+
     const clearAllOverlays = () => {
       currentOverlays.forEach((overlay) => {
         try {
@@ -96,22 +98,19 @@ export function MapOverlays({
 
         // Add new overlays with preloading
         for (const overlayId of activeOverlays) {
+          if (aborted) return;
           if (!currentOverlays.has(overlayId)) {
             const overlayConfig = mapOverlays.find((o) => o.id === overlayId);
             if (overlayConfig) {
-              // Skip overlays that don't align with base map (different aspect ratio)
-              // These would look distorted - better to show a warning or placeholder
               if (!overlayConfig.alignsWithBaseMap) {
                 mapLog.log(`Overlay ${overlayId} has different aspect ratio, may appear distorted`);
               }
 
-              // Preload image first for better quality and get versioned path
               const versionedPath = await preloadOverlayImage(overlayConfig.imagePath);
+              if (aborted) return;
 
-              // Use standard bounds for all overlays that align with base map
-              // Start with 0 opacity and fade in for smooth transition
               const overlay = leafletModule.imageOverlay(versionedPath, PIXEL_BOUNDS, {
-                opacity: 0, // Start invisible
+                opacity: 0,
                 className: `map-overlay-layer ${!overlayConfig.alignsWithBaseMap ? 'overlay-different-aspect' : ''}`,
                 interactive: false,
                 zIndex: 100 + activeOverlays.indexOf(overlayId),
@@ -120,10 +119,12 @@ export function MapOverlays({
               overlay.addTo(mapInstance);
               currentOverlays.set(overlayId, overlay);
 
-              // Fade in smoothly after adding to map
               requestAnimationFrame(() => {
+                if (aborted) return;
                 setTimeout(() => {
-                  overlay.setOpacity(overlayConfig.alignsWithBaseMap ? 0.92 : 0.85);
+                  if (!aborted) {
+                    overlay.setOpacity(overlayConfig.alignsWithBaseMap ? 0.92 : 0.85);
+                  }
                 }, 50);
               });
 
@@ -132,11 +133,15 @@ export function MapOverlays({
           }
         }
       } catch (error) {
-        mapLog.log('Error managing active overlays:', error);
+        if (!aborted) mapLog.log('Error managing active overlays:', error);
       }
     };
 
     addOverlays();
+
+    return () => {
+      aborted = true;
+    };
   }, [mapInstance, leafletModule, overlaysReady, activeOverlays, preloadOverlayImage]);
 
   // Ensure overlays are cleaned up when component unmounts.

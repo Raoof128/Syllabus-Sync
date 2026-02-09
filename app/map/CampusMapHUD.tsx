@@ -96,6 +96,7 @@ export default function CampusMapHUD({
             size="sm"
             className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
             onClick={onCopyShare}
+            aria-label={t('share')}
           >
             <Share2 className="h-4 w-4" />
             <span className="hidden sm:inline font-medium">{t('share')}</span>
@@ -107,6 +108,7 @@ export default function CampusMapHUD({
             className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
             onClick={onExport}
             disabled={!onExport}
+            aria-label={t('export')}
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline font-medium">{t('export')}</span>
@@ -192,10 +194,6 @@ export default function CampusMapHUD({
                   className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain bg-mq-card-background max-h-[200px] sm:max-h-[280px]"
                   initial="hidden"
                   animate="visible"
-                  // Tier 6: Responsive Layout Improvements - Touch optimized drag
-                  drag="y"
-                  dragConstraints={{ top: 0, bottom: 0 }}
-                  dragElastic={0.2}
                   variants={{
                     hidden: { opacity: 0 },
                     visible: {

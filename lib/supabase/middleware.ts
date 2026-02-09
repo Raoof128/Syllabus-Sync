@@ -1,31 +1,29 @@
 import { logger } from '@/lib/logger';
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Creates a Supabase client for middleware usage
  * Uses cookies for session management
  */
 export function createClient(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables')
+    throw new Error('Missing Supabase environment variables');
   }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return request.cookies.getAll()
+        return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => 
-          request.cookies.set(name, value)
-        )
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
       },
     },
-  })
+  });
 }
 
 /**
@@ -33,13 +31,13 @@ export function createClient(request: NextRequest) {
  * Called when session is refreshed or created
  */
 export async function updateSession(request: NextRequest, response: NextResponse) {
-  const supabase = createClient(request)
-  
+  const supabase = createClient(request);
+
   // This will refresh the session if it's expired
   const {
     data: { session },
     error,
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
   if (error) {
     // SILENT: Handle common refresh token failures without logging to console.
@@ -50,9 +48,9 @@ export async function updateSession(request: NextRequest, response: NextResponse
       error.status === 400;
 
     if (!isRefreshTokenError) {
-      logger.error('Session update error:', error)
+      logger.error('Session update error:', error);
     }
-    return
+    return;
   }
 
   // If session exists, ensure cookies are properly set
@@ -64,10 +62,10 @@ export async function updateSession(request: NextRequest, response: NextResponse
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-    }
+    };
 
-    response.cookies.set('sb-access-token', session.access_token, cookieOptions)
-    response.cookies.set('sb-refresh-token', session.refresh_token || '', cookieOptions)
+    response.cookies.set('sb-access-token', session.access_token, cookieOptions);
+    response.cookies.set('sb-refresh-token', session.refresh_token || '', cookieOptions);
   }
 }
 
@@ -77,16 +75,19 @@ export async function updateSession(request: NextRequest, response: NextResponse
  */
 export async function getAuthenticatedUser(request: NextRequest) {
   try {
-    const supabase = createClient(request)
-    const { data: { session }, error } = await supabase.auth.getSession()
-    
+    const supabase = createClient(request);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
     if (error || !session?.user) {
-      return null
+      return null;
     }
-    
-    return session.user
+
+    return session.user;
   } catch (error) {
-    logger.error('Auth check error:', error)
-    return null
+    logger.error('Auth check error:', error);
+    return null;
   }
 }

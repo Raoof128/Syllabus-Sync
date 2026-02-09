@@ -4,7 +4,52 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Raouf: Deploy Security Audit Migration + Env Setup — 2026-02-08
+### Raouf: Map Page Production Audit — 25 Findings Fixed — 2026-02-09
+
+**Scope:** Full file-by-file audit of map page module (30+ files), all findings fixed
+**Type:** Bug fix / Performance / Security / Accessibility / Architecture
+
+#### Fixes Applied (by severity)
+
+**High (3):**
+
+- **Fixed stale closure in navigation state subscription** — `useMapNavigation.ts` callback captured mutable values; now uses refs and registers once
+- **Fixed unnecessary ORS route refetches** — removed `isNavigating` from route effect deps; toggling navigation no longer triggers API calls
+- **Fixed server route cache memory leak** — `ipCacheCount` in `navigate/route.ts` now decrements on TTL expiry and eviction; added `clientIP` tracking to cache entries
+
+**Medium (12):**
+
+- **Fixed duplicate `@keyframes shimmer`** — two definitions in `animations.css` (background-position vs transform) overwrote each other; renamed second to `shimmer-translate`
+- **Removed duplicate overlay management** — deleted `useMapOverlays.ts` hook (duplicate of `MapOverlays.tsx` component)
+- **Fixed async overlay race condition** — `MapOverlays.tsx` now uses `aborted` flag to prevent stale overlay additions after deps change
+- **Fixed popup string matching** — `CampusMap.tsx` now matches markers by CRS position instead of brittle popup content string matching
+- **Fixed URL/store overlay sync** — now reacts to `searchParams` changes (supports browser back/forward) with loop guard
+- **Fixed map readiness timeout** — increased to 5s, shows notice instead of silently hiding failed map
+- **Added aria-labels to HUD buttons** — Share/Export buttons now accessible when text hidden on mobile
+- **Removed drag="y" from buildings list** — prevented conflict with native overflow-y-auto scrolling
+- **Removed `will-change: contents`** — from `.leaflet-overlay-pane` in `leaflet.css` (GPU memory risk on mobile)
+- **Removed singleton NavigationStateManager** — `getNavigationManager()`/`resetNavigationManager()` conflicted with per-component instances
+- **Gated `simulatePosition` for production** — early-returns in prod, dev-only function
+- **Fixed `RouteAnnouncer` type mismatch** — removed `'arrived'` from `locationStatus` (arrival via `navState` only)
+
+**Low (5):**
+
+- **Gated geospatialCalibration `console.warn`** — only logs RMSE in non-production
+- **Derived `validOverlays` from source** — `mapStore.ts` now imports overlay IDs from `mapOverlays` instead of hardcoded array
+- **Added passive flag to DeviceMotion listener** — prevents perf warnings
+- **Cleared existing timeout in MapErrorBoundary** — prevents queuing multiple retry timeouts
+- **Removed unused `isNavigating` prop** — from `useMapLocation` interface (fallback logic sufficient)
+
+**Other:**
+
+- Applied Prettier formatting to 16 files
+- Fixed flaky CSRF perf test threshold (100ms → 500ms for 1000 crypto operations)
+- **Fixed lint warning** in `useMapNavigation.ts` (removed unused `eslint-disable`)
+- **Fixed format check failure** by adding `logs/` to `.prettierignore`
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 411/411 tests, build all pass)
 
 **Scope:** Deploy `lookup_user_by_email` RPC, set WebAuthn env vars, fix migration SQL
 **Type:** DevOps / Deployment

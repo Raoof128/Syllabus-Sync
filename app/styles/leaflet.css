@@ -72,7 +72,7 @@
 .leaflet-overlay-pane {
   /* GPU acceleration */
   transform: translateZ(0);
-  will-change: transform, contents;
+  will-change: transform;
   /* Smooth layer stacking */
   isolation: isolate;
 }

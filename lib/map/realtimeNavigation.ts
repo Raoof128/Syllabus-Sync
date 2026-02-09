@@ -905,23 +905,3 @@ export class NavigationStateManager {
     this.onStateChange?.(this.getState());
   }
 }
-
-// ============================================
-// SINGLETON INSTANCE
-// ============================================
-
-let navigationManager: NavigationStateManager | null = null;
-
-export function getNavigationManager(): NavigationStateManager {
-  if (!navigationManager) {
-    navigationManager = new NavigationStateManager();
-  }
-  return navigationManager;
-}
-
-export function resetNavigationManager(): void {
-  if (navigationManager) {
-    navigationManager.stopNavigation();
-  }
-  navigationManager = null;
-}

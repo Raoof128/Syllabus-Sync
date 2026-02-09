@@ -32,7 +32,7 @@ export async function createServerClient() {
     if (!serverWarningShown) {
       console.warn(
         '⚠️ Supabase not configured for server. Auth features disabled.\n' +
-          'To enable auth, update .env.local with your Supabase credentials.'
+          'To enable auth, update .env.local with your Supabase credentials.',
       );
       serverWarningShown = true;
     }

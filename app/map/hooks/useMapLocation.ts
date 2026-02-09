@@ -31,7 +31,6 @@ interface UseMapLocationProps {
   leafletModule: typeof import('leaflet') | null;
   isMapReady: (map: LeafletMap | null) => boolean;
   userIcon: Icon | import('leaflet').DivIcon | null;
-  isNavigating?: boolean;
   navManagerRef: React.MutableRefObject<NavigationStateManager | null>;
 }
 
@@ -40,7 +39,6 @@ export function useMapLocation({
   leafletModule,
   isMapReady,
   userIcon,
-  isNavigating,
   navManagerRef,
 }: UseMapLocationProps) {
   const { safeT } = useSafeTranslation();
@@ -121,7 +119,7 @@ export function useMapLocation({
 
     // Passive listener, no permission request needed unless on iOS 13+
     // If permission is needed, this will just stay silent until granted elsewhere.
-    window.addEventListener('devicemotion', handleMotion);
+    window.addEventListener('devicemotion', handleMotion, { passive: true });
 
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
@@ -197,11 +195,9 @@ export function useMapLocation({
 
           // Update navigation manager
           const navManager = navManagerRef.current;
-          const navigationActive =
-            isNavigating ??
-            (navManager
-              ? NAVIGATION_ACTIVE_STATUSES.includes(navManager.getState().status)
-              : false);
+          const navigationActive = navManager
+            ? NAVIGATION_ACTIVE_STATUSES.includes(navManager.getState().status)
+            : false;
 
           if (navigationActive && navManager) {
             navManager.updatePosition({
@@ -353,7 +349,7 @@ export function useMapLocation({
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [mapInstance, leafletModule, isMapReady, userIcon, isNavigating, navManagerRef]);
+  }, [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef]);
 
   // Center on user function
   const centerOnUser = () => {
@@ -382,6 +378,7 @@ export function useMapLocation({
    */
   const simulatePosition = useCallback(
     (lat: number, lng: number, heading: number = 0, speed: number = 1.4) => {
+      if (process.env.NODE_ENV === 'production') return;
       if (!isMapReady(mapInstance) || !leafletModule) return;
 
       const timestamp = Date.now();

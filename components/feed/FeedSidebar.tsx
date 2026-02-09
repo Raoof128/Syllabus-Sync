@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, memo, useCallback } from 'react';
-import { TrendingUp, Calendar, Users, Megaphone, ChevronRight, Sparkles, Info, ExternalLink } from 'lucide-react';
+import {
+  TrendingUp,
+  Calendar,
+  Users,
+  Megaphone,
+  ChevronRight,
+  Sparkles,
+  Info,
+  ExternalLink,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
@@ -42,11 +51,7 @@ interface Announcement {
   linkText?: string;
 }
 
-const FeedSidebarComponent = ({
-  stats,
-  categoryStats,
-  onCategoryClick
-}: FeedSidebarProps) => {
+const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSidebarProps) => {
   const { t } = useTypedTranslation();
 
   // Dialog states
@@ -62,14 +67,16 @@ const FeedSidebarComponent = ({
       type: 'featured',
       title: 'Add Events to Your Calendar',
       description: 'Click "Add to Calendar" on any event to save it to your personal calendar...',
-      fullDescription: 'You can add any campus event to your personal calendar with just one click. This helps you stay organized and never miss important events. Simply click the "Add to Calendar" button on any event card to save it to Google Calendar, Apple Calendar, or download an ICS file.',
+      fullDescription:
+        'You can add any campus event to your personal calendar with just one click. This helps you stay organized and never miss important events. Simply click the "Add to Calendar" button on any event card to save it to Google Calendar, Apple Calendar, or download an ICS file.',
     },
     {
       id: 'new-enrollment',
       type: 'new',
       title: 'Semester 1 Enrollment Open',
       description: 'Course enrolment for Semester 1, 2026 is now open. Check your...',
-      fullDescription: 'Course enrolment for Semester 1, 2026 is now open. Check your enrolled units, add new courses, or modify your timetable through the student portal. Make sure to complete your enrolment before the deadline to secure your spot in popular classes.',
+      fullDescription:
+        'Course enrolment for Semester 1, 2026 is now open. Check your enrolled units, add new courses, or modify your timetable through the student portal. Make sure to complete your enrolment before the deadline to secure your spot in popular classes.',
       link: 'https://students.mq.edu.au/enrolment',
       linkText: 'Go to Enrollment Portal',
     },
@@ -78,7 +85,8 @@ const FeedSidebarComponent = ({
       type: 'info',
       title: 'Library Extended Hours',
       description: 'During exam period, the library will be open 24/7. Additional study...',
-      fullDescription: 'During exam period, the library will be open 24/7. Additional study spaces have been made available on levels 2 and 3. Free coffee and snacks will be provided between 10pm and 6am to support your late-night study sessions. Security patrols have also been increased for your safety.',
+      fullDescription:
+        'During exam period, the library will be open 24/7. Additional study spaces have been made available on levels 2 and 3. Free coffee and snacks will be provided between 10pm and 6am to support your late-night study sessions. Security patrols have also been increased for your safety.',
     },
   ];
 
@@ -86,10 +94,13 @@ const FeedSidebarComponent = ({
     setSelectedAnnouncement(announcement);
   }, []);
 
-  const handleCategoryItemClick = useCallback((category: string) => {
-    setCategoriesDialogOpen(false);
-    onCategoryClick?.(category);
-  }, [onCategoryClick]);
+  const handleCategoryItemClick = useCallback(
+    (category: string) => {
+      setCategoriesDialogOpen(false);
+      onCategoryClick?.(category);
+    },
+    [onCategoryClick],
+  );
 
   const getBadgeStyle = (type: Announcement['type']) => {
     switch (type) {
@@ -149,7 +160,9 @@ const FeedSidebarComponent = ({
                 <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20 hover:bg-mq-info/15 transition-colors">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-mq-info" aria-hidden="true" />
-                    <span className="text-mq-sm font-medium text-mq-content">{t('totalEvents')}</span>
+                    <span className="text-mq-sm font-medium text-mq-content">
+                      {t('totalEvents')}
+                    </span>
                   </div>
                   <span
                     className="text-mq-lg font-bold text-mq-info"
@@ -213,15 +226,17 @@ const FeedSidebarComponent = ({
                   <article
                     key={announcement.id}
                     className={`p-3 rounded-mq-lg border hover:shadow-sm transition-all ${
-                      announcement.type === 'featured' 
-                        ? 'bg-mq-primary/10 border-mq-primary/20' 
+                      announcement.type === 'featured'
+                        ? 'bg-mq-primary/10 border-mq-primary/20'
                         : announcement.type === 'new'
-                        ? 'bg-mq-success/10 border-mq-success/20'
-                        : 'bg-mq-info/10 border-mq-info/20'
+                          ? 'bg-mq-success/10 border-mq-success/20'
+                          : 'bg-mq-info/10 border-mq-info/20'
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      <Badge className={`${getBadgeStyle(announcement.type)} flex-shrink-0 text-[10px]`}>
+                      <Badge
+                        className={`${getBadgeStyle(announcement.type)} flex-shrink-0 text-[10px]`}
+                      >
                         {getBadgeLabel(announcement.type)}
                       </Badge>
                       <div className="min-w-0">
@@ -261,30 +276,46 @@ const FeedSidebarComponent = ({
                   <div className="flex items-center justify-between hover:bg-mq-hover-background p-2 -mx-2 rounded-mq transition-colors">
                     <dt className="flex items-center gap-2">
                       <span>💼</span>
-                      <span className="text-mq-sm font-medium text-mq-content">{t('category_Career')}</span>
+                      <span className="text-mq-sm font-medium text-mq-content">
+                        {t('category_Career')}
+                      </span>
                     </dt>
-                    <dd className="text-mq-sm font-semibold text-mq-info">{categoryStats?.Career ?? 0}</dd>
+                    <dd className="text-mq-sm font-semibold text-mq-info">
+                      {categoryStats?.Career ?? 0}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between hover:bg-mq-hover-background p-2 -mx-2 rounded-mq transition-colors">
                     <dt className="flex items-center gap-2">
                       <span>📚</span>
-                      <span className="text-mq-sm font-medium text-mq-content">{t('category_Academic')}</span>
+                      <span className="text-mq-sm font-medium text-mq-content">
+                        {t('category_Academic')}
+                      </span>
                     </dt>
-                    <dd className="text-mq-sm font-semibold text-mq-success">{categoryStats?.Academic ?? 0}</dd>
+                    <dd className="text-mq-sm font-semibold text-mq-success">
+                      {categoryStats?.Academic ?? 0}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between hover:bg-mq-hover-background p-2 -mx-2 rounded-mq transition-colors">
                     <dt className="flex items-center gap-2">
                       <span>🎉</span>
-                      <span className="text-mq-sm font-medium text-mq-content">{t('category_Social')}</span>
+                      <span className="text-mq-sm font-medium text-mq-content">
+                        {t('category_Social')}
+                      </span>
                     </dt>
-                    <dd className="text-mq-sm font-semibold text-mq-purple">{categoryStats?.Social ?? 0}</dd>
+                    <dd className="text-mq-sm font-semibold text-mq-purple">
+                      {categoryStats?.Social ?? 0}
+                    </dd>
                   </div>
                   <div className="flex items-center justify-between hover:bg-mq-hover-background p-2 -mx-2 rounded-mq transition-colors">
                     <dt className="flex items-center gap-2">
                       <span>🍕</span>
-                      <span className="text-mq-sm font-medium text-mq-content">{t('category_FreeFood')}</span>
+                      <span className="text-mq-sm font-medium text-mq-content">
+                        {t('category_FreeFood')}
+                      </span>
                     </dt>
-                    <dd className="text-mq-sm font-semibold text-mq-warning">{categoryStats?.['Free Food'] ?? 0}</dd>
+                    <dd className="text-mq-sm font-semibold text-mq-warning">
+                      {categoryStats?.['Free Food'] ?? 0}
+                    </dd>
                   </div>
                 </dl>
               </CardContent>
@@ -301,9 +332,7 @@ const FeedSidebarComponent = ({
               <TrendingUp className="h-5 w-5 text-mq-primary" />
               {t('eventStatistics')}
             </DialogTitle>
-            <DialogDescription>
-              Overview of events happening on campus
-            </DialogDescription>
+            <DialogDescription>Overview of events happening on campus</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
@@ -364,9 +393,7 @@ const FeedSidebarComponent = ({
               <Megaphone className="h-5 w-5 text-mq-primary" />
               {t('announcements')}
             </DialogTitle>
-            <DialogDescription>
-              Important updates and news from the university
-            </DialogDescription>
+            <DialogDescription>Important updates and news from the university</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto">
@@ -375,11 +402,11 @@ const FeedSidebarComponent = ({
                 key={announcement.id}
                 onClick={() => handleAnnouncementClick(announcement)}
                 className={`w-full text-left p-4 rounded-mq-lg border hover:shadow-md transition-all ${
-                  announcement.type === 'featured' 
-                    ? 'bg-mq-primary/10 border-mq-primary/20 hover:bg-mq-primary/15' 
+                  announcement.type === 'featured'
+                    ? 'bg-mq-primary/10 border-mq-primary/20 hover:bg-mq-primary/15'
                     : announcement.type === 'new'
-                    ? 'bg-mq-success/10 border-mq-success/20 hover:bg-mq-success/15'
-                    : 'bg-mq-info/10 border-mq-info/20 hover:bg-mq-info/15'
+                      ? 'bg-mq-success/10 border-mq-success/20 hover:bg-mq-success/15'
+                      : 'bg-mq-info/10 border-mq-info/20 hover:bg-mq-info/15'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -401,7 +428,10 @@ const FeedSidebarComponent = ({
       </Dialog>
 
       {/* Single Announcement Detail Dialog */}
-      <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && setSelectedAnnouncement(null)}>
+      <Dialog
+        open={!!selectedAnnouncement}
+        onOpenChange={(open) => !open && setSelectedAnnouncement(null)}
+      >
         <DialogContent className="max-w-md">
           {selectedAnnouncement && (
             <>
@@ -422,7 +452,9 @@ const FeedSidebarComponent = ({
                 {selectedAnnouncement.link && (
                   <div className="mt-6">
                     <Button
-                      onClick={() => window.open(selectedAnnouncement.link, '_blank', 'noopener,noreferrer')}
+                      onClick={() =>
+                        window.open(selectedAnnouncement.link, '_blank', 'noopener,noreferrer')
+                      }
                       className="w-full gap-2"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -440,9 +472,7 @@ const FeedSidebarComponent = ({
       <Dialog open={categoriesDialogOpen} onOpenChange={setCategoriesDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {t('eventCategories')}
-            </DialogTitle>
+            <DialogTitle className="flex items-center gap-2">{t('eventCategories')}</DialogTitle>
             <DialogDescription>
               Filter events by category to find what interests you
             </DialogDescription>
@@ -502,7 +532,9 @@ const FeedSidebarComponent = ({
                   <p className="text-mq-sm text-mq-content-secondary">{t('mealsSnacks')}</p>
                 </div>
               </div>
-              <Badge className="bg-mq-warning text-white">{categoryStats?.['Free Food'] ?? 0}</Badge>
+              <Badge className="bg-mq-warning text-white">
+                {categoryStats?.['Free Food'] ?? 0}
+              </Badge>
             </button>
 
             <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg mt-4">

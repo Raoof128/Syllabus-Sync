@@ -32,7 +32,12 @@ describe('RouteAnnouncer', () => {
   });
 
   it('announces arrival immediately', () => {
-    render(<RouteAnnouncer navState={null} locationStatus="arrived" />);
+    render(
+      <RouteAnnouncer
+        navState={{ isNavigating: false, status: 'arrived' }}
+        locationStatus="found"
+      />,
+    );
     const region = screen.getByRole('status', { hidden: true });
     expect(region).toHaveTextContent('You have arrived at your destination.');
   });

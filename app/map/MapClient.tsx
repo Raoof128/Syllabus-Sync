@@ -99,6 +99,7 @@ export default function MapClient() {
 
   // Smooth loading transition state
   const [isMapReady, setIsMapReady] = useState(false);
+  const [mapLoadTimedOut, setMapLoadTimedOut] = useState(false);
   const mapReadyTimeoutRef = useRef<number | null>(null);
 
   // Buildings sidebar state
@@ -173,14 +174,16 @@ export default function MapClient() {
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
   const autoNavigate = searchParams.get('autonav') === 'true';
 
-  // Sync overlays from URL on mount
+  // Sync overlays from URL when searchParams change (supports back/forward navigation)
   useEffect(() => {
     const urlOverlays = parseOverlaysFromURL(searchParams);
-    if (urlOverlays.length > 0) {
+    const layersParam = searchParams.get('layers') || '';
+    const currentParam = overlaysToURLParam(activeOverlays);
+    // Only update store if URL differs from current store state (avoid loops)
+    if (layersParam && layersParam !== currentParam) {
       setOverlays(urlOverlays);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+  }, [searchParams, activeOverlays, setOverlays]);
 
   // Update URL when overlays change (without navigating)
   useEffect(() => {
@@ -294,8 +297,11 @@ export default function MapClient() {
         window.clearTimeout(mapReadyTimeoutRef.current);
       }
       mapReadyTimeoutRef.current = window.setTimeout(() => {
-        setIsMapReady(true);
-      }, 2500);
+        if (!isMapReady) {
+          setMapLoadTimedOut(true);
+          setIsMapReady(true);
+        }
+      }, 5000);
     }
 
     return () => {
@@ -431,7 +437,12 @@ export default function MapClient() {
                                 {t(`overlay_${overlay.id}_name` as TranslationKey)}
                               </p>
                               {!overlay.alignsWithBaseMap && (
-                                <span className="text-[10px] text-amber-500" title="May appear stretched">⚠</span>
+                                <span
+                                  className="text-[10px] text-amber-500"
+                                  title="May appear stretched"
+                                >
+                                  ⚠
+                                </span>
                               )}
                             </div>
                             <p className="text-mq-xs text-mq-content-secondary truncate">
@@ -525,6 +536,14 @@ export default function MapClient() {
                       </m.div>
                     )}
                   </AnimatePresence>
+
+                  {mapLoadTimedOut && (
+                    <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
+                      <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
+                        {safeT('mapLoadSlow', 'Map is taking longer than expected to load.')}
+                      </p>
+                    </div>
+                  )}
 
                   {/* HUD overlays - loaded immediately, sits on top */}
                   <CampusMapHUD

@@ -80,7 +80,6 @@ const TodosWidget = memo(() => {
     return format(d, 'EEE, MMM d • h:mm a', { locale: currentLocale });
   };
 
-
   return (
     <CardSolid className="h-full flex flex-col">
       <CardHeader
@@ -143,7 +142,10 @@ const TodosWidget = memo(() => {
               mixBlendMode: 'normal',
             }}
           >
-            <CheckSquare className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
+            <CheckSquare
+              className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
+              aria-hidden="true"
+            />
             <p className="text-mq-content-tertiary">{tOr('noTodos', 'No to-do items')}</p>
             <p className="text-mq-content-tertiary text-sm mt-1">
               {tOr('addTodosInCalendar', 'Add to-do items in the Calendar tab')}
@@ -154,7 +156,10 @@ const TodosWidget = memo(() => {
             {pendingTodos.map((todo) => {
               const dueDate = todo.dueDate ? new Date(todo.dueDate) : null;
               const isOverdue = dueDate && isPast(dueDate);
-              const todoDateStr = dueDate && isValid(dueDate) ? format(dueDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+              const todoDateStr =
+                dueDate && isValid(dueDate)
+                  ? format(dueDate, 'yyyy-MM-dd')
+                  : format(new Date(), 'yyyy-MM-dd');
 
               return (
                 <div
@@ -163,7 +168,9 @@ const TodosWidget = memo(() => {
                     'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
-                  onClick={() => router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`)}
+                  onClick={() =>
+                    router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`)
+                  }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
@@ -194,7 +201,11 @@ const TodosWidget = memo(() => {
                             toggleComplete(todo.id);
                           }}
                           className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
-                          aria-label={todo.completed ? tOr('markIncomplete', 'Mark incomplete') : tOr('markComplete', 'Mark complete')}
+                          aria-label={
+                            todo.completed
+                              ? tOr('markIncomplete', 'Mark incomplete')
+                              : tOr('markComplete', 'Mark complete')
+                          }
                         >
                           {todo.completed ? (
                             <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -213,7 +224,10 @@ const TodosWidget = memo(() => {
                         </h4>
                       </div>
                       <Badge
-                        className={cn(PRIORITY_COLORS[todo.priority], 'text-[10px] px-1.5 py-0.5 font-medium shrink-0')}
+                        className={cn(
+                          PRIORITY_COLORS[todo.priority],
+                          'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
+                        )}
                         variant="neutral"
                       >
                         {t(`priority_${todo.priority}` as TranslationKey)}
@@ -242,4 +256,3 @@ const TodosWidget = memo(() => {
 TodosWidget.displayName = 'TodosWidget';
 
 export default TodosWidget;
-

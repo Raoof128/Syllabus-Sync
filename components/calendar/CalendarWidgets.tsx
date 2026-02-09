@@ -170,20 +170,24 @@ export default function CalendarWidgets({
   }, []);
 
   // Helper function to scroll only if element is not visible
-  const scrollIfNotVisible = React.useCallback((el: HTMLElement | null) => {
-    if (el && !isElementInViewport(el)) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [isElementInViewport]);
+  const scrollIfNotVisible = React.useCallback(
+    (el: HTMLElement | null) => {
+      if (el && !isElementInViewport(el)) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    },
+    [isElementInViewport],
+  );
 
   // Scroll Effects
   useEffect(() => {
     if (highlightedDeadlineId && assignmentsWidgetRef.current) {
       // Check if it's an exam or assignment to scroll to correct widget
       const deadline = deadlines.find((d) => d.id === highlightedDeadlineId);
-      const targetRef = (deadline?.type === 'Exam' || deadline?.type === 'Quiz')
-        ? examsWidgetRef.current
-        : assignmentsWidgetRef.current;
+      const targetRef =
+        deadline?.type === 'Exam' || deadline?.type === 'Quiz'
+          ? examsWidgetRef.current
+          : assignmentsWidgetRef.current;
 
       setTimeout(() => {
         scrollIfNotVisible(targetRef);
@@ -389,7 +393,10 @@ export default function CalendarWidgets({
 
         {/* Exams Widget */}
         <MagicCard isLiquidEnhanced>
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={examsWidgetRef}>
+          <div
+            className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+            ref={examsWidgetRef}
+          >
             <Card className="border border-mq-border shadow-sm bg-mq-card-background">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between">
@@ -559,7 +566,8 @@ export default function CalendarWidgets({
                         key={unit.id}
                         className={cn(
                           'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                          highlightedUnitId === unit.id && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse bg-mq-primary/5',
+                          highlightedUnitId === unit.id &&
+                            'ring-2 ring-mq-primary ring-offset-1 animate-pulse bg-mq-primary/5',
                         )}
                         style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
                         onClick={() => onOpenUnitDetail(unit)}
@@ -606,7 +614,10 @@ export default function CalendarWidgets({
               : ''
           }
         >
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={eventsWidgetRef}>
+          <div
+            className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+            ref={eventsWidgetRef}
+          >
             <Card
               variant="glass"
               className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
@@ -715,7 +726,10 @@ export default function CalendarWidgets({
               : ''
           }
         >
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border" ref={todosWidgetRef}>
+          <div
+            className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+            ref={todosWidgetRef}
+          >
             <Card
               variant="glass"
               className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"

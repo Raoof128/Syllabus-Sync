@@ -241,11 +241,14 @@ export default function CalendarClient() {
   }, []);
 
   // Helper function to scroll only if element is not visible
-  const scrollIfNotVisible = useCallback((el: HTMLElement | null, block: ScrollLogicalPosition = 'center') => {
-    if (el && !isElementInViewport(el)) {
-      el.scrollIntoView({ behavior: 'smooth', block });
-    }
-  }, [isElementInViewport]);
+  const scrollIfNotVisible = useCallback(
+    (el: HTMLElement | null, block: ScrollLogicalPosition = 'center') => {
+      if (el && !isElementInViewport(el)) {
+        el.scrollIntoView({ behavior: 'smooth', block });
+      }
+    },
+    [isElementInViewport],
+  );
 
   // Highlighted unit derived from URL query parameter
   const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
@@ -307,10 +310,7 @@ export default function CalendarClient() {
   }, [highlightedDeadlineId, deadlines, scrollIfNotVisible]);
 
   // Highlighted todo derived from URL query parameter
-  const highlightedTodoId = useMemo(
-    () => searchParams.get('highlightTodo'),
-    [searchParams],
-  );
+  const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
 
   // Handle highlighted todo side effects (open detail panel)
   useEffect(() => {
@@ -340,10 +340,7 @@ export default function CalendarClient() {
   }, [highlightedTodoId, todos]);
 
   // Highlighted event derived from URL query parameter
-  const highlightedEventId = useMemo(
-    () => searchParams.get('highlightEvent'),
-    [searchParams],
-  );
+  const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
 
   // Handle highlighted event side effects (open detail panel)
   useEffect(() => {

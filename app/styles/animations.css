@@ -224,7 +224,7 @@
    Used for progress bars and loading states
    ============================================ */
 
-@keyframes shimmer {
+@keyframes shimmer-translate {
   0% {
     transform: translateX(-100%);
   }
@@ -234,7 +234,7 @@
 }
 
 .animate-shimmer {
-  animation: shimmer 2s ease-in-out infinite;
+  animation: shimmer-translate 2s ease-in-out infinite;
 }
 
 /* ============================================

@@ -40,7 +40,7 @@ export function createBrowserClient() {
       console.warn(
         '⚠️ Supabase not configured. Auth features disabled.\n' +
           'To enable auth, update .env.local with your Supabase credentials from:\n' +
-          'https://supabase.com/dashboard/project/_/settings/api'
+          'https://supabase.com/dashboard/project/_/settings/api',
       );
       browserWarningShown = true;
     }
@@ -49,22 +49,34 @@ export function createBrowserClient() {
       auth: {
         signUp: async () => ({
           data: { user: null, session: null },
-          error: { message: 'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.' }
+          error: {
+            message:
+              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+          },
         }),
         signInWithPassword: async () => ({
           data: { user: null, session: null },
-          error: { message: 'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.' }
+          error: {
+            message:
+              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+          },
         }),
         signOut: async () => ({ error: null }),
         getSession: async () => ({ data: { session: null }, error: null }),
         getUser: async () => ({ data: { user: null }, error: null }),
         resetPasswordForEmail: async () => ({
           data: null,
-          error: { message: 'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.' }
+          error: {
+            message:
+              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+          },
         }),
         updateUser: async () => ({
           data: { user: null },
-          error: { message: 'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.' }
+          error: {
+            message:
+              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+          },
         }),
         onAuthStateChange: (_event: string, callback: (event: string, session: null) => void) => {
           // Immediately call with null session to indicate no user

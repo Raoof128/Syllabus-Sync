@@ -64,15 +64,22 @@ const UserEventsWidget = memo(() => {
       })
       .sort((a, b) => {
         const dateA = a.startAt
-          ? (a.startAt instanceof Date ? a.startAt : new Date(a.startAt))
-          : (a.date instanceof Date ? a.date : new Date(a.date));
+          ? a.startAt instanceof Date
+            ? a.startAt
+            : new Date(a.startAt)
+          : a.date instanceof Date
+            ? a.date
+            : new Date(a.date);
         const dateB = b.startAt
-          ? (b.startAt instanceof Date ? b.startAt : new Date(b.startAt))
-          : (b.date instanceof Date ? b.date : new Date(b.date));
+          ? b.startAt instanceof Date
+            ? b.startAt
+            : new Date(b.startAt)
+          : b.date instanceof Date
+            ? b.date
+            : new Date(b.date);
         return dateA.getTime() - dateB.getTime();
       });
   }, [events]);
-
 
   const formatEventTime = (event: { startAt: Date; date: Date; time?: string }) => {
     const startDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
@@ -131,7 +138,10 @@ const UserEventsWidget = memo(() => {
           </div>
         ) : monthEndEvents.length === 0 ? (
           <div className="text-center py-8">
-            <Calendar className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4" aria-hidden="true" />
+            <Calendar
+              className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
+              aria-hidden="true"
+            />
             <p className="text-mq-content-tertiary">{tOr('noEventsYet', 'No events yet')}</p>
             <p className="text-mq-content-tertiary text-sm mt-1">
               {tOr('addEventsInCalendar', 'Add events in the Calendar tab')}
@@ -142,9 +152,13 @@ const UserEventsWidget = memo(() => {
             {monthEndEvents.map((event) => {
               const eventColor = event.color || categoryColors[event.category] || '#A6192E';
               const eventStartDate = event.startAt
-                ? (event.startAt instanceof Date ? event.startAt : new Date(event.startAt))
+                ? event.startAt instanceof Date
+                  ? event.startAt
+                  : new Date(event.startAt)
                 : event.date
-                  ? (event.date instanceof Date ? event.date : new Date(event.date))
+                  ? event.date instanceof Date
+                    ? event.date
+                    : new Date(event.date)
                   : null;
               const eventIsToday = eventStartDate ? isToday(eventStartDate) : false;
               const eventDateStr = eventStartDate ? format(eventStartDate, 'yyyy-MM-dd') : '';
@@ -157,7 +171,9 @@ const UserEventsWidget = memo(() => {
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
                   style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
-                  onClick={() => router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`)}
+                  onClick={() =>
+                    router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`)
+                  }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
@@ -175,7 +191,10 @@ const UserEventsWidget = memo(() => {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <h4 className="text-mq-sm font-medium text-mq-content truncate" title={event.title}>
+                      <h4
+                        className="text-mq-sm font-medium text-mq-content truncate"
+                        title={event.title}
+                      >
                         {event.title}
                       </h4>
                       {eventIsToday && (

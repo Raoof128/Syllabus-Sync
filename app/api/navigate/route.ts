@@ -48,6 +48,7 @@ const EXTENDED_BOUNDS = {
 interface CachedRoute {
   data: unknown;
   timestamp: number;
+  clientIP?: string;
 }
 const routeCache = new Map<string, CachedRoute>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -71,6 +72,11 @@ function getCachedRoute(key: string): unknown | null {
   if (!cached) return null;
   if (Date.now() - cached.timestamp > CACHE_TTL) {
     routeCache.delete(key);
+    if (cached.clientIP) {
+      const count = ipCacheCount.get(cached.clientIP) || 0;
+      if (count > 1) ipCacheCount.set(cached.clientIP, count - 1);
+      else ipCacheCount.delete(cached.clientIP);
+    }
     return null;
   }
   return cached.data;
@@ -90,9 +96,17 @@ function setCachedRoute(key: string, data: unknown, clientIP?: string): void {
   // Evict oldest entries if cache is full
   if (routeCache.size >= MAX_CACHE_SIZE) {
     const oldestKey = routeCache.keys().next().value;
-    if (oldestKey) routeCache.delete(oldestKey);
+    if (oldestKey) {
+      const evicted = routeCache.get(oldestKey);
+      if (evicted?.clientIP) {
+        const count = ipCacheCount.get(evicted.clientIP) || 0;
+        if (count > 1) ipCacheCount.set(evicted.clientIP, count - 1);
+        else ipCacheCount.delete(evicted.clientIP);
+      }
+      routeCache.delete(oldestKey);
+    }
   }
-  routeCache.set(key, { data, timestamp: Date.now() });
+  routeCache.set(key, { data, timestamp: Date.now(), clientIP });
 }
 
 /**
@@ -279,7 +293,7 @@ export async function POST(request: NextRequest) {
 
     // If no ORS_API_KEY, return demo route
     if (!ORS_API_KEY) {
-      console.warn('ORS_API_KEY not configured - returning demo route');
+      logger.warn('ORS_API_KEY not configured - returning demo route');
       const demoData = generateDemoRoute(start, end);
       setCachedRoute(cacheKey, demoData, clientIP);
 

@@ -101,6 +101,7 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
       }
 
       // Auto-retry after a short delay to allow React to settle
+      if (this.retryTimeout) clearTimeout(this.retryTimeout);
       this.retryTimeout = setTimeout(() => {
         this.setState((prev) => ({
           hasError: false,

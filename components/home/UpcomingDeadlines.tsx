@@ -140,13 +140,19 @@ const UpcomingDeadlines = memo(() => {
                       ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
                       : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
-                  onClick={() => router.push(`/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`)}
+                  onClick={() =>
+                    router.push(
+                      `/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`,
+                    )
+                  }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(`/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`);
+                      router.push(
+                        `/calendar?date=${deadlineDateStr}&highlightDeadline=${deadline.id}`,
+                      );
                     }
                   }}
                 >

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toastUtils } from '@/lib/utils/toast';
 import { devLog } from '@/lib/utils/devLog';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
@@ -43,19 +43,31 @@ export function useMapNavigation({
   const [navState, setNavState] = useState<NavigationState | null>(null);
   const [routeInstructions, setRouteInstructions] = useState<RouteInstruction[]>([]);
 
-  // Subscribe to navigation manager state
+  const isNavigatingRef = useRef(isNavigating);
+  const selectedBuildingRef = useRef(selectedBuilding);
+  const stopNavigationRef = useRef<() => void>(() => {});
+
   useEffect(() => {
-    if (navManagerRef.current) {
-      navManagerRef.current.setOnStateChange((state) => {
-        setNavState(state);
-        if (state.status === 'arrived' && isNavigating) {
-          mapLog.log('User arrived at destination!');
-          toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuilding?.name || '');
-          setIsNavigating(false);
-        }
-      });
-    }
-  }, [navManagerRef, isNavigating, selectedBuilding, safeT]);
+    isNavigatingRef.current = isNavigating;
+  }, [isNavigating]);
+  useEffect(() => {
+    selectedBuildingRef.current = selectedBuilding;
+  }, [selectedBuilding]);
+
+  // Subscribe to navigation manager state (register once)
+  useEffect(() => {
+    const mgr = navManagerRef.current;
+    if (!mgr) return;
+    mgr.setOnStateChange((state) => {
+      setNavState(state);
+      if (state.status === 'arrived' && isNavigatingRef.current) {
+        mapLog.log('User arrived at destination!');
+        toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuildingRef.current?.name || '');
+        setIsNavigating(false);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navManagerRef]);
 
   // Start Navigation
   const startNavigation = useCallback(() => {
@@ -102,6 +114,10 @@ export function useMapNavigation({
     mapLog.log('Navigation stopped');
   }, [navManagerRef]);
 
+  useEffect(() => {
+    stopNavigationRef.current = stopNavigation;
+  }, [stopNavigation]);
+
   // Route Fetching Effect
   useEffect(() => {
     let active = true;
@@ -112,7 +128,7 @@ export function useMapNavigation({
         setRouteCoords([]);
         setGpsRouteCoords([]);
         setRouteInstructions([]);
-        if (isNavigating) stopNavigation();
+        if (isNavigatingRef.current) stopNavigationRef.current();
         return;
       }
 
@@ -166,7 +182,7 @@ export function useMapNavigation({
       active = false;
       clearTimeout(timer);
     };
-  }, [selectedBuilding, origin, isNavigating, stopNavigation, gpsToCrsSimple, getBuildingLatLng]);
+  }, [selectedBuilding, origin, gpsToCrsSimple, getBuildingLatLng]);
 
   return {
     isNavigating,

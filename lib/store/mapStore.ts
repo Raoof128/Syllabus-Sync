@@ -6,7 +6,7 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { MapOverlayId } from '@/lib/map/mapOverlays';
+import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 
 export interface MapState {
   // Active overlay layers
@@ -115,11 +115,11 @@ export const parseOverlaysFromURL = (searchParams: URLSearchParams): MapOverlayI
   const layersParam = searchParams.get('layers');
   if (!layersParam) return [];
 
-  const validOverlays: MapOverlayId[] = ['parking', 'water', 'accessibility', 'permits', 'exam', 'walk'];
+  const validOverlayIds = mapOverlays.map((o) => o.id);
 
   return layersParam
     .split(',')
-    .filter((id): id is MapOverlayId => validOverlays.includes(id as MapOverlayId));
+    .filter((id): id is MapOverlayId => validOverlayIds.includes(id as MapOverlayId));
 };
 
 // Helper to create URL query string from overlays

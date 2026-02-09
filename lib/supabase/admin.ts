@@ -43,7 +43,7 @@ export function createAdminClient() {
       console.warn(
         '⚠️ Supabase admin client not configured. Admin features disabled.\n' +
           'To enable admin features, add SUPABASE_SERVICE_ROLE_KEY to .env.local\n' +
-          'Get it from: https://supabase.com/dashboard/project/_/settings/api'
+          'Get it from: https://supabase.com/dashboard/project/_/settings/api',
       );
       adminWarningShown = true;
     }

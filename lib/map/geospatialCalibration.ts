@@ -339,9 +339,11 @@ export function getAffineCoefficients(): AffineCoefficients {
   if (!_cachedCoeffs) {
     _cachedCoeffs = computeAffineCoefficients(GROUND_CONTROL_POINTS);
     _cachedRmse = computeRMSE(_cachedCoeffs, GROUND_CONTROL_POINTS);
-    console.warn(
-      `[GeoCalibration] Affine transformation computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} px`,
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[GeoCalibration] Affine transformation computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} px`,
+      );
+    }
   }
   return _cachedCoeffs;
 }

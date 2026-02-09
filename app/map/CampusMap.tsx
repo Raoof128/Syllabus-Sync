@@ -288,16 +288,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
             const openPopupForBuilding = () => {
               try {
+                const targetLatLng = getBuildingCrsCoords(selectedBuildingProp);
                 map.eachLayer((layer) => {
                   if (layer instanceof leafletModule.Marker) {
-                    const marker = layer as import('leaflet').Marker;
-                    const popupContent = marker.getPopup()?.getContent();
+                    const markerPos = layer.getLatLng();
                     if (
-                      popupContent &&
-                      typeof popupContent === 'string' &&
-                      popupContent.includes(selectedBuildingProp.id)
+                      Math.abs(markerPos.lat - targetLatLng.lat) < 1 &&
+                      Math.abs(markerPos.lng - targetLatLng.lng) < 1
                     ) {
-                      marker.openPopup();
+                      layer.openPopup();
                     }
                   }
                 });
