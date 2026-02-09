@@ -169,35 +169,47 @@ export default function MapClient() {
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
   const autoNavigate = searchParams.get('autonav') === 'true';
 
-  // Sync overlays from URL when searchParams change (supports back/forward navigation)
+  // Ref-based lock to prevent URL↔store feedback loops.
+  // 'url' = URL just wrote to store (suppress store→URL echo)
+  // 'store' = store just wrote to URL (suppress URL→store echo)
+  const syncLockRef = useRef<'url' | 'store' | null>(null);
+
+  // URL → store: only fires when searchParams change (back/forward or initial load)
   useEffect(() => {
-    const urlOverlays = parseOverlaysFromURL(searchParams);
+    if (syncLockRef.current === 'store') return;
     const layersParam = searchParams.get('layers') || '';
-    const currentParam = overlaysToURLParam(activeOverlays);
-    // Only update store if URL differs from current store state (avoid loops)
-    if (layersParam && layersParam !== currentParam) {
-      setOverlays(urlOverlays);
-    }
-  }, [searchParams, activeOverlays, setOverlays]);
+    if (!layersParam) return;
 
-  // Update URL when overlays change (without navigating)
+    const urlOverlays = parseOverlaysFromURL(searchParams);
+    syncLockRef.current = 'url';
+    setOverlays(urlOverlays);
+    queueMicrotask(() => {
+      syncLockRef.current = null;
+    });
+  }, [searchParams, setOverlays]);
+
+  // Store → URL: fires when activeOverlays change (user toggle)
   useEffect(() => {
-    const layersParam = overlaysToURLParam(activeOverlays);
-    const currentLayers = searchParams.get('layers') || '';
+    if (syncLockRef.current === 'url') return;
 
-    // Only update URL if layers actually changed
-    if (layersParam !== currentLayers) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (layersParam) {
-        params.set('layers', layersParam);
-      } else {
-        params.delete('layers');
-      }
+    const nextParam = overlaysToURLParam(activeOverlays);
+    const currentParam = searchParams.get('layers') || '';
 
-      // Use replace to avoid adding to history
-      const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-      window.history.replaceState({}, '', newUrl);
+    if (nextParam === currentParam) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextParam) {
+      params.set('layers', nextParam);
+    } else {
+      params.delete('layers');
     }
+
+    syncLockRef.current = 'store';
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+    window.history.replaceState({}, '', newUrl);
+    queueMicrotask(() => {
+      syncLockRef.current = null;
+    });
   }, [activeOverlays, searchParams]);
 
   // Auto-scroll and notify when arriving with a building + autonav flag

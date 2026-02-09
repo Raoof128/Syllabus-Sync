@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Map Layer Crash Fix — 2026-02-10
+
+**Scope:** Fix crash when toggling map overlay layers
+**Type:** Bug fix
+
+#### Bugs Fixed
+
+1. **URL↔store infinite loop** (`MapClient.tsx`) — Effect 1 (URL→store sync) included `activeOverlays` in its dependency array. When user toggled an overlay OFF, the effect re-fired, saw the stale URL still had the old layer, and re-added it to the store — undoing the toggle. This caused state thrashing / "Maximum update depth exceeded". **Fix:** Removed `activeOverlays` from effect 1 deps. Added a ref-based lock (`syncLockRef`) with `queueMicrotask` release so the two sync effects (URL→store, store→URL) never fight.
+
+2. **Pane remount stale DOM reference** (`MapOverlays.tsx`) — Component returned `null` when no overlays were active, unmounting the `<Pane>`. On re-toggle, `map.createPane('campus-overlays')` returned the old Leaflet reference whose DOM element had been removed by React unmount. ImageOverlay then rendered into a stale/detached DOM node. **Fix:** Pane is now always mounted when `overlaysReady` is true; only the ImageOverlay children are conditional.
+
+#### Files Changed
+
+- `app/map/MapClient.tsx` — Rewrote URL↔store sync with ref lock, removed `activeOverlays` from URL→store effect deps
+- `app/map/components/MapOverlays.tsx` — Pane always rendered when ready, removed unused `mapOverlays` import
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build)
+
+---
+
 ### Raouf: Map Overlay System Rebuild — 2026-02-10
 
 **Scope:** End-to-end rebuild of map overlay layers

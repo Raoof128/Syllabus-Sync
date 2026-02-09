@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { mapOverlays, mapOverlayById, type MapOverlayId } from '@/lib/map/mapOverlays';
+import { mapOverlayById, type MapOverlayId } from '@/lib/map/mapOverlays';
 import type { ReactLeafletModule } from '@/lib/hooks/useLeafletLoader';
 
 interface MapOverlaysProps {
@@ -12,6 +12,9 @@ interface MapOverlaysProps {
  * Declarative overlay renderer.
  * Renders active overlays as react-leaflet ImageOverlay components inside a
  * dedicated Pane with pointer-events disabled so overlays never steal clicks.
+ *
+ * The Pane is always mounted (when overlaysReady) to avoid Leaflet stale-pane
+ * issues on remount. Only the ImageOverlay children are conditional.
  */
 export function MapOverlays({
   reactLeafletModule,
@@ -29,7 +32,7 @@ export function MapOverlays({
     [activeOverlays],
   );
 
-  if (!overlaysReady || activeConfigs.length === 0) return null;
+  if (!overlaysReady) return null;
 
   return (
     <Pane name="campus-overlays" style={{ zIndex: 450, pointerEvents: 'none' }}>
