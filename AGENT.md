@@ -466,3 +466,12 @@ Summary: Extracted 100 location entries from maps/source/m.html, cross-reference
 Files: lib/map/buildings.ts (35 new building entries), locales/{ar,bn,en,es,fa,fr,he,hi,id,it,ja,ko,ms,ru,ta,th,ur,vi,zh}/translations.json (70 keys each).
 Verification: npm run check passes — secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓.
 Follow-ups: None — all new buildings auto-appear in CampusMap markers, BuildingAutocomplete, and search.
+
+---
+
+Raouf: 2026-02-10 10:53 AEDT
+Scope: Fix Round 6 building position offsets — BUILDING_PIXEL_OFFSET_X correction
+Summary: Fixed all 35 new buildings from Round 6 rendering 110px too far right on the map. Root cause: `getBuildingCrsCoords()` adds `BUILDING_PIXEL_OFFSET_X = 110` to stored position.x before converting to CRS.Simple coordinates. Existing buildings' stored positions already account for this offset (hand-placed via position editor), but Round 6 buildings were derived from GPS using `x = (lng - WEST) / (EAST - WEST) * WIDTH` which gives "true pixel" positions — so the +110 shift made them 110px too far right. Fix: subtracted 110 from the x-coordinate of all 35 new buildings.
+Files: `lib/map/buildings.ts` (35 position corrections).
+Verification: `npm run check` ✅ (all pass).
+Follow-ups: None.

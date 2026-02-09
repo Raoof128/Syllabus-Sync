@@ -1774,7 +1774,7 @@ export const buildings: Building[] = [
   {
     id: 'LBNMQ',
     name: '1919 Lanzhou Beef Noodle',
-    position: [2409, 1795],
+    position: [2299, 1795],
     description: 'Chinese hand-pulled noodle restaurant on campus.',
     tags: ['food', 'restaurant', 'noodles'],
     translationKey: 'building_LBNMQ_name',
@@ -1786,7 +1786,7 @@ export const buildings: Building[] = [
   {
     id: 'BKCMQ',
     name: 'BAP Korean',
-    position: [2525, 1735],
+    position: [2415, 1735],
     description: 'Korean cuisine restaurant on campus.',
     tags: ['food', 'restaurant', 'korean'],
     translationKey: 'building_BKCMQ_name',
@@ -1798,7 +1798,7 @@ export const buildings: Building[] = [
   {
     id: 'BJMQ',
     name: 'Boost Juice',
-    position: [2272, 1550],
+    position: [2162, 1550],
     description: 'Juice and smoothie bar.',
     tags: ['food', 'drinks', 'juice'],
     translationKey: 'building_BJMQ_name',
@@ -1810,7 +1810,7 @@ export const buildings: Building[] = [
   {
     id: 'CTMQ',
     name: 'Chatime',
-    position: [2523, 1833],
+    position: [2413, 1833],
     description: 'Bubble tea and drinks.',
     tags: ['food', 'drinks', 'bubble tea'],
     translationKey: 'building_CTMQ_name',
@@ -1822,7 +1822,7 @@ export const buildings: Building[] = [
   {
     id: 'EIMQ',
     name: 'Eat Istanbul',
-    position: [2536, 1445],
+    position: [2426, 1445],
     description: 'Turkish restaurant on campus.',
     tags: ['food', 'restaurant', 'turkish'],
     translationKey: 'building_EIMQ_name',
@@ -1834,7 +1834,7 @@ export const buildings: Building[] = [
   {
     id: 'IMMQ',
     name: 'Iguanas Mexicana',
-    position: [2277, 1553],
+    position: [2167, 1553],
     description: 'Mexican food on campus.',
     tags: ['food', 'restaurant', 'mexican'],
     translationKey: 'building_IMMQ_name',
@@ -1846,7 +1846,7 @@ export const buildings: Building[] = [
   {
     id: 'IGGMQ',
     name: 'Indi Go-Go',
-    position: [2277, 1553],
+    position: [2167, 1553],
     description: 'Indian food on campus.',
     tags: ['food', 'restaurant', 'indian'],
     translationKey: 'building_IGGMQ_name',
@@ -1858,7 +1858,7 @@ export const buildings: Building[] = [
   {
     id: 'LGBMQ',
     name: 'Lashings Gourmet Burgers',
-    position: [2381, 1543],
+    position: [2271, 1543],
     description: 'Gourmet burger restaurant on campus.',
     tags: ['food', 'restaurant', 'burgers'],
     translationKey: 'building_LGBMQ_name',
@@ -1870,7 +1870,7 @@ export const buildings: Building[] = [
   {
     id: 'LAMQ',
     name: 'Little Asia',
-    position: [2373, 1560],
+    position: [2263, 1560],
     description: 'Asian food court on campus.',
     tags: ['food', 'restaurant', 'asian'],
     translationKey: 'building_LAMQ_name',
@@ -1882,7 +1882,7 @@ export const buildings: Building[] = [
   {
     id: 'MSMQ',
     name: 'Monster Sushi',
-    position: [2437, 1791],
+    position: [2327, 1791],
     description: 'Sushi restaurant on campus.',
     tags: ['food', 'restaurant', 'sushi', 'japanese'],
     translationKey: 'building_MSMQ_name',
@@ -1894,7 +1894,7 @@ export const buildings: Building[] = [
   {
     id: 'PRMQ',
     name: 'PappaRich',
-    position: [2462, 1789],
+    position: [2352, 1789],
     description: 'Malaysian cuisine restaurant on campus.',
     tags: ['food', 'restaurant', 'malaysian'],
     translationKey: 'building_PRMQ_name',
@@ -1906,7 +1906,7 @@ export const buildings: Building[] = [
   {
     id: 'RMQ',
     name: "Roll'd",
-    position: [2238, 1789],
+    position: [2128, 1789],
     description: 'Vietnamese rice paper rolls and pho.',
     tags: ['food', 'restaurant', 'vietnamese'],
     translationKey: 'building_RMQ_name',
@@ -1918,7 +1918,7 @@ export const buildings: Building[] = [
   {
     id: 'SOMQ',
     name: 'Soul Origin',
-    position: [2447, 1549],
+    position: [2337, 1549],
     description: 'Fresh healthy meals, salads, and coffee.',
     tags: ['food', 'cafe', 'healthy'],
     translationKey: 'building_SOMQ_name',
@@ -1930,7 +1930,7 @@ export const buildings: Building[] = [
   {
     id: 'SLCMQ',
     name: 'St Laurent Coffee',
-    position: [2502, 1517],
+    position: [2392, 1517],
     description: 'Specialty coffee shop on campus.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_SLCMQ_name',
@@ -1942,7 +1942,7 @@ export const buildings: Building[] = [
   {
     id: 'SWMQ',
     name: 'Sushi World',
-    position: [2418, 1483],
+    position: [2308, 1483],
     description: 'Sushi and Japanese takeaway on campus.',
     tags: ['food', 'restaurant', 'sushi', 'japanese'],
     translationKey: 'building_SWMQ_name',
@@ -1954,7 +1954,7 @@ export const buildings: Building[] = [
   {
     id: 'TBMQ',
     name: 'Taste Baguette',
-    position: [2541, 1498],
+    position: [2431, 1498],
     description: 'Bakery and cafe serving baguettes and pastries.',
     tags: ['food', 'cafe', 'bakery'],
     translationKey: 'building_TBMQ_name',
@@ -1966,7 +1966,7 @@ export const buildings: Building[] = [
   {
     id: 'BUMQ',
     name: '(BREW)us',
-    position: [3032, 858],
+    position: [2922, 858],
     description: 'Coffee and brunch spot near Macquarie University Station.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_BUMQ_name',
@@ -1978,7 +1978,7 @@ export const buildings: Building[] = [
   {
     id: 'ECMQ',
     name: 'esc Cafe',
-    position: [3529, 1955],
+    position: [3419, 1955],
     description: 'Cafe near the eastern campus precinct.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_ECMQ_name',
@@ -1990,7 +1990,7 @@ export const buildings: Building[] = [
   {
     id: 'CCMQ',
     name: 'Crunch Cafe',
-    position: [1698, 1022],
+    position: [1588, 1022],
     description: 'Cafe near the Sport & Aquatic Centre.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_CCMQ_name',
@@ -2002,7 +2002,7 @@ export const buildings: Building[] = [
   {
     id: 'WWC',
     name: 'MQH Cafe',
-    position: [3693, 1500],
+    position: [3583, 1500],
     description: 'Cafe at Macquarie University Hospital precinct.',
     tags: ['food', 'cafe', 'hospital'],
     translationKey: 'building_WWC_name',
@@ -2014,7 +2014,7 @@ export const buildings: Building[] = [
   {
     id: 'PICCOLO',
     name: 'Piccolo Me',
-    position: [2073, 2765],
+    position: [1963, 2765],
     description: 'Specialty coffee and food.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_PICCOLO_name',
@@ -2028,7 +2028,7 @@ export const buildings: Building[] = [
   {
     id: 'PSOUTH2',
     name: 'Carpark P South 2',
-    position: [2626, 2692],
+    position: [2516, 2692],
     description: 'Car park in the south of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PSOUTH2_name',
@@ -2039,7 +2039,7 @@ export const buildings: Building[] = [
   {
     id: 'PEAST3',
     name: 'Carpark P East 3',
-    position: [3299, 2272],
+    position: [3189, 2272],
     description: 'Car park in the east of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PEAST3_name',
@@ -2050,7 +2050,7 @@ export const buildings: Building[] = [
   {
     id: 'PEAST2',
     name: 'Carpark P East 2',
-    position: [3343, 1932],
+    position: [3233, 1932],
     description: 'Car park in the east of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PEAST2_name',
@@ -2061,7 +2061,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST5',
     name: 'Carpark P West 5',
-    position: [1359, 1520],
+    position: [1249, 1520],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST5_name',
@@ -2072,7 +2072,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST4',
     name: 'Carpark P West 4',
-    position: [1345, 2877],
+    position: [1235, 2877],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST4_name',
@@ -2083,7 +2083,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST3',
     name: 'Carpark P West 3',
-    position: [1619, 2357],
+    position: [1509, 2357],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST3_name',
@@ -2096,7 +2096,7 @@ export const buildings: Building[] = [
   {
     id: 'HEALTHP1',
     name: 'MQ Health Disability Parking',
-    position: [3459, 1136],
+    position: [3349, 1136],
     description: 'Disability parking for Macquarie University Clinic.',
     tags: ['parking', 'accessibility', 'hospital'],
     translationKey: 'building_HEALTHP1_name',
@@ -2108,7 +2108,7 @@ export const buildings: Building[] = [
   {
     id: 'HEALTHP2',
     name: 'Macquarie Hospital Parking',
-    position: [3461, 1753],
+    position: [3351, 1753],
     description: 'Parking for Macquarie University Hospital and Clinic.',
     tags: ['parking', 'hospital'],
     translationKey: 'building_HEALTHP2_name',
@@ -2121,7 +2121,7 @@ export const buildings: Building[] = [
   {
     id: '130HR',
     name: 'Central Courtyard Accommodation',
-    position: [2570, 1570],
+    position: [2460, 1570],
     description: 'On-campus student accommodation near Central Courtyard.',
     tags: ['accommodation', 'residential', 'housing'],
     translationKey: 'building_130HR_name',
@@ -2133,7 +2133,7 @@ export const buildings: Building[] = [
   {
     id: '136HR',
     name: 'Morling Residential Cottage',
-    position: [2668, 3405],
+    position: [2558, 3405],
     description: 'Residential cottage on the southern edge of campus.',
     tags: ['accommodation', 'residential', 'housing'],
     translationKey: 'building_136HR_name',
@@ -2147,7 +2147,7 @@ export const buildings: Building[] = [
   {
     id: 'BIKEHUB',
     name: 'Central BikeHub',
-    position: [2218, 2117],
+    position: [2108, 2117],
     description: 'Central bike storage and repair hub on campus.',
     tags: ['transport', 'cycling', 'bike'],
     translationKey: 'building_BIKEHUB_name',
@@ -2158,7 +2158,7 @@ export const buildings: Building[] = [
   {
     id: 'BIKEHUBE',
     name: 'Eastern BikeHub',
-    position: [2943, 1651],
+    position: [2833, 1651],
     description: 'Bike storage and repair hub in the eastern precinct.',
     tags: ['transport', 'cycling', 'bike'],
     translationKey: 'building_BIKEHUBE_name',
@@ -2171,7 +2171,7 @@ export const buildings: Building[] = [
   {
     id: 'MUSE',
     name: 'MUSE (MQ University Study Experience)',
-    position: [2233, 1735],
+    position: [2123, 1735],
     description: 'Collaborative study space and student experience hub.',
     tags: ['study', 'academic', 'student'],
     translationKey: 'building_MUSE_name',
@@ -2185,7 +2185,7 @@ export const buildings: Building[] = [
   {
     id: 'BBALL',
     name: 'Basketball Courts',
-    position: [1919, 1369],
+    position: [1809, 1369],
     description: 'Outdoor basketball courts on campus.',
     tags: ['sports', 'basketball', 'recreation'],
     translationKey: 'building_BBALL_name',

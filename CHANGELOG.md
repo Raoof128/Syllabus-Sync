@@ -359,3 +359,20 @@ All notable changes to this project will be documented in this file.
 #### Verification
 
 - `npm run check` passes: secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓
+
+### Raouf: 2026-02-10 10:53 AEDT — Fix Round 6 Building Position Offsets
+
+#### What changed
+
+- Fixed all 35 new buildings rendering **110px too far right** on the map
+- Root cause: `getBuildingCrsCoords()` adds `BUILDING_PIXEL_OFFSET_X = 110` to stored `position[0]`. Round 6 GPS→pixel conversion gave "true pixel" positions, so the +110 double-shifted markers rightward.
+- Fix: subtracted 110 from the x-coordinate of all 35 new buildings' stored positions
+- No existing building positions were affected
+
+#### Files modified
+
+- `lib/map/buildings.ts` — 35 position x-coordinate corrections (each -110)
+
+#### Verification
+
+- `npm run check` passes: secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓
