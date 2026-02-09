@@ -69,7 +69,9 @@ export function MapController({
       map.setMaxBounds(PIXEL_BOUNDS);
       map.setMaxZoom(3);
       map.fitBounds(PIXEL_BOUNDS, { padding: [20, 20] });
-      map.setMinZoom(map.getZoom());
+      // Allow zooming out 1.5 levels below the fitted zoom so users
+      // can see the full campus with some surrounding space.
+      map.setMinZoom(map.getZoom() - 1.5);
     } catch (error) {
       mapLog.log('Map setup error:', error);
     }

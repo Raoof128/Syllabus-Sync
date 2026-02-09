@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Map Zoom Shake Fix + Extended Zoom Out — 2026-02-10
+
+**Scope:** Fix map shaking on zoom + allow more zoom out
+**Type:** Bug fix / UX improvement
+
+#### Issues Fixed
+
+1. **Map shaking/jitter on zoom** (`leaflet.css`) — Three CSS rules fought Leaflet's internal JS-driven zoom animation:
+   - `.leaflet-zoom-animated { transition: transform 0.25s ... }` — CSS transition competed with Leaflet's programmatic transform updates, causing the image to oscillate.
+   - `.leaflet-image-layer { transform: translateZ(0); will-change: opacity, transform }` — Forced a compositor layer with a competing static transform.
+   - `.leaflet-overlay-pane { transform: translateZ(0); will-change: transform }` — Same issue on the overlay pane.
+   All three removed. Leaflet manages its own transforms; CSS must not override them.
+
+2. **Zoom-out too restrictive** (`MapController.tsx`) — `map.setMinZoom(map.getZoom())` after `fitBounds` locked the minimum zoom to the exact fitted level, preventing any zoom out. Changed to `map.getZoom() - 1.5` to allow 1.5 zoom levels below the fitted campus view.
+
+3. **Edge rubber-banding** (`CampusMap.tsx`) — `maxBoundsViscosity={0.5}` caused an elastic bounce when panning near map edges, contributing to the shaking feel. Changed to `1.0` (hard stop, no bounce).
+
+#### Files Changed
+
+- `app/styles/leaflet.css` — Removed `transition`, `transform: translateZ(0)`, and `will-change` from `.leaflet-zoom-animated`, `.leaflet-image-layer`, and `.leaflet-overlay-pane`
+- `app/map/components/MapController.tsx` — `setMinZoom(getZoom() - 1.5)` instead of `setMinZoom(getZoom())`
+- `app/map/CampusMap.tsx` — `maxBoundsViscosity={1.0}` instead of `0.5`
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build)
+
+---
+
 ### Raouf: Map Layer Crash Fix — 2026-02-10
 
 **Scope:** Fix crash when toggling map overlay layers

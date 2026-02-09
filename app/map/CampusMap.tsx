@@ -324,7 +324,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             zoomDelta={0.5}
             inertia
             inertiaDeceleration={3000}
-            maxBoundsViscosity={0.5}
+            maxBoundsViscosity={1.0}
             style={{ height: '100%', width: '100%' }}
           >
             <MapController

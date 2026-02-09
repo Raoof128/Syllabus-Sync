@@ -43,16 +43,12 @@
   /* High quality image rendering - use auto for better upscaling */
   image-rendering: auto;
   image-rendering: -webkit-optimize-contrast;
-  /* Hardware acceleration for smooth transitions */
+  /* Prevent subpixel rendering issues */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  /* Force GPU rendering layer */
-  transform: translateZ(0);
-  -webkit-transform: translate3d(0, 0, 0);
-  /* Smooth transitions when changing layers */
-  transition: opacity 0.3s ease-in-out;
-  /* Prevent subpixel rendering issues */
-  will-change: opacity, transform;
+  /* NOTE: Do NOT set transform or will-change here — Leaflet manages
+     its own transforms on image layers via JS. Competing CSS transforms
+     cause the map image to shake/jitter during zoom. */
 }
 
 /* Base map and overlay layers - highest quality */
@@ -70,19 +66,16 @@
 
 /* Ensure overlays scale smoothly when zooming */
 .leaflet-overlay-pane {
-  /* GPU acceleration */
-  transform: translateZ(0);
-  will-change: transform;
   /* Smooth layer stacking */
   isolation: isolate;
+  /* NOTE: Do NOT set transform or will-change here — Leaflet positions
+     overlay panes via inline transforms. CSS overrides cause jitter. */
 }
 
-/* Prevent blur on transform/zoom */
-.leaflet-zoom-animated {
-  will-change: transform;
-  /* Smooth zoom transition */
-  transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
-}
+/* NOTE: Do NOT add transition or will-change on .leaflet-zoom-animated —
+   Leaflet drives zoom animation via JS transforms. A CSS transition
+   on transform creates a competing animation that causes the map
+   image to shake/oscillate during zoom. */
 
 /* Handle overlays with different aspect ratios */
 .overlay-different-aspect {

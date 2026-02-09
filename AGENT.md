@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Map Zoom Shake Fix + Extended Zoom Out
+Summary: Fixed two map UX issues. (1) **Zoom shaking/jitter**: `leaflet.css` had `transition: transform 0.25s` on `.leaflet-zoom-animated`, creating a CSS transition that competed with Leaflet's own JS-driven zoom animation — causing the map image to oscillate/shake on zoom. Also had `transform: translateZ(0)` and `will-change: opacity, transform` on `.leaflet-image-layer` and `.leaflet-overlay-pane`, creating competing compositor layers. Removed all three offending CSS rules. (2) **Zoom-out range too restrictive**: `MapController.tsx` set `minZoom = map.getZoom()` after `fitBounds`, locking zoom to the fitted level. Changed to `map.getZoom() - 1.5` to allow 1.5 levels of zoom out below the fitted campus view. (3) **Edge rubber-banding**: `maxBoundsViscosity` was 0.5 (elastic) in CampusMap.tsx, causing a springy bounce at map edges that contributed to the shaking feel. Changed to 1.0 (hard stop).
+Files: Modified 3 files: `app/styles/leaflet.css` (removed competing transforms/transitions), `app/map/components/MapController.tsx` (minZoom lowered), `app/map/CampusMap.tsx` (maxBoundsViscosity → 1.0).
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build all pass).
+Follow-ups: None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Map Layer Crash Fix — URL↔store loop + Pane remount
 Summary: Fixed two bugs causing map page crash when toggling overlays. (1) **URL↔store infinite loop**: Effect 1 (URL→store) had `activeOverlays` in its dependency array, causing it to re-fire on every store change and re-add overlays the user just removed (URL still had old value). Fixed by removing `activeOverlays` from deps and adding a ref-based lock (`syncLockRef`) with `queueMicrotask` release to prevent the two sync effects from fighting. (2) **Pane remount stale reference**: `MapOverlays` returned `null` when `activeConfigs.length === 0`, unmounting the `<Pane>`. On re-toggle, Leaflet's `createPane` returned a stale reference to the removed DOM element. Fixed by always rendering the Pane when `overlaysReady` is true (only ImageOverlay children are conditional). Also removed unused `mapOverlays` import from MapOverlays.tsx.
 Files: Modified 2 files: `app/map/MapClient.tsx` (URL sync rewrite), `app/map/components/MapOverlays.tsx` (Pane always mounted).
