@@ -457,3 +457,12 @@ Summary: Completed file-by-file audit of every map page file (17 files across ap
 Files: No files modified (audit-only).
 Verification: `npm run typecheck` ✅ (0 errors); `npx eslint app/map/` ✅ (0 errors); `npx vitest run tests/map` ✅ (52/52 passed); Supabase REST API ✅; Supabase Auth ✅; Supabase Storage ✅; `supabase migration list` ✅.
 Follow-ups: (1) Some local migrations exist only remotely and vice versa — run `supabase db push` when ready to sync. (2) Docker Desktop required for `supabase db dump`/`supabase status` locally. (3) Storage buckets are empty — no map assets stored in Supabase Storage (map raster served from `/public/maps/`).
+
+---
+
+Raouf: 2026-02-10 10:34 AEDT
+Scope: Add 35 new campus locations from HTML/PDF sources (Round 6)
+Summary: Extracted 100 location entries from maps/source/m.html, cross-referenced against 118 existing buildings, deduplicated to 35 truly new unique locations. Added all 35 to lib/map/buildings.ts with correct pixel coords (GPS→pixel conversion), categories, i18n keys, and GPS locations. Added 70 translation keys (35 name + 35 desc) across all 19 locale files. New locations include 21 food venues, 6 car parks, 2 hospital parking areas, 2 accommodation, 2 bike hubs, 1 study space, 1 sports facility.
+Files: lib/map/buildings.ts (35 new building entries), locales/{ar,bn,en,es,fa,fr,he,hi,id,it,ja,ko,ms,ru,ta,th,ur,vi,zh}/translations.json (70 keys each).
+Verification: npm run check passes — secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓.
+Follow-ups: None — all new buildings auto-appear in CampusMap markers, BuildingAutocomplete, and search.

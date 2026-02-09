@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
    - `.leaflet-zoom-animated { transition: transform 0.25s ... }` — CSS transition competed with Leaflet's programmatic transform updates, causing the image to oscillate.
    - `.leaflet-image-layer { transform: translateZ(0); will-change: opacity, transform }` — Forced a compositor layer with a competing static transform.
    - `.leaflet-overlay-pane { transform: translateZ(0); will-change: transform }` — Same issue on the overlay pane.
-   All three removed. Leaflet manages its own transforms; CSS must not override them.
+     All three removed. Leaflet manages its own transforms; CSS must not override them.
 
 2. **Zoom-out too restrictive** (`MapController.tsx`) — `map.setMinZoom(map.getZoom())` after `fitBounds` locked the minimum zoom to the exact fitted level, preventing any zoom out. Changed to `map.getZoom() - 1.5` to allow 1.5 zoom levels below the fitted campus view.
 
@@ -334,3 +334,28 @@ All notable changes to this project will be documented in this file.
 #### Verification
 
 - `npm run check` passes: secrets ✓ format ✓ typecheck ✓ lint ✓ test (396/396) ✓ build ✓
+
+### Raouf: 2026-02-10 10:34 AEDT — Round 6: Add 35 New Campus Locations
+
+#### What changed
+
+- Added 35 new unique campus locations to `lib/map/buildings.ts`:
+  - **Food & Drink (21):** 1919 Lanzhou Beef Noodle, BAP Korean, Boost Juice, Chatime, Eat Istanbul, Iguanas Mexicana, Indi Go-Go, Lashings Gourmet Burgers, Little Asia, Monster Sushi, PappaRich, Roll'd, Soul Origin, St Laurent Coffee, Sushi World, Taste Baguette, (BREW)us, esc Cafe, Crunch Cafe, MQH Cafe, Piccolo Me
+  - **Parking (6):** P South 2, P East 3, P East 2, P West 5, P West 4, P West 3
+  - **Hospital Parking (2):** MQ Health Disability Parking, Macquarie Hospital Parking
+  - **Accommodation (2):** Central Courtyard Accommodation, Morling Residential Cottage
+  - **Bike Infrastructure (2):** Central BikeHub, Eastern BikeHub
+  - **Study Spaces (1):** MUSE
+  - **Sports (1):** Basketball Courts
+- Added 70 i18n translation keys (35 name + 35 desc) across all 19 locales
+- Source: `maps/source/m.html` (100 entries parsed, 35 unique after dedup)
+- GPS→pixel coordinate conversion for CRS.Simple map alignment
+
+#### Files modified
+
+- `lib/map/buildings.ts` — 35 new building entries
+- `locales/*/translations.json` — 70 new keys in all 19 locale files
+
+#### Verification
+
+- `npm run check` passes: secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓
