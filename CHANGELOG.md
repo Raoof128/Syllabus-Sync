@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Map Page Audit Round 2 — 4 Findings Fixed — 2026-02-10
+
+**Scope:** Follow-up file-by-file audit of map module, fixing remaining issues from previous audit
+**Type:** Bug fix / Performance / Code quality
+
+#### Fixes Applied
+
+1. **Wrapped `centerOnUser` in `useCallback`** (`useMapLocation.ts`) — was a plain function creating a new reference every render; now memoized with proper deps (`mapInstance`, `isMapReady`, `locationStatus`)
+2. **Replaced `console.error` with `mapLog.error`** (`CampusMap.tsx`) — campus image load error handler used raw `console.error`; now uses the project's `devLog.map` utility for consistent logging
+3. **Added `ImageOverlay` to `ReactLeafletComponents` type** (`leafletTypes.ts`) — interface was missing `ImageOverlay` which is used in `CampusMap.tsx`; also added JSDoc cross-reference to the runtime `ReactLeafletModule` type
+4. **Added `AbortController` to ORS route fetch** (`useMapNavigation.ts`, `lib/services/ors.ts`) — replaced boolean `active` flag with proper `AbortController`; in-flight fetch requests are now cancelled on effect cleanup; added `AbortError` handling in `fetchORSRoute`
+
+#### Files Changed
+
+- `app/map/hooks/useMapLocation.ts` — `centerOnUser` wrapped in `useCallback`
+- `app/map/CampusMap.tsx` — `console.error` → `mapLog.error`
+- `lib/map/leafletTypes.ts` — added `ImageOverlay` to `ReactLeafletComponents`
+- `lib/services/ors.ts` — added optional `signal` param, `AbortError` handling
+- `app/map/hooks/useMapNavigation.ts` — `AbortController` replaces boolean flag
+- `tests/map/useMapNavigation.test.ts` — updated assertion to expect `AbortSignal`
+
 ### Raouf: Map Page Production Audit — 25 Findings Fixed — 2026-02-09
 
 **Scope:** Full file-by-file audit of map page module (30+ files), all findings fixed

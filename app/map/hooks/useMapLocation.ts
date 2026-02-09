@@ -352,7 +352,7 @@ export function useMapLocation({
   }, [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef]);
 
   // Center on user function
-  const centerOnUser = () => {
+  const centerOnUser = useCallback(() => {
     if (
       userMarkerRef.current &&
       mapInstance &&
@@ -371,7 +371,7 @@ export function useMapLocation({
         safeTRef.current('waitLocation', 'Please wait for your location to be found.'),
       );
     }
-  };
+  }, [mapInstance, isMapReady, locationStatus]);
 
   /**
    * Simulate a GPS position update (for testing/demo)

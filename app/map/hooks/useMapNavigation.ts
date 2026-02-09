@@ -120,7 +120,7 @@ export function useMapNavigation({
 
   // Route Fetching Effect
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function updateRoute() {
       if (!selectedBuilding || !origin) {
@@ -146,9 +146,9 @@ export function useMapNavigation({
         preview: routeData,
         error,
         orsData,
-      } = await fetchORSRoute(origin, destGps);
+      } = await fetchORSRoute(origin, destGps, controller.signal);
 
-      if (!active) return;
+      if (controller.signal.aborted) return;
 
       if (routeData && coordinates) {
         // coordinates from ORS are [lng, lat] GPS
@@ -179,7 +179,7 @@ export function useMapNavigation({
 
     const timer = setTimeout(updateRoute, 100);
     return () => {
-      active = false;
+      controller.abort();
       clearTimeout(timer);
     };
   }, [selectedBuilding, origin, gpsToCrsSimple, getBuildingLatLng]);

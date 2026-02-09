@@ -14,13 +14,15 @@
 export type LeafletModule = typeof import('leaflet');
 
 /**
- * React-Leaflet component types we use in the app
+ * React-Leaflet component types we use in the app.
+ * @see {@link import('@/lib/hooks/useLeafletLoader').ReactLeafletModule} for the runtime type used by useLeafletLoader.
  */
 export interface ReactLeafletComponents {
   MapContainer: typeof import('react-leaflet').MapContainer;
   Marker: typeof import('react-leaflet').Marker;
   Popup: typeof import('react-leaflet').Popup;
   Polyline: typeof import('react-leaflet').Polyline;
+  ImageOverlay: typeof import('react-leaflet').ImageOverlay;
   useMap: typeof import('react-leaflet').useMap;
   useMapEvents: typeof import('react-leaflet').useMapEvents;
 }

@@ -40,6 +40,7 @@ interface ApiResponse {
 export async function fetchORSRoute(
   start: { lat: number; lng: number },
   end: { lat: number; lng: number },
+  signal?: AbortSignal,
 ): Promise<{
   coordinates: [number, number][];
   preview: RoutePreview | null;
@@ -57,6 +58,7 @@ export async function fetchORSRoute(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ start, end }),
+      signal,
     });
 
     const json: ApiResponse = await response.json();
@@ -97,6 +99,9 @@ export async function fetchORSRoute(
 
     return { coordinates: coords, preview, orsData: data };
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return { coordinates: [], preview: null, error: 'Aborted' };
+    }
     logger.error('Error fetching ORS route:', error);
     return { coordinates: [], preview: null, error: 'Network Error' };
   }

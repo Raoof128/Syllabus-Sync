@@ -104,6 +104,7 @@ describe('useMapNavigation', () => {
     expect(orsService.fetchORSRoute).toHaveBeenCalledWith(
       props.origin,
       expect.anything(), // destGps
+      expect.any(AbortSignal), // abort signal
     );
     // gpsRouteCoords is internal, so we check routeCoords (pixel) or preview
     expect(result.current.routeCoords.length).toBeGreaterThan(0);

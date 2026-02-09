@@ -443,7 +443,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                     mapLog.log('Campus map image loaded successfully');
                   },
                   error: () => {
-                    console.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
+                    mapLog.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
                   },
                 }}
               />
