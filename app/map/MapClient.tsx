@@ -14,9 +14,7 @@ import {
   Car,
   Droplets,
   BadgeCheck,
-  GraduationCap,
   Link as LinkIcon,
-  Footprints,
 } from 'lucide-react';
 import { TranslatedMapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
@@ -32,7 +30,6 @@ import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/lib/map/constants';
@@ -48,11 +45,9 @@ const normalizeForSearch = (value: string): string =>
 // Map overlay icons
 const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
   parking: Car,
-  water: Droplets,
+  drinking_water: Droplets,
   accessibility: Accessibility,
-  permits: BadgeCheck,
-  exam: GraduationCap,
-  walk: Footprints,
+  special_permits: BadgeCheck,
 };
 
 // Dynamic import for the heavy map lib with Suspense
@@ -223,7 +218,7 @@ export default function MapClient() {
     // Prefetch all overlay images in the background
     mapOverlays.forEach((overlay) => {
       const img = new Image();
-      img.src = overlay.imagePath;
+      img.src = overlay.url;
     });
   }, [showOverlayPanel]);
 
@@ -432,21 +427,9 @@ export default function MapClient() {
                             <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
                           </m.div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1">
-                              <p className="text-mq-sm font-medium truncate">
-                                {t(`overlay_${overlay.id}_name` as TranslationKey)}
-                              </p>
-                              {!overlay.alignsWithBaseMap && (
-                                <span
-                                  className="text-[10px] text-amber-500"
-                                  title="May appear stretched"
-                                >
-                                  ⚠
-                                </span>
-                              )}
-                            </div>
+                            <p className="text-mq-sm font-medium truncate">{t(overlay.labelKey)}</p>
                             <p className="text-mq-xs text-mq-content-secondary truncate">
-                              {t(`overlay_${overlay.id}_desc` as TranslationKey)}
+                              {t(overlay.descKey)}
                             </p>
                           </div>
                           <AnimatePresence>

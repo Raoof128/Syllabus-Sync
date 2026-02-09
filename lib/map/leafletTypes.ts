@@ -23,6 +23,7 @@ export interface ReactLeafletComponents {
   Popup: typeof import('react-leaflet').Popup;
   Polyline: typeof import('react-leaflet').Polyline;
   ImageOverlay: typeof import('react-leaflet').ImageOverlay;
+  Pane: typeof import('react-leaflet').Pane;
   useMap: typeof import('react-leaflet').useMap;
   useMapEvents: typeof import('react-leaflet').useMapEvents;
 }

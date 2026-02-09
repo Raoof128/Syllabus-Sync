@@ -6,15 +6,15 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { mapOverlays, type MapOverlayId } from '@/lib/map/mapOverlays';
+import { MAP_OVERLAY_IDS, normaliseOverlayIds, type MapOverlayId } from '@/lib/map/mapOverlays';
 
 export interface MapState {
-  // Active overlay layers
+  // Active overlay layers (always in registry order, no duplicates)
   activeOverlays: MapOverlayId[];
   // Toggle an overlay on/off
   toggleOverlay: (overlayId: MapOverlayId) => void;
-  // Set multiple overlays at once
-  setOverlays: (overlays: MapOverlayId[]) => void;
+  // Set multiple overlays at once (normalises)
+  setOverlays: (overlays: string[]) => void;
   // Clear all overlays
   clearOverlays: () => void;
   // Check if an overlay is active
@@ -46,13 +46,14 @@ export const useMapStore = create<MapState>()(
       activeOverlays: [],
 
       toggleOverlay: (overlayId) =>
-        set((state) => ({
-          activeOverlays: state.activeOverlays.includes(overlayId)
+        set((state) => {
+          const next = state.activeOverlays.includes(overlayId)
             ? state.activeOverlays.filter((id) => id !== overlayId)
-            : [...state.activeOverlays, overlayId],
-        })),
+            : normaliseOverlayIds([...state.activeOverlays, overlayId]);
+          return { activeOverlays: next };
+        }),
 
-      setOverlays: (overlays) => set({ activeOverlays: overlays }),
+      setOverlays: (overlays) => set({ activeOverlays: normaliseOverlayIds(overlays) }),
 
       clearOverlays: () => set({ activeOverlays: [] }),
 
@@ -90,21 +91,25 @@ export const useMapStore = create<MapState>()(
     {
       name: 'map-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
       partialize: (state): MapPersistedState => ({
         activeOverlays: state.activeOverlays,
         showOverlayPanel: state.showOverlayPanel,
         lastPosition: state.lastPosition,
         hapticFeedbackEnabled: state.hapticFeedbackEnabled,
       }),
-      migrate: (persistedState) => {
-        const state = persistedState as Partial<MapPersistedState>;
-        return {
-          activeOverlays: state?.activeOverlays ?? [],
+      migrate: (persistedState, version) => {
+        const state = persistedState as Partial<MapPersistedState & { activeOverlays: string[] }>;
+        // Re-normalise overlays on migration to drop stale IDs (e.g. 'exam', 'walk', 'water', 'permits')
+        const migrated: MapPersistedState = {
+          activeOverlays: normaliseOverlayIds(state?.activeOverlays ?? []),
           showOverlayPanel: state?.showOverlayPanel ?? false,
           lastPosition: state?.lastPosition ?? null,
           hapticFeedbackEnabled: state?.hapticFeedbackEnabled ?? true,
         };
+        // Suppress unused parameter lint — version is needed by Zustand's migrate signature
+        void version;
+        return migrated;
       },
     },
   ),
@@ -114,15 +119,12 @@ export const useMapStore = create<MapState>()(
 export const parseOverlaysFromURL = (searchParams: URLSearchParams): MapOverlayId[] => {
   const layersParam = searchParams.get('layers');
   if (!layersParam) return [];
-
-  const validOverlayIds = mapOverlays.map((o) => o.id);
-
-  return layersParam
-    .split(',')
-    .filter((id): id is MapOverlayId => validOverlayIds.includes(id as MapOverlayId));
+  return normaliseOverlayIds(layersParam.split(','));
 };
 
-// Helper to create URL query string from overlays
+// Helper to create URL query string from overlays (always in registry order)
 export const overlaysToURLParam = (overlays: MapOverlayId[]): string => {
-  return overlays.length > 0 ? overlays.join(',') : '';
+  // Ensure stable ordering
+  const ordered = MAP_OVERLAY_IDS.filter((id) => overlays.includes(id));
+  return ordered.length > 0 ? ordered.join(',') : '';
 };

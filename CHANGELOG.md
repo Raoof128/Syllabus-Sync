@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Map Overlay System Rebuild — 2026-02-10
+
+**Scope:** End-to-end rebuild of map overlay layers
+**Type:** Feature rebuild / Infrastructure
+
+#### Changes Applied
+
+1. **PDF→PNG build script** (`scripts/build-overlays.sh`) — Converts source PDFs in `maps/source/` to transparent overlay PNGs at 300 DPI using Poppler (`pdftoppm`) + ImageMagick (`magick`). Removes white background with 12% fuzz. Outputs to `public/maps/overlays/`. Added `npm run build:overlays` script in `package.json`.
+
+2. **Overlay registry** (`lib/map/mapOverlays.ts`) — Complete rewrite. New `MapOverlayConfig` type with `labelKey`/`descKey` (i18n), `type: 'image'`, `url` (versioned), `bounds` (PIXEL_BOUNDS), `opacity`, `zIndex`, `color`. `MAP_OVERLAY_IDS` const array for canonical ordering. `mapOverlayById` Map for O(1) lookup. `normaliseOverlayIds()` — filters invalid, dedupes, orders by registry. 4 overlays: parking, drinking_water, accessibility, special_permits.
+
+3. **State store** (`lib/store/mapStore.ts`) — `setOverlays()` and `toggleOverlay()` now normalise through `normaliseOverlayIds()`. Store version bumped 1→2 with migration that re-normalises to drop stale IDs (exam, walk, water, permits). `overlaysToURLParam()` outputs stable registry-ordered strings.
+
+4. **Declarative rendering** (`app/map/components/MapOverlays.tsx`) — Complete rewrite from imperative Leaflet `addLayer/removeLayer` to declarative react-leaflet `<Pane>` + `<ImageOverlay>`. Pane has `pointer-events: none`. No async preloading, no refs, no race conditions. 47 lines total.
+
+5. **ReactLeafletModule** — Added `Pane` to `ReactLeafletModule` interface (`useLeafletLoader.ts`) and `ReactLeafletComponents` (`leafletTypes.ts`). `Pane` loaded dynamically alongside other react-leaflet components.
+
+6. **MapClient.tsx** — Updated `OVERLAY_ICONS` (4 entries, removed exam/walk). Overlay toggles now use `overlay.labelKey`/`descKey` instead of `as TranslationKey` casting. Removed `alignsWithBaseMap` warning badge. Removed unused `TranslationKey` import. Updated image prefetch to use `overlay.url`.
+
+7. **CampusMap.tsx** — `MapOverlays` now receives `reactLeafletModule` prop instead of `mapInstance`/`leafletModule`.
+
+8. **i18n** — Renamed overlay keys: `overlay_water_*` → `overlay_drinking_water_*`, `overlay_permits_*` → `overlay_special_permits_*`. Removed `overlay_exam_*` and `overlay_walk_*` keys. Updated all 19 locale files.
+
+9. **Tests** (`tests/map/mapOverlays.test.ts`) — 12 new tests: registry integrity, normalisation (empty, invalid, duplicates, ordering, all valid), URL parsing (empty, valid, invalid), URL param generation (ordering, empty).
+
+10. **Documentation** (`docs/map-overlays.md`) — How overlays are generated, where PNGs live, how to add a new overlay, architecture table, URL sync description, gotchas, QA checklist.
+
+#### Files Changed
+
+- `scripts/build-overlays.sh` — **new** PDF→PNG conversion script
+- `package.json` — added `build:overlays` script
+- `lib/map/mapOverlays.ts` — complete rewrite (4 overlays, new types)
+- `lib/store/mapStore.ts` — normalised setOverlays, store v2 migration
+- `app/map/components/MapOverlays.tsx` — declarative rewrite
+- `app/map/MapClient.tsx` — updated icons, toggle UI, prefetch
+- `app/map/CampusMap.tsx` — updated MapOverlays props
+- `lib/hooks/useLeafletLoader.ts` — added Pane
+- `lib/map/leafletTypes.ts` — added Pane
+- `locales/*/translations.json` (×19) — updated overlay keys
+- `tests/map/mapOverlays.test.ts` — **new** 12 tests
+- `docs/map-overlays.md` — **new** documentation
+- `public/maps/overlays/` — 4 new overlay PNGs generated
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build)
+- `npm run build:overlays` ✅ (all 4 PNGs generated)
+
+---
+
 ### Raouf: Map Page Architectural Follow-ups — 4 Refactors — 2026-02-10
 
 **Scope:** Completing all deferred architectural follow-ups from map page audits

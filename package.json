@@ -32,7 +32,8 @@
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=.lighthouserc.json",
     "docker:dev": "docker-compose -f docker/docker-compose.yml up --build",
     "docker:prod": "docker-compose -f docker/docker-compose.prod.yml up -d",
-    "docker:down": "docker-compose -f docker/docker-compose.yml down"
+    "docker:down": "docker-compose -f docker/docker-compose.yml down",
+    "build:overlays": "bash scripts/build-overlays.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

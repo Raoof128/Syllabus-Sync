@@ -354,8 +354,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
             {/* Overlays */}
             <MapOverlays
-              mapInstance={mapInstance}
-              leafletModule={leafletModule}
+              reactLeafletModule={reactLeafletModule}
               activeOverlays={activeOverlays}
               overlaysReady={overlaysReady}
             />

@@ -1,154 +1,99 @@
 // lib/map/mapOverlays.ts
-// Map Overlay Layers Configuration
+// Map Overlay Layers — single source of truth for all overlay definitions.
 
-export type MapOverlayId = 'parking' | 'water' | 'accessibility' | 'permits' | 'exam' | 'walk';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { PIXEL_BOUNDS, MAP_ASSET_VERSION } from '@/lib/map/constants';
 
-export interface MapOverlay {
+// ─── Overlay IDs (canonical order) ───────────────────────────────────────────
+export const MAP_OVERLAY_IDS = [
+  'parking',
+  'drinking_water',
+  'accessibility',
+  'special_permits',
+] as const;
+
+export type MapOverlayId = (typeof MAP_OVERLAY_IDS)[number];
+
+// ─── Config type ─────────────────────────────────────────────────────────────
+export interface MapOverlayConfig {
   id: MapOverlayId;
-  name: string;
-  description: string;
-  imagePath: string;
-  icon: string; // Lucide icon name
-  color: string; // Tailwind color class
-  category: 'transport' | 'facilities' | 'accessibility' | 'academic' | 'recreation';
-  enabled: boolean; // Default enabled state
-  // Metadata for hover tooltips
-  source: string; // Data source attribution
-  lastUpdated: string; // When the data was last updated
-  legend?: string[]; // What the overlay shows (icons/colors meaning)
-  // Image dimensions for proper scaling (width x height in pixels)
-  dimensions?: { width: number; height: number };
-  // Whether overlay aligns with base map bounds (true) or needs special positioning
-  alignsWithBaseMap: boolean;
+  labelKey: TranslationKey;
+  descKey: TranslationKey;
+  type: 'image';
+  url: string;
+  bounds: [[number, number], [number, number]];
+  opacity: number;
+  zIndex: number;
+  color: string; // Tailwind color class for the UI toggle icon
 }
 
-export const mapOverlays: MapOverlay[] = [
+// ─── Registry ────────────────────────────────────────────────────────────────
+export const mapOverlays: MapOverlayConfig[] = [
   {
     id: 'parking',
-    name: 'Parking',
-    description: 'Parking zones, EV charging, ticket machines, accessible bays, metro stop',
-    imagePath: '/maps/overlays/Campus-Map_parking.png',
-    icon: 'Car',
+    labelKey: 'overlay_parking_name' as TranslationKey,
+    descKey: 'overlay_parking_desc' as TranslationKey,
+    type: 'image',
+    url: `/maps/overlays/parking_overlay.png?v=${MAP_ASSET_VERSION}`,
+    bounds: PIXEL_BOUNDS,
+    opacity: 0.92,
+    zIndex: 100,
     color: 'text-blue-500',
-    category: 'transport',
-    enabled: false,
-    source: 'MQ Property Division',
-    lastUpdated: 'August 2024',
-    legend: [
-      'Blue zones: Staff parking',
-      'Green zones: Student parking',
-      'Yellow: EV charging stations',
-      'Purple: Accessible bays',
-    ],
-    dimensions: { width: 1684, height: 1191 },
-    alignsWithBaseMap: true,
   },
   {
-    id: 'water',
-    name: 'Drinking Water',
-    description: 'Water fountain locations across campus',
-    imagePath: '/maps/overlays/Drinking-water.png',
-    icon: 'Droplets',
+    id: 'drinking_water',
+    labelKey: 'overlay_drinking_water_name' as TranslationKey,
+    descKey: 'overlay_drinking_water_desc' as TranslationKey,
+    type: 'image',
+    url: `/maps/overlays/drinking_water_overlay.png?v=${MAP_ASSET_VERSION}`,
+    bounds: PIXEL_BOUNDS,
+    opacity: 0.92,
+    zIndex: 101,
     color: 'text-cyan-500',
-    category: 'facilities',
-    enabled: false,
-    source: 'MQ Sustainability Office',
-    lastUpdated: 'June 2024',
-    legend: ['Blue drops: Water fountains', 'Refill stations marked'],
-    dimensions: { width: 1684, height: 1191 },
-    alignsWithBaseMap: true,
   },
   {
     id: 'accessibility',
-    name: 'Accessibility',
-    description: 'Accessible pathways, toilets, lifts, and stairs',
-    imagePath: '/maps/overlays/map_accessibility.png',
-    icon: 'Accessibility',
+    labelKey: 'overlay_accessibility_name' as TranslationKey,
+    descKey: 'overlay_accessibility_desc' as TranslationKey,
+    type: 'image',
+    url: `/maps/overlays/accessibility_overlay.png?v=${MAP_ASSET_VERSION}`,
+    bounds: PIXEL_BOUNDS,
+    opacity: 0.92,
+    zIndex: 102,
     color: 'text-purple-500',
-    category: 'accessibility',
-    enabled: false,
-    source: 'MQ Campus Services',
-    lastUpdated: 'July 2024',
-    legend: [
-      'Purple lines: Accessible paths',
-      'Wheelchair icons: Accessible toilets',
-      'Lift icons: Elevator locations',
-    ],
-    dimensions: { width: 1684, height: 1191 },
-    alignsWithBaseMap: true,
   },
   {
-    id: 'permits',
-    name: 'Special Permits',
-    description: 'Service vehicle parking and special permit zones',
-    imagePath: '/maps/overlays/map_special_permits_service_vehicles.png',
-    icon: 'BadgeCheck',
+    id: 'special_permits',
+    labelKey: 'overlay_special_permits_name' as TranslationKey,
+    descKey: 'overlay_special_permits_desc' as TranslationKey,
+    type: 'image',
+    url: `/maps/overlays/special_permits_overlay.png?v=${MAP_ASSET_VERSION}`,
+    bounds: PIXEL_BOUNDS,
+    opacity: 0.92,
+    zIndex: 103,
     color: 'text-orange-500',
-    category: 'transport',
-    enabled: false,
-    source: 'MQ Security & Transport',
-    lastUpdated: 'August 2024',
-    legend: ['Orange zones: Service vehicles only', 'Special permit areas marked'],
-    dimensions: { width: 1684, height: 1191 },
-    alignsWithBaseMap: true,
-  },
-  {
-    id: 'exam',
-    name: 'Exam Locations',
-    description: 'Exam buildings and room locations (S2 2024)',
-    imagePath: '/maps/overlays/Exam-Map-S22024.png',
-    icon: 'GraduationCap',
-    color: 'text-red-500',
-    category: 'academic',
-    enabled: false,
-    source: 'MQ Examinations Office',
-    lastUpdated: 'Semester 2, 2024',
-    legend: ['Red markers: Exam venues', 'Numbers: Building codes', 'Check iLearn for your venue'],
-    dimensions: { width: 1410, height: 1760 },
-    alignsWithBaseMap: false, // Portrait orientation, different aspect ratio
-  },
-  {
-    id: 'walk',
-    name: 'Loop Walk',
-    description: 'Campus walking trails and exercise routes',
-    imagePath: '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
-    icon: 'Footprints',
-    color: 'text-green-500',
-    category: 'recreation',
-    enabled: false,
-    source: 'MQ Campus Services',
-    lastUpdated: 'June 2024',
-    legend: ['Green route: Main loop', 'Distance markers shown', 'Accessible paths highlighted'],
-    dimensions: { width: 1191, height: 1684 },
-    alignsWithBaseMap: false, // Portrait orientation, different aspect ratio
   },
 ];
 
-// Helper functions
-export const getOverlayById = (id: MapOverlayId): MapOverlay | undefined => {
-  return mapOverlays.find((overlay) => overlay.id === id);
-};
+// ─── Lookup helpers ──────────────────────────────────────────────────────────
+export const mapOverlayById = new Map<MapOverlayId, MapOverlayConfig>(
+  mapOverlays.map((o) => [o.id, o]),
+);
 
-export const getOverlaysByCategory = (category: MapOverlay['category']): MapOverlay[] => {
-  return mapOverlays.filter((overlay) => overlay.category === category);
-};
+export const getOverlayById = (id: MapOverlayId): MapOverlayConfig | undefined =>
+  mapOverlayById.get(id);
 
-export const OVERLAY_CATEGORY_LABELS: Record<MapOverlay['category'], string> = {
-  transport: 'Transport',
-  facilities: 'Facilities',
-  accessibility: 'Accessibility',
-  academic: 'Academic',
-  recreation: 'Recreation',
-};
-
-// For storing user preferences
-export type MapOverlayPreferences = Record<MapOverlayId, boolean>;
-
-export const DEFAULT_OVERLAY_PREFERENCES: MapOverlayPreferences = {
-  parking: false,
-  water: false,
-  accessibility: false,
-  permits: false,
-  exam: false,
-  walk: false,
-};
+// ─── Normalise overlay IDs ───────────────────────────────────────────────────
+// Filters invalid IDs, removes duplicates, orders by registry position.
+export function normaliseOverlayIds(ids: string[]): MapOverlayId[] {
+  const seen = new Set<MapOverlayId>();
+  const result: MapOverlayId[] = [];
+  // Walk registry order so output is always deterministic
+  for (const registryId of MAP_OVERLAY_IDS) {
+    if (ids.includes(registryId) && !seen.has(registryId)) {
+      seen.add(registryId);
+      result.push(registryId);
+    }
+  }
+  return result;
+}
