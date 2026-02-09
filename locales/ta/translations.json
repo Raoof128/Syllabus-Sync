@@ -1559,5 +1559,10 @@
   "nameMinLength": "பெயரில் குறைந்தது 2 எழுத்துகள் இருக்க வேண்டும்",
   "all": "அனைத்து",
   "showOnlyChangedBuildingsTitle": "மாற்றப்பட்ட கட்டிடங்களை மட்டும் காட்டு",
-  "downloadAsFileTitle": "கோப்பாக பதிவிறக்கவும்"
+  "downloadAsFileTitle": "கோப்பாக பதிவிறக்கவும்",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

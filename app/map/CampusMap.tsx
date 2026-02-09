@@ -28,7 +28,7 @@ import { gpsToCrsSimple } from '@/lib/map/geospatialCalibration';
 import { useMapLocation } from './hooks/useMapLocation';
 import { useMapNavigation } from './hooks/useMapNavigation';
 import { MapOverlays } from './components/MapOverlays';
-import { useReducedMotion } from 'framer-motion';
+import { MapController } from './components/MapController';
 
 // Map-specific logger
 const mapLog = devLog.map;
@@ -199,9 +199,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
     // OVERLAYS READY EFFECT
     // ============================================
+    const mapValid = !!mapInstance && isMapReady(mapInstance);
+
     useEffect(() => {
-      if (!mapInstance || !isMapReady(mapInstance)) {
-        setOverlaysReady(false);
+      if (!mapValid || !mapInstance) {
         return;
       }
       if (!hasNotifiedReadyRef.current) {
@@ -218,107 +219,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         clearTimeout(timer);
         setOverlaysReady(false);
       };
-    }, [mapInstance, isMapReady, isMountedRef, onMapReady]);
-
-    // ============================================
-    // MAP CONTROLLER
-    // ============================================
-    const MapController = useMemo(() => {
-      if (!reactLeafletModule || !leafletModule) return null;
-      const { useMap } = reactLeafletModule;
-
-      const Controller = ({
-        selectedBuildingProp,
-        setMapInstanceProp,
-      }: {
-        selectedBuildingProp?: Building;
-        setMapInstanceProp: (map: import('leaflet').Map) => void;
-      }) => {
-        const map = useMap();
-        const prefersReducedMotion = useReducedMotion();
-        const [isReady, setIsReady] = useState(false);
-
-        useEffect(() => {
-          if (!map) return;
-          const checkReady = () => {
-            if (isMapReady(map)) {
-              setIsReady(true);
-              setMapInstanceProp(map);
-            }
-          };
-          checkReady();
-          map.once('load', checkReady);
-          return () => {
-            map.off('load', checkReady);
-          };
-        }, [map, setMapInstanceProp]);
-
-        useEffect(() => {
-          if (!isReady || !isMapReady(map)) return;
-          try {
-            map.zoomControl.setPosition('bottomright');
-            map.setMaxBounds(PIXEL_BOUNDS);
-            map.setMaxZoom(3);
-            // Fit image to container on first load so the campus fills the viewport.
-            map.fitBounds(PIXEL_BOUNDS, { padding: [20, 20] });
-            // Lock min zoom to the fitted view to prevent the map from starting tiny.
-            map.setMinZoom(map.getZoom());
-          } catch (error) {
-            mapLog.log('Map setup error:', error);
-          }
-        }, [map, isReady]);
-
-        useEffect(() => {
-          if (!isReady || !isMapReady(map) || !selectedBuildingProp) return;
-          let popupTimeout: ReturnType<typeof setTimeout> | null = null;
-          try {
-            const buildingLatLng = getBuildingCrsCoords(selectedBuildingProp);
-
-            // Smooth transition to building (Tier 4: Contextual Animations)
-            // Tier 7: Reduced Motion Respect
-            const shouldAnimate = !prefersReducedMotion;
-
-            map.flyTo(buildingLatLng, 1, {
-              duration: shouldAnimate ? 1.5 : 0,
-              easeLinearity: 0.25,
-              paddingTopLeft: [0, 0], // Can adjust based on sidebar
-              paddingBottomRight: [0, 0],
-              animate: shouldAnimate,
-            } as import('leaflet').ZoomPanOptions);
-
-            const openPopupForBuilding = () => {
-              try {
-                const targetLatLng = getBuildingCrsCoords(selectedBuildingProp);
-                map.eachLayer((layer) => {
-                  if (layer instanceof leafletModule.Marker) {
-                    const markerPos = layer.getLatLng();
-                    if (
-                      Math.abs(markerPos.lat - targetLatLng.lat) < 1 &&
-                      Math.abs(markerPos.lng - targetLatLng.lng) < 1
-                    ) {
-                      layer.openPopup();
-                    }
-                  }
-                });
-              } catch {
-                // ignore popup open errors during rapid state changes/HMR
-              }
-            };
-
-            // Slight delay to allow flyTo to start (skip delay when reduced motion is preferred)
-            popupTimeout = setTimeout(openPopupForBuilding, shouldAnimate ? 800 : 0);
-          } catch (error) {
-            mapLog.log('Building nav error:', error);
-          }
-          return () => {
-            if (popupTimeout) clearTimeout(popupTimeout);
-          };
-        }, [selectedBuildingProp, map, isReady, prefersReducedMotion]);
-
-        return null;
-      };
-      return Controller;
-    }, [reactLeafletModule, leafletModule, isMapReady]);
+    }, [mapValid, mapInstance, isMapReady, isMountedRef, onMapReady]);
 
     // ============================================
     // RENDER
@@ -408,7 +309,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         )}
 
         {/* Map Container */}
-        {isClientReady && reactLeafletModule && leafletModule && MapController ? (
+        {isClientReady && reactLeafletModule && leafletModule ? (
           <reactLeafletModule.MapContainer
             key={`map-${mapKey}`}
             crs={leafletModule.CRS.Simple}
@@ -427,8 +328,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             style={{ height: '100%', width: '100%' }}
           >
             <MapController
-              selectedBuildingProp={selectedBuilding}
-              setMapInstanceProp={setMapInstance}
+              selectedBuilding={selectedBuilding}
+              setMapInstance={setMapInstance}
+              reactLeafletModule={reactLeafletModule}
+              leafletModule={leafletModule}
             />
 
             {/* Base Campus Layer */}
@@ -491,7 +394,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                           variant="secondary"
                           className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
                         >
-                          {BUILDING_CATEGORY_LABELS[selectedBuilding.category]}
+                          {t(BUILDING_CATEGORY_LABELS[selectedBuilding.category])}
                         </Badge>
                       )}
                     </div>

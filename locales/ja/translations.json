@@ -1559,5 +1559,10 @@
   "nameMinLength": "名前は少なくとも 2 文字である必要があります",
   "all": "全て",
   "showOnlyChangedBuildingsTitle": "変更された建物のみを表示",
-  "downloadAsFileTitle": "ファイルとしてダウンロード"
+  "downloadAsFileTitle": "ファイルとしてダウンロード",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

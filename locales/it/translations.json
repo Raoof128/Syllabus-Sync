@@ -1559,5 +1559,10 @@
   "nameMinLength": "Il nome deve contenere almeno 2 caratteri",
   "all": "Tutto",
   "showOnlyChangedBuildingsTitle": "Mostra solo gli edifici modificati",
-  "downloadAsFileTitle": "Scarica come file"
+  "downloadAsFileTitle": "Scarica come file",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

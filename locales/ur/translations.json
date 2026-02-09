@@ -1559,5 +1559,10 @@
   "nameMinLength": "نام کم از کم 2 حرف ہونا چاہئے",
   "all": "سب",
   "showOnlyChangedBuildingsTitle": "صرف بدلی ہوئی عمارتیں دکھائیں",
-  "downloadAsFileTitle": "فائل کے طور پر ڈاؤن لوڈ کریں"
+  "downloadAsFileTitle": "فائل کے طور پر ڈاؤن لوڈ کریں",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

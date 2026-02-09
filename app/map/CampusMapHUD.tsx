@@ -33,8 +33,6 @@ type Props = {
 
 import { LayeredCard } from './components/LayeredCard';
 
-const MotionLink = m.create(Link);
-
 export default function CampusMapHUD({
   selectedBuilding,
   buildings,
@@ -205,10 +203,8 @@ export default function CampusMapHUD({
                   {visibleBuildings.map((b) => {
                     const isSelected = selectedBuilding?.id === b.id;
                     return (
-                      <MotionLink
+                      <m.div
                         key={b.id}
-                        href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
-                        onClick={() => triggerHaptic('tap', 'medium')}
                         variants={{
                           hidden: { opacity: 0, x: prefersReducedMotion ? 0 : -10 },
                           visible: { opacity: 1, x: 0 },
@@ -232,29 +228,35 @@ export default function CampusMapHUD({
                               }
                         }
                         className={cn(
-                          'flex items-center justify-between p-2.5 rounded-mq-lg transition-colors duration-200',
+                          'rounded-mq-lg transition-colors duration-200',
                           isSelected
                             ? 'bg-mq-primary/10 border border-mq-primary/20 shadow-sm'
                             : 'hover:bg-mq-hover-background border border-transparent',
                         )}
                       >
-                        <div className="flex flex-col min-w-0">
-                          <span
-                            className={cn(
-                              'text-sm font-medium truncate',
-                              isSelected ? 'text-mq-primary' : 'text-mq-content',
-                            )}
-                          >
-                            {b.id}
-                          </span>
-                          <span className="text-xs text-mq-content-secondary truncate max-w-[48vw] sm:max-w-[180px]">
-                            {t(b.translationKey)}
-                          </span>
-                        </div>
-                        {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />
-                        )}
-                      </MotionLink>
+                        <Link
+                          href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
+                          onClick={() => triggerHaptic('tap', 'medium')}
+                          className="flex items-center justify-between p-2.5"
+                        >
+                          <div className="flex flex-col min-w-0">
+                            <span
+                              className={cn(
+                                'text-sm font-medium truncate',
+                                isSelected ? 'text-mq-primary' : 'text-mq-content',
+                              )}
+                            >
+                              {b.id}
+                            </span>
+                            <span className="text-xs text-mq-content-secondary truncate max-w-[48vw] sm:max-w-[180px]">
+                              {t(b.translationKey)}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <div className="w-2 h-2 rounded-full bg-mq-primary shrink-0" />
+                          )}
+                        </Link>
+                      </m.div>
                     );
                   })}
                   {visibleBuildings.length === 0 && (

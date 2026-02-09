@@ -1559,5 +1559,10 @@
   "nameMinLength": "이름은 2자 이상이어야 합니다.",
   "all": "모두",
   "showOnlyChangedBuildingsTitle": "변경된 건물만 표시",
-  "downloadAsFileTitle": "파일로 다운로드"
+  "downloadAsFileTitle": "파일로 다운로드",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

@@ -1559,5 +1559,10 @@
   "nameMinLength": "নাম কমপক্ষে 2 অক্ষরের হতে হবে",
   "all": "সব",
   "showOnlyChangedBuildingsTitle": "শুধুমাত্র পরিবর্তিত ভবন দেখান",
-  "downloadAsFileTitle": "ফাইল হিসাবে ডাউনলোড করুন"
+  "downloadAsFileTitle": "ফাইল হিসাবে ডাউনলোড করুন",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

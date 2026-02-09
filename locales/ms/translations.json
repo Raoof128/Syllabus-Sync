@@ -1559,5 +1559,10 @@
   "nameMinLength": "Nama mestilah sekurang-kurangnya 2 aksara",
   "all": "Semua",
   "showOnlyChangedBuildingsTitle": "Tunjukkan hanya bangunan yang diubah",
-  "downloadAsFileTitle": "Muat turun sebagai fail"
+  "downloadAsFileTitle": "Muat turun sebagai fail",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

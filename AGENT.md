@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Map Page Architectural Follow-ups — 4 refactors
+Summary: Completed all deferred architectural follow-ups from map page audits. (1) i18n `BUILDING_CATEGORY_LABELS` — changed from hardcoded English to `TranslationKey` references; updated `CampusMap.tsx` to use `t()`. (2) Refactored `MotionLink = m.create(Link)` in `CampusMapHUD.tsx` — replaced fragile wrapper with `m.div` + standard `Link` child. (3) Extracted `MapController` from `useMemo` in `CampusMap.tsx` to standalone `components/MapController.tsx` — receives modules via props, has own `isMapReady`. Fixed exposed lint error (`setOverlaysReady` in effect body). (4) i18n hardcoded strings in `MapErrorBoundary.tsx` — added `translations` prop + `TranslatedMapErrorBoundary` functional wrapper using `useSafeTranslation()`. Updated `MapClient.tsx` and `withMapErrorBoundary` HOC. Added 5 new translation keys to all 19 locale files.
+Files: Modified 6 files: `buildings.ts`, `CampusMap.tsx`, `CampusMapHUD.tsx`, `MapErrorBoundary.tsx`, `MapClient.tsx`. Created 1 file: `components/MapController.tsx`. Modified 19 locale files (added 5 keys each).
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, tests, build all pass). 52/52 map tests pass.
+Follow-ups: None — all deferred architectural items from previous audits are now resolved.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Map Page Audit Round 2 — 4 findings fixed
 Summary: Follow-up audit of map module. Fixed 4 issues: (1) Wrapped `centerOnUser` in `useCallback` in `useMapLocation.ts` — was creating new function reference every render. (2) Replaced raw `console.error` with `mapLog.error` in `CampusMap.tsx` image error handler. (3) Added `ImageOverlay` to `ReactLeafletComponents` type in `leafletTypes.ts` — was missing from the interface. (4) Added `AbortController` to ORS route fetch in `useMapNavigation.ts` and `lib/services/ors.ts` — in-flight requests are now properly cancelled on effect cleanup instead of using a boolean `active` flag. Also handles `AbortError` gracefully.
 Files: Modified 5 files: `useMapLocation.ts`, `CampusMap.tsx`, `leafletTypes.ts`, `ors.ts`, `useMapNavigation.ts`. Modified 1 test: `useMapNavigation.test.ts`.

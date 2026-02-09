@@ -1559,5 +1559,10 @@
   "nameMinLength": "نام باید حداقل 2 کاراکتر باشد",
   "all": "همه",
   "showOnlyChangedBuildingsTitle": "فقط ساختمان های تغییر یافته را نشان دهید",
-  "downloadAsFileTitle": "دانلود به صورت فایل"
+  "downloadAsFileTitle": "دانلود به صورت فایل",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

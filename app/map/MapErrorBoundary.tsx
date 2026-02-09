@@ -5,10 +5,22 @@ import { AlertTriangle, RefreshCw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { logger } from '@/lib/logger';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
+
+/** Translated strings passed from the functional wrapper to the class component */
+interface MapErrorTranslations {
+  mapFailedToLoad: string;
+  mapLoadErrorDescription: string;
+  technicalDetails: string;
+  tryAgain: string;
+  reloadPage: string;
+  mapErrorPersistHelp: string;
+}
 
 interface MapErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  translations?: MapErrorTranslations;
 }
 
 interface MapErrorBoundaryState {
@@ -150,6 +162,8 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
         return this.props.fallback;
       }
 
+      const t = this.props.translations;
+
       // Default error UI
       return (
         <div
@@ -169,17 +183,19 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
             </div>
 
             {/* Error message */}
-            <h3 className="text-lg font-semibold text-mq-content mb-2">Map failed to load</h3>
+            <h3 className="text-lg font-semibold text-mq-content mb-2">
+              {t?.mapFailedToLoad ?? 'Map failed to load'}
+            </h3>
             <p className="text-mq-sm text-mq-content-secondary mb-4">
-              We encountered an issue loading the campus map. This might be due to a network issue
-              or browser compatibility problem.
+              {t?.mapLoadErrorDescription ??
+                'We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.'}
             </p>
 
             {/* Error details (development only) */}
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="w-full mb-4 text-left">
                 <summary className="text-mq-xs text-mq-content-tertiary cursor-pointer hover:text-mq-content">
-                  Technical details
+                  {t?.technicalDetails ?? 'Technical details'}
                 </summary>
                 <pre className="mt-2 p-3 text-xs bg-mq-background rounded-mq overflow-x-auto text-mq-error">
                   {this.state.error.message}
@@ -197,20 +213,21 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
             <div className="flex items-center gap-3">
               <Button onClick={this.handleRetry} className="gap-2">
                 <RefreshCw className="h-4 w-4" />
-                Try again
+                {t?.tryAgain ?? 'Try again'}
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => window.location.reload()}
                 className="gap-2"
               >
-                Reload page
+                {t?.reloadPage ?? 'Reload page'}
               </Button>
             </div>
 
             {/* Help text */}
             <p className="mt-4 text-mq-xs text-mq-content-tertiary">
-              If the problem persists, try refreshing the page or clearing your browser cache.
+              {t?.mapErrorPersistHelp ??
+                'If the problem persists, try refreshing the page or clearing your browser cache.'}
             </p>
           </div>
         </div>
@@ -222,6 +239,41 @@ export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorB
 }
 
 /**
+ * TranslatedMapErrorBoundary — functional wrapper that provides i18n
+ * translations to the class-based MapErrorBoundary.
+ */
+export function TranslatedMapErrorBoundary({
+  children,
+  fallback,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) {
+  const { safeT } = useSafeTranslation();
+
+  const translations: MapErrorTranslations = {
+    mapFailedToLoad: safeT('mapFailedToLoad', 'Map failed to load'),
+    mapLoadErrorDescription: safeT(
+      'mapLoadErrorDescription',
+      'We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.',
+    ),
+    technicalDetails: safeT('technicalDetails', 'Technical details'),
+    tryAgain: safeT('tryAgain', 'Try again'),
+    reloadPage: safeT('reloadPage', 'Reload page'),
+    mapErrorPersistHelp: safeT(
+      'mapErrorPersistHelp',
+      'If the problem persists, try refreshing the page or clearing your browser cache.',
+    ),
+  };
+
+  return (
+    <MapErrorBoundary fallback={fallback} translations={translations}>
+      {children}
+    </MapErrorBoundary>
+  );
+}
+
+/**
  * withMapErrorBoundary - HOC to wrap components with MapErrorBoundary
  */
 export function withMapErrorBoundary<P extends object>(
@@ -229,9 +281,9 @@ export function withMapErrorBoundary<P extends object>(
   fallback?: ReactNode,
 ): React.FC<P> {
   const ComponentWithErrorBoundary: React.FC<P> = (props) => (
-    <MapErrorBoundary fallback={fallback}>
+    <TranslatedMapErrorBoundary fallback={fallback}>
       <WrappedComponent {...props} />
-    </MapErrorBoundary>
+    </TranslatedMapErrorBoundary>
   );
 
   ComponentWithErrorBoundary.displayName = `withMapErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;

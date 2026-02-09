@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Map Page Architectural Follow-ups — 4 Refactors — 2026-02-10
+
+**Scope:** Completing all deferred architectural follow-ups from map page audits
+**Type:** Refactor / i18n / Code quality
+
+#### Changes Applied
+
+1. **i18n `BUILDING_CATEGORY_LABELS`** (`buildings.ts`) — changed from hardcoded English strings (`Record<BuildingCategory, string>`) to translation keys (`Record<BuildingCategory, TranslationKey>`). Updated `CampusMap.tsx` to pass labels through `t()`. Maps: academic→categoryTeaching, services→categoryServices, health→categoryHealth, food→categoryFood, sports→categorySports, venue→categoryVenues, research→categoryResearch, residential→categoryHousing, other→categoryOther.
+
+2. **Refactored `MotionLink = m.create(Link)`** (`CampusMapHUD.tsx`) — removed fragile `m.create(Link)` wrapper that could break across Next.js/framer-motion upgrades. Replaced with `m.div` wrapper + standard `Link` child, preserving all animation behavior (variants, whileHover, whileTap, animate).
+
+3. **Extracted `MapController` from `useMemo`** (`CampusMap.tsx` → `components/MapController.tsx`) — moved the component defined inside `useMemo` to a standalone module-level component. Receives `reactLeafletModule` and `leafletModule` as props. Contains its own `isMapReady` check. Removed unused `useReducedMotion` import from CampusMap. Fixed exposed lint error (`setOverlaysReady` in effect body) by deriving `mapValid` outside the effect.
+
+4. **i18n hardcoded strings in `MapErrorBoundary`** — added `translations` prop to the class component with fallback defaults. Created `TranslatedMapErrorBoundary` functional wrapper that calls `useSafeTranslation()` and passes translations down. Updated `MapClient.tsx` and `withMapErrorBoundary` HOC to use the translated wrapper. Added 5 new translation keys to all 19 locale files: `mapFailedToLoad`, `mapLoadErrorDescription`, `technicalDetails`, `reloadPage`, `mapErrorPersistHelp`.
+
+#### Files Changed
+
+- `lib/map/buildings.ts` — `BUILDING_CATEGORY_LABELS` values changed to `TranslationKey`
+- `app/map/CampusMap.tsx` — `t(BUILDING_CATEGORY_LABELS[…])`, removed inline MapController, removed `useReducedMotion` import, fixed overlays ready lint error
+- `app/map/CampusMapHUD.tsx` — removed `m.create(Link)`, replaced `MotionLink` with `m.div` + `Link`
+- `app/map/components/MapController.tsx` — **new file**, extracted standalone component
+- `app/map/MapErrorBoundary.tsx` — added `translations` prop, `TranslatedMapErrorBoundary` wrapper
+- `app/map/MapClient.tsx` — import `TranslatedMapErrorBoundary` instead of `MapErrorBoundary`
+- `locales/*/translations.json` (×19) — added 5 new keys
+
 ### Raouf: Map Page Audit Round 2 — 4 Findings Fixed — 2026-02-10
 
 **Scope:** Follow-up file-by-file audit of map module, fixing remaining issues from previous audit

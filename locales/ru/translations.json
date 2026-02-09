@@ -1559,5 +1559,10 @@
   "nameMinLength": "Имя должно содержать не менее 2 символов.",
   "all": "Все",
   "showOnlyChangedBuildingsTitle": "Показать только измененные здания",
-  "downloadAsFileTitle": "Скачать как файл"
+  "downloadAsFileTitle": "Скачать как файл",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

@@ -18,7 +18,7 @@ import {
   Link as LinkIcon,
   Footprints,
 } from 'lucide-react';
-import { MapErrorBoundary } from './MapErrorBoundary';
+import { TranslatedMapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
 import CampusMapHUD from './CampusMapHUD';
 import { RouteAnnouncer } from './components/RouteAnnouncer';
@@ -509,7 +509,7 @@ export default function MapClient() {
                   <div
                     className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
                   >
-                    <MapErrorBoundary>
+                    <TranslatedMapErrorBoundary>
                       <Suspense fallback={null}>
                         <CampusMap
                           ref={campusMapRef}
@@ -520,7 +520,7 @@ export default function MapClient() {
                           onMapReady={() => setIsMapReady(true)}
                         />
                       </Suspense>
-                    </MapErrorBoundary>
+                    </TranslatedMapErrorBoundary>
                   </div>
 
                   {/* Skeleton Overlay (fades out when map is ready) */}

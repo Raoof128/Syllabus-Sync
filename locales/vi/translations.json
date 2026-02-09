@@ -1559,5 +1559,10 @@
   "nameMinLength": "Tên phải có ít nhất 2 ký tự",
   "all": "Tất cả",
   "showOnlyChangedBuildingsTitle": "Chỉ hiển thị các tòa nhà đã thay đổi",
-  "downloadAsFileTitle": "Tải xuống dưới dạng tập tin"
+  "downloadAsFileTitle": "Tải xuống dưới dạng tập tin",
+  "mapFailedToLoad": "Map failed to load",
+  "mapLoadErrorDescription": "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+  "technicalDetails": "Technical details",
+  "reloadPage": "Reload page",
+  "mapErrorPersistHelp": "If the problem persists, try refreshing the page or clearing your browser cache."
 }

@@ -1793,15 +1793,15 @@ export const getBuildingsByTag = (tag: string): Building[] => {
   return buildings.filter((building) => building.tags?.includes(tag));
 };
 
-// Building category labels for display
-export const BUILDING_CATEGORY_LABELS: Record<BuildingCategory, string> = {
-  academic: 'Academic',
-  services: 'Student Services',
-  health: 'Health & Medical',
-  food: 'Food & Retail',
-  sports: 'Sports & Recreation',
-  venue: 'Venues & Theatres',
-  research: 'Research',
-  residential: 'Accommodation',
-  other: 'Other',
+// Building category labels for display (i18n translation keys)
+export const BUILDING_CATEGORY_LABELS: Record<BuildingCategory, TranslationKey> = {
+  academic: 'categoryTeaching',
+  services: 'categoryServices',
+  health: 'categoryHealth',
+  food: 'categoryFood',
+  sports: 'categorySports',
+  venue: 'categoryVenues',
+  research: 'categoryResearch',
+  residential: 'categoryHousing',
+  other: 'categoryOther',
 };
