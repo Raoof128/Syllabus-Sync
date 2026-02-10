@@ -1,3 +1,10 @@
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Settings Page Audit + Redirect/Test Hardening
+Summary: Audited settings route behavior and testing reliability. Replaced `/settings` null placeholder page with a server redirect to `/settings/general` for deterministic navigation and no blank interim render. Updated privacy settings test to await password-strength UI stabilization to avoid React `act(...)` warnings.
+- **Files:** `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+- **Verification:** `npm run check` ✅.
+- **Follow-ups:** None.
+
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Selected-pin indicator, map search polish, zoom controls
 Summary: Added an explicit selected-building pulse indicator on the map, improved search behavior by matching normalized translated building names and related metadata, polished search input usability in dark mode (clear button, better field contrast, accurate result count), and enabled/repositioned zoom controls to bottom-right.

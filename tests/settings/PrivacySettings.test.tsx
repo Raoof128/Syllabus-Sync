@@ -207,7 +207,7 @@ describe('PrivacySettings', () => {
     expect(input).toHaveAttribute('type', 'password');
   });
 
-  it('shows password strength indicator when typing new password', () => {
+  it('shows password strength indicator when typing new password', async () => {
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -215,8 +215,10 @@ describe('PrivacySettings', () => {
     const newPasswordInput = screen.getByTestId('new-password-input');
     fireEvent.change(newPasswordInput, { target: { value: 'test' } });
 
-    expect(screen.getByTestId('password-strength')).toBeInTheDocument();
-    expect(screen.getByText('Weak')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('password-strength')).toBeInTheDocument();
+      expect(screen.getByText('Weak')).toBeInTheDocument();
+    });
   });
 
   it('shows strong password indicator for complex passwords', () => {

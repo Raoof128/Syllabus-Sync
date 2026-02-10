@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Settings Page Audit + Redirect Fix — 2026-02-10
+
+**Scope:** Full settings-page audit and stabilization
+**Type:** Bug fix / QA hardening
+
+#### Issues Fixed
+
+1. **`/settings` root route blank-state risk** (`app/settings/page.tsx`) — page returned `null` and relied on client-side redirect in layout effect. Replaced with server redirect using `redirect('/settings/general')` so navigation is deterministic and no empty page is rendered during hydration.
+
+2. **Settings test `act(...)` warning** (`tests/settings/PrivacySettings.test.tsx`) — password-strength test asserted immediately after input change, producing intermittent React update warning in logs. Updated test to await UI stabilization with `waitFor`.
+
+#### Files Changed
+
+- `app/settings/page.tsx` — implemented server redirect for root settings route
+- `tests/settings/PrivacySettings.test.tsx` — made password-strength assertion async and stable
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build)
+
+---
+
 ### Raouf: Map Zoom Shake Fix + Extended Zoom Out — 2026-02-10
 
 **Scope:** Fix map shaking on zoom + allow more zoom out

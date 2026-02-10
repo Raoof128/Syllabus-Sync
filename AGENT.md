@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Settings Page Audit + Root Redirect + Test Stabilization
+Summary: Completed a focused production audit of the Settings module and applied two fixes. (1) Replaced client-side placeholder null-render in `app/settings/page.tsx` with server redirect using `redirect('/settings/general')` to eliminate blank-state flash and guarantee deterministic route behavior for `/settings`. (2) Stabilized `tests/settings/PrivacySettings.test.tsx` password-strength assertion by awaiting post-input UI updates via `waitFor`, removing React `act(...)` warning noise from the settings test path. Confirmed the full repository quality gate remains green after changes.
+Files: Modified 2 files: `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 423/423 tests, build all pass).
+Follow-ups: None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Map Zoom Shake Fix + Extended Zoom Out
 Summary: Fixed two map UX issues. (1) **Zoom shaking/jitter**: `leaflet.css` had `transition: transform 0.25s` on `.leaflet-zoom-animated`, creating a CSS transition that competed with Leaflet's own JS-driven zoom animation — causing the map image to oscillate/shake on zoom. Also had `transform: translateZ(0)` and `will-change: opacity, transform` on `.leaflet-image-layer` and `.leaflet-overlay-pane`, creating competing compositor layers. Removed all three offending CSS rules. (2) **Zoom-out range too restrictive**: `MapController.tsx` set `minZoom = map.getZoom()` after `fitBounds`, locking zoom to the fitted level. Changed to `map.getZoom() - 1.5` to allow 1.5 levels of zoom out below the fitted campus view. (3) **Edge rubber-banding**: `maxBoundsViscosity` was 0.5 (elastic) in CampusMap.tsx, causing a springy bounce at map edges that contributed to the shaking feel. Changed to 1.0 (hard stop).
 Files: Modified 3 files: `app/styles/leaflet.css` (removed competing transforms/transitions), `app/map/components/MapController.tsx` (minZoom lowered), `app/map/CampusMap.tsx` (maxBoundsViscosity → 1.0).

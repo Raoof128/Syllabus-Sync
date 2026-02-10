@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-10 (Australia/Sydney) - Settings Page Audit + Redirect/Test Hardening
+- **Status:** ✅ Complete - Settings root routing and test stability improved.
+- **Scope:** Settings UX reliability, QA signal quality.
+- **Summary:** Audited the settings page flow and removed root-route blank render behavior by switching `/settings` to a server redirect toward `/settings/general`. Also fixed the settings privacy test to await password-strength UI updates, removing React `act(...)` warning noise.
+- **Files:** `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+- **Verification:** `npm run check` passed (secrets, format, typecheck, lint, tests, build).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-07 (Australia/Sydney) - Selected-Pin Indicator + Search/Zoom Polish
 - **Status:** ✅ Complete - Selection visibility and search UX improved.
 - **Scope:** Map Marker UX, Dark Mode Search, Map Controls.
