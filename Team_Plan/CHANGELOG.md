@@ -1,4 +1,11 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Settings Link Integrity + Repo Cleanup
+Summary: Completed settings links audit and hygiene pass. Added automated route-integrity tests for settings section routes and quick actions, removed redundant client redirect effect from settings layout, deleted unused AccountSettings component/export, updated broken documentation URL constant, and cleaned local `.DS_Store`/stale puppeteer logs.
+- **Files:** `app/settings/layout.tsx`, `app/settings/components/QuickActions.tsx`, `app/settings/components/index.ts`, `lib/config.ts`, `tests/settings/SettingsRoutesIntegrity.test.ts`, `app/settings/components/AccountSettings.tsx` (deleted).
+- **Verification:** `npm run check` ✅ (425 tests passed).
+- **Follow-ups:** Optional CI split for settings-only checks on settings-path changes.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Page Audit + Redirect/Test Hardening
 Summary: Audited settings route behavior and testing reliability. Replaced `/settings` null placeholder page with a server redirect to `/settings/general` for deterministic navigation and no blank interim render. Updated privacy settings test to await password-strength UI stabilization to avoid React `act(...)` warnings.
 - **Files:** `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.

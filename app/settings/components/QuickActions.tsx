@@ -12,7 +12,7 @@ type QuickActionsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-const quickActionLinks: { href: string; labelKey: TranslationKey; icon: typeof Home }[] = [
+export const quickActionLinks: { href: string; labelKey: TranslationKey; icon: typeof Home }[] = [
   { href: '/home', labelKey: 'homeDashboard', icon: Home },
   { href: '/calendar', labelKey: 'calendarView', icon: Calendar },
   { href: '/feed', labelKey: 'eventsFeed', icon: Newspaper },

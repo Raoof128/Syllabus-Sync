@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Settings Links Audit + Repo Cleanup — 2026-02-10
+
+**Scope:** Settings link integrity and repository hygiene
+**Type:** QA hardening / cleanup
+
+#### Issues Fixed
+
+1. **Settings route integrity hardening** — added route-integrity coverage to ensure settings section paths and quick-action links always map to real `app/**/page.tsx` files.
+   - Exported `SETTINGS_SECTION_PATHS` from `app/settings/layout.tsx`
+   - Exported `quickActionLinks` from `app/settings/components/QuickActions.tsx`
+   - Added `tests/settings/SettingsRoutesIntegrity.test.ts`
+
+2. **Redundant redirect logic removed** (`app/settings/layout.tsx`) — deleted client-side `router.replace('/settings/general')` effect. Root redirect is already handled server-side in `app/settings/page.tsx`, so keeping both was unnecessary.
+
+3. **Dead settings code removed** — deleted unused `AccountSettings` component and removed barrel export to reduce maintenance overhead.
+
+4. **Broken documentation URL fixed** (`lib/config.ts`) — `EXTERNAL_LINKS.documentation` no longer points to a 404 repository URL.
+
+5. **Workspace artifact cleanup** — removed local `.DS_Store` files and stale `logs/mcp-puppeteer-*.log` artifacts.
+
+#### Files Changed
+
+- `app/settings/layout.tsx`
+- `app/settings/components/QuickActions.tsx`
+- `app/settings/components/index.ts`
+- `lib/config.ts`
+- `tests/settings/SettingsRoutesIntegrity.test.ts` (new)
+- `app/settings/components/AccountSettings.tsx` (deleted)
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build)
+
+---
+
 ### Raouf: Settings Page Audit + Redirect Fix — 2026-02-10
 
 **Scope:** Full settings-page audit and stabilization

@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Settings Links Validation + Repository Hygiene Cleanup
+Summary: Performed a full settings-page link audit and repository cleanup pass. (1) Verified all internal settings navigation and quick-action paths map to existing `app/**/page.tsx` routes. Added automated integrity coverage by exporting route/link constants and creating `tests/settings/SettingsRoutesIntegrity.test.ts` to prevent future broken settings links. (2) Removed redundant client-side `/settings` redirect effect from `settings/layout.tsx` since root routing is now handled server-side in `app/settings/page.tsx`. (3) Cleaned dead code by removing unused `AccountSettings` component and barrel export. (4) Fixed broken documentation URL in `EXTERNAL_LINKS.documentation` (old GitHub repo URL returned 404). (5) Removed local junk artifacts (`.DS_Store`, stale `logs/mcp-puppeteer-*.log`) from workspace.
+Files: Modified 4 files (`app/settings/layout.tsx`, `app/settings/components/QuickActions.tsx`, `app/settings/components/index.ts`, `lib/config.ts`), added 1 file (`tests/settings/SettingsRoutesIntegrity.test.ts`), deleted 1 file (`app/settings/components/AccountSettings.tsx`).
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build all pass).
+Follow-ups: If you want, I can add a CI job that runs only settings-link integrity + settings tests on pull requests touching `app/settings/**`.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Page Audit + Root Redirect + Test Stabilization
 Summary: Completed a focused production audit of the Settings module and applied two fixes. (1) Replaced client-side placeholder null-render in `app/settings/page.tsx` with server redirect using `redirect('/settings/general')` to eliminate blank-state flash and guarantee deterministic route behavior for `/settings`. (2) Stabilized `tests/settings/PrivacySettings.test.tsx` password-strength assertion by awaiting post-input UI updates via `waitFor`, removing React `act(...)` warning noise from the settings test path. Confirmed the full repository quality gate remains green after changes.
 Files: Modified 2 files: `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.

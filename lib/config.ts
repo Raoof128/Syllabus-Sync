@@ -126,7 +126,7 @@ export const SOCIAL_LINKS = {
  * Links to documentation, feedback, and support
  */
 export const EXTERNAL_LINKS = {
-  documentation: 'https://github.com/syllabus-sync/syllabus-sync#readme',
+  documentation: 'https://github.com/mrpouyaalavi',
   feedback: 'mailto:support@mq.edu.au?subject=Syllabus Sync Feedback',
   privacy: 'https://www.mq.edu.au/privacy',
   terms: 'https://www.mq.edu.au/terms',

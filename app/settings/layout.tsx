@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -63,6 +63,8 @@ const SECTIONS: {
   },
 ];
 
+export const SETTINGS_SECTION_PATHS = SECTIONS.map((section) => section.path);
+
 function SettingsLayout({ children }: { children?: React.ReactNode }) {
   const isClient = useIsClient();
   const router = useRouter();
@@ -72,13 +74,6 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
   // Determine active section based on current path
   const activeSectionId =
     SECTIONS.find((section) => pathname?.startsWith(section.path))?.id || 'general';
-
-  // Redirect to general if on root settings page
-  useEffect(() => {
-    if (pathname === '/settings') {
-      router.replace('/settings/general');
-    }
-  }, [pathname, router]);
 
   const navigateToSection = (path: string) => {
     router.push(path);
