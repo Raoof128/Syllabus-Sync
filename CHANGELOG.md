@@ -4,6 +4,55 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Rollback — Restore Sketch Directory — 2026-02-10
+
+**Scope:** Revert only Sketch deletion
+**Type:** Rollback / repository file restore
+
+#### Changes Applied
+
+1. Restored `Sketch/` tracked design snapshot files per request.
+2. Left other cleanup deletions unchanged.
+
+#### Files Changed
+
+- `Sketch/*` (restored)
+
+#### Verification
+
+- Git status confirms no pending deletions under `Sketch/`.
+
+---
+
+### Raouf: Extended Directory Audit Cleanup — 2026-02-10
+
+**Scope:** Additional top-level directory relevance review
+**Type:** Repository hygiene / structure cleanup
+
+#### Changes Applied
+
+1. **Removed non-essential tracked directories**
+   - Deleted `Sketch/` design snapshot images
+   - Deleted `team-opencode-config/` assistant workflow config/prompts
+   - Deleted tracked log artifact `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json`
+
+2. **Kept required project directories**
+   - Retained source, tests, docs, infra, localization, and migration directories
+   - Explicitly kept `.devcontainer` and `.github`
+   - Retained `Team_Plan` because it is referenced in README/docs and project process
+
+#### Files Changed
+
+- `Sketch/*` (deleted)
+- `team-opencode-config/*` (deleted)
+- `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json` (deleted)
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build)
+
+---
+
 ### Raouf: Directory Cleanup Audit — 2026-02-10
 
 **Scope:** Remove non-runtime tooling/IDE artifact directories

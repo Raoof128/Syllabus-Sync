@@ -2,6 +2,22 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-10 (Australia/Sydney) - Rollback: Restore Sketch Only
+- **Status:** ✅ Complete - `Sketch/` restored as requested.
+- **Scope:** Targeted rollback of previous directory cleanup.
+- **Summary:** Reverted only the `Sketch` directory deletion and kept all other cleanup decisions unchanged.
+- **Files:** `Sketch/*` restored.
+- **Verification:** Git status shows no deletions for `Sketch/`.
+- **Follow-ups:** None.
+
+### Raouf: 2026-02-10 (Australia/Sydney) - Extended Directory Audit (Sketch/Team Config/Logs)
+- **Status:** ✅ Complete - Additional directory cleanup done with full validation.
+- **Scope:** Repository structure hygiene and artifact reduction.
+- **Summary:** Reviewed requested directories and removed non-essential tracked content: `Sketch/` (UI snapshots), `team-opencode-config/` (assistant workflow prompts/config), and tracked `logs` audit artifact file. Kept all runtime/source/infra directories plus `.devcontainer`, `.github`, and `Team_Plan`.
+- **Files:** `Sketch/*` (deleted), `team-opencode-config/*` (deleted), `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json` (deleted).
+- **Verification:** `npm run check` passed (425/425 tests, lint, typecheck, build).
+- **Follow-ups:** Optional archive path (`docs/archive/`) for future design snapshots.
+
 ### Raouf: 2026-02-10 (Australia/Sydney) - Directory Audit + Artifact Removal
 - **Status:** ✅ Complete - Non-essential tooling/IDE artifacts removed, repo remains green.
 - **Scope:** Repository hygiene, security hardening.

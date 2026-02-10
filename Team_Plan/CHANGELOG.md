@@ -1,4 +1,18 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Rollback - Restore Sketch Directory
+Summary: Restored `Sketch/` files only per user request. Other previously removed directories/files remain deleted.
+- **Files:** `Sketch/*` restored.
+- **Verification:** Git status confirms no `Sketch/` deletions remain.
+- **Follow-ups:** None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Extended Directory Audit Cleanup
+Summary: Audited additional user-listed directories and removed non-essential tracked artifacts: `Sketch/` (design snapshots), `team-opencode-config/` (assistant-specific prompts/config), and tracked logs audit file. Kept core runtime, infra, and process directories including `.devcontainer`, `.github`, and `Team_Plan`.
+- **Files:** Deleted `Sketch/*`, `team-opencode-config/*`, `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json`.
+- **Verification:** `npm run check` ✅ (425 tests passed + build/lint/typecheck green).
+- **Follow-ups:** Optional future `docs/archive/` for non-runtime design artifacts.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Directory Audit + Artifact Cleanup
 Summary: Audited requested root directories and removed non-runtime tracked artifacts: `.codex`, `.gemini`, `.idea`, `.playwright-mcp`. Kept `.github` (CI/templates) and `.devcontainer` (dev env). This also removed tracked plaintext SSH credential content from `.gemini/settings.json`.
 - **Files:** Deleted tracked files under `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`.

@@ -1,6 +1,20 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Rollback Request — Restore Sketch Directory
+Summary: Per user request, reverted only the `Sketch/` deletion from the previous directory cleanup pass. All `Sketch/*.JPG` files are restored. Kept other cleanup changes intact (`team-opencode-config/*` and tracked `logs` audit artifact remain deleted).
+Files: Restored tracked files under `Sketch/` only.
+Verification: Git status confirms `Sketch/` deletions are no longer present.
+Follow-ups: None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Extended Directory Audit — Keep/Remove Decision Pass
+Summary: Audited the additional requested directories and removed non-essential project artifacts while preserving required infrastructure and source directories. **Kept:** `.devcontainer`, `.github`, `Team_Plan`, `__tests__`, `app`, `components`, `data`, `docker`, `docs`, `k8s`, `lib`, `locales`, `maps`, `public`, `scripts`, `security`, `supabase/migrations`, `tests`, `types`. **Removed:** `Sketch/` (design image snapshots not referenced by runtime/build/tests), `team-opencode-config/` (assistant workflow prompts/config not used by app pipeline), and tracked `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json` artifact.
+Files: Deleted 22 tracked files: `Sketch/*` (12), `team-opencode-config/*` (9), `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json` (1).
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build all pass).
+Follow-ups: If desired, I can add a root `docs/archive/` and move future design snapshots there instead of tracking them in top-level folders.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Repository Directory Audit — Tooling/IDE Artifact Cleanup
 Summary: Audited requested top-level directories for production/runtime relevance and removed non-essential, tool-specific artifacts while preserving developer infrastructure that benefits the project. **Removed:** `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/` (all tracked files deleted). This removed local agent configs, IDE metadata, and Playwright MCP debug outputs that are not needed for app runtime, build, testing, or deployment. Notably, `.gemini/settings.json` contained a plaintext SSH password and was removed from versioned content to reduce security exposure. **Kept:** `.github/` (CI/CD, issue/PR templates) and `.devcontainer/` (reproducible development environment).
 Files: Deleted 22 tracked files under `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`. No runtime source files modified.
