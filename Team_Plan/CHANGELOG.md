@@ -1,4 +1,11 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Directory Audit + Artifact Cleanup
+Summary: Audited requested root directories and removed non-runtime tracked artifacts: `.codex`, `.gemini`, `.idea`, `.playwright-mcp`. Kept `.github` (CI/templates) and `.devcontainer` (dev env). This also removed tracked plaintext SSH credential content from `.gemini/settings.json`.
+- **Files:** Deleted tracked files under `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`.
+- **Verification:** `npm run check` ✅ (425 tests passed, lint/typecheck/build green).
+- **Follow-ups:** Rotate exposed credentials previously stored in deleted `.gemini` config.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Documentation Suite Refresh (README + Docs)
 Summary: Refreshed documentation to match current repo state. Updated README test counts and architecture/test tree examples, fixed broken relative links across docs, replaced stale script references (`test:lighthouse`), updated onboarding stack/check pipeline notes, and added a new `docs/i18n.md` localization guide. Internal markdown link check now reports zero broken links.
 - **Files:** `README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`, `docs/i18n.md`.

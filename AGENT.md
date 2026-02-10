@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Repository Directory Audit — Tooling/IDE Artifact Cleanup
+Summary: Audited requested top-level directories for production/runtime relevance and removed non-essential, tool-specific artifacts while preserving developer infrastructure that benefits the project. **Removed:** `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/` (all tracked files deleted). This removed local agent configs, IDE metadata, and Playwright MCP debug outputs that are not needed for app runtime, build, testing, or deployment. Notably, `.gemini/settings.json` contained a plaintext SSH password and was removed from versioned content to reduce security exposure. **Kept:** `.github/` (CI/CD, issue/PR templates) and `.devcontainer/` (reproducible development environment).
+Files: Deleted 22 tracked files under `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`. No runtime source files modified.
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build all pass).
+Follow-ups: Recommend rotating any credentials previously stored in `.gemini/settings.json` and adding a secret-scanning CI job if not already enforced.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Documentation Suite Refresh — README + Docs Consistency
 Summary: Performed a full documentation consistency pass after re-reading `AGENT.md` and `CHANGELOG.md`. Updated stale README metrics and repository tree details (test count now 425+, removed nonexistent route-group entry, aligned test folder examples). Fixed documentation drift in `docs/` by correcting broken relative links, replacing obsolete script references (`test:lighthouse` → `lighthouse`), updating onboarding tech notes (Tailwind 4.x, current `npm run check` pipeline), and replacing links to missing docs with existing references. Added new `docs/i18n.md` so README internationalization reference resolves and localization workflow is documented. Verified local markdown link integrity script reports zero broken internal links.
 Files: Modified 6 docs (`README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`) and added `docs/i18n.md`.

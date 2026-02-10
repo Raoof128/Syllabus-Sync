@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Directory Cleanup Audit — 2026-02-10
+
+**Scope:** Remove non-runtime tooling/IDE artifact directories
+**Type:** Repository hygiene / security hardening
+
+#### Changes Applied
+
+1. **Removed non-essential tracked directories**
+   - Deleted `.codex/` tracked environment file
+   - Deleted `.gemini/` tracked settings file
+   - Deleted `.idea/` tracked JetBrains project metadata
+   - Deleted `.playwright-mcp/` tracked debug verification artifacts (`.md` + `.png`)
+
+2. **Preserved project-relevant infrastructure**
+   - Kept `.github/` (workflows, issue templates, PR templates)
+   - Kept `.devcontainer/` (reproducible development environment)
+
+3. **Security note**
+   - Removed plaintext SSH credential exposure present in `.gemini/settings.json` from tracked content.
+
+#### Files Changed
+
+- `.codex/environments/environment.toml` (deleted)
+- `.gemini/settings.json` (deleted)
+- `.idea/*` tracked files (deleted)
+- `.playwright-mcp/*` tracked files (deleted)
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build)
+
+---
+
 ### Raouf: Documentation Suite Refresh — 2026-02-10
 
 **Scope:** README + docs consistency, accuracy, and link integrity

@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-10 (Australia/Sydney) - Directory Audit + Artifact Removal
+- **Status:** ✅ Complete - Non-essential tooling/IDE artifacts removed, repo remains green.
+- **Scope:** Repository hygiene, security hardening.
+- **Summary:** Audited `.codex/environments`, `.devcontainer`, `.gemini`, `.github`, `.idea`, and `.playwright-mcp`. Removed tracked files under `.codex`, `.gemini`, `.idea`, and `.playwright-mcp` as not required for runtime/build/deploy. Kept `.github` and `.devcontainer` as project-relevant infrastructure. Removed a plaintext SSH credential exposure by deleting tracked `.gemini/settings.json`.
+- **Files:** Deleted tracked files in `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`.
+- **Verification:** `npm run check` passed (425/425 tests, lint, typecheck, build).
+- **Follow-ups:** Rotate credentials previously present in `.gemini/settings.json`.
+
 ### Raouf: 2026-02-10 (Australia/Sydney) - Documentation Suite Refresh
 - **Status:** ✅ Complete - README/docs are now aligned with current repository state.
 - **Scope:** Documentation consistency, link integrity, and onboarding accuracy.
