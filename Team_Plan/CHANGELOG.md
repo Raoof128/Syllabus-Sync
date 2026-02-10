@@ -1,4 +1,11 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Root File Cleanup
+Summary: Audited requested root files and removed only redundant ones: `.eslintrc.json` (legacy/unused) and `LICENSE.md` (duplicate of `LICENSE`). Kept the rest as active project/config/compliance assets.
+- **Files:** `.eslintrc.json` deleted, `LICENSE.md` deleted.
+- **Verification:** `npm run check` ✅ (425 tests + lint/typecheck/build green).
+- **Follow-ups:** None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Rollback - Restore Sketch Directory
 Summary: Restored `Sketch/` files only per user request. Other previously removed directories/files remain deleted.
 - **Files:** `Sketch/*` restored.

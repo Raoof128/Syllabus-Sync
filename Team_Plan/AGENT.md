@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-10 (Australia/Sydney) - Root File Cleanup (`.eslintrc.json`, `LICENSE.md`)
+- **Status:** ✅ Complete - Redundant root files removed safely.
+- **Scope:** Root-level repository hygiene.
+- **Summary:** Removed legacy `.eslintrc.json` (unused under current `eslint.config.mjs`) and duplicate `LICENSE.md` (canonical `LICENSE` retained). Kept all other audited root files.
+- **Files:** `.eslintrc.json` (deleted), `LICENSE.md` (deleted).
+- **Verification:** `npm run check` passed (425/425 tests + lint/typecheck/build).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-10 (Australia/Sydney) - Rollback: Restore Sketch Only
 - **Status:** ✅ Complete - `Sketch/` restored as requested.
 - **Scope:** Targeted rollback of previous directory cleanup.

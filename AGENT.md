@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Root File Audit — Redundant Config/License Cleanup
+Summary: Audited the additional root-level file list and removed only files confirmed redundant. Deleted `.eslintrc.json` (legacy ESLint config not used; project uses flat config via `eslint.config.mjs`) and `LICENSE.md` (duplicate of canonical `LICENSE`, not referenced). Kept all other listed root files because they are active config, compliance docs, build/runtime config, or useful operational assets.
+Files: Deleted 2 files: `.eslintrc.json`, `LICENSE.md`.
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build all pass).
+Follow-ups: None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Rollback Request — Restore Sketch Directory
 Summary: Per user request, reverted only the `Sketch/` deletion from the previous directory cleanup pass. All `Sketch/*.JPG` files are restored. Kept other cleanup changes intact (`team-opencode-config/*` and tracked `logs` audit artifact remain deleted).
 Files: Restored tracked files under `Sketch/` only.

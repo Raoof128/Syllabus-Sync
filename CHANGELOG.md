@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Root Files Cleanup — 2026-02-10
+
+**Scope:** Additional root-level file relevance audit
+**Type:** Repository hygiene
+
+#### Changes Applied
+
+1. Deleted `.eslintrc.json` (legacy config not used by ESLint v9 flat-config setup).
+2. Deleted `LICENSE.md` (duplicate of canonical `LICENSE` file).
+3. Retained all other listed root files as they are active/required for build, docs, security, CI, or operations.
+
+#### Files Changed
+
+- `.eslintrc.json` (deleted)
+- `LICENSE.md` (deleted)
+
+#### Verification
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build)
+
+---
+
 ### Raouf: Rollback — Restore Sketch Directory — 2026-02-10
 
 **Scope:** Revert only Sketch deletion
