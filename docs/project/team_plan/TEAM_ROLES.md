@@ -145,9 +145,9 @@ tests/
 
 #### **Configuration Files**
 ```
-tailwind.config.ts             # Tailwind configuration
-postcss.config.mjs             # PostCSS config
-vitest.config.ts               # Test configuration
+config/tailwind/tailwind.config.ts             # Tailwind configuration
+config/postcss/postcss.config.mjs             # PostCSS config
+config/vitest/vitest.config.ts               # Test configuration
 ```
 app/
 ├── page.tsx                    # Root redirect
@@ -292,11 +292,11 @@ lib/
 
 #### **Build System & Configuration**
 ```
-├── next.config.ts              # ⭐ Next.js optimization & features
-├── eslint.config.mjs           # ⭐ ESLint rules (0 errors, 0 warnings)
-├── tailwind.config.ts          # ⭐ Tailwind with dark mode support
-├── vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── postcss.config.mjs          # ⭐ PostCSS processing
+├── config/next/next.config.ts              # ⭐ Next.js optimization & features
+├── config/eslint/eslint.config.mjs           # ⭐ ESLint rules (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode support
+├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs          # ⭐ PostCSS processing
 └── package.json                # ⭐ Dependencies & scripts (v0.5.0)
 ```
 
@@ -332,11 +332,11 @@ Responsible for data architecture, database design, API development, configurati
 
 #### **Configuration & Build System**
 ```
-├── next.config.ts              # ⭐ Next.js with bundle optimization & features
-├── eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
-├── tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
-├── vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── postcss.config.mjs          # ⭐ PostCSS configuration
+├── config/next/next.config.ts              # ⭐ Next.js with bundle optimization & features
+├── config/eslint/eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
+├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs          # ⭐ PostCSS configuration
 └── package.json                # ⭐ Dependencies & scripts (v0.5.0)
 ```
 
@@ -430,11 +430,11 @@ Responsible for Home tab, Calendar tab, half of Feed tab (frontend), all user-fa
 
 #### **Build System & Configuration**
 ```
-├── next.config.ts              # ⭐ Next.js with bundle optimization & features
-├── eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
-├── tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
-├── vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── postcss.config.mjs          # ⭐ PostCSS configuration
+├── config/next/next.config.ts              # ⭐ Next.js with bundle optimization & features
+├── config/eslint/eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
+├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs          # ⭐ PostCSS configuration
 └── package.json                # ⭐ Dependencies & scripts (v0.5.0)
 ```
 

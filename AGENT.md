@@ -556,3 +556,16 @@ Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Feature tree cleanup
 Summary: Removed empty scaffold-only subdirectories in `features/*` to keep the final tree minimal and intentional. Retained only populated feature paths.
 Verification: `npm run typecheck` ✅.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Presentation-grade root cleanup + config centralization
+Summary: Reorganized root clutter into structured folders while preserving tool/runtime behavior. Moved configs to `config/*` (`next`, `ts`, `eslint`, `prettier`, `vitest`, `playwright`, `tailwind`, `postcss`, `lighthouse`, `sentry`), infra/tooling assets to `infra/docker` and `tools/*`, and policy/ops/db docs to `docs/operations`, `docs/policies`, `docs/database`. Added/kept root shims for compatibility: `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `postcss.config.mjs`, `proxy.ts`, and `sentry.*.config.ts` (required by Next/Sentry/proxy discovery conventions). Updated `package.json` scripts to explicit config paths and updated workflow Lighthouse/Playwright config references accordingly. Per latest instruction, removed e2e execution from scripts/CI (`test:e2e`, `test:e2e:ui`, `test:accessibility` removed; CI accessibility/e2e job paths removed; `test:ci` now unit/integration only).
+Files: Moved files per requested mapping into `config/`, `infra/`, `tools/`, and `docs/`; modified root shims and CI workflows; added `docs/README.md` index.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅ (425/425), `npm run build` ✅, `npm run check` ✅. E2E intentionally removed/skipped per user direction.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Final e2e artifact removal per user instruction
+Summary: Removed remaining e2e Playwright artifacts (`tests/e2e.spec.ts`, `tests/accessibility.spec.ts`, `config/playwright/playwright.config.ts`), removed Playwright-related dev dependencies (`@playwright/test`, `@axe-core/playwright`), and cleaned Vitest config by removing stale e2e exclude entries.
+Files: `tests/e2e.spec.ts` (deleted), `tests/accessibility.spec.ts` (deleted), `config/playwright/playwright.config.ts` (deleted), `config/vitest/vitest.config.ts`, `package.json`, `package-lock.json`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, `npm run build` ✅.
+Follow-ups: None.

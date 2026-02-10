@@ -9,11 +9,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['tests/e2e.spec.ts', 'tests/accessibility.spec.ts'],
     globals: true,
     testTimeout: 10000,
     alias: {
-      '@': path.resolve(__dirname, './'),
+      '@': path.resolve(__dirname, '../..'),
     },
     // Coverage configuration
     coverage: {

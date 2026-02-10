@@ -1,29 +1,22 @@
-# Documentation
+# Documentation Index
 
-This repository uses a feature-first structure with a thin Next.js `app/` layer.
+This folder contains presentation-grade project documentation for the Macquarie University demo.
 
-## Structure Overview
+## Sections
 
-- `app/`: Routes, layouts, and route handlers only.
-- `features/`: Feature modules (`map`, `calendar`, `settings`, `auth`, `feed`, `home`, `gamification`).
-- `components/ui`: Shared UI primitives.
-- `components/layout`: Shared layout components.
-- `lib/`: Shared platform layers (`security`, `i18n`, `store`, `schemas`, `services`, and utilities).
-- `assets/maps`: Source map assets and non-public geodata.
-- `public/maps`, `public/tiles`: Browser-fetched map assets.
-- `tests/`: Unified test root (`unit`, integration-style tests, e2e specs).
-- `supabase/`: Migrations and database assets.
+- `docs/operations/`: Operational runbooks and deployment guidance.
+- `docs/policies/`: Security and governance policy documents.
+- `docs/database/`: Database reference artifacts and schema snapshots.
+- `docs/project/`: Internal project planning material and design sketches.
 
-## Local Commands
+## Repository Layout References
 
-- `npm run typecheck`
-- `npm run lint`
-- `npm run test`
-- `npm run build`
-- `npm run check`
+- `config/`: Centralized tool configuration (Next.js, TypeScript, ESLint, Prettier, Vitest, Playwright, Tailwind, PostCSS, Lighthouse, Sentry).
+- `infra/`: Infrastructure build/deployment assets (for example Docker files).
+- `tools/`: Operational tooling (proxy helpers, load-test utilities).
 
-## Project Materials
+## Core Entry Points
 
-- `docs/project/team_plan/`: Planning, roles, and roadmap material.
-- `docs/project/sketch/`: Design sketch images.
-- `docs/project/restructure-notes.md`: Detailed repo restructuring log.
+- Project overview: `/README.md`
+- Change history: `/CHANGELOG.md`
+- Workflow notes: `/AGENT.md`

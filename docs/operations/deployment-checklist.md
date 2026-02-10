@@ -14,7 +14,7 @@ All database schema mismatches have been identified and resolved. API routes hav
 
 ```sql
 -- Run the complete corrected schema
--- File: database-schema.sql
+-- File: docs/database/database-schema.sql
 ```
 
 #### **Option B: Migrate Existing Database**
@@ -155,10 +155,10 @@ If migration fails, use rollback helpers in `data-migration-helpers.sql`
 
 ### **New Files**
 
-- `database-schema.sql` - Complete corrected schema
+- `docs/database/database-schema.sql` - Complete corrected schema
 - `database-migrations.sql` - Step-by-step migration script
 - `data-migration-helpers.sql` - Data migration utilities
-- `DEPLOYMENT-CHECKLIST.md` - This deployment guide
+- `docs/operations/deployment-checklist.md` - This deployment guide
 
 ### **Modified Files**
 

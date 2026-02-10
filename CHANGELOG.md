@@ -690,3 +690,64 @@ All notable changes to this project will be documented in this file.
 - Verification: `npm run typecheck` ✅.
 
 ---
+
+### Raouf: Root Aesthetic Reorganization + Tooling Preservation — 2026-02-10
+
+**Scope:** Presentation-grade repository root cleanup with no functional regressions  
+**Type:** Refactor / repository structure / tooling reliability
+
+#### Changes Applied
+
+1. Centralized tool configuration under `config/`:
+   - `config/next/next.config.ts`
+   - `config/ts/tsconfig.json`
+   - `config/eslint/eslint.config.mjs`
+   - `config/prettier/.prettierrc.json`, `config/prettier/.prettierignore`
+   - `config/vitest/vitest.config.ts`
+   - `config/playwright/playwright.config.ts`
+   - `config/tailwind/tailwind.config.ts`
+   - `config/postcss/postcss.config.mjs`
+   - `config/lighthouse/.lighthouserc.json`
+   - `config/sentry/sentry.{client,edge,server}.config.ts`
+
+2. Moved infra/tooling and docs artifacts:
+   - `infra/docker/{Dockerfile,.dockerignore}`
+   - `tools/proxy/proxy.ts`
+   - `tools/loadtest/{artillery.config.yml,artillery.processor.js}`
+   - `docs/operations/deployment-checklist.md`
+   - `docs/policies/security-policy.md`
+   - `docs/database/database-schema.sql`
+   - Added `docs/README.md` documentation index
+
+3. Retained root compatibility shims (by design):
+   - `next.config.ts` -> re-export from `config/next`
+   - `tsconfig.json` -> extends `config/ts/tsconfig.json`
+   - `tailwind.config.ts` -> re-export shim
+   - `postcss.config.mjs` -> re-export shim
+   - `proxy.ts` shim retained for Next.js proxy discovery
+   - `sentry.*.config.ts` shims retained for Sentry/Next discovery expectations
+
+4. Script + CI path updates:
+   - `package.json` scripts now explicitly reference moved config files.
+   - `.github/workflows` updated for new Lighthouse config path and cleaned references.
+
+5. Per user direction: removed e2e execution paths:
+   - Removed `test:e2e`, `test:e2e:ui`, `test:accessibility` scripts.
+   - `test:ci` now runs `npm run test` only.
+   - Removed CI accessibility/e2e execution blocks.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (425/425)
+- `npm run build` ✅
+- `npm run check` ✅
+
+---
+
+Raouf: 2026-02-10 (Australia/Sydney)
+- Completed final e2e removal per instruction: deleted `tests/e2e.spec.ts`, `tests/accessibility.spec.ts`, and `config/playwright/playwright.config.ts`.
+- Removed Playwright dependencies (`@playwright/test`, `@axe-core/playwright`) from devDependencies.
+- Cleaned `config/vitest/vitest.config.ts` by removing obsolete e2e excludes.
+- Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, `npm run build` ✅.

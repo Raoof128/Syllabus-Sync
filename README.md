@@ -166,7 +166,7 @@ cp .env.example .env.local
 
 #### 3. Database Initialization
 
-Execute `database-schema.sql` in your Supabase SQL Editor to:
+Execute `docs/database/database-schema.sql` in your Supabase SQL Editor to:
 
 - Create all required tables with proper constraints
 - Implement Row Level Security (RLS) policies
@@ -237,6 +237,9 @@ syllabus-sync/
 ├── docs/                           # Documentation and project artifacts
 │   ├── README.md                  # Docs index
 │   └── project/                   # Team plans, sketches, restructure notes
+├── config/                         # Tooling configuration (next/ts/eslint/vitest/etc.)
+├── infra/                          # Infrastructure assets (Docker, deployment helpers)
+├── tools/                          # Operational tooling (proxy/loadtest utilities)
 ├── public/                         # Static assets & media
 └── assets/                         # Non-public source assets
 ```
@@ -290,7 +293,7 @@ Our platform maintains a defense-in-depth security architecture:
 
 ### **Development Resources**
 
-- **[🚀 Deployment Checklist](DEPLOYMENT-CHECKLIST.md)** - Production deployment guidelines and validation steps
+- **[🚀 Deployment Checklist](docs/operations/deployment-checklist.md)** - Production deployment guidelines and validation steps
 - **[🎨 Design Sketches](docs/project/sketch/)** - Project concept and UI sketches
 
 ## 👥 Core Development Team

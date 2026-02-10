@@ -179,17 +179,11 @@ jobs:
       - name: Run Lighthouse audit
         uses: treosh/lighthouse-ci-action@v10
         with:
-          configPath: .lighthouserc.json
+          configPath: config/lighthouse/.lighthouserc.json
           urls: |
             ${{ needs.deploy-to-production.outputs.deployment-url }}
           uploadArtifacts: true
           temporaryPublicStorage: true
-
-      - name: Accessibility audit
-        uses: coactions/accessibility-check@v1
-        with:
-          url: ${{ needs.deploy-to-production.outputs.deployment-url }}
-          failOnError: false
 
       - name: Notify team
         if: always()

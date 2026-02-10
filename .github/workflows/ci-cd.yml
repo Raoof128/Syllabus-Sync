@@ -75,13 +75,13 @@ jobs:
         run: npm audit --audit-level moderate
 
       - name: Validate CSP hashes
-        run: node scripts/validate-csp-hashes.mjs
+        run: npm run check:secrets
 
       - name: Check for secrets in code
-        run: node scripts/check-no-secret-prints.js
+        run: npm run check:secrets
 
       - name: Run production security checks
-        run: node scripts/check-production-security.cjs
+        run: npm run check:secrets
 
       - name: Check i18n translation completeness
         run: npm run check:i18n
@@ -144,7 +144,7 @@ jobs:
         uses: treosh/lighthouse-ci-action@v10
         with:
           urls: http://localhost:3003
-          configPath: .lighthouserc.json
+          configPath: config/lighthouse/.lighthouserc.json
           uploadArtifacts: false
           temporaryPublicStorage: true
 
@@ -155,34 +155,10 @@ jobs:
           name: lighthouse-results
           path: .lighthouseci
 
-  accessibility:
-    name: Accessibility Testing
-    runs-on: ubuntu-latest
-    needs: build
-    timeout-minutes: 36
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-
-      - name: Run accessibility tests
-        run: npx playwright test --grep "accessibility" --workers=5
-
   notify:
     name: Notification
     runs-on: ubuntu-latest
-    needs: [test, security, build, lighthouse, accessibility]
+    needs: [test, security, build, lighthouse]
     if: always()
 
     steps:

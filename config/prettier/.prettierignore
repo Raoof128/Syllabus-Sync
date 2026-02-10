@@ -3,11 +3,17 @@ node_modules
 out
 dist
 coverage
+.lighthouseci
+test-results
 .idea
 .vscode
+.agent
+next-env.d.ts
 public
 Team_Plan
 security
 database-schema.sql
 supabase/migrations
+supabase
+supabase/README.md
 logs
