@@ -1,7 +1,7 @@
 // tests/settings/AppearanceSettings.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import AppearanceSettings from '@/app/settings/components/AppearanceSettings';
+import AppearanceSettings from '@/features/settings/components/AppearanceSettings';
 
 // Mock toast utils
 vi.mock('@/lib/utils/toast', () => ({

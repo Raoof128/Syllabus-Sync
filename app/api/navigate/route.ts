@@ -5,7 +5,7 @@ import { getClientIP } from '@/lib/security/ip';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
 import { createHash } from 'crypto';
 import { logger } from '@/lib/logger';
-import { GPS_CAMPUS_BOUNDS } from '@/lib/map/constants';
+import { GPS_CAMPUS_BOUNDS } from '@/features/map/lib/constants';
 
 // Use server-only env var (no NEXT_PUBLIC_ prefix) for security
 // The API key should only be set via ORS_API_KEY on the server

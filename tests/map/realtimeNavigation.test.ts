@@ -11,7 +11,7 @@ import {
   generateNavigationText,
   formatETA,
   OFF_ROUTE_THRESHOLD,
-} from '@/lib/map/realtimeNavigation';
+} from '@/features/map/lib/realtimeNavigation';
 
 describe('GpsPositionSmoother', () => {
   let smoother: GpsPositionSmoother;

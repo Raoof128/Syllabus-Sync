@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { RouteAnnouncer } from '../../app/map/components/RouteAnnouncer';
+import { RouteAnnouncer } from '@/features/map/components/RouteAnnouncer';
 
 // Mock useSafeTranslation
 vi.mock('@/lib/hooks/useSafeTranslation', () => ({

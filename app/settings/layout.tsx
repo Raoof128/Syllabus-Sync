@@ -4,13 +4,13 @@ import { useSyncExternalStore } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { SettingsSectionBoundary } from './components/SettingsSectionBoundary';
+import { SettingsSectionBoundary } from '@/features/settings/components/SettingsSectionBoundary';
 import { cn } from '@/lib/utils';
 import { Palette, Shield, Layout, Settings, Sparkles, LifeBuoy } from 'lucide-react';
 import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
-import { SettingsSkeleton } from './components';
+import { SettingsSkeleton } from '@/features/settings/components';
 
 const useIsClient = () =>
   useSyncExternalStore(

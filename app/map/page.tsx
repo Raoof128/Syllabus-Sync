@@ -2,7 +2,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import MapClient from './MapClient';
+import MapClient from '@/features/map/components/MapClient';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Campus Map`,

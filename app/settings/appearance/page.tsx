@@ -2,7 +2,7 @@
 
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useThemeStore } from '@/lib/store/themeStore';
-import { AppearanceSettings } from '../components';
+import { AppearanceSettings } from '@/features/settings/components';
 
 export default function AppearanceSettingsPage() {
   const { t, language, setLanguage } = useTypedTranslation();

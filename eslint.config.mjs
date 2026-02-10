@@ -41,7 +41,8 @@ const eslintConfig = defineConfig([
     '.vscode/**',
     '.DS_Store',
     'public/**',
-    'Team_Plan/**',
+    'docs/project/team_plan/**',
+    'docs/project/sketch/**',
     'next-env.d.ts',
   ]),
 ]);

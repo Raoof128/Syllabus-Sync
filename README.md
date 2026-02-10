@@ -209,14 +209,17 @@ syllabus-sync/
 │   ├── calendar/                   # Academic calendar & scheduling
 │   ├── map/                       # Campus navigation system
 │   └── settings/                  # User preferences & configuration
-├── components/                     # Atomic Design Component Library
-│   ├── ui/                        # Base UI primitives & design system
-│   │   ├── mq/                    # Macquarie University branded components
-│   │   └── ...                    # Reusable UI elements
-│   ├── gamification/               # XP, levels, and achievement components
-│   ├── assignments/                # Academic assignment management
-│   ├── deadlines/                 # Deadline tracking & notifications
-│   └── units/                     # Course unit interface components
+├── features/                       # Feature-first modules
+│   ├── map/                       # Campus map feature module
+│   ├── calendar/                  # Calendar feature module
+│   ├── settings/                  # Settings feature module
+│   ├── feed/                      # Feed feature module
+│   ├── home/                      # Home dashboard feature module
+│   ├── auth/                      # Auth feature module
+│   └── gamification/              # XP and progression feature module
+├── components/                     # Shared component layers
+│   ├── ui/                        # Shared UI primitives
+│   └── layout/                    # Shared layout components
 ├── lib/                           # Core business logic & utilities
 │   ├── store/                      # Zustand state management architecture
 │   │   ├── unitsStore.ts           # Academic unit state
@@ -231,9 +234,11 @@ syllabus-sync/
 │   ├── map/                        # Map/navigation tests
 │   ├── api/                        # API route tests
 │   └── security/                   # Security-focused tests
-├── docs/                           # Technical documentation
+├── docs/                           # Documentation and project artifacts
+│   ├── README.md                  # Docs index
+│   └── project/                   # Team plans, sketches, restructure notes
 ├── public/                         # Static assets & media
-└── Team_Plan/                      # Development logs & change tracking
+└── assets/                         # Non-public source assets
 ```
 
 ### **Key Architectural Patterns**
@@ -277,17 +282,16 @@ Our platform maintains a defense-in-depth security architecture:
 
 ### **Technical Documentation**
 
-- **[📋 Agent Progress](Team_Plan/AGENT.md)** - Detailed development logs, architectural decisions, and team protocols
-- **[📅 Changelog](Team_Plan/CHANGELOG.md)** - Comprehensive version history, feature rollouts, and migration guides
-- **[🔧 API Reference](docs/api.md)** - Complete REST API documentation with examples and schemas
-- **[🏗️ Architecture](docs/ARCHITECTURE.md)** - Deep dive into system design, security patterns, and data flow
+- **[📋 Agent Progress](docs/project/team_plan/AGENT.md)** - Detailed development logs, architectural decisions, and team protocols
+- **[📅 Changelog](docs/project/team_plan/CHANGELOG.md)** - Comprehensive version history, feature rollouts, and migration guides
+- **[🗂️ Restructure Notes](docs/project/restructure-notes.md)** - Before/after tree and migration decisions
+- **[📁 Docs Index](docs/README.md)** - Documentation structure and usage
 - **[🔒 Security Guide](SECURITY.md)** - Security policies, vulnerability reporting, and best practices
 
 ### **Development Resources**
 
 - **[🚀 Deployment Checklist](DEPLOYMENT-CHECKLIST.md)** - Production deployment guidelines and validation steps
-- **[🎨 Design System](docs/design-system.md)** - UI component library usage and customization
-- **[🌐 Internationalization](docs/i18n.md)** - Localization workflow and translation guidelines
+- **[🎨 Design Sketches](docs/project/sketch/)** - Project concept and UI sketches
 
 ## 👥 Core Development Team
 

@@ -6,7 +6,11 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { MAP_OVERLAY_IDS, normaliseOverlayIds, type MapOverlayId } from '@/lib/map/mapOverlays';
+import {
+  MAP_OVERLAY_IDS,
+  normaliseOverlayIds,
+  type MapOverlayId,
+} from '@/features/map/lib/mapOverlays';
 
 export interface MapState {
   // Active overlay layers (always in registry order, no duplicates)

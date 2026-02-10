@@ -24,7 +24,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
-import ItemActionButtons from '@/components/calendar/ItemActionButtons';
+import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 
 interface ExamDetailPanelProps {
   exam: Deadline | null;

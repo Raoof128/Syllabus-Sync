@@ -54,8 +54,8 @@ function validateAdminToken(request: NextRequest): boolean {
 }
 
 // SECURITY: Allowlist of valid building IDs (prevents regex injection)
-// This list matches ALL building IDs in lib/map/buildings.ts
-// Generated from: grep "id:" lib/map/buildings.ts | sed "s/.*'\(.*\)'.*/'\1',/"
+// This list matches ALL building IDs in features/map/lib/buildings.ts
+// Generated from: grep "id:" features/map/lib/buildings.ts | sed "s/.*'\(.*\)'.*/'\1',/"
 const ALLOWED_BUILDING_IDS = [
   // Core Campus Buildings
   '18WW',
@@ -180,7 +180,7 @@ const ALLOWED_BUILDING_IDS = [
 ];
 
 // SECURITY: Position bounds (Campus map is 4678x3307 pixels)
-// These bounds match the map dimensions in lib/map/buildings.ts MAP_CONFIG
+// These bounds match the map dimensions in features/map/lib/buildings.ts MAP_CONFIG
 const POSITION_BOUNDS = {
   minX: 0,
   maxX: 4678,
@@ -328,7 +328,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Read the buildings.ts file
-    const buildingsPath = path.join(process.cwd(), 'lib/map/buildings.ts');
+    const buildingsPath = path.join(process.cwd(), 'features/map/lib/buildings.ts');
 
     // SECURITY: Verify file exists and is in expected location
     try {

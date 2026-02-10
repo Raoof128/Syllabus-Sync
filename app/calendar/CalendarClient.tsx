@@ -36,13 +36,13 @@ import dynamic from 'next/dynamic';
 import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
 import { toastUtils } from '@/lib/utils/toast';
 import { cn } from '@/lib/utils';
-import CalendarHeader, { CalendarView } from '@/components/calendar/CalendarHeader';
-import CalendarSidebar from '@/components/calendar/CalendarSidebar';
-import CalendarWidgets from '@/components/calendar/CalendarWidgets';
-import ProgramLegend from '@/components/calendar/ProgramLegend';
-import DayView from '@/components/calendar/DayView';
-import AgendaView from '@/components/calendar/AgendaView';
-import FilterPanel, { CalendarFilters } from '@/components/calendar/FilterPanel';
+import CalendarHeader, { CalendarView } from '@/features/calendar/components/CalendarHeader';
+import CalendarSidebar from '@/features/calendar/components/CalendarSidebar';
+import CalendarWidgets from '@/features/calendar/components/CalendarWidgets';
+import ProgramLegend from '@/features/calendar/components/ProgramLegend';
+import DayView from '@/features/calendar/components/DayView';
+import AgendaView from '@/features/calendar/components/AgendaView';
+import FilterPanel, { CalendarFilters } from '@/features/calendar/components/FilterPanel';
 
 dayjs.extend(isoWeek);
 
@@ -82,7 +82,7 @@ const EventDetailPanel = dynamic(() => import('@/components/events/EventDetailPa
   loading: () => null,
 });
 
-const TodoDetailPanel = dynamic(() => import('@/components/calendar/TodoDetailPanel'), {
+const TodoDetailPanel = dynamic(() => import('@/features/calendar/components/TodoDetailPanel'), {
   loading: () => null,
 });
 

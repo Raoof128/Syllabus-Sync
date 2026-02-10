@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./__tests__/setup.ts'],
-    include: ['tests/**/*.{test,spec}.{ts,tsx}', '__tests__/**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/e2e.spec.ts', 'tests/accessibility.spec.ts'],
     globals: true,
     testTimeout: 10000,
@@ -23,7 +23,6 @@ export default defineConfig({
       exclude: [
         'node_modules/**',
         'tests/**',
-        '__tests__/**',
         '**/*.d.ts',
         '**/*.config.{ts,js,mjs}',
         '**/types/**',

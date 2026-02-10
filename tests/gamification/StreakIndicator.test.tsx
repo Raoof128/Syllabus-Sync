@@ -5,7 +5,7 @@ import {
   StreakIndicator,
   StreakBadge,
   StreakCard,
-} from '@/components/gamification/StreakIndicator';
+} from '@/features/gamification/components/StreakIndicator';
 
 // Mock the gamification store
 const mockProfile = {

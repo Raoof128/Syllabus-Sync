@@ -5,7 +5,7 @@ import { MapPin, Search, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/mq/input';
 import { Button } from '@/components/ui/mq/button';
-import { buildings, type Building } from '@/lib/map/buildings';
+import { buildings, type Building } from '@/features/map/lib/buildings';
 import { searchBuildings } from '@/lib/utils/buildingValidation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';

@@ -33,7 +33,7 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-import TodaySchedule from '@/components/home/TodaySchedule';
+import TodaySchedule from '@/features/home/components/TodaySchedule';
 
 describe('TodaySchedule', () => {
   afterEach(() => {

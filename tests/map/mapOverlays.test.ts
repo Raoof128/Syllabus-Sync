@@ -4,7 +4,7 @@ import {
   mapOverlays,
   mapOverlayById,
   normaliseOverlayIds,
-} from '@/lib/map/mapOverlays';
+} from '@/features/map/lib/mapOverlays';
 import { parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 
 describe('mapOverlays registry', () => {

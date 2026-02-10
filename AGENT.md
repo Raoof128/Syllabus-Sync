@@ -531,3 +531,28 @@ Summary: Fixed all 35 new buildings from Round 6 rendering 110px too far right o
 Files: `lib/map/buildings.ts` (35 position corrections).
 Verification: `npm run check` ✅ (all pass).
 Follow-ups: None.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Feature-First Repository Restructure + Duplicate Elimination
+Summary: Completed phased repository reorganization while preserving runtime behavior. (1) Eliminated duplicates: removed `src/lib/supabase` (kept `lib/supabase` canonical), moved `types/global.d.ts` into `lib/types/global.d.ts` and removed `/types`, consolidated root `__tests__` into `tests/unit/**` and updated `vitest.config.ts` to single `tests/**` root. (2) Implemented `features/` architecture: moved feature components into `features/{auth,calendar,feed,home,gamification,settings,map}`, moved map hooks/components out of `app/map` into `features/map`, moved `lib/map` into `features/map/lib`, moved `useLeafletLoader` into `features/map/hooks`, and rewired imports across app/lib/tests. (3) Consolidated source map assets into `assets/maps` from `maps/` and `data/` while retaining runtime `public/maps` + `public/tiles`. (4) Moved project planning/design materials to `docs/project/team_plan` and `docs/project/sketch`; added `docs/README.md` and `docs/project/restructure-notes.md`. (5) Updated `.gitignore` with `logs/`, `screenshots/`, `artifacts/`; added explicit aliases in `tsconfig.json` for `@/features/*`, `@/lib/*`, `@/components/*`.
+Files: Wide refactor across route imports and feature modules; moved directories: `components/{auth,calendar,feed,home,gamification}`, `app/settings/components`, `app/map/*`, `lib/map/*`, `maps/*`, `data/{MQ_Full.geojson,mq-pdfs,mq-exports}`, `Team_Plan`, `Sketch`.
+Verification: `npm run check` ✅ (format, typecheck, lint, 425 tests, build). `npm run test:e2e` ❌ (environmental: Playwright browsers missing; requires `npx playwright install`).
+Follow-ups: Install Playwright browsers in CI/dev image before e2e gate.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Post-Restructure Consistency Sweep
+Summary: Updated stale references after directory migration: README architecture/docs links now point to `features/` and `docs/project/*`; updated `app/globals.css` team-plan reference; updated admin route comments/paths and position-editor guidance from `lib/map` to `features/map/lib`; aligned ESLint ignore paths with moved docs folders. Re-ran full quality gate.
+Files: `README.md`, `app/globals.css`, `app/api/admin/update-building-positions/route.ts`, `features/map/position-editor/PositionEditorClient.tsx`, `eslint.config.mjs`.
+Verification: `npm run check` ✅.
+Follow-ups: Playwright e2e still requires browser binaries in environment (`npx playwright install`).
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Post-move empty directory cleanup
+Summary: Removed empty legacy directories left after migration (`__tests__/`, `types/`; legacy `Team_Plan`/`Sketch` paths no longer present as top-level dirs). Ensured physical tree aligns with the new structure.
+Files: Directory-only cleanup.
+Verification: `npm run check` status remains green from latest run.
+
+Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Feature tree cleanup
+Summary: Removed empty scaffold-only subdirectories in `features/*` to keep the final tree minimal and intentional. Retained only populated feature paths.
+Verification: `npm run typecheck` ✅.

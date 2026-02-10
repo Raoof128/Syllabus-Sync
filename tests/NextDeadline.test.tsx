@@ -16,7 +16,7 @@ vi.mock('@/lib/store/deadlinesStore', () => ({
   useDeadlinesStore: (selector: (state: typeof mockState) => unknown) => selector(mockState),
 }));
 
-import NextDeadline from '@/components/home/NextDeadline';
+import NextDeadline from '@/features/home/components/NextDeadline';
 
 describe('NextDeadline', () => {
   afterEach(() => {

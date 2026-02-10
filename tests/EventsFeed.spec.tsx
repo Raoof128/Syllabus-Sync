@@ -13,7 +13,7 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-import EventsFeed from '@/components/home/EventsFeed';
+import EventsFeed from '@/features/home/components/EventsFeed';
 
 describe('EventsFeed', () => {
   it('renders the events header', () => {

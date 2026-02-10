@@ -20,7 +20,7 @@ import { apiRequest } from '@/lib/utils/api';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
-import { LevelUpNotificationProvider } from '@/components/gamification/LevelUpNotification';
+import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 // V3.1: Performance optimization - move constant arrays outside component

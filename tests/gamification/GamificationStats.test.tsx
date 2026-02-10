@@ -1,7 +1,10 @@
 // tests/gamification/GamificationStats.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { GamificationStats, XPIndicator } from '@/components/gamification/GamificationStats';
+import {
+  GamificationStats,
+  XPIndicator,
+} from '@/features/gamification/components/GamificationStats';
 
 // Mock the gamification store
 const mockProfile = {
@@ -48,7 +51,7 @@ vi.mock('@/lib/store/gamificationStore', () => ({
 }));
 
 // Mock the child components
-vi.mock('@/components/gamification/LevelBadge', () => ({
+vi.mock('@/features/gamification/components/LevelBadge', () => ({
   LevelBadge: ({ size, showTitle }: { size?: string; showTitle?: boolean }) => (
     <div data-testid="level-badge" data-size={size} data-show-title={showTitle}>
       Level 3
@@ -56,7 +59,7 @@ vi.mock('@/components/gamification/LevelBadge', () => ({
   ),
 }));
 
-vi.mock('@/components/gamification/XPProgressBar', () => ({
+vi.mock('@/features/gamification/components/XPProgressBar', () => ({
   XPProgressBar: ({ size, showNumbers }: { size?: string; showNumbers?: boolean }) => (
     <div data-testid="xp-progress-bar" data-size={size} data-show-numbers={showNumbers}>
       XP Progress
@@ -64,7 +67,7 @@ vi.mock('@/components/gamification/XPProgressBar', () => ({
   ),
 }));
 
-vi.mock('@/components/gamification/StreakIndicator', () => ({
+vi.mock('@/features/gamification/components/StreakIndicator', () => ({
   StreakBadge: () => <div data-testid="streak-badge">5 🔥</div>,
 }));
 

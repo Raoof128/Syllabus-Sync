@@ -613,3 +613,80 @@ All notable changes to this project will be documented in this file.
 #### Verification
 
 - `npm run check` passes: secrets ✓ format ✓ typecheck ✓ lint ✓ test ✓ build ✓
+
+### Raouf: Feature-First Restructure + Repo Consolidation — 2026-02-10
+
+**Scope:** Repository architecture overhaul to feature-first layout with duplicate removal and asset/doc consolidation  
+**Type:** Refactor / repository structure / maintainability
+
+#### Changes Applied
+
+1. Removed duplicate code roots:
+   - Deleted `src/lib/supabase` and standardized on `lib/supabase`.
+   - Moved `types/global.d.ts` -> `lib/types/global.d.ts`; removed `/types`.
+   - Moved root `__tests__` into `tests/unit/**` and switched Vitest to single tests root.
+
+2. Introduced `features/` modules and migrated feature code:
+   - Added `features/{auth,calendar,feed,home,gamification,settings,map}`.
+   - Moved feature UI from `components/*` into `features/*/components`.
+   - Moved settings components from `app/settings/components` into `features/settings/components`.
+   - Moved map module internals from `app/map/*` and `lib/map/*` into `features/map/{components,hooks,lib,position-editor}`.
+   - Updated all impacted imports in app/lib/tests.
+
+3. Consolidated non-public map assets:
+   - Added `assets/maps` and moved source/raster/geodata and PDF export inputs from `maps/` and `data/`.
+   - Kept `public/maps` and `public/tiles` for runtime browser fetch compatibility.
+
+4. Reorganized documentation/project artifacts:
+   - Moved `Team_Plan/` -> `docs/project/team_plan/`.
+   - Moved `Sketch/` -> `docs/project/sketch/`.
+   - Added `docs/README.md` and `docs/project/restructure-notes.md`.
+
+5. Hygiene/config updates:
+   - Updated `.gitignore` with `logs/`, `screenshots/`, `artifacts/`.
+   - Added explicit path aliases to `tsconfig.json`: `@/features/*`, `@/lib/*`, `@/components/*`.
+
+#### Verification
+
+- `npm run check` ✅ (format, typecheck, lint, 425/425 tests, build)
+- `npm run test:e2e` ⚠️ failed due to missing Playwright browser binaries in environment (`npx playwright install` required)
+
+---
+
+### Raouf: Post-Restructure Reference Cleanup — 2026-02-10
+
+**Scope:** Consistency follow-up after feature-first migration  
+**Type:** Documentation and path hygiene
+
+#### Changes Applied
+
+1. Updated `README.md` tree/docs sections to reflect current structure (`features/`, `docs/project/*`, `assets/`).
+2. Fixed stale documentation comments/paths:
+   - `app/globals.css` team-plan reference updated to `docs/project/team_plan/CHANGELOG.md`.
+   - `app/api/admin/update-building-positions/route.ts` comments and file path now reference `features/map/lib/buildings.ts`.
+   - `features/map/position-editor/PositionEditorClient.tsx` guidance updated to `features/map/lib/buildings.ts`.
+3. Updated ESLint ignores from legacy `Team_Plan/**` to `docs/project/team_plan/**` and `docs/project/sketch/**`.
+
+#### Verification
+
+- `npm run check` ✅ (format, typecheck, lint, 425/425 tests, build)
+
+---
+
+### Raouf: Empty Legacy Directory Cleanup — 2026-02-10
+
+**Scope:** Final structural cleanup  
+**Type:** Repository hygiene
+
+- Removed empty legacy directories left after migration (`__tests__/`, `types/`).
+- Confirmed top-level `Team_Plan/` and `Sketch/` are no longer present after relocation to `docs/project/*`.
+
+---
+
+### Raouf: Feature Tree Cleanup — 2026-02-10
+
+- Removed empty scaffold-only directories under `features/*`.
+- Kept populated feature paths only.
+- Verification: `npm run typecheck` ✅.
+
+---

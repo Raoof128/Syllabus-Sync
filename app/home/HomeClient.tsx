@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import TodaySchedule from '@/components/home/TodaySchedule';
-import UpcomingDeadlines from '@/components/home/UpcomingDeadlines';
-import TodosWidget from '@/components/home/TodosWidget';
-import UserEventsWidget from '@/components/home/UserEventsWidget';
-import { WelcomeHeader } from '@/components/home/WelcomeHeader';
+import TodaySchedule from '@/features/home/components/TodaySchedule';
+import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
+import TodosWidget from '@/features/home/components/TodosWidget';
+import UserEventsWidget from '@/features/home/components/UserEventsWidget';
+import { WelcomeHeader } from '@/features/home/components/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
@@ -25,9 +25,9 @@ import { Badge } from '@/components/ui/mq/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
-import { CardSolid } from '@/components/home/HomeCard';
-import HomeKpiStrip from '@/components/home/HomeKpiStrip';
-import WeekHeatStrip from '@/components/home/WeekHeatStrip';
+import { CardSolid } from '@/features/home/components/HomeCard';
+import HomeKpiStrip from '@/features/home/components/HomeKpiStrip';
+import WeekHeatStrip from '@/features/home/components/WeekHeatStrip';
 import { apiRequest } from '@/lib/utils/api';
 
 type AuthUser = {

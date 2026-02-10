@@ -1,7 +1,7 @@
 // tests/settings/HelpSupport.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import HelpSupport from '@/app/settings/components/HelpSupport';
+import HelpSupport from '@/features/settings/components/HelpSupport';
 
 // Mock toast utils
 vi.mock('@/lib/utils/toast', () => ({

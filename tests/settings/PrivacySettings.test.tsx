@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
-import PrivacySettings from '@/app/settings/components/PrivacySettings';
+import PrivacySettings from '@/features/settings/components/PrivacySettings';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({

@@ -10,7 +10,7 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { toastUtils } from '@/lib/utils/toast';
-import { useGamificationStore, showXPEarnedNotification } from '@/components/gamification';
+import { useGamificationStore, showXPEarnedNotification } from '@/features/gamification/components';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
@@ -18,9 +18,14 @@ import { apiRequest } from '@/lib/utils/api';
 import { Event } from '@/lib/types';
 import dynamic from 'next/dynamic';
 import LoadingPlaceholder from '@/components/ui/LoadingPlaceholder';
-import { FeedFilters, TimeRange, SortMode, CategoryFilter } from '@/components/feed/FeedFilters';
-import { FeedEventCard } from '@/components/feed/FeedEventCard';
-import { FeedSidebar } from '@/components/feed/FeedSidebar';
+import {
+  FeedFilters,
+  TimeRange,
+  SortMode,
+  CategoryFilter,
+} from '@/features/feed/components/FeedFilters';
+import { FeedEventCard } from '@/features/feed/components/FeedEventCard';
+import { FeedSidebar } from '@/features/feed/components/FeedSidebar';
 
 // Dynamically import EventForm for code splitting
 const EventForm = dynamic(() => import('@/components/events/EventForm'), {

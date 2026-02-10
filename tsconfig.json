@@ -19,6 +19,9 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@/features/*": ["./features/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/components/*": ["./components/*"],
       "@/*": ["./*"]
     },
     "target": "ES2022"

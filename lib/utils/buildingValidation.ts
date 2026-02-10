@@ -5,7 +5,7 @@
  * Used by all entity forms (Assignments, Exams, Units, Events, Todos).
  */
 
-import { buildings, type Building } from '@/lib/map/buildings';
+import { buildings, type Building } from '@/features/map/lib/buildings';
 
 // Cache the building lookup map for performance
 let buildingMap: Map<string, Building> | null = null;

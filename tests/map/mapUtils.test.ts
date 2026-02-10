@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createMarkerIcon } from '@/lib/map/mapUtils';
+import { createMarkerIcon } from '@/features/map/lib/mapUtils';
 
 // Mock Leaflet
 const mockIconConstructor = vi.fn();

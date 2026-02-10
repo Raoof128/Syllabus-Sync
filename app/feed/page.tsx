@@ -2,8 +2,8 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import PublicFeedClient from '@/components/feed/PublicFeedClient';
-import { FeedSkeletons } from '@/components/feed/FeedSkeletons';
+import PublicFeedClient from '@/features/feed/components/PublicFeedClient';
+import { FeedSkeletons } from '@/features/feed/components/FeedSkeletons';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - University Events & Announcements`,

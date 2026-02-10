@@ -5,7 +5,7 @@ import {
   getCalibrationDiagnostics,
   GROUND_CONTROL_POINTS,
   computeAffineCoefficients,
-} from '../../lib/map/geospatialCalibration';
+} from '@/features/map/lib/geospatialCalibration';
 
 describe('Geospatial Calibration', () => {
   it('should have a low RMSE', () => {

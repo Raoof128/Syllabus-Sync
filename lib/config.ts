@@ -81,10 +81,10 @@ export const UNIT_COLORS = [
 
 /**
  * Campus Buildings
- * @deprecated Use `buildings` from '@/lib/map/buildings' instead.
+ * @deprecated Use `buildings` from '@/features/map/lib/buildings' instead.
  * This export is kept for backwards compatibility but imports from the canonical source.
  */
-export { buildings as CAMPUS_BUILDINGS } from '@/lib/map/buildings';
+export { buildings as CAMPUS_BUILDINGS } from '@/features/map/lib/buildings';
 
 /**
  * Feature Flags

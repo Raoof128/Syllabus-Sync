@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDistance, formatDuration } from '@/lib/map/navigationHelpers';
+import { formatDistance, formatDuration } from '@/features/map/lib/navigationHelpers';
 
 describe('formatDistance', () => {
   it('should format meters correctly', () => {

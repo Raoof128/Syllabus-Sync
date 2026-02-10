@@ -1,7 +1,7 @@
 'use client';
 
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { HelpSupport } from '../components';
+import { HelpSupport } from '@/features/settings/components';
 
 export default function SupportSettingsPage() {
   const { t } = useTypedTranslation();

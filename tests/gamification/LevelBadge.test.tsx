@@ -1,7 +1,7 @@
 // tests/gamification/LevelBadge.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { LevelBadge, LevelBadgeInline } from '@/components/gamification/LevelBadge';
+import { LevelBadge, LevelBadgeInline } from '@/features/gamification/components/LevelBadge';
 
 // Mock the gamification store
 const mockProfile = {

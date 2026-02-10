@@ -1,7 +1,7 @@
 // tests/gamification/XPProgressBar.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { XPProgressBar, XPProgressCompact } from '@/components/gamification/XPProgressBar';
+import { XPProgressBar, XPProgressCompact } from '@/features/gamification/components/XPProgressBar';
 
 // Mock the gamification store
 const mockProfile = {

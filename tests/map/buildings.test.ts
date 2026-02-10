@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildings, getBuildingById, searchBuildings } from '@/lib/map/buildings';
+import { buildings, getBuildingById, searchBuildings } from '@/features/map/lib/buildings';
 
 describe('buildings data', () => {
   it('should have buildings defined', () => {

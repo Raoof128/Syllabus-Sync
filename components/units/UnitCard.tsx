@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { CardSolid } from '@/components/home/HomeCard';
+import { CardSolid } from '@/features/home/components/HomeCard';
 import { formatScheduleTime } from '@/lib/utils/locale';
 
 interface UnitCardProps {

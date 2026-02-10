@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 import { Button } from '@/components/ui/mq/button';
-import ItemActionButtons from '@/components/calendar/ItemActionButtons';
+import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;

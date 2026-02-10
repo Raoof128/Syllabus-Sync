@@ -51,6 +51,9 @@ yarn-error.log*
 *.tmp
 *.bak
 *.orig
+logs/
+screenshots/
+artifacts/
 
 # env files (can opt-in for committing if needed)
 .env*

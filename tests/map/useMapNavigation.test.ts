@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useMapNavigation } from '@/app/map/hooks/useMapNavigation';
+import { useMapNavigation } from '@/features/map/hooks/useMapNavigation';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { NavigationStateManager } from '@/lib/map/realtimeNavigation';
+import { NavigationStateManager } from '@/features/map/lib/realtimeNavigation';
 import * as orsService from '@/lib/services/ors';
 import { toastUtils } from '@/lib/utils/toast';
 

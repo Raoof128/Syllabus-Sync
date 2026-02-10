@@ -1,4 +1,4 @@
-import { RoutePreview } from '@/lib/map/navigationHelpers';
+import { RoutePreview } from '@/features/map/lib/navigationHelpers';
 import { logger } from '@/lib/logger';
 
 interface ORSFeature {

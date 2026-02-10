@@ -1,7 +1,7 @@
 // tests/settings/SettingsSkeleton.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import SettingsSkeleton from '@/app/settings/components/SettingsSkeleton';
+import SettingsSkeleton from '@/features/settings/components/SettingsSkeleton';
 
 describe('SettingsSkeleton', () => {
   const mockT = vi.fn((key: string) => {

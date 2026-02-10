@@ -6,7 +6,7 @@ import {
   LevelUpNotificationProvider,
   useLevelUpNotification,
   showXPEarnedNotification,
-} from '@/components/gamification/LevelUpNotification';
+} from '@/features/gamification/components/LevelUpNotification';
 
 // Mock toast utils
 const mockSuccess = vi.fn();

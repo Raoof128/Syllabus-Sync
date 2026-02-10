@@ -1,7 +1,7 @@
 // tests/settings/GamificationSettings.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import GamificationSettings from '@/app/settings/components/GamificationSettings';
+import GamificationSettings from '@/features/settings/components/GamificationSettings';
 
 // Mock toast utils
 vi.mock('@/lib/utils/toast', () => ({

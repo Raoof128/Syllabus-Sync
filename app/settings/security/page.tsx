@@ -1,7 +1,7 @@
 'use client';
 
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { PrivacySettings, SecuritySettings } from '../components';
+import { PrivacySettings, SecuritySettings } from '@/features/settings/components';
 
 export default function SecuritySettingsPage() {
   const { t, language } = useTypedTranslation();

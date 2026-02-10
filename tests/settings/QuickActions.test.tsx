@@ -1,7 +1,7 @@
 // tests/settings/QuickActions.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import QuickActions from '@/app/settings/components/QuickActions';
+import QuickActions from '@/features/settings/components/QuickActions';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({

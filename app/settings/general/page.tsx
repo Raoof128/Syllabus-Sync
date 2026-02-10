@@ -1,7 +1,7 @@
 'use client';
 
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { NotificationSettings } from '../components';
+import { NotificationSettings } from '@/features/settings/components';
 
 export default function GeneralSettingsPage() {
   const { t } = useTypedTranslation();
