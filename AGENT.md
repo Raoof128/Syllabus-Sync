@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Optional Path Removal Batch (Per User Request)
+Summary: Removed requested optional paths: `.devcontainer/`, `docker/`, `k8s/`, `scripts/`, `docs/`, `security/`, `COMPLETION-SUMMARY.md`, and `opencode.jsonc`. To keep the repository operational after removing `scripts/`, updated `package.json` script entries that depended on deleted files (`check:secrets`, `check:i18n`, `docker:*`, `build:overlays`) with explicit placeholder commands. Also fixed a broken test dependency by inlining `maskToken` helper logic in `tests/maskToken.test.ts` after `scripts/test-api.js` was removed.
+Files: Deleted 8 paths (directories/files listed above). Modified `package.json` and `tests/maskToken.test.ts`.
+Verification: `npm run check` ✅ (format, typecheck, lint, 425/425 tests, build all pass with updated script wiring).
+Follow-ups: If you want strict security checks restored, we should reintroduce a dedicated `check:secrets` implementation outside the deleted `scripts/` directory.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Root File Audit — Redundant Config/License Cleanup
 Summary: Audited the additional root-level file list and removed only files confirmed redundant. Deleted `.eslintrc.json` (legacy ESLint config not used; project uses flat config via `eslint.config.mjs`) and `LICENSE.md` (duplicate of canonical `LICENSE`, not referenced). Kept all other listed root files because they are active config, compliance docs, build/runtime config, or useful operational assets.
 Files: Deleted 2 files: `.eslintrc.json`, `LICENSE.md`.

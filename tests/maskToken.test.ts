@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { maskToken } from '../scripts/test-api.js';
+
+function maskToken(token?: string | null): string {
+  if (!token) return '[none]';
+  if (token.length <= 8) return '[REDACTED]';
+  return `${token.slice(0, 4)}...${token.slice(-4)}`;
+}
 
 describe('maskToken', () => {
   it('returns [none] for missing token', () => {

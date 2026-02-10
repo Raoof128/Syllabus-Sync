@@ -1,4 +1,11 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Optional Paths Removal Batch
+Summary: Removed requested optional paths (`.devcontainer`, `docker`, `k8s`, `scripts`, `docs`, `security`, `COMPLETION-SUMMARY.md`, `opencode.jsonc`). Updated `package.json` script commands that referenced removed files/dirs with placeholders, and fixed `tests/maskToken.test.ts` by inlining helper logic after removing script import dependency.
+- **Files:** Deleted listed paths; modified `package.json`, `tests/maskToken.test.ts`.
+- **Verification:** `npm run check` ✅ (425 tests + lint/typecheck/build all pass).
+- **Follow-ups:** Optional re-add of strict secret scanning outside removed `scripts/` directory.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Root File Cleanup
 Summary: Audited requested root files and removed only redundant ones: `.eslintrc.json` (legacy/unused) and `LICENSE.md` (duplicate of `LICENSE`). Kept the rest as active project/config/compliance assets.
 - **Files:** `.eslintrc.json` deleted, `LICENSE.md` deleted.
