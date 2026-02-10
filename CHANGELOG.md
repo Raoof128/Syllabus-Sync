@@ -751,3 +751,14 @@ Raouf: 2026-02-10 (Australia/Sydney)
 - Removed Playwright dependencies (`@playwright/test`, `@axe-core/playwright`) from devDependencies.
 - Cleaned `config/vitest/vitest.config.ts` by removing obsolete e2e excludes.
 - Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, `npm run build` ✅.
+
+---
+
+Raouf: 2026-02-11 (Australia/Sydney)
+- **Scope:** i18n Audit & Fix
+- **Summary:** Performed a comprehensive i18n audit. Fixed missing keys in 18 locales (`ar`, `bn`, `es`, `fa`, `fr`, `he`, `hi`, `id`, `it`, `ja`, `ko`, `ms`, `ru`, `ta`, `th`, `ur`, `vi`, `zh`). Externalized hardcoded strings in `TOTPSetup.tsx` and `PasskeyManager.tsx`. Added missing security-related keys (`totpQrCodeAlt`, `copySecret`, `passkeyNamePlaceholder`) to all locales. Fixed untranslated device status keys (`deviceUnknown`, `deviceThis`, `deviceBrowser`) in all non-English locales.
+- **Files Changed:**
+  - `locales/*/translations.json` (19 files)
+  - `features/settings/components/security/TOTPSetup.tsx`
+  - `features/settings/components/security/PasskeyManager.tsx`
+- **Verification:** Verified key presence in `zh` locale file. Components now use `t()` for previously hardcoded strings.

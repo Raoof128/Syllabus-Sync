@@ -254,7 +254,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={qrCode}
-                    alt="TOTP QR Code"
+                    alt={t('totpQrCodeAlt')}
                     width={200}
                     height={200}
                     className="w-[200px] h-[200px]"
@@ -276,7 +276,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                     size="sm"
                     onClick={copySecret}
                     className="p-1 h-auto"
-                    aria-label="Copy secret"
+                    aria-label={t('copySecret')}
                   >
                     {secretCopied ? (
                       <CheckCircle className="h-4 w-4 text-mq-success" />
