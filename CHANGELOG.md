@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Raouf: Documentation Suite Refresh — 2026-02-10
+
+**Scope:** README + docs consistency, accuracy, and link integrity
+**Type:** Documentation maintenance / quality improvement
+
+#### Changes Applied
+
+1. **README accuracy updates**
+   - Updated test badge/count references from `290` to `425+`
+   - Removed nonexistent `(routes)` directory entry from architecture tree
+   - Aligned test tree examples to current suite organization
+
+2. **Docs link integrity fixes**
+   - Corrected broken relative links across docs (`docs/...` self-prefix issues)
+   - Replaced links to missing files (`development.md`, `implementation.md`) with valid existing references
+   - Added missing `docs/i18n.md` referenced by README
+
+3. **Workflow/script updates**
+   - Replaced obsolete `npm run test:lighthouse` references with `npm run lighthouse`
+   - Updated onboarding `npm run check` pipeline text to include `secrets` and current stage names
+   - Updated onboarding tech stack note from Tailwind 3.4 to Tailwind 4.x
+
+#### Files Changed
+
+- `README.md`
+- `docs/onboarding.md`
+- `docs/performance.md`
+- `docs/monitoring.md`
+- `docs/unit-testing.md`
+- `docs/integration-testing.md`
+- `docs/i18n.md` (new)
+
+#### Verification
+
+- Internal markdown link checker: `BROKEN_COUNT 0`
+- `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build)
+
+---
+
 ### Raouf: Settings Links Audit + Repo Cleanup — 2026-02-10
 
 **Scope:** Settings link integrity and repository hygiene

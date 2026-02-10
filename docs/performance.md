@@ -427,7 +427,7 @@ config:
 echo "🚀 Running Performance Tests..."
 
 # Core Web Vitals
-npm run test:lighthouse
+npm run lighthouse
 
 # Bundle analysis
 npm run analyze
@@ -449,7 +449,7 @@ echo "✅ Performance tests completed"
 # GitHub Actions workflow step
 - name: Performance Tests
   run: |
-    npm run test:lighthouse
+    npm run lighthouse
     npm run test:bundle-size
     npm run test:memory-usage
 
@@ -498,4 +498,4 @@ const checkPerformanceAlerts = (metrics: PerformanceMetrics) => {
 
 **Performance Excellence** ⚡
 
-_For comprehensive performance monitoring, see [docs/monitoring.md](docs/monitoring.md)_
+_For comprehensive performance monitoring, see [monitoring.md](monitoring.md)_

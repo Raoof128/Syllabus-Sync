@@ -1,6 +1,13 @@
 # Agent Rules
 
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Documentation Suite Refresh — README + Docs Consistency
+Summary: Performed a full documentation consistency pass after re-reading `AGENT.md` and `CHANGELOG.md`. Updated stale README metrics and repository tree details (test count now 425+, removed nonexistent route-group entry, aligned test folder examples). Fixed documentation drift in `docs/` by correcting broken relative links, replacing obsolete script references (`test:lighthouse` → `lighthouse`), updating onboarding tech notes (Tailwind 4.x, current `npm run check` pipeline), and replacing links to missing docs with existing references. Added new `docs/i18n.md` so README internationalization reference resolves and localization workflow is documented. Verified local markdown link integrity script reports zero broken internal links.
+Files: Modified 6 docs (`README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`) and added `docs/i18n.md`.
+Verification: `npm run check` ✅ (secrets, format, typecheck, lint, 425/425 tests, build all pass). Internal markdown link audit: `BROKEN_COUNT 0`.
+Follow-ups: Optional next pass can normalize older template-heavy docs (`docs/monitoring.md`, `docs/performance.md`, `DEPLOYMENT-CHECKLIST.md`) into fully repository-specific runbooks.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Links Validation + Repository Hygiene Cleanup
 Summary: Performed a full settings-page link audit and repository cleanup pass. (1) Verified all internal settings navigation and quick-action paths map to existing `app/**/page.tsx` routes. Added automated integrity coverage by exporting route/link constants and creating `tests/settings/SettingsRoutesIntegrity.test.ts` to prevent future broken settings links. (2) Removed redundant client-side `/settings` redirect effect from `settings/layout.tsx` since root routing is now handled server-side in `app/settings/page.tsx`. (3) Cleaned dead code by removing unused `AccountSettings` component and barrel export. (4) Fixed broken documentation URL in `EXTERNAL_LINKS.documentation` (old GitHub repo URL returned 404). (5) Removed local junk artifacts (`.DS_Store`, stale `logs/mcp-puppeteer-*.log`) from workspace.
 Files: Modified 4 files (`app/settings/layout.tsx`, `app/settings/components/QuickActions.tsx`, `app/settings/components/index.ts`, `lib/config.ts`), added 1 file (`tests/settings/SettingsRoutesIntegrity.test.ts`), deleted 1 file (`app/settings/components/AccountSettings.tsx`).

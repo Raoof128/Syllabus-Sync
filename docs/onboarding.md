@@ -32,7 +32,6 @@ Before you begin, ensure you have:
 
 # Accounts you'll need
 - GitHub account with 2FA enabled
-- Google account (for development OAuth)
 - Supabase account (access to our project database)
 ```
 
@@ -108,7 +107,6 @@ Create `.vscode/settings.json`:
 syllabus-sync/
 ├── app/                    # Next.js 16 App Router
 │   ├── api/               # API routes with security middleware
-│   ├── (routes)/          # Route groups for organization
 │   ├── calendar/           # Academic calendar
 │   ├── home/              # Dashboard & analytics
 │   ├── map/                # Campus navigation
@@ -131,7 +129,7 @@ syllabus-sync/
 ### **Key Technologies**
 
 - **Frontend:** React 19, Next.js 16, TypeScript 5.x
-- **Styling:** Tailwind CSS 3.4, Custom MQ Design System
+- **Styling:** Tailwind CSS 4.x, Custom MQ Design System
 - **State Management:** Zustand 5.x with persistence
 - **Database:** Supabase (PostgreSQL) with Row Level Security
 - **Authentication:** Supabase Auth + WebAuthn Passkeys
@@ -169,7 +167,7 @@ We use these tools and standards:
 
 ```bash
 # Before committing
-npm run check  # Runs: format → typecheck → lint → test → build
+npm run check  # Runs: secrets → format → typecheck → lint → tests → build
 ```
 
 **Our Standards:**
@@ -177,7 +175,6 @@ npm run check  # Runs: format → typecheck → lint → test → build
 - **TypeScript:** Strict mode, no `any` types
 - **ESLint:** Custom rules for security and consistency
 - **Prettier:** Consistent formatting
-- **Husky:** Pre-commit hooks (coming soon)
 - **Conventional Commits:** Standardized commit messages
 
 #### **3. Testing Strategy**
@@ -194,7 +191,7 @@ npm run test:e2e:ui            # Interactive mode
 npm run test:accessibility       # Accessibility focused tests
 
 # Performance tests
-npm run test:lighthouse          # Lighthouse audits
+npm run lighthouse                # Lighthouse CI audits
 npm run analyze                  # Bundle analysis
 ```
 
@@ -341,10 +338,10 @@ gitGraph LR
 
 ### **Internal Documentation**
 
-- **[Architecture Guide](docs/ARCHITECTURE.md):** System design and data flow
-- **[API Documentation](docs/api.md):** Complete API reference
-- **[Component Library](docs/design-system.md):** UI components and design system
-- **[Development Guide](docs/development.md):** Detailed development practices
+- **[Architecture Guide](ARCHITECTURE.md):** System design and data flow
+- **[API Documentation](api.md):** Complete API reference
+- **[Component Library](design-system.md):** UI components and design system
+- **[Contribution Guide](../CONTRIBUTING.md):** Detailed development practices
 
 ### **External Tools**
 

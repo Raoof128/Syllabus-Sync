@@ -570,4 +570,4 @@ export default defineConfig({
 
 **Comprehensive Unit Testing** 🧪
 
-_For integration testing guidelines, see [docs/integration-testing.md](docs/integration-testing.md)_
+_For integration testing guidelines, see [integration-testing.md](integration-testing.md)_

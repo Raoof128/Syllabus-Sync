@@ -1,4 +1,11 @@
 Raouf: 2026-02-10 (Australia/Sydney)
+Scope: Documentation Suite Refresh (README + Docs)
+Summary: Refreshed documentation to match current repo state. Updated README test counts and architecture/test tree examples, fixed broken relative links across docs, replaced stale script references (`test:lighthouse`), updated onboarding stack/check pipeline notes, and added a new `docs/i18n.md` localization guide. Internal markdown link check now reports zero broken links.
+- **Files:** `README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`, `docs/i18n.md`.
+- **Verification:** `npm run check` ✅ (425 tests passed). Internal markdown link audit: `BROKEN_COUNT 0`.
+- **Follow-ups:** Optional modernization pass for long template-heavy ops docs.
+
+Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Link Integrity + Repo Cleanup
 Summary: Completed settings links audit and hygiene pass. Added automated route-integrity tests for settings section routes and quick actions, removed redundant client redirect effect from settings layout, deleted unused AccountSettings component/export, updated broken documentation URL constant, and cleaned local `.DS_Store`/stale puppeteer logs.
 - **Files:** `app/settings/layout.tsx`, `app/settings/components/QuickActions.tsx`, `app/settings/components/index.ts`, `lib/config.ts`, `tests/settings/SettingsRoutesIntegrity.test.ts`, `app/settings/components/AccountSettings.tsx` (deleted).

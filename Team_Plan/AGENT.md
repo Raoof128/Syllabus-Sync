@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-10 (Australia/Sydney) - Documentation Suite Refresh
+- **Status:** ✅ Complete - README/docs are now aligned with current repository state.
+- **Scope:** Documentation consistency, link integrity, and onboarding accuracy.
+- **Summary:** Updated README metrics and architecture tree details, corrected broken relative links across docs, replaced outdated script references (`test:lighthouse`), updated onboarding toolchain/check pipeline notes, and added a new `docs/i18n.md` reference guide. Local markdown link audit now reports zero broken internal links.
+- **Files:** `README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`, `docs/i18n.md` (new).
+- **Verification:** `npm run check` passed (425/425 tests, lint, typecheck, build). Internal markdown link checker: `BROKEN_COUNT 0`.
+- **Follow-ups:** Optional deep rewrite of template-style operational docs to fully repo-specific runbooks.
+
 ### Raouf: 2026-02-10 (Australia/Sydney) - Settings Link Integrity + Repo Hygiene
 - **Status:** ✅ Complete - Settings links validated and cleanup finished.
 - **Scope:** Settings navigation reliability, dead-code cleanup, repo hygiene.

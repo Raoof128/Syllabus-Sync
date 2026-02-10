@@ -636,4 +636,4 @@ HEALTH_CHECK_TIMEOUT=5000      # 5 seconds timeout
 
 **Production-Ready Monitoring** 📊
 
-_For implementation details, see [docs/implementation.md](docs/implementation.md)_
+_For implementation details, see [ARCHITECTURE.md](ARCHITECTURE.md) and [api.md](api.md)._

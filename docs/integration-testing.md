@@ -497,4 +497,4 @@ export const collectTestMetrics = (testResults: TestResults[]): TestMetrics => {
 
 **Comprehensive Integration Testing** 🧪
 
-_For unit testing guidelines, see [docs/unit-testing.md](docs/unit-testing.md)_
+_For unit testing guidelines, see [unit-testing.md](unit-testing.md)_

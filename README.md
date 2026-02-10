@@ -9,7 +9,7 @@ _Next-Generation Student Experience Platform for Macquarie University_
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
-[![Vitest](https://img.shields.io/badge/Tests-290_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-425_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
 
 ---
 
@@ -205,7 +205,6 @@ syllabus-sync/
 │   │   ├── units/                 # Academic unit management
 │   │   ├── deadlines/              # Assignment & exam tracking
 │   │   └── ...                    # Feature-specific API routes
-│   ├── (routes)/                  # Route groups for organization
 │   ├── home/                      # Main dashboard & analytics engine
 │   ├── calendar/                   # Academic calendar & scheduling
 │   ├── map/                       # Campus navigation system
@@ -227,10 +226,11 @@ syllabus-sync/
 │   ├── services/                   # External API integrations
 │   ├── hooks/                      # Custom React hooks
 │   └── utils/                      # Shared utility functions
-├── tests/                          # Comprehensive test suite (290+ tests)
-│   ├── unit/                       # Component and logic tests
-│   ├── integration/                # API route tests
-│   └── e2e/                        # End-to-end scenarios
+├── tests/                          # Comprehensive test suite (425+ tests)
+│   ├── settings/                   # Settings feature tests
+│   ├── map/                        # Map/navigation tests
+│   ├── api/                        # API route tests
+│   └── security/                   # Security-focused tests
 ├── docs/                           # Technical documentation
 ├── public/                         # Static assets & media
 └── Team_Plan/                      # Development logs & change tracking
@@ -261,7 +261,7 @@ Our platform maintains a defense-in-depth security architecture:
 ### **Quality Assurance Framework**
 
 - **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, and 100% test coverage requirements
-- **Comprehensive Testing:** 290+ tests covering unit, integration, and E2E scenarios with accessibility validation
+- **Comprehensive Testing:** 425+ tests covering unit/integration/API/security scenarios with accessibility validation
 - **Performance Monitoring:** Core Web Vitals tracking, bundle analysis, and production error reporting
 - **Code Quality Gates:** TypeScript strict mode, ESLint rules, and Prettier formatting enforcement
 
