@@ -1645,5 +1645,9 @@
   "weekView": "Week View",
   "dayView": "Day View",
   "agendaView": "Agenda View",
-  "weekOf": "Week of"
+  "weekOf": "Week of",
+  "pushNotificationsActiveDesc": "Push notifications are active on this device.",
+  "pushNotificationsBlockedDesc": "Push notifications are blocked by your browser settings.",
+  "enablePushNotificationsDesc": "Enable push notifications to receive updates.",
+  "customizeNotifications": "Customize Notifications"
 }

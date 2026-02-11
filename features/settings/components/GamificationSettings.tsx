@@ -8,6 +8,8 @@ import { toastUtils } from '@/lib/utils/toast';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import type { GamificationSettings as GamificationSettingsType } from '@/lib/types';
+import { GamificationToggleRow } from './GamificationToggleRow';
 import {
   Dialog,
   DialogContent,
@@ -21,43 +23,13 @@ type GamificationSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-type ToggleControlProps = {
-  checked: boolean;
-  onToggle: () => void;
-  label: string;
-  testId?: string;
-};
-
-const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={checked}
-    aria-label={label}
-    onClick={onToggle}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
-    data-testid={testId}
-  >
-    <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
-      aria-hidden="true"
-    />
-  </button>
-);
-
 const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
   const { profile, settings, updateSettings, getLevelTitle, getStreakEmoji, resetProgress } =
     useGamificationStore();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
   const handleToggleSetting = useCallback(
-    (
-      key:
-        | 'showXPNotifications'
-        | 'showLevelUpNotifications'
-        | 'showStreakReminders'
-        | 'displayOnProfile',
-    ) => {
+    (key: keyof GamificationSettingsType) => {
       const newValue = !settings[key];
       updateSettings({ [key]: newValue });
       toastUtils.success(
@@ -131,96 +103,48 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             </div>
 
             {/* XP Notifications Toggle */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-mq-content">{t('showXPNotifications')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('showXPNotificationsDesc')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ToggleControl
-                    checked={settings.showXPNotifications}
-                    onToggle={() => handleToggleSetting('showXPNotifications')}
-                    label={t('showXPNotifications')}
-                    testId="toggle-xp-notifications"
-                  />
-                  <span className="text-mq-xs text-mq-content-secondary">
-                    {settings.showXPNotifications ? t('enabled') : t('disabled')}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <GamificationToggleRow
+              settingKey="showXPNotifications"
+              labelKey="showXPNotifications"
+              descKey="showXPNotificationsDesc"
+              enabled={settings.showXPNotifications}
+              t={t}
+              onToggle={handleToggleSetting}
+              testId="toggle-xp-notifications"
+            />
 
             {/* Level Up Notifications Toggle */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-mq-content">{t('showLevelUpNotifications')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('showLevelUpNotificationsDesc')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ToggleControl
-                    checked={settings.showLevelUpNotifications}
-                    onToggle={() => handleToggleSetting('showLevelUpNotifications')}
-                    label={t('showLevelUpNotifications')}
-                    testId="toggle-levelup-notifications"
-                  />
-                  <span className="text-mq-xs text-mq-content-secondary">
-                    {settings.showLevelUpNotifications ? t('enabled') : t('disabled')}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <GamificationToggleRow
+              settingKey="showLevelUpNotifications"
+              labelKey="showLevelUpNotifications"
+              descKey="showLevelUpNotificationsDesc"
+              enabled={settings.showLevelUpNotifications}
+              t={t}
+              onToggle={handleToggleSetting}
+              testId="toggle-levelup-notifications"
+            />
 
             {/* Streak Reminders Toggle */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-mq-content">{t('showStreakReminders')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('showStreakRemindersDesc')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ToggleControl
-                    checked={settings.showStreakReminders}
-                    onToggle={() => handleToggleSetting('showStreakReminders')}
-                    label={t('showStreakReminders')}
-                    testId="toggle-streak-reminders"
-                  />
-                  <span className="text-mq-xs text-mq-content-secondary">
-                    {settings.showStreakReminders ? t('enabled') : t('disabled')}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <GamificationToggleRow
+              settingKey="showStreakReminders"
+              labelKey="showStreakReminders"
+              descKey="showStreakRemindersDesc"
+              enabled={settings.showStreakReminders}
+              t={t}
+              onToggle={handleToggleSetting}
+              testId="toggle-streak-reminders"
+            />
 
             {/* Display on Profile Toggle */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-mq-content">{t('displayOnProfile')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">
-                    {t('displayOnProfileDesc')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ToggleControl
-                    checked={settings.displayOnProfile}
-                    onToggle={() => handleToggleSetting('displayOnProfile')}
-                    label={t('displayOnProfile')}
-                    testId="toggle-display-profile"
-                  />
-                  <span className="text-mq-xs text-mq-content-secondary">
-                    {settings.displayOnProfile ? t('enabled') : t('disabled')}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <GamificationToggleRow
+              settingKey="displayOnProfile"
+              labelKey="displayOnProfile"
+              descKey="displayOnProfileDesc"
+              enabled={settings.displayOnProfile}
+              t={t}
+              onToggle={handleToggleSetting}
+              testId="toggle-display-profile"
+            />
 
             {/* Reset Progress */}
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">

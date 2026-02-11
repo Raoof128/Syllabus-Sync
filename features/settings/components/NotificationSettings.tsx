@@ -3,134 +3,23 @@
 import { memo, useCallback, useEffect, useSyncExternalStore } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Bell, BellOff, Mail, Calendar, Info, Clock, AlertTriangle } from 'lucide-react';
+import { Bell, BellOff, Mail, Calendar, Info, AlertTriangle } from 'lucide-react';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { REMINDER_TIMING_OPTIONS } from '../constants';
+import { ToggleControl } from './ToggleControl';
+import { NotificationRow } from './NotificationRow';
 
 type NotificationSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-// Reminder timing options - labels will be translated at render time
-const REMINDER_TIMING_OPTIONS = [
-  { value: 15, labelKey: 'timing15min' as const },
-  { value: 30, labelKey: 'timing30min' as const },
-  { value: 60, labelKey: 'timing1hour' as const },
-  { value: 120, labelKey: 'timing2hours' as const },
-  { value: 1440, labelKey: 'timing1day' as const },
-  { value: 2880, labelKey: 'timing2days' as const },
-] as const;
-
 // Helper for detecting client-side rendering without setState in effect
 const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
-
-type ToggleControlProps = {
-  checked: boolean;
-  onToggle: () => void;
-  label: string;
-  testId?: string;
-};
-
-const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={checked}
-    aria-label={label}
-    onClick={onToggle}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
-    data-testid={testId}
-  >
-    <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
-      aria-hidden="true"
-    />
-  </button>
-);
-
-const NotificationRow = memo(
-  ({
-    type,
-    icon: Icon,
-    label,
-    desc,
-    timing,
-    enabled,
-    permissionGranted,
-    t,
-    onToggle,
-    onTimingChange,
-  }: {
-    type: 'deadlines' | 'classes' | 'events';
-    icon: React.ElementType;
-    label: string;
-    desc: string;
-    timing: number;
-    enabled: boolean;
-    permissionGranted: boolean;
-    t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
-    onToggle: (type: 'deadlines' | 'classes' | 'events', enabled: boolean) => void;
-    onTimingChange: (type: 'deadlines' | 'classes' | 'events', minutes: number) => void;
-  }) => (
-    <div
-      className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
-      data-testid={`notification-item-${type}`}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1">
-          <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-          <div className="flex-1 min-w-0">
-            <p className="text-mq-sm font-medium text-mq-content">{label}</p>
-            <p className="text-mq-xs text-mq-content-secondary mt-0.5">{desc}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ToggleControl
-            checked={enabled}
-            onToggle={() => onToggle(type, !enabled)}
-            label={`${label} ${t('notifications')}`}
-            testId={`toggle-${type}-notifications`}
-          />
-          <span className="text-mq-xs text-mq-content-secondary">
-            {enabled ? t('enabled') : t('disabled')}
-          </span>
-        </div>
-      </div>
-
-      {/* Reminder Timing Selector - only show when enabled */}
-      {enabled && permissionGranted && (
-        <div className="mt-3 pt-3 border-t border-mq-border">
-          <div className="flex items-center gap-2">
-            <Clock className="h-3 w-3" aria-hidden="true" />
-            <label htmlFor={`timing-${type}`} className="text-mq-xs text-mq-content-secondary">
-              {t('remindMe')}
-            </label>
-            <select
-              id={`timing-${type}`}
-              value={timing}
-              onChange={(e) => onTimingChange(type, Number(e.target.value))}
-              className="text-mq-xs bg-mq-background border border-mq-border rounded-mq px-2 py-1 text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
-              aria-label={t('reminderTimingFor', { type: label })}
-              data-testid={`timing-select-${type}`}
-            >
-              {REMINDER_TIMING_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {t(option.labelKey)} {t('before')}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      )}
-    </div>
-  ),
-);
-
-NotificationRow.displayName = 'NotificationRow';
 
 const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
   // Use useSyncExternalStore to detect client without setState in effect
@@ -300,65 +189,71 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
                           ? t('pushNotificationsBlocked')
                           : t('enablePushNotifications')}
                     </p>
-                    <p className="text-mq-xs text-mq-content-secondary">
+                    <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                       {permissionStatus === 'granted'
-                        ? t('pushActiveDesc')
+                        ? t('pushNotificationsActiveDesc')
                         : permissionStatus === 'denied'
-                          ? t('pushBlockedDesc')
-                          : t('pushPromptDesc')}
+                          ? t('pushNotificationsBlockedDesc')
+                          : t('enablePushNotificationsDesc')}
                     </p>
                   </div>
                 </div>
-                {permissionStatus === 'granted' ? (
-                  <div className="flex items-center gap-2">
-                    <ToggleControl
-                      checked={pushEnabled}
-                      onToggle={handleTogglePush}
-                      label={`${t('pushNotifications')} ${pushEnabled ? t('enabled') : t('disabled')}`}
-                      testId="toggle-push-notifications"
-                    />
-                    <span className="text-mq-xs text-mq-content-secondary">
-                      {pushEnabled ? t('on') : t('off')}
-                    </span>
-                  </div>
-                ) : permissionStatus !== 'denied' && isNotificationSupported ? (
+                {permissionStatus !== 'granted' && isNotificationSupported && (
                   <Button
-                    variant="ghost"
                     size="sm"
+                    className="flex-shrink-0"
                     onClick={handleRequestPermission}
-                    className="px-3 py-1 text-xs bg-mq-primary text-white border-2 border-mq-primary rounded-md hover:bg-mq-primary/80 hover:border-mq-primary/80"
                     data-testid="enable-notifications-button"
                   >
                     {t('enable')}
                   </Button>
-                ) : null}
+                )}
               </div>
             </div>
           )}
 
-          {/* Individual Notification Types */}
-          {notificationItems.map(({ key, icon, label, desc, timing }) => (
-            <NotificationRow
-              key={key}
-              type={key}
-              icon={icon}
-              label={label}
-              desc={desc}
-              timing={timing}
-              enabled={currentNotifications[key]}
-              permissionGranted={permissionStatus === 'granted'}
-              t={t}
-              onToggle={handleNotificationPreference}
-              onTimingChange={handleTimingChange}
-            />
-          ))}
+          {/* Master Push Toggle */}
+          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-mq-sm font-medium text-mq-content">{t('pushNotifications')}</p>
+                <p className="text-mq-xs text-mq-content-secondary mt-0.5">
+                  {t('pushNotificationsDesc')}
+                </p>
+              </div>
+              <ToggleControl
+                checked={pushEnabled}
+                onToggle={handleTogglePush}
+                label={t('pushNotifications')}
+                testId="toggle-push-notifications"
+              />
+            </div>
+          </div>
 
-          {/* Info text */}
-          {isClient && permissionStatus === 'granted' && pushEnabled && (
-            <p className="text-mq-xs text-mq-content-tertiary text-center pt-2">
-              {t('browserNotificationInfo')}
-            </p>
-          )}
+          <div className="border-t border-mq-border my-4" />
+
+          <h3 className="text-mq-sm font-semibold text-mq-content mb-3">
+            {t('customizeNotifications')}
+          </h3>
+
+          {/* Notification Categories */}
+          <div className="space-y-3">
+            {notificationItems.map((item) => (
+              <NotificationRow
+                key={item.key}
+                type={item.key}
+                icon={item.icon}
+                label={item.label}
+                desc={item.desc}
+                timing={item.timing}
+                enabled={currentNotifications[item.key]}
+                permissionGranted={permissionStatus === 'granted'}
+                t={t}
+                onToggle={handleNotificationPreference}
+                onTimingChange={handleTimingChange}
+              />
+            ))}
+          </div>
         </CardContent>
       </Card>
     </MagicCard>

@@ -1,4 +1,16 @@
 Raouf: 2026-02-12 (Australia/Sydney)
+Scope: Full System Integrity Check & Test ID Fix
+Summary: Ran `npm run check` and fixed a test failure in `NotificationSettings.test.tsx`. The failure was due to a mismatch in `data-testid` for the "Enable" button in the push notification banner. Reverted the test ID in `NotificationSettings.tsx` to `enable-notifications-button` to align with the existing tests.
+Files: Modified `features/settings/components/NotificationSettings.tsx`.
+Verification: `npm run check` passes ✅ (All 428 tests pass, build successful).
+
+Raouf: 2026-02-12 (Australia/Sydney)
+Scope: Settings Page Components Refactor (Notification & Gamification)
+Summary: Refactored `NotificationSettings.tsx` and `GamificationSettings.tsx` to reduce complexity and improve type safety. Extracted `ToggleControl`, `NotificationRow`, and `GamificationToggleRow` components. Fixed missing translation keys in `translations.json` to resolve type errors.
+Files: Modified `NotificationSettings.tsx`, `GamificationSettings.tsx`, `locales/en/translations.json`. Created `ToggleControl.tsx`, `NotificationRow.tsx`, `GamificationToggleRow.tsx`.
+Verification: `npm run typecheck` passes ✅.
+
+Raouf: 2026-02-12 (Australia/Sydney)
 Scope: Full System Integrity Check & Lint Fix
 Summary: Ran `npm run format`, `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`. Fixed a React Hook lint error in `CalendarWidgets.tsx` where `setState` was called synchronously within an effect.
 Files: Modified `features/calendar/components/CalendarWidgets.tsx`.
