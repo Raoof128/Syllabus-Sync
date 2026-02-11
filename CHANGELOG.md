@@ -6,11 +6,11 @@
 #### Changes Applied
 
 1.  **Full Verification**: Successfully ran the entire verification suite:
-    *   `npm run format`: Ensured consistent code style.
-    *   `npm run lint`: Identified and fixed a cascading render issue.
-    *   `npm run typecheck`: Verified all TypeScript types.
-    *   `npm run test`: All 425 tests passed.
-    *   `npm run build`: Production build completed successfully.
+    - `npm run format`: Ensured consistent code style.
+    - `npm run lint`: Identified and fixed a cascading render issue.
+    - `npm run typecheck`: Verified all TypeScript types.
+    - `npm run test`: All 425 tests passed.
+    - `npm run build`: Production build completed successfully.
 2.  **Lint Fix**: Refactored `CalendarWidgets.tsx` to move a `setState` call into a `setTimeout` within an effect to avoid cascading renders and satisfy `react-hooks/set-state-in-effect`.
 
 #### Files Changed
