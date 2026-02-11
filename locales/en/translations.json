@@ -1641,5 +1641,9 @@
   "building_MUSE_name": "MUSE (MQ University Study Experience)",
   "building_MUSE_desc": "Collaborative study space and student experience hub.",
   "building_BBALL_name": "Basketball Courts",
-  "building_BBALL_desc": "Outdoor basketball courts on campus."
+  "building_BBALL_desc": "Outdoor basketball courts on campus.",
+  "weekView": "Week View",
+  "dayView": "Day View",
+  "agendaView": "Agenda View",
+  "weekOf": "Week of"
 }

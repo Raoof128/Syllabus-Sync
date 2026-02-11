@@ -55,6 +55,8 @@ interface CalendarWidgetsProps {
   onOpenTodoDetail?: (todo: Todo) => void;
   onDeleteTodo?: (todo: Todo) => void;
   onNotifyTodo?: (todo: Todo) => void;
+  unitsWidgetRef?: React.RefObject<HTMLDivElement>;
+  assignmentsWidgetRef?: React.RefObject<HTMLDivElement>;
 }
 
 export default function CalendarWidgets({
@@ -79,6 +81,8 @@ export default function CalendarWidgets({
   onOpenTodoDetail,
   onDeleteTodo,
   onNotifyTodo: _onNotifyTodo,
+  unitsWidgetRef: externalUnitsRef,
+  assignmentsWidgetRef: externalAssignmentsRef,
 }: CalendarWidgetsProps) {
   const { t, language } = useTypedTranslation();
   const tOr = (key: TranslationKey | string, fallback: string) => {
@@ -141,8 +145,10 @@ export default function CalendarWidgets({
   const exams = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz');
 
   // Highlight Refs
-  const unitsWidgetRef = useRef<HTMLDivElement>(null);
-  const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
+  const internalUnitsRef = useRef<HTMLDivElement>(null);
+  const internalAssignmentsRef = useRef<HTMLDivElement>(null);
+  const unitsWidgetRef = externalUnitsRef || internalUnitsRef;
+  const assignmentsWidgetRef = externalAssignmentsRef || internalAssignmentsRef;
   const examsWidgetRef = useRef<HTMLDivElement>(null);
   const eventsWidgetRef = useRef<HTMLDivElement>(null);
   const todosWidgetRef = useRef<HTMLDivElement>(null);
@@ -157,7 +163,9 @@ export default function CalendarWidgets({
   const sectionHighlight = searchParams.get('highlight') === 'true';
 
   // State for section highlight that persists for 5 seconds
-  const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(null);
+  const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(
+    null,
+  );
 
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
   const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
@@ -199,7 +207,7 @@ export default function CalendarWidgets({
         scrollIfNotVisible(targetRef);
       }, 100);
     }
-  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible]);
+  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, assignmentsWidgetRef]);
 
   useEffect(() => {
     if ((highlightedUnitId || highlightedWidget === 'units') && unitsWidgetRef.current) {
@@ -207,7 +215,7 @@ export default function CalendarWidgets({
         scrollIfNotVisible(unitsWidgetRef.current);
       }, 100);
     }
-  }, [highlightedUnitId, highlightedWidget, scrollIfNotVisible]);
+  }, [highlightedUnitId, highlightedWidget, scrollIfNotVisible, unitsWidgetRef]);
 
   useEffect(() => {
     if (highlightedTodoId && todosWidgetRef.current) {
@@ -228,12 +236,12 @@ export default function CalendarWidgets({
   // Handle section scroll from home page "View All" links
   useEffect(() => {
     if (highlightSection && sectionHighlight) {
-      // Activate the highlight
-      if (highlightSection === 'events' || highlightSection === 'todos') {
-        setSectionHighlightActive(highlightSection);
-      }
-
       const scrollTimer = setTimeout(() => {
+        // Activate the highlight
+        if (highlightSection === 'events' || highlightSection === 'todos') {
+          setSectionHighlightActive(highlightSection);
+        }
+
         if (highlightSection === 'events' && eventsWidgetRef.current) {
           eventsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else if (highlightSection === 'todos' && todosWidgetRef.current) {

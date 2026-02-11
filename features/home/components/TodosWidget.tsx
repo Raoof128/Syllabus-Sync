@@ -111,7 +111,10 @@ const TodosWidget = memo(() => {
           )}
         </div>
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
-          <Link href="/calendar?section=todos&highlight=true" aria-label={`${t('viewAll')} ${tOr('todos', 'Todos')}`}>
+          <Link
+            href="/calendar?section=todos&highlight=true"
+            aria-label={`${t('viewAll')} ${tOr('todos', 'Todos')}`}
+          >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t('viewAll')}</span>
           </Link>

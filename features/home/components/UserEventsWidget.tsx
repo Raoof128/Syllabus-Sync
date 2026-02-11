@@ -125,7 +125,10 @@ const UserEventsWidget = memo(() => {
           )}
         </div>
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
-          <Link href="/calendar?section=events&highlight=true" aria-label={`${t('viewAll')} ${tOr('myEvents', 'My Events')}`}>
+          <Link
+            href="/calendar?section=events&highlight=true"
+            aria-label={`${t('viewAll')} ${tOr('myEvents', 'My Events')}`}
+          >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t('viewAll')}</span>
           </Link>

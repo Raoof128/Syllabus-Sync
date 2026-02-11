@@ -86,4 +86,3 @@ The repository had mixed placement for feature code and duplicates:
 ### Documentation
 
 - Moved `AGENT.md` to `docs/project/`
-

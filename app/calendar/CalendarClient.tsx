@@ -1,48 +1,38 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
   Edit2,
+  AlertTriangle,
+  Trash2,
+  Calendar,
   ChevronLeft,
   ChevronRight,
-  Trash2,
-  AlertTriangle,
   Clock,
-  Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useTodosStore } from '@/lib/store/todosStore';
 import DeadlineForm from '@/components/deadlines/DeadlineForm';
-import { Deadline, Event, Unit, Todo } from '@/lib/types';
-import { useHydration } from '@/lib/hooks';
+import { Deadline, Event, Todo, ClassTime } from '@/lib/types';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-// Events are now loaded from Supabase via eventsStore (no more sampleEvents import)
-import {
-  getMQKeyDatesForDay,
-  MQ_DATE_COLORS,
-  PROGRAM_STYLES,
-  PROGRAM_LABELS,
-} from '@/data/mqKeyDates';
-import { UNIT_COLORS } from '@/lib/config';
-import dynamic from 'next/dynamic';
-import { formatLocalizedDate, formatLocation } from '@/lib/utils/locale';
-import { toastUtils } from '@/lib/utils/toast';
 import { cn } from '@/lib/utils';
-import CalendarHeader, { CalendarView } from '@/features/calendar/components/CalendarHeader';
+import { UNIT_COLORS } from '@/lib/config';
 import CalendarSidebar from '@/features/calendar/components/CalendarSidebar';
 import CalendarWidgets from '@/features/calendar/components/CalendarWidgets';
-import ProgramLegend from '@/features/calendar/components/ProgramLegend';
 import DayView from '@/features/calendar/components/DayView';
 import AgendaView from '@/features/calendar/components/AgendaView';
-import FilterPanel, { CalendarFilters } from '@/features/calendar/components/FilterPanel';
+import FilterPanel from '@/features/calendar/components/FilterPanel';
+import dynamic from 'next/dynamic';
+
+// Hooks
+import { useCalendarData } from '@/features/calendar/hooks/useCalendarData';
+import { useCalendarView } from '@/features/calendar/hooks/useCalendarView';
+import { useCalendarFiltering } from '@/features/calendar/hooks/useCalendarFiltering';
+import { useCalendarDialogs } from '@/features/calendar/hooks/useCalendarDialogs';
+import { useCalendarHighlights } from '@/features/calendar/hooks/useCalendarHighlights';
+import { useCalendarGetters } from '@/features/calendar/hooks/useCalendarGetters';
 
 dayjs.extend(isoWeek);
 
@@ -86,707 +76,159 @@ const TodoDetailPanel = dynamic(() => import('@/features/calendar/components/Tod
   loading: () => null,
 });
 
-import {
-  HOURS,
-  HOUR_HEIGHT,
-  START_HOUR,
-  getEventColors,
-  getDeadlineColor,
-  parseTimeRange,
-  getTimePositionAndHeight,
-  calculateOverlapGroups,
-  CalendarItem,
-} from '@/lib/calendar-utils';
-
 export default function CalendarClient() {
-  const searchParams = useSearchParams();
-  const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
-  const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
-  const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
-  const userEvents = useEventsStore((state) => state.events);
-  const loadEvents = useEventsStore((state) => state.loadEvents);
-  const removeEvent = useEventsStore((state) => state.removeEvent);
-  const units = useUnitsStore((state) => state.units);
-  const loadUnits = useUnitsStore((state) => state.loadUnits);
-  const removeUnit = useUnitsStore((state) => state.removeUnit);
-
-  const addTodo = useTodosStore((state) => state.addTodo);
-  const removeTodo = useTodosStore((state) => state.removeTodo);
-  const updateTodo = useTodosStore((state) => state.updateTodo);
-  const todos = useTodosStore((state) => state.todos);
-  const loadTodos = useTodosStore((state) => state.loadTodos);
-
-  const hasHydrated = useHydration();
-  const { language, t } = useTypedTranslation();
+  const { t } = useTypedTranslation();
   const tOr = (key: TranslationKey, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
   };
 
-  // Load all data from database on mount
-  useEffect(() => {
-    if (hasHydrated) {
-      loadUnits();
-      loadDeadlines();
-      loadEvents();
-      loadTodos();
-    }
-  }, [hasHydrated, loadUnits, loadDeadlines, loadEvents, loadTodos]);
-
-  // Calendar View State
-  const [view, setView] = useState<CalendarView>('week');
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<CalendarFilters>({
-    showUnits: true,
-    showDeadlines: true,
-    showEvents: true,
-    showCompleted: false,
-  });
-
-  // Filter Data
-  const filteredUnits = useMemo(() => {
-    return filters.showUnits ? units : [];
-  }, [units, filters.showUnits]);
-
-  const filteredDeadlines = useMemo(() => {
-    if (!filters.showDeadlines) return [];
-    if (!filters.showCompleted) return deadlines.filter((x) => !x.completed);
-    return deadlines;
-  }, [deadlines, filters.showDeadlines, filters.showCompleted]);
-
-  const filteredEvents = useMemo(() => {
-    return filters.showEvents ? userEvents : [];
-  }, [userEvents, filters.showEvents]);
-
-  // Dialog states
-  const [deadlineDialogOpen, setDeadlineDialogOpen] = useState(false);
-  const [editDeadline, setEditDeadline] = useState<Deadline | null>(null);
-
-  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
-  const [editAssignment, setEditAssignment] = useState<Deadline | null>(null);
-
-  const [examDialogOpen, setExamDialogOpen] = useState(false);
-  const [editExam, setEditExam] = useState<Deadline | null>(null);
-
-  const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [editEvent, setEditEvent] = useState<Event | null>(null);
-
-  const [unitDialogOpen, setUnitDialogOpen] = useState(false);
-  const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
-
-  // Unit detail panel state
-  const [unitDetailOpen, setUnitDetailOpen] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
-
-  // Delete confirmation modal state
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
-
-  // Delete confirmation state for assignments
-  const [assignmentDeleteConfirmOpen, setAssignmentDeleteConfirmOpen] = useState(false);
-  const [assignmentToDelete, setAssignmentToDelete] = useState<Deadline | null>(null);
-
-  // Delete confirmation state for exams
-  const [examDeleteConfirmOpen, setExamDeleteConfirmOpen] = useState(false);
-  const [examToDelete, setExamToDelete] = useState<Deadline | null>(null);
-
-  // Delete confirmation state for deadlines
-  const [deadlineDeleteConfirmOpen, setDeadlineDeleteConfirmOpen] = useState(false);
-  const [deadlineToDelete, setDeadlineToDelete] = useState<Deadline | null>(null);
-
-  // Delete confirmation state for events
-  const [eventDeleteConfirmOpen, setEventDeleteConfirmOpen] = useState(false);
-  const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
-
-  const [todoDeleteConfirmOpen, setTodoDeleteConfirmOpen] = useState(false);
-  const [todoToDelete, setTodoToDelete] = useState<{ id: string; title: string } | null>(null);
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [todoDialogOpen, setTodoDialogOpen] = useState(false);
-  const [editTodoTitle, setEditTodoTitle] = useState('');
-  const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
-  const [editTodoDueDate, setEditTodoDueDate] = useState('');
-  const [editTodoDueTime, setEditTodoDueTime] = useState('');
-  const [editTodoColor, setEditTodoColor] = useState<string>('#10b981'); // Default green
-
-  // Assignment detail panel state
-  const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<Deadline | null>(null);
-
-  // Exam detail panel state
-  const [examDetailOpen, setExamDetailOpen] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<Deadline | null>(null);
-
-  // Event detail panel state
-  const [eventDetailOpen, setEventDetailOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
-  // Todo detail panel state
-  const [todoDetailOpen, setTodoDetailOpen] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
-
-  const unitsWidgetRef = useRef<HTMLDivElement>(null);
-  const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
-
-  // Helper function to check if element is visible in viewport
-  const isElementInViewport = useCallback((el: HTMLElement | null): boolean => {
-    if (!el) return false;
-    const rect = el.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-  }, []);
-
-  // Helper function to scroll only if element is not visible
-  const scrollIfNotVisible = useCallback(
-    (el: HTMLElement | null, block: ScrollLogicalPosition = 'center') => {
-      if (el && !isElementInViewport(el)) {
-        el.scrollIntoView({ behavior: 'smooth', block });
-      }
-    },
-    [isElementInViewport],
-  );
-
-  // Highlighted unit derived from URL query parameter
-  const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
-  const highlightedUnit = useMemo(() => {
-    if (!highlightedUnitId) return null;
-    return units.find((unit) => unit.id === highlightedUnitId) ?? null;
-  }, [highlightedUnitId, units]);
-
-  // Highlighted deadline derived from URL query parameter
-  const highlightedDeadlineId = useMemo(
-    () => searchParams.get('highlightDeadline'),
-    [searchParams],
-  );
-  const deadlineHighlightActive = Boolean(highlightedDeadlineId);
-  const deadlineRefs = useRef<Map<string, HTMLElement>>(new Map());
-
-  // Handle highlighted deadline side effects (scroll + show detail panel)
-  useEffect(() => {
-    if (!highlightedDeadlineId) {
-      return;
-    }
-
-    // Find the highlighted deadline
-    const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
-
-    // Scroll to assignments widget (only if not visible) and open detail panel
-    const scrollTimer = window.setTimeout(() => {
-      // First scroll to the assignments widget only if not already visible
-      scrollIfNotVisible(assignmentsWidgetRef.current, 'start');
-
-      // Then scroll to the specific deadline item if it exists in calendar view
-      const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
-      if (deadlineElement) {
-        setTimeout(() => {
-          scrollIfNotVisible(deadlineElement, 'center');
-        }, 400);
-      }
-
-      // Open the correct detail panel based on deadline type
-      if (highlightedDeadline) {
-        if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
-          setSelectedExam(highlightedDeadline);
-          setExamDetailOpen(true);
-        } else {
-          setSelectedAssignment(highlightedDeadline);
-          setAssignmentDetailOpen(true);
-        }
-      }
-
-      // Clear the URL parameter after capturing state (panel will stay open)
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightDeadline');
-      window.history.replaceState({}, '', url.toString());
-    }, 300);
-
-    return () => {
-      clearTimeout(scrollTimer);
-    };
-  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible]);
-
-  // Highlighted todo derived from URL query parameter
-  const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
-
-  // Handle highlighted todo side effects (open detail panel)
-  useEffect(() => {
-    if (!highlightedTodoId) {
-      return;
-    }
-
-    // Find the highlighted todo
-    const highlightedTodo = todos.find((t) => t.id === highlightedTodoId);
-
-    // Open the todo detail panel
-    const timer = window.setTimeout(() => {
-      if (highlightedTodo) {
-        setSelectedTodo(highlightedTodo);
-        setTodoDetailOpen(true);
-      }
-
-      // Clear the URL parameter after capturing state (panel will stay open)
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightTodo');
-      window.history.replaceState({}, '', url.toString());
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [highlightedTodoId, todos]);
-
-  // Highlighted event derived from URL query parameter
-  const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
-
-  // Handle highlighted event side effects (open detail panel)
-  useEffect(() => {
-    if (!highlightedEventId) {
-      return;
-    }
-
-    // Find the highlighted event
-    const highlightedEvent = userEvents.find((e) => e.id === highlightedEventId);
-
-    // Open the event detail panel
-    const timer = window.setTimeout(() => {
-      if (highlightedEvent) {
-        setSelectedEvent(highlightedEvent);
-        setEventDetailOpen(true);
-      }
-
-      // Clear the URL parameter after capturing state (panel will stay open)
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightEvent');
-      window.history.replaceState({}, '', url.toString());
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [highlightedEventId, userEvents]);
-
-  // Track if we've already opened the unit panel for this highlight (to prevent re-opening)
-  const processedUnitHighlightRef = useRef<string | null>(null);
-
-  // Reset the processed ref when URL changes (new highlight request)
-  useEffect(() => {
-    if (highlightedUnitId && processedUnitHighlightRef.current !== highlightedUnitId) {
-      // New highlight request, reset to allow processing
-      processedUnitHighlightRef.current = null;
-    }
-  }, [highlightedUnitId]);
-
-  // Handle highlighted unit - open the detail panel when a unit is highlighted via URL
-  useEffect(() => {
-    // Wait for hydration and units to be loaded before trying to find the highlighted unit
-    if (!hasHydrated || !highlightedUnitId || !highlightedUnit) {
-      return;
-    }
-
-    // Prevent re-opening if we've already processed this highlight
-    if (processedUnitHighlightRef.current === highlightedUnitId) {
-      return;
-    }
-
-    processedUnitHighlightRef.current = highlightedUnitId;
-
-    // Open detail panel with small delay to allow scroll to happen first
-    const timer = window.setTimeout(() => {
-      setSelectedUnit(highlightedUnit);
-      setUnitDetailOpen(true);
-
-      // Clear the URL parameter after capturing state (panel will stay open)
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightUnit');
-      window.history.replaceState({}, '', url.toString());
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [highlightedUnitId, highlightedUnit, hasHydrated]);
-
-  // Use selectedUnit for the panel (no longer depends on URL)
-  const effectiveSelectedUnit = selectedUnit;
-  const effectiveUnitDetailOpen = unitDetailOpen;
-
-  const handleUnitDetailOpenChange = useCallback((open: boolean) => {
-    setUnitDetailOpen(open);
-  }, []);
-
-  // Highlighted widget derived from URL query parameter (e.g., "units" for My Units widget)
-  const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);
-
-  // Handle highlighted widget side effects (scroll + auto-clear URL)
-  useEffect(() => {
-    if (!highlightedWidget) return;
-
-    const scrollTimer = window.setTimeout(() => {
-      if (highlightedWidget === 'units') {
-        scrollIfNotVisible(unitsWidgetRef.current);
-      }
-    }, 100);
-
-    // Clear highlight and URL parameter after 3 seconds
-    const clearTimer = window.setTimeout(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightWidget');
-      window.history.replaceState({}, '', url.toString());
-    }, 3000);
-
-    return () => {
-      clearTimeout(scrollTimer);
-      clearTimeout(clearTimer);
-    };
-  }, [highlightedWidget, scrollIfNotVisible]);
-
-  // Scroll to units widget when highlighted via URL (URL clearing is handled in the panel open effect)
-  useEffect(() => {
-    if (!highlightedUnitId) return;
-
-    const scrollTimer = window.setTimeout(() => {
-      scrollIfNotVisible(unitsWidgetRef.current);
-    }, 100);
-
-    return () => {
-      clearTimeout(scrollTimer);
-    };
-  }, [highlightedUnitId, scrollIfNotVisible]);
-
-  // Get date from URL parameter if provided
-  const urlDate = useMemo(() => {
-    const dateParam = searchParams.get('date');
-    if (dateParam) {
-      const parsed = dayjs(dateParam);
-      if (parsed.isValid()) {
-        return parsed;
-      }
-    }
-    return null;
-  }, [searchParams]);
-
-  // Calendar state - use URL date if provided, otherwise current week
-  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const dateParam = params.get('date');
-      if (dateParam) {
-        const parsed = dayjs(dateParam);
-        if (parsed.isValid()) {
-          return parsed.startOf('isoWeek').toDate();
-        }
-      }
-    }
-    return dayjs().startOf('isoWeek').toDate();
-  });
-
-  // Mobile: track the currently selected day index (0-6 for Mon-Sun)
-  const [mobileSelectedDayIndex, setMobileSelectedDayIndex] = useState(() => {
-    // Check for URL date parameter first
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const dateParam = params.get('date');
-      if (dateParam) {
-        const parsed = dayjs(dateParam);
-        if (parsed.isValid()) {
-          const weekStart = parsed.startOf('isoWeek');
-          return parsed.diff(weekStart, 'day');
-        }
-      }
-    }
-    // Default to today's day of week (0 = Monday in isoWeek)
-    const today = dayjs();
-    const weekStart = dayjs().startOf('isoWeek');
-    return today.diff(weekStart, 'day');
-  });
-
-  // Update week when URL date changes
-  useEffect(() => {
-    if (urlDate) {
-      const newWeekStart = urlDate.startOf('isoWeek').toDate();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentWeekStart(newWeekStart);
-      // Update mobile selected day
-      const dayIndex = urlDate.diff(urlDate.startOf('isoWeek'), 'day');
-      setMobileSelectedDayIndex(dayIndex);
-
-      // Clear the date parameter from URL after processing
-      const clearTimer = setTimeout(() => {
-        const url = new URL(window.location.href);
-        url.searchParams.delete('date');
-        window.history.replaceState({}, '', url.toString());
-      }, 1000);
-
-      return () => clearTimeout(clearTimer);
-    }
-  }, [urlDate]);
-
-  // Get days of the current week
-  const weekDays = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, index) => dayjs(currentWeekStart).add(index, 'day').toDate()),
-    [currentWeekStart],
-  );
-
-  // Events from store (loaded from Supabase API)
-  // const allEvents = useMemo(() => userEvents, [userEvents]);
-
-  // Get unit schedules for a specific day
-  const getUnitsForDay = (date: Date) => {
-    const dayName = dayjs(date).locale('en').format('dddd'); // Monday, Tuesday, etc.
-    return filteredUnits.flatMap((unit) =>
-      unit.schedule.filter((s) => s.day === dayName).map((s) => ({ ...unit, schedule: s })),
-    );
-  };
-
-  // Get items for a specific day (filtering out "classes" category from MQ dates since we show units instead)
-  const getItemsForDay = (date: Date) => {
-    const dayDeadlines = filteredDeadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
-    // Use startAt as source of truth for events, fallback to date for backward compatibility
-    const dayEvents = filteredEvents.filter((e) => {
-      const eventDate = e.startAt || e.date;
-      return dayjs(eventDate).isSame(date, 'day');
-    });
-    const dayMQDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
-    const dayUnits = getUnitsForDay(date);
-    return { deadlines: dayDeadlines, events: dayEvents, mqDates: dayMQDates, units: dayUnits };
-  };
-
-  const formatLocalized = (date: Date, options: Intl.DateTimeFormatOptions) =>
-    formatLocalizedDate(date, language, options);
-
-  const formatDayNumber = (date: Date) => formatLocalized(date, { day: 'numeric' });
-  const formatMonthYear = (date: Date) => formatLocalized(date, { month: 'long', year: 'numeric' });
-  const formatWeekdayLong = (date: Date) => formatLocalized(date, { weekday: 'long' });
-  const formatWeekdayShort = (date: Date) => formatLocalized(date, { weekday: 'short' });
-  const formatTimeShort = (date: Date) =>
-    formatLocalized(date, { hour: 'numeric', minute: '2-digit' });
-  // formatWeekdayMonthDayTime - available for future use
-  // const formatWeekdayMonthDayTime = (date: Date) =>
-  //   formatLocalized(date, {
-  //     weekday: 'short',
-  //     month: 'short',
-  //     day: 'numeric',
-  //     hour: 'numeric',
-  //     minute: '2-digit',
-  //   });
-  // formatMonthDayTime - available for future use
-  // const formatMonthDayTime = (date: Date) =>
-  //   formatLocalized(date, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-
-  const formatHourLabel = (hour: number) =>
-    formatLocalized(dayjs().hour(hour).minute(0).second(0).millisecond(0).toDate(), {
-      hour: 'numeric',
-    });
-
-  const formatScheduleTime = (time: string) => {
-    const [hourStr, minuteStr] = time.split(':');
-    const hour = Number(hourStr);
-    const minute = Number(minuteStr);
-    if (Number.isNaN(hour) || Number.isNaN(minute)) return time;
-    return formatLocalized(dayjs().hour(hour).minute(minute).second(0).millisecond(0).toDate(), {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
-  const getEventTitle = (event: Event) =>
-    event.translationKey ? t(event.translationKey as TranslationKey) : event.title;
-
-  const getDeadlineTypeLabel = (type: Deadline['type']) => t(`type_${type}` as TranslationKey);
-
-  const computeCurrentTimePosition = () => {
-    const now = dayjs();
-    const hours = now.hour();
-    const minutes = now.minute();
-    if (hours < START_HOUR || hours >= 24) return null;
-    return (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
-  };
-
-  // Current time position for the red line indicator (updates every minute)
-  const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(null);
-
-  useEffect(() => {
-    const update = () => setCurrentTimePosition(computeCurrentTimePosition());
-    update();
-    const intervalId = window.setInterval(update, 60_000);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Navigation handlers
-  const goToPreviousWeek = () =>
-    setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
-  const goToNextWeek = () => setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
-  const goToToday = () => {
-    setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
-    // Also reset mobile day to today
-    const today = dayjs();
-    const weekStart = dayjs().startOf('isoWeek');
-    setMobileSelectedDayIndex(today.diff(weekStart, 'day'));
-  };
-
-  // Mobile day navigation
-  const goToPreviousDay = () => {
-    if (mobileSelectedDayIndex > 0) {
-      setMobileSelectedDayIndex(mobileSelectedDayIndex - 1);
-    } else {
-      // Go to previous week, select Sunday (index 6)
-      setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
-      setMobileSelectedDayIndex(6);
-    }
-  };
-  const goToNextDay = () => {
-    if (mobileSelectedDayIndex < 6) {
-      setMobileSelectedDayIndex(mobileSelectedDayIndex + 1);
-    } else {
-      // Go to next week, select Monday (index 0)
-      setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
-      setMobileSelectedDayIndex(0);
-    }
-  };
-
-  // Get the currently selected mobile day
-  const mobileSelectedDay = weekDays[mobileSelectedDayIndex] || weekDays[0];
-
-  // Keyboard navigation for weeks
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Skip keyboard shortcuts when user is typing in an input field
-    const target = e.target as HTMLElement;
-    const isInputField =
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA' ||
-      target.isContentEditable ||
-      target.closest('[contenteditable="true"]');
-
-    if (isInputField) {
-      return; // Don't intercept keyboard events when typing
-    }
-
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      goToPreviousWeek();
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      goToNextWeek();
-    } else if (e.key === 't' || e.key === 'T') {
-      e.preventDefault();
-      goToToday();
-    }
-  };
-
-  // Deadline handlers
-  const openEditDeadline = (deadline: Deadline) => {
-    setEditDeadline(deadline);
-    setDeadlineDialogOpen(true);
-  };
-
-  // Assignment handlers
-  const openAddAssignment = () => {
-    setEditAssignment(null);
-    setAssignmentDialogOpen(true);
-  };
-
-  const openEditAssignment = (assignment: Deadline) => {
-    setEditAssignment(assignment);
-    setAssignmentDialogOpen(true);
-  };
-
-  // Assignment detail panel handler
-  const openAssignmentDetail = (assignment: Deadline) => {
-    setSelectedAssignment(assignment);
-    setAssignmentDetailOpen(true);
-  };
-
-  // Exam handlers
-  const openAddExam = () => {
-    setEditExam(null);
-    setExamDialogOpen(true);
-  };
-
-  const openEditExam = (exam: Deadline) => {
-    setEditExam(exam);
-    setExamDialogOpen(true);
-  };
-
-  // Event handlers - open detail panel to view event details
-  const handleEventClick = (event: Event) => {
-    setSelectedEvent(event);
-    setEventDetailOpen(true);
-  };
-
-  const openAddTodo = () => {
-    setEditingTodo(null);
-    setEditTodoTitle('');
-    setEditTodoPriority('Medium');
-    setEditTodoDueDate('');
-    setEditTodoDueTime('');
-    setEditTodoColor('#10b981');
-    setTodoDialogOpen(true);
-  };
-
-  const openEditTodo = (todo: Todo) => {
-    setEditingTodo(todo);
-    setEditTodoTitle(todo.title);
-    setEditTodoPriority(todo.priority);
-    setEditTodoColor(todo.color || '#10b981');
-    if (todo.dueDate) {
-      const date = new Date(todo.dueDate);
-      setEditTodoDueDate(dayjs(date).format('YYYY-MM-DD'));
-      setEditTodoDueTime(dayjs(date).format('HH:mm'));
-    } else {
-      setEditTodoDueDate('');
-      setEditTodoDueTime('');
-    }
-    setTodoDialogOpen(true);
-  };
-
-  // Unit handlers
-  const openAddUnit = () => {
-    setEditingUnit(null);
-    setUnitDialogOpen(true);
-  };
-
-  const openEditUnit = (unit: Unit) => {
-    setEditingUnit(unit);
-    setUnitDialogOpen(true);
-  };
-
-  const handleDeleteUnit = (unit: Unit) => {
-    setUnitToDelete(unit);
-    setDeleteConfirmOpen(true);
-  };
-
-  // View Handlers
-  const handleViewChange = (newView: CalendarView) => {
-    setView(newView);
-    // Update URL param
-    const url = new URL(window.location.href);
-    url.searchParams.set('view', newView);
-    window.history.replaceState({}, '', url.toString());
-  };
-
-  const handleToggleFilters = () => setIsFiltersOpen(!isFiltersOpen);
-
-  const handleDateChange = (date: Date) => {
-    setCurrentWeekStart(dayjs(date).startOf('isoWeek').toDate());
-  };
-
-  const confirmDeleteUnit = () => {
-    if (unitToDelete) {
-      // Cascade delete: remove all deadlines associated with this unit locally
-      removeDeadlinesByUnit(unitToDelete.id, unitToDelete.code);
-      // Then delete the unit (which also cascades on the backend)
-      removeUnit(unitToDelete.id);
-      setDeleteConfirmOpen(false);
-      setUnitToDelete(null);
-    }
-  };
-
-  // Assignment delete handlers
+  // 1. Data Hook
+  const {
+    deadlines,
+    userEvents,
+    units,
+    todos,
+    hasHydrated,
+    removeDeadline,
+    removeEvent,
+    removeUnit,
+    addTodo,
+    removeTodo,
+    updateTodo,
+  } = useCalendarData();
+
+  // 2. View Hook
+  const {
+    view,
+    setView,
+    currentWeekStart,
+    mobileSelectedDayIndex,
+    setMobileSelectedDayIndex,
+    goToPreviousWeek,
+    goToNextWeek,
+    goToToday,
+    weekDays,
+  } = useCalendarView();
+
+  // 3. Filtering Hook
+  const {
+    filters,
+    setFilters,
+    isFiltersOpen,
+    handleToggleFilters,
+    filteredUnits,
+    filteredDeadlines,
+    filteredEvents,
+  } = useCalendarFiltering(units, deadlines, userEvents);
+
+  // 4. Dialogs Hook
+  const dialogs = useCalendarDialogs();
+  const {
+    // Dialog states
+    deadlineDialogOpen,
+    setDeadlineDialogOpen,
+    editDeadline,
+    assignmentDialogOpen,
+    setAssignmentDialogOpen,
+    editAssignment,
+    examDialogOpen,
+    setExamDialogOpen,
+    editExam,
+    eventDialogOpen,
+    setEventDialogOpen,
+    editEvent,
+    setEditEvent,
+    unitDialogOpen,
+    setUnitDialogOpen,
+    editingUnit,
+    todoDialogOpen,
+    setTodoDialogOpen,
+    editingTodo,
+    setEditingTodo,
+    editTodoTitle,
+    setEditTodoTitle,
+    editTodoPriority,
+    setEditTodoPriority,
+    editTodoDueDate,
+    setEditTodoDueDate,
+    editTodoDueTime,
+    setEditTodoDueTime,
+    editTodoColor,
+    setEditTodoColor,
+
+    // Detail panel states
+    unitDetailOpen,
+    setUnitDetailOpen,
+    selectedUnit,
+    setSelectedUnit,
+    assignmentDetailOpen,
+    setAssignmentDetailOpen,
+    selectedAssignment,
+    setSelectedAssignment,
+    examDetailOpen,
+    setExamDetailOpen,
+    selectedExam,
+    setSelectedExam,
+    eventDetailOpen,
+    setEventDetailOpen,
+    selectedEvent,
+    todoDetailOpen,
+    setTodoDetailOpen,
+    selectedTodo,
+    setSelectedTodo,
+
+    // Delete confirm states
+    deleteConfirmOpen,
+    setDeleteConfirmOpen,
+    unitToDelete,
+    setUnitToDelete,
+    assignmentDeleteConfirmOpen,
+    setAssignmentDeleteConfirmOpen,
+    assignmentToDelete,
+    setAssignmentToDelete,
+    examDeleteConfirmOpen,
+    setExamDeleteConfirmOpen,
+    examToDelete,
+    setExamToDelete,
+    deadlineDeleteConfirmOpen,
+    setDeadlineDeleteConfirmOpen,
+    deadlineToDelete,
+    setDeadlineToDelete,
+    eventDeleteConfirmOpen,
+    setEventDeleteConfirmOpen,
+    eventToDelete,
+    setEventToDelete,
+    todoDeleteConfirmOpen,
+    setTodoDeleteConfirmOpen,
+    todoToDelete,
+    setTodoToDelete,
+
+    // Actions
+    openEditDeadline,
+    openAddAssignment,
+    openEditAssignment,
+    openAssignmentDetail,
+    openAddExam,
+    openEditExam,
+    handleEventClick,
+    openEditEvent,
+    openAddTodo,
+    openEditTodo,
+    openAddUnit,
+    openEditUnit,
+    handleDeleteUnit,
+  } = dialogs;
+
+  // 5. Highlights Hook
+  const { unitsWidgetRef, assignmentsWidgetRef, deadlineRefs, highlightedDeadlineId } =
+    useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs);
+
+  // 6. Getters Hook
+  const { formatDayNumber, formatMonthYear, formatWeekdayShort, formatTimeShort, formatLocalized } =
+    useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
+
+  // Local Helpers
   const handleDeleteAssignment = (assignment: Deadline) => {
     setAssignmentToDelete(assignment);
     setAssignmentDeleteConfirmOpen(true);
@@ -800,7 +242,6 @@ export default function CalendarClient() {
     }
   };
 
-  // Exam delete handlers
   const handleDeleteExam = (exam: Deadline) => {
     setExamToDelete(exam);
     setExamDeleteConfirmOpen(true);
@@ -814,7 +255,6 @@ export default function CalendarClient() {
     }
   };
 
-  // Deadline delete handlers
   const confirmDeleteDeadline = () => {
     if (deadlineToDelete) {
       removeDeadline(deadlineToDelete.id);
@@ -823,7 +263,6 @@ export default function CalendarClient() {
     }
   };
 
-  // Event delete handlers
   const handleDeleteEvent = (event: Event) => {
     setEventToDelete(event);
     setEventDeleteConfirmOpen(true);
@@ -837,1170 +276,331 @@ export default function CalendarClient() {
     }
   };
 
-  // Todo handlers
   const handleDeleteTodo = (todo: Todo) => {
     setTodoToDelete({ id: todo.id, title: todo.title });
     setTodoDeleteConfirmOpen(true);
   };
 
-  const handleNotifyTodo = (todo: Todo) => {
-    // Schedule a reminder for this todo
-    if (todo.dueDate) {
-      // Use toast to confirm reminder was set
-      const dueDate = new Date(todo.dueDate);
-      toastUtils.success(
-        t('reminderSet' as TranslationKey) || 'Reminder Set',
-        `${todo.title} - ${dueDate.toLocaleDateString()}`,
-        { id: `todo-reminder-set-${todo.id}` },
-      );
-    } else {
-      toastUtils.info(
-        t('noDateForReminder' as TranslationKey) || 'No Due Date',
-        t('todoNeedsDueDate' as TranslationKey) || 'Add a due date to set a reminder',
-        { id: `todo-reminder-no-date-${todo.id}` },
-      );
+  const handleNotifyTodo = (_todo: Todo) => {
+    // Notification logic would go here
+  };
+
+  const confirmDeleteUnit = () => {
+    if (unitToDelete) {
+      removeUnit(unitToDelete.id);
+      setDeleteConfirmOpen(false);
+      setUnitToDelete(null);
     }
   };
 
-  // Get building info for a deadline (either from deadline itself or from its unit)
-  // const getDeadlineBuilding = (deadline: Deadline): string | undefined => {
-  //   // First check if deadline has its own building (for exams)
-  //   if (deadline.building) return deadline.building;
-  //   // Otherwise, get building from the associated unit
-  //   const unit = units.find((u) => u.code === deadline.unitCode);
-  //   return unit?.location?.building;
-  // };
-
-  // Event edit handler
-  const openEditEvent = (event: Event) => {
-    setEditEvent(event);
-    setEventDialogOpen(true);
-  };
-
-  // Open unit detail panel
-  const openUnitDetail = (unit: Unit) => {
-    setSelectedUnit(unit);
-    setUnitDetailOpen(true);
-  };
-
-  // Handle viewing deadline detail from unit detail panel
   const handleEditDeadlineFromPanel = (deadline: Deadline) => {
-    setUnitDetailOpen(false);
-    // Open the appropriate detail panel based on deadline type
     if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
-      setSelectedExam(deadline);
-      setExamDetailOpen(true);
+      openEditExam(deadline);
     } else {
-      setSelectedAssignment(deadline);
-      setAssignmentDetailOpen(true);
+      openEditAssignment(deadline);
     }
   };
 
-  // Filter deadlines by type
-  // const assignments = deadlines.filter((d) => d.type === 'Assignment');
-  // const exams = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz');
+  const handleUnitDetailOpenChange = (open: boolean) => {
+    setUnitDetailOpen(open);
+  };
+
+  // Get unit schedules for a specific day (used in mobile view/helpers)
+  const getUnitsForDay = (date: Date) => {
+    const dayName = dayjs(date).locale('en').format('dddd');
+    return filteredUnits.flatMap((unit) =>
+      unit.schedule
+        .filter((s: ClassTime) => s.day === dayName)
+        .map((s: ClassTime) => ({ ...unit, schedule: [s] })),
+    );
+  };
+
+  const getItemsForDay = (date: Date) => {
+    const dayDeadlines = filteredDeadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
+    const dayEvents = filteredEvents.filter((e) => {
+      const eventDate = e.startAt || e.date;
+      return dayjs(eventDate).isSame(date, 'day');
+    });
+    return { dayDeadlines, dayEvents };
+  };
+
+  if (!hasHydrated) {
+    return null;
+  }
 
   return (
-    <div
-      className="container mx-auto p-4 sm:p-6 max-w-[1600px] calendar-page min-h-screen"
-      role="region"
-      aria-labelledby="calendar-heading"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
-      {/* Program Legend - on top to help users understand the calendar colors */}
-      <ProgramLegend className="mb-4" />
+    <div className="flex flex-col h-full bg-mq-background">
+      {/* Mobile Header (Date Selector) */}
+      <div className="md:hidden flex flex-col bg-mq-card-background border-b border-mq-border sticky top-0 z-20">
+        <div className="flex items-center justify-between p-4">
+          <h1 className="text-xl font-bold text-mq-content">
+            {formatMonthYear(dayjs(currentWeekStart).add(mobileSelectedDayIndex, 'day').toDate())}
+          </h1>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon" onClick={goToPreviousWeek}>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={goToToday}>
+              {t('today')}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={goToNextWeek}>
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
 
-      <CalendarHeader
-        currentDate={currentWeekStart}
-        view={view}
-        onViewChange={handleViewChange}
-        onDateChange={handleDateChange}
-        onToday={goToToday}
-        onToggleFilters={handleToggleFilters}
-        isFiltersOpen={isFiltersOpen}
-      />
+        {/* Mobile Days Row */}
+        <div className="flex overflow-x-auto pb-2 px-2 gap-2 scrollbar-hide">
+          {weekDays.map((date, index) => {
+            const isSelected = index === mobileSelectedDayIndex;
+            const isToday = dayjs(date).isSame(dayjs(), 'day');
 
-      <FilterPanel
-        isOpen={isFiltersOpen}
-        onClose={() => setIsFiltersOpen(false)}
-        filters={filters}
-        onFilterChange={setFilters}
-      />
+            return (
+              <button
+                key={index}
+                onClick={() => setMobileSelectedDayIndex(index)}
+                className={cn(
+                  'flex flex-col items-center justify-center min-w-[3.5rem] py-2 rounded-lg transition-colors',
+                  isSelected
+                    ? 'bg-mq-primary text-white'
+                    : 'bg-mq-background text-mq-content hover:bg-mq-background-hover',
+                  isToday && !isSelected && 'border border-mq-primary text-mq-primary',
+                )}
+              >
+                <span className="text-xs font-medium opacity-80">{formatWeekdayShort(date)}</span>
+                <span className="text-lg font-bold">{formatDayNumber(date)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 mt-4">
-        {/* Main Calendar Area */}
-        <div className="flex-1 min-w-0 overflow-x-auto">
-          {!hasHydrated && (
-            <p className="mb-4 text-xs text-mq-content-secondary" role="status" aria-live="polite">
-              {t('loading')}
-            </p>
-          )}
+      {/* Desktop Header */}
+      <div className="hidden md:block sticky top-0 z-30 bg-mq-background pb-4 pt-6 px-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-mq-content">
+                {formatMonthYear(currentWeekStart)}
+              </h1>
+              <p className="text-mq-content-secondary mt-1">
+                {t('weekOf')}{' '}
+                {formatLocalized(currentWeekStart, {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
 
+            <div className="flex items-center gap-3">
+              <div className="flex bg-mq-card-background rounded-lg p-1 border border-mq-border">
+                <Button
+                  variant={view === 'week' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setView('week')}
+                  className="text-sm"
+                >
+                  {t('weekView')}
+                </Button>
+                <Button
+                  variant={view === 'day' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setView('day')}
+                  className="text-sm"
+                >
+                  {t('dayView')}
+                </Button>
+                <Button
+                  variant={view === 'agenda' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setView('agenda')}
+                  className="text-sm"
+                >
+                  {t('agendaView')}
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" onClick={goToPreviousWeek}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={goToToday}>
+                  {t('today')}
+                </Button>
+                <Button variant="outline" size="icon" onClick={goToNextWeek}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <Button
+                variant={isFiltersOpen ? 'secondary' : 'outline'}
+                onClick={handleToggleFilters}
+                className="gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                {t('filter')}
+              </Button>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <FilterPanel
+              filters={filters}
+              onFilterChange={setFilters}
+              isOpen={isFiltersOpen}
+              onClose={handleToggleFilters}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden relative">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pb-24 md:pb-6 scrollbar-hide">
           {/* Week View */}
-          {/* Default to Week view if view is week or undefined */}
           {view === 'week' && (
-            // Apple/Google Calendar Style Weekly View
-            <ScrollReveal delay={0.1}>
-              <div className="bg-mq-card-background border border-mq-border rounded-mq-xl shadow-sm overflow-x-auto scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent">
-                <div className="p-0 calendar-main-panel">
-                  <div className="min-w-[1000px]">
-                    {/* Calendar Header - Week navigation for desktop, day navigation for mobile */}
-                    <div className="sticky top-0 z-40 flex items-center justify-between p-4 border-b border-mq-border bg-mq-card-background/95 backdrop-blur-md">
-                      {/* Desktop week navigation REMOVED per user request */}
-                      {/* Mobile day navigation */}
-                      <div className="flex md:hidden items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={goToPreviousDay}
-                          aria-label={t('calendarPreviousDay' as TranslationKey) || 'Previous day'}
-                        >
-                          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={goToToday}>
-                          {t('today')}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={goToNextDay}
-                          aria-label={t('calendarNextDay' as TranslationKey) || 'Next day'}
-                        >
-                          <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                        </Button>
-                      </div>
-                      {/* Desktop: Month/Year title */}
-                      <h2 className="hidden md:block text-lg font-semibold text-mq-content">
-                        {formatMonthYear(currentWeekStart)}
-                      </h2>
-                      {/* Mobile: Selected day title */}
-                      <h2 className="md:hidden text-lg font-semibold text-mq-content">
-                        {formatWeekdayLong(mobileSelectedDay)}, {formatDayNumber(mobileSelectedDay)}
-                      </h2>
-                      <div className="w-24" /> {/* Spacer for balance */}
-                    </div>
+            <ScrollReveal>
+              <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-h-[calc(100vh-200px)]">
+                {weekDays.map((date, index) => {
+                  const { dayDeadlines, dayEvents } = getItemsForDay(date);
+                  const dayUnits = getUnitsForDay(date);
+                  const isToday = dayjs(date).isSame(dayjs(), 'day');
 
-                    {/* Mobile: Week day quick picker */}
-                    <div className="md:hidden flex justify-center gap-1 p-2 border-b border-mq-border bg-mq-background-secondary">
-                      {weekDays.map((day, index) => {
-                        const isSelected = index === mobileSelectedDayIndex;
-                        const isTodayPill = dayjs(day).isSame(dayjs(), 'day');
-                        return (
-                          <button
-                            key={day.toISOString()}
-                            type="button"
-                            onClick={() => setMobileSelectedDayIndex(index)}
-                            className={cn(
-                              'flex flex-col items-center justify-center w-10 h-14 rounded-lg transition-all',
-                              isSelected
-                                ? 'bg-mq-primary text-white shadow-md'
-                                : isTodayPill
-                                  ? 'bg-mq-primary/10 text-mq-primary'
-                                  : 'bg-mq-background hover:bg-mq-hover-background text-mq-content',
-                            )}
-                            aria-label={`${formatWeekdayLong(day)}, ${formatDayNumber(day)}`}
-                            aria-pressed={isSelected}
-                          >
-                            <span className="text-[10px] font-medium uppercase">
-                              {formatWeekdayShort(day).slice(0, 2)}
-                            </span>
-                            <span
-                              className={cn('text-sm font-semibold', isSelected && 'text-white')}
-                            >
-                              {formatDayNumber(day)}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Calendar Grid with Time Lines - Scrollable from 6am to 12am */}
-                    {/* Desktop: Full week view */}
+                  return (
                     <div
-                      className="hidden md:block"
-                      role="grid"
-                      aria-label={t('calendarWeeklyGridLabel')}
-                      aria-roledescription={t('calendarWeeklyGridDescription')}
+                      key={index}
+                      className={cn(
+                        'flex flex-col gap-2 p-3 rounded-xl border min-h-[150px] transition-colors',
+                        isToday
+                          ? 'bg-mq-primary/5 border-mq-primary/20'
+                          : 'bg-mq-card-background border-mq-border hover:border-mq-primary/30',
+                      )}
                     >
-                      <div className="w-full">
-                        {/* Day Headers - Sticky with MQ Key Dates */}
-                        <div
-                          className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-mq-border sticky top-[73px] bg-mq-background/95 backdrop-blur-md z-30"
-                          role="row"
-                        >
-                          <div
-                            className="p-2 text-center text-xs text-mq-content-secondary border-r border-mq-border"
-                            aria-hidden="true"
-                          />
-                          {weekDays.map((day) => {
-                            const dayName = formatWeekdayLong(day);
-                            const dayDate = formatDayNumber(day);
-                            const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
-                            return (
-                              <div
-                                key={day.toISOString()}
-                                className={cn(
-                                  'p-2 text-center border-r border-mq-border last:border-r-0',
-                                  isTodayCell && 'bg-mq-primary/10',
-                                )}
-                                role="columnheader"
-                                aria-label={
-                                  isTodayCell
-                                    ? t('calendarDayAriaLabelToday', {
-                                        dayDate,
-                                        dayName,
-                                        todayLabel: t('today'),
-                                      })
-                                    : t('calendarDayAriaLabel', { dayDate, dayName })
-                                }
-                              >
-                                <div
-                                  className="text-xs text-mq-content-secondary uppercase font-medium"
-                                  aria-hidden="true"
-                                >
-                                  {formatWeekdayShort(day)}
-                                </div>
-                                <div
-                                  className={cn(
-                                    'text-xl font-semibold mt-1 inline-flex items-center justify-center',
-                                    isTodayCell
-                                      ? 'w-9 h-9 rounded-full bg-mq-primary text-white'
-                                      : 'text-mq-content',
-                                  )}
-                                  aria-hidden="true"
-                                >
-                                  {formatDayNumber(day)}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Full-Day Events Row - MQ Key Dates as visual blocks */}
-                        {(() => {
-                          // Check if any day has MQ key dates (non-class)
-                          const hasAnyFullDayEvents = weekDays.some((day) => {
-                            const mqDates = getMQKeyDatesForDay(day).filter(
-                              (d) => d.category !== 'classes',
-                            );
-                            return mqDates.length > 0;
-                          });
-
-                          if (!hasAnyFullDayEvents) return null;
-
-                          return (
-                            <div
-                              className="grid grid-cols-[60px_repeat(7,1fr)] border-b-2 border-mq-border bg-mq-background-secondary/50"
-                              role="row"
-                            >
-                              {/* Label column */}
-                              <div className="p-2 text-xs font-medium text-mq-content-secondary text-right pr-2 border-r border-mq-border flex items-center justify-end min-h-[80px]">
-                                {t('calendarAllDay')}
-                              </div>
-                              {/* Full-day events for each day */}
-                              {weekDays.map((day) => {
-                                const dayMQDates = getMQKeyDatesForDay(day).filter(
-                                  (d) => d.category !== 'classes',
-                                );
-                                const isTodayCell = dayjs(day).isSame(dayjs(), 'day');
-
-                                return (
-                                  <div
-                                    key={`fullday-${day.toISOString()}`}
-                                    className={cn(
-                                      'min-h-[80px] max-h-[160px] overflow-y-auto p-2 border-r border-mq-border last:border-r-0 flex flex-col gap-2 scrollbar-thin scrollbar-thumb-mq-border scrollbar-track-transparent',
-                                      isTodayCell && 'bg-mq-primary/10',
-                                    )}
-                                  >
-                                    {dayMQDates.map((mqDate) => {
-                                      const categoryColors = MQ_DATE_COLORS[mqDate.category];
-                                      const programStyle = PROGRAM_STYLES[mqDate.program];
-                                      // Category short label for badge
-                                      const categoryLabel =
-                                        {
-                                          exams: 'Exam',
-                                          admin: 'Admin',
-                                          results: 'Results',
-                                          payment: 'Payment',
-                                          enrollment: 'Enroll',
-                                          recess: 'Break',
-                                          classes: 'Class',
-                                        }[mqDate.category] || mqDate.category;
-
-                                      return (
-                                        <div
-                                          key={mqDate.id}
-                                          className={cn(
-                                            'min-h-[36px] px-2 py-1.5 rounded-md text-[11px] font-semibold flex flex-col justify-center leading-tight shadow-sm border-l-4',
-                                            programStyle.bgLight,
-                                            programStyle.border,
-                                            programStyle.pattern,
-                                          )}
-                                          title={
-                                            mqDate.description
-                                              ? `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                              : `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}`
-                                          }
-                                        >
-                                          <div className="flex items-center gap-1 mb-0.5">
-                                            <span className="text-sm" aria-hidden="true">
-                                              {programStyle.icon}
-                                            </span>
-                                            <span
-                                              className={cn(
-                                                'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
-                                                categoryColors.bg,
-                                                categoryColors.text,
-                                              )}
-                                            >
-                                              {categoryLabel}
-                                            </span>
-                                          </div>
-                                          <span className={cn('line-clamp-1', programStyle.text)}>
-                                            {mqDate.event}
-                                          </span>
-                                          <span
-                                            className={cn(
-                                              'text-[9px] opacity-70 line-clamp-1',
-                                              programStyle.text,
-                                            )}
-                                          >
-                                            {mqDate.term}
-                                          </span>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
-                        })()}
-
-                        {/* Time Grid */}
-                        <div
-                          className="relative"
-                          style={{
-                            height: HOURS.length * HOUR_HEIGHT + 12,
-                          }}
-                          role="presentation"
-                          aria-hidden="true"
-                        >
-                          {/* Hour Lines */}
-                          {HOURS.map((hour, index) => (
-                            <div
-                              key={hour}
-                              className="absolute left-0 right-0 grid grid-cols-[60px_repeat(7,1fr)]"
-                              style={{ top: index * HOUR_HEIGHT + 8 }}
-                              role="row"
-                            >
-                              {/* Time Label */}
-                              <div
-                                className="text-xs text-mq-content-secondary text-right pr-2 -mt-2"
-                                role="rowheader"
-                                aria-label={formatHourLabel(hour)}
-                              >
-                                {formatHourLabel(hour)}
-                              </div>
-                              {/* Hour Lines for each day */}
-                              {weekDays.map((day, dayIndex) => (
-                                <div
-                                  key={`${day.toISOString()}-${hour}`}
-                                  className={cn(
-                                    'calendar-grid-cell border-t border-r border-mq-border last:border-r-0',
-                                    dayIndex === 0 && 'border-l',
-                                    dayjs(day).isSame(dayjs(), 'day') && 'bg-mq-primary/10',
-                                  )}
-                                  style={{ height: HOUR_HEIGHT }}
-                                  role="gridcell"
-                                  aria-hidden="true"
-                                />
-                              ))}
-                            </div>
-                          ))}
-
-                          {/* Current Time Indicator */}
-                          {currentTimePosition !== null && (
-                            <div
-                              className="absolute left-[60px] right-0 z-30 pointer-events-none"
-                              style={{ top: currentTimePosition + 8 }}
-                            >
-                              <div className="flex items-center">
-                                <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
-                                <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
-                              </div>
-                            </div>
+                      <div className="flex flex-col items-center mb-2">
+                        <span className="text-xs font-medium text-mq-content-secondary uppercase">
+                          {formatWeekdayShort(date)}
+                        </span>
+                        <span
+                          className={cn(
+                            'text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full mt-1',
+                            isToday ? 'bg-mq-primary text-white' : 'text-mq-content',
                           )}
-
-                          {/* Events, Units and Deadlines Overlay */}
-                          <div className="absolute left-[60px] right-0 top-[8px] bottom-0 grid grid-cols-7">
-                            {weekDays.map((day) => {
-                              const {
-                                deadlines: dayDeadlines,
-                                events: dayEvents,
-                                units: dayUnits,
-                              } = getItemsForDay(day);
-
-                              // Build calendar items for collision detection
-                              const calendarItems: CalendarItem[] = [];
-
-                              // Add units
-                              dayUnits.forEach((unitData) => {
-                                const schedule = unitData.schedule;
-                                const timeInfo = parseTimeRange(
-                                  `${schedule.startTime} - ${schedule.endTime}`,
-                                );
-                                if (timeInfo) {
-                                  calendarItems.push({
-                                    id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
-                                    startHour: timeInfo.startHour,
-                                    startMin: timeInfo.startMin,
-                                    endHour: timeInfo.endHour,
-                                    endMin: timeInfo.endMin,
-                                    type: 'unit',
-                                    data: unitData,
-                                  });
-                                }
-                              });
-
-                              // Add deadlines
-                              dayDeadlines.forEach((deadline) => {
-                                const dueDayjs = dayjs(deadline.dueDate);
-                                const hours = dueDayjs.hour();
-                                const minutes = dueDayjs.minute();
-                                if (hours >= START_HOUR) {
-                                  calendarItems.push({
-                                    id: `deadline-${deadline.id}`,
-                                    startHour: hours,
-                                    startMin: minutes,
-                                    endHour: hours + 1,
-                                    endMin: minutes,
-                                    type: 'deadline',
-                                    data: deadline,
-                                  });
-                                }
-                              });
-
-                              // Add events
-                              dayEvents.forEach((event) => {
-                                const timeInfo = parseTimeRange(event.time);
-                                if (timeInfo) {
-                                  calendarItems.push({
-                                    id: `event-${event.id}`,
-                                    startHour: timeInfo.startHour,
-                                    startMin: timeInfo.startMin,
-                                    endHour: timeInfo.endHour,
-                                    endMin: timeInfo.endMin,
-                                    type: 'event',
-                                    data: event,
-                                  });
-                                }
-                              });
-
-                              // Calculate overlap groups
-                              const overlapInfo = calculateOverlapGroups(calendarItems);
-
-                              return (
-                                <div
-                                  key={day.toISOString()}
-                                  className="calendar-day-column relative border-r border-mq-border last:border-r-0"
-                                >
-                                  {/* Units - filled time block with unit color */}
-                                  {dayUnits.map((unitData) => {
-                                    const schedule = unitData.schedule;
-                                    const timeInfo = parseTimeRange(
-                                      `${schedule.startTime} - ${schedule.endTime}`,
-                                    );
-
-                                    if (!timeInfo) return null;
-
-                                    const posInfo = getTimePositionAndHeight(
-                                      timeInfo.startHour,
-                                      timeInfo.startMin,
-                                      timeInfo.endHour,
-                                      timeInfo.endMin,
-                                    );
-                                    if (!posInfo) return null;
-
-                                    // Get overlap info for this item
-                                    const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
-                                    const overlap = overlapInfo.get(itemId) || {
-                                      column: 0,
-                                      totalColumns: 1,
-                                    };
-                                    const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                    const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                    const locationSuffix = unitData.location?.building
-                                      ? t('calendarUnitLocationSuffix', {
-                                          building: unitData.location.building,
-                                          room: unitData.location.room,
-                                        })
-                                      : '';
-
-                                    return (
-                                      <button
-                                        key={`${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                        type="button"
-                                        className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur"
-                                        style={{
-                                          top: posInfo.top,
-                                          height: Math.max(posInfo.height, 44),
-                                          left,
-                                          width,
-                                          borderLeftColor: unitData.color,
-                                        }}
-                                        aria-label={t('calendarUnitAriaLabel', {
-                                          endTime: formatScheduleTime(schedule.endTime),
-                                          instruction: t('calendarPressEnterOrSpaceToViewDetails'),
-                                          locationSuffix,
-                                          startTime: formatScheduleTime(schedule.startTime),
-                                          unitCode: unitData.code,
-                                        })}
-                                        title={t('calendarUnitTitle', { unitCode: unitData.code })}
-                                        onClick={() => {
-                                          const originalUnit = units.find(
-                                            (u) => u.id === unitData.id,
-                                          );
-                                          if (originalUnit) openUnitDetail(originalUnit);
-                                        }}
-                                      >
-                                        <div className="p-1 h-full overflow-hidden text-mq-content">
-                                          <span className="block text-xs font-bold line-clamp-2 break-words leading-tight">
-                                            {unitData.code}
-                                          </span>
-                                          <span className="text-[10px] opacity-80 block">
-                                            {formatScheduleTime(schedule.startTime)} -{' '}
-                                            {formatScheduleTime(schedule.endTime)}
-                                          </span>
-                                          {posInfo.height > 50 && (
-                                            <span className="text-[10px] opacity-70 block line-clamp-2 break-words leading-tight">
-                                              {formatLocation(
-                                                unitData.location.building,
-                                                unitData.location.room,
-                                                t('room'),
-                                              )}
-                                            </span>
-                                          )}
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-
-                                  {/* Deadlines - point-in-time markers (not time blocks) */}
-                                  {dayDeadlines.map((deadline, idx) => {
-                                    const dueDayjs = dayjs(deadline.dueDate);
-                                    const dueDate = dueDayjs.toDate();
-                                    const hours = dueDayjs.hour();
-                                    const minutes = dueDayjs.minute();
-                                    const deadlineColor = getDeadlineColor(deadline, units);
-                                    const deadlineTypeLabel = getDeadlineTypeLabel(deadline.type);
-
-                                    // Calculate position at exact due time (point-in-time, not duration)
-                                    // Use a small fixed height for the marker instead of spanning an hour
-                                    const MARKER_HEIGHT = 28; // Fixed height for deadline marker
-                                    const topPosition =
-                                      (hours - START_HOUR) * HOUR_HEIGHT +
-                                      (minutes / 60) * HOUR_HEIGHT +
-                                      8;
-
-                                    // Display name: UNIT_CODE – Type or Title
-                                    const displayName = `${deadline.unitCode} – ${deadline.title}`;
-
-                                    if (hours < START_HOUR) {
-                                      // Show at top if outside visible hours
-                                      const isHighlighted =
-                                        deadlineHighlightActive &&
-                                        highlightedDeadlineId === deadline.id;
-                                      return (
-                                        <button
-                                          key={deadline.id}
-                                          type="button"
-                                          ref={(el) => {
-                                            if (el) deadlineRefs.current.set(deadline.id, el);
-                                          }}
-                                          onClick={() => openEditDeadline(deadline)}
-                                          className={cn(
-                                            'absolute left-1 right-1 text-left text-xs px-2 py-1 rounded shadow-sm font-medium z-10 text-white overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background transition-all hover:z-50',
-                                            deadline.completed && 'opacity-50 line-through',
-                                            isHighlighted &&
-                                              'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse',
-                                          )}
-                                          style={{
-                                            top: 4 + idx * 24,
-                                            height: 24,
-                                            backgroundColor: deadlineColor,
-                                          }}
-                                          aria-label={t('calendarDeadlineAriaLabel', {
-                                            displayName,
-                                            instruction: t('calendarPressEnterToEdit'),
-                                            time: formatTimeShort(dueDate),
-                                            type: deadlineTypeLabel,
-                                          })}
-                                          title={`${deadlineTypeLabel}: ${displayName} - Due ${formatTimeShort(dueDate)}`}
-                                        >
-                                          <span className="block truncate text-[10px]">
-                                            {displayName}
-                                          </span>
-                                        </button>
-                                      );
-                                    }
-
-                                    // Get overlap info for this item
-                                    const itemId = `deadline-${deadline.id}`;
-                                    const overlap = overlapInfo.get(itemId) || {
-                                      column: 0,
-                                      totalColumns: 1,
-                                    };
-                                    const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                    const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-                                    const isHighlightedDeadline =
-                                      deadlineHighlightActive &&
-                                      highlightedDeadlineId === deadline.id;
-
-                                    return (
-                                      <button
-                                        key={deadline.id}
-                                        type="button"
-                                        ref={(el) => {
-                                          if (el) deadlineRefs.current.set(deadline.id, el);
-                                        }}
-                                        onClick={() => openEditDeadline(deadline)}
-                                        className={cn(
-                                          'absolute text-left text-xs px-1.5 py-0.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background transition-all hover:z-50 hover:shadow-lg',
-                                          deadline.completed && 'opacity-50 line-through',
-                                          isHighlightedDeadline &&
-                                            'ring-4 ring-mq-primary ring-offset-2 ring-offset-mq-background shadow-lg shadow-mq-primary/30 animate-pulse z-20',
-                                        )}
-                                        style={{
-                                          top: topPosition,
-                                          height: MARKER_HEIGHT, // Fixed height for point-in-time marker
-                                          left,
-                                          width,
-                                          backgroundColor: `${deadlineColor}`,
-                                          borderLeftColor: deadlineColor,
-                                        }}
-                                        aria-label={t('calendarDeadlineAriaLabelStatus', {
-                                          displayName,
-                                          instruction: t('calendarPressEnterToEdit'),
-                                          status: deadline.completed
-                                            ? t('calendarCompletedStatus')
-                                            : t('calendarNotCompletedStatus'),
-                                          time: formatTimeShort(dueDate),
-                                          type: deadlineTypeLabel,
-                                        })}
-                                        title={`${deadlineTypeLabel}: ${displayName} - Due at ${formatTimeShort(dueDate)}`}
-                                      >
-                                        {/* Compact deadline marker */}
-                                        <div className="flex items-center gap-1 h-full">
-                                          <Clock
-                                            className="h-3 w-3 shrink-0 opacity-80"
-                                            aria-hidden="true"
-                                          />
-                                          <span className="text-[10px] font-bold shrink-0">
-                                            {formatTimeShort(dueDate)}
-                                          </span>
-                                          <span className="text-[10px] truncate opacity-90">
-                                            {displayName}
-                                          </span>
-                                        </div>
-                                      </button>
-                                    );
-                                  })}
-
-                                  {/* Events - filled time block */}
-                                  {dayEvents.map((event, idx) => {
-                                    const timeInfo = parseTimeRange(event.time);
-                                    const eventColors = getEventColors(event);
-                                    const eventTitle = getEventTitle(event);
-
-                                    if (!timeInfo) {
-                                      // Show at top if no valid time
-                                      const offsetTop = 4 + dayDeadlines.length * 24 + idx * 24;
-                                      return (
-                                        <button
-                                          key={event.id}
-                                          type="button"
-                                          onClick={() => handleEventClick(event)}
-                                          className={cn(
-                                            'absolute left-1 right-1 text-left text-[10px] px-2 py-1.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                            eventColors.bg,
-                                            eventColors.text,
-                                          )}
-                                          style={{ top: offsetTop, ...eventColors.style }}
-                                          aria-label={t('calendarEventAriaLabel', {
-                                            instruction: t('calendarPressEnterToViewDetails'),
-                                            time: event.time,
-                                            title: eventTitle,
-                                          })}
-                                          title={t('calendarEventTitle', {
-                                            time: event.time,
-                                            title: eventTitle,
-                                          })}
-                                        >
-                                          <span className="block line-clamp-1 hover:line-clamp-none whitespace-normal hover:overflow-visible">
-                                            {eventTitle}
-                                          </span>
-                                        </button>
-                                      );
-                                    }
-
-                                    const posInfo = getTimePositionAndHeight(
-                                      timeInfo.startHour,
-                                      timeInfo.startMin,
-                                      timeInfo.endHour,
-                                      timeInfo.endMin,
-                                    );
-
-                                    if (!posInfo) {
-                                      const offsetTop = 4 + dayDeadlines.length * 22 + idx * 22;
-                                      return (
-                                        <button
-                                          key={event.id}
-                                          type="button"
-                                          onClick={() => handleEventClick(event)}
-                                          className={cn(
-                                            'absolute left-1 right-1 text-left text-[10px] px-1 py-0.5 rounded shadow-sm font-medium z-10 line-clamp-2 break-words leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
-                                            eventColors.bg,
-                                            eventColors.text,
-                                          )}
-                                          style={{ top: offsetTop, ...eventColors.style }}
-                                          aria-label={t('calendarEventAriaLabelShort', {
-                                            time: event.time,
-                                            title: eventTitle,
-                                          })}
-                                          title={t('calendarEventTitle', {
-                                            time: event.time,
-                                            title: eventTitle,
-                                          })}
-                                        >
-                                          {eventTitle}
-                                        </button>
-                                      );
-                                    }
-
-                                    // Get overlap info for this item
-                                    const itemId = `event-${event.id}`;
-                                    const overlap = overlapInfo.get(itemId) || {
-                                      column: 0,
-                                      totalColumns: 1,
-                                    };
-                                    const evtWidth = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                    const evtLeft = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                    return (
-                                      <button
-                                        key={event.id}
-                                        type="button"
-                                        onClick={() => handleEventClick(event)}
-                                        className={cn(
-                                          'absolute text-left text-[10px] px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 leading-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit overflow-hidden hover:overflow-visible',
-                                          eventColors.bg,
-                                          eventColors.border,
-                                          eventColors.text,
-                                        )}
-                                        style={{
-                                          top: posInfo.top,
-                                          height: Math.max(posInfo.height, 44),
-                                          left: evtLeft,
-                                          width: evtWidth,
-                                          ...eventColors.style,
-                                        }}
-                                        aria-label={t('calendarEventAriaLabel', {
-                                          instruction: t('calendarPressEnterToViewDetails'),
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                        title={t('calendarEventTitle', {
-                                          time: event.time,
-                                          title: eventTitle,
-                                        })}
-                                      >
-                                        <span className="block line-clamp-2 hover:line-clamp-none break-words leading-tight">
-                                          {eventTitle}
-                                        </span>
-                                        <span className="text-[8px] opacity-80 block truncate">
-                                          {event.time}
-                                        </span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
+                        >
+                          {formatDayNumber(date)}
+                        </span>
                       </div>
-                    </div>
 
-                    {/* Mobile: Single day view */}
-                    <div
-                      className="md:hidden"
-                      role="region"
-                      aria-label={t('calendarDayViewLabel' as TranslationKey) || 'Day view'}
-                    >
-                      {/* Mobile Day Header with MQ Key Dates */}
-                      {(() => {
-                        const dayMQDates = getMQKeyDatesForDay(mobileSelectedDay).filter(
-                          (d) => d.category !== 'classes',
-                        );
-                        const isTodayCell = dayjs(mobileSelectedDay).isSame(dayjs(), 'day');
-
-                        return (
+                      <div className="flex-1 flex flex-col gap-2">
+                        {/* Units */}
+                        {dayUnits.map((item) => (
                           <div
-                            className={cn(
-                              'p-3 border-b border-mq-border',
-                              isTodayCell && 'bg-mq-primary/10',
-                            )}
+                            key={`unit-${item.id}-${(item.schedule[0] as ClassTime).startTime}`}
+                            onClick={() => {
+                              setSelectedUnit(item);
+                              setUnitDetailOpen(true);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedUnit(item);
+                                setUnitDetailOpen(true);
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            className="text-xs p-2 rounded-lg bg-mq-background border border-mq-border cursor-pointer hover:border-mq-primary transition-colors group"
+                            style={{ borderLeftColor: item.color, borderLeftWidth: '3px' }}
                           >
-                            {/* MQ Key Dates for mobile */}
-                            {dayMQDates.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {dayMQDates.map((mqDate) => {
-                                  const categoryColors = MQ_DATE_COLORS[mqDate.category];
-                                  const programStyle = PROGRAM_STYLES[mqDate.program];
-                                  const categoryLabel =
-                                    {
-                                      exams: 'Exam',
-                                      admin: 'Admin',
-                                      results: 'Results',
-                                      payment: 'Payment',
-                                      enrollment: 'Enroll',
-                                      recess: 'Break',
-                                      classes: 'Class',
-                                    }[mqDate.category] || mqDate.category;
-                                  return (
-                                    <div
-                                      key={mqDate.id}
-                                      className={cn(
-                                        'px-2 py-1.5 rounded-md text-xs font-semibold shadow-sm border-l-4 flex flex-col',
-                                        programStyle.bgLight,
-                                        programStyle.border,
-                                        programStyle.pattern,
-                                      )}
-                                      title={
-                                        mqDate.description
-                                          ? `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}: ${mqDate.description}`
-                                          : `${PROGRAM_LABELS[mqDate.program]}: ${mqDate.event} - ${mqDate.term}`
-                                      }
-                                    >
-                                      <div className="flex items-center gap-1 mb-0.5">
-                                        <span className="text-sm" aria-hidden="true">
-                                          {programStyle.icon}
-                                        </span>
-                                        <span
-                                          className={cn(
-                                            'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
-                                            categoryColors.bg,
-                                            categoryColors.text,
-                                          )}
-                                        >
-                                          {categoryLabel}
-                                        </span>
-                                      </div>
-                                      <span className={cn('line-clamp-1', programStyle.text)}>
-                                        {mqDate.event}
-                                      </span>
-                                      <span
-                                        className={cn('text-[9px] opacity-70', programStyle.text)}
-                                      >
-                                        {mqDate.term}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {/* Mobile Time Grid */}
-                      <div
-                        className="relative"
-                        style={{
-                          height: HOURS.length * HOUR_HEIGHT + 12,
-                        }}
-                      >
-                        {/* Hour Lines */}
-                        {HOURS.map((hour, index) => (
-                          <div
-                            key={hour}
-                            className="absolute left-0 right-0 flex"
-                            style={{ top: index * HOUR_HEIGHT + 8 }}
-                          >
-                            {/* Time Label */}
-                            <div className="w-14 text-xs text-mq-content-secondary text-right pr-2 -mt-2 border-r border-mq-border flex-shrink-0">
-                              {formatHourLabel(hour)}
+                            <div className="font-semibold truncate">{item.code}</div>
+                            <div className="text-[10px] text-mq-content-secondary truncate">
+                              {item.location?.building} {item.location?.room}
                             </div>
-                            {/* Hour line */}
-                            <div
-                              className={cn(
-                                'flex-1 border-t border-mq-border',
-                                dayjs(mobileSelectedDay).isSame(dayjs(), 'day') &&
-                                  'bg-mq-primary/10',
-                              )}
-                              style={{ height: HOUR_HEIGHT }}
-                            />
+                            <div className="text-[10px] text-mq-content-secondary mt-1 group-hover:text-mq-primary">
+                              {(item.schedule[0] as ClassTime).startTime}
+                            </div>
                           </div>
                         ))}
 
-                        {/* Current Time Indicator (only if viewing today) */}
-                        {currentTimePosition !== null &&
-                          dayjs(mobileSelectedDay).isSame(dayjs(), 'day') && (
-                            <div
-                              className="absolute left-[56px] right-0 z-30 pointer-events-none"
-                              style={{ top: currentTimePosition + 8 }}
-                            >
-                              <div className="flex items-center">
-                                <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5 shadow-lg" />
-                                <div className="flex-1 h-0.5 bg-red-500 shadow-sm" />
-                              </div>
+                        {/* Deadlines */}
+                        {dayDeadlines.map((deadline) => (
+                          <div
+                            key={deadline.id}
+                            ref={(el) => {
+                              if (el && deadlineRefs.current) {
+                                deadlineRefs.current.set(deadline.id, el);
+                              }
+                            }}
+                            onClick={() => {
+                              if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
+                                setSelectedExam(deadline);
+                                setExamDetailOpen(true);
+                              } else {
+                                setSelectedAssignment(deadline);
+                                setAssignmentDetailOpen(true);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
+                                  setSelectedExam(deadline);
+                                  setExamDetailOpen(true);
+                                } else {
+                                  setSelectedAssignment(deadline);
+                                  setAssignmentDetailOpen(true);
+                                }
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            className={cn(
+                              'text-xs p-2 rounded-lg border cursor-pointer transition-all',
+                              highlightedDeadlineId === deadline.id
+                                ? 'ring-2 ring-mq-primary shadow-lg scale-[1.02]'
+                                : 'hover:scale-[1.02]',
+                            )}
+                            style={{
+                              backgroundColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}15`,
+                              borderColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}30`,
+                              borderLeftWidth: '3px',
+                              borderLeftColor: deadline.type === 'Exam' ? '#ef4444' : '#3b82f6',
+                            }}
+                          >
+                            <div className="font-medium truncate">{deadline.title}</div>
+                            <div className="flex items-center gap-1 text-[10px] text-mq-content-secondary mt-1">
+                              <Clock className="h-3 w-3" />
+                              {formatTimeShort(new Date(deadline.dueDate))}
                             </div>
-                          )}
+                          </div>
+                        ))}
 
-                        {/* Mobile Events Overlay */}
-                        <div className="absolute left-[56px] right-0 top-[8px] bottom-0">
-                          {(() => {
-                            const {
-                              deadlines: dayDeadlines,
-                              events: dayEvents,
-                              units: dayUnits,
-                            } = getItemsForDay(mobileSelectedDay);
-
-                            // Build calendar items for collision detection
-                            const calendarItems: CalendarItem[] = [];
-
-                            // Add units
-                            dayUnits.forEach((unitData) => {
-                              const schedule = unitData.schedule;
-                              const timeInfo = parseTimeRange(
-                                `${schedule.startTime} - ${schedule.endTime}`,
-                              );
-                              if (timeInfo) {
-                                calendarItems.push({
-                                  id: `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`,
-                                  startHour: timeInfo.startHour,
-                                  startMin: timeInfo.startMin,
-                                  endHour: timeInfo.endHour,
-                                  endMin: timeInfo.endMin,
-                                  type: 'unit',
-                                  data: unitData,
-                                });
+                        {/* Events */}
+                        {dayEvents.map((event) => (
+                          <div
+                            key={event.id}
+                            onClick={() => handleEventClick(event)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleEventClick(event);
                               }
-                            });
-
-                            // Add deadlines
-                            dayDeadlines.forEach((deadline) => {
-                              const dueDayjs = dayjs(deadline.dueDate);
-                              const hours = dueDayjs.hour();
-                              const minutes = dueDayjs.minute();
-                              if (hours >= START_HOUR) {
-                                calendarItems.push({
-                                  id: `deadline-${deadline.id}`,
-                                  startHour: hours,
-                                  startMin: minutes,
-                                  endHour: hours + 1,
-                                  endMin: minutes,
-                                  type: 'deadline',
-                                  data: deadline,
-                                });
-                              }
-                            });
-
-                            // Add events
-                            dayEvents.forEach((event) => {
-                              const timeInfo = parseTimeRange(event.time);
-                              if (timeInfo) {
-                                calendarItems.push({
-                                  id: `event-${event.id}`,
-                                  startHour: timeInfo.startHour,
-                                  startMin: timeInfo.startMin,
-                                  endHour: timeInfo.endHour,
-                                  endMin: timeInfo.endMin,
-                                  type: 'event',
-                                  data: event,
-                                });
-                              }
-                            });
-
-                            // Calculate overlap groups
-                            const overlapInfo = calculateOverlapGroups(calendarItems);
-
-                            return (
-                              <>
-                                {/* Units */}
-                                {dayUnits.map((unitData) => {
-                                  const schedule = unitData.schedule;
-                                  const timeInfo = parseTimeRange(
-                                    `${schedule.startTime} - ${schedule.endTime}`,
-                                  );
-                                  if (!timeInfo) return null;
-
-                                  const posInfo = getTimePositionAndHeight(
-                                    timeInfo.startHour,
-                                    timeInfo.startMin,
-                                    timeInfo.endHour,
-                                    timeInfo.endMin,
-                                  );
-                                  if (!posInfo) return null;
-
-                                  const itemId = `unit-${unitData.id}-${schedule.day}-${schedule.startTime}`;
-                                  const overlap = overlapInfo.get(itemId) || {
-                                    column: 0,
-                                    totalColumns: 1,
-                                  };
-                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                  return (
-                                    <button
-                                      key={`mobile-${unitData.id}-${schedule.day}-${schedule.startTime}`}
-                                      type="button"
-                                      className="absolute rounded-md shadow-md z-10 border-l-4 overflow-hidden cursor-pointer hover:opacity-80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus min-h-[44px] flex flex-col justify-center bg-mq-card-background backdrop-blur p-2"
-                                      style={{
-                                        top: posInfo.top,
-                                        height: Math.max(posInfo.height, 44),
-                                        left,
-                                        width,
-                                        borderLeftColor: unitData.color,
-                                      }}
-                                      onClick={() => {
-                                        const originalUnit = units.find(
-                                          (u) => u.id === unitData.id,
-                                        );
-                                        if (originalUnit) openUnitDetail(originalUnit);
-                                      }}
-                                    >
-                                      <span className="text-xs font-bold text-mq-content line-clamp-1">
-                                        {unitData.code}
-                                      </span>
-                                      <span className="text-[10px] text-mq-content-secondary">
-                                        {formatScheduleTime(schedule.startTime)} -{' '}
-                                        {formatScheduleTime(schedule.endTime)}
-                                      </span>
-                                      <span className="text-[10px] text-mq-content-secondary line-clamp-1">
-                                        {formatLocation(
-                                          unitData.location.building,
-                                          unitData.location.room,
-                                          t('room'),
-                                        )}
-                                      </span>
-                                    </button>
-                                  );
-                                })}
-
-                                {/* Deadlines */}
-                                {dayDeadlines.map((deadline) => {
-                                  const dueDayjs = dayjs(deadline.dueDate);
-                                  const dueDate = dueDayjs.toDate();
-                                  const hours = dueDayjs.hour();
-                                  const minutes = dueDayjs.minute();
-                                  const deadlineColor = getDeadlineColor(deadline, units);
-
-                                  const posInfo = getTimePositionAndHeight(
-                                    hours,
-                                    minutes,
-                                    hours + 1,
-                                    minutes,
-                                  );
-                                  if (!posInfo || hours < START_HOUR) return null;
-
-                                  const itemId = `deadline-${deadline.id}`;
-                                  const overlap = overlapInfo.get(itemId) || {
-                                    column: 0,
-                                    totalColumns: 1,
-                                  };
-                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                  return (
-                                    <button
-                                      key={`mobile-deadline-${deadline.id}`}
-                                      type="button"
-                                      onClick={() => openEditDeadline(deadline)}
-                                      className={cn(
-                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 text-white min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                        deadline.completed && 'opacity-50 line-through',
-                                      )}
-                                      style={{
-                                        top: posInfo.top,
-                                        height: Math.max(posInfo.height, 44),
-                                        left,
-                                        width,
-                                        backgroundColor: `${deadlineColor}dd`,
-                                        borderLeftColor: deadlineColor,
-                                      }}
-                                    >
-                                      <span className="block line-clamp-2 hover:line-clamp-none">
-                                        {deadline.unitCode} – {deadline.title}
-                                      </span>
-                                      <span className="text-[10px] opacity-80">
-                                        {formatTimeShort(dueDate)}
-                                      </span>
-                                    </button>
-                                  );
-                                })}
-
-                                {/* Events */}
-                                {dayEvents.map((event) => {
-                                  const timeInfo = parseTimeRange(event.time);
-                                  const eventColors = getEventColors(event);
-                                  const eventTitle = getEventTitle(event);
-
-                                  if (!timeInfo) return null;
-
-                                  const posInfo = getTimePositionAndHeight(
-                                    timeInfo.startHour,
-                                    timeInfo.startMin,
-                                    timeInfo.endHour,
-                                    timeInfo.endMin,
-                                  );
-                                  if (!posInfo) return null;
-
-                                  const itemId = `event-${event.id}`;
-                                  const overlap = overlapInfo.get(itemId) || {
-                                    column: 0,
-                                    totalColumns: 1,
-                                  };
-                                  const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
-                                  const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
-
-                                  return (
-                                    <button
-                                      key={`mobile-event-${event.id}`}
-                                      type="button"
-                                      onClick={() => handleEventClick(event)}
-                                      className={cn(
-                                        'absolute text-left text-xs px-2 py-1.5 rounded-md shadow-md font-medium z-10 border-l-4 min-h-[44px] transition-all hover:z-50 hover:h-auto hover:min-h-fit',
-                                        eventColors.bg,
-                                        eventColors.border,
-                                        eventColors.text,
-                                      )}
-                                      style={{
-                                        top: posInfo.top,
-                                        height: Math.max(posInfo.height, 44),
-                                        left,
-                                        width,
-                                        ...eventColors.style,
-                                      }}
-                                    >
-                                      <span className="block line-clamp-2 hover:line-clamp-none">
-                                        {eventTitle}
-                                      </span>
-                                      <span className="text-[10px] opacity-80">{event.time}</span>
-                                    </button>
-                                  );
-                                })}
-                              </>
-                            );
-                          })()}
-                        </div>
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            className="text-xs p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 border-l-emerald-500 border-l-[3px] cursor-pointer hover:bg-emerald-500/20 transition-colors"
+                          >
+                            <div className="font-medium truncate">{event.title}</div>
+                            {event.startAt && (
+                              <div className="text-[10px] text-mq-content-secondary mt-1">
+                                {formatTimeShort(new Date(event.startAt))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </ScrollReveal>
           )}
@@ -2012,7 +612,10 @@ export default function CalendarClient() {
               units={filteredUnits}
               deadlines={filteredDeadlines}
               events={filteredEvents}
-              onUnitClick={openUnitDetail}
+              onUnitClick={(u) => {
+                setSelectedUnit(u);
+                setUnitDetailOpen(true);
+              }}
               onDeadlineClick={(d) => openEditDeadline(d)}
               onEventClick={handleEventClick}
             />
@@ -2025,7 +628,10 @@ export default function CalendarClient() {
               units={filteredUnits}
               deadlines={filteredDeadlines}
               events={filteredEvents}
-              onUnitClick={openUnitDetail}
+              onUnitClick={(u) => {
+                setSelectedUnit(u);
+                setUnitDetailOpen(true);
+              }}
               onDeadlineClick={(d) => openEditDeadline(d)}
               onEventClick={handleEventClick}
             />
@@ -2046,7 +652,10 @@ export default function CalendarClient() {
             }}
             onAddUnit={openAddUnit}
             onEditUnit={openEditUnit}
-            onOpenUnitDetail={openUnitDetail}
+            onOpenUnitDetail={(u) => {
+              setSelectedUnit(u);
+              setUnitDetailOpen(true);
+            }}
             onDeleteUnit={handleDeleteUnit}
             onAddEvent={() => {
               setEditEvent(null);
@@ -2065,6 +674,8 @@ export default function CalendarClient() {
             }}
             onDeleteTodo={handleDeleteTodo}
             onNotifyTodo={handleNotifyTodo}
+            unitsWidgetRef={unitsWidgetRef as React.RefObject<HTMLDivElement>}
+            assignmentsWidgetRef={assignmentsWidgetRef as React.RefObject<HTMLDivElement>}
           />
         </CalendarSidebar>
       </div>
@@ -2094,20 +705,20 @@ export default function CalendarClient() {
 
       {/* Unit Detail Panel */}
       <UnitDetailPanel
-        unit={effectiveSelectedUnit}
-        open={effectiveUnitDetailOpen}
+        unit={selectedUnit}
+        open={unitDetailOpen}
         onOpenChange={handleUnitDetailOpenChange}
         onEditDeadline={handleEditDeadlineFromPanel}
         onEditUnit={() => {
-          if (effectiveSelectedUnit) {
+          if (selectedUnit) {
             handleUnitDetailOpenChange(false);
-            openEditUnit(effectiveSelectedUnit);
+            openEditUnit(selectedUnit);
           }
         }}
         onDeleteUnit={() => {
-          if (effectiveSelectedUnit) {
+          if (selectedUnit) {
             handleUnitDetailOpenChange(false);
-            handleDeleteUnit(effectiveSelectedUnit);
+            handleDeleteUnit(selectedUnit);
           }
         }}
       />
@@ -2468,27 +1079,32 @@ export default function CalendarClient() {
                   {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="date"
-                    value={editTodoDueDate}
-                    onChange={(e) => setEditTodoDueDate(e.target.value)}
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
-                    aria-label={tOr('selectDueDate', 'Select due date')}
-                    required
-                  />
-                  <input
-                    type="time"
-                    value={editTodoDueTime}
-                    onChange={(e) => setEditTodoDueTime(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]"
-                    aria-label={tOr('selectDueTime', 'Select due time')}
-                  />
+                  <div className="flex items-center gap-2 flex-1">
+                    <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
+                    <input
+                      type="date"
+                      value={editTodoDueDate}
+                      onChange={(e) => setEditTodoDueDate(e.target.value)}
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      aria-label={tOr('selectDueDate', 'Select due date')}
+                      required
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-32">
+                    <input
+                      type="time"
+                      value={editTodoDueTime}
+                      onChange={(e) => setEditTodoDueTime(e.target.value)}
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      aria-label={tOr('selectDueTime', 'Select due time')}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Color Selection - Scrollable */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-mq-content">
+              {/* Color Picker */}
+              <div>
+                <label className="block text-sm font-medium text-mq-content mb-2">
                   {tOr('color', 'Color')}
                 </label>
                 <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
@@ -2498,47 +1114,52 @@ export default function CalendarClient() {
                       type="button"
                       onClick={() => setEditTodoColor(colorOption.value)}
                       className={cn(
-                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        'w-8 h-8 rounded-full border transition-transform hover:scale-110',
                         editTodoColor === colorOption.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
-                          : 'border-transparent hover:border-mq-border',
+                          ? 'ring-2 ring-offset-2 ring-offset-mq-background ring-mq-primary scale-110'
+                          : 'border-transparent',
                       )}
                       style={{ backgroundColor: colorOption.value }}
-                      title={colorOption.name}
-                      aria-label={colorOption.name}
+                      aria-label={`Select color ${colorOption.name}`}
                     />
                   ))}
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => {
                     setTodoDialogOpen(false);
                     setEditingTodo(null);
-                    setEditTodoTitle('');
-                    setEditTodoPriority('Medium');
-                    setEditTodoDueDate('');
-                    setEditTodoDueTime('');
-                    setEditTodoColor('#10b981');
                   }}
                 >
                   {t('cancelAction')}
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={!editTodoTitle.trim() || !editTodoDueDate}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                >
-                  {tOr('saveChanges', editingTodo ? 'Save Changes' : 'Add Task')}
+                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  {editingTodo ? tOr('saveChanges', 'Save Changes') : tOr('addTodo', 'Add Task')}
                 </Button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Todo Detail Panel */}
+      <TodoDetailPanel
+        todo={selectedTodo}
+        open={todoDetailOpen}
+        onOpenChange={setTodoDetailOpen}
+        onEdit={(todo) => {
+          setTodoDetailOpen(false);
+          openEditTodo(todo);
+        }}
+        onDelete={(todo) => {
+          setTodoDetailOpen(false);
+          handleDeleteTodo(todo);
+        }}
+      />
 
       {/* Assignment Detail Panel */}
       <AssignmentDetailPanel
@@ -2575,35 +1196,13 @@ export default function CalendarClient() {
         event={selectedEvent}
         open={eventDetailOpen}
         onOpenChange={setEventDetailOpen}
-        onEdit={
-          selectedEvent?.sourcePublicEventId
-            ? undefined
-            : (event) => {
-                setEventDetailOpen(false);
-                openEditEvent(event);
-              }
-        }
+        onEdit={(event) => {
+          setEventDetailOpen(false);
+          openEditEvent(event);
+        }}
         onDelete={(event) => {
           setEventDetailOpen(false);
           handleDeleteEvent(event);
-        }}
-      />
-
-      {/* Todo Detail Panel */}
-      <TodoDetailPanel
-        todo={selectedTodo}
-        open={todoDetailOpen}
-        onOpenChange={setTodoDetailOpen}
-        onEdit={(todo) => {
-          setTodoDetailOpen(false);
-          openEditTodo(todo);
-        }}
-        onDelete={(todo) => {
-          setTodoDetailOpen(false);
-          handleDeleteTodo(todo);
-        }}
-        onNotify={(todo) => {
-          handleNotifyTodo(todo);
         }}
       />
     </div>

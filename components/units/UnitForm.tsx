@@ -408,7 +408,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                             <SelectTrigger className="h-9">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent position="popper" sideOffset={4} className="max-h-[280px]">
+                            <SelectContent
+                              position="popper"
+                              sideOffset={4}
+                              className="max-h-[280px]"
+                            >
                               {DAYS.map((day) => (
                                 <SelectItem key={day} value={day}>
                                   {t(day.toLowerCase() as TranslationKey)}
