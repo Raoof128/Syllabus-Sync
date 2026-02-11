@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
 import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
@@ -12,28 +12,24 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
 import { LazyMotion, m, domAnimation } from 'framer-motion';
 
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useTodosStore } from '@/lib/store/todosStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { useProfilesStore } from '@/lib/store/profilesStore';
-import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
 import { DEMO_USER } from '@/lib/config';
 import { Info, Plus, BookOpen, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { useHydration } from '@/lib/hooks';
 import Link from 'next/link';
 import { CardSolid } from '@/features/home/components/HomeCard';
 import HomeKpiStrip from '@/features/home/components/HomeKpiStrip';
 import WeekHeatStrip from '@/features/home/components/WeekHeatStrip';
-import { apiRequest } from '@/lib/utils/api';
 
-type AuthUser = {
-  email?: string;
-  user_metadata?: { full_name?: string; name?: string };
-};
+import {
+  useHomeUser,
+  useSampleSeeding,
+  useHomeData,
+  useHomeEventListeners,
+  useHomeErrorBoundary,
+} from '@/features/home/hooks';
+import { AuthUser } from '@/features/home/types';
 
 interface HomeClientProps {
   initialUser?: AuthUser | null;
@@ -43,269 +39,15 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const { t } = useTypedTranslation();
   const router = useRouter();
 
-  // -- HOOKS MUST BE DECLARED BEFORE ANY RETURNS --
-  // Global error boundary for home page
-  const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // User state from server auth endpoint
-  const [user, setUser] = useState<AuthUser | null>(initialUser);
+  // -- HOOKS --
+  const { hasError, errorMessage, handleErrorRecovery } = useHomeErrorBoundary();
+  const { displayName, hasHydrated } = useHomeUser(initialUser);
+  useSampleSeeding();
+  const { units, hasUnits, unitStats } = useHomeData();
+  useHomeEventListeners();
 
   // FAB state
   const [fabOpen, setFabOpen] = useState(false);
-
-  const units = useUnitsStore((state) => state.units);
-  const loadUnits = useUnitsStore((state) => state.loadUnits);
-  const addUnit = useUnitsStore((state) => state.addUnit);
-  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
-  const addDeadline = useDeadlinesStore((state) => state.addDeadline);
-  const loadTodos = useTodosStore((state) => state.loadTodos);
-  const loadEvents = useEventsStore((state) => state.loadEvents);
-  const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
-  const profiles = useProfilesStore((state) => state.profiles);
-  const currentProfileId = useProfilesStore((state) => state.currentProfileId);
-  const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
-  const currentProfile = getCurrentProfile();
-  const hasHydrated = useHydration();
-
-  // Load data from database on mount
-  useEffect(() => {
-    if (hasHydrated) {
-      loadUnits();
-      loadDeadlines();
-      loadTodos();
-      loadEvents();
-    }
-  }, [hasHydrated, loadUnits, loadDeadlines, loadTodos, loadEvents]);
-
-  // Keep user state in sync with auth endpoint
-  useEffect(() => {
-    let isActive = true;
-
-    const loadUser = async () => {
-      try {
-        const data = await apiRequest<{ user?: AuthUser }>('/api/auth/user', { noRetry: true });
-        if (isActive) {
-          setUser(data?.user ?? null);
-        }
-      } catch {
-        if (isActive) {
-          setUser(null);
-        }
-      }
-    };
-
-    void loadUser();
-
-    const handleFocus = () => {
-      void loadUser();
-    };
-
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      isActive = false;
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, []);
-
-  // Get display name for welcome message: profile name > user metadata > email extraction > fallback
-  const displayName = (() => {
-    if (currentProfile?.name) return currentProfile.name;
-    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
-    if (user?.user_metadata?.name) return user.user_metadata.name;
-    // Extract name from email prefix and capitalize it
-    if (user?.email) {
-      const emailPrefix = user.email.split('@')[0];
-      // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
-      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
-      // Capitalize first letter
-      if (nameWithoutNumbers.length > 0) {
-        return (
-          nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
-        );
-      }
-    }
-    return null;
-  })();
-
-  // Auto-select first profile if profiles exist but none is selected (migration for existing users)
-  useEffect(() => {
-    if (hasHydrated && profiles.length > 0 && !currentProfileId) {
-      setCurrentProfile(profiles[0].id);
-    }
-  }, [hasHydrated, profiles, currentProfileId, setCurrentProfile]);
-
-  const [seedDisabled] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return localStorage.getItem('seed-disabled') === 'true';
-    } catch {
-      return false;
-    }
-  });
-
-  const hasSeededRef = useRef(false);
-
-  // Load sample data on first visit with comprehensive validation
-  useEffect(() => {
-    if (!hasHydrated || hasSeededRef.current || seedDisabled) {
-      return;
-    }
-
-    const unitsSeededKey = 'units-seeded';
-    const deadlinesSeededKey = 'deadlines-seeded';
-
-    try {
-      const unitsSeeded = localStorage.getItem(unitsSeededKey) === 'true';
-      const deadlinesSeeded = localStorage.getItem(deadlinesSeededKey) === 'true';
-
-      // Validate sample data before adding
-      const validUnits = sampleUnits.filter((unit) => {
-        return (
-          unit &&
-          unit.code &&
-          unit.name &&
-          unit.color &&
-          Array.isArray(unit.schedule) &&
-          unit.schedule.length > 0
-        );
-      });
-
-      const validDeadlines = sampleDeadlines.filter((deadline) => {
-        return (
-          deadline &&
-          deadline.title &&
-          deadline.unitCode &&
-          deadline.priority &&
-          deadline.dueDate &&
-          !isNaN(new Date(deadline.dueDate).getTime())
-        );
-      });
-
-      if (!unitsSeeded && validUnits.length > 0) {
-        validUnits.forEach(addUnit);
-        localStorage.setItem(unitsSeededKey, 'true');
-      }
-
-      if (!deadlinesSeeded && validDeadlines.length > 0) {
-        validDeadlines.forEach(addDeadline);
-        localStorage.setItem(deadlinesSeededKey, 'true');
-      }
-    } catch {
-      try {
-        // Fallback: add data without localStorage
-        const validUnits = sampleUnits.filter(
-          (unit) => unit && unit.code && unit.name && unit.color && Array.isArray(unit.schedule),
-        );
-        const validDeadlines = sampleDeadlines.filter(
-          (deadline) => deadline && deadline.title && deadline.unitCode && deadline.dueDate,
-        );
-
-        validUnits.forEach(addUnit);
-        validDeadlines.forEach(addDeadline);
-      } catch {
-        // Silent fail - sample data loading is not critical
-      }
-    }
-    hasSeededRef.current = true;
-  }, [addDeadline, addUnit, hasHydrated, seedDisabled]);
-
-  // Listen for custom events from child components
-  useEffect(() => {
-    const handleAddUnitEvent = () => {
-      // Navigate to calendar page where units can be managed
-      router.push('/calendar');
-    };
-
-    const handleAddDeadlineEvent = () => {
-      // Navigate to calendar page where deadline can be added
-      router.push('/calendar');
-    };
-
-    window.addEventListener('add-unit', handleAddUnitEvent);
-    window.addEventListener('add-deadline', handleAddDeadlineEvent);
-
-    return () => {
-      window.removeEventListener('add-unit', handleAddUnitEvent);
-      window.removeEventListener('add-deadline', handleAddDeadlineEvent);
-    };
-  }, [router]);
-
-  const hasUnits = units.length > 0;
-
-  // Memoized unit stats calculation for better performance
-  const unitStats = useMemo(() => {
-    try {
-      const totalClasses = units.reduce((acc, u) => acc + (u.schedule?.length || 0), 0);
-      const totalStudyHours = units.reduce((acc, u) => {
-        if (!u.schedule) return acc;
-        return (
-          acc +
-          u.schedule.reduce((hours, s) => {
-            try {
-              const [startH, startM] = s.startTime.split(':').map(Number);
-              const [endH, endM] = s.endTime.split(':').map(Number);
-
-              // Validate time values
-              if (isNaN(startH) || isNaN(startM) || isNaN(endH) || isNaN(endM)) {
-                return hours;
-              }
-
-              // Ensure valid time ranges
-              if (startH < 0 || startH > 23 || endH < 0 || endH > 23) {
-                return hours;
-              }
-
-              return hours + Math.max(0, endH - startH + (endM - startM) / 60);
-            } catch {
-              return hours;
-            }
-          }, 0)
-        );
-      }, 0);
-
-      return {
-        unitCount: units.length,
-        totalClasses,
-        studyHours: Math.max(0, Math.round(totalStudyHours)),
-      };
-    } catch {
-      return {
-        unitCount: units.length,
-        totalClasses: 0,
-        studyHours: 0,
-      };
-    }
-  }, [units]);
-
-  // Error recovery function
-  const handleErrorRecovery = () => {
-    setHasError(false);
-    setErrorMessage(null);
-    window.location.reload();
-  };
-
-  // Catch any unhandled errors in child components
-  useEffect(() => {
-    const handleUnhandledError = (event: ErrorEvent) => {
-      setHasError(true);
-      setErrorMessage(event.error?.message || 'An unexpected error occurred');
-    };
-
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      setHasError(true);
-      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
-    };
-
-    window.addEventListener('error', handleUnhandledError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('error', handleUnhandledError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, []);
 
   // If there's an error, show error UI
   if (hasError) {
