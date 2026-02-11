@@ -2,6 +2,14 @@
 ## Current Development Session (January 22-February 1, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, and Security Enhancements
 
+### Raouf: 2026-02-12 (Australia/Sydney) - Weather Widget Audit & Refactor
+- **Status:** ✅ Complete - Weather widget refactored and fully tested.
+- **Scope:** Technical debt reduction and test coverage.
+- **Summary:** Conducted a full audit of the weather widget, removed dead code (`useWeather.ts` hook), refactored the widget to use a new modular custom hook (`components/layout/weather/useWeather.ts`), and added comprehensive unit tests. Fixed logic duplication and improved maintainability.
+- **Files:** `components/layout/WeatherWidget.tsx`, `components/layout/weather/*` (created), `lib/hooks/useWeather.ts` (deleted), `tests/layout/WeatherWidget.test.tsx` (created), `tests/layout/useWeather.test.ts` (created).
+- **Verification:** `npx vitest run tests/layout/` passed (14 tests passed).
+- **Follow-ups:** None.
+
 ### Raouf: 2026-02-10 (Australia/Sydney) - Optional Paths Removal Batch
 - **Status:** ✅ Complete - Requested optional directories/files removed and repo remains check-green.
 - **Scope:** Requested repository structure trimming.

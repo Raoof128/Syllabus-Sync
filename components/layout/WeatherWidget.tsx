@@ -1,7 +1,6 @@
-// components/layout/WeatherWidget.tsx
 'use client';
 
-import { memo, useState, useEffect, useCallback } from 'react';
+import { memo, useState, useEffect } from 'react';
 import {
   Sun,
   Moon,
@@ -15,146 +14,12 @@ import {
   ChevronDown,
   Check,
 } from 'lucide-react';
-
-// Sydney region coordinates
-const SYDNEY_REGIONS = [
-  { id: 'macquarie', name: 'Macquarie Uni', lat: -33.7738, lon: 151.1126 },
-  { id: 'sydney-cbd', name: 'Sydney CBD', lat: -33.8688, lon: 151.2093 },
-  { id: 'north-sydney', name: 'North Sydney', lat: -33.839, lon: 151.207 },
-  { id: 'parramatta', name: 'Parramatta', lat: -33.8151, lon: 151.0011 },
-  { id: 'chatswood', name: 'Chatswood', lat: -33.7969, lon: 151.1803 },
-  { id: 'bondi', name: 'Bondi', lat: -33.8915, lon: 151.2767 },
-  { id: 'manly', name: 'Manly', lat: -33.797, lon: 151.287 },
-] as const;
-
-type SydneyRegion = (typeof SYDNEY_REGIONS)[number];
-type Vibe = 'sunny' | 'cloudy' | 'rainy' | 'thunder' | 'snowy' | 'windy' | 'night';
-
-interface WeatherData {
-  temp: number;
-  condition: string;
-  location: string;
-  vibe: Vibe;
-  isDay: boolean;
-}
-
-const STORAGE_KEY = 'mq-weather-region';
-const CACHE_KEY_PREFIX = 'mq-weather-cache-';
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes - shorter for more accurate data
+import { useWeather } from './weather/useWeather';
+import { SYDNEY_REGIONS } from './weather/constants';
 
 const WeatherWidget = memo(() => {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<SydneyRegion>(SYDNEY_REGIONS[0]);
+  const { weatherData, loading, error, selectedRegion, handleRegionChange, retry } = useWeather();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  // Load saved region preference
-  useEffect(() => {
-    try {
-      const savedRegionId = localStorage.getItem(STORAGE_KEY);
-      if (savedRegionId) {
-        const region = SYDNEY_REGIONS.find((r) => r.id === savedRegionId);
-        if (region) {
-          setSelectedRegion(region);
-        }
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
-  }, []);
-
-  // Fetch weather data
-  const fetchWeather = useCallback(async (region: SydneyRegion, forceRefresh = false) => {
-    setLoading(true);
-    setError(null);
-
-    // Check cache first (unless force refresh)
-    if (!forceRefresh) {
-      try {
-        const cacheKey = `${CACHE_KEY_PREFIX}${region.id}`;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached) as { timestamp: number; data: WeatherData };
-          if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
-            setWeatherData(parsed.data);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch {
-        // Ignore cache read errors
-      }
-    }
-
-    try {
-      // Add timestamp to prevent any browser caching
-      const response = await fetch(
-        `/api/weather?lat=${region.lat}&lon=${region.lon}&_t=${Date.now()}`,
-      );
-      if (!response.ok) {
-        throw new Error('Weather service unreachable');
-      }
-
-      const apiResponse = await response.json();
-      const data = apiResponse?.data;
-
-      const tempValue = data?.current_weather?.temperature;
-      const weatherCode = data?.current_weather?.weathercode;
-      const isDayValue = data?.current_weather?.is_day;
-
-      if (
-        typeof tempValue !== 'number' ||
-        typeof weatherCode !== 'number' ||
-        (isDayValue !== 0 && isDayValue !== 1)
-      ) {
-        throw new Error('Invalid weather data');
-      }
-
-      const condition = mapWeatherCode(weatherCode);
-      const vibe = determineVibe(weatherCode, isDayValue === 1);
-
-      const newData: WeatherData = {
-        temp: Math.round(tempValue),
-        condition,
-        location: region.name,
-        vibe,
-        isDay: isDayValue === 1,
-      };
-
-      setWeatherData(newData);
-
-      // Cache the result
-      try {
-        const cacheKey = `${CACHE_KEY_PREFIX}${region.id}`;
-        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: newData }));
-      } catch {
-        // Ignore cache write errors
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Weather unavailable');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch weather when region changes
-  useEffect(() => {
-    fetchWeather(selectedRegion);
-  }, [selectedRegion, fetchWeather]);
-
-  // Handle region selection
-  const handleRegionChange = (region: SydneyRegion) => {
-    setSelectedRegion(region);
-    setIsDropdownOpen(false);
-    // Force refresh when region changes
-    fetchWeather(region, true);
-    try {
-      localStorage.setItem(STORAGE_KEY, region.id);
-    } catch {
-      // Ignore localStorage errors
-    }
-  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -230,7 +95,7 @@ const WeatherWidget = memo(() => {
   if (error || !weatherData) {
     return (
       <button
-        onClick={() => fetchWeather(selectedRegion)}
+        onClick={retry}
         className="h-7 px-3 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-1 shadow-sm text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors"
       >
         <AlertCircle className="w-3 h-3" aria-hidden="true" />
@@ -296,7 +161,10 @@ const WeatherWidget = memo(() => {
             {SYDNEY_REGIONS.map((region) => (
               <button
                 key={region.id}
-                onClick={() => handleRegionChange(region)}
+                onClick={() => {
+                  handleRegionChange(region);
+                  setIsDropdownOpen(false);
+                }}
                 className={`
                   w-full px-3 py-2 text-left text-sm flex items-center justify-between
                   transition-colors hover:bg-mq-background-secondary
@@ -320,52 +188,6 @@ const WeatherWidget = memo(() => {
     </div>
   );
 });
-
-// Weather code mapping
-const WEATHER_CODE_LABELS: Record<number, string> = {
-  0: 'Clear sky',
-  1: 'Partly cloudy',
-  2: 'Cloudy',
-  3: 'Overcast',
-  45: 'Foggy',
-  48: 'Rime fog',
-  51: 'Light drizzle',
-  53: 'Moderate drizzle',
-  55: 'Dense drizzle',
-  56: 'Light freezing drizzle',
-  57: 'Dense freezing drizzle',
-  61: 'Slight rain',
-  63: 'Moderate rain',
-  65: 'Heavy rain',
-  66: 'Light freezing rain',
-  67: 'Heavy freezing rain',
-  71: 'Slight snow',
-  73: 'Moderate snow',
-  75: 'Heavy snow',
-  77: 'Snow grains',
-  80: 'Slight rain showers',
-  81: 'Moderate rain showers',
-  82: 'Violent rain showers',
-  85: 'Slight snow showers',
-  86: 'Heavy snow showers',
-  95: 'Thunderstorm',
-  96: 'Thunderstorm with hail',
-  99: 'Thunderstorm with heavy hail',
-};
-
-const mapWeatherCode = (code: number): string => {
-  return WEATHER_CODE_LABELS[code] || 'Windy';
-};
-
-const determineVibe = (weatherCode: number, isDay: boolean): Vibe => {
-  if (!isDay) return 'night';
-  if (weatherCode === 0) return 'sunny';
-  if ([1, 2, 3].includes(weatherCode)) return 'cloudy';
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) return 'rainy';
-  if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return 'snowy';
-  if ([95, 96, 99].includes(weatherCode)) return 'thunder';
-  return 'windy';
-};
 
 WeatherWidget.displayName = 'WeatherWidget';
 

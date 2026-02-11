@@ -1,3 +1,10 @@
+Raouf: 2026-02-12 (Australia/Sydney)
+Scope: Weather Widget Audit & Refactor
+Summary: Conducted a full audit of the weather widget, removed dead code (`useWeather.ts` hook), refactored the widget to use a new modular custom hook (`components/layout/weather/useWeather.ts`), and added comprehensive unit tests. Fixed logic duplication and improved maintainability.
+- **Files:** `components/layout/WeatherWidget.tsx`, `components/layout/weather/*` (created), `lib/hooks/useWeather.ts` (deleted), `tests/layout/WeatherWidget.test.tsx` (created), `tests/layout/useWeather.test.ts` (created).
+- **Verification:** `npx vitest run tests/layout/` passed (14 tests passed).
+- **Follow-ups:** None.
+
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Optional Paths Removal Batch
 Summary: Removed requested optional paths (`.devcontainer`, `docker`, `k8s`, `scripts`, `docs`, `security`, `COMPLETION-SUMMARY.md`, `opencode.jsonc`). Updated `package.json` script commands that referenced removed files/dirs with placeholders, and fixed `tests/maskToken.test.ts` by inlining helper logic after removing script import dependency.
