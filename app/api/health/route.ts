@@ -12,17 +12,13 @@ export async function GET(request: Request) {
 
     if (!supabaseAdmin) {
       // If admin client can't be initialized (e.g. during build or missing env),
-      // return a simulated healthy status in dev/build, or error in prod
-      if (!isProduction) {
-        return jsonSuccess({
-          status: 'healthy',
-          database: 'not_configured (dev/build mode)',
-          timestamp: new Date().toISOString(),
-          version: process.env.npm_package_version || 'dev',
-        });
-      }
-
-      return jsonError('Database configuration missing', 500, ERROR_CODES.INTERNAL_ERROR);
+      // return a degraded but healthy status to prevent container restart loops
+      return jsonSuccess({
+        status: 'degraded',
+        database: 'not_configured',
+        timestamp: new Date().toISOString(),
+        ...(isProduction ? {} : { version: process.env.npm_package_version || 'dev' }),
+      });
     }
 
     // Simple query to test database connectivity using admin client
@@ -36,13 +32,13 @@ export async function GET(request: Request) {
       // Log the actual error server-side for debugging
       logger.error('Health check DB error:', error.message, error.code);
 
-      return jsonError(
-        'Service temporarily unavailable',
-        503,
-        ERROR_CODES.DATABASE_ERROR,
-        // Only include details in development
-        isProduction ? undefined : { hint: 'Database connection issue' },
-      );
+      // Return degraded status with 200 to prevent container restart loops
+      return jsonSuccess({
+        status: 'degraded',
+        database: 'disconnected',
+        timestamp: new Date().toISOString(),
+        ...(isProduction ? {} : { hint: 'Database connection issue' }),
+      });
     }
 
     return jsonSuccess({

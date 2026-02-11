@@ -33,7 +33,6 @@ import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 import { cn } from '@/lib/utils';
-import { CalendarDays, Clock } from 'lucide-react';
 
 interface AssignmentFormProps {
   open: boolean;
@@ -298,22 +297,16 @@ export default function AssignmentForm({
                 <Label htmlFor="assignment-date">
                   {t('dueDate')} <span className="text-mq-error">*</span>
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="assignment-date"
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    aria-invalid={Boolean(errors.dueDate)}
-                    aria-required="true"
-                    aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
-                    className={`pr-10 ${errors.dueDate ? 'border-mq-error' : ''}`}
-                  />
-                  <CalendarDays
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                    aria-hidden="true"
-                  />
-                </div>
+                <Input
+                  id="assignment-date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  aria-invalid={Boolean(errors.dueDate)}
+                  aria-required="true"
+                  aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
+                  className={errors.dueDate ? 'border-mq-error' : ''}
+                />
                 {errors.dueDate && (
                   <p id="assignment-date-error" className="text-sm text-mq-error" role="alert">
                     {errors.dueDate}
@@ -322,19 +315,12 @@ export default function AssignmentForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="assignment-time">{t('dueTime')}</Label>
-                <div className="relative">
-                  <Input
-                    id="assignment-time"
-                    type="time"
-                    value={dueTime}
-                    onChange={(e) => setDueTime(e.target.value)}
-                    className="pr-10"
-                  />
-                  <Clock
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                    aria-hidden="true"
-                  />
-                </div>
+                <Input
+                  id="assignment-time"
+                  type="time"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                />
               </div>
             </div>
 
@@ -396,7 +382,7 @@ export default function AssignmentForm({
 
               {/* Custom Color Picker - Scrollable */}
               {useCustomColor && (
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
                   {UNIT_COLORS.map((c) => (
                     <button
                       key={c.value}
@@ -405,7 +391,7 @@ export default function AssignmentForm({
                       className={cn(
                         'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
                         color === c.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
                           : 'border-transparent hover:border-mq-border',
                       )}
                       style={{ backgroundColor: c.value }}

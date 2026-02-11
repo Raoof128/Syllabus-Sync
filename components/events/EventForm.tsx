@@ -31,7 +31,6 @@ import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import { cn } from '@/lib/utils';
 import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
-import { CalendarDays, Clock } from 'lucide-react';
 
 interface EventFormProps {
   open: boolean;
@@ -343,22 +342,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-date">
                 {t('date')} <span className="text-mq-error">*</span>
               </Label>
-              <div className="relative">
-                <Input
-                  id="event-date"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  aria-invalid={Boolean(errors.date)}
-                  aria-required="true"
-                  aria-describedby={errors.date ? 'event-date-error' : undefined}
-                  className={`pr-10 ${errors.date ? 'border-mq-error' : ''}`}
-                />
-                <CalendarDays
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                  aria-hidden="true"
-                />
-              </div>
+              <Input
+                id="event-date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                aria-invalid={Boolean(errors.date)}
+                aria-required="true"
+                aria-describedby={errors.date ? 'event-date-error' : undefined}
+                className={errors.date ? 'border-mq-error' : ''}
+              />
               {errors.date && (
                 <p id="event-date-error" className="text-xs text-mq-error" role="alert">
                   {errors.date}
@@ -369,23 +362,17 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-time">
                 {t('time')} <span className="text-mq-error">*</span>
               </Label>
-              <div className="relative">
-                <Input
-                  id="event-time"
-                  type="text"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  placeholder={t('exampleTime')}
-                  aria-invalid={Boolean(errors.time)}
-                  aria-required="true"
-                  aria-describedby={errors.time ? 'event-time-error' : undefined}
-                  className={`pr-10 ${errors.time ? 'border-mq-error' : ''}`}
-                />
-                <Clock
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                  aria-hidden="true"
-                />
-              </div>
+              <Input
+                id="event-time"
+                type="text"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                placeholder={t('exampleTime')}
+                aria-invalid={Boolean(errors.time)}
+                aria-required="true"
+                aria-describedby={errors.time ? 'event-time-error' : undefined}
+                className={errors.time ? 'border-mq-error' : ''}
+              />
               {errors.time && (
                 <p id="event-time-error" className="text-xs text-mq-error" role="alert">
                   {errors.time}
@@ -440,7 +427,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           {/* Color Selection - Scrollable horizontal buttons */}
           <div className="space-y-2">
             <Label>{t('color')}</Label>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+            <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
               {UNIT_COLORS.map((colorOption) => (
                 <button
                   key={colorOption.value}
@@ -449,7 +436,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                   className={cn(
                     'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
                     color === colorOption.value
-                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
                       : 'border-transparent hover:border-mq-border',
                   )}
                   style={{ backgroundColor: colorOption.value }}

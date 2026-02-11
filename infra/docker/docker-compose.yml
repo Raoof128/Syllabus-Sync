@@ -1,0 +1,50 @@
+# Docker Compose for Syllabus Sync
+# Usage:
+#   Development: docker compose -f infra/docker/docker-compose.yml up
+#   Production:  docker compose -f infra/docker/docker-compose.yml --profile production up
+
+services:
+  # Development server with hot reload
+  app:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: runner
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development with source mounting (for hot reload)
+  app-dev:
+    profiles:
+      - development
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: builder
+    ports:
+      - '3000:3000'
+    volumes:
+      - ../..:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+networks:
+  default:
+    name: syllabus-sync-network

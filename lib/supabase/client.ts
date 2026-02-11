@@ -86,12 +86,47 @@ export function createBrowserClient() {
           return { data: { subscription: { unsubscribe: () => {} } } };
         },
       },
-      from: () => ({
-        select: () => ({ data: [], error: null }),
-        insert: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
-        update: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
-        delete: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
-      }),
+      from: () => {
+        // Create a chainable query builder mock
+        const chainable = {
+          select: () => chainable,
+          insert: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
+          update: () => chainable,
+          delete: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
+          upsert: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
+          is: () => chainable,
+          eq: () => chainable,
+          neq: () => chainable,
+          gt: () => chainable,
+          gte: () => chainable,
+          lt: () => chainable,
+          lte: () => chainable,
+          like: () => chainable,
+          ilike: () => chainable,
+          in: () => chainable,
+          contains: () => chainable,
+          containedBy: () => chainable,
+          range: () => chainable,
+          overlaps: () => chainable,
+          match: () => chainable,
+          not: () => chainable,
+          or: () => chainable,
+          filter: () => chainable,
+          order: () => chainable,
+          limit: () => chainable,
+          offset: () => chainable,
+          single: () => ({ data: null, error: null }),
+          maybeSingle: () => ({ data: null, error: null }),
+          // Terminal methods that return the result
+          then: (resolve: (value: { data: []; error: null }) => void) => {
+            resolve({ data: [], error: null });
+          },
+          // Make it awaitable
+          data: [],
+          error: null,
+        };
+        return chainable;
+      },
     } as unknown as ReturnType<typeof createSupabaseBrowserClient>;
   }
 

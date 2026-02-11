@@ -62,3 +62,28 @@ The repository had mixed placement for feature code and duplicates:
 
 - `public/maps` and `public/tiles` were retained because runtime code fetches from `/maps/...` and tile serving can be required for map UX.
 - Existing non-feature shared modules in `components/` and `lib/` were preserved when they are cross-feature or infrastructural.
+
+## Final Cleanup (February 2026)
+
+### Docker consolidation
+
+- Merged `docker/` and `infra/docker/` into single `infra/docker/`
+- Added `docker-compose.yml` for development and production workflows
+- Added `README.md` with usage instructions
+
+### Configuration cleanup
+
+- Moved `codecov.yml` to `config/codecov/` (symlink at root for CI)
+- All configuration files now live in `config/` subdirectories
+
+### Removed empty directories
+
+- Removed empty `maps/source/` directory
+- Removed empty `supabase/init.sql/` directory
+- Removed empty `supabase/snippets/` directory
+- Removed empty `docker/ssl/` directory
+
+### Documentation
+
+- Moved `AGENT.md` to `docs/project/`
+

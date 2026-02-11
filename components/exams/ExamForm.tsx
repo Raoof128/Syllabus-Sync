@@ -33,7 +33,6 @@ import { format, isValid } from 'date-fns';
 import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
-import { CalendarDays, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
 
@@ -340,22 +339,16 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   {t('examDate' as TranslationKey) || 'Exam Date'}{' '}
                   <span className="text-mq-error">*</span>
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="exam-date"
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    aria-invalid={Boolean(errors.dueDate)}
-                    aria-required="true"
-                    aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
-                    className={`pr-10 ${errors.dueDate ? 'border-mq-error' : ''}`}
-                  />
-                  <CalendarDays
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                    aria-hidden="true"
-                  />
-                </div>
+                <Input
+                  id="exam-date"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  aria-invalid={Boolean(errors.dueDate)}
+                  aria-required="true"
+                  aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
+                  className={errors.dueDate ? 'border-mq-error' : ''}
+                />
                 {errors.dueDate && (
                   <p id="exam-date-error" className="text-sm text-mq-error" role="alert">
                     {errors.dueDate}
@@ -367,21 +360,15 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   {t('examTime' as TranslationKey) || 'Exam Time'}{' '}
                   <span className="text-mq-error">*</span>
                 </Label>
-                <div className="relative">
-                  <Input
-                    id="exam-time"
-                    type="time"
-                    value={dueTime}
-                    onChange={(e) => setDueTime(e.target.value)}
-                    aria-invalid={Boolean(errors.dueTime)}
-                    aria-required="true"
-                    className={`pr-10 ${errors.dueTime ? 'border-mq-error' : ''}`}
-                  />
-                  <Clock
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none"
-                    aria-hidden="true"
-                  />
-                </div>
+                <Input
+                  id="exam-time"
+                  type="time"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                  aria-invalid={Boolean(errors.dueTime)}
+                  aria-required="true"
+                  className={errors.dueTime ? 'border-mq-error' : ''}
+                />
                 {errors.dueTime && (
                   <p className="text-sm text-mq-error" role="alert">
                     {errors.dueTime}
@@ -448,7 +435,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
               {/* Custom Color Picker - Scrollable */}
               {useCustomColor && (
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
                   {UNIT_COLORS.map((c) => (
                     <button
                       key={c.value}
@@ -457,7 +444,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                       className={cn(
                         'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
                         color === c.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
                           : 'border-transparent hover:border-mq-border',
                       )}
                       style={{ backgroundColor: c.value }}

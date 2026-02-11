@@ -27,9 +27,11 @@
     "check:i18n": "echo \"Skipped: scripts directory removed\"",
     "lighthouse": "lhci autorun --config=config/lighthouse/.lighthouserc.json",
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=config/lighthouse/.lighthouserc.json",
-    "docker:dev": "echo \"Unavailable: docker directory removed\"",
-    "docker:prod": "echo \"Unavailable: docker directory removed\"",
-    "docker:down": "echo \"Unavailable: docker directory removed\"",
+    "docker:build": "docker build -f infra/docker/Dockerfile -t syllabus-sync .",
+    "docker:run": "docker run -p 3000:3000 --env-file infra/docker/.env syllabus-sync",
+    "docker:dev": "docker compose -f infra/docker/docker-compose.yml --profile development up",
+    "docker:prod": "docker compose -f infra/docker/docker-compose.yml up",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
     "build:overlays": "echo \"Unavailable: scripts directory removed\""
   },
   "dependencies": {

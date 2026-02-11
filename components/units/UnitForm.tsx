@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, X, Clock } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
 
@@ -352,7 +352,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           {/* Color Selection - Scrollable */}
           <div className="space-y-2">
             <Label>{t('unitColor')}</Label>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+            <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
               {UNIT_COLORS.map((c) => (
                 <button
                   key={c.value}
@@ -361,7 +361,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   className={cn(
                     'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
                     color === c.value
-                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
                       : 'border-transparent hover:border-mq-border',
                   )}
                   style={{ backgroundColor: c.value }}
@@ -408,7 +408,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                             <SelectTrigger className="h-9">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="max-h-60 overflow-y-auto">
+                            <SelectContent position="popper" sideOffset={4} className="max-h-[200px] overflow-y-auto">
                               {DAYS.map((day) => (
                                 <SelectItem key={day} value={day}>
                                   {t(day.toLowerCase() as TranslationKey)}
@@ -421,35 +421,23 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         {/* Start Time */}
                         <div className="space-y-1">
                           <Label className="text-xs">{t('start')}</Label>
-                          <div className="relative">
-                            <Input
-                              type="time"
-                              value={ct.startTime}
-                              onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
-                              className={`h-9 pr-10 ${hasTimeError ? 'border-mq-error' : ''}`}
-                            />
-                            <Clock
-                              className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-mq-content-tertiary pointer-events-none"
-                              aria-hidden="true"
-                            />
-                          </div>
+                          <Input
+                            type="time"
+                            value={ct.startTime}
+                            onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
+                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                          />
                         </div>
 
                         {/* End Time */}
                         <div className="space-y-1">
                           <Label className="text-xs">{t('end')}</Label>
-                          <div className="relative">
-                            <Input
-                              type="time"
-                              value={ct.endTime}
-                              onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
-                              className={`h-9 pr-10 ${hasTimeError ? 'border-mq-error' : ''}`}
-                            />
-                            <Clock
-                              className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-mq-content-tertiary pointer-events-none"
-                              aria-hidden="true"
-                            />
-                          </div>
+                          <Input
+                            type="time"
+                            value={ct.endTime}
+                            onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
+                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                          />
                         </div>
                       </div>
 

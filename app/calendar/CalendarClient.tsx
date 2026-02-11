@@ -2468,27 +2468,21 @@ export default function CalendarClient() {
                   {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex items-center gap-2 flex-1">
-                    <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
-                    <input
-                      type="date"
-                      value={editTodoDueDate}
-                      onChange={(e) => setEditTodoDueDate(e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
-                      aria-label={tOr('selectDueDate', 'Select due date')}
-                      required
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
-                    <input
-                      type="time"
-                      value={editTodoDueTime}
-                      onChange={(e) => setEditTodoDueTime(e.target.value)}
-                      className="px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]"
-                      aria-label={tOr('selectDueTime', 'Select due time')}
-                    />
-                  </div>
+                  <input
+                    type="date"
+                    value={editTodoDueDate}
+                    onChange={(e) => setEditTodoDueDate(e.target.value)}
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content"
+                    aria-label={tOr('selectDueDate', 'Select due date')}
+                    required
+                  />
+                  <input
+                    type="time"
+                    value={editTodoDueTime}
+                    onChange={(e) => setEditTodoDueTime(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-mq-content min-w-[110px]"
+                    aria-label={tOr('selectDueTime', 'Select due time')}
+                  />
                 </div>
               </div>
 
@@ -2497,7 +2491,7 @@ export default function CalendarClient() {
                 <label className="block text-sm font-medium text-mq-content">
                   {tOr('color', 'Color')}
                 </label>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-mq-border">
+                <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
                   {UNIT_COLORS.map((colorOption) => (
                     <button
                       key={colorOption.value}
@@ -2506,7 +2500,7 @@ export default function CalendarClient() {
                       className={cn(
                         'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
                         editTodoColor === colorOption.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary'
+                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
                           : 'border-transparent hover:border-mq-border',
                       )}
                       style={{ backgroundColor: colorOption.value }}

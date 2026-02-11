@@ -13,6 +13,9 @@ const sentryEnabled = isProduction && Boolean(process.env.SENTRY_AUTH_TOKEN);
 const nextConfig: NextConfig = {
   /* config options here */
 
+  // Output standalone build for Docker deployment
+  output: 'standalone',
+
   // SECURITY: Disable X-Powered-By header to reduce information disclosure
   poweredByHeader: false,
 
