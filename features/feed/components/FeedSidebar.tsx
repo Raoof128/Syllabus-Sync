@@ -59,6 +59,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
   const [announcementsDialogOpen, setAnnouncementsDialogOpen] = useState(false);
   const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [selectedStat, setSelectedStat] = useState<'total' | 'thisWeek' | 'freeFood' | null>(null);
 
   // Announcements data - using hardcoded content since these are static announcements
   const announcements: Announcement[] = [
@@ -140,131 +141,169 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
         {/* Quick Stats - Clickable */}
         <ScrollReveal delay={0.25}>
           <MagicCard isLiquidEnhanced className="overflow-hidden">
-            <Card
-              className="border-mq-border bg-mq-card-background shadow-mq-sm cursor-pointer group"
-              onClick={() => setStatsDialogOpen(true)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setStatsDialogOpen(true)}
-            >
+            <div className="mq-magic-card-content">
+              <Card className="border-mq-border bg-mq-card-background shadow-mq-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-lg">
                   <span className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                     {t('thisWeek')}
                   </span>
-                  <ChevronRight className="h-4 w-4 text-mq-content-tertiary group-hover:text-mq-primary transition-colors" />
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 pt-2">
-                <div className="flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20 hover:bg-mq-info/15 transition-colors">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedStat('total');
+                  }}
+                  className="w-full flex items-center justify-between p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20 hover:bg-mq-info/20 hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-mq-info" aria-hidden="true" />
                     <span className="text-mq-sm font-medium text-mq-content">
                       {t('totalEvents')}
                     </span>
                   </div>
-                  <span
-                    className="text-mq-lg font-bold text-mq-info"
-                    aria-label={`${stats.total} ${t('totalEvents')}`}
-                  >
-                    {stats.total}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg border border-mq-purple/20 hover:bg-mq-purple/15 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-mq-lg font-bold text-mq-info"
+                      aria-label={`${stats.total} ${t('totalEvents')}`}
+                    >
+                      {stats.total}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-mq-content-tertiary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedStat('thisWeek');
+                  }}
+                  className="w-full flex items-center justify-between p-3 bg-mq-purple/10 rounded-mq-lg border border-mq-purple/20 hover:bg-mq-purple/20 hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-mq-purple" aria-hidden="true" />
                     <span className="text-mq-sm font-medium text-mq-content">{t('thisWeek')}</span>
                   </div>
-                  <span
-                    className="text-mq-lg font-bold text-mq-purple"
-                    aria-label={`${stats.thisWeek} ${t('thisWeek')}`}
-                  >
-                    {stats.thisWeek}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20 hover:bg-mq-warning/15 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-mq-lg font-bold text-mq-purple"
+                      aria-label={`${stats.thisWeek} ${t('thisWeek')}`}
+                    >
+                      {stats.thisWeek}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-mq-content-tertiary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedStat('freeFood');
+                  }}
+                  className="w-full flex items-center justify-between p-3 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20 hover:bg-mq-warning/20 hover:shadow-md transition-all cursor-pointer group"
+                >
                   <div className="flex items-center gap-2">
                     <span className="text-mq-warning" aria-hidden="true">
                       🍕
                     </span>
                     <span className="text-mq-sm font-medium text-mq-content">{t('freeFood')}</span>
                   </div>
-                  <span
-                    className="text-mq-lg font-bold text-mq-warning"
-                    aria-label={`${stats.freeFood} ${t('freeFood')}`}
-                  >
-                    {stats.freeFood}
-                  </span>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-mq-lg font-bold text-mq-warning"
+                      aria-label={`${stats.freeFood} ${t('freeFood')}`}
+                    >
+                      {stats.freeFood}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-mq-content-tertiary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </button>
               </CardContent>
             </Card>
+            </div>
           </MagicCard>
         </ScrollReveal>
 
         {/* Announcements - Clickable */}
         <ScrollReveal delay={0.3}>
           <MagicCard isLiquidEnhanced className="overflow-hidden">
-            <Card
-              className="border-mq-border bg-mq-card-background shadow-mq-sm cursor-pointer group"
-              onClick={() => setAnnouncementsDialogOpen(true)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setAnnouncementsDialogOpen(true)}
-            >
+            <div className="mq-magic-card-content">
+              <Card className="border-mq-border bg-mq-card-background shadow-mq-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-lg">
                   <span className="flex items-center gap-2">
                     <Megaphone className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                     {t('announcements')}
                   </span>
-                  <ChevronRight className="h-4 w-4 text-mq-content-tertiary group-hover:text-mq-primary transition-colors" />
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 pt-2">
-                {announcements.slice(0, 2).map((announcement) => (
-                  <article
+                {announcements.map((announcement) => (
+                  <button
                     key={announcement.id}
-                    className={`p-3 rounded-mq-lg border hover:shadow-sm transition-all ${
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAnnouncementClick(announcement);
+                    }}
+                    className={`w-full text-left p-3 rounded-mq-lg border hover:shadow-md transition-all cursor-pointer group ${
                       announcement.type === 'featured'
-                        ? 'bg-mq-primary/10 border-mq-primary/20'
+                        ? 'bg-mq-primary/10 border-mq-primary/20 hover:bg-mq-primary/15'
                         : announcement.type === 'new'
-                          ? 'bg-mq-success/10 border-mq-success/20'
-                          : 'bg-mq-info/10 border-mq-info/20'
+                          ? 'bg-mq-success/10 border-mq-success/20 hover:bg-mq-success/15'
+                          : 'bg-mq-info/10 border-mq-info/20 hover:bg-mq-info/15'
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      <Badge
-                        className={`${getBadgeStyle(announcement.type)} flex-shrink-0 text-[10px]`}
-                      >
-                        {getBadgeLabel(announcement.type)}
-                      </Badge>
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-mq-content text-mq-sm line-clamp-1">
-                          {announcement.title}
-                        </h4>
-                        <p className="text-mq-xs text-mq-content-secondary mt-1 line-clamp-2">
+                      {announcement.type === 'featured' && (
+                        <Megaphone className="h-4 w-4 text-mq-content-secondary flex-shrink-0 mt-0.5" />
+                      )}
+                      {announcement.type === 'new' && (
+                        <Sparkles className="h-4 w-4 text-mq-content-secondary flex-shrink-0 mt-0.5" />
+                      )}
+                      {announcement.type === 'info' && (
+                        <Info className="h-4 w-4 text-mq-content-secondary flex-shrink-0 mt-0.5" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge
+                            className={`${getBadgeStyle(announcement.type)} flex-shrink-0 text-[10px]`}
+                          >
+                            {getBadgeLabel(announcement.type)}
+                          </Badge>
+                          <h4 className="font-semibold text-mq-content text-mq-sm line-clamp-1">
+                            {announcement.title}
+                          </h4>
+                        </div>
+                        <p className="text-mq-xs text-mq-content-secondary line-clamp-2">
                           {announcement.description}
                         </p>
                       </div>
+                      <ChevronRight className="h-4 w-4 text-mq-content-tertiary flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                  </article>
+                  </button>
                 ))}
               </CardContent>
             </Card>
+            </div>
           </MagicCard>
         </ScrollReveal>
 
         {/* Event Categories Legend - Clickable */}
         <ScrollReveal delay={0.35}>
           <MagicCard isLiquidEnhanced className="overflow-hidden">
-            <Card
-              className="border-mq-border bg-mq-card-background shadow-mq-sm cursor-pointer group"
-              onClick={() => setCategoriesDialogOpen(true)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setCategoriesDialogOpen(true)}
-            >
+            <div className="mq-magic-card-content">
+              <Card
+                className="border-mq-border bg-mq-card-background shadow-mq-sm cursor-pointer group"
+                onClick={() => setCategoriesDialogOpen(true)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setCategoriesDialogOpen(true)}
+              >
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between text-lg">
                   <span>{t('byCategory')}</span>
@@ -320,6 +359,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 </dl>
               </CardContent>
             </Card>
+            </div>
           </MagicCard>
         </ScrollReveal>
       </aside>
@@ -382,6 +422,123 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               </p>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Individual Stat Detail Dialog */}
+      <Dialog open={!!selectedStat} onOpenChange={(open) => !open && setSelectedStat(null)}>
+        <DialogContent className="max-w-md">
+          {selectedStat === 'total' && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-3 bg-mq-info/20 rounded-full">
+                    <Calendar className="h-6 w-6 text-mq-info" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">{t('totalEvents')}</DialogTitle>
+                    <p className="text-3xl font-bold text-mq-info mt-1">{stats.total}</p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="mt-4 space-y-4">
+                <p className="text-mq-content-secondary leading-relaxed">
+                  This shows the total number of upcoming campus events across all categories.
+                  Events include career fairs, social gatherings, academic workshops, and more.
+                </p>
+                <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
+                  <h4 className="font-medium text-mq-content mb-2">What&apos;s Included:</h4>
+                  <ul className="space-y-2 text-sm text-mq-content-secondary">
+                    <li className="flex items-center gap-2">
+                      <span>💼</span> Career events and job fairs
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>📚</span> Academic workshops and seminars
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>🎉</span> Social events and meetups
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>🍕</span> Events with free food
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </>
+          )}
+          {selectedStat === 'thisWeek' && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-3 bg-mq-purple/20 rounded-full">
+                    <Users className="h-6 w-6 text-mq-purple" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">{t('thisWeek')}</DialogTitle>
+                    <p className="text-3xl font-bold text-mq-purple mt-1">{stats.thisWeek}</p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="mt-4 space-y-4">
+                <p className="text-mq-content-secondary leading-relaxed">
+                  Events happening in the next 7 days. Don&apos;t miss out on these upcoming opportunities
+                  to connect, learn, and have fun on campus!
+                </p>
+                <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
+                  <h4 className="font-medium text-mq-content mb-2">Pro Tips:</h4>
+                  <ul className="space-y-2 text-sm text-mq-content-secondary">
+                    <li className="flex items-center gap-2">
+                      <span>📅</span> Add events to your calendar to get reminders
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>🔔</span> Enable notifications for last-minute updates
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>👥</span> Invite friends to join you
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </>
+          )}
+          {selectedStat === 'freeFood' && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-3 bg-mq-warning/20 rounded-full">
+                    <span className="text-2xl">🍕</span>
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">{t('freeFood')}</DialogTitle>
+                    <p className="text-3xl font-bold text-mq-warning mt-1">{stats.freeFood}</p>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="mt-4 space-y-4">
+                <p className="text-mq-content-secondary leading-relaxed">
+                  Events featuring free food and refreshments! Perfect for students looking to
+                  grab a bite while networking or learning something new.
+                </p>
+                <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
+                  <h4 className="font-medium text-mq-content mb-2">What to Expect:</h4>
+                  <ul className="space-y-2 text-sm text-mq-content-secondary">
+                    <li className="flex items-center gap-2">
+                      <span>🍕</span> Pizza and snacks at club events
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>☕</span> Coffee and pastries at morning seminars
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>🍪</span> Treats at study sessions
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span>🥤</span> Refreshments at career fairs
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 

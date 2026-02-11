@@ -523,7 +523,7 @@ const Header = memo(() => {
             <DropdownMenuContent
               align="end"
               sideOffset={4}
-              className="w-48 max-w-[calc(100vw-2rem)] border-mq-border shadow-mq-lg"
+              className="w-48 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border-mq-border shadow-mq-lg"
             >
               <DropdownMenuItem asChild>
                 <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">

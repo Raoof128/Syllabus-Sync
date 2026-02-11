@@ -51,10 +51,8 @@ function DropdownMenuContent({
           'shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
           // Size and overflow constraints
           'max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
-          // Light mode: white/light background with dark text
-          'bg-white text-[#1a1a1a] border border-[#d4d4d4]',
-          // Dark mode: charcoal background with light text
-          'dark:bg-[#373a36] dark:text-[#e8e9e7] dark:border-[#535650]',
+          // Use theme-aware CSS variables for background and text
+          'bg-mq-card-background text-mq-content border border-mq-border',
           // Ensure dropdown stays within viewport boundaries - critical for mobile
           'max-w-[calc(100vw-2rem)]',
           className,
@@ -86,16 +84,12 @@ function DropdownMenuItem({
       className={cn(
         // Base styles
         "relative flex cursor-default items-center gap-2 rounded-mq-sm px-2 py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // Light mode colors
-        "text-[#1a1a1a] [&_svg:not([class*='text-'])]:text-[#4a4a44]",
-        // Dark mode colors
-        "dark:text-[#e8e9e7] dark:[&_svg:not([class*='text-'])]:text-[#a0a29c]",
-        // Hover/focus states - light mode
-        'focus:bg-[#f5f5f5] focus:text-[#1a1a1a]',
-        // Hover/focus states - dark mode
-        'dark:focus:bg-[#535650] dark:focus:text-[#e8e9e7]',
+        // Use theme-aware colors
+        "text-mq-content [&_svg:not([class*='text-'])]:text-mq-content-secondary",
+        // Hover/focus states using theme variables
+        'focus:bg-mq-hover-background focus:text-mq-content',
         // Destructive variant
-        'data-[variant=destructive]:text-[#ef4444] data-[variant=destructive]:focus:bg-[#ef4444]/10 data-[variant=destructive]:focus:text-[#ef4444] data-[variant=destructive]:*:[svg]:text-[#ef4444]!',
+        'data-[variant=destructive]:text-mq-error data-[variant=destructive]:focus:bg-mq-error/10 data-[variant=destructive]:focus:text-mq-error data-[variant=destructive]:*:[svg]:text-mq-error!',
         className,
       )}
       {...props}

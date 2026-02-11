@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { useSearchParams } from 'next/navigation';
@@ -153,9 +153,15 @@ export default function CalendarWidgets({
   const highlightedTodoId = searchParams.get('highlightTodo');
   const highlightedEventId = searchParams.get('highlightEvent');
   const highlightedWidget = searchParams.get('highlightWidget');
+  const highlightSection = searchParams.get('section');
+  const sectionHighlight = searchParams.get('highlight') === 'true';
+
+  // State for section highlight that persists for 5 seconds
+  const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(null);
+
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
-  const todoHighlightActive = Boolean(highlightedTodoId);
-  const eventHighlightActive = Boolean(highlightedEventId);
+  const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
+  const eventHighlightActive = Boolean(highlightedEventId) || sectionHighlightActive === 'events';
 
   // Helper function to check if element is visible in viewport
   const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
@@ -218,6 +224,39 @@ export default function CalendarWidgets({
       }, 100);
     }
   }, [highlightedEventId, scrollIfNotVisible]);
+
+  // Handle section scroll from home page "View All" links
+  useEffect(() => {
+    if (highlightSection && sectionHighlight) {
+      // Activate the highlight
+      if (highlightSection === 'events' || highlightSection === 'todos') {
+        setSectionHighlightActive(highlightSection);
+      }
+
+      const scrollTimer = setTimeout(() => {
+        if (highlightSection === 'events' && eventsWidgetRef.current) {
+          eventsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (highlightSection === 'todos' && todosWidgetRef.current) {
+          todosWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // Clear URL params after scrolling
+        const url = new URL(window.location.href);
+        url.searchParams.delete('section');
+        url.searchParams.delete('highlight');
+        window.history.replaceState({}, '', url.toString());
+      }, 300);
+
+      // Clear highlight after 2 seconds
+      const highlightTimer = setTimeout(() => {
+        setSectionHighlightActive(null);
+      }, 2000);
+
+      return () => {
+        clearTimeout(scrollTimer);
+        clearTimeout(highlightTimer);
+      };
+    }
+  }, [highlightSection, sectionHighlight]);
 
   // Format Helpers
   const formatMonthDayTime = (date: Date) =>
@@ -610,8 +649,8 @@ export default function CalendarWidgets({
           isLiquidEnhanced
           className={
             eventHighlightActive
-              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
-              : ''
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all duration-300 animate-pulse'
+              : 'transition-all duration-300'
           }
         >
           <div
@@ -722,8 +761,8 @@ export default function CalendarWidgets({
           isLiquidEnhanced
           className={
             todoHighlightActive
-              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
-              : ''
+              ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all duration-300 animate-pulse'
+              : 'transition-all duration-300'
           }
         >
           <div
