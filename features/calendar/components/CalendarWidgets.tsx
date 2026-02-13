@@ -109,6 +109,9 @@ export default function CalendarWidgets({
   // State for individual event highlight that auto-clears after 3 seconds
   const [eventHighlightDismissed, setEventHighlightDismissed] = useState(false);
 
+  // Track if we've processed the current URL params to prevent re-processing
+  const hasProcessedCurrentHighlight = useRef(false);
+
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
   const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
   const eventHighlightActive =
@@ -195,9 +198,12 @@ export default function CalendarWidgets({
 
   // Handle section scroll from home page "View All" links
   useEffect(() => {
-    if (highlightSection && sectionHighlight) {
-      const scrollTimer = setTimeout(() => {
-        // Activate the highlight
+    if (highlightSection && sectionHighlight && !hasProcessedCurrentHighlight.current) {
+      // Mark as processed
+      hasProcessedCurrentHighlight.current = true;
+
+      // Activate highlight and scroll after a small delay (avoid synchronous setState in effect)
+      const activateTimer = setTimeout(() => {
         if (highlightSection === 'events' || highlightSection === 'todos') {
           setSectionHighlightActive(highlightSection);
         }
@@ -207,21 +213,18 @@ export default function CalendarWidgets({
         } else if (highlightSection === 'todos' && todosWidgetRef.current) {
           todosWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        // Clear URL params after scrolling
-        const url = new URL(window.location.href);
-        url.searchParams.delete('section');
-        url.searchParams.delete('highlight');
-        window.history.replaceState({}, '', url.toString());
-      }, 300);
+      }, 0);
 
       // Clear highlight after 3 seconds
-      const highlightTimer = setTimeout(() => {
+      const clearTimer = setTimeout(() => {
         setSectionHighlightActive(null);
       }, 3000);
 
       return () => {
-        clearTimeout(scrollTimer);
-        clearTimeout(highlightTimer);
+        clearTimeout(activateTimer);
+        clearTimeout(clearTimer);
+        // Reset ref in cleanup so effect can run again on next page visit
+        hasProcessedCurrentHighlight.current = false;
       };
     }
   }, [highlightSection, sectionHighlight]);

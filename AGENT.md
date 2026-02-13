@@ -1,4 +1,10 @@
 Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Fix View All Events Widget Highlight - React Strict Mode Compatible
+Summary: Fixed the Events widget highlight not appearing when clicking "View All" from the home page. Root cause: React Strict Mode in development runs effects twice - first run set the `hasProcessedCurrentHighlight` ref to true, cleanup cleared timers, second run saw ref was true and exited early without creating new timers, resulting in no highlight. Solution: Move ref reset from timer callback to effect cleanup function. Now in Strict Mode: first run sets ref and timers, cleanup clears timers and resets ref, second run sees ref is false and creates new timers correctly. In production: effect runs once, cleanup only runs on unmount. The widget now: (1) activates highlight in setTimeout(0) to avoid React lint warnings, (2) scrolls smoothly to widget, (3) stays highlighted for exactly 3 seconds, (4) clears automatically. Works in both dev (Strict Mode) and production.
+Files: Modified `features/calendar/components/CalendarWidgets.tsx`.
+Verification: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (442/442 tests pass).
+
+Raouf: 2026-02-13 (Australia/Sydney)
 Scope: Event Highlight Timing, Clickable Announcements, Security-Login Wiring, UnitForm Scroll Fix
 Summary: Fixed 4 UX issues: (1) Calendar event highlight now auto-clears after exactly 3 seconds instead of persisting indefinitely; section highlight also updated from 2s to 3s. (2) Feed announcement cards are now clickable with expand/collapse to show full message and optional links. (3) Security settings now includes an "Account Security" section with a "Change Password" button that navigates to the login page with redirect back. (4) UnitForm dialog restructured with flex layout so the form body scrolls independently while header/footer stay fixed, supporting all 7 days of class times.
 Files: Modified `features/calendar/components/CalendarWidgets.tsx`, `features/feed/components/AnnouncementsSection.tsx`, `features/settings/components/SecuritySettings.tsx`, `components/units/UnitForm.tsx`.
