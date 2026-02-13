@@ -18,7 +18,7 @@ export const ToggleControl = ({ checked, onToggle, label, testId }: ToggleContro
     data-testid={testId}
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-5' : 'translate-x-1'}`}
+      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-6' : 'translate-x-1'}`}
       aria-hidden="true"
     />
   </button>

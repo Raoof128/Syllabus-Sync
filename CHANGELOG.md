@@ -1,3 +1,20 @@
+### Raouf: Standardize Security Settings Toggle Components — 2026-02-13
+
+**Scope:** Fix visual inconsistency in Privacy settings security toggles.
+**Type:** UI Polish — Settings Page
+
+**Changes:**
+- **BiometricToggle**: Replaced text "Enable"/"Disable" ghost button with standard `ToggleControl` switch. Removed round icon container and Badge pills. Toggle opens confirmation dialog.
+- **TOTPSetup**: Same treatment — replaced text button with `ToggleControl` switch, removed round icon container and Badge.
+- **PasskeyManager**: Removed round icon container and Badge. Simplified to standard row layout with inline icon. "Add" button styled consistently with other settings buttons.
+- **SMS Coming Soon**: Updated to standard row layout with inline `MessageSquare` icon.
+- **Tests**: Updated BiometricToggle tests to query `role="switch"` instead of `role="button"`.
+
+**Files:** `BiometricToggle.tsx`, `TOTPSetup.tsx`, `PasskeyManager.tsx`, `PrivacySettings.tsx`, `BiometricToggle.test.tsx`
+**Verification:** lint ✅, typecheck ✅, 442/442 tests ✅
+
+---
+
 ### Raouf: Custom Email Verification System — 2026-02-13
 
 **Scope:** Replace Supabase email verification with a fully custom flow using Resend.

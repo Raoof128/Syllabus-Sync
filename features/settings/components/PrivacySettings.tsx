@@ -3,7 +3,7 @@
 import { memo, useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Shield, Loader2 } from 'lucide-react';
+import { Shield, Loader2, MessageSquare } from 'lucide-react';
 import { EXTERNAL_LINKS } from '@/lib/config';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -141,15 +141,18 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   {/* SMS Verification — coming soon */}
                   <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-mq-content">SMS Verification</h3>
-                        <p className="text-mq-sm text-mq-content-secondary">
-                          SMS verification coming soon
-                        </p>
+                      <div className="flex items-center gap-3 flex-1">
+                        <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-mq-sm font-medium text-mq-content">
+                            SMS Verification
+                          </p>
+                          <p className="text-mq-xs text-mq-content-secondary mt-0.5">
+                            SMS verification coming soon
+                          </p>
+                        </div>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-mq-hover-background text-mq-content-secondary font-medium">
-                        Coming Soon
-                      </span>
+                      <span className="text-mq-xs text-mq-content-secondary">Coming Soon</span>
                     </div>
                   </div>
 

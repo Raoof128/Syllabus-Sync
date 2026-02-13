@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
 import { Input } from '@/components/ui/mq/input';
 import {
   Fingerprint,
@@ -194,42 +193,26 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
   return (
     <>
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-mq-primary/10 rounded-full">
-              <Fingerprint className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-mq-content">
-                  Passkeys & Biometrics
-                </h3>
-                {credentials.length > 0 ? (
-                  <Badge className="bg-mq-success/20 text-mq-success">
-                    {credentials.length} registered
-                  </Badge>
-                ) : (
-                  <Badge className="bg-mq-content-secondary/20 text-mq-content-secondary">
-                    None
-                  </Badge>
-                )}
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">
-                Sign in securely with fingerprint, face recognition, or
-                security keys.
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1">
+            <Fingerprint className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="text-mq-sm font-medium text-mq-content">Passkeys & Security Keys</p>
+              <p className="text-mq-xs text-mq-content-secondary mt-0.5">
+                Sign in with fingerprint, face recognition, or security keys
               </p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
+            className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
             onClick={() => {
               setAddError(null);
               setDeviceName('');
               setShowAddDialog(true);
             }}
             disabled={isLoading || isFetching}
-            className="px-3 py-1 text-xs text-mq-primary hover:bg-mq-primary/10"
             data-testid="add-passkey"
           >
             <Plus className="h-3 w-3 mr-1" />

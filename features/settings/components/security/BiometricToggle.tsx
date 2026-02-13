@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
-import { Fingerprint, Smartphone, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Fingerprint, Smartphone, AlertTriangle, Info } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
@@ -14,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useBiometrics } from '@/lib/hooks/useBiometrics';
+import { ToggleControl } from '../ToggleControl';
 
 type BiometricToggleProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -47,62 +47,39 @@ export function BiometricToggle({ t }: BiometricToggleProps) {
     }
   };
 
-  const getBiometricStatusBadge = () => {
-    if (!biometricAvailable) {
-      return (
-        <Badge className="bg-mq-content-tertiary/20 text-mq-content-tertiary">
-          {t('notSupported')}
-        </Badge>
-      );
-    }
-    if (!platformAuthAvailable) {
-      return <Badge className="bg-mq-warning/20 text-mq-warning">{t('noDeviceFound')}</Badge>;
-    }
-    if (biometricEnabled) {
-      return <Badge className="bg-mq-success/20 text-mq-success">{t('enabled')}</Badge>;
-    }
-    return (
-      <Badge className="bg-mq-content-secondary/20 text-mq-content-secondary">
-        {t('disabled')}
-      </Badge>
-    );
+  const canToggle = biometricAvailable && platformAuthAvailable && !isLoading && !isStatusLoading;
+
+  const getStatusText = () => {
+    if (!biometricAvailable) return t('notSupported');
+    if (!platformAuthAvailable) return t('noDeviceFound');
+    return biometricEnabled ? t('enabled') : t('disabled');
   };
 
   return (
     <>
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-mq-primary/10 rounded-full">
-              <Fingerprint className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-mq-content">{t('biometricLogin')}</h3>
-                {getBiometricStatusBadge()}
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">{t('biometricLoginDesc')}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1">
+            <Fingerprint className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="text-mq-sm font-medium text-mq-content">{t('biometricLogin')}</p>
+              <p className="text-mq-xs text-mq-content-secondary mt-0.5">
+                {t('biometricLoginDesc')}
+              </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              biometricEnabled ? setShowDisableDialog(true) : setShowEnableDialog(true)
-            }
-            disabled={
-              !biometricAvailable || !platformAuthAvailable || isLoading || isStatusLoading
-            }
-            className={`px-3 py-1 text-xs ${
-              biometricEnabled
-                ? 'text-red-500 hover:bg-red-500/10'
-                : 'text-mq-primary hover:bg-mq-primary/10'
-            }`}
-            aria-pressed={biometricEnabled}
-            data-testid="toggle-biometric"
-          >
-            {biometricEnabled ? t('disable') : t('enable')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ToggleControl
+              checked={biometricEnabled}
+              onToggle={() =>
+                canToggle &&
+                (biometricEnabled ? setShowDisableDialog(true) : setShowEnableDialog(true))
+              }
+              label={t('biometricLogin')}
+              testId="toggle-biometric"
+            />
+            <span className="text-mq-xs text-mq-content-secondary">{getStatusText()}</span>
+          </div>
         </div>
 
         {/* Device Info */}
@@ -111,7 +88,6 @@ export function BiometricToggle({ t }: BiometricToggleProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
               <Smartphone className="h-4 w-4" aria-hidden="true" />
               <span>{t('biometricDeviceReady')}</span>
-              <CheckCircle className="h-4 w-4" aria-hidden="true" />
             </div>
           </div>
         )}
@@ -172,7 +148,11 @@ export function BiometricToggle({ t }: BiometricToggleProps) {
             <DialogDescription>{t('disableBiometricDesc')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowDisableDialog(false)} disabled={isLoading}>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDisableDialog(false)}
+              disabled={isLoading}
+            >
               {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDisable} disabled={isLoading}>

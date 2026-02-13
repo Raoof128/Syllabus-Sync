@@ -16,35 +16,21 @@ vi.mock('@/lib/hooks/useBiometrics', () => ({
 }));
 
 describe('BiometricToggle', () => {
-  // We need to mock 't' function
   const mockT = (key: string) => key;
 
   it('shows enabled state correctly', () => {
-    // Override the mock for this specific test if needed, or rely on props/mock state
-    // The component calls useBiometrics internally.
-    // To test 'enabled' state via props, we might need to adjust the mock or the component.
-    // However, the component Logic is: uses 'useBiometrics' hook.
-    // The provided test example assumes 'BiometricToggle' accepts props 'isEnabled' and 'onToggle',
-    // BUT looking at the file 'BiometricToggle.tsx', it ONLY accepts '{ t }'.
-    // It gets state from 'useBiometrics' hook.
-    // So I must Mock the hook to change state.
-
-    // I will write a test that fits the Actual Component.
-
     render(<BiometricToggle t={mockT} />);
-    // Initial mock state is disabled (false).
-    expect(screen.getByRole('button', { name: 'enable' })).toBeInTheDocument();
+    // Component uses ToggleControl (role="switch") instead of a button
+    const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
   });
 
   it('calls toggle function when clicked', () => {
     render(<BiometricToggle t={mockT} />);
-    const button = screen.getByRole('button', { name: 'enable' });
-    fireEvent.click(button);
-    // It should open a dialog, not immediately toggle.
-    // The component logic: onClick => setShowEnableDialog(true)
-    // Then dialog has "enable" button.
-
-    // Check if dialog opens (by checking for dialog text)
+    const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
+    fireEvent.click(toggle);
+    // It should open the enable dialog
     expect(screen.getByText('enableBiometricDesc')).toBeInTheDocument();
   });
 });

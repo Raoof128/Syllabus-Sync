@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
 import { Input } from '@/components/ui/mq/input';
 import {
   Shield,
@@ -25,6 +24,7 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { toastUtils } from '@/lib/utils/toast';
 import { API_ROUTES } from '@/lib/constants/config';
 import type { MFAFactor } from '@/lib/security/mfa';
+import { ToggleControl } from '../ToggleControl';
 
 interface TOTPSetupProps {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -46,9 +46,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
   const [secretCopied, setSecretCopied] = useState(false);
   const [disableFactorId, setDisableFactorId] = useState<string | null>(null);
 
-  const totpFactors = factors.filter(
-    (f) => f.type === 'totp' && f.status === 'verified',
-  );
+  const totpFactors = factors.filter((f) => f.type === 'totp' && f.status === 'verified');
   const isEnabled = totpFactors.length > 0;
 
   const handleStartSetup = useCallback(async () => {
@@ -59,10 +57,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       const result = await res.json();
 
       if (!res.ok || !result?.data) {
-        toastUtils.error(
-          t('error'),
-          result?.error?.message || 'Failed to start setup',
-        );
+        toastUtils.error(t('error'), result?.error?.message || 'Failed to start setup');
         return;
       }
 
@@ -91,9 +86,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       const result = await res.json();
 
       if (!res.ok || !result?.data?.verified) {
-        setVerifyError(
-          result?.error?.message || 'Invalid code. Please try again.',
-        );
+        setVerifyError(result?.error?.message || 'Invalid code. Please try again.');
         return;
       }
 
@@ -120,10 +113,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       const result = await res.json();
 
       if (!res.ok) {
-        toastUtils.error(
-          t('error'),
-          result?.error?.message || 'Failed to disable 2FA',
-        );
+        toastUtils.error(t('error'), result?.error?.message || 'Failed to disable 2FA');
         return;
       }
 
@@ -156,59 +146,35 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
   return (
     <>
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-mq-primary/10 rounded-full">
-              <Shield className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-mq-content">
-                  Authenticator App (TOTP)
-                </h3>
-                {isEnabled ? (
-                  <Badge className="bg-mq-success/20 text-mq-success">
-                    {t('enabled')}
-                  </Badge>
-                ) : (
-                  <Badge className="bg-mq-content-secondary/20 text-mq-content-secondary">
-                    {t('disabled')}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">
-                Use an authenticator app like Google Authenticator or Authy for
-                two-step verification.
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1">
+            <Shield className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <p className="text-mq-sm font-medium text-mq-content">Authenticator App (TOTP)</p>
+              <p className="text-mq-xs text-mq-content-secondary mt-0.5">
+                Use an authenticator app like Google Authenticator or Authy
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              if (isEnabled) {
-                setDisableFactorId(totpFactors[0]?.id ?? null);
-                setShowDisableDialog(true);
-              } else {
-                handleStartSetup();
-              }
-            }}
-            disabled={isLoading}
-            className={`px-3 py-1 text-xs ${
-              isEnabled
-                ? 'text-red-500 hover:bg-red-500/10'
-                : 'text-mq-primary hover:bg-mq-primary/10'
-            }`}
-            data-testid="toggle-totp"
-          >
-            {isLoading ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : isEnabled ? (
-              t('disable')
-            ) : (
-              t('enable')
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ToggleControl
+              checked={isEnabled}
+              onToggle={() => {
+                if (isLoading) return;
+                if (isEnabled) {
+                  setDisableFactorId(totpFactors[0]?.id ?? null);
+                  setShowDisableDialog(true);
+                } else {
+                  handleStartSetup();
+                }
+              }}
+              label="Authenticator App (TOTP)"
+              testId="toggle-totp"
+            />
+            <span className="text-mq-xs text-mq-content-secondary">
+              {isEnabled ? t('enabled') : t('disabled')}
+            </span>
+          </div>
         </div>
 
         {isEnabled && totpFactors.length > 0 && (
@@ -216,8 +182,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-success">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               <span>
-                Active since{' '}
-                {new Date(totpFactors[0].createdAt).toLocaleDateString()}
+                Active since {new Date(totpFactors[0].createdAt).toLocaleDateString()}
               </span>
             </div>
           </div>
@@ -235,9 +200,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              {step === 'qr'
-                ? 'Set Up Authenticator App'
-                : 'Verify Setup'}
+              {step === 'qr' ? 'Set Up Authenticator App' : 'Verify Setup'}
             </DialogTitle>
             <DialogDescription>
               {step === 'qr'
@@ -319,23 +282,12 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           )}
 
           <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={resetSetup}
-              disabled={isLoading}
-            >
+            <Button variant="ghost" onClick={resetSetup} disabled={isLoading}>
               {t('cancel')}
             </Button>
-            {step === 'qr' && (
-              <Button onClick={() => setStep('verify')}>
-                Continue
-              </Button>
-            )}
+            {step === 'qr' && <Button onClick={() => setStep('verify')}>Continue</Button>}
             {step === 'verify' && (
-              <Button
-                onClick={handleVerify}
-                disabled={isLoading || verifyCode.length !== 6}
-              >
+              <Button onClick={handleVerify} disabled={isLoading || verifyCode.length !== 6}>
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -364,8 +316,8 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               2FA Enabled!
             </DialogTitle>
             <DialogDescription>
-              Your account is now protected with two-factor authentication. You
-              will need your authenticator app each time you sign in.
+              Your account is now protected with two-factor authentication. You will need your
+              authenticator app each time you sign in.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -375,10 +327,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       </Dialog>
 
       {/* Disable Confirmation Dialog */}
-      <Dialog
-        open={showDisableDialog}
-        onOpenChange={setShowDisableDialog}
-      >
+      <Dialog open={showDisableDialog} onOpenChange={setShowDisableDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -386,16 +335,16 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               Disable Two-Factor Authentication?
             </DialogTitle>
             <DialogDescription>
-              This will remove the authenticator app requirement from your
-              account. Your account will be less secure.
+              This will remove the authenticator app requirement from your account. Your account will
+              be less secure.
             </DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-mq-lg border border-red-500/20">
               <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
               <p className="text-mq-sm text-mq-content-secondary">
-                Without 2FA, anyone with your password can access your account.
-                This action requires current session verification.
+                Without 2FA, anyone with your password can access your account. This action requires
+                current session verification.
               </p>
             </div>
           </div>
@@ -407,11 +356,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             >
               {t('cancel')}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDisable}
-              disabled={isLoading}
-            >
+            <Button variant="destructive" onClick={handleDisable} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
