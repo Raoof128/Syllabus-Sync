@@ -49,6 +49,55 @@ vi.mock('@/lib/constants', () => ({
   },
 }));
 
+// Mock constants/config
+vi.mock('@/lib/constants/config', () => ({
+  API_ROUTES: {
+    AUTH: {
+      MFA_STATUS: '/api/auth/mfa/status',
+      PASSWORD: '/api/auth/password',
+    },
+  },
+  SECURITY_CONFIG: {
+    MIN_PASSWORD_LENGTH: 12,
+    MAX_LOGIN_ATTEMPTS: 5,
+    SESSION_TIMEOUT_MINS: 30,
+  },
+}));
+
+// Mock security components that use react-query
+vi.mock('@/features/settings/components/security/BiometricToggle', () => ({
+  BiometricToggle: () => <div data-testid="biometric-toggle">Biometric Toggle</div>,
+}));
+
+vi.mock('@/features/settings/components/security/TOTPSetup', () => ({
+  TOTPSetup: () => <div data-testid="totp-setup">TOTP Setup</div>,
+}));
+
+vi.mock('@/features/settings/components/security/SMSSetup', () => ({
+  SMSSetup: () => <div data-testid="sms-setup">SMS Setup</div>,
+}));
+
+vi.mock('@/features/settings/components/security/PasskeyManager', () => ({
+  PasskeyManager: () => <div data-testid="passkey-manager">Passkey Manager</div>,
+}));
+
+// Mock useSessionManager hook
+const mockFetchSessions = vi.fn();
+const mockEndSession = vi.fn();
+const mockEndAllSessions = vi.fn();
+let mockSessionsData: any[] = [];
+let mockIsLoadingSessions = false;
+
+vi.mock('@/lib/hooks/useSessionManager', () => ({
+  useSessionManager: () => ({
+    sessions: mockSessionsData,
+    isLoadingSessions: mockIsLoadingSessions,
+    fetchSessions: mockFetchSessions,
+    endSession: mockEndSession,
+    endAllSessions: mockEndAllSessions,
+  }),
+}));
+
 // Mock fetch
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
@@ -146,10 +195,21 @@ describe('PrivacySettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
+    mockFetchSessions.mockReset();
+    mockEndSession.mockReset();
+    mockEndAllSessions.mockReset();
+    mockSessionsData = [];
+    mockIsLoadingSessions = false;
   });
 
   // Basic rendering tests
   it('renders privacy settings card', () => {
+    // Mock MFA status fetch
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('privacy-settings')).toBeInTheDocument();
@@ -157,24 +217,44 @@ describe('PrivacySettings', () => {
   });
 
   it('renders change password button', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('change-password-button')).toBeInTheDocument();
   });
 
   it('renders manage sessions button', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('manage-sessions-button')).toBeInTheDocument();
   });
 
   it('renders privacy policy button', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('privacy-policy-button')).toBeInTheDocument();
   });
 
   it('renders export data button', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
@@ -182,6 +262,11 @@ describe('PrivacySettings', () => {
 
   // Password dialog tests
   it('opens password dialog when change password button is clicked', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -193,6 +278,11 @@ describe('PrivacySettings', () => {
   });
 
   it('toggles current password visibility', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -208,6 +298,11 @@ describe('PrivacySettings', () => {
   });
 
   it('shows password strength indicator when typing new password', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -222,6 +317,11 @@ describe('PrivacySettings', () => {
   });
 
   it('shows strong password indicator for complex passwords', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -233,6 +333,11 @@ describe('PrivacySettings', () => {
   });
 
   it('shows password mismatch error', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('change-password-button'));
@@ -250,10 +355,16 @@ describe('PrivacySettings', () => {
   });
 
   it('calls API when password form is submitted', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
+    // First call for MFA status, then password change
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true, data: { factors: [] } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
 
     render(<PrivacySettings {...defaultProps} />);
 
@@ -289,17 +400,17 @@ describe('PrivacySettings', () => {
   it('opens sessions dialog when manage sessions button is clicked', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ success: true, data: { sessions: mockSessions } }),
+      json: async () => ({ success: true, data: { factors: [] } }),
     });
 
     render(<PrivacySettings {...defaultProps} />);
 
-    act(() => {
+    await act(async () => {
       fireEvent.click(screen.getByTestId('manage-sessions-button'));
     });
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/auth/sessions');
+      expect(mockFetchSessions).toHaveBeenCalled();
     });
 
     expect(screen.getByTestId('sessions-dialog')).toBeInTheDocument();
@@ -308,8 +419,11 @@ describe('PrivacySettings', () => {
   it('renders sessions in the dialog', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ success: true, data: { sessions: mockSessions } }),
+      json: async () => ({ success: true, data: { factors: [] } }),
     });
+
+    // Set sessions to be returned by the mocked hook
+    mockSessionsData.push(...mockSessions);
 
     render(<PrivacySettings {...defaultProps} />);
 
@@ -326,8 +440,11 @@ describe('PrivacySettings', () => {
   it('disables sign out button for current session', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ success: true, data: { sessions: mockSessions } }),
+      json: async () => ({ success: true, data: { factors: [] } }),
     });
+
+    // Set sessions to be returned by the mocked hook
+    mockSessionsData.push(...mockSessions);
 
     render(<PrivacySettings {...defaultProps} />);
 
@@ -340,19 +457,13 @@ describe('PrivacySettings', () => {
   });
 
   it('calls sessions API when ending a non-current session', async () => {
-    mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: { sessions: mockSessions } }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: { sessions: mockSessions } }),
-      });
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
+    // Set sessions to be returned by the mocked hook
+    mockSessionsData.push(...mockSessions);
 
     render(<PrivacySettings {...defaultProps} />);
 
@@ -363,23 +474,22 @@ describe('PrivacySettings', () => {
     fireEvent.click(sessionButton);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/auth/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scope: 'others' }),
-      });
+      expect(mockEndSession).toHaveBeenCalled();
     });
   });
 
   it('renders end all sessions button', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ success: true, data: { sessions: mockSessions } }),
+      json: async () => ({ success: true, data: { factors: [] } }),
     });
+
+    // Set sessions to be returned by the mocked hook
+    mockSessionsData.push(...mockSessions);
 
     render(<PrivacySettings {...defaultProps} />);
 
-    act(() => {
+    await act(async () => {
       fireEvent.click(screen.getByTestId('manage-sessions-button'));
     });
 
@@ -388,6 +498,11 @@ describe('PrivacySettings', () => {
 
   // Privacy policy test
   it('opens privacy policy link when button is clicked', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('privacy-policy-button'));
@@ -401,6 +516,11 @@ describe('PrivacySettings', () => {
 
   // Export dialog tests
   it('opens export dialog when export button is clicked', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('export-data-button'));
@@ -409,6 +529,11 @@ describe('PrivacySettings', () => {
   });
 
   it('shows export warning in dialog', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('export-data-button'));
@@ -417,6 +542,11 @@ describe('PrivacySettings', () => {
   });
 
   it('triggers download when confirm export is clicked', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('export-data-button'));
@@ -428,12 +558,22 @@ describe('PrivacySettings', () => {
 
   // Accessibility tests
   it('has proper region role for accessibility', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByRole('region', { name: 'Privacy & Security' })).toBeInTheDocument();
   });
 
   it('renders section headings as h3 elements', () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true, data: { factors: [] } }),
+    });
+
     render(<PrivacySettings {...defaultProps} />);
 
     const headings = screen.getAllByRole('heading', { level: 3 });
@@ -443,17 +583,20 @@ describe('PrivacySettings', () => {
   it('has proper list role in sessions dialog', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ success: true, data: { sessions: mockSessions } }),
+      json: async () => ({ success: true, data: { factors: [] } }),
     });
+
+    // Set sessions to be returned by the mocked hook
+    mockSessionsData.push(...mockSessions);
 
     render(<PrivacySettings {...defaultProps} />);
 
-    act(() => {
+    await act(async () => {
       fireEvent.click(screen.getByTestId('manage-sessions-button'));
     });
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/auth/sessions');
+      expect(mockFetchSessions).toHaveBeenCalled();
     });
     expect(screen.getByRole('list', { name: 'Manage Sessions' })).toBeInTheDocument();
   });

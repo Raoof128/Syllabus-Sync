@@ -44,17 +44,44 @@ export async function POST(request: NextRequest) {
     }
 
     const { email } = parsed.data;
-    const { data: userRecord } = await adminClient
-      .from('auth.users')
-      .select('user_metadata')
-      .eq('email', email)
-      .limit(1)
-      .single();
 
-    const metadata = (userRecord?.user_metadata || {}) as Record<string, unknown>;
-    const available = Boolean(metadata.biometric_credential_id);
+    // Use targeted RPC lookup instead of from('auth.users') which
+    // doesn't work with Supabase JS client for system tables.
+    const { data: lookupResult, error: lookupError } = await adminClient.rpc(
+      'lookup_user_by_email',
+      { lookup_email: email },
+    );
 
-    return jsonSuccess({ available });
+    if (lookupError) {
+      logger.error('Passkey status lookup error:', lookupError);
+      return jsonSuccess({ available: false, mfaEnabled: false });
+    }
+
+    const userRow = Array.isArray(lookupResult) ? lookupResult[0] : lookupResult;
+
+    if (!userRow?.user_id) {
+      // Don't reveal whether user exists
+      return jsonSuccess({ available: false, mfaEnabled: false });
+    }
+
+    const metadata = (userRow.user_meta ?? {}) as Record<string, unknown>;
+    const biometricAvailable = Boolean(metadata.biometric_credential_id);
+
+    // Check MFA factors via admin API
+    let mfaEnabled = false;
+    try {
+      const { data: factorsData } = await adminClient.auth.admin.mfa.listFactors({
+        userId: userRow.user_id,
+      });
+      const verifiedFactors = factorsData?.factors?.filter(
+        (f: { status: string }) => f.status === 'verified',
+      );
+      mfaEnabled = (verifiedFactors?.length ?? 0) > 0;
+    } catch {
+      // MFA check is best-effort
+    }
+
+    return jsonSuccess({ available: biometricAvailable, mfaEnabled });
   } catch (error) {
     logger.error('Passkey status error:', error);
     return jsonError('Failed to check passkey status', 500, ERROR_CODES.INTERNAL_ERROR);

@@ -19,7 +19,7 @@ import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
 import { MFAChallenge } from './components/MFAChallenge';
-import { AlertTriangle, Eye, EyeOff, Fingerprint, Loader2 } from 'lucide-react';
+import { AlertTriangle, Eye, EyeOff, Fingerprint, Loader2, Shield, ShieldCheck } from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTypedTranslation();
@@ -62,6 +62,9 @@ export default function LoginClient() {
   const [passkeyStatus, setPasskeyStatus] = useState<
     'idle' | 'checking' | 'available' | 'unavailable' | 'unsupported'
   >('idle');
+
+  // MFA status for the entered email
+  const [mfaEnabled, setMfaEnabled] = useState(false);
 
   // Redirect Logic
   const rawRedirect = searchParams.get('redirectTo');
@@ -129,10 +132,11 @@ export default function LoginClient() {
     });
   };
 
-  // Passkey Availability Effect
+  // Passkey & Security Status Effect
   useEffect(() => {
     if (!email || !email.includes('@')) {
       setPasskeyStatus('idle');
+      setMfaEnabled(false);
       return;
     }
 
@@ -153,9 +157,11 @@ export default function LoginClient() {
         const result = await response.json();
         if (!active) return;
         setPasskeyStatus(result?.data?.available ? 'available' : 'unavailable');
+        setMfaEnabled(Boolean(result?.data?.mfaEnabled));
       } catch {
         if (active) {
           setPasskeyStatus('unavailable');
+          setMfaEnabled(false);
         }
       }
     }, 400);
@@ -178,7 +184,7 @@ export default function LoginClient() {
 
       <div className="relative z-10 w-full max-w-none min-h-[100dvh] h-auto lg:h-[100dvh] overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">
         {/* Left Panel */}
-        <div className="w-full lg:w-5/12 bg-mq-background text-mq-content backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-mq-border px-8 lg:px-12 py-12 flex flex-col">
+        <div className="w-full lg:w-5/12 bg-mq-background text-mq-content backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-mq-border px-8 lg:px-12 py-12 flex flex-col overflow-y-auto">
           <div className="flex items-center justify-center mb-8">
             <div className="relative w-40 h-40 flex items-center justify-center">
               <Image
@@ -329,12 +335,62 @@ export default function LoginClient() {
                 </p>
               </div>
 
+              {/* Security Methods Section */}
+              {email && email.includes('@') && passkeyStatus !== 'idle' && (
+                <div className="rounded-xl border border-mq-border bg-mq-card-background/50 p-3 space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-mq-content-secondary">
+                    <Shield className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t('securityMethods' as Parameters<typeof t>[0]) || 'Security Methods'}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {/* Biometric / Passkey Status */}
+                    <span
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                        passkeyStatus === 'available'
+                          ? 'bg-mq-success/10 text-mq-success'
+                          : passkeyStatus === 'checking'
+                            ? 'bg-mq-content-secondary/10 text-mq-content-secondary'
+                            : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
+                      }`}
+                    >
+                      <Fingerprint className="h-3 w-3" aria-hidden="true" />
+                      {passkeyStatus === 'checking'
+                        ? t('loading')
+                        : passkeyStatus === 'available'
+                          ? t('biometricLogin')
+                          : passkeyStatus === 'unsupported'
+                            ? t('notSupported')
+                            : t('disabled')}
+                    </span>
+
+                    {/* MFA Status */}
+                    <span
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                        mfaEnabled
+                          ? 'bg-mq-success/10 text-mq-success'
+                          : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
+                      }`}
+                    >
+                      <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+                      {mfaEnabled
+                        ? t('twoFactorAuth' as Parameters<typeof t>[0]) || '2FA Enabled'
+                        : t('twoFactorAuthOff' as Parameters<typeof t>[0]) || '2FA Off'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <Button
                 type="button"
                 variant="outline"
-                className="h-12 rounded-full flex items-center justify-center gap-2 font-bold"
+                className={`h-12 rounded-full flex items-center justify-center gap-2 font-bold ${
+                  passkeyStatus === 'available'
+                    ? 'border-mq-success/30 hover:border-mq-success/50'
+                    : ''
+                }`}
                 onClick={handlePasskeyLogin}
-                disabled={isGlobalLoading || !email}
+                disabled={isGlobalLoading || !email || passkeyStatus !== 'available'}
               >
                 {isPasskeyLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -343,16 +399,6 @@ export default function LoginClient() {
                 )}
                 {isPasskeyLoading ? t('loading') : t('biometricLogin')}
               </Button>
-              <p className="text-xs text-mq-content-secondary text-center">
-                {t('biometricLogin')}:{' '}
-                {passkeyStatus === 'checking'
-                  ? t('loading')
-                  : passkeyStatus === 'available'
-                    ? t('enabled')
-                    : passkeyStatus === 'unsupported'
-                      ? t('notSupported')
-                      : t('disabled')}
-              </p>
 
               <div className="flex items-center gap-3 text-xs text-mq-content font-semibold pt-2">
                 <div className="h-px flex-1 bg-mq-border" />

@@ -1,3 +1,75 @@
+### Raouf: Wire Security Settings to Login Page — 2026-02-13
+
+**Scope:** Connect security settings from Privacy tab to the login page with visual indicators.
+**Type:** Bug Fix / Feature Enhancement
+
+#### Changes Applied
+
+1. **Passkey Status API Bug Fix (passkey/status/route.ts)**:
+   - **Bug:** Was using `adminClient.from('auth.users')` which silently fails with Supabase JS client (can't query system tables). This caused the biometric login button to always show "disabled" on the login page.
+   - **Fix:** Replaced with `adminClient.rpc('lookup_user_by_email')` RPC call, matching the working pattern from the passkey options route.
+   - **Enhancement:** Now also returns `mfaEnabled` field by checking verified MFA factors via `adminClient.auth.admin.mfa.listFactors()`.
+
+2. **Login Page Security Indicators (LoginClient.tsx)**:
+   - Added a "Security Methods" panel that appears after the user enters a valid email
+   - Shows color-coded badges for:
+     - **Biometric Login**: green badge when passkey/biometric is registered, grey when not
+     - **2FA Status**: green "2FA Enabled" badge when TOTP/SMS is set up, grey "2FA Off" when not
+   - Updated passkey button: disabled when passkey is unavailable, highlighted with green border when available
+   - Removed redundant passkey status text, replaced with integrated security methods panel
+
+#### Files Changed
+
+- `app/api/auth/passkey/status/route.ts`
+- `app/login/LoginClient.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test` ✅ (442/442 tests pass)
+
+---
+
+### Raouf: Integrate Security Options into Privacy Settings Tab — 2026-02-13
+
+**Scope:** Add all security options to Privacy settings tab with full test coverage.
+**Type:** Feature Integration / Test Fix
+
+#### Changes Applied
+
+1. **Security Components Integration (PrivacySettings.tsx)**: Integrated all multi-factor authentication and security options into the Privacy settings tab:
+   - Added BiometricToggle component for fingerprint/face ID authentication
+   - Added TOTPSetup component for authenticator app 2FA (Google Authenticator, Authy, etc.)
+   - Added SMSSetup component for SMS-based 2FA
+   - Added PasskeyManager component for WebAuthn/FIDO2 passkeys
+   - Implemented MFA status fetching with `fetchMFAStatus` callback that calls `/api/auth/mfa/status`
+   - Added loading state while fetching MFA factors
+   - Created new "Two-Factor Authentication & Security" section with Shield icon
+
+2. **Test Suite Fixes (PrivacySettings.test.tsx)**: Fixed all 23 tests that were failing due to react-query dependency:
+   - Mocked security components (BiometricToggle, TOTPSetup, SMSSetup, PasskeyManager) to avoid QueryClient errors
+   - Mocked `useSessionManager` hook with controllable state for session-related tests
+   - Added API_ROUTES.AUTH.MFA_STATUS and API_ROUTES.AUTH.PASSWORD to config mock
+   - Added SECURITY_CONFIG with MIN_PASSWORD_LENGTH to config mock
+   - Updated all tests to mock MFA status fetch on component mount
+   - Updated session tests to use mocked hook instead of expecting direct fetch calls
+   - Fixed async/await patterns in act() calls for proper state update handling
+
+#### Files Changed
+
+- `features/settings/components/PrivacySettings.tsx`
+- `tests/settings/PrivacySettings.test.tsx`
+
+#### Verification
+
+- `npm test -- tests/settings/PrivacySettings.test.tsx` ✅ (23/23 tests pass)
+- All security components properly integrated
+- MFA status fetching works correctly
+- Tests are robust with proper mocking
+
+---
+
 ### Raouf: Event Highlight, Clickable Announcements, Security Wiring & UnitForm Scroll — 2026-02-13
 
 **Scope:** Fix 4 UX issues across calendar, feed, settings, and unit form.

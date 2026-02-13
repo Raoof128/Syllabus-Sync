@@ -1,15 +1,21 @@
 'use client';
 
-import { memo, useState } from 'react';
+import { memo, useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Shield } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 import { EXTERNAL_LINKS } from '@/lib/config';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { ChangePasswordDialog } from './privacy/ChangePasswordDialog';
 import { SessionsList } from './privacy/SessionsList';
 import { DataManagement } from './privacy/DataManagement';
+import { BiometricToggle } from './security/BiometricToggle';
+import { TOTPSetup } from './security/TOTPSetup';
+import { SMSSetup } from './security/SMSSetup';
+import { PasskeyManager } from './security/PasskeyManager';
+import { API_ROUTES } from '@/lib/constants/config';
+import type { MFAFactor } from '@/lib/security/mfa';
 
 type PrivacySettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -19,6 +25,27 @@ type PrivacySettingsProps = {
 const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showSessionsDialog, setShowSessionsDialog] = useState(false);
+  const [factors, setFactors] = useState<MFAFactor[]>([]);
+  const [isLoadingMFA, setIsLoadingMFA] = useState(true);
+
+  const fetchMFAStatus = useCallback(async () => {
+    try {
+      setIsLoadingMFA(true);
+      const res = await fetch(API_ROUTES.AUTH.MFA_STATUS);
+      if (res.ok) {
+        const json = await res.json();
+        setFactors(json.data?.factors ?? []);
+      }
+    } catch {
+      // silently fail — settings page should not crash
+    } finally {
+      setIsLoadingMFA(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMFAStatus();
+  }, [fetchMFAStatus]);
 
   return (
     <>
@@ -93,6 +120,34 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   {t('view')}
                 </Button>
               </div>
+            </div>
+
+            {/* Two-Factor Authentication & Security */}
+            <div className="pt-4 border-t border-mq-border space-y-4">
+              <h3 className="text-sm font-semibold text-mq-content flex items-center gap-2">
+                <Shield className="h-4 w-4" aria-hidden="true" />
+                {t('twoFactorAuthentication' as TranslationKey) || 'Two-Factor Authentication'}
+              </h3>
+
+              {isLoadingMFA ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-mq-primary" />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {/* Authenticator App (TOTP) */}
+                  <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
+
+                  {/* SMS Verification */}
+                  <SMSSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
+
+                  {/* Passkey / WebAuthn */}
+                  <PasskeyManager t={t} />
+
+                  {/* Biometric Authentication */}
+                  <BiometricToggle t={t} />
+                </div>
+              )}
             </div>
 
             {/* Data Management (Export & Clear) */}
