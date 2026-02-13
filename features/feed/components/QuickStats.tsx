@@ -1,18 +1,33 @@
 'use client';
 
-import { memo, useMemo } from 'react';
-import { TrendingUp, Calendar, Users, Pizza } from 'lucide-react';
+import { memo, useMemo, useState, useCallback } from 'react';
+import { TrendingUp, Calendar, Users, Pizza, MapPin, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PublicEvent } from '@/lib/types/publicEvents';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
 
 interface QuickStatsProps {
   events: PublicEvent[];
   className?: string;
 }
 
+interface DialogState {
+  title: string;
+  events: PublicEvent[];
+}
+
 export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
   const { t } = useTypedTranslation();
+  const [dialogState, setDialogState] = useState<DialogState | null>(null);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -27,13 +42,27 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
 
     return {
       total: events.length,
+      totalEvents: events,
       thisWeek: thisWeekEvents.length,
+      thisWeekEvents,
       freeFood: freeFood.length,
+      freeFoodEvents: freeFood,
       career: career.length,
+      careerEvents: career,
       social: social.length,
+      socialEvents: social,
       academic: academic.length,
+      academicEvents: academic,
     };
   }, [events]);
+
+  const openDialog = useCallback((title: string, eventsList: PublicEvent[]) => {
+    setDialogState({ title, events: eventsList });
+  }, []);
+
+  const closeDialog = useCallback(() => {
+    setDialogState(null);
+  }, []);
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -51,6 +80,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
           value={stats.total}
           color="text-mq-primary"
           bgColor="bg-mq-primary/10"
+          onClick={() => openDialog(t('totalEvents') || 'Total Events', stats.totalEvents)}
         />
         <StatCard
           icon={Users}
@@ -58,6 +88,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
           value={stats.thisWeek}
           color="text-purple-500"
           bgColor="bg-purple-500/10"
+          onClick={() => openDialog(t('thisWeek') || 'This Week', stats.thisWeekEvents)}
         />
         <StatCard
           icon={Pizza}
@@ -65,6 +96,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
           value={stats.freeFood}
           color="text-amber-500"
           bgColor="bg-amber-500/10"
+          onClick={() => openDialog(t('freeFood') || 'Free Food', stats.freeFoodEvents)}
         />
       </div>
 
@@ -80,6 +112,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             count={stats.career}
             total={stats.total}
             color="bg-blue-500"
+            onClick={() => openDialog(t('career') || 'Career', stats.careerEvents)}
           />
           <CategoryBar
             icon="📚"
@@ -87,6 +120,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             count={stats.academic}
             total={stats.total}
             color="bg-emerald-500"
+            onClick={() => openDialog(t('academic') || 'Academic', stats.academicEvents)}
           />
           <CategoryBar
             icon="🎉"
@@ -94,6 +128,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             count={stats.social}
             total={stats.total}
             color="bg-purple-500"
+            onClick={() => openDialog(t('social') || 'Social', stats.socialEvents)}
           />
           <CategoryBar
             icon="🍕"
@@ -101,9 +136,45 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             count={stats.freeFood}
             total={stats.total}
             color="bg-amber-500"
+            onClick={() => openDialog(t('freeFood') || 'Free Food', stats.freeFoodEvents)}
           />
         </div>
       </div>
+
+      {/* Events Dialog */}
+      <Dialog
+        open={dialogState !== null}
+        onOpenChange={(open: boolean) => {
+          if (!open) closeDialog();
+        }}
+      >
+        <DialogContent className="max-w-3xl max-h-[80vh]">
+          {dialogState && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl">{dialogState.title}</DialogTitle>
+                <DialogDescription className="text-sm text-mq-content-secondary">
+                  {dialogState.events.length} {dialogState.events.length === 1 ? 'event' : 'events'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-4 space-y-3 overflow-y-auto max-h-[50vh]">
+                {dialogState.events.length === 0 ? (
+                  <p className="text-center py-8 text-mq-content-tertiary">No events found</p>
+                ) : (
+                  dialogState.events.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))
+                )}
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button variant="outline" onClick={closeDialog}>
+                  {t('close') || 'Close'}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 });
@@ -116,14 +187,27 @@ interface StatCardProps {
   value: number;
   color: string;
   bgColor: string;
+  onClick: () => void;
 }
 
-function StatCard({ icon: Icon, label, value, color, bgColor }: StatCardProps) {
+function StatCard({ icon: Icon, label, value, color, bgColor, onClick }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-mq-card-background border border-mq-border">
+    <div
+      className="flex items-center justify-between p-3 rounded-xl bg-mq-card-background border border-mq-border cursor-pointer select-none hover:shadow-md active:scale-[0.98] transition-all"
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${label}`}
+    >
       <div className="flex items-center gap-3">
         <div className={cn('p-2 rounded-lg', bgColor)}>
-          <Icon className={cn('h-4 w-4', color)} />
+          <Icon className={cn('h-4 w-4', color)} aria-hidden="true" />
         </div>
         <span className="text-sm text-mq-content-secondary">{label}</span>
       </div>
@@ -138,13 +222,26 @@ interface CategoryBarProps {
   count: number;
   total: number;
   color: string;
+  onClick: () => void;
 }
 
-function CategoryBar({ icon, label, count, total, color }: CategoryBarProps) {
+function CategoryBar({ icon, label, count, total, color, onClick }: CategoryBarProps) {
   const percentage = total > 0 ? (count / total) * 100 : 0;
 
   return (
-    <div>
+    <div
+      className="cursor-pointer select-none p-2 -m-2 rounded-lg hover:bg-mq-background-secondary/50 transition-all active:scale-[0.98]"
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`View ${label} events`}
+    >
       <div className="flex items-center justify-between text-sm mb-1">
         <span className="flex items-center gap-1.5 text-mq-content-secondary">
           <span>{icon}</span>
@@ -157,6 +254,75 @@ function CategoryBar({ icon, label, count, total, color }: CategoryBarProps) {
           className={cn('h-full rounded-full transition-all duration-500', color)}
           style={{ width: `${percentage}%` }}
         />
+      </div>
+    </div>
+  );
+}
+
+// Event Card Component for Dialog
+interface EventCardProps {
+  event: PublicEvent;
+}
+
+function EventCard({ event }: EventCardProps) {
+  const categoryColors: Record<string, string> = {
+    Career: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+    Social: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+    Academic: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    'Free Food': 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-AU', {
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-AU', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const getTimeRange = () => {
+    if (event.allDay) return 'All Day';
+    const start = formatTime(event.startAt);
+    if (event.endAt) {
+      const end = formatTime(event.endAt);
+      return `${start} - ${end}`;
+    }
+    return start;
+  };
+
+  return (
+    <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background hover:shadow-sm transition-all">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h4 className="font-semibold text-base text-mq-content flex-1">{event.title}</h4>
+        <Badge className={cn('text-xs shrink-0 border', categoryColors[event.category])}>
+          {event.category}
+        </Badge>
+      </div>
+      {event.description && (
+        <p className="text-sm text-mq-content-secondary mb-3">{event.description}</p>
+      )}
+      <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-mq-content-secondary">
+        <div className="flex items-center gap-1.5">
+          <Calendar className="h-4 w-4" aria-hidden="true" />
+          <span>{formatDate(event.startAt)}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-4 w-4" aria-hidden="true" />
+          <span>{getTimeRange()}</span>
+        </div>
+        {event.location && (
+          <div className="flex items-center gap-1.5">
+            <MapPin className="h-4 w-4" aria-hidden="true" />
+            <span>{event.location}</span>
+          </div>
+        )}
       </div>
     </div>
   );

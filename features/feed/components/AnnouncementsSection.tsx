@@ -1,11 +1,19 @@
 'use client';
 
 import { memo, useState, useCallback } from 'react';
-import { Bell, Sparkles, Info, AlertCircle, Megaphone, ChevronDown } from 'lucide-react';
+import { Bell, Sparkles, Info, AlertCircle, Megaphone } from 'lucide-react';
 import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/mq/button';
 
 interface Announcement {
   id: string;
@@ -75,10 +83,14 @@ interface AnnouncementsSectionProps {
 export const AnnouncementsSection = memo(
   ({ announcements = staticAnnouncements, className }: AnnouncementsSectionProps) => {
     const { t } = useTypedTranslation();
-    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
-    const toggleExpanded = useCallback((id: string) => {
-      setExpandedId((prev) => (prev === id ? null : id));
+    const openAnnouncement = useCallback((announcement: Announcement) => {
+      setSelectedAnnouncement(announcement);
+    }, []);
+
+    const closeDialog = useCallback(() => {
+      setSelectedAnnouncement(null);
     }, []);
 
     return (
@@ -96,26 +108,24 @@ export const AnnouncementsSection = memo(
           {announcements.map((announcement) => {
             const style = typeStyles[announcement.type];
             const Icon = style.icon;
-            const isExpanded = expandedId === announcement.id;
 
             return (
               <MagicCard key={announcement.id} isLiquidEnhanced>
                 <div
                   className={cn(
-                    'p-4 rounded-xl border border-mq-border bg-mq-card-background transition-all cursor-pointer select-none',
+                    'p-4 rounded-xl border border-mq-border bg-mq-card-background transition-all cursor-pointer select-none hover:shadow-md active:scale-[0.98]',
                     style.bgClass,
-                    isExpanded && 'border-mq-primary/30 shadow-sm',
                   )}
-                  onClick={() => toggleExpanded(announcement.id)}
+                  onClick={() => openAnnouncement(announcement)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      toggleExpanded(announcement.id);
+                      openAnnouncement(announcement);
                     }
                   }}
                   role="button"
                   tabIndex={0}
-                  aria-expanded={isExpanded}
+                  aria-label={`Open ${announcement.title}`}
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -124,7 +134,7 @@ export const AnnouncementsSection = memo(
                         style.iconClass,
                       )}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -138,37 +148,73 @@ export const AnnouncementsSection = memo(
                           {announcement.title}
                         </h4>
                       </div>
-                      <p
-                        className={cn(
-                          'text-xs text-mq-content-secondary transition-all duration-200',
-                          isExpanded ? '' : 'line-clamp-2',
-                        )}
-                      >
+                      <p className="text-xs text-mq-content-secondary line-clamp-2">
                         {announcement.message}
                       </p>
-                      {isExpanded && announcement.link && (
-                        <a
-                          href={announcement.link}
-                          className="inline-block mt-2 text-xs text-mq-primary hover:underline font-medium"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {t('learnMore') || 'Learn more'}
-                        </a>
-                      )}
                     </div>
-                    <ChevronDown
-                      className={cn(
-                        'h-4 w-4 shrink-0 text-mq-content-tertiary transition-transform duration-200',
-                        isExpanded && 'rotate-180',
-                      )}
-                      aria-hidden="true"
-                    />
                   </div>
                 </div>
               </MagicCard>
             );
           })}
         </div>
+
+        {/* Announcement Dialog */}
+        <Dialog
+          open={selectedAnnouncement !== null}
+          onOpenChange={(open: boolean) => {
+            if (!open) closeDialog();
+          }}
+        >
+          <DialogContent className="max-w-2xl">
+            {selectedAnnouncement && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className={cn(
+                        'p-2 rounded-lg bg-mq-background-secondary',
+                        typeStyles[selectedAnnouncement.type].iconClass,
+                      )}
+                    >
+                      {(() => {
+                        const Icon = typeStyles[selectedAnnouncement.type].icon;
+                        return <Icon className="h-5 w-5" aria-hidden="true" />;
+                      })()}
+                    </div>
+                    <Badge
+                      className={cn(
+                        'text-xs uppercase tracking-wide',
+                        typeStyles[selectedAnnouncement.type].badge,
+                      )}
+                    >
+                      {selectedAnnouncement.type === 'new' && (t('new') || 'New')}
+                      {selectedAnnouncement.type === 'info' && (t('info') || 'Info')}
+                      {selectedAnnouncement.type === 'warning' && (t('important') || 'Important')}
+                      {selectedAnnouncement.type === 'highlight' && (t('featured') || 'Featured')}
+                    </Badge>
+                  </div>
+                  <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
+                </DialogHeader>
+                <DialogDescription className="text-base leading-relaxed text-mq-content-secondary mt-4">
+                  {selectedAnnouncement.message}
+                </DialogDescription>
+                <div className="flex items-center justify-end gap-3 mt-6">
+                  {selectedAnnouncement.link && (
+                    <Button variant="primary" asChild>
+                      <a href={selectedAnnouncement.link} target="_blank" rel="noopener noreferrer">
+                        {t('learnMore') || 'Learn More'}
+                      </a>
+                    </Button>
+                  )}
+                  <Button variant="outline" onClick={closeDialog}>
+                    {t('close') || 'Close'}
+                  </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     );
   },
