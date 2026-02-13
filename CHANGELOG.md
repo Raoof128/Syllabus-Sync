@@ -1,3 +1,31 @@
+### Raouf: Event Highlight, Clickable Announcements, Security Wiring & UnitForm Scroll — 2026-02-13
+
+**Scope:** Fix 4 UX issues across calendar, feed, settings, and unit form.
+**Type:** Bug Fix / Enhancement
+
+#### Changes Applied
+
+1. **Event Highlight Timing (CalendarWidgets.tsx)**: Fixed `animate-pulse` highlight persisting indefinitely when navigating from Home "View All" to calendar. Added `eventHighlightDismissed` state with a 3-second auto-clear timeout. Also updated section highlight from 2s to 3s for consistency.
+2. **Clickable Announcement Cards (AnnouncementsSection.tsx)**: Announcement cards in the feed sidebar are now interactive. Clicking a card expands it to show the full message text (removes `line-clamp-2`) and reveals optional links. Includes a chevron indicator, keyboard accessibility, and `aria-expanded` state.
+3. **Security Settings to Login Page (SecuritySettings.tsx)**: Added an "Account Security" section with a "Change Password" button that navigates to `/login?redirectTo=/settings/security`, allowing users to re-authenticate and return to settings.
+4. **UnitForm Scroll Fix (UnitForm.tsx)**: Restructured the dialog layout from `overflow-y-auto` on the entire dialog to a flex column layout (`flex flex-col overflow-hidden`) where only the form body scrolls (`flex-1 overflow-y-auto min-h-0`). Header and footer remain fixed. Supports adding class times for all 7 days (Monday–Sunday) without overflow issues.
+
+#### Files Changed
+
+- `features/calendar/components/CalendarWidgets.tsx`
+- `features/feed/components/AnnouncementsSection.tsx`
+- `features/settings/components/SecuritySettings.tsx`
+- `components/units/UnitForm.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test` ✅ (442/442 tests pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Full System Integrity Check & Test Fix — 2026-02-12
 
 **Scope:** Run full project verification and fix test regression.

@@ -1,3 +1,9 @@
+Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Event Highlight Timing, Clickable Announcements, Security-Login Wiring, UnitForm Scroll Fix
+Summary: Fixed 4 UX issues: (1) Calendar event highlight now auto-clears after exactly 3 seconds instead of persisting indefinitely; section highlight also updated from 2s to 3s. (2) Feed announcement cards are now clickable with expand/collapse to show full message and optional links. (3) Security settings now includes an "Account Security" section with a "Change Password" button that navigates to the login page with redirect back. (4) UnitForm dialog restructured with flex layout so the form body scrolls independently while header/footer stay fixed, supporting all 7 days of class times.
+Files: Modified `features/calendar/components/CalendarWidgets.tsx`, `features/feed/components/AnnouncementsSection.tsx`, `features/settings/components/SecuritySettings.tsx`, `components/units/UnitForm.tsx`.
+Verification: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (442/442 tests pass), `npm run build` ✅.
+
 Raouf: 2026-02-12 (Australia/Sydney)
 Scope: Full System Integrity Check & Test ID Fix
 Summary: Ran `npm run check` and fixed a test failure in `NotificationSettings.test.tsx`. The failure was due to a mismatch in `data-testid` for the "Enable" button in the push notification banner. Reverted the test ID in `NotificationSettings.tsx` to `enable-notifications-button` to align with the existing tests.

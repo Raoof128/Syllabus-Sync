@@ -1,8 +1,10 @@
 'use client';
 
 import { memo, useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Shield, Loader2 } from 'lucide-react';
+import { Shield, Loader2, LogIn, KeyRound } from 'lucide-react';
+import { Button } from '@/components/ui/mq/button';
 import { MagicCard } from '@/components/ui/MagicCard';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { BiometricToggle } from './security/BiometricToggle';
@@ -17,6 +19,7 @@ type SecuritySettingsProps = {
 };
 
 const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
+  const router = useRouter();
   const [factors, setFactors] = useState<MFAFactor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,6 +69,22 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
 
               {/* Legacy Biometric Toggle (backwards compatibility) */}
               <BiometricToggle t={t} />
+
+              {/* Account Security Actions */}
+              <div className="pt-2 border-t border-mq-border space-y-3">
+                <h3 className="text-sm font-medium text-mq-content-secondary flex items-center gap-2">
+                  <KeyRound className="h-4 w-4" aria-hidden="true" />
+                  {t('accountSecurity' as TranslationKey) || 'Account Security'}
+                </h3>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2"
+                  onClick={() => router.push('/login?redirectTo=/settings/security')}
+                >
+                  <LogIn className="h-4 w-4" aria-hidden="true" />
+                  {t('changePassword' as TranslationKey) || 'Change Password'}
+                </Button>
+              </div>
             </>
           )}
         </CardContent>

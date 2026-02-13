@@ -1,7 +1,7 @@
 'use client';
 
-import { memo } from 'react';
-import { Bell, Sparkles, Info, AlertCircle, Megaphone } from 'lucide-react';
+import { memo, useState, useCallback } from 'react';
+import { Bell, Sparkles, Info, AlertCircle, Megaphone, ChevronDown } from 'lucide-react';
 import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -75,6 +75,11 @@ interface AnnouncementsSectionProps {
 export const AnnouncementsSection = memo(
   ({ announcements = staticAnnouncements, className }: AnnouncementsSectionProps) => {
     const { t } = useTypedTranslation();
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+
+    const toggleExpanded = useCallback((id: string) => {
+      setExpandedId((prev) => (prev === id ? null : id));
+    }, []);
 
     return (
       <div className={cn('', className)}>
@@ -91,14 +96,26 @@ export const AnnouncementsSection = memo(
           {announcements.map((announcement) => {
             const style = typeStyles[announcement.type];
             const Icon = style.icon;
+            const isExpanded = expandedId === announcement.id;
 
             return (
               <MagicCard key={announcement.id} isLiquidEnhanced>
                 <div
                   className={cn(
-                    'p-4 rounded-xl border border-mq-border bg-mq-card-background transition-all',
+                    'p-4 rounded-xl border border-mq-border bg-mq-card-background transition-all cursor-pointer select-none',
                     style.bgClass,
+                    isExpanded && 'border-mq-primary/30 shadow-sm',
                   )}
+                  onClick={() => toggleExpanded(announcement.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggleExpanded(announcement.id);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -121,10 +138,31 @@ export const AnnouncementsSection = memo(
                           {announcement.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-mq-content-secondary line-clamp-2">
+                      <p
+                        className={cn(
+                          'text-xs text-mq-content-secondary transition-all duration-200',
+                          isExpanded ? '' : 'line-clamp-2',
+                        )}
+                      >
                         {announcement.message}
                       </p>
+                      {isExpanded && announcement.link && (
+                        <a
+                          href={announcement.link}
+                          className="inline-block mt-2 text-xs text-mq-primary hover:underline font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {t('learnMore') || 'Learn more'}
+                        </a>
+                      )}
                     </div>
+                    <ChevronDown
+                      className={cn(
+                        'h-4 w-4 shrink-0 text-mq-content-tertiary transition-transform duration-200',
+                        isExpanded && 'rotate-180',
+                      )}
+                      aria-hidden="true"
+                    />
                   </div>
                 </div>
               </MagicCard>

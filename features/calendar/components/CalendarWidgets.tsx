@@ -101,14 +101,19 @@ export default function CalendarWidgets({
   const highlightSection = searchParams.get('section');
   const sectionHighlight = searchParams.get('highlight') === 'true';
 
-  // State for section highlight that persists for 5 seconds
+  // State for section highlight that persists for 3 seconds
   const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(
     null,
   );
 
+  // State for individual event highlight that auto-clears after 3 seconds
+  const [eventHighlightDismissed, setEventHighlightDismissed] = useState(false);
+
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
   const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
-  const eventHighlightActive = Boolean(highlightedEventId) || sectionHighlightActive === 'events';
+  const eventHighlightActive =
+    (Boolean(highlightedEventId) && !eventHighlightDismissed) ||
+    sectionHighlightActive === 'events';
 
   // Helper function to check if element is visible in viewport
   const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
@@ -172,6 +177,22 @@ export default function CalendarWidgets({
     }
   }, [highlightedEventId, scrollIfNotVisible]);
 
+  // Auto-dismiss individual event highlight after 3 seconds
+  useEffect(() => {
+    if (highlightedEventId) {
+      const resetTimer = setTimeout(() => {
+        setEventHighlightDismissed(false);
+      }, 0);
+      const dismissTimer = setTimeout(() => {
+        setEventHighlightDismissed(true);
+      }, 3000);
+      return () => {
+        clearTimeout(resetTimer);
+        clearTimeout(dismissTimer);
+      };
+    }
+  }, [highlightedEventId]);
+
   // Handle section scroll from home page "View All" links
   useEffect(() => {
     if (highlightSection && sectionHighlight) {
@@ -193,10 +214,10 @@ export default function CalendarWidgets({
         window.history.replaceState({}, '', url.toString());
       }, 300);
 
-      // Clear highlight after 2 seconds
+      // Clear highlight after 3 seconds
       const highlightTimer = setTimeout(() => {
         setSectionHighlightActive(null);
-      }, 2000);
+      }, 3000);
 
       return () => {
         clearTimeout(scrollTimer);
