@@ -117,6 +117,38 @@ export async function GET(request: Request) {
  *   "relatedId": "uuid"
  * }
  */
+/**
+ * DELETE /api/notifications - Clear all notifications for the user
+ *
+ * Soft-deletes all notifications by setting deleted_at timestamp.
+ */
+export async function DELETE(request: Request) {
+  return requireAuth(request, async (userId) => {
+    try {
+      const supabase = await createServerClient();
+
+      const { data, error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .select('id');
+
+      if (error) {
+        return handleDatabaseError(error);
+      }
+
+      return jsonSuccess({
+        deleted: data?.length ?? 0,
+        message: 'All notifications cleared',
+      });
+    } catch (error) {
+      logger.error('DELETE /api/notifications error:', error);
+      return jsonError('Failed to clear notifications', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+  });
+}
+
 export async function POST(request: Request) {
   // Note: CSRF protection removed - Supabase authentication with requireAuth provides sufficient security
   // for client-side API calls. CSRF is more relevant for cookie-based session auth without tokens.

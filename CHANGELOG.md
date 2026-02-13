@@ -1,3 +1,27 @@
+### Raouf: Fix Select Dropdown Scroll & Notification Bulk Delete — 2026-02-13
+
+**Scope:** Fix two bugs — non-scrollable Select dropdown and missing notification clear endpoint.
+**Type:** Bug Fix — UI / API
+
+#### Changes Applied
+
+1. **Select Dropdown Scroll Fix (select.tsx)**: Removed fixed `h-(--radix-select-trigger-height)` from the Radix Select Viewport in popper mode. This CSS variable forced the Viewport to match the trigger height (~36px), preventing items from rendering and scroll from working. The Viewport now sizes naturally to fit its children, while the Content's `max-h` and `overflow-y-auto` constrain and scroll the dropdown.
+
+2. **Notification Bulk Delete (notifications/route.ts)**: Added missing `DELETE /api/notifications` handler. The store's `clearAll()` method was calling `DELETE /api/notifications` which returned 405 Method Not Allowed because only GET and POST were exported. New handler authenticates the user, deletes all their non-soft-deleted notifications, and returns the deleted count.
+
+#### Files Changed
+
+- `components/ui/select.tsx`
+- `app/api/notifications/route.ts`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test` ✅ (442/442 tests pass)
+
+---
+
 ### Raouf: Standardize Security Settings Toggle Components — 2026-02-13
 
 **Scope:** Fix visual inconsistency in Privacy settings security toggles.
