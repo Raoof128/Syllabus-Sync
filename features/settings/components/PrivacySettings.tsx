@@ -12,7 +12,7 @@ import { SessionsList } from './privacy/SessionsList';
 import { DataManagement } from './privacy/DataManagement';
 import { BiometricToggle } from './security/BiometricToggle';
 import { TOTPSetup } from './security/TOTPSetup';
-import { SMSSetup } from './security/SMSSetup';
+
 import { PasskeyManager } from './security/PasskeyManager';
 import { API_ROUTES } from '@/lib/constants/config';
 import type { MFAFactor } from '@/lib/security/mfa';
@@ -138,8 +138,20 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   {/* Authenticator App (TOTP) */}
                   <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
-                  {/* SMS Verification */}
-                  <SMSSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
+                  {/* SMS Verification — coming soon */}
+                  <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-mq-content">SMS Verification</h3>
+                        <p className="text-mq-sm text-mq-content-secondary">
+                          SMS verification coming soon
+                        </p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full bg-mq-hover-background text-mq-content-secondary font-medium">
+                        Coming Soon
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Passkey / WebAuthn */}
                   <PasskeyManager t={t} />

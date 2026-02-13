@@ -1,3 +1,97 @@
+### Raouf: Custom Email Verification System — 2026-02-13
+
+**Scope:** Replace Supabase email verification with a fully custom flow using Resend.
+**Type:** Feature — Security Infrastructure
+
+#### Architecture
+
+`User → API → Database → Resend (email provider)`
+
+No Supabase email service. No Supabase OTP. No magic links.
+
+#### Deliverables
+
+1. **SQL Migration** (`supabase/migrations/20260213000000_email_verifications.sql`):
+   - `email_verifications` table with UUID PK, `user_id`, `token_hash` (SHA-256), `expires_at`, `used`, `created_at`
+   - Partial indexes for fast token lookup, cleanup, and per-user invalidation
+   - RLS enabled (service_role only)
+   - `cleanup_expired_email_verifications()` SQL function
+   - Optional `pg_cron` daily schedule (3:00 AM UTC)
+
+2. **Token Utility** (`lib/security/emailVerification.ts`):
+   - `generateVerificationToken()` — 32 random bytes, hex
+   - `hashToken()` — SHA-256 hash (only hash stored in DB)
+   - `getTokenExpiry()` — 20-minute expiry
+   - `emailVerifySendLimiter` — 3 sends per hour per user, fail-closed
+
+3. **Email Service** (`lib/services/emailService.ts`):
+   - Resend API integration (`RESEND_API_KEY`)
+   - Branded HTML template (Macquarie University crimson header, verify button, footer)
+   - `sendVerificationEmail({ to, token })` — raw token in URL, never logged
+
+4. **Send Verification Route** (`POST /api/auth/email/send-verification`):
+   - Authenticated (requires session)
+   - Rate-limited (3/hour via `emailVerifySendLimiter`)
+   - Invalidates previous active tokens for the user
+   - Generates new token, stores SHA-256 hash, sends email via Resend
+
+5. **Verify Route** (`POST /api/auth/email/verify`):
+   - Hashes incoming token, finds non-used + non-expired record
+   - Marks token used (atomic update with race condition guard)
+   - Confirms user via `adminClient.auth.admin.updateUserById()` with `email_confirm: true`
+   - Generic "Invalid or expired verification link" for all failure cases (no info leakage)
+
+6. **Cleanup Route** (`POST /api/auth/email/cleanup`):
+   - Protected by `CRON_SECRET` bearer token
+   - Calls `cleanup_expired_email_verifications()` RPC
+   - Returns deleted count
+
+7. **Verify Page** (`/verify?token=<raw_token>`):
+   - Client-side landing page with loading → success/error states
+   - Validates token format before sending to API
+   - Links back to login on success or failure
+
+8. **UI Update** (`PrivacySettings.tsx`):
+   - Replaced `<SMSSetup>` component with "SMS verification coming soon" placeholder
+   - Greyed out card with "Coming Soon" badge
+
+9. **Config**:
+   - Added `EMAIL_SEND_VERIFICATION`, `EMAIL_VERIFY`, `EMAIL_CLEANUP` to `API_ROUTES.AUTH`
+   - Added `RESEND_API_KEY`, `VERIFICATION_EMAIL_FROM`, `CRON_SECRET` to `.env.local.example`
+
+#### Security Constraints Met
+
+- HTTPS only (token in URL, verified server-side)
+- No raw tokens stored (SHA-256 only)
+- 20-minute token expiry (no long-lived tokens)
+- Tokens marked used after verification (no reuse)
+- Generic error messages (no information leakage)
+- Zod validation on all inputs
+- Raw tokens never logged
+- Rate limiting: 3 sends/hour, fail-closed
+- Cron endpoint protected by shared secret
+
+#### Files Changed
+
+- `supabase/migrations/20260213000000_email_verifications.sql` (new)
+- `lib/security/emailVerification.ts` (new)
+- `lib/services/emailService.ts` (new)
+- `app/api/auth/email/send-verification/route.ts` (new)
+- `app/api/auth/email/verify/route.ts` (new)
+- `app/api/auth/email/cleanup/route.ts` (new)
+- `app/verify/page.tsx` (new)
+- `lib/constants/config.ts` (modified)
+- `.env.local.example` (modified)
+- `features/settings/components/PrivacySettings.tsx` (modified)
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test` ✅ (442/442 tests pass)
+
+---
+
 ### Raouf: Verify TOTP Authenticator App Wiring — 2026-02-13
 
 **Scope:** Audit and verify the full Authenticator App (TOTP) flow is correctly wired from settings to login.
