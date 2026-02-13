@@ -1,3 +1,35 @@
+### Raouf: Verify TOTP Authenticator App Wiring — 2026-02-13
+
+**Scope:** Audit and verify the full Authenticator App (TOTP) flow is correctly wired from settings to login.
+**Type:** Verification / Security Audit
+
+#### Findings
+
+**Status: Fully Wired & Working** — No issues found.
+
+1. **Enrollment Flow (Settings → Privacy Tab)**:
+   - `TOTPSetup.tsx` → `POST /api/auth/mfa/enroll` → Supabase `mfa.enroll({ factorType: 'totp' })`
+   - Returns QR code, secret, URI with `Cache-Control: no-store` (prevents TOTP secret caching)
+   - User enters 6-digit code → `POST /api/auth/mfa/verify` → `mfa.challenge()` + `mfa.verify()` → factor verified
+   - Unenroll via `POST /api/auth/mfa/unenroll` requires aal2 re-authentication
+
+2. **Login Flow**:
+   - `loginAction()` → `signInWithPassword()` (aal1) → `getAuthenticatorAssuranceLevel()`
+   - If `nextLevel === 'aal2'` && `currentLevel === 'aal1'` → returns `mfaRequired: true` with verified factors
+   - `MFAChallenge` component renders → user enters code → `POST /api/auth/mfa/challenge-verify`
+   - Server creates challenge + verifies → session upgraded to aal2 → redirect to /home
+   - **Fail-closed**: If MFA check throws, login is blocked (prevents MFA bypass)
+
+3. **Security Controls**:
+   - Rate limiting: 5 verify attempts/15min, 10 enrollments/hour, 5 unenrollments/hour
+   - Zod validation on all endpoints (UUID factorId, 6-digit numeric code)
+   - Client-side: 5 max attempts, auto-cancel after max failures
+   - Factor switcher supports both TOTP and SMS
+
+4. **Test Coverage**: 68/68 security tests pass (mfa.test.ts, mfa-status.test.ts, totp-enroll-cachecontrol.test.ts, login-mfa-failclosed.test.ts, webauthn tests)
+
+---
+
 ### Raouf: Wire Security Settings to Login Page — 2026-02-13
 
 **Scope:** Connect security settings from Privacy tab to the login page with visual indicators.

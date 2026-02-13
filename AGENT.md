@@ -1,4 +1,10 @@
 Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Verify TOTP Authenticator App Wiring
+Summary: Verified the full TOTP (Authenticator App) flow is correctly wired end-to-end from settings enrollment through login challenge verification. Traced: (1) Enrollment: TOTPSetup → POST /api/auth/mfa/enroll → Supabase MFA enroll → QR code + secret → POST /api/auth/mfa/verify → challenge + verify → factor verified. (2) Login: loginAction → signInWithPassword (aal1) → getAuthenticatorAssuranceLevel → if nextLevel=aal2, return mfaRequired with factors → MFAChallenge component → POST /api/auth/mfa/challenge-verify → challenge + verify → aal2. (3) Security: rate limiting on all endpoints, fail-closed on MFA check failure, Zod validation, no-cache headers on enrollment, input sanitisation. No issues found — all wiring is correct.
+Files: No files modified (verification audit only).
+Verification: `npm run test` ✅ (442/442 tests pass), 68/68 security tests pass across 7 test files.
+
+Raouf: 2026-02-13 (Australia/Sydney)
 Scope: Wire Security Settings to Login Page
 Summary: Connected security settings from Privacy tab to the login page. (1) Fixed critical bug in passkey status API — was using `adminClient.from('auth.users')` which doesn't work with Supabase JS client for system tables; replaced with `adminClient.rpc('lookup_user_by_email')` matching the pattern used by the passkey options route. (2) Extended passkey status API to also return `mfaEnabled` field by checking verified MFA factors via admin API. (3) Enhanced login page with a "Security Methods" indicator section that appears after entering an email, showing biometric/passkey availability and 2FA status as color-coded badges. (4) Updated passkey button to only be clickable when passkey is actually available (disabled otherwise) with green border highlight when available. (5) Removed redundant passkey status text below button, replaced with the new integrated security methods panel.
 Files: Modified [app/api/auth/passkey/status/route.ts](app/api/auth/passkey/status/route.ts), [app/login/LoginClient.tsx](app/login/LoginClient.tsx).
