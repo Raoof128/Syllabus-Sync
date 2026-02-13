@@ -11,6 +11,9 @@
 
 import { randomBytes, createHash } from 'crypto';
 import { createRateLimiter } from '@/lib/services/rateLimitService';
+import { sendVerificationEmail } from '@/lib/services/emailService';
+import { logger } from '@/lib/logger';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // ============================================================================
 // CONSTANTS
@@ -59,4 +62,63 @@ export function hashToken(token: string): string {
  */
 export function getTokenExpiry(): Date {
   return new Date(Date.now() + EMAIL_VERIFY_TOKEN_EXPIRY_MS);
+}
+
+// ============================================================================
+// ORCHESTRATOR
+// ============================================================================
+
+/**
+ * Create a verification token, store its hash, and send the email.
+ *
+ * Used by:
+ * - Signup route (no user session — uses admin client)
+ * - Send-verification route (authenticated — also uses admin client for DB)
+ *
+ * @param adminClient - Supabase admin client (service_role)
+ * @param userId - User UUID
+ * @param email - User email address
+ * @returns success boolean and optional error message
+ */
+export async function createAndSendVerification(
+  adminClient: SupabaseClient,
+  userId: string,
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
+  // 1. Invalidate previous active tokens for this user
+  await adminClient
+    .from('email_verifications')
+    .update({ used: true })
+    .eq('user_id', userId)
+    .eq('used', false);
+
+  // 2. Generate token and store hash
+  const rawToken = generateVerificationToken();
+  const tokenHash = hashToken(rawToken);
+  const expiresAt = getTokenExpiry();
+
+  const { error: insertError } = await adminClient.from('email_verifications').insert({
+    user_id: userId,
+    token_hash: tokenHash,
+    expires_at: expiresAt.toISOString(),
+  });
+
+  if (insertError) {
+    logger.error('Failed to store verification token', {
+      userId,
+      error: insertError.message,
+    });
+    return { success: false, error: 'Failed to create verification token' };
+  }
+
+  // 3. Send email via Resend (raw token in URL, NOT logged)
+  const result = await sendVerificationEmail({ to: email, token: rawToken });
+
+  if (!result.success) {
+    logger.error('Verification email send failed', { userId });
+    return { success: false, error: 'Failed to send verification email' };
+  }
+
+  logger.info('Verification email sent', { userId });
+  return { success: true };
 }

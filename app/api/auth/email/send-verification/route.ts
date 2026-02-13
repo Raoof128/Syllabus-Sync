@@ -8,12 +8,9 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import {
-  generateVerificationToken,
-  hashToken,
-  getTokenExpiry,
   emailVerifySendLimiter,
+  createAndSendVerification,
 } from '@/lib/security/emailVerification';
-import { sendVerificationEmail } from '@/lib/services/emailService';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 
@@ -21,10 +18,7 @@ import { logger } from '@/lib/logger';
  * POST /api/auth/email/send-verification
  *
  * Sends a verification email to the authenticated user.
- * - Invalidates any previous active tokens for this user
- * - Generates a new token (32 random bytes, hex)
- * - Stores SHA-256 hash in DB (never the raw token)
- * - Sends branded HTML email via Resend
+ * Used for resending verification emails (user already signed in).
  */
 export async function POST(request: NextRequest) {
   // 1. Rate limit (3 sends per hour per IP)
@@ -63,46 +57,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Invalidate previous tokens for this user
-    await adminClient
-      .from('email_verifications')
-      .update({ used: true })
-      .eq('user_id', user.id)
-      .eq('used', false);
-
-    // 5. Generate token and store hash
-    const rawToken = generateVerificationToken();
-    const tokenHash = hashToken(rawToken);
-    const expiresAt = getTokenExpiry();
-
-    const { error: insertError } = await adminClient.from('email_verifications').insert({
-      user_id: user.id,
-      token_hash: tokenHash,
-      expires_at: expiresAt.toISOString(),
-    });
-
-    if (insertError) {
-      logger.error('Failed to store verification token', {
-        userId: user.id,
-        error: insertError.message,
-      });
-      return jsonError('Failed to send verification email', 500, ERROR_CODES.INTERNAL_ERROR);
-    }
-
-    // 6. Send email via Resend (raw token in URL, NOT logged)
-    const email = user.email;
-    if (!email) {
+    // 4. Check user has an email
+    if (!user.email) {
       return jsonError('No email address on account', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    const result = await sendVerificationEmail({ to: email, token: rawToken });
+    // 5. Create token, store hash, send email
+    const result = await createAndSendVerification(adminClient, user.id, user.email);
 
     if (!result.success) {
-      logger.error('Verification email send failed', { userId: user.id });
-      return jsonError('Failed to send verification email', 500, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
+      return jsonError(
+        'Failed to send verification email',
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
-
-    logger.info('Verification email sent', { userId: user.id });
 
     return jsonSuccess({ sent: true });
   } catch (error) {

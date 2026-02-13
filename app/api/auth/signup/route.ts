@@ -12,6 +12,8 @@ import { signupLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
+import { createAndSendVerification } from '@/lib/security/emailVerification';
+import { isEmailServiceConfigured } from '@/lib/services/emailService';
 
 // ============================================================================
 // AUDIT LOGGING HELPER
@@ -299,6 +301,20 @@ export async function POST(request: NextRequest) {
           error: profileError.message,
         });
         // Can't rollback without admin client - log for manual cleanup
+      }
+    }
+
+    // Send custom verification email (production flow)
+    // Skip for dev emails in development (they get auto-confirmed below)
+    if (adminClient && !(isDevelopment && isDevEmail(email))) {
+      if (isEmailServiceConfigured()) {
+        // Fire and forget — don't block signup response on email delivery
+        createAndSendVerification(adminClient, userId, email).catch((err) => {
+          logger.error('Failed to send verification email after signup', {
+            userId,
+            error: err,
+          });
+        });
       }
     }
 
