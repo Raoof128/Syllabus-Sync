@@ -166,6 +166,52 @@ function isMapAsset(url) {
          MAP_ASSETS.some(asset => pathname === asset);
 }
 
+/**
+ * Build a safe offline response for requests that are intentionally network-only.
+ * This prevents unhandled fetch rejections while keeping sensitive routes uncached.
+ */
+function getOfflineResponse(request) {
+  const isDocumentRequest =
+    request.mode === 'navigate' || request.destination === 'document';
+
+  if (isDocumentRequest) {
+    return new Response(
+      '<!doctype html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>Offline</h1><p>Please reconnect and try again.</p></body></html>',
+      {
+        status: 503,
+        statusText: 'Offline',
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      }
+    );
+  }
+
+  const acceptHeader = request.headers.get('accept') || '';
+  const isJsonRequest =
+    acceptHeader.includes('application/json') || request.url.includes('/api/');
+
+  if (isJsonRequest) {
+    return new Response(JSON.stringify({ error: 'Network unavailable' }), {
+      status: 503,
+      statusText: 'Offline',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
+  return new Response('', {
+    status: 503,
+    statusText: 'Offline',
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
 // Fetch event - network-first for most content, cache only static assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -178,7 +224,11 @@ self.addEventListener('fetch', (event) => {
 
   // SECURITY: NEVER cache API, auth routes, or HTML pages - always go to network
   if (!isCacheable(url)) {
-    event.respondWith(fetch(request));
+    event.respondWith(
+      fetch(request).catch(() => {
+        return getOfflineResponse(request);
+      })
+    );
     return;
   }
 

@@ -1,4 +1,22 @@
 Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Map Off-Campus Warning Behavior - 3-Second Popup
+Summary: Changed the off-campus warning banner from persistent display to a timed popup. The banner now appears for 3 seconds only when the user transitions from on-campus to off-campus, then auto-hides. If the user returns on-campus, the popup state and timers are cleared immediately. Navigation disable behavior while off-campus remains unchanged.
+Files: Modified [features/map/components/CampusMap.tsx](features/map/components/CampusMap.tsx).
+Verification: `npm run lint` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Fix Dev HMR WebSocket Failures (/_next/webpack-hmr)
+Summary: Fixed repeated `web-socket.ts:50` failures by excluding all `/_next/*` routes from the Next.js proxy matcher. The previous matcher only excluded `/_next/static` and `/_next/image`, so `/_next/webpack-hmr` could be intercepted by proxy logic and break WebSocket upgrade flow. Updated both proxy matcher definitions to skip `/_next/` entirely.
+Files: Modified [proxy.ts](proxy.ts), [tools/proxy/proxy.ts](tools/proxy/proxy.ts).
+Verification: `npm run lint` ✅, `npm run typecheck` ✅, HMR websocket smoke test to `ws://localhost:3000/_next/webpack-hmr` ✅ (`WS_OPEN`).
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Service Worker Fetch Failure Handling (sw.js:181)
+Summary: Fixed the uncaught promise rejection in the service worker when network-only requests fail offline. Added a `getOfflineResponse()` helper for document, JSON/API, and generic requests, then wrapped the non-cacheable network fetch path in a catch block so it returns controlled `503` `no-store` responses instead of throwing `TypeError: Failed to fetch`.
+Files: Modified [public/sw.js](public/sw.js).
+Verification: `npm run lint` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Map Warning Placement Update - Move Off-Campus Banner to Bottom
 Summary: Updated the off-campus warning placement per user request to render at the bottom of the map instead of top. Changed warning container positioning from top-based offsets to bottom anchoring (`bottom-3 left-3 right-3`) while preserving responsive layout, styling, and readability. This keeps the warning visible and avoids competing with top HUD controls.
 Files: Modified [features/map/components/CampusMap.tsx](features/map/components/CampusMap.tsx).

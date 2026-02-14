@@ -87,9 +87,13 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
     const [overlaysReady, setOverlaysReady] = useState(false);
     const [overlayUrl, setOverlayUrl] = useState<string | null>(null);
+    const [showOffCampusWarning, setShowOffCampusWarning] = useState(false);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const navManagerRef = useRef<NavigationStateManager | null>(null);
     const hasNotifiedReadyRef = useRef(false);
+    const wasOffCampusRef = useRef(false);
+    const offCampusWarningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const offCampusWarningSyncRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Initialize Navigation Manager
     useEffect(() => {
@@ -225,6 +229,53 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       };
     }, [mapValid, mapInstance, isMapReady, isMountedRef, onMapReady]);
 
+    useEffect(() => {
+      const wasOffCampus = wasOffCampusRef.current;
+
+      if (offCampusWarningSyncRef.current) {
+        clearTimeout(offCampusWarningSyncRef.current);
+        offCampusWarningSyncRef.current = null;
+      }
+
+      if (isOffCampus && !wasOffCampus) {
+        offCampusWarningSyncRef.current = setTimeout(() => {
+          setShowOffCampusWarning(true);
+          offCampusWarningSyncRef.current = null;
+        }, 0);
+        if (offCampusWarningTimeoutRef.current) {
+          clearTimeout(offCampusWarningTimeoutRef.current);
+        }
+        offCampusWarningTimeoutRef.current = setTimeout(() => {
+          setShowOffCampusWarning(false);
+          offCampusWarningTimeoutRef.current = null;
+        }, 3000);
+      }
+
+      if (!isOffCampus) {
+        offCampusWarningSyncRef.current = setTimeout(() => {
+          setShowOffCampusWarning(false);
+          offCampusWarningSyncRef.current = null;
+        }, 0);
+        if (offCampusWarningTimeoutRef.current) {
+          clearTimeout(offCampusWarningTimeoutRef.current);
+          offCampusWarningTimeoutRef.current = null;
+        }
+      }
+
+      wasOffCampusRef.current = isOffCampus;
+    }, [isOffCampus]);
+
+    useEffect(() => {
+      return () => {
+        if (offCampusWarningSyncRef.current) {
+          clearTimeout(offCampusWarningSyncRef.current);
+        }
+        if (offCampusWarningTimeoutRef.current) {
+          clearTimeout(offCampusWarningTimeoutRef.current);
+        }
+      };
+    }, []);
+
     // ============================================
     // RENDER
     // ============================================
@@ -298,7 +349,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           )}
         </div>
 
-        {isOffCampus && (
+        {showOffCampusWarning && (
           <div className="absolute bottom-3 left-3 right-3 md:right-auto z-[1000] rounded-mq-lg bg-mq-warning px-4 py-3 text-sm text-white shadow flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2">
             <span className="font-semibold">
               {safeT('locationOutsideCampusTitle', 'Outside campus boundary')}

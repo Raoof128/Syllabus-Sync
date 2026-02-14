@@ -1,3 +1,91 @@
+### Raouf: Map Off-Campus Warning 3-Second Popup - 2026-02-14
+
+**Scope:** Replace persistent off-campus banner with a timed popup.
+**Type:** UX Fix - Map Warning Behavior
+
+#### Changes Applied
+
+1. Added local popup state and timer refs in `CampusMap.tsx`:
+   - `showOffCampusWarning`
+   - transition tracking (`wasOffCampusRef`)
+   - timeout cleanup refs
+2. Updated off-campus effect logic:
+   - show warning only when transitioning to off-campus
+   - auto-hide warning after 3 seconds
+   - clear popup/timers immediately when returning on-campus
+3. Updated warning render condition:
+   - from `isOffCampus` to `showOffCampusWarning`
+4. Added cleanup for all warning timers on unmount.
+
+#### Files Changed
+
+- `features/map/components/CampusMap.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+
+---
+
+### Raouf: Dev HMR WebSocket Stability Fix - 2026-02-14
+
+**Scope:** Fix repeated `web-socket.ts:50` errors for `/_next/webpack-hmr`.
+**Type:** Bug Fix - Dev Tooling / Next.js Proxy
+
+#### Root Cause
+
+The proxy matcher excluded only `/_next/static` and `/_next/image`, but not `/_next/webpack-hmr`. As a result, HMR websocket requests could be routed through proxy logic and fail to upgrade reliably.
+
+#### Changes Applied
+
+1. Updated root proxy matcher in `proxy.ts`:
+   - from `/_next/static|_next/image`
+   - to `/_next/` (exclude all Next internals, including HMR websocket endpoint)
+2. Updated `tools/proxy/proxy.ts` matcher to the same pattern for consistency and future maintainability.
+3. Updated matcher comments to document that `/_next/` exclusion includes HMR websocket traffic.
+
+#### Files Changed
+
+- `proxy.ts`
+- `tools/proxy/proxy.ts`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- Live HMR websocket smoke test ✅ (`ws://localhost:3000/_next/webpack-hmr` opened successfully)
+
+---
+
+### Raouf: Service Worker Fetch Failure Handling - 2026-02-14
+
+**Scope:** Fix `sw.js:181` uncaught `TypeError: Failed to fetch` for network-only routes.
+**Type:** Bug Fix - PWA / Service Worker
+
+#### Root Cause
+
+The network-only branch (`!isCacheable(url)`) called `fetch(request)` without rejection handling. When offline or when a request failed at the network layer, the promise rejection surfaced as an uncaught error in the service worker.
+
+#### Changes Applied
+
+1. Added `getOfflineResponse(request)` in `public/sw.js` to return safe `503` responses with `Cache-Control: no-store` for:
+   - document/navigation requests (minimal offline HTML response)
+   - JSON/API requests (JSON error payload)
+   - other non-cacheable requests (empty `503` response)
+2. Wrapped the non-cacheable `fetch(request)` path in `.catch(...)` and returned `getOfflineResponse(request)` to prevent unhandled promise rejections.
+
+#### Files Changed
+
+- `public/sw.js`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Map Warning Moved to Bottom — 2026-02-14
 
 **Scope:** Move the off-campus warning banner to the bottom of the map.
