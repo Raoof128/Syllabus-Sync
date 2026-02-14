@@ -260,7 +260,10 @@ export default function LoginClient() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex-1 flex flex-col min-w-0">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4 flex-1 flex flex-col min-w-0"
+            >
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-mq-content font-bold">
                   {t('email')}
