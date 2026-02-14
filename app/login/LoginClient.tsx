@@ -19,7 +19,15 @@ import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
 import { MFAChallenge } from './components/MFAChallenge';
-import { AlertTriangle, Eye, EyeOff, Fingerprint, Loader2, Shield, ShieldCheck } from 'lucide-react';
+import {
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  Fingerprint,
+  Loader2,
+  Shield,
+  ShieldCheck,
+} from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTypedTranslation();

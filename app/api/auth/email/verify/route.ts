@@ -12,7 +12,10 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
 const verifySchema = z.object({
-  token: z.string().length(64).regex(/^[0-9a-f]{64}$/),
+  token: z
+    .string()
+    .length(64)
+    .regex(/^[0-9a-f]{64}$/),
 });
 
 /**
@@ -81,16 +84,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Mark user as email-verified via admin API
-    const { error: userUpdateError } = await adminClient.auth.admin.updateUserById(
-      record.user_id,
-      {
-        email_confirm: true,
-        user_metadata: {
-          email_verified_at: new Date().toISOString(),
-          email_verified_method: 'custom_token',
-        },
+    const { error: userUpdateError } = await adminClient.auth.admin.updateUserById(record.user_id, {
+      email_confirm: true,
+      user_metadata: {
+        email_verified_at: new Date().toISOString(),
+        email_verified_method: 'custom_token',
       },
-    );
+    });
 
     if (userUpdateError) {
       logger.error('Failed to confirm user email', {

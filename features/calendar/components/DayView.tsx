@@ -138,8 +138,8 @@ export default function DayView({
   }
 
   return (
-    <div className="flex flex-col h-full bg-mq-card-background border border-mq-border rounded-lg overflow-hidden relative">
-      <div className="flex-1 overflow-y-auto relative no-scrollbar" style={{ height: '600px' }}>
+    <div className="relative flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-mq-border bg-mq-card-background">
+      <div className="relative h-[clamp(28rem,65vh,52rem)] flex-1 overflow-x-hidden overflow-y-auto no-scrollbar md:h-[clamp(32rem,68vh,56rem)]">
         {/* MQ Key Dates Header */}
         {mqKeyDates.length > 0 && (
           <div className="p-3 border-b border-mq-border bg-mq-background-secondary/30 sticky top-0 z-20 backdrop-blur-sm">

@@ -112,7 +112,7 @@ export default function EventDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
@@ -122,7 +122,7 @@ export default function EventDetailPanel({
 
         <div className="space-y-6 py-4">
           {/* Quick Actions */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2 p-2 rounded-lg">
                 <PartyPopper className="h-5 w-5 text-mq-content-secondary" />
@@ -145,7 +145,7 @@ export default function EventDetailPanel({
           </div>
 
           {/* Info Cards */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Category */}
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">

@@ -321,7 +321,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           </div>
 
           {/* Location (Building and optional Room) */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="building">
                 {t('buildingLabel')} <span className="text-mq-error">*</span>
@@ -396,8 +396,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                     key={ct.id}
                     className={`p-3 border rounded-lg ${hasTimeError ? 'border-mq-error' : ''}`}
                   >
-                    <div className="flex items-start gap-2">
-                      <div className="flex-1 grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-start gap-2 sm:flex-row">
+                      <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
                         {/* Day */}
                         <div className="space-y-1">
                           <Label className="text-xs">{t('day')}</Label>
@@ -451,7 +451,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         variant="ghost"
                         size="sm"
                         onClick={() => removeClassTime(ct.id)}
-                        className="mt-6"
+                        className="mt-1 sm:mt-6"
                         aria-label={t('removeClassTime')}
                       >
                         <X className="w-4 h-4" />

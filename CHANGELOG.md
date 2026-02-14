@@ -1,3 +1,131 @@
+### Raouf: Calendar Responsive Follow-Up (Dialogs & Forms) — 2026-02-14
+
+**Scope:** Complete calendar-page responsiveness by fixing remaining dialog/form breakpoint issues.
+**Type:** UI Responsiveness — Follow-up
+
+#### Additional Root Causes Found
+
+1. Several calendar-linked forms/details still used fixed multi-column grids on phone widths (`grid-cols-2`, `grid-cols-3`, `grid-cols-4`).
+2. Custom delete/todo modals in `CalendarClient` used large fixed padding and horizontal action rows, crowding 360–430px screens.
+3. Main calendar wrapper overflow behavior could still constrain stacked mobile/tablet flow.
+4. Quick-action rows in detail panels did not wrap when content/actions were long.
+
+#### Changes Applied
+
+1. **Calendar wrapper + custom modals (`app/calendar/CalendarClient.tsx`)**
+   - Made overflow behavior breakpoint-aware for stacked layouts:
+     - Wrapper now uses desktop-only hidden overflow: `lg:overflow-hidden`.
+     - Main pane uses desktop-only internal scrolling: `lg:overflow-y-auto lg:overflow-x-hidden`.
+   - Updated all custom confirm/todo modal panels:
+     - `p-6 -> p-4 sm:p-6`
+     - `max-h-[90vh] -> max-h-[calc(100vh-2rem)]`
+     - action rows now stack on mobile: `flex-col-reverse sm:flex-row sm:justify-end`
+
+2. **Forms (mobile-first field grids)**
+   - `components/assignments/AssignmentForm.tsx`: date/time row `grid-cols-1 sm:grid-cols-2`
+   - `components/events/EventForm.tsx`: date/time and building/room rows `grid-cols-1 sm:grid-cols-2`; delete-confirm inline row now wraps
+   - `components/exams/ExamForm.tsx`: building/room and date/time rows `grid-cols-1 sm:grid-cols-2`
+   - `components/units/UnitForm.tsx`:
+     - location row `grid-cols-1 sm:grid-cols-2`
+     - class-time row changed to mobile-first stacking with `sm:flex-row`
+     - day/start/end controls `grid-cols-1 sm:grid-cols-3`
+
+3. **Detail dialogs (card grids + action wrapping)**
+   - `components/assignments/AssignmentDetailPanel.tsx`
+   - `components/events/EventDetailPanel.tsx`
+   - `components/exams/ExamDetailPanel.tsx`
+   - `features/calendar/components/TodoDetailPanel.tsx`
+   - For all above:
+     - dialog max-height updated to `max-h-[calc(100vh-2rem)]`
+     - top action rows now wrap (`flex-wrap`, `gap-3`)
+     - info-card grids now `grid-cols-1 sm:grid-cols-2`
+   - `TodoDetailPanel`: due-date card span adjusted to `col-span-1 sm:col-span-2` to prevent narrow-grid overflow.
+
+4. **Unit detail + skeleton**
+   - `components/units/UnitDetailPanel.tsx`:
+     - dialog max-height updated to `max-h-[calc(100vh-2rem)]`
+     - header row/actions now wrap on small screens
+     - stats grid `grid-cols-2 sm:grid-cols-4`
+   - `components/events/EventFormSkeleton.tsx`: placeholder grid `grid-cols-1 sm:grid-cols-2`
+
+#### Files Changed
+
+- `app/calendar/CalendarClient.tsx`
+- `components/assignments/AssignmentForm.tsx`
+- `components/events/EventForm.tsx`
+- `components/exams/ExamForm.tsx`
+- `components/units/UnitForm.tsx`
+- `components/assignments/AssignmentDetailPanel.tsx`
+- `components/events/EventDetailPanel.tsx`
+- `components/exams/ExamDetailPanel.tsx`
+- `features/calendar/components/TodoDetailPanel.tsx`
+- `components/units/UnitDetailPanel.tsx`
+- `components/events/EventFormSkeleton.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/CalendarPage.test.tsx` ✅ (4/4 tests pass)
+- `npm run lighthouse:local` attempted again, but local `lhci` still exits with `Hello, this is AnupamAS01!` and produces no report artifact in this environment.
+
+---
+
+### Raouf: Calendar Page Responsive Breakpoint Fixes — 2026-02-14
+
+**Scope:** Make `/calendar` fully responsive across phone/tablet/laptop/wide breakpoints without redesign.
+**Type:** UI Responsiveness — Layout/Overflow
+
+#### Root Causes Found
+
+1. Main content + sidebar container stayed in horizontal flex mode at all sizes, which could clip/hide sidebar widgets on smaller breakpoints.
+2. Week view used `md:grid-cols-7`, forcing a dense 7-column calendar starting at 768px.
+3. Desktop header controls had no wrapping strategy, causing overflow pressure at intermediate widths.
+4. Day view used fixed `height: 600px`, causing clipping on short screens and poor scaling on larger ones.
+5. Calendar page and skeleton spacing used rigid padding/widths that were less resilient on narrow phones.
+
+#### Changes Applied
+
+1. **Calendar page spacing (`app/calendar/page.tsx`)**
+   - Updated main container to responsive spacing: `px-3 py-4 sm:px-6 sm:py-6`.
+   - Updated skeleton widths/padding to avoid narrow-screen overflow.
+
+2. **Main calendar layout (`app/calendar/CalendarClient.tsx`)**
+   - Changed main body wrapper to `flex-col` on mobile/tablet and `lg:flex-row` on larger screens.
+   - Added `min-w-0` to primary scroll container to prevent flex overflow.
+   - Updated week grid breakpoints to progressive columns: `1 -> 2 -> 3 -> 7` (`xl` for 7-day layout).
+   - Improved header responsiveness: wrapped desktop control groups and reduced rigid spacing.
+   - Improved mobile header wrapping/truncation for long month text.
+
+3. **Sidebar sizing (`features/calendar/components/CalendarSidebar.tsx`)**
+   - Kept full width below `lg`, and tuned desktop width to `lg:w-[22rem] xl:w-96` for better laptop balance.
+
+4. **Day view viewport fitting (`features/calendar/components/DayView.tsx`)**
+   - Replaced fixed `height: 600px` with responsive clamped heights:
+     - `h-[clamp(28rem,65vh,52rem)]`
+     - `md:h-[clamp(32rem,68vh,56rem)]`
+   - Kept internal scroll behavior and prevented horizontal overflow.
+
+5. **Filter action alignment (`features/calendar/components/FilterPanel.tsx`)**
+   - Adjusted action row span/alignment so controls don’t crowd at tablet/laptop widths.
+
+#### Files Changed
+
+- `app/calendar/page.tsx`
+- `app/calendar/CalendarClient.tsx`
+- `features/calendar/components/CalendarSidebar.tsx`
+- `features/calendar/components/DayView.tsx`
+- `features/calendar/components/FilterPanel.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/CalendarPage.test.tsx` ✅ (4/4 tests pass)
+- Lighthouse attempted via `npm run lighthouse:local` and direct `npx lhci collect ...`, but the configured `lhci` command exits immediately with `Hello, this is AnupamAS01!` in this environment, so no report artifact was generated.
+
+---
+
 ### Raouf: Fix Select Dropdown Scroll & Notification Bulk Delete — 2026-02-13
 
 **Scope:** Fix two bugs — non-scrollable Select dropdown and missing notification clear endpoint.
@@ -28,6 +156,7 @@
 **Type:** UI Polish — Settings Page
 
 **Changes:**
+
 - **BiometricToggle**: Replaced text "Enable"/"Disable" ghost button with standard `ToggleControl` switch. Removed round icon container and Badge pills. Toggle opens confirmation dialog.
 - **TOTPSetup**: Same treatment — replaced text button with `ToggleControl` switch, removed round icon container and Badge.
 - **PasskeyManager**: Removed round icon container and Badge. Simplified to standard row layout with inline icon. "Add" button styled consistently with other settings buttons.

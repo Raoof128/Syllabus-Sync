@@ -92,17 +92,17 @@ export const metadata: Metadata = {
 // Skeleton loader for calendar page
 function CalendarSkeleton() {
   return (
-    <div className="container mx-auto p-6 max-w-7xl animate-pulse">
+    <div className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:px-6 sm:py-6">
       {/* Header skeleton */}
       <div className="mb-8">
-        <div className="h-10 bg-mq-background-secondary rounded-mq w-48 mb-2" />
-        <div className="h-5 bg-mq-background-secondary rounded-mq w-80" />
+        <div className="mb-2 h-10 w-40 rounded-mq bg-mq-background-secondary sm:w-48" />
+        <div className="h-5 w-full max-w-80 rounded-mq bg-mq-background-secondary" />
       </div>
 
       {/* Calendar card skeleton */}
       <div className="mq-magic-card">
         <div className="mq-magic-card-content p-6 bg-mq-card-background border border-mq-border">
-          <div className="h-8 bg-mq-background-secondary rounded-mq w-56 mb-6" />
+          <div className="mb-6 h-8 w-48 rounded-mq bg-mq-background-secondary sm:w-56" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -127,7 +127,11 @@ export default function CalendarPage() {
 
   return (
     <Suspense fallback={<CalendarSkeleton />}>
-      <main id="main-content" className="container mx-auto p-6 max-w-7xl calendar-page" role="main">
+      <main
+        id="main-content"
+        className="calendar-page container mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6"
+        role="main"
+      >
         {/* Structured Data for Calendar (JSON-LD) */}
         <script
           type="application/ld+json"

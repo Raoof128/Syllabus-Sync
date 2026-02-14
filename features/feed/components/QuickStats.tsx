@@ -161,9 +161,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
                 {dialogState.events.length === 0 ? (
                   <p className="text-center py-8 text-mq-content-tertiary">No events found</p>
                 ) : (
-                  dialogState.events.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))
+                  dialogState.events.map((event) => <EventCard key={event.id} event={event} />)
                 )}
               </div>
               <div className="flex justify-end mt-4">

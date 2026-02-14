@@ -1,12 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import {
-  jsonSuccess,
-  jsonError,
-  jsonUnauthorized,
-  ERROR_CODES,
-} from '@/app/api/_lib/response';
+import { jsonSuccess, jsonError, jsonUnauthorized, ERROR_CODES } from '@/app/api/_lib/response';
 import {
   emailVerifySendLimiter,
   createAndSendVerification,
@@ -27,12 +22,10 @@ export async function POST(request: NextRequest) {
 
   if (!allowed) {
     logger.warn('Email verification rate limit exceeded', { clientIP });
-    return jsonError(
-      'Too many requests. Please try again later.',
-      429,
-      ERROR_CODES.RATE_LIMITED,
-      { retryAfter: resetIn, remaining },
-    );
+    return jsonError('Too many requests. Please try again later.', 429, ERROR_CODES.RATE_LIMITED, {
+      retryAfter: resetIn,
+      remaining,
+    });
   }
 
   try {
@@ -66,11 +59,7 @@ export async function POST(request: NextRequest) {
     const result = await createAndSendVerification(adminClient, user.id, user.email);
 
     if (!result.success) {
-      return jsonError(
-        'Failed to send verification email',
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
+      return jsonError('Failed to send verification email', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
     return jsonSuccess({ sent: true });

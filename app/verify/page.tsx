@@ -13,10 +13,7 @@ export default function VerifyPage() {
   const router = useRouter();
 
   const token = searchParams.get('token');
-  const isValidFormat = useMemo(
-    () => !!token && /^[0-9a-f]{64}$/.test(token),
-    [token],
-  );
+  const isValidFormat = useMemo(() => !!token && /^[0-9a-f]{64}$/.test(token), [token]);
 
   // If token format is invalid, start in error state (no effect needed)
   const [state, setState] = useState<VerifyState>(isValidFormat ? 'loading' : 'error');

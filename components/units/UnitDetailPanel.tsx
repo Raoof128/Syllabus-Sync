@@ -180,9 +180,9 @@ export default function UnitDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-start gap-3">
             <div
               className="w-12 h-12 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${unit.color}20` }}
@@ -193,7 +193,7 @@ export default function UnitDetailPanel({
               <DialogTitle className="text-xl">{unit.code}</DialogTitle>
               <p className="text-sm text-mq-content-secondary">{unit.name}</p>
             </div>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
               <ItemActionButtons
                 itemType="unit"
                 itemId={unit.id}
@@ -259,7 +259,7 @@ export default function UnitDetailPanel({
         )}
 
         {/* Stats Summary */}
-        <div className="grid grid-cols-4 gap-3 py-3">
+        <div className="grid grid-cols-2 gap-3 py-3 sm:grid-cols-4">
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary">
             <div className="text-2xl font-bold" style={{ color: unit.color }}>
               {stats.total}

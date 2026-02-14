@@ -118,7 +118,7 @@ export default function FilterPanel({
               </div>
             </div>
 
-            <div className="col-span-1 md:col-span-2 lg:col-span-2 flex justify-end items-end h-full">
+            <div className="col-span-1 flex h-full items-end justify-start md:col-span-2 md:justify-end lg:col-span-4 xl:col-span-2">
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" onClick={resetFilters} className="text-xs">
                   Reset

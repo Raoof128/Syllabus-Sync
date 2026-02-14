@@ -337,7 +337,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           </div>
 
           {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="event-date">
                 {t('date')} <span className="text-mq-error">*</span>
@@ -382,7 +382,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           </div>
 
           {/* Building and Room */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="event-building">
                 {t('building')} <span className="text-mq-error">*</span>
@@ -459,7 +459,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
             </Button>
           )}
           {showDeleteConfirm && (
-            <div className="flex items-center gap-2 mr-auto">
+            <div className="mr-auto flex flex-wrap items-center gap-2">
               <span className="text-sm text-mq-error">{t('confirmDelete')}</span>
               <Button variant="destructive" size="sm" onClick={handleDelete}>
                 {t('yes')}

@@ -329,14 +329,14 @@ export default function CalendarClient() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-mq-background">
+    <div className="flex h-full min-h-0 flex-col bg-mq-background">
       {/* Mobile Header (Date Selector) */}
       <div className="md:hidden flex flex-col bg-mq-card-background border-b border-mq-border sticky top-0 z-20">
-        <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-mq-content">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4">
+          <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-mq-content sm:text-xl">
             {formatMonthYear(dayjs(currentWeekStart).add(mobileSelectedDayIndex, 'day').toDate())}
           </h1>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <Button variant="ghost" size="icon" onClick={goToPreviousWeek}>
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -376,11 +376,11 @@ export default function CalendarClient() {
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden md:block sticky top-0 z-30 bg-mq-background pb-4 pt-6 px-6">
+      <div className="hidden md:block sticky top-0 z-30 bg-mq-background px-4 pb-4 pt-4 lg:px-6 lg:pt-6">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-mq-content">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-mq-content lg:text-3xl">
                 {formatMonthYear(currentWeekStart)}
               </h1>
               <p className="text-mq-content-secondary mt-1">
@@ -393,8 +393,8 @@ export default function CalendarClient() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex bg-mq-card-background rounded-lg p-1 border border-mq-border">
+            <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+              <div className="flex flex-wrap bg-mq-card-background rounded-lg p-1 border border-mq-border">
                 <Button
                   variant={view === 'week' ? 'secondary' : 'ghost'}
                   size="sm"
@@ -436,7 +436,7 @@ export default function CalendarClient() {
               <Button
                 variant={isFiltersOpen ? 'secondary' : 'outline'}
                 onClick={handleToggleFilters}
-                className="gap-2"
+                className="gap-2 whitespace-nowrap"
               >
                 <Calendar className="h-4 w-4" />
                 {t('filter')}
@@ -455,12 +455,12 @@ export default function CalendarClient() {
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 pb-24 md:pb-6 scrollbar-hide">
+      <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        <div className="order-1 flex-1 min-w-0 overflow-visible p-4 pb-24 scrollbar-hide md:p-6 md:pb-6 lg:overflow-x-hidden lg:overflow-y-auto">
           {/* Week View */}
           {view === 'week' && (
             <ScrollReveal>
-              <div className="grid grid-cols-1 md:grid-cols-7 gap-4 min-h-[calc(100vh-200px)]">
+              <div className="grid grid-cols-1 gap-4 min-h-[calc(100vh-200px)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
                 {weekDays.map((date, index) => {
                   const { dayDeadlines, dayEvents } = getItemsForDay(date);
                   const dayUnits = getUnitsForDay(date);
@@ -639,7 +639,7 @@ export default function CalendarClient() {
         </div>
 
         {/* Sticky Sidebar with Widgets */}
-        <CalendarSidebar>
+        <CalendarSidebar className="order-2 lg:order-none">
           <CalendarWidgets
             onAddAssignment={openAddAssignment}
             onEditAssignment={openEditAssignment}
@@ -726,7 +726,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Units */}
       {deleteConfirmOpen && unitToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -739,7 +739,7 @@ export default function CalendarClient() {
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">{t('deleteUnitConfirmDesc')}</p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -764,7 +764,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Assignments */}
       {assignmentDeleteConfirmOpen && assignmentToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-600" />
@@ -780,7 +780,7 @@ export default function CalendarClient() {
               {t('deleteAssignmentConfirmDesc' as TranslationKey) ||
                 'This action cannot be undone. Are you sure you want to delete this assignment?'}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -805,7 +805,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Exams */}
       {examDeleteConfirmOpen && examToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-600" />
@@ -821,7 +821,7 @@ export default function CalendarClient() {
               {t('deleteExamConfirmDesc' as TranslationKey) ||
                 'This action cannot be undone. Are you sure you want to delete this exam?'}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -846,7 +846,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Deadlines */}
       {deadlineDeleteConfirmOpen && deadlineToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-600" />
@@ -862,7 +862,7 @@ export default function CalendarClient() {
               {t('deleteDeadlineConfirmDesc' as TranslationKey) ||
                 'This action cannot be undone. Are you sure you want to delete this deadline?'}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -887,7 +887,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Events */}
       {eventDeleteConfirmOpen && eventToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-600" />
@@ -903,7 +903,7 @@ export default function CalendarClient() {
               {t('deleteEventConfirmDesc' as TranslationKey) ||
                 'This action cannot be undone. Are you sure you want to delete this event?'}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -928,7 +928,7 @@ export default function CalendarClient() {
       {/* Delete Confirmation Modal for Todos */}
       {todoDeleteConfirmOpen && todoToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
                 <Trash2 className="h-5 w-5 text-red-600" />
@@ -946,7 +946,7 @@ export default function CalendarClient() {
                 'This action cannot be undone. Are you sure you want to delete this task?',
               )}
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -977,7 +977,7 @@ export default function CalendarClient() {
       {/* Todo Modal */}
       {todoDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
                 <Edit2 className="h-5 w-5 text-emerald-600" />
@@ -1126,7 +1126,7 @@ export default function CalendarClient() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
                 <Button
                   type="button"
                   variant="outline"

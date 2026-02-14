@@ -144,9 +144,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                       <div className="flex items-center gap-3 flex-1">
                         <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-mq-sm font-medium text-mq-content">
-                            SMS Verification
-                          </p>
+                          <p className="text-mq-sm font-medium text-mq-content">SMS Verification</p>
                           <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                             SMS verification coming soon
                           </p>

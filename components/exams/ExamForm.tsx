@@ -306,7 +306,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </div>
 
             {/* Building and Room */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-building">
                   {t('building' as TranslationKey) || 'Building'}{' '}
@@ -333,7 +333,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </div>
 
             {/* Exam Date and Time */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-date">
                   {t('examDate' as TranslationKey) || 'Exam Date'}{' '}
