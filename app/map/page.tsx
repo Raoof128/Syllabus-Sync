@@ -29,11 +29,11 @@ export const metadata: Metadata = {
 // Skeleton loader for map page - mimics map layout
 function MapSkeleton() {
   return (
-    <div className="container mx-auto p-4 max-w-7xl animate-pulse">
+    <div className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:p-4">
       {/* Header skeleton */}
       <div className="mb-6">
-        <div className="h-10 bg-mq-background-secondary rounded-mq w-48 mb-2" />
-        <div className="h-5 bg-mq-background-secondary rounded-mq w-72" />
+        <div className="mb-2 h-10 w-40 rounded-mq bg-mq-background-secondary sm:w-48" />
+        <div className="h-5 w-full max-w-72 rounded-mq bg-mq-background-secondary" />
       </div>
 
       {/* Search skeleton */}
@@ -53,7 +53,7 @@ function MapSkeleton() {
       {/* Building grid skeleton */}
       <div className="bg-mq-card-background rounded-mq-lg border border-mq-border p-4">
         <div className="h-8 bg-mq-background-secondary rounded-mq w-48 mb-4" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="h-20 bg-mq-background-secondary rounded-mq-lg" />
           ))}

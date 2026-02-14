@@ -299,7 +299,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         </div>
 
         {isOffCampus && (
-          <div className="absolute top-3 left-3 right-3 md:right-auto z-[1200] px-4 py-3 rounded-mq-lg bg-mq-warning text-white text-sm shadow flex items-start gap-2">
+          <div className="absolute bottom-3 left-3 right-3 md:right-auto z-[1000] rounded-mq-lg bg-mq-warning px-4 py-3 text-sm text-white shadow flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2">
             <span className="font-semibold">
               {safeT('locationOutsideCampusTitle', 'Outside campus boundary')}
             </span>
@@ -387,7 +387,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 zIndexOffset={1000}
               >
                 <reactLeafletModule.Popup>
-                  <div className="p-3 min-w-[260px] max-w-[320px]">
+                  <div className="p-3 w-[min(320px,calc(100vw-5rem))]">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <h3 className="font-bold text-base leading-tight text-mq-content flex-1">
                         {t(selectedBuilding.translationKey)}

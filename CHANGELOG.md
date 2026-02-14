@@ -1,3 +1,144 @@
+### Raouf: Map Warning Moved to Bottom — 2026-02-14
+
+**Scope:** Move the off-campus warning banner to the bottom of the map.
+**Type:** UI Adjustment — Positioning
+
+#### Change Applied
+
+1. **Warning position update (`features/map/components/CampusMap.tsx`)**
+   - Repositioned off-campus warning from top placement to bottom placement:
+     - from top-based offsets
+     - to `bottom-3 left-3 right-3`
+   - Kept existing styling and responsive stacking behavior intact.
+
+#### Files Changed
+
+- `features/map/components/CampusMap.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/map` ✅ (64/64 tests pass)
+
+---
+
+### Raouf: Map Off-Campus Warning Overlap Fix — 2026-02-14
+
+**Scope:** Prevent off-campus warning from blocking mobile Places/search access on `/map`.
+**Type:** UI Responsiveness — Layering/Position Fix
+
+#### Root Cause
+
+The off-campus warning banner was positioned at `top-3` with `z-[1200]`, which overlaid the mobile top-left Places quick button and made building search hard to access.
+
+#### Changes Applied
+
+1. **Warning offset on mobile**
+   - Changed warning top offset to `top-14` on small screens, while keeping `sm:top-3` on larger screens.
+
+2. **Layer priority adjustment**
+   - Lowered warning layer from `z-[1200]` to `z-[1000]` so HUD controls remain interactive.
+
+#### Files Changed
+
+- `features/map/components/CampusMap.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/map` ✅ (64/64 tests pass)
+
+---
+
+### Raouf: Map Mobile Search Toggle Visibility Fix — 2026-02-14
+
+**Scope:** Ensure building search is discoverable in responsive/mobile mode on `/map`.
+**Type:** UI Responsiveness — UX Fix
+
+#### Root Cause
+
+After responsive updates, the Places panel was collapsed on mobile by default and users could miss where to open building search.
+
+#### Changes Applied
+
+1. **Mobile quick access button (`features/map/components/CampusMapHUD.tsx`)**
+   - Added a small floating `Places` button (`sm:hidden`) at top-left when the panel is collapsed.
+   - Button opens the panel and triggers light haptic feedback.
+
+2. **Collapsed panel visibility behavior**
+   - Left Places panel is now hidden on mobile when collapsed and remains available on desktop:
+     - `!isPlacesPanelExpanded && 'hidden sm:flex'`
+   - This keeps map view clean while preserving obvious entry point for search.
+
+#### Files Changed
+
+- `features/map/components/CampusMapHUD.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/map` ✅ (64/64 tests pass)
+
+---
+
+### Raouf: Map Page Responsive Breakpoint Fixes — 2026-02-14
+
+**Scope:** Make `/map` fully responsive across phone/tablet/laptop/wide breakpoints without redesign.
+**Type:** UI Responsiveness — Layout/Overflow
+
+#### Root Causes Found
+
+1. Map page shell and skeleton used rigid spacing and dense default grids on narrow devices.
+2. Map layers header/actions could crowd at intermediate widths due non-wrapping layout.
+3. Overlay toggle cards rendered as two columns at all small widths, compressing content on phones.
+4. Active-layer action row (`Copy Link` / `Clear All`) could overflow horizontally.
+5. HUD Places panel defaulted expanded on mobile (contrary to intended behavior) and consumed excessive viewport width.
+6. Off-campus warning and selected-building popup width constraints could become tight on narrow screens.
+
+#### Changes Applied
+
+1. **Map page shell/skeleton (`app/map/page.tsx`)**
+   - Updated skeleton container spacing to mobile-first: `px-3 py-4 sm:p-4`.
+   - Made heading skeleton widths fluid (`w-full max-w-*`).
+   - Building skeleton grid now progressive: `grid-cols-1 sm:grid-cols-2 md:grid-cols-4`.
+
+2. **Map page main layout controls (`features/map/components/MapClient.tsx`)**
+   - Updated page section spacing to mobile-first (`px-3 py-4 sm:p-4`).
+   - Scaled heading typography for phones: `text-mq-2xl sm:text-mq-3xl`.
+   - Refactored map-layer header row to wrap on small widths (no control crowding).
+   - Overlay toggle grid now progressive: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`.
+   - Active-layer action row now stacks on mobile and aligns horizontally on larger screens.
+
+3. **HUD responsiveness (`features/map/components/CampusMapHUD.tsx`)**
+   - Implemented intended behavior: Places panel collapsed by default on mobile, expanded on desktop (`matchMedia('(min-width: 640px)')` sync).
+   - Reduced mobile Places panel width to avoid overlap pressure with top-right toolbar:
+     - `w-[min(240px,calc(100vw-24px))]` on mobile
+     - `sm:w-[min(320px,calc(100vw-24px))]` on larger sizes.
+
+4. **Map overlays/readability (`features/map/components/CampusMap.tsx`)**
+   - Off-campus warning banner now stacks text on mobile (`flex-col`) and restores row layout on larger screens.
+   - Selected-building popup content width changed from fixed min/max widths to viewport-constrained width:
+     - `w-[min(320px,calc(100vw-5rem))]`.
+
+#### Files Changed
+
+- `app/map/page.tsx`
+- `features/map/components/MapClient.tsx`
+- `features/map/components/CampusMapHUD.tsx`
+- `features/map/components/CampusMap.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/map` ✅ (64/64 tests pass)
+- `npm run lighthouse:local` attempted, but local `lhci` still exits with `Hello, this is AnupamAS01!` and does not generate a report artifact in this environment.
+
+---
+
 ### Raouf: Calendar Responsive Follow-Up (Dialogs & Forms) — 2026-02-14
 
 **Scope:** Complete calendar-page responsiveness by fixing remaining dialog/form breakpoint issues.

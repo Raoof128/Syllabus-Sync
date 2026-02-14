@@ -47,8 +47,19 @@ export default function CampusMapHUD({
   const searchParams = useSearchParams();
   const layersParam = searchParams.get('layers');
 
-  // Mobile: Places panel is collapsed by default, expanded on desktop
-  const [isPlacesPanelExpanded, setIsPlacesPanelExpanded] = useState(true);
+  // Mobile: Places panel is collapsed by default, expanded on desktop.
+  const [isPlacesPanelExpanded, setIsPlacesPanelExpanded] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 640px)');
+    const syncExpandedState = () => {
+      setIsPlacesPanelExpanded(mediaQuery.matches);
+    };
+
+    syncExpandedState();
+    mediaQuery.addEventListener('change', syncExpandedState);
+    return () => mediaQuery.removeEventListener('change', syncExpandedState);
+  }, []);
 
   const buildMapHref = useCallback(
     (buildingId?: string) => {
@@ -86,6 +97,26 @@ export default function CampusMapHUD({
 
   return (
     <div className="absolute inset-0 z-[1100] pointer-events-none">
+      {/* Mobile quick access button for building search/panel */}
+      {!isPlacesPanelExpanded && (
+        <div className="absolute top-3 left-3 pointer-events-auto sm:hidden">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-9 gap-1.5 rounded-full border border-mq-border bg-mq-card-background/95 px-3 text-mq-content shadow-md backdrop-blur-sm"
+            onClick={() => {
+              setIsPlacesPanelExpanded(true);
+              triggerHaptic('tap', 'light');
+            }}
+            aria-label={t('places')}
+            title={t('places')}
+          >
+            <Building2 className="h-4 w-4" />
+            <span className="text-xs font-medium">{t('places')}</span>
+          </Button>
+        </div>
+      )}
+
       {/* Top-right actions - Floating Toolbar */}
       <div className="absolute top-3 right-3 pointer-events-auto">
         <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
@@ -115,7 +146,12 @@ export default function CampusMapHUD({
       </div>
 
       {/* Left sidebar */}
-      <div className="absolute top-3 left-3 w-[min(280px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]">
+      <div
+        className={cn(
+          'absolute top-3 left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]',
+          !isPlacesPanelExpanded && 'hidden sm:flex',
+        )}
+      >
         {/* Screen reader announcement for search results */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}

@@ -325,7 +325,7 @@ export default function MapClient() {
   return (
     <LazyMotion features={domAnimation}>
       <section
-        className="container mx-auto p-4 max-w-7xl map-page relative"
+        className="container mx-auto max-w-7xl map-page relative px-3 py-4 sm:p-4"
         aria-label={t('campusMapLabel')}
       >
         {/* Skip Link - Keyboard Accessibility (only visible when focused) */}
@@ -345,7 +345,7 @@ export default function MapClient() {
 
         {/* Header */}
         <header className="mb-6">
-          <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('map')}</h1>
+          <h1 className="mb-2 text-mq-2xl font-bold text-mq-content sm:text-mq-3xl">{t('map')}</h1>
           <p className="text-mq-content-secondary">
             {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
           </p>
@@ -355,15 +355,15 @@ export default function MapClient() {
         <div className="mb-4">
           <MagicCard isLiquidEnhanced>
             <div className="mq-magic-card-content p-4 bg-mq-card-background border border-mq-border">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+              <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-start gap-3">
                   <Layers className="h-5 w-5" />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-mq-sm font-medium text-mq-content">{t('mapLayers')}</p>
                     <p className="text-mq-xs text-mq-content-secondary">{t('mapLayersDesc')}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                   {activeOverlays.length > 0 && (
                     <Badge variant="secondary" className="text-xs">
                       {activeOverlays.length} {t('active')}
@@ -376,7 +376,7 @@ export default function MapClient() {
                     ref={overlayToggleButtonRef}
                     aria-expanded={showOverlayPanel}
                     aria-controls="map-overlays-panel"
-                    className="gap-2"
+                    className="gap-2 whitespace-nowrap"
                   >
                     <Layers className="h-4 w-4" />
                     {showOverlayPanel ? t('hideLayers') : t('showLayers')}
@@ -395,7 +395,7 @@ export default function MapClient() {
                   tabIndex={-1}
                   className="space-y-3 pt-3 border-t border-mq-border"
                 >
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {mapOverlays.map((overlay) => {
                       const Icon = OVERLAY_ICONS[overlay.id];
                       const isActive = activeOverlays.includes(overlay.id);
@@ -460,7 +460,7 @@ export default function MapClient() {
                     })}
                   </div>
                   {activeOverlays.length > 0 && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -489,7 +489,7 @@ export default function MapClient() {
             <Card className="border border-mq-border bg-mq-card-background">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>{t('interactiveCampusMap')}</CardTitle>
+                  <CardTitle className="min-w-0 break-words">{t('interactiveCampusMap')}</CardTitle>
                   <p className="text-xs text-mq-content-tertiary hidden md:block">
                     {t('mapPanZoomHint')}
                   </p>
