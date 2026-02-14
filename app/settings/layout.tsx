@@ -85,23 +85,23 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
       {/* Hero Header Shell */}
       <div className="relative bg-mq-background/80 backdrop-blur-xl border-b border-mq-border sticky top-0 z-40 transition-all duration-300 supports-[backdrop-filter]:bg-mq-background/60">
         <div className="absolute inset-0 bg-gradient-to-r from-mq-primary/5 via-transparent to-mq-secondary/5 opacity-50 pointer-events-none" />
-        <div className="container mx-auto px-4 py-4 sm:px-6 max-w-7xl relative">
+        <div className="container mx-auto max-w-7xl px-3 py-3 sm:px-6 sm:py-4 relative">
           <div className="flex items-center gap-3 mb-1">
             <div className="p-2 rounded-lg bg-mq-primary/10 text-mq-primary">
               <Settings className="h-5 w-5" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-mq-content tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-bold text-mq-content tracking-tight">
               {t('settingsTitle')}
             </h1>
           </div>
-          <p className="text-sm text-mq-content-secondary ml-[44px] max-w-md">
+          <p className="text-sm text-mq-content-secondary mt-1 max-w-md sm:ml-[44px]">
             {t('settingsSubtitle')}
           </p>
         </div>
 
         {/* Mobile Navigation (Horizontal Scroll) */}
         <div className="lg:hidden w-full overflow-x-auto scrollbar-hide border-t border-mq-border/50">
-          <div className="flex items-center px-4 py-2 gap-2 min-w-max">
+          <div className="flex items-center px-3 sm:px-4 py-2 gap-2 min-w-max">
             {SECTIONS.map((section) => {
               const Icon = section.icon;
               const isActive = activeSectionId === section.id;
@@ -125,8 +125,8 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="lg:grid lg:grid-cols-[260px_1fr] gap-8 lg:gap-12 items-start">
+      <main className="container mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
+        <div className="lg:grid lg:grid-cols-[260px_1fr] gap-6 lg:gap-10 items-start">
           {/* Desktop Sidebar Navigation */}
           <aside className="hidden lg:block sticky top-32 space-y-1">
             <div className="mb-4 px-3 text-xs font-semibold text-mq-content-tertiary uppercase tracking-wider">
@@ -164,7 +164,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
           </aside>
 
           {/* Settings Content Area */}
-          <div className="min-h-[500px]">
+          <div className="min-h-[420px] sm:min-h-[500px] min-w-0">
             {!isClient ? (
               <SettingsSkeleton t={t} />
             ) : (

@@ -42,12 +42,12 @@ const QuickActions = memo(({ t }: QuickActionsProps) => {
               <Button
                 key={href}
                 variant="ghost"
-                className="w-full justify-start rounded-mq-lg bg-mq-card-background text-mq-content border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
+                className="w-full h-auto py-2 justify-start rounded-mq-lg bg-mq-card-background text-mq-content border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
                 asChild
               >
                 <Link href={href} data-testid={`quick-action-${href.replace('/', '')}`}>
                   <Icon className="h-4 w-4 mr-2" aria-hidden="true" />
-                  {label}
+                  <span className="min-w-0 break-words text-left">{label}</span>
                 </Link>
               </Button>
             );

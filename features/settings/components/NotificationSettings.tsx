@@ -172,8 +172,8 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
               className="p-3 rounded-mq-lg border border-mq-border bg-mq-background-secondary"
               data-testid="push-notification-banner"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
                   {permissionStatus === 'granted' ? (
                     <Bell className="h-5 w-5" aria-hidden="true" />
                   ) : permissionStatus === 'denied' ? (
@@ -181,7 +181,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
                   ) : (
                     <AlertTriangle className="h-5 w-5" aria-hidden="true" />
                   )}
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-mq-sm font-medium text-mq-content">
                       {permissionStatus === 'granted'
                         ? t('pushNotificationsActive')
@@ -201,7 +201,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
                 {permissionStatus !== 'granted' && isNotificationSupported && (
                   <Button
                     size="sm"
-                    className="flex-shrink-0"
+                    className="w-full sm:w-auto sm:flex-shrink-0"
                     onClick={handleRequestPermission}
                     data-testid="enable-notifications-button"
                   >
@@ -214,8 +214,8 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
 
           {/* Master Push Toggle */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-mq-sm font-medium text-mq-content">{t('pushNotifications')}</p>
                 <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                   {t('pushNotificationsDesc')}

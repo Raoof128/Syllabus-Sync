@@ -62,7 +62,7 @@ const MapSettings = memo(({ t }: MapSettingsProps) => {
             className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300"
             data-testid="haptic-feedback-item"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3 flex-1">
                 <Navigation className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 <div className="flex-1 min-w-0">
@@ -72,7 +72,7 @@ const MapSettings = memo(({ t }: MapSettingsProps) => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:flex-shrink-0">
                 <ToggleControl
                   checked={hapticFeedbackEnabled}
                   onToggle={handleToggleHapticFeedback}

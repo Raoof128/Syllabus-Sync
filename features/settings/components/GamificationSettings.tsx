@@ -62,7 +62,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
             {/* Current Progress Display */}
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
               <h3 className="font-semibold text-mq-content mb-3">{t('yourProgress')}</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4" aria-hidden="true" />
                   <div>
@@ -148,7 +148,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
 
             {/* Reset Progress */}
             <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                   <h3 className="font-semibold text-mq-content">{t('resetProgress')}</h3>
                   <p className="text-mq-sm text-mq-content-secondary">{t('resetProgressDesc')}</p>
@@ -159,6 +159,7 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                 <Button
                   variant="destructive"
                   size="sm"
+                  className="w-full sm:w-auto"
                   onClick={() => setShowResetDialog(true)}
                   aria-describedby="reset-progress-caution"
                   data-testid="reset-progress-button"

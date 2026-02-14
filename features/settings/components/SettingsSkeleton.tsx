@@ -22,12 +22,12 @@ const SKELETON_COUNTS = {
 const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
   return (
     <div
-      className="settings-page container mx-auto p-6 max-w-7xl"
+      className="settings-page container mx-auto max-w-7xl p-4 sm:p-6"
       data-testid="settings-skeleton"
       aria-busy="true"
       aria-label={t('loading')}
     >
-      <header className="mb-8">
+      <header className="mb-6 sm:mb-8">
         <div
           className="h-8 w-48 bg-mq-card-background rounded-mq-lg animate-pulse mb-2"
           aria-hidden="true"
@@ -38,7 +38,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
         />
       </header>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Notification Settings Skeleton */}
         <div className="mq-magic-card mq-liquid-enhanced">
           <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
@@ -222,7 +222,7 @@ const SettingsSkeleton = memo(({ t }: SettingsSkeletonProps) => {
               {/* Progress Display Skeleton */}
               <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border">
                 <div className="h-5 w-28 bg-mq-hover-background rounded animate-pulse mb-3" />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={`progress-${i}`} className="flex items-center gap-2">
                       <div className="h-4 w-4 bg-mq-hover-background rounded animate-pulse" />

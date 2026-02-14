@@ -49,7 +49,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+              className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
               onClick={handleViewDocumentation}
               data-testid="view-documentation-button"
             >
@@ -65,7 +65,7 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+              className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
               onClick={handleSendFeedback}
               data-testid="send-feedback-button"
             >

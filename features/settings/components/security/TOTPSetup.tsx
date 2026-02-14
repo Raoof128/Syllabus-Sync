@@ -146,7 +146,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
   return (
     <>
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 flex-1">
             <Shield className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
@@ -156,7 +156,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:flex-shrink-0">
             <ToggleControl
               checked={isEnabled}
               onToggle={() => {
@@ -230,8 +230,8 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                 <p className="text-xs text-mq-content-secondary text-center">
                   Can&apos;t scan? Enter this code manually:
                 </p>
-                <div className="flex items-center gap-2 justify-center">
-                  <code className="text-xs bg-mq-card-background px-3 py-1.5 rounded border border-mq-border font-mono tracking-wider select-all">
+                <div className="flex flex-wrap items-center gap-2 justify-center">
+                  <code className="max-w-full break-all text-xs bg-mq-card-background px-3 py-1.5 rounded border border-mq-border font-mono tracking-wider select-all">
                     {secret}
                   </code>
                   <Button

@@ -1,3 +1,71 @@
+### Raouf: Settings Page Responsive Breakpoint Pass - 2026-02-14
+
+**Scope:** Make `/settings` pages fully responsive across phone, tablet, laptop, and wide breakpoints.
+**Type:** UI Responsiveness - Layout/Overflow
+
+#### Root Causes
+
+1. Settings subpages used early `md:grid-cols-2` splits, causing cramped cards on tablets and narrower laptops.
+2. Settings shell spacing/heading alignment used rigid values (`ml-[44px]`, larger default paddings) that reduced small-screen readability.
+3. Multiple card rows used non-wrapping `justify-between` action layouts, causing compression/overflow with long labels and controls.
+4. Security card internals had overflow risk for long passkey/totp text (manual secret/device metadata) on narrow screens.
+
+#### Changes Applied
+
+1. **Settings shell & section pages**
+   - Updated shell spacing and title sizing in `app/settings/layout.tsx` to mobile-first `px/py` values.
+   - Made subtitle alignment responsive (`sm:ml-[44px]` only).
+   - Improved content area resilience with `min-w-0` and adjusted min-height.
+   - Updated section grids:
+     - `security` and `experience` now split to 2 columns at `xl` (not `md`).
+     - `general`, `appearance`, `support` use tighter mobile-first spacing.
+
+2. **Card action rows**
+   - Converted key settings rows from fixed horizontal layouts to stacked mobile layouts with `sm:` horizontal alignment:
+     - Notification permission banner + master toggle
+     - Notification row toggles and timing select
+     - Privacy card actions (change password, manage sessions, privacy policy)
+     - Map settings haptic toggle row
+     - Biometric/TOTP/Passkey top rows
+     - Gamification reset row
+   - Added mobile full-width button behavior where needed (`w-full sm:w-auto`).
+
+3. **Overflow hardening**
+   - TOTP manual secret row now wraps (`flex-wrap`, `break-all`, `max-w-full`).
+   - Passkey credential rows now stack on mobile and allow device metadata to wrap.
+   - Quick actions now support wrapped labels and auto-height rows.
+   - Help/support action buttons now full-width on mobile.
+   - Settings skeleton updated with mobile-first padding/gaps and single-column progress skeleton on phones.
+
+#### Files Changed
+
+- `app/settings/layout.tsx`
+- `app/settings/general/page.tsx`
+- `app/settings/appearance/page.tsx`
+- `app/settings/security/page.tsx`
+- `app/settings/experience/page.tsx`
+- `app/settings/support/page.tsx`
+- `features/settings/components/NotificationSettings.tsx`
+- `features/settings/components/NotificationRow.tsx`
+- `features/settings/components/GamificationSettings.tsx`
+- `features/settings/components/MapSettings.tsx`
+- `features/settings/components/PrivacySettings.tsx`
+- `features/settings/components/security/TOTPSetup.tsx`
+- `features/settings/components/security/PasskeyManager.tsx`
+- `features/settings/components/security/BiometricToggle.tsx`
+- `features/settings/components/QuickActions.tsx`
+- `features/settings/components/HelpSupport.tsx`
+- `features/settings/components/SettingsSkeleton.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- tests/settings` ✅ (85/85 tests pass)
+- `npm run lighthouse:local` attempted ⚠️ but local `lhci` exits with `Hello, this is AnupamAS01!` and no report artifact is generated in this environment.
+
+---
+
 ### Raouf: Map Off-Campus Warning 3-Second Popup - 2026-02-14
 
 **Scope:** Replace persistent off-campus banner with a timed popup.

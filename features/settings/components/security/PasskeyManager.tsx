@@ -193,7 +193,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
   return (
     <>
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 flex-1">
             <Fingerprint className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
@@ -206,7 +206,7 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+            className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
             onClick={() => {
               setAddError(null);
               setDeviceName('');
@@ -226,15 +226,15 @@ export function PasskeyManager({ t }: PasskeyManagerProps) {
             {credentials.map((cred) => (
               <div
                 key={cred.id}
-                className="flex items-center justify-between p-2 rounded-lg bg-mq-card-background border border-mq-border/50"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg bg-mq-card-background border border-mq-border/50"
               >
-                <div className="flex items-center gap-2">
-                  <Smartphone className="h-4 w-4 text-mq-content-secondary" />
-                  <div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Smartphone className="h-4 w-4 text-mq-content-secondary flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-mq-content">
                       {cred.deviceName}
                     </p>
-                    <p className="text-xs text-mq-content-tertiary">
+                    <p className="text-xs text-mq-content-tertiary break-words">
                       Added{' '}
                       {new Date(cred.createdAt).toLocaleDateString()}
                       {cred.lastUsedAt &&
