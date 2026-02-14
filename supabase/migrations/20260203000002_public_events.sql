@@ -63,6 +63,7 @@ WHERE source_public_event_id IS NOT NULL;
 ALTER TABLE public.public_events ENABLE ROW LEVEL SECURITY;
 
 -- Everyone can READ public events (including anonymous users)
+DROP POLICY IF EXISTS "Anyone can read public events" ON public.public_events;
 CREATE POLICY "Anyone can read public events"
 ON public.public_events
 FOR SELECT

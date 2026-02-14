@@ -1008,3 +1008,80 @@ No Supabase email service. No Supabase OTP. No magic links.
 - `npm run test -- tests/gamification` ✅ (96/96 tests pass)
 - `npm run typecheck` ✅
 - `npx eslint --config config/eslint/eslint.config.mjs ...changed files` ✅
+
+### Raouf: Supabase DB Alignment Audit (Code vs Canonical Migrations) — 2026-02-14
+
+**Scope:** Validate that all tables/functions used by code are present in canonical `supabase/migrations` and close discovered gaps.
+**Type:** Database Audit / Schema Alignment
+
+#### Changes Applied
+
+1. Ran Supabase CLI diagnostics:
+   - `supabase status` failed (Docker daemon not running locally).
+   - `supabase db lint` failed locally (no local DB at `127.0.0.1:54322`).
+   - `supabase db lint --linked` and `supabase db push --dry-run` blocked by temp-role auth failures (`password authentication failed`) and pooler circuit breaker.
+2. Performed static code-to-schema alignment audit:
+   - Extracted all `.from('table')` names from app code.
+   - Extracted all `.rpc('function')` names from app code.
+   - Compared against canonical object definitions in `supabase/migrations`.
+3. Found two alignment gaps in canonical migrations:
+   - Missing `public.user_sessions` table (referenced by session termination logic).
+   - Missing `public.get_my_audit_logs` RPC (referenced by `/api/audit`).
+4. Added a new migration to resolve both:
+   - Creates `public.user_sessions` with indexes, RLS, policies, and grants.
+   - Adds `public.get_my_audit_logs(...)` RPC with bounded limit/offset and grants.
+
+#### Files Changed
+
+- `supabase/migrations/20260214001000_align_code_db_objects.sql` (new)
+
+#### Verification
+
+- Code-to-migration table diff: no missing tables ✅
+- Code-to-migration RPC diff: no missing functions ✅
+- `npm run typecheck` ✅
+
+### Raouf: Supabase CLI Recovery and Full Migration Rollout — 2026-02-14
+
+**Scope:** Fix Supabase CLI remote DB auth path and push all pending migrations safely.
+**Type:** Database Operations / Migration Reliability
+
+#### Changes Applied
+
+1. Recovered CLI migration connectivity using explicit DB password auth:
+   - Linked project using project ref from `.env.local` URL + `supabase link -p`.
+   - Confirmed dry-run migration plan through CLI after pooler auth recovery.
+2. Began full `supabase db push --include-all` and fixed runtime migration blockers encountered in order:
+   - Patched non-idempotent constraint block in `20260114011650_fix_schema_comprehensive.sql` (`units_user_code_unique` relation-name collision).
+   - Resolved duplicate migration version collisions by renaming pending files:
+     - `20260119000000_multiuser_demo_seed.sql` -> `20260119050000_multiuser_demo_seed.sql`
+     - `20260124000000_create_todos_table.sql` -> `20260124001000_create_todos_table.sql`
+     - `20260207000000_fix_building_codes.sql` -> `20260207001000_fix_building_codes.sql`
+   - Patched non-idempotent policy creation in `20260203000002_public_events.sql` by adding `DROP POLICY IF EXISTS` before recreate.
+3. Completed migration push through all pending files, including latest gamification/security alignment migrations.
+4. Performed post-push SQL validation against remote DB and detected schema-history drift:
+   - Missing `log_audit` RPC
+   - Missing code-required tables: `app_config`, `audit_logs`, `auth_audit_logs`, `backup_codes`, `webauthn_challenges`, `webauthn_credentials`
+5. Added and pushed recovery migrations:
+   - `20260214002000_restore_log_audit_function.sql`
+   - `20260214003000_restore_missing_core_security_tables.sql`
+6. Re-verified final alignment:
+   - `supabase db push --dry-run --include-all` returns **Remote database is up to date**
+   - Migration history local=remote through `20260214003000`
+   - Direct SQL checks confirm no missing code-referenced tables or RPCs
+
+#### Files Changed
+
+- `supabase/migrations/20260114011650_fix_schema_comprehensive.sql`
+- `supabase/migrations/20260203000002_public_events.sql`
+- `supabase/migrations/20260119050000_multiuser_demo_seed.sql` (renamed)
+- `supabase/migrations/20260124001000_create_todos_table.sql` (renamed)
+- `supabase/migrations/20260207001000_fix_building_codes.sql` (renamed)
+- `supabase/migrations/20260214002000_restore_log_audit_function.sql` (new)
+- `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (new)
+
+#### Verification
+
+- `supabase db push --dry-run --include-all -p ...` ✅
+- `supabase migration list -p ...` ✅ (local/remote fully aligned)
+- SQL verification ✅ (`missing_tables=none`, `missing_functions=none` for app-required objects)

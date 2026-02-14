@@ -83,12 +83,20 @@ BEGIN
         ALTER TABLE public.units DROP CONSTRAINT units_code_key;
     END IF;
 
-    -- Add user-scoped unique constraint if not exists
+    -- Add user-scoped unique constraint if not exists.
+    -- Guard both constraint and relation name because a prior index with the
+    -- same name can exist and cause "relation already exists" on ADD CONSTRAINT.
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.table_constraints
         WHERE table_schema = 'public'
         AND table_name = 'units'
         AND constraint_name = 'units_user_code_unique'
+    ) AND NOT EXISTS (
+        SELECT 1
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public'
+        AND c.relname = 'units_user_code_unique'
     ) THEN
         ALTER TABLE public.units
         ADD CONSTRAINT units_user_code_unique UNIQUE (user_id, code);
@@ -880,4 +888,3 @@ LEFT JOIN public.gamification_profiles gp ON p.id = gp.user_id;
 
 -- Ensure authenticated users can still select from the view
 GRANT SELECT ON public.user_details TO authenticated;
-
