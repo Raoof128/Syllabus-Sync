@@ -31,14 +31,14 @@ export default function ManageProfilesPage() {
   if (!currentProfile) {
     if (hasLoaded) {
       return (
-        <div className="container mx-auto p-6 max-w-4xl">
+        <div className="container mx-auto max-w-4xl px-3 py-4 sm:p-6">
           <MagicCard isLiquidEnhanced>
             <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-              <div className="text-center py-12">
+              <div className="text-center py-10 sm:py-12">
                 <div className="text-mq-content-tertiary">
-                  <UserIcon className="h-16 w-16 mx-auto mb-4" />
+                  <UserIcon className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4" />
                 </div>
-                <h2 className="text-mq-xl font-semibold text-mq-content mb-2">
+                <h2 className="text-mq-lg sm:text-mq-xl font-semibold text-mq-content mb-2">
                   {t('noProfilesYet')}
                 </h2>
                 <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
@@ -55,7 +55,7 @@ export default function ManageProfilesPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:p-6 max-w-4xl space-y-6">
+    <div className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6">
       <ProfileHeader profile={currentProfile} isSaving={isSaving} />
 
       {/* Pass the FORM object down to cards */}
@@ -73,7 +73,7 @@ export default function ManageProfilesPage() {
             onClick={saveProfile}
             disabled={isSaving || !isValid}
             size="lg"
-            className="shadow-lg flex items-center gap-2"
+            className="w-full sm:w-auto shadow-lg flex items-center gap-2"
           >
             {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
             {isSaving ? t('saving') : t('saveChanges')}

@@ -135,55 +135,65 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Master Push Toggle */}
-              <div className="flex items-center justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center gap-3">
-                  <Bell className="h-5 w-5 text-mq-content-secondary" />
-                  <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
+                <div className="flex items-start gap-3 min-w-0">
+                  <Bell className="h-5 w-5 text-mq-content-secondary flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-mq-content">{t('pushNotifications')}</p>
-                    <p className="text-xs text-mq-content-tertiary">{t('pushNotificationsDesc')}</p>
+                    <p className="text-xs text-mq-content-tertiary break-words">
+                      {t('pushNotificationsDesc')}
+                    </p>
                   </div>
                 </div>
-                <ToggleSwitch
-                  checked={pushEnabled}
-                  onChange={() => setPushEnabled(!pushEnabled)}
-                  ariaLabel={t('pushNotifications')}
-                />
+                <div className="sm:flex-shrink-0">
+                  <ToggleSwitch
+                    checked={pushEnabled}
+                    onChange={() => setPushEnabled(!pushEnabled)}
+                    ariaLabel={t('pushNotifications')}
+                  />
+                </div>
               </div>
 
               {/* Email Notifications */}
-              <div className="flex items-center justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-mq-content-secondary" />
-                  <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
+                <div className="flex items-start gap-3 min-w-0">
+                  <Mail className="h-5 w-5 text-mq-content-secondary flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-mq-content">{t('emailNotifications')}</p>
-                    <p className="text-xs text-mq-content-tertiary">
+                    <p className="text-xs text-mq-content-tertiary break-words">
                       {t('emailNotificationsDesc')}
                     </p>
                   </div>
                 </div>
-                <ToggleSwitch
-                  checked={currentProfile.preferences.notifications}
-                  onChange={() => togglePreference('notifications')}
-                  ariaLabel={t('emailNotifications')}
-                  disabled={isTogglingPreference}
-                />
+                <div className="sm:flex-shrink-0">
+                  <ToggleSwitch
+                    checked={currentProfile.preferences.notifications}
+                    onChange={() => togglePreference('notifications')}
+                    ariaLabel={t('emailNotifications')}
+                    disabled={isTogglingPreference}
+                  />
+                </div>
               </div>
 
               {/* Email Reminders */}
-              <div className="flex items-center justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-mq-content-secondary" />
-                  <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 bg-mq-card-background rounded-mq border border-mq-border">
+                <div className="flex items-start gap-3 min-w-0">
+                  <Calendar className="h-5 w-5 text-mq-content-secondary flex-shrink-0" />
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-mq-content">{t('emailReminders')}</p>
-                    <p className="text-xs text-mq-content-tertiary">{t('emailRemindersDesc')}</p>
+                    <p className="text-xs text-mq-content-tertiary break-words">
+                      {t('emailRemindersDesc')}
+                    </p>
                   </div>
                 </div>
-                <ToggleSwitch
-                  checked={currentProfile.preferences.emailReminders}
-                  onChange={() => togglePreference('emailReminders')}
-                  ariaLabel={t('emailReminders')}
-                  disabled={isTogglingPreference}
-                />
+                <div className="sm:flex-shrink-0">
+                  <ToggleSwitch
+                    checked={currentProfile.preferences.emailReminders}
+                    onChange={() => togglePreference('emailReminders')}
+                    ariaLabel={t('emailReminders')}
+                    disabled={isTogglingPreference}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -203,23 +213,25 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
             <CardContent className="space-y-4">
               {/* Deadline Reminders */}
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="h-5 w-5" />
-                    <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <BookOpen className="h-5 w-5 flex-shrink-0" />
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-mq-content">
                         {t('deadlineReminders')}
                       </p>
-                      <p className="text-xs text-mq-content-tertiary">
+                      <p className="text-xs text-mq-content-tertiary break-words">
                         {t('deadlineRemindersDesc')}
                       </p>
                     </div>
                   </div>
-                  <ToggleSwitch
-                    checked={deadlinesEnabled}
-                    onChange={() => setDeadlinesEnabled(!deadlinesEnabled)}
-                    ariaLabel={t('deadlineReminders' as 'title') || 'Deadline Reminders'}
-                  />
+                  <div className="sm:flex-shrink-0">
+                    <ToggleSwitch
+                      checked={deadlinesEnabled}
+                      onChange={() => setDeadlinesEnabled(!deadlinesEnabled)}
+                      ariaLabel={t('deadlineReminders' as 'title') || 'Deadline Reminders'}
+                    />
+                  </div>
                 </div>
                 {deadlinesEnabled && (
                   <Select
@@ -242,19 +254,23 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
 
               {/* Class Reminders */}
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <GraduationCap className="h-5 w-5" />
-                    <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <GraduationCap className="h-5 w-5 flex-shrink-0" />
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-mq-content">{t('classReminders')}</p>
-                      <p className="text-xs text-mq-content-tertiary">{t('classRemindersDesc')}</p>
+                      <p className="text-xs text-mq-content-tertiary break-words">
+                        {t('classRemindersDesc')}
+                      </p>
                     </div>
                   </div>
-                  <ToggleSwitch
-                    checked={classesEnabled}
-                    onChange={() => setClassesEnabled(!classesEnabled)}
-                    ariaLabel={t('classReminders' as 'title') || 'Class Reminders'}
-                  />
+                  <div className="sm:flex-shrink-0">
+                    <ToggleSwitch
+                      checked={classesEnabled}
+                      onChange={() => setClassesEnabled(!classesEnabled)}
+                      ariaLabel={t('classReminders' as 'title') || 'Class Reminders'}
+                    />
+                  </div>
                 </div>
                 {classesEnabled && (
                   <Select
@@ -277,19 +293,23 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
 
               {/* Event Reminders */}
               <div className="space-y-3 p-3 bg-mq-card-background rounded-mq border border-mq-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-5 w-5" />
-                    <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <Calendar className="h-5 w-5 flex-shrink-0" />
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-mq-content">{t('eventReminders')}</p>
-                      <p className="text-xs text-mq-content-tertiary">{t('eventRemindersDesc')}</p>
+                      <p className="text-xs text-mq-content-tertiary break-words">
+                        {t('eventRemindersDesc')}
+                      </p>
                     </div>
                   </div>
-                  <ToggleSwitch
-                    checked={eventsEnabled}
-                    onChange={() => setEventsEnabled(!eventsEnabled)}
-                    ariaLabel={t('eventReminders' as 'title') || 'Event Reminders'}
-                  />
+                  <div className="sm:flex-shrink-0">
+                    <ToggleSwitch
+                      checked={eventsEnabled}
+                      onChange={() => setEventsEnabled(!eventsEnabled)}
+                      ariaLabel={t('eventReminders' as 'title') || 'Event Reminders'}
+                    />
+                  </div>
                 </div>
                 {eventsEnabled && (
                   <Select

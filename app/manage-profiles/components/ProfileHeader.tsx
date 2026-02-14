@@ -53,7 +53,7 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
           <div className="relative group">
             <label className="cursor-pointer block">
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden shadow-lg ring-4 ring-mq-background"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center overflow-hidden shadow-lg ring-4 ring-mq-background"
                 style={{
                   backgroundColor: profile.avatar ? 'transparent' : BRAND_COLORS.primary,
                 }}
@@ -92,18 +92,18 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
           </div>
 
           {/* Profile Summary */}
-          <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-mq-content mb-1">
+          <div className="flex-1 min-w-0 text-center sm:text-left">
+            <h1 className="text-xl sm:text-2xl font-bold text-mq-content mb-1 break-words">
               {profile.name || t('guest')}
             </h1>
-            <p className="text-mq-content-secondary flex items-center justify-center sm:justify-start gap-2">
+            <p className="text-mq-content-secondary flex items-center justify-center sm:justify-start gap-2 min-w-0">
               <Mail className="h-4 w-4" />
-              {profile.email}
+              <span className="break-all">{profile.email}</span>
             </p>
             {profile.studentId && (
-              <p className="text-mq-content-tertiary text-sm mt-1 flex items-center justify-center sm:justify-start gap-2">
+              <p className="text-mq-content-tertiary text-sm mt-1 flex items-center justify-center sm:justify-start gap-2 min-w-0">
                 <IdCard className="h-4 w-4" />
-                <span>
+                <span className="break-all">
                   {t('idPrefix')}
                   {profile.studentId}
                 </span>

@@ -1,3 +1,54 @@
+### Raouf: Manage Profiles Responsive Breakpoint Pass - 2026-02-14
+
+**Scope:** Make `/manage-profiles` responsive across phone, tablet, laptop, and wide breakpoints.
+**Type:** UI Responsiveness - Layout/Overflow
+
+#### Root Causes
+
+1. Multiple preference/reminder rows used rigid `justify-between` horizontal layouts, causing compression on 360–430px screens.
+2. Manage profile containers/skeleton used dense fixed padding that reduced small-screen readability.
+3. Profile header summary did not explicitly guard long email/student id text from overflow pressure.
+4. Save-action area did not adapt button width for narrow layouts.
+
+#### Changes Applied
+
+1. **Page-level spacing (`app/manage-profiles/page.tsx`)**
+   - Updated empty-state and main-page containers to mobile-first padding/spacing.
+   - Tuned empty-state heading/icon sizes for phone widths.
+   - Updated save button to responsive width (`w-full sm:w-auto`).
+
+2. **Profile header overflow hardening (`app/manage-profiles/components/ProfileHeader.tsx`)**
+   - Made avatar size responsive on small screens.
+   - Added `min-w-0` and `break-all` handling for email/student id content.
+   - Scaled title text for smaller viewports.
+
+3. **Reminder settings row responsiveness (`app/manage-profiles/components/ReminderSettings.tsx`)**
+   - Converted all top-level preference and reminder rows from fixed horizontal layout to stacked mobile layout with `sm:` horizontal alignment.
+   - Added `min-w-0`, `break-words`, icon `flex-shrink-0`, and explicit toggle wrappers to prevent text/control collisions.
+   - Kept existing card visuals and control behavior unchanged.
+
+4. **Skeleton and error state fit**
+   - `ProfileSkeleton.tsx`: mobile-first container spacing.
+   - `error.tsx`: switched to `min-h` + mobile padding for safer small-screen rendering.
+
+#### Files Changed
+
+- `app/manage-profiles/page.tsx`
+- `app/manage-profiles/components/ProfileHeader.tsx`
+- `app/manage-profiles/components/ReminderSettings.tsx`
+- `app/manage-profiles/components/ProfileSkeleton.tsx`
+- `app/manage-profiles/error.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- app/manage-profiles/__tests__/actions.test.ts` ⚠️ No tests discovered by configured Vitest include (`tests/**/*`)
+- `npx vitest run app/manage-profiles/__tests__/actions.test.ts` ⚠️ Fails in ad-hoc mode due unresolved alias import (`@/lib/logger`) outside project test config path mapping
+- `npm run lighthouse:local` attempted ⚠️ but local `lhci` exits with `Hello, this is AnupamAS01!` and no report artifact is generated in this environment.
+
+---
+
 ### Raouf: Login Page Responsive Breakpoint Pass - 2026-02-14
 
 **Scope:** Make `/login` fully responsive across phone, tablet, laptop, and wide breakpoints.
