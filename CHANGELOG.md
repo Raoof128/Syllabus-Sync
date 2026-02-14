@@ -1,3 +1,29 @@
+### Raouf: Repository Documentation Audit & Full System Check - 2026-02-14
+
+**Scope:** Full repo audit, documentation refresh, and system verification.
+**Type:** Documentation / QA
+
+#### Changes Applied
+
+1. Updated `README.md`:
+   - Test badge: 425 → 443 (50 test files)
+   - Added Security & Authentication feature section (email verification, TOTP, WebAuthn, gamification hardening, DB alignment)
+   - Expanded responsive design description with breakpoint coverage
+   - Added missing app routes (feed, login, signup, verify, manage-profiles) to directory tree
+   - Added supabase migrations directory to tree
+   - Added gamification/unit test directories to tests tree
+   - Removed duplicate "Features" header
+2. Synced `docs/project/AGENT.md` with all Feb 11-14 entries
+3. Synced `docs/project/team_plan/AGENT.md` with all Feb 12-14 entries
+4. Synced `docs/project/team_plan/CHANGELOG.md` with all Feb 12-14 entries
+5. Added this audit entry to root `AGENT.md` and `CHANGELOG.md`
+
+#### Verification
+
+- `npm run check` ✅ (443/443 tests pass, build successful)
+
+---
+
 ### Raouf: Header Actions Right Alignment Fix - 2026-02-14
 
 **Scope:** Move the three header action controls to the far right.

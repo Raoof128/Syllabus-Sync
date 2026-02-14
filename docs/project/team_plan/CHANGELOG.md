@@ -1,3 +1,63 @@
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Repository Documentation Audit & Full System Check
+Summary: Full repo audit — updated README (test badge 425→443, added email verification/gamification/responsive features, expanded directory tree), synced all AGENT.md and CHANGELOG.md files across docs/project and docs/project/team_plan with root entries through Feb 14. Ran `npm run check` pipeline.
+- **Files:** `README.md`, `AGENT.md`, `CHANGELOG.md`, `docs/project/AGENT.md`, `docs/project/team_plan/AGENT.md`, `docs/project/team_plan/CHANGELOG.md`.
+- **Verification:** `npm run check` ✅ (443/443 tests pass, build successful).
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Supabase CLI Recovery + Full Remote Migration Push
+Summary: Fixed Supabase CLI auth, resolved non-idempotent constraints and duplicate version collisions, pushed all migrations to remote, added recovery migrations for missing objects.
+- **Files:** Modified/renamed multiple migration files; added recovery migrations.
+- **Verification:** `supabase db push --dry-run --include-all` ✅ (remote up to date).
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Supabase CLI Alignment Audit (Tables/RPC vs Code)
+Summary: Static code-to-schema audit found two gaps (missing `user_sessions` table and `get_my_audit_logs` RPC). Added alignment migration.
+- **Files:** Added `supabase/migrations/20260214001000_align_code_db_objects.sql`.
+- **Verification:** No missing tables/functions; `npm run typecheck` ✅.
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Gamification Logic and Security Production Audit
+Summary: Full gamification audit — XP math fix, store reset hardening, API validation/CSRF, DB RPC security lockdown (cross-user guards, search_path, execute grants).
+- **Files:** Modified gamification store/components/API routes; added hardening migration.
+- **Verification:** `npm run test -- tests/gamification` ✅ (96/96), `npm run typecheck` ✅.
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Responsive Breakpoint Passes (Calendar, Map, Settings, Login, Manage-Profiles)
+Summary: Mobile-first responsive passes for all major pages (360px-2560px). Fixed rigid grids, overflow, dialog sizing, HUD behavior, off-campus warning placement.
+- **Files:** Modified 30+ component files across app and features directories.
+- **Verification:** `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (443/443 tests pass).
+
+Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Service Worker + HMR WebSocket + Map UX Fixes
+Summary: Fixed sw.js uncaught fetch errors offline, HMR WebSocket proxy exclusion, off-campus warning 3s popup timing, and mobile Places button visibility.
+- **Files:** Modified `public/sw.js`, `proxy.ts`, `tools/proxy/proxy.ts`, map components.
+- **Verification:** `npm run lint` ✅, `npm run typecheck` ✅, `npm run test -- tests/map` ✅ (64/64).
+
+Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Custom Email Verification System (Resend)
+Summary: Production-ready custom email verification replacing Supabase email. SHA-256 token hashing, 20-min expiry, rate limiting (3/hour), Resend API integration, verify landing page, daily cleanup cron via Vercel.
+- **Files:** Created migration, token module, email service, 3 API routes, verify page. Modified config/env.
+- **Verification:** `npm run test` ✅ (442/442 tests pass).
+
+Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Security Settings Integration + Login Page Wiring
+Summary: Integrated all MFA/security options into Privacy settings tab. Fixed passkey status API bug. Added security method indicators (biometric/2FA badges) to login page. Standardized all security toggle components to ToggleControl pattern.
+- **Files:** Modified privacy settings, passkey routes, login client, security toggle components, tests.
+- **Verification:** `npm run test` ✅ (442/442 tests pass).
+
+Raouf: 2026-02-13 (Australia/Sydney)
+Scope: Feed UX + Select Dropdown + Notification Bug Fixes
+Summary: Announcement cards open in dialog, stats/category bars clickable with event details dialog, event highlight 3s auto-clear (React Strict Mode compatible), Select dropdown scroll fix, notification bulk DELETE endpoint.
+- **Files:** Modified feed components, calendar widgets, select.tsx, notifications route.
+- **Verification:** `npm run test` ✅ (442/442 tests pass).
+
+Raouf: 2026-02-12 (Australia/Sydney)
+Scope: Settings Refactor + Calendar Refactor + System Integrity Checks
+Summary: Extracted ToggleControl/NotificationRow/GamificationToggleRow components. Calendar accessibility refactor with i18n fixes. Multiple full system checks with test ID regression fix.
+- **Files:** Modified/created settings and calendar components, translations.
+- **Verification:** `npm run check` ✅ (428/428 tests pass, build successful).
+
 Raouf: 2026-02-12 (Australia/Sydney)
 Scope: Weather Widget Audit & Refactor
 Summary: Conducted a full audit of the weather widget, removed dead code (`useWeather.ts` hook), refactored the widget to use a new modular custom hook (`components/layout/weather/useWeather.ts`), and added comprehensive unit tests. Fixed logic duplication and improved maintainability.

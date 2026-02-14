@@ -9,7 +9,7 @@ _Next-Generation Student Experience Platform for Macquarie University_
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
-[![Vitest](https://img.shields.io/badge/Tests-425_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-443_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
 
 ---
 
@@ -66,7 +66,7 @@ graph TD
 
 - **Apple Liquid Glass 2025 UI:** Award-winning design system featuring organic SVG refractions, fluid mesh gradients, and haptic-responsive interactions
 - **Micro-animations & Transitions:** Sophisticated motion design with respect for user accessibility preferences
-- **Responsive Design:** Mobile-first approach with optimized touch targets and progressive enhancement
+- **Responsive Design:** Mobile-first approach with full breakpoint passes (360px-2560px) across all pages — login, calendar, map, settings, manage-profiles — with optimized touch targets and progressive enhancement
 
 #### **🛡️ Enterprise Security**
 
@@ -81,8 +81,6 @@ graph TD
 - **Accessibility Excellence:** WCAG 2.1 AA certified with comprehensive ARIA semantics, 44px minimum tap targets, and keyboard-first navigation patterns
 
 ---
-
-## 🚀 Features
 
 ## 🚀 Core Platform Features
 
@@ -106,6 +104,14 @@ graph TD
 - **Advanced Analytics:** Performance tracking with predictive insights and improvement recommendations
 - **Social Features:** Leaderboards, achievement sharing, and collaborative study group formation
 - **Motivation Engine:** Streak tracking, milestone rewards, and personalized challenge system
+
+### 🔐 **Security & Authentication**
+
+- **Custom Email Verification:** Production-ready email verification via Resend with SHA-256 token hashing, 20-minute expiry, and rate limiting (3 sends/hour)
+- **Multi-Factor Authentication:** TOTP authenticator app support (Google Authenticator, Authy) with fail-closed login enforcement
+- **WebAuthn/Passkey Support:** FIDO2 passkey registration and login with biometric indicators on the login page
+- **Gamification Security Hardening:** Cross-user mutation guards, SECURITY DEFINER lockdown, and search_path hardening on database RPCs
+- **Database Alignment:** Full code-to-migration audit ensuring all referenced tables and RPCs exist in canonical Supabase migrations
 
 ### 🔔 **Intelligent Notification Hub**
 
@@ -208,6 +214,11 @@ syllabus-sync/
 │   ├── home/                      # Main dashboard & analytics engine
 │   ├── calendar/                   # Academic calendar & scheduling
 │   ├── map/                       # Campus navigation system
+│   ├── feed/                      # Public event feed
+│   ├── login/                     # Authentication login page
+│   ├── signup/                    # User registration flow
+│   ├── verify/                    # Email verification landing page
+│   ├── manage-profiles/           # Multi-profile management
 │   └── settings/                  # User preferences & configuration
 ├── features/                       # Feature-first modules
 │   ├── map/                       # Campus map feature module
@@ -229,18 +240,22 @@ syllabus-sync/
 │   ├── services/                   # External API integrations
 │   ├── hooks/                      # Custom React hooks
 │   └── utils/                      # Shared utility functions
-├── tests/                          # Comprehensive test suite (425+ tests)
-│   ├── settings/                   # Settings feature tests
-│   ├── map/                        # Map/navigation tests
+├── tests/                          # Comprehensive test suite (443+ tests)
+│   ├── settings/                   # Settings feature tests (85 tests)
+│   ├── map/                        # Map/navigation tests (64 tests)
+│   ├── gamification/               # Gamification logic tests (96 tests)
 │   ├── api/                        # API route tests
-│   └── security/                   # Security-focused tests
+│   ├── security/                   # Security-focused tests (68 tests)
+│   └── unit/                       # Unit tests for components and utilities
 ├── docs/                           # Documentation and project artifacts
 │   ├── README.md                  # Docs index
 │   └── project/                   # Team plans, sketches, restructure notes
 ├── config/                         # Tooling configuration (next/ts/eslint/vitest/etc.)
 ├── infra/                          # Infrastructure assets (Docker, deployment helpers)
 ├── tools/                          # Operational tooling (proxy/loadtest utilities)
-├── public/                         # Static assets & media
+├── supabase/                       # Database migrations & configuration
+│   └── migrations/                # Ordered SQL migration files
+├── public/                         # Static assets & media (includes sw.js)
 └── assets/                         # Non-public source assets
 ```
 
@@ -264,12 +279,12 @@ Our platform maintains a defense-in-depth security architecture:
 - **Intelligent Rate Limiting:** IP-based distributed throttling via Upstash Redis with adaptive limits based on user behavior
 - **Zero-Trust Data Validation:** Comprehensive Zod schema validation, PostgreSQL foreign key constraints, and SQL injection prevention
 - **Content Security Policy:** SHA-256 hashed CSP with granular directives for XSS prevention
-- **Authentication Security:** Secure session management, passkey support, and multi-factor authentication capabilities
+- **Authentication Security:** Secure session management, passkey/WebAuthn support, TOTP authenticator app 2FA, and custom email verification via Resend (SHA-256 hashed tokens, 20-min expiry, rate-limited)
 
 ### **Quality Assurance Framework**
 
-- **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, and 100% test coverage requirements
-- **Comprehensive Testing:** 425+ tests covering unit/integration/API/security scenarios with accessibility validation
+- **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, and test coverage requirements
+- **Comprehensive Testing:** 443+ tests across 50 test files covering unit/integration/API/security scenarios with accessibility validation
 - **Performance Monitoring:** Core Web Vitals tracking, bundle analysis, and production error reporting
 - **Code Quality Gates:** TypeScript strict mode, ESLint rules, and Prettier formatting enforcement
 
