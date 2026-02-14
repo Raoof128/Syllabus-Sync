@@ -100,6 +100,14 @@ describe('GamificationStats - Compact Variant', () => {
     expect(container.firstChild).toHaveClass('custom-stats');
   });
 
+  it('uses percentage progress directly for compact progress width', () => {
+    render(<GamificationStats />);
+
+    const levelBadge = screen.getByTestId('level-badge');
+    const progressFill = levelBadge.querySelector('span[aria-hidden="true"] > span');
+    expect(progressFill).toHaveStyle({ width: '50%' });
+  });
+
   it('shows demo indicator when in demo mode', async () => {
     const { useGamificationStore } = await import('@/lib/store/gamificationStore');
     vi.mocked(useGamificationStore).mockImplementation((selector: unknown) => {

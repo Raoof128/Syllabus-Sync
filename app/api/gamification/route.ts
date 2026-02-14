@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
@@ -52,6 +51,14 @@ function calculateLevel(xp: number): number {
 function xpForLevel(level: number): number {
   if (level <= 1) return 0;
   return (level - 1) * (level - 1) * 25;
+}
+
+function parseEventsLimit(limitParam: string | null): number {
+  const parsed = Number.parseInt(limitParam ?? '', 10);
+  if (!Number.isFinite(parsed)) {
+    return 10;
+  }
+  return Math.min(50, Math.max(1, parsed));
 }
 
 // ============================================================================
@@ -152,7 +159,7 @@ export async function GET(request: NextRequest) {
   // Check for events query parameter
   const url = new URL(request.url);
   const includeEvents = url.searchParams.get('events') === 'true';
-  const eventsLimit = Math.min(50, parseInt(url.searchParams.get('limit') || '10', 10));
+  const eventsLimit = parseEventsLimit(url.searchParams.get('limit'));
 
   return optionalAuth(request, async (userId) => {
     // Demo mode: return sample data
@@ -264,14 +271,12 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/gamification/record-activity - Record user activity (for streak tracking)
+ * POST /api/gamification - Record user activity (for streak tracking)
  * This is called when the user performs certain actions to update their streak
  */
-export async function POST(_request: NextRequest) {
+export async function POST(request: NextRequest) {
   // SECURITY: Apply CSRF protection and rate limiting (stricter for mutations)
-  // Note: We cast the return of withCSRFProtection to any to bypass strict RouteHandlerConfig validation
-  // in Next.js 16 when using higher-order functions that wrap Request handlers.
-  return withCSRFProtection(async (req) => {
+  return withCSRFProtection(async (req: NextRequest) => {
     const clientIP = getClientIP(req);
     const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
     if (!allowed) {
@@ -331,6 +336,6 @@ export async function POST(_request: NextRequest) {
             xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
         },
       });
-    }) as any;
-  })(_request as any) as any;
+    });
+  })(request);
 }

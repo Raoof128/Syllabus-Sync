@@ -136,7 +136,7 @@ export function GamificationStats({
   }
 
   if (variant === 'compact') {
-    const rawProgress = Math.min(100, Math.max(0, Math.round((progress ?? 0) * 100)));
+    const rawProgress = Math.min(100, Math.max(0, Math.round(progress ?? 0)));
     // Ensure a visible sliver for low progress without exceeding 100%
     const progressPercent = rawProgress <= 0 ? 0 : Math.min(100, Math.max(rawProgress, 18));
     const levelAriaLabel = t('levelBadgeAria', { level, currentXP, xpToNext });

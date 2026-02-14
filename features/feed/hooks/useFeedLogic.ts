@@ -176,8 +176,9 @@ export function useFeedLogic() {
           ...(isValidUUID && { relatedId: eventId }),
         });
 
-        // If user is authenticated (not demo mode), award XP
-        if (!isDemo) {
+        // If user is authenticated and the event has a verifiable UUID, award XP
+        // (event_attended now requires a concrete event reference for anti-abuse checks)
+        if (!isDemo && isValidUUID) {
           try {
             const response = await apiRequest<{
               message: string;
@@ -186,7 +187,7 @@ export function useFeedLogic() {
               method: 'POST',
               body: JSON.stringify({
                 eventType: 'event_attended',
-                referenceId: null, // Use null since sample events don't have UUID IDs
+                referenceId: eventId,
                 metadata: { eventId, title: eventTitle },
               }),
             });

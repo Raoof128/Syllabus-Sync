@@ -170,7 +170,7 @@ export async function resetAllStores(): Promise<void> {
     useEventsStore.getState().clearEvents();
     useProfilesStore.getState().clearProfiles();
     useNotificationsStore.getState().clearNotifications();
-    useGamificationStore.getState().resetProgress();
+    useGamificationStore.getState().reset();
     useTodosStore.getState().clearTodos();
     useNotificationPreferencesStore.getState().clearAllReminders();
 

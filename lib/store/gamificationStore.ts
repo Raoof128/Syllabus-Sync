@@ -205,6 +205,7 @@ export const useGamificationStore = create<GamificationState>()(
           recentEvents: [],
           hasLoaded: false,
           isLoading: false,
+          isDemo: false,
           error: null,
           settings: DEFAULT_GAMIFICATION_SETTINGS,
         });
@@ -230,8 +231,15 @@ export const useGamificationStore = create<GamificationState>()(
         profile: state.profile,
         recentEvents: state.recentEvents,
         isDemo: state.isDemo,
-        hasLoaded: state.hasLoaded,
         settings: state.settings,
+      }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as Partial<GamificationState>),
+        // Always force a fresh profile fetch on app boot
+        hasLoaded: false,
+        isLoading: false,
+        error: null,
       }),
     },
   ),
@@ -258,9 +266,8 @@ export function useXPProgress() {
     };
   }
 
-  const xpInLevel = profile.xp - profile.xpForCurrentLevel;
-  const nextLevelXp = profile.xpForCurrentLevel + profile.xpToNextLevel + xpInLevel;
-  const xpNeededForLevel = nextLevelXp - profile.xpForCurrentLevel;
+  const xpInLevel = Math.max(0, profile.xp - profile.xpForCurrentLevel);
+  const xpNeededForLevel = Math.max(0, xpInLevel + profile.xpToNextLevel);
 
   return {
     currentXP: profile.xp,

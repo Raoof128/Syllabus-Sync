@@ -968,3 +968,43 @@ No Supabase email service. No Supabase OTP. No magic links.
 #### Verification
 
 - `npm run check` ✅ (lint, typecheck, 425/425 tests, build)
+
+### Raouf: Gamification Production Audit and Hardening — 2026-02-14
+
+**Scope:** Full gamification function/logic audit and production hardening (store, API, feed integration, DB RPC security).
+**Type:** Security / Reliability / Correctness
+
+#### Changes Applied
+
+1. Fixed XP progress math in `useXPProgress` so per-level totals are computed correctly.
+2. Fixed compact gamification badge progress scaling bug (`progress` is now treated as 0-100, not 0-1).
+3. Removed persisted `hasLoaded` behavior from gamification store and forced `hasLoaded=false` on rehydration to prevent stale cached data.
+4. Updated logout reset flow to fully clear gamification state via `reset()` instead of `resetProgress()`.
+5. Hardened `/api/gamification` query parsing with bounded, NaN-safe `limit` handling.
+6. Removed unsafe `any` casts in gamification POST route and kept CSRF wrapper typed.
+7. Added CSRF protection to `/api/gamification/award-xp`.
+8. Tightened award-xp request schema: `event_attended` now requires a UUID `referenceId`.
+9. Added robust duplicate-check and database-error handling for XP award paths.
+10. Added strict parsing/validation of `award_xp` RPC payload before returning success.
+11. Updated feed XP award flow to only call `event_attended` XP award when the event ID is a valid UUID.
+12. Added migration to harden gamification RPC functions:
+    - Cross-user mutation guard in `award_xp` and `update_streak`
+    - `SECURITY DEFINER SET search_path = public`
+    - Revoke PUBLIC execute; grant only to `authenticated` and `service_role`
+
+#### Files Changed
+
+- `lib/store/gamificationStore.ts`
+- `features/gamification/components/GamificationStats.tsx`
+- `lib/utils/clientStorage.ts`
+- `app/api/gamification/route.ts`
+- `app/api/gamification/award-xp/route.ts`
+- `features/feed/hooks/useFeedLogic.ts`
+- `tests/gamification/GamificationStats.test.tsx`
+- `supabase/migrations/20260214000000_harden_gamification_rpc.sql` (new)
+
+#### Verification
+
+- `npm run test -- tests/gamification` ✅ (96/96 tests pass)
+- `npm run typecheck` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs ...changed files` ✅
