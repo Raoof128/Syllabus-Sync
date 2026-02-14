@@ -1,4 +1,10 @@
 Raouf: 2026-02-14 (Australia/Sydney)
+Scope: Header Action Buttons Alignment (Far Right)
+Summary: Adjusted the header actions container so the three controls (profile avatar menu, theme toggle, notifications) align to the far right edge on small screens. Added mobile full-width action row with right justification while preserving existing desktop spacing/behavior.
+Files: Modified [components/layout/Header.tsx](components/layout/Header.tsx).
+Verification: `npm run lint` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Manage Profiles Page Responsive Breakpoint Pass (Mobile/Tablet/Desktop/Wide)
 Summary: Completed a mobile-first responsiveness pass for `/manage-profiles` without redesign. Root causes fixed: rigid row layouts (`justify-between`) in reminder preference cards compressing content on phones, container spacing that was dense on narrow viewports, and potential overflow for long email/student identifiers in profile header. Updated page/skeleton spacing, converted reminder rows to stack on mobile and align horizontally on larger screens, added text wrapping and `min-w-0` protections, and adjusted save action/button behavior for small screens.
 Files: Modified [app/manage-profiles/page.tsx](app/manage-profiles/page.tsx), [app/manage-profiles/components/ProfileHeader.tsx](app/manage-profiles/components/ProfileHeader.tsx), [app/manage-profiles/components/ReminderSettings.tsx](app/manage-profiles/components/ReminderSettings.tsx), [app/manage-profiles/components/ProfileSkeleton.tsx](app/manage-profiles/components/ProfileSkeleton.tsx), [app/manage-profiles/error.tsx](app/manage-profiles/error.tsx).

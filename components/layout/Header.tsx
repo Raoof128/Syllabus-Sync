@@ -267,7 +267,7 @@ const Header = memo(() => {
       </div>
 
       {/* Right side - Actions */}
-      <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0 mt-1 sm:mt-0">
+      <div className="flex w-full sm:w-auto justify-end items-center gap-1 sm:gap-2 md:gap-3 shrink-0 mt-1 sm:mt-0">
         {/* Notifications - wrapped in isClient to prevent hydration mismatch with Radix UI IDs */}
         {isClient && (
           <DropdownMenu>

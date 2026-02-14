@@ -1,3 +1,32 @@
+### Raouf: Header Actions Right Alignment Fix - 2026-02-14
+
+**Scope:** Move the three header action controls to the far right.
+**Type:** UI Fix - Header Alignment
+
+#### Root Cause
+
+On mobile, the header uses `flex-col`; the actions row did not stretch/justify to the right, so the profile/theme/notification controls were not anchored to the far-right side.
+
+#### Changes Applied
+
+1. Updated header actions container in `components/layout/Header.tsx`:
+   - from: `flex items-center ...`
+   - to: `flex w-full sm:w-auto justify-end items-center ...`
+2. Result:
+   - mobile: action row fills width and aligns to far right
+   - desktop/tablet: existing layout and spacing remain unchanged
+
+#### Files Changed
+
+- `components/layout/Header.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Manage Profiles Responsive Breakpoint Pass - 2026-02-14
 
 **Scope:** Make `/manage-profiles` responsive across phone, tablet, laptop, and wide breakpoints.
