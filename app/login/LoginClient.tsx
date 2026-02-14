@@ -187,30 +187,30 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="login-page min-h-[100dvh] flex items-start lg:items-center justify-center bg-mq-background p-0 relative overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="login-page min-h-[100dvh] flex items-start lg:items-center justify-center bg-mq-background px-2 py-2 sm:px-4 sm:py-4 lg:p-0 relative overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/32 to-mq-background/85" />
 
-      <div className="relative z-10 w-full max-w-none min-h-[100dvh] h-auto lg:h-[100dvh] overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">
+      <div className="relative z-10 w-full max-w-[1920px] min-h-[calc(100dvh-1rem)] sm:min-h-[calc(100dvh-2rem)] lg:min-h-[100dvh] h-auto lg:h-[100dvh] overflow-x-hidden lg:overflow-hidden bg-mq-background/10 border border-mq-border/18 backdrop-blur-3xl shadow-[0_18px_70px_rgba(0,0,0,0.25)] flex flex-col lg:flex-row">
         {/* Left Panel */}
-        <div className="w-full lg:w-5/12 bg-mq-background text-mq-content backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-mq-border px-8 lg:px-12 py-12 flex flex-col overflow-y-auto">
-          <div className="flex items-center justify-center mb-8">
-            <div className="relative w-40 h-40 flex items-center justify-center">
+        <div className="w-full lg:w-5/12 bg-mq-background text-mq-content backdrop-blur-xl border-b lg:border-b-0 lg:border-r border-mq-border px-4 sm:px-6 lg:px-12 py-6 sm:py-8 lg:py-12 flex flex-col overflow-y-auto">
+          <div className="flex items-center justify-center mb-6 sm:mb-8">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 lg:w-40 lg:h-40 flex items-center justify-center">
               <Image
                 src="/MQ_Logo_Final.png"
                 alt={t('mqLogoAlt')}
                 width={160}
                 height={160}
-                className="object-contain drop-shadow-xl w-auto h-auto"
+                className="object-contain drop-shadow-xl w-full h-full"
                 priority
               />
             </div>
           </div>
 
-          <div className="space-y-2 mb-6 text-center">
-            <h1 className="text-2xl font-bold text-mq-content">
+          <div className="space-y-2 mb-5 sm:mb-6 text-center">
+            <h1 className="text-xl sm:text-2xl font-bold text-mq-content">
               {t('welcomeTo', { appName: APP_CONFIG.name })}
             </h1>
-            <p className="text-mq-content font-medium">
+            <p className="text-sm sm:text-base text-mq-content font-medium">
               {t('signInToAccess', { uniName: UNIVERSITY_CONFIG.name })}
             </p>
             <p className="text-sm text-mq-content font-medium">
@@ -260,7 +260,7 @@ export default function LoginClient() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex-1 flex flex-col">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 flex-1 flex flex-col min-w-0">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-mq-content font-bold">
                   {t('email')}
@@ -321,7 +321,7 @@ export default function LoginClient() {
                 </button>
               </div>
 
-              <div className="pt-2 flex justify-center">
+              <div className="pt-1 sm:pt-2 flex justify-center">
                 <FingerprintButton
                   type="submit"
                   text={t('signIn')}
@@ -330,7 +330,7 @@ export default function LoginClient() {
                   isSuccess={isSuccess}
                   isError={isError}
                   onAnimationComplete={() => isError && setGeneralError(null)}
-                  className="w-full max-w-[260px] font-bold"
+                  className="w-full sm:max-w-[260px] font-bold"
                 />
               </div>
 
@@ -345,7 +345,7 @@ export default function LoginClient() {
 
               {/* Security Methods Section */}
               {email && email.includes('@') && passkeyStatus !== 'idle' && (
-                <div className="rounded-xl border border-mq-border bg-mq-card-background/50 p-3 space-y-2">
+                <div className="rounded-xl border border-mq-border bg-mq-card-background/50 p-3 space-y-2 min-w-0">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-mq-content-secondary">
                     <Shield className="h-3.5 w-3.5" aria-hidden="true" />
                     {t('securityMethods' as Parameters<typeof t>[0]) || 'Security Methods'}
@@ -392,7 +392,7 @@ export default function LoginClient() {
               <Button
                 type="button"
                 variant="outline"
-                className={`h-12 rounded-full flex items-center justify-center gap-2 font-bold ${
+                className={`h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold ${
                   passkeyStatus === 'available'
                     ? 'border-mq-success/30 hover:border-mq-success/50'
                     : ''
@@ -418,7 +418,7 @@ export default function LoginClient() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-full flex items-center justify-center gap-2 font-bold"
+                  className="h-12 w-full min-w-0 rounded-full flex items-center justify-center gap-2 px-3 text-xs sm:text-sm font-bold"
                   onClick={() => handleOAuthLogin('google')}
                 >
                   <svg
@@ -449,7 +449,7 @@ export default function LoginClient() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-12 rounded-full flex items-center justify-center gap-2 font-bold"
+                  className="h-12 w-full min-w-0 rounded-full flex items-center justify-center gap-2 px-3 text-xs sm:text-sm font-bold"
                   onClick={() => handleOAuthLogin('facebook')}
                 >
                   <svg
@@ -473,7 +473,7 @@ export default function LoginClient() {
         </div>
 
         {/* Right Panel */}
-        <div className="relative flex-1 lg:w-7/12 bg-black/55">
+        <div className="hidden md:block relative md:min-h-[320px] lg:min-h-0 flex-1 lg:w-7/12 bg-black/55">
           <Image
             src="/images/login-bg.png"
             alt={t('mqSignpostAlt')}
@@ -483,20 +483,20 @@ export default function LoginClient() {
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/88 via-[#0a2f3c]/82 to-[#0f172a]/90" />
-          <div className="relative z-10 h-full w-full p-8 lg:p-12 flex flex-col justify-between text-white">
-            <div className="space-y-4 max-w-xl">
-              <p className="uppercase tracking-[0.2em] text-xs text-[color:var(--alabaster)]">
+          <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-12 flex flex-col justify-between text-white">
+            <div className="space-y-3 sm:space-y-4 max-w-2xl">
+              <p className="uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs text-[color:var(--alabaster)]">
                 {t('campusNavigation')}
               </p>
-              <h2 className="text-3xl lg:text-4xl font-bold leading-tight text-[color:var(--alabaster)]">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-[color:var(--alabaster)]">
                 {t('loginHeroTitle')}
               </h2>
-              <p className="text-sm lg:text-base max-w-xl text-[color:var(--alabaster)]">
+              <p className="text-sm sm:text-base max-w-xl text-[color:var(--alabaster)]">
                 {t('loginHeroDescription')}
               </p>
             </div>
 
-            <div className="relative flex-1 w-full mt-10 lg:mt-0" />
+            <div className="relative hidden lg:block flex-1 w-full mt-10 lg:mt-0" />
           </div>
         </div>
       </div>

@@ -1,3 +1,52 @@
+### Raouf: Login Page Responsive Breakpoint Pass - 2026-02-14
+
+**Scope:** Make `/login` fully responsive across phone, tablet, laptop, and wide breakpoints.
+**Type:** UI Responsiveness - Layout/Overflow
+
+#### Root Causes
+
+1. Login shell used rigid spacing and fullscreen overflow behavior that could cause cramped/clipped layout on 360–430px.
+2. Left auth panel used large default paddings and logo sizing on phones.
+3. Right hero panel always rendered, creating excessive vertical footprint on small devices.
+4. MFA challenge code input used large fixed typography/tracking, reducing comfort on narrow widths.
+5. Fingerprint login control relied on fixed CSS width (`200px`) instead of fluid constraints.
+
+#### Changes Applied
+
+1. **Login shell and panel spacing (`app/login/LoginClient.tsx`)**
+   - Added mobile-first outer padding and responsive min-height handling.
+   - Updated container overflow strategy to avoid horizontal clipping while keeping desktop behavior.
+   - Reduced left-panel paddings on phones and scaled logo/title sizing responsively.
+   - Made primary form actions and OAuth buttons fluid (`w-full`, responsive text sizing).
+
+2. **Hero panel responsiveness (`app/login/LoginClient.tsx`)**
+   - Hid right hero panel on smallest screens (`hidden md:block`) to prioritize login usability.
+   - Preserved hero panel on tablet/desktop with responsive text sizing and spacing.
+
+3. **MFA challenge mobile fit (`app/login/components/MFAChallenge.tsx`)**
+   - Tuned heading/icon and verification input sizing for narrow viewports.
+   - Reduced input letter-spacing on phones and improved error text wrapping.
+
+4. **Skeleton and control fluidity**
+   - Updated login skeleton spacing/logo sizing (`app/login/page.tsx`) for phone widths.
+   - Made fingerprint button base width fluid in CSS (`app/styles/fingerprint.css`) using `width: min(100%, 260px)` with small-screen height/font tuning.
+
+#### Files Changed
+
+- `app/login/LoginClient.tsx`
+- `app/login/components/MFAChallenge.tsx`
+- `app/login/page.tsx`
+- `app/styles/fingerprint.css`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npm run typecheck` ✅
+- `npm run test -- app/login/__tests__/actions.test.ts tests/security/login-mfa-failclosed.test.ts` ✅ (4/4 tests pass)
+- `npm run lighthouse:local` attempted ⚠️ but local `lhci` exits with `Hello, this is AnupamAS01!` and no report artifact is generated in this environment.
+
+---
+
 ### Raouf: Settings Page Responsive Breakpoint Pass - 2026-02-14
 
 **Scope:** Make `/settings` pages fully responsive across phone, tablet, laptop, and wide breakpoints.

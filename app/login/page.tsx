@@ -22,10 +22,10 @@ export const metadata: Metadata = {
 function LoginSkeleton() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-mq-background">
-      <div className="w-full max-w-md p-8">
+      <div className="w-full max-w-md p-4 sm:p-8">
         {/* Logo skeleton */}
-        <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-mq-border animate-pulse" />
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-mq-border animate-pulse" />
         </div>
         {/* Title skeleton */}
         <div className="h-8 w-48 mx-auto bg-mq-border rounded animate-pulse mb-4" />

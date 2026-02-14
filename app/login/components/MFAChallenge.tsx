@@ -142,16 +142,16 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     factors.some((f) => f.type === 'totp') && factors.some((f) => f.type === 'phone');
 
   return (
-    <div className="space-y-6 w-full max-w-sm mx-auto">
+    <div className="space-y-5 sm:space-y-6 w-full max-w-sm mx-auto">
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex justify-center">
-          <div className="p-3 bg-mq-primary/10 rounded-full">
-            <Shield className="h-8 w-8 text-mq-primary" />
+          <div className="p-2.5 sm:p-3 bg-mq-primary/10 rounded-full">
+            <Shield className="h-7 w-7 sm:h-8 sm:w-8 text-mq-primary" />
           </div>
         </div>
-        <h2 className="text-xl font-bold text-mq-content">Two-Step Verification</h2>
-        <p className="text-sm text-mq-content-secondary">
+        <h2 className="text-lg sm:text-xl font-bold text-mq-content">Two-Step Verification</h2>
+        <p className="text-xs sm:text-sm text-mq-content-secondary">
           {selectedFactor?.type === 'totp'
             ? 'Enter the 6-digit code from your authenticator app.'
             : `Enter the code sent to ****${selectedFactor?.phone?.slice(-4) ?? ''}.`}
@@ -175,16 +175,16 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
           onKeyDown={(e) => {
             if (e.key === 'Enter' && code.length === 6) handleVerify();
           }}
-          className="text-center text-3xl tracking-[0.5em] font-mono h-16"
+          className="text-center text-2xl sm:text-3xl tracking-[0.35em] sm:tracking-[0.5em] font-mono h-14 sm:h-16"
           autoFocus
           autoComplete="one-time-code"
           disabled={isLoading || attemptsLeft <= 0}
         />
 
         {error && (
-          <div className="flex items-center gap-2 text-red-500 text-sm justify-center">
+          <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm justify-center text-center">
             <AlertTriangle className="h-4 w-4" />
-            <span>{error}</span>
+            <span className="break-words">{error}</span>
           </div>
         )}
       </div>
