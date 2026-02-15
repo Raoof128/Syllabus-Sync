@@ -1,3 +1,38 @@
+### Raouf: Fix Avatar Persistence Bug — Avatar Resets After Upload & Restart — 2026-02-15
+
+**Scope:** Fix avatar disappearing after upload and app restart.
+**Type:** Bug Fix — Profile Avatar Persistence
+
+#### Root Cause
+
+When `uploadAvatarToStorage()` failed (Supabase Storage unavailable, network error, etc.):
+1. Avatar stayed as a data URL in local optimistic state
+2. `mapClientToDb()` intentionally skips data URLs (security: don't store base64 in DB)
+3. `avatar_url` was never written to the database
+4. On app restart, `fetchProfile()` read `avatar_url: null` from DB
+5. `mapDbToClient()` set `avatar: undefined`, overwriting the local-only data URL
+6. User saw avatar disappear despite getting a "success" toast
+
+#### Fix
+
+1. **Revert on upload failure** (`profilesStore.ts:362-377`): When `uploadAvatarToStorage` returns `null`, immediately revert avatar to its previous value and show error toast
+2. **Strip failed avatar from DB updates** (`profilesStore.ts:381-385`): Set `avatar: undefined` in `updatesForDb` when upload failed, preventing silent no-op through `mapClientToDb`
+3. **Early return on avatar-only failure** (`profilesStore.ts:390-392`): Return `null` when avatar was the only update and it failed, so caller knows the operation didn't succeed
+4. **Conditional success toast** (`ProfileHeader.tsx:37-40`): Only show success toast when `updateProfile` returns a profile (not `null`)
+
+#### Files Changed
+
+- `lib/store/profilesStore.ts`
+- `app/manage-profiles/components/ProfileHeader.tsx`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npx tsc --noEmit` ✅
+- Full test suite ✅ (443/443 tests pass)
+
+---
+
 ### Raouf: Map Page Full Audit — Fix All Navigation & Function Issues — 2026-02-15
 
 **Scope:** Complete audit of all map page functions and live navigation, then fix all identified issues.

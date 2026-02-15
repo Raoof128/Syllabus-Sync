@@ -34,8 +34,11 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
       const result = e.target?.result as string;
       setIsAvatarSaving(true);
       try {
-        await updateProfile(profile.id, { avatar: result });
-        toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
+        const updated = await updateProfile(profile.id, { avatar: result });
+        if (updated) {
+          toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
+        }
+        // If null, upload failed — store already shows error toast and reverts
       } catch {
         toastUtils.error(t('error'), t('failedToUpdateProfile'));
       } finally {

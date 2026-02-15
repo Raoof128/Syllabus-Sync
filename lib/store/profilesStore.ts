@@ -10,6 +10,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
+import { toastUtils } from '@/lib/utils/toast';
 
 // ============================================================================
 // TYPES
@@ -355,27 +356,43 @@ export const useProfilesStore = create<ProfilesState>()(
         }));
 
         let uploadedAvatarUrl: string | null = null;
+        let avatarUploadFailed = false;
         if (updates.avatar && isDataUrl(updates.avatar)) {
           uploadedAvatarUrl = await uploadAvatarToStorage(updates.avatar, id);
           if (uploadedAvatarUrl) {
-            const resolvedAvatarUrl = uploadedAvatarUrl ?? undefined;
             set((state) => ({
               profiles: state.profiles.map((p) =>
-                p.id === id ? { ...p, avatar: resolvedAvatarUrl, lastLogin: new Date() } : p,
+                p.id === id ? { ...p, avatar: uploadedAvatarUrl!, lastLogin: new Date() } : p,
               ),
             }));
+          } else {
+            // Upload failed — revert avatar to previous value so data URL doesn't linger
+            avatarUploadFailed = true;
+            set((state) => ({
+              profiles: state.profiles.map((p) =>
+                p.id === id ? { ...p, avatar: currentProfile.avatar, lastLogin: new Date() } : p,
+              ),
+            }));
+            toastUtils.error('Avatar upload failed', 'Your avatar could not be saved. Please try again.');
           }
         }
 
+        // Build updates for DB: use uploaded URL if available, strip failed avatar
         const updatesForDb = uploadedAvatarUrl
           ? { ...updates, avatar: uploadedAvatarUrl }
-          : updates;
+          : avatarUploadFailed
+            ? { ...updates, avatar: undefined }
+            : updates;
 
         const preferences = updatesForDb.preferences;
 
-        // Determine which fields need server sync
+        // If avatar was the only update and it failed, nothing to save
         const dbUpdates = mapClientToDb(updatesForDb);
         const hasServerUpdates = Object.keys(dbUpdates).length > 0;
+
+        if (avatarUploadFailed && !hasServerUpdates && !updatesForDb.preferences) {
+          return null;
+        }
 
         let serverProfile: UserProfile = optimisticProfile;
 
