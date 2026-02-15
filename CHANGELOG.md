@@ -1380,3 +1380,27 @@ Scope: Privacy Policy Documentation + README Wiring
 Summary: Added `docs/policies/privacy-policy.md` documenting app data collection/usage categories (account, profile, academic, notification, security/audit, MFA/passkeys, location, client storage), third-party processors, retention behavior, and user controls with implementation evidence pointers. Linked privacy policy from `README.md` and added policy entry points to `docs/README.md`.
 Files: Added `docs/policies/privacy-policy.md`; Modified `README.md`, `docs/README.md`.
 Verification: Documentation evidence review completed against relevant API routes, storage utilities, and Supabase migrations; links verified present in docs navigation ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Console Warning Noise Reduction (Preload + Offline Fetch)
+Summary: Reduced dev-console security/network noise by removing an unused third-party font source (`https://apps.rokt.com`) from CSP and improving store-side offline/network error handling. Added reusable network/offline helpers in API utilities and updated notifications/events/deadlines loading paths to avoid repeated `Failed to fetch` warning spam while keeping auth-error behavior and persisted fallback logic.
+Files: Modified `lib/security/csp.ts`, `lib/utils/api.ts`, `lib/store/notificationsStore.ts`, `lib/store/eventsStore.ts`, `lib/store/deadlinesStore.ts`.
+Verification: Targeted ESLint pass on changed files ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Supabase ECONNRESET Fail-Fast + ChunkLoadError Hardening
+Summary: Reduced long-running proxy/API hangs caused by Supabase upstream fetch instability by introducing a timeout-enabled fetch wrapper and proxy auth fail-fast guard. Updated service worker policy to stop caching Next.js runtime/chunk assets and bumped cache versions, mitigating stale-chunk `ChunkLoadError` scenarios after deploys.
+Files: Added `lib/supabase/fetch.ts`; Modified `lib/supabase/server.ts`, `lib/proxy.ts`, `public/sw.js`.
+Verification: Targeted ESLint pass ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Proxy Timeout Race Fix + AbortError Noise Suppression
+Summary: Resolved proxy auth timeout spam and follow-on `AbortError` logs by removing the auth `Promise.race` timeout branch that could abandon `getUser()` calls. Added transient auth/network log throttling in proxy and limited timeout-based fetch behavior to proxy-only usage; server-side Supabase client reverted to default fetch behavior.
+Files: Modified `lib/proxy.ts`, `lib/supabase/server.ts`.
+Verification: Targeted ESLint pass ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Additional Proxy/Auth Noise & Latency Reduction
+Summary: Optimized proxy auth flow by bypassing Supabase user lookup on routes that do not need user context, improving response times for public endpoints and reducing unnecessary upstream auth calls. Added throttled transient network-error handling in API auth middleware to reduce repeated `fetch failed`/`ECONNRESET` logging while preserving unauthenticated fallback behavior.
+Files: Modified `lib/proxy.ts`, `app/api/_lib/middleware.ts`.
+Verification: Targeted ESLint pass ✅, `npm run typecheck` ✅.

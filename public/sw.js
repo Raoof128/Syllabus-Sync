@@ -5,9 +5,9 @@
 // SECURITY: This service worker implements a strict caching policy to prevent
 // sensitive data from being cached and exposed after logout or on shared devices.
 
-const CACHE_NAME = 'syllabus-sync-v4'; // Bump version for cache invalidation
-const STATIC_CACHE = 'syllabus-sync-static-v4';
-const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v4';
+const CACHE_NAME = 'syllabus-sync-v5'; // Bump version for cache invalidation
+const STATIC_CACHE = 'syllabus-sync-static-v5';
+const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v5';
 const MAP_CACHE = 'syllabus-sync-map-v1'; // Dedicated cache for map assets
 
 // SECURITY: Only cache truly static assets - NO HTML pages that may contain user data
@@ -54,7 +54,6 @@ const NO_CACHE_PATHS = [
 
 // SECURITY: File extensions that are safe to cache (static assets only)
 const SAFE_TO_CACHE_EXTENSIONS = [
-  '.js',
   '.css',
   '.woff',
   '.woff2',
@@ -143,6 +142,11 @@ self.addEventListener('message', (event) => {
  */
 function isCacheable(url) {
   const pathname = url.pathname;
+
+  // Never cache Next.js runtime/chunk assets in SW to avoid stale chunk load errors.
+  if (pathname.startsWith('/_next/')) {
+    return false;
+  }
   
   // Never cache paths in the no-cache list
   if (NO_CACHE_PATHS.some(path => pathname.startsWith(path))) {

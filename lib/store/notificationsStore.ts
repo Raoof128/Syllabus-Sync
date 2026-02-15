@@ -5,11 +5,12 @@ import { create } from 'zustand';
 import { API_ROUTES } from '@/lib/constants/config';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { apiRequest } from '@/lib/utils/api';
+import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
 const STALE_MS = 60 * 1000; // 1 minute revalidation window
+let hasLoggedNetworkFallback = false;
 
 type LoadOptions = { force?: boolean };
 
@@ -79,7 +80,13 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
           window.location.href = '/login';
         }
       } else {
-        console.warn('Failed to load notifications from API:', error);
+        const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
+        if (!isNetworkError) {
+          console.warn('Failed to load notifications from API:', error);
+        } else if (!hasLoggedNetworkFallback) {
+          hasLoggedNetworkFallback = true;
+          console.warn('Notifications API unavailable; using local state fallback.');
+        }
         set({ hasLoaded: true, lastLoadedAt: Date.now() });
       }
     } finally {

@@ -23,6 +23,28 @@ export interface ApiRequestOptions extends RequestInit {
   skipCsrf?: boolean;
 }
 
+/**
+ * Returns true when an error likely represents a browser/network fetch failure
+ * (offline, DNS, CORS/network interruption), not an API business error.
+ */
+export function isLikelyNetworkError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('failed to fetch') ||
+    message.includes('networkerror') ||
+    message.includes('network request failed') ||
+    message.includes('load failed')
+  );
+}
+
+/**
+ * Browser offline hint.
+ */
+export function isBrowserOffline(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
 // ============================================================================
 // CSRF TOKEN HELPERS
 // ============================================================================

@@ -15,6 +15,28 @@ import { logger } from '@/lib/logger';
 
 // HTTP methods that modify state and require CSRF protection
 const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+let lastTransientAuthLogAt = 0;
+const TRANSIENT_AUTH_LOG_INTERVAL_MS = 60_000;
+
+function isTransientAuthNetworkError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const message = err.message.toLowerCase();
+  return (
+    err.name === 'AbortError' ||
+    message.includes('fetch failed') ||
+    message.includes('econnreset') ||
+    message.includes('network')
+  );
+}
+
+function shouldLogTransientAuthError(): boolean {
+  const now = Date.now();
+  if (now - lastTransientAuthLogAt < TRANSIENT_AUTH_LOG_INTERVAL_MS) {
+    return false;
+  }
+  lastTransientAuthLogAt = now;
+  return true;
+}
 
 /**
  * Require authentication for API routes
@@ -48,7 +70,13 @@ export const requireAuth = async (
         error?.status === 400;
 
       if (error && !isRefreshError) {
-        console.warn('API auth error:', error.message);
+        if (isTransientAuthNetworkError(new Error(error.message))) {
+          if (shouldLogTransientAuthError()) {
+            console.warn('API auth status: transient upstream issue; treating as unauthenticated');
+          }
+        } else {
+          console.warn('API auth error:', error.message);
+        }
       }
       return jsonUnauthorized('Valid authentication token required');
     }
@@ -84,7 +112,15 @@ export const optionalAuth = async (
         error.status === 400;
 
       if (!isRefreshError) {
-        console.warn('Optional auth status:', error.message);
+        if (isTransientAuthNetworkError(new Error(error.message))) {
+          if (shouldLogTransientAuthError()) {
+            console.warn(
+              'Optional auth status: transient upstream issue; continuing without user context',
+            );
+          }
+        } else {
+          console.warn('Optional auth status:', error.message);
+        }
       }
     }
 
@@ -92,7 +128,16 @@ export const optionalAuth = async (
   } catch (error) {
     const isRefreshError =
       error instanceof Error && error.message.includes('Refresh Token Not Found');
-    if (!isRefreshError) {
+    const isTransient = isTransientAuthNetworkError(
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    if (isTransient) {
+      if (shouldLogTransientAuthError()) {
+        console.warn(
+          'Optional auth status: transient upstream failure; continuing unauthenticated',
+        );
+      }
+    } else if (!isRefreshError) {
       logger.error(
         'Optional auth middleware error:',
         error instanceof Error ? error.message : 'Unknown error',
@@ -145,7 +190,13 @@ export const requireAuthWithRateLimit = async (
         error?.status === 400;
 
       if (error && !isRefreshError) {
-        console.warn('API auth error:', error.message);
+        if (isTransientAuthNetworkError(new Error(error.message))) {
+          if (shouldLogTransientAuthError()) {
+            console.warn('API auth status: transient upstream issue; treating as unauthenticated');
+          }
+        } else {
+          console.warn('API auth error:', error.message);
+        }
       }
       return jsonUnauthorized('Valid authentication token required');
     }

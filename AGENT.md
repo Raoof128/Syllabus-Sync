@@ -259,3 +259,27 @@ Scope: Privacy Policy Documentation + README Wiring
 Summary: Added a dedicated privacy policy document that explicitly describes what user/system data Syllabus Sync collects and how it is used, with direct code/schema evidence references. Wired privacy documentation into the main README technical docs list and updated docs index policy entry points for discoverability.
 Files: Added `docs/policies/privacy-policy.md`; Modified `README.md`, `docs/README.md`.
 Verification: Cross-checked policy claims against implemented code paths and schema objects in `app/api/auth/*`, `app/api/profiles/route.ts`, `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `lib/security/emailVerification.ts`, `lib/supabase/middleware.ts`, and `supabase/migrations/*` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Console Warning Noise Reduction (Preload + Offline Fetch)
+Summary: Investigated browser warnings for unused `apps.rokt.com` font preload and repeated `Failed to fetch` store warnings. Removed unused Rokt font source from CSP (`font-src`) because the repo has no first-party Rokt integration. Added shared network/offline detection helpers in `lib/utils/api.ts` and updated notifications/events/deadlines stores to suppress repeated offline fetch warning spam while preserving authentication error handling and persisted-data fallback behavior.
+Files: Modified `lib/security/csp.ts`, `lib/utils/api.ts`, `lib/store/notificationsStore.ts`, `lib/store/eventsStore.ts`, `lib/store/deadlinesStore.ts`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs lib/security/csp.ts lib/utils/api.ts lib/store/notificationsStore.ts lib/store/eventsStore.ts lib/store/deadlinesStore.ts` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Supabase ECONNRESET Fail-Fast + ChunkLoadError Hardening
+Summary: Implemented fail-fast Supabase request behavior to reduce long proxy/API stalls during transient network failures (e.g., ECONNRESET). Added a shared timed fetch wrapper (`lib/supabase/fetch.ts`), wired it into server-side Supabase clients (`lib/supabase/server.ts`, `lib/proxy.ts`), and added a hard timeout guard around proxy auth resolution to prevent minute-long request blocking. Hardened service worker caching to prevent stale Next.js chunk/runtime asset caching by excluding `/_next/*`, removing JS extension caching, and bumping cache versions in `public/sw.js`.
+Files: Added `lib/supabase/fetch.ts`; Modified `lib/supabase/server.ts`, `lib/proxy.ts`, `public/sw.js`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs lib/proxy.ts lib/supabase/server.ts lib/supabase/fetch.ts` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Proxy Timeout Race Fix + AbortError Noise Suppression
+Summary: Fixed repeated `Proxy auth status: timeout after 3500ms` and `AbortError: Supabase request timeout after 8000ms` noise by removing the proxy `Promise.race` timeout pattern that left unresolved `getUser()` promises. Kept timeout-bounded fetch only in proxy path, restored default Supabase server client fetch in `lib/supabase/server.ts`, and added throttled transient network-error logging in proxy (ECONNRESET/fetch failed/AbortError) to prevent repeated console spam.
+Files: Modified `lib/proxy.ts`, `lib/supabase/server.ts`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs lib/proxy.ts lib/supabase/server.ts lib/supabase/fetch.ts` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Additional Proxy/Auth Noise & Latency Reduction
+Summary: Reduced proxy/auth overhead and transient error noise further by skipping proxy user-resolution for routes that do not require user context (especially public API routes like `/api/auth/*`, `/api/health`, `/api/weather`). Added transient network error throttling in shared API auth middleware (`requireAuth`, `optionalAuth`, `requireAuthWithRateLimit`) so ECONNRESET/fetch-failed conditions are treated as temporary upstream failures without repeated console spam.
+Files: Modified `lib/proxy.ts`, `app/api/_lib/middleware.ts`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs lib/proxy.ts app/api/_lib/middleware.ts lib/supabase/server.ts` ✅, `npm run typecheck` ✅.

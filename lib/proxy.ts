@@ -3,6 +3,40 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { getCSP } from '@/lib/security/csp';
 import { setCSRFCookie } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
+import { fetchWithTimeout } from '@/lib/supabase/fetch';
+
+let lastTransientProxyAuthLogAt = 0;
+const TRANSIENT_PROXY_LOG_INTERVAL_MS = 60_000;
+
+function isTransientProxyAuthError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const message = err.message.toLowerCase();
+  return (
+    err.name === 'AbortError' ||
+    message.includes('fetch failed') ||
+    message.includes('econnreset') ||
+    message.includes('network')
+  );
+}
+
+function shouldLogTransientProxyAuthError(): boolean {
+  const now = Date.now();
+  if (now - lastTransientProxyAuthLogAt < TRANSIENT_PROXY_LOG_INTERVAL_MS) {
+    return false;
+  }
+  lastTransientProxyAuthLogAt = now;
+  return true;
+}
+
+function isPublicApiPath(path: string): boolean {
+  return (
+    path.startsWith('/api/auth/') ||
+    path.startsWith('/api/health') ||
+    path.startsWith('/api/mq-demo') ||
+    path.startsWith('/api/weather') ||
+    path.startsWith('/api/test-weather')
+  );
+}
 
 /**
  * Next.js 16 Proxy handler (formerly Middleware)
@@ -10,6 +44,14 @@ import { logger } from '@/lib/logger';
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
+  const authRoutes = ['/login', '/signup', '/reset-password'];
+  const publicRoutes = ['/test-weather'];
+  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
+  const isApiRoute = path.startsWith('/api/');
+  const isPublicApi = isPublicApiPath(path);
+  const shouldResolveUser = isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi);
 
   if (path === '/@vite/client') {
     return new NextResponse('', {
@@ -70,8 +112,16 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  // Fast path: routes that don't require user context avoid expensive auth fetch.
+  if (!shouldResolveUser) {
+    return response;
+  }
+
   // 2. Initialize Supabase Client
   const supabase = createServerClient(supabaseUrl!, supabaseAnonKey!, {
+    global: {
+      fetch: fetchWithTimeout,
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -118,8 +168,14 @@ export async function proxy(request: NextRequest) {
         error.status === 400;
 
       if (!isRefreshTokenError) {
-        // Only log unexpected auth errors
-        console.warn('Proxy auth status:', error.message);
+        if (isTransientProxyAuthError(new Error(error.message))) {
+          if (shouldLogTransientProxyAuthError()) {
+            console.warn('Proxy auth status: transient network/auth issue; request continuing');
+          }
+        } else {
+          // Only log unexpected auth errors
+          console.warn('Proxy auth status:', error.message);
+        }
       } else {
         // Quietly clear invalid session data to prevent repeated errors
         try {
@@ -130,31 +186,20 @@ export async function proxy(request: NextRequest) {
       }
     }
   } catch (err) {
-    // Only log unexpected catastrophic errors, not common refresh failures
     const isRefreshError = err instanceof Error && err.message.includes('Refresh Token Not Found');
-    if (!isRefreshError) {
+    const isTransient = isTransientProxyAuthError(err);
+
+    // Suppress noisy transient network exceptions from auth checks.
+    if (isTransient) {
+      if (shouldLogTransientProxyAuthError()) {
+        console.warn('Proxy auth status: transient upstream failure; request continuing');
+      }
+    } else if (!isRefreshError) {
       logger.error('Proxy auth exception:', err);
     }
   }
 
   // 4. Route Protection
-  // Protected Pages (temporarily disabled for testing)
-  const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
-  const publicRoutes = ['/test-weather'];
-  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
-
-  // Auth Pages
-  const authRoutes = ['/login', '/signup', '/reset-password'];
-  const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
-
-  // API Protection
-  const isApiRoute = path.startsWith('/api/');
-  const isPublicApi =
-    path.startsWith('/api/auth/') ||
-    path.startsWith('/api/health') ||
-    path.startsWith('/api/mq-demo') ||
-    path.startsWith('/api/weather') ||
-    path.startsWith('/api/test-weather');
 
   // Logic:
   // If authenticated and on auth route -> redirect to /home

@@ -2,12 +2,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Deadline, StressLevel } from '@/lib/types';
-import { apiRequest } from '@/lib/utils/api';
+import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
+let hasLoggedNetworkFallback = false;
 
 interface DeadlinesState {
   deadlines: Deadline[];
@@ -84,7 +85,13 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             // Auth failure: clear persisted data to prevent showing stale user data
             set({ deadlines: [], hasLoaded: true });
           } else {
-            console.warn('Failed to load deadlines from API:', error);
+            const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
+            if (!isNetworkError) {
+              console.warn('Failed to load deadlines from API:', error);
+            } else if (!hasLoggedNetworkFallback) {
+              hasLoggedNetworkFallback = true;
+              console.warn('Deadlines API unavailable; using persisted data fallback.');
+            }
             // Non-auth error: keep persisted data but mark as loaded
             set({ hasLoaded: true });
           }

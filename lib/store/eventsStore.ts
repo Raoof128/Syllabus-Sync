@@ -7,8 +7,9 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Event } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
-import { apiRequest } from '@/lib/utils/api';
+import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { v4 as uuidv4 } from 'uuid';
+let hasLoggedNetworkFallback = false;
 
 interface EventsState {
   events: Event[];
@@ -78,7 +79,13 @@ export const useEventsStore = create<EventsState>()(
           } else {
             // Non-auth error: keep persisted data but mark as loaded
             // Do NOT fall back to sample data - this causes "ghost" events
-            console.warn('Failed to load events from API, using persisted data:', error);
+            const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
+            if (!isNetworkError) {
+              console.warn('Failed to load events from API, using persisted data:', error);
+            } else if (!hasLoggedNetworkFallback) {
+              hasLoggedNetworkFallback = true;
+              console.warn('Events API unavailable; using persisted data fallback.');
+            }
             set({ hasLoaded: true });
           }
         } finally {
