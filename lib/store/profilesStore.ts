@@ -373,7 +373,10 @@ export const useProfilesStore = create<ProfilesState>()(
                 p.id === id ? { ...p, avatar: currentProfile.avatar, lastLogin: new Date() } : p,
               ),
             }));
-            toastUtils.error('Avatar upload failed', 'Your avatar could not be saved. Please try again.');
+            toastUtils.error(
+              'Avatar upload failed',
+              'Your avatar could not be saved. Please try again.',
+            );
           }
         }
 

@@ -1,3 +1,47 @@
+### Raouf: PWA Hardening — Proper Icon Set, Manifest Fixes, Offline Page, Layout Metadata — 2026-02-16
+
+**Scope:** Improve PWA installability and Lighthouse compliance without replacing the custom security-hardened service worker.
+**Type:** Enhancement — PWA Infrastructure
+
+#### Changes
+
+1. **Icon set generation** — Created proper square icons from the existing 1536x1024 logo:
+   - `public/icons/icon-192.png` (192x192)
+   - `public/icons/icon-384.png` (384x384)
+   - `public/icons/icon-512.png` (512x512)
+   - `public/icons/maskable-512.png` (512x512, with safe-zone padding on MQ red background)
+   - `public/icons/apple-touch-icon.png` + `public/apple-touch-icon.png` (180x180)
+
+2. **Manifest fixes** (`public/manifest.webmanifest`):
+   - Split `"purpose": "any maskable"` into separate icon entries (fixes Chrome DevTools warning)
+   - Added 192x192 and 384x384 icon sizes (Lighthouse requires 192 minimum)
+   - Changed `start_url` from `/` to `/home` (authenticated entry point)
+
+3. **Layout metadata** (`app/layout.tsx`):
+   - Added `applicationName` for PWA install prompt
+   - Added `appleWebApp` config (capable, title, statusBarStyle) for iOS Add-to-Home-Screen
+   - Added `apple-touch-icon` to icons metadata
+
+4. **Offline page** (`app/offline/page.tsx`):
+   - Created a styled offline fallback page using the app's design tokens
+   - Includes retry button and matches the existing visual language
+
+5. **Service worker updates** (`public/sw.js`):
+   - Added PWA icons to static precache list
+   - Bumped cache version from v3 to v4
+
+#### Files Changed
+
+- Created: `public/icons/icon-192.png`, `public/icons/icon-384.png`, `public/icons/icon-512.png`, `public/icons/maskable-512.png`, `public/icons/apple-touch-icon.png`, `public/apple-touch-icon.png`, `app/offline/page.tsx`
+- Modified: `public/manifest.webmanifest`, `app/layout.tsx`, `public/sw.js`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npx tsc --noEmit` ✅
+
+---
+
 ### Raouf: Fix Avatar Persistence Bug — Avatar Resets After Upload & Restart — 2026-02-15
 
 **Scope:** Fix avatar disappearing after upload and app restart.
@@ -6,6 +50,7 @@
 #### Root Cause
 
 When `uploadAvatarToStorage()` failed (Supabase Storage unavailable, network error, etc.):
+
 1. Avatar stayed as a data URL in local optimistic state
 2. `mapClientToDb()` intentionally skips data URLs (security: don't store base64 in DB)
 3. `avatar_url` was never written to the database

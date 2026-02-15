@@ -2,18 +2,33 @@
   "name": "Syllabus Sync - Macquarie University",
   "short_name": "Syllabus Sync",
   "description": "Your intelligent campus companion for managing academic schedules, deadlines, and campus navigation at Macquarie University",
-  "start_url": "/",
+  "start_url": "/home",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#A6192E",
   "orientation": "portrait-primary",
-  "scope": "/",
   "icons": [
     {
-      "src": "/MQ_Logo_Final.png",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     },
     {
       "src": "/favicon.ico",

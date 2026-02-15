@@ -13,11 +13,17 @@ export const metadata: Metadata = {
     template: `%s | ${APP_CONFIG.name}`,
   },
   description: APP_CONFIG.fullDescription,
+  applicationName: APP_CONFIG.name,
   metadataBase: new URL(UNIVERSITY_CONFIG.website),
   alternates: {
     canonical: '/',
   },
   manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: APP_CONFIG.name,
+    statusBarStyle: 'default',
+  },
   openGraph: {
     title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
     description: APP_CONFIG.fullDescription,
@@ -35,6 +41,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 

@@ -5,16 +5,19 @@
 // SECURITY: This service worker implements a strict caching policy to prevent
 // sensitive data from being cached and exposed after logout or on shared devices.
 
-const CACHE_NAME = 'syllabus-sync-v3'; // Bump version for cache invalidation
-const STATIC_CACHE = 'syllabus-sync-static-v3';
-const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v3';
+const CACHE_NAME = 'syllabus-sync-v4'; // Bump version for cache invalidation
+const STATIC_CACHE = 'syllabus-sync-static-v4';
+const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v4';
 const MAP_CACHE = 'syllabus-sync-map-v1'; // Dedicated cache for map assets
 
 // SECURITY: Only cache truly static assets - NO HTML pages that may contain user data
+// Exception: /offline is a static shell page with no user data, safe to precache
 const STATIC_ASSETS = [
   '/manifest.webmanifest',
   '/favicon.ico',
   '/MQ_Logo_Final.png',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
 ];
 
 // Map assets to precache for offline support (non-sensitive public data)

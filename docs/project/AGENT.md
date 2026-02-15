@@ -1,3 +1,9 @@
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: PWA Hardening — Proper Icon Set, Manifest Fixes, Offline Page, Layout Metadata
+Summary: Improved PWA installability and Lighthouse compliance. Generated proper square icon set (192/384/512/maskable/apple-touch), fixed manifest (split any+maskable, start_url to /home), added appleWebApp + applicationName metadata, created /offline route, bumped SW cache to v4.
+Files: Created `public/icons/*`, `public/apple-touch-icon.png`, `app/offline/page.tsx`. Modified `public/manifest.webmanifest`, `app/layout.tsx`, `public/sw.js`.
+Verification: `npm run lint` ✅, `npx tsc --noEmit` ✅.
+
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Repository Documentation Audit & Full System Check
 Summary: Completed full repository audit including all docs (README.md, AGENT.md, CHANGELOG.md, docs/project/\*). Updated README test badge from 425 to 443, added recent features (email verification, gamification hardening, responsive breakpoint passes, WebAuthn/passkey support, DB alignment), expanded directory tree with missing routes and supabase migrations, and synced all doc-level AGENT/CHANGELOG files with root entries through Feb 14. Ran `npm run check` to verify full pipeline.
