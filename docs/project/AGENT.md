@@ -1,4 +1,10 @@
 Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Privacy Policy (APP-Compliant) — Full Policy Page, Collection Notices, Legal Links
+Summary: Created `/privacy` page (14-section APP-compliant policy tailored to actual stack), added APP 5 collection notice to signup, added privacy/terms links to login footer, changed config from external MQ URLs to internal `/privacy` and `/terms` routes.
+Files: Created `app/privacy/page.tsx`. Modified `app/signup/SignupClient.tsx`, `app/login/LoginClient.tsx`, `lib/config.ts`.
+Verification: `npm run lint` ✅, `npx tsc --noEmit` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
 Scope: PWA Hardening — Proper Icon Set, Manifest Fixes, Offline Page, Layout Metadata
 Summary: Improved PWA installability and Lighthouse compliance. Generated proper square icon set (192/384/512/maskable/apple-touch), fixed manifest (split any+maskable, start_url to /home), added appleWebApp + applicationName metadata, created /offline route, bumped SW cache to v4.
 Files: Created `public/icons/*`, `public/apple-touch-icon.png`, `app/offline/page.tsx`. Modified `public/manifest.webmanifest`, `app/layout.tsx`, `public/sw.js`.

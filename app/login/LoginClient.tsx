@@ -468,8 +468,29 @@ export default function LoginClient() {
                 </Button>
               </div>
 
-              <div className="pt-4 text-center text-xs text-mq-content font-medium">
-                © {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
+              <div className="pt-4 text-center text-xs text-mq-content font-medium space-y-1">
+                <div>
+                  © {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
+                </div>
+                <div className="text-mq-content-secondary">
+                  <a
+                    href="/privacy"
+                    className="hover:underline hover:text-mq-primary"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('privacyPolicy')}
+                  </a>
+                  {' · '}
+                  <a
+                    href="/terms"
+                    className="hover:underline hover:text-mq-primary"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('termsOfService')}
+                  </a>
+                </div>
               </div>
             </form>
           )}

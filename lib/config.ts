@@ -128,6 +128,6 @@ export const SOCIAL_LINKS = {
 export const EXTERNAL_LINKS = {
   documentation: 'https://github.com/mrpouyaalavi',
   feedback: 'mailto:support@mq.edu.au?subject=Syllabus Sync Feedback',
-  privacy: 'https://www.mq.edu.au/privacy',
-  terms: 'https://www.mq.edu.au/terms',
+  privacy: '/privacy',
+  terms: '/terms',
 } as const;

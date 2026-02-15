@@ -323,6 +323,21 @@ export default function SignupClient() {
                 <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
               )}
 
+              {/* APP 5 Collection Notice */}
+              <p className="text-xs text-mq-content-secondary leading-relaxed">
+                We collect your name, email, student ID, course, and year to create and manage your
+                account, provide the Service, and maintain security. Our service providers
+                (including cloud hosting) may process data outside Australia.{' '}
+                <a
+                  href="/privacy"
+                  className="text-mq-primary hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('privacyPolicy')}
+                </a>
+              </p>
+
               <Button
                 type="button"
                 onClick={handleNextStep}

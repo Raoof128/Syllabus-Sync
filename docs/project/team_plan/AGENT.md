@@ -2,6 +2,9 @@
 ## Current Development Session (January 22-February 14, 2026)
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, Security Enhancements, Responsive Design, and Documentation
 
+### Raouf: 2026-02-16 (Australia/Sydney) - Privacy Policy (APP-Compliant) — Policy Page, Collection Notices, Legal Links
+- **Status:** ✅ Complete - Full APP-compliant privacy policy, signup collection notice, login footer links, internal routing.
+
 ### Raouf: 2026-02-16 (Australia/Sydney) - PWA Hardening — Icon Set, Manifest, Offline Page, Layout Metadata
 - **Status:** ✅ Complete - PWA installable with proper icons, manifest, iOS support, offline page.
 

@@ -1,3 +1,40 @@
+### Raouf: Privacy Policy (APP-Compliant) — Full Policy Page, Collection Notices, Legal Links — 2026-02-16
+
+**Scope:** Implement industry-grade privacy infrastructure aligned with Australian Privacy Principles (APPs).
+**Type:** Feature — Legal/Privacy Compliance
+
+#### Changes
+
+1. **Privacy Policy page** (`app/privacy/page.tsx`):
+   - 14-section APP-compliant policy covering: purpose & scope, data categories (account, MFA, usage, location, cookies), collection methods, purposes, disclosure, overseas transfer with vendor table (Supabase, Vercel, Sentry, ORS + regions), security measures, data retention, cookies & analytics, access & correction rights (APPs 12-13), complaints (30-day response + OAIC escalation), NDB scheme, education context, and changes
+   - Tailored to actual tech stack — references real security controls (CSP nonces, SW no-cache for API/auth, TOTP no-store, cache-clear-on-logout, password hashing, WebAuthn)
+   - Uses app design system tokens (`mq-content`, `mq-card-background`, etc.)
+
+2. **APP 5 Collection Notice** (`app/signup/SignupClient.tsx`):
+   - Added between terms checkbox and Next button on Step 1
+   - Explains what data is collected (name, email, student ID, course, year), purpose, and overseas processing
+   - Links to `/privacy` for full details
+
+3. **Login footer links** (`app/login/LoginClient.tsx`):
+   - Added Privacy Policy and Terms of Service links below copyright
+
+4. **Internal link routing** (`lib/config.ts`):
+   - Changed `EXTERNAL_LINKS.privacy` from `https://www.mq.edu.au/privacy` to `/privacy`
+   - Changed `EXTERNAL_LINKS.terms` from `https://www.mq.edu.au/terms` to `/terms`
+   - Settings page privacy button now opens the in-app policy
+
+#### Files Changed
+
+- Created: `app/privacy/page.tsx`
+- Modified: `app/signup/SignupClient.tsx`, `app/login/LoginClient.tsx`, `lib/config.ts`
+
+#### Verification
+
+- `npm run lint` ✅
+- `npx tsc --noEmit` ✅
+
+---
+
 ### Raouf: PWA Hardening — Proper Icon Set, Manifest Fixes, Offline Page, Layout Metadata — 2026-02-16
 
 **Scope:** Improve PWA installability and Lighthouse compliance without replacing the custom security-hardened service worker.
