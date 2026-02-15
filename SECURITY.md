@@ -69,10 +69,10 @@ This ensures security features (CSRF, rate limiting, dev bypasses) cannot be cir
 
 ## Development vs Production
 
-| Feature                    | Development                      | Production               |
-| -------------------------- | -------------------------------- | ------------------------ |
-| Dev email bypass           | Enabled (with DEV_BYPASS_EMAILS) | **Always disabled**      |
+| Feature                    | Development                      | Production                  |
+| -------------------------- | -------------------------------- | --------------------------- |
+| Dev email bypass           | Enabled (with DEV_BYPASS_EMAILS) | **Always disabled**         |
 | Origin/CSRF route controls | Applied by middleware/route      | Applied by middleware/route |
-| Rate limiting              | In-memory (fallback)             | **Requires Redis**       |
-| Error details              | Exposed                          | **Hidden**               |
-| Database errors            | Detailed                         | **Generic message only** |
+| Rate limiting              | In-memory (fallback)             | **Requires Redis**          |
+| Error details              | Exposed                          | **Hidden**                  |
+| Database errors            | Detailed                         | **Generic message only**    |

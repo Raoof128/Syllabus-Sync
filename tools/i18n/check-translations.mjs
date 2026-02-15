@@ -29,7 +29,10 @@ async function loadTranslation(locale) {
 
 async function main() {
   const localeEntries = await fs.readdir(LOCALES_DIR, { withFileTypes: true });
-  const locales = localeEntries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const locales = localeEntries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
 
   if (!locales.includes(BASE_LOCALE)) {
     throw new Error(`Base locale "${BASE_LOCALE}" is missing`);

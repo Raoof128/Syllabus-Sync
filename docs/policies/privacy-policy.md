@@ -14,18 +14,18 @@ This policy applies to:
 
 ## What We Collect and Why
 
-| Data Category | What We Collect | Why We Collect It | Primary Code/Schema Evidence |
-| --- | --- | --- | --- |
-| Account and identity data | Email address, authentication account identifier, password-based auth (handled by Supabase Auth) | Account creation, login, session management | `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`, `supabase/migrations/20260104000000_initial_schema.sql` |
-| Profile data | `full_name`, `student_id`, `course`, `year`, `avatar_url`, `email` | Personalize the user profile and academic dashboard | `app/api/profiles/route.ts`, `docs/database/database-schema.sql` (`public.profiles`) |
-| Academic planning data | Units, class times, deadlines, events, todos | Core app functionality for planning and scheduling | `docs/database/database-schema.sql` (`public.units`, `public.class_times`, `public.deadlines`, `public.events`), `supabase/migrations/20260124001000_create_todos_table.sql` |
-| Notification data | In-app notifications and notification preferences (email/push toggles, reminder timing) | Deliver reminders and in-app alerts | `docs/database/database-schema.sql` (`public.notifications`, `public.user_preferences`), `lib/store/notificationPreferencesStore.ts` |
-| Security and audit data | Audit event metadata, IP address, user agent, action and severity logs | Security monitoring, abuse detection, and incident investigation | `app/api/audit/route.ts`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.audit_logs`, `public.auth_audit_logs`) |
-| MFA and authentication hardening data | MFA factors (TOTP/SMS via Supabase), passkey credential material, WebAuthn challenge records | Account security and strong authentication | `app/api/auth/mfa/*`, `app/api/webauthn/*`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.webauthn_credentials`, `public.webauthn_challenges`) |
-| Email verification data | Token hash, user ID, expiry, used flag | Verify email ownership and prevent token replay | `lib/security/emailVerification.ts`, `app/api/auth/email/verify/route.ts`, `supabase/migrations/20260213000000_email_verifications.sql` |
-| Device/session metadata | Session device label (derived from user-agent), session scope operations, session cookies | User session display and session control | `app/api/auth/sessions/route.ts`, `lib/supabase/middleware.ts` |
-| Location/coordinates (feature-based) | Latitude/longitude provided for routing and weather features | Navigation routing and weather display | `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `features/map/hooks/useMapLocation.ts` |
-| Client-side preference and cache data | Theme/language and selected persisted app state in browser storage | UX continuity and offline/resume behavior | `lib/utils/clientStorage.ts`, `lib/store/*Store.ts` (persist middleware), `public/sw.js` |
+| Data Category                         | What We Collect                                                                                  | Why We Collect It                                                | Primary Code/Schema Evidence                                                                                                                                                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account and identity data             | Email address, authentication account identifier, password-based auth (handled by Supabase Auth) | Account creation, login, session management                      | `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`, `supabase/migrations/20260104000000_initial_schema.sql`                                                                 |
+| Profile data                          | `full_name`, `student_id`, `course`, `year`, `avatar_url`, `email`                               | Personalize the user profile and academic dashboard              | `app/api/profiles/route.ts`, `docs/database/database-schema.sql` (`public.profiles`)                                                                                                    |
+| Academic planning data                | Units, class times, deadlines, events, todos                                                     | Core app functionality for planning and scheduling               | `docs/database/database-schema.sql` (`public.units`, `public.class_times`, `public.deadlines`, `public.events`), `supabase/migrations/20260124001000_create_todos_table.sql`            |
+| Notification data                     | In-app notifications and notification preferences (email/push toggles, reminder timing)          | Deliver reminders and in-app alerts                              | `docs/database/database-schema.sql` (`public.notifications`, `public.user_preferences`), `lib/store/notificationPreferencesStore.ts`                                                    |
+| Security and audit data               | Audit event metadata, IP address, user agent, action and severity logs                           | Security monitoring, abuse detection, and incident investigation | `app/api/audit/route.ts`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.audit_logs`, `public.auth_audit_logs`)                                 |
+| MFA and authentication hardening data | MFA factors (TOTP/SMS via Supabase), passkey credential material, WebAuthn challenge records     | Account security and strong authentication                       | `app/api/auth/mfa/*`, `app/api/webauthn/*`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.webauthn_credentials`, `public.webauthn_challenges`) |
+| Email verification data               | Token hash, user ID, expiry, used flag                                                           | Verify email ownership and prevent token replay                  | `lib/security/emailVerification.ts`, `app/api/auth/email/verify/route.ts`, `supabase/migrations/20260213000000_email_verifications.sql`                                                 |
+| Device/session metadata               | Session device label (derived from user-agent), session scope operations, session cookies        | User session display and session control                         | `app/api/auth/sessions/route.ts`, `lib/supabase/middleware.ts`                                                                                                                          |
+| Location/coordinates (feature-based)  | Latitude/longitude provided for routing and weather features                                     | Navigation routing and weather display                           | `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `features/map/hooks/useMapLocation.ts`                                                                                         |
+| Client-side preference and cache data | Theme/language and selected persisted app state in browser storage                               | UX continuity and offline/resume behavior                        | `lib/utils/clientStorage.ts`, `lib/store/*Store.ts` (persist middleware), `public/sw.js`                                                                                                |
 
 ## How We Use Data
 
@@ -76,14 +76,14 @@ Evidence:
 
 ## Third-Party Processors and External Services
 
-| Service | Purpose | Data Shared |
-| --- | --- | --- |
-| Supabase | Authentication, database, storage | Account identifiers, app data, security/audit records needed by features |
-| Resend | Transactional email verification | User email address and verification message content |
-| OpenRouteService | Route generation for map navigation | Route coordinates submitted by user action |
-| Open-Meteo | Weather retrieval | Coordinates used for weather lookup |
-| Upstash Redis / Vercel KV (if configured) | Distributed rate-limit counters | Derived request identifiers and counter state |
-| Sentry (if enabled) | Error and performance monitoring | Runtime diagnostic metadata and error context |
+| Service                                   | Purpose                             | Data Shared                                                              |
+| ----------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------ |
+| Supabase                                  | Authentication, database, storage   | Account identifiers, app data, security/audit records needed by features |
+| Resend                                    | Transactional email verification    | User email address and verification message content                      |
+| OpenRouteService                          | Route generation for map navigation | Route coordinates submitted by user action                               |
+| Open-Meteo                                | Weather retrieval                   | Coordinates used for weather lookup                                      |
+| Upstash Redis / Vercel KV (if configured) | Distributed rate-limit counters     | Derived request identifiers and counter state                            |
+| Sentry (if enabled)                       | Error and performance monitoring    | Runtime diagnostic metadata and error context                            |
 
 Evidence:
 
