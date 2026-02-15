@@ -179,6 +179,9 @@ function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: numb
     coordinates.push([start.lng + lngDiff * t, start.lat + latDiff * t]);
   }
 
+  // Waypoint indices for steps: start, midpoint, end
+  const midWaypoint = Math.floor(numPoints / 2);
+
   return {
     type: 'FeatureCollection',
     features: [
@@ -197,19 +200,28 @@ function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: numb
             {
               steps: [
                 {
+                  type: 11, // ORS type 11 = depart
                   distance: distanceMeters * 0.3,
                   duration: durationSeconds * 0.3,
                   instruction: `Head towards ${end.lat > start.lat ? 'north' : 'south'}`,
+                  way_points: [0, midWaypoint],
+                  name: '',
                 },
                 {
+                  type: 4, // ORS type 4 = straight
                   distance: distanceMeters * 0.5,
                   duration: durationSeconds * 0.5,
                   instruction: 'Continue on the campus pathway',
+                  way_points: [midWaypoint, numPoints - 1],
+                  name: '',
                 },
                 {
+                  type: 10, // ORS type 10 = arrive
                   distance: distanceMeters * 0.2,
                   duration: durationSeconds * 0.2,
                   instruction: 'Arrive at your destination',
+                  way_points: [numPoints - 1, numPoints],
+                  name: '',
                 },
               ],
             },

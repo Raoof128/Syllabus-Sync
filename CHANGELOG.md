@@ -1,3 +1,50 @@
+### Raouf: Map Page Full Audit — Fix All Navigation & Function Issues — 2026-02-15
+
+**Scope:** Complete audit of all map page functions and live navigation, then fix all identified issues.
+**Type:** Bug Fix / Feature Improvement — Map Navigation
+
+#### Issues Found & Fixed
+
+1. **Demo route missing instruction fields (`app/api/navigate/route.ts`)**
+   - `generateDemoRoute()` steps lacked `type`, `way_points`, and `name` fields
+   - `parseRouteInstructions()` produced instructions with `type: 'straight'` and coords `[0, 0]`
+   - **Fix:** Added ORS-compatible `type` codes (11=depart, 4=straight, 10=arrive), proper `way_points` indices, and empty `name` fields
+
+2. **No automatic re-routing when off-route (`features/map/hooks/useMapNavigation.ts`)**
+   - NavigationStateManager detected off-route and set `status: 'recalculating'` but nothing re-fetched the route
+   - **Fix:** Added `rerouteTrigger` state incremented by nav state callback when status is `'recalculating'`. A new effect watches the trigger, re-fetches the route from current origin, and restarts navigation with the new route. Capped at 3 reroute attempts before stopping navigation with user warning.
+
+3. **User marker using raw GPS instead of Kalman-smoothed positions (`features/map/hooks/useMapLocation.ts`)**
+   - `setSmoothedPosition(smoothed)` was called but markers used raw `gpsLat`/`gpsLng` for `gpsToCrsSimple()`
+   - **Fix:** Hoisted `smoothedLat`/`smoothedLng` variables initialized from raw GPS, then overwritten with Kalman-filtered values after 2+ data points (warm-up). Markers now use smoothed coordinates for stable visual tracking.
+
+4. **iOS DeviceMotion permission not requested (`features/map/hooks/useMapLocation.ts`)**
+   - `window.addEventListener('devicemotion', ...)` was added passively, but iOS 13+ requires `DeviceMotionEvent.requestPermission()`
+   - Motion detection silently failed on all iOS devices
+   - **Fix:** Added permission request with graceful fallback — if permission is denied or request fails (not triggered by user gesture), falls back to direct listener attachment.
+
+5. **Off-campus warning convoluted setTimeout(0) pattern (`features/map/components/CampusMap.tsx`)**
+   - Two separate `setTimeout(0)` calls wrapped in refs (`offCampusWarningSyncRef`) just to avoid synchronous setState
+   - **Fix:** Simplified to direct `setShowOffCampusWarning()` calls with eslint-disable annotation explaining the geolocation external system sync pattern. Removed unused `offCampusWarningSyncRef`.
+
+6. **`isLoadingRoute` not exposed** — Confirmed already returned from `useMapNavigation` hook, available to consumers.
+
+#### Files Changed
+
+- `app/api/navigate/route.ts`
+- `features/map/hooks/useMapNavigation.ts`
+- `features/map/hooks/useMapLocation.ts`
+- `features/map/components/CampusMap.tsx`
+
+#### Verification
+
+- `npx eslint` ✅ (0 errors on all changed files)
+- `npx tsc --noEmit` ✅
+- `npx vitest run tests/map/` ✅ (64/64 tests pass)
+- Full test suite ✅ (443/443 tests pass)
+
+---
+
 ### Raouf: Repository Documentation Audit & Full System Check - 2026-02-14
 
 **Scope:** Full repo audit, documentation refresh, and system verification.

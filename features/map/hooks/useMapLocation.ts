@@ -94,6 +94,7 @@ export function useMapLocation({
     if (typeof window === 'undefined' || !window.DeviceMotionEvent) return;
 
     let motionTimeout: ReturnType<typeof setTimeout>;
+    let cleanedUp = false;
 
     const handleMotion = (event: DeviceMotionEvent) => {
       const { acceleration } = event;
@@ -117,11 +118,35 @@ export function useMapLocation({
       }
     };
 
-    // Passive listener, no permission request needed unless on iOS 13+
-    // If permission is needed, this will just stay silent until granted elsewhere.
-    window.addEventListener('devicemotion', handleMotion, { passive: true });
+    const addMotionListener = () => {
+      if (cleanedUp) return;
+      window.addEventListener('devicemotion', handleMotion, { passive: true });
+    };
+
+    // iOS 13+ requires explicit permission request for DeviceMotionEvent
+    const DME = DeviceMotionEvent as unknown as {
+      requestPermission?: () => Promise<'granted' | 'denied'>;
+    };
+    if (typeof DME.requestPermission === 'function') {
+      DME.requestPermission()
+        .then((permission) => {
+          if (permission === 'granted') {
+            addMotionListener();
+          } else {
+            mapLog.log('DeviceMotion permission denied');
+          }
+        })
+        .catch(() => {
+          // Permission request failed (e.g., not triggered by user gesture).
+          // Fall back to adding listener directly — some browsers allow it without permission.
+          addMotionListener();
+        });
+    } else {
+      addMotionListener();
+    }
 
     return () => {
+      cleanedUp = true;
       window.removeEventListener('devicemotion', handleMotion);
       clearTimeout(motionTimeout);
     };
@@ -181,6 +206,9 @@ export function useMapLocation({
         lastPositionRef.current = { lat: gpsLat, lng: gpsLng, time: currentTime };
 
         // Kalman Smoothing
+        let smoothedLat = gpsLat;
+        let smoothedLng = gpsLng;
+
         if (positionSmootherRef.current) {
           const smoothed = positionSmootherRef.current.update({
             lat: gpsLat,
@@ -192,6 +220,12 @@ export function useMapLocation({
           });
 
           setSmoothedPosition(smoothed);
+
+          // Use smoothed coordinates for marker placement after initial warm-up
+          if (positionSmootherRef.current.getHistory().length > 1) {
+            smoothedLat = smoothed.smoothedLat;
+            smoothedLng = smoothed.smoothedLng;
+          }
 
           // Update navigation manager
           const navManager = navManagerRef.current;
@@ -232,10 +266,10 @@ export function useMapLocation({
           offCampusToastShown.current = false;
         }
 
-        // Update Markers (Pixel Coordinates)
+        // Update Markers (Pixel Coordinates) - uses Kalman-smoothed positions for visual stability
         try {
           // gpsToCrsSimple returns { lat, lng } which are CRS.Simple coordinates (pixel-based but labeled lat/lng)
-          const crsPos = gpsToCrsSimple(gpsLat, gpsLng);
+          const crsPos = gpsToCrsSimple(smoothedLat, smoothedLng);
 
           if (crsPos) {
             // User Marker

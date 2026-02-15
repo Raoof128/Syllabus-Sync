@@ -49,7 +49,10 @@ export function useMapNavigation({
 
   const isNavigatingRef = useRef(isNavigating);
   const selectedBuildingRef = useRef(selectedBuilding);
+  const originRef = useRef(origin);
   const stopNavigationRef = useRef<() => void>(() => {});
+  const rerouteCountRef = useRef(0);
+  const MAX_REROUTES = 3;
 
   useEffect(() => {
     isNavigatingRef.current = isNavigating;
@@ -57,6 +60,12 @@ export function useMapNavigation({
   useEffect(() => {
     selectedBuildingRef.current = selectedBuilding;
   }, [selectedBuilding]);
+  useEffect(() => {
+    originRef.current = origin;
+  }, [origin]);
+
+  // Reroute trigger: incremented when nav manager requests recalculation
+  const [rerouteTrigger, setRerouteTrigger] = useState(0);
 
   // Subscribe to navigation manager state (register once)
   useEffect(() => {
@@ -68,6 +77,22 @@ export function useMapNavigation({
         mapLog.log('User arrived at destination!');
         toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuildingRef.current?.name || '');
         setIsNavigating(false);
+        rerouteCountRef.current = 0;
+      }
+      // Trigger automatic re-route when off-route and recalculating
+      if (state.status === 'recalculating' && isNavigatingRef.current) {
+        if (rerouteCountRef.current < MAX_REROUTES) {
+          rerouteCountRef.current += 1;
+          mapLog.log(`Off-route recalculation ${rerouteCountRef.current}/${MAX_REROUTES}`);
+          setRerouteTrigger((prev) => prev + 1);
+        } else {
+          mapLog.log('Max reroute attempts reached, stopping navigation');
+          toastUtils.warning(
+            safeT('navigationError', 'Navigation stopped'),
+            safeT('tooManyReroutes', 'Unable to find route. Please try again.'),
+          );
+          stopNavigationRef.current();
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,6 +120,7 @@ export function useMapNavigation({
 
     // Pass REAL GPS coordinates to navigation manager
     // gpsRouteCoords are already [lng, lat] from ORS
+    rerouteCountRef.current = 0;
     navManagerRef.current.startNavigation(gpsRouteCoords, instructions, preview.distanceMeters);
     setIsNavigating(true);
 
@@ -121,6 +147,61 @@ export function useMapNavigation({
   useEffect(() => {
     stopNavigationRef.current = stopNavigation;
   }, [stopNavigation]);
+
+  // Reroute Effect: re-fetch route when user goes significantly off-route
+  useEffect(() => {
+    if (rerouteTrigger === 0) return;
+    const currentOrigin = originRef.current;
+    const currentBuilding = selectedBuildingRef.current;
+    if (!currentOrigin || !currentBuilding || !navManagerRef.current) return;
+
+    const controller = new AbortController();
+
+    async function reroute() {
+      const destGps = getBuildingGps(currentBuilding!);
+      if (!destGps || !currentOrigin) return;
+
+      mapLog.log('Rerouting from current position...');
+      const {
+        coordinates,
+        preview: routeData,
+        orsData,
+      } = await fetchORSRoute(currentOrigin, destGps, controller.signal);
+
+      if (controller.signal.aborted) return;
+
+      if (routeData && coordinates) {
+        setGpsRouteCoords(coordinates as [number, number][]);
+
+        const pixelCoords = coordinates
+          .map((c) => gpsToCrsSimple(c[1], c[0]))
+          .filter((p): p is { lat: number; lng: number } => p !== null)
+          .map((p) => [p.lat, p.lng] as [number, number]);
+
+        const destLatLng = getBuildingLatLng(currentBuilding!);
+        pixelCoords.push([destLatLng.lat, destLatLng.lng]);
+
+        setRouteCoords(pixelCoords);
+        setPreview(routeData);
+        const instructions = orsData ? parseRouteInstructions(orsData) : [];
+        setRouteInstructions(instructions);
+
+        // Restart navigation with new route
+        if (navManagerRef.current) {
+          navManagerRef.current.startNavigation(
+            coordinates as [number, number][],
+            instructions,
+            routeData.distanceMeters,
+          );
+        }
+        mapLog.log('Reroute complete', { distance: routeData.distanceMeters });
+      }
+    }
+
+    reroute();
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rerouteTrigger]);
 
   // Route Fetching Effect
   useEffect(() => {

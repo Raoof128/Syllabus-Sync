@@ -93,7 +93,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const hasNotifiedReadyRef = useRef(false);
     const wasOffCampusRef = useRef(false);
     const offCampusWarningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const offCampusWarningSyncRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Initialize Navigation Manager
     useEffect(() => {
@@ -229,19 +228,17 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       };
     }, [mapValid, mapInstance, isMapReady, isMountedRef, onMapReady]);
 
+    /* eslint-disable react-hooks/set-state-in-effect --
+       Synchronizing isOffCampus (derived from geolocation, an external system)
+       into local warning display state. The setTimeout auto-dismiss must use
+       setState to clear the banner after 3 seconds. */
     useEffect(() => {
       const wasOffCampus = wasOffCampusRef.current;
-
-      if (offCampusWarningSyncRef.current) {
-        clearTimeout(offCampusWarningSyncRef.current);
-        offCampusWarningSyncRef.current = null;
-      }
+      wasOffCampusRef.current = isOffCampus;
 
       if (isOffCampus && !wasOffCampus) {
-        offCampusWarningSyncRef.current = setTimeout(() => {
-          setShowOffCampusWarning(true);
-          offCampusWarningSyncRef.current = null;
-        }, 0);
+        // Entered off-campus: show warning for 3 seconds
+        setShowOffCampusWarning(true);
         if (offCampusWarningTimeoutRef.current) {
           clearTimeout(offCampusWarningTimeoutRef.current);
         }
@@ -249,32 +246,22 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           setShowOffCampusWarning(false);
           offCampusWarningTimeoutRef.current = null;
         }, 3000);
-      }
-
-      if (!isOffCampus) {
-        offCampusWarningSyncRef.current = setTimeout(() => {
-          setShowOffCampusWarning(false);
-          offCampusWarningSyncRef.current = null;
-        }, 0);
+      } else if (!isOffCampus) {
+        // Returned on-campus: clear immediately
+        setShowOffCampusWarning(false);
         if (offCampusWarningTimeoutRef.current) {
           clearTimeout(offCampusWarningTimeoutRef.current);
           offCampusWarningTimeoutRef.current = null;
         }
       }
 
-      wasOffCampusRef.current = isOffCampus;
-    }, [isOffCampus]);
-
-    useEffect(() => {
       return () => {
-        if (offCampusWarningSyncRef.current) {
-          clearTimeout(offCampusWarningSyncRef.current);
-        }
         if (offCampusWarningTimeoutRef.current) {
           clearTimeout(offCampusWarningTimeoutRef.current);
         }
       };
-    }, []);
+    }, [isOffCampus]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // ============================================
     // RENDER
