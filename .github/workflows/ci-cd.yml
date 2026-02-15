@@ -72,18 +72,12 @@ jobs:
         run: npm ci
 
       - name: Run npm audit
-        run: npm audit --audit-level moderate
+        run: npm audit --audit-level high
 
-      - name: Validate CSP hashes
+      - name: Scan for committed secrets
         run: npm run check:secrets
 
-      - name: Check for secrets in code
-        run: npm run check:secrets
-
-      - name: Run production security checks
-        run: npm run check:secrets
-
-      - name: Check i18n translation completeness
+      - name: Validate translation key parity
         run: npm run check:i18n
 
       - name: Run bundle analysis

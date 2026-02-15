@@ -358,3 +358,19 @@ export const bulkOperationLimiter = createRateLimiter({
   maxRequests: 5, // Max 5 bulk operations per minute
   failClosed: false,
 });
+
+/** Rate limiter for password breach lookups */
+export const passwordBreachLimiter = createRateLimiter({
+  prefix: 'password_breach',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 20, // Max 20 checks per minute per IP
+  failClosed: true,
+});
+
+/** Rate limiter for security header scans */
+export const securityScanLimiter = createRateLimiter({
+  prefix: 'security_scan',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 10, // Max 10 scans per minute per user/IP
+  failClosed: true,
+});

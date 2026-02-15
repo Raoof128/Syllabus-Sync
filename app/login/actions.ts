@@ -2,7 +2,9 @@
 
 import { createServerClient } from '@/lib/supabase/server';
 import { loginSchema, LoginFormData } from './schemas/loginSchema';
-import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { headers } from 'next/headers';
+import { loginLimiter } from '@/lib/services/rateLimitService';
+import { getClientIPFromHeaders } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 
 export interface MFAFactorInfo {
@@ -19,6 +21,13 @@ export interface LoginResult {
   availableFactors?: MFAFactorInfo[];
 }
 
+function maskEmailForLogs(email: string): string {
+  const [localPart, domain] = email.toLowerCase().split('@');
+  if (!localPart || !domain) return 'invalid-email';
+  if (localPart.length <= 2) return `${localPart[0] ?? '*'}***@${domain}`;
+  return `${localPart.slice(0, 2)}***@${domain}`;
+}
+
 export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   // 1. Validate Input (Zod)
   const result = loginSchema.safeParse(data);
@@ -26,13 +35,17 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
     return { error: 'validation_error' };
   }
 
+  const headersList = await headers();
+  const clientIp = getClientIPFromHeaders(headersList);
+  const emailHint = maskEmailForLogs(result.data.email);
+
   // Log the attempt (Security)
-  logger.info('Login attempt', { email: data.email });
+  logger.info('Login attempt', { email_hint: emailHint });
 
   // 2. Security: Rate Limiting (5 attempts per min)
-  const limit = await checkRateLimit(5, 60 * 1000);
-  if (!limit.success) {
-    logger.warn('Login rate limit exceeded', { email: data.email });
+  const limit = await loginLimiter(clientIp);
+  if (!limit.allowed) {
+    logger.warn('Login rate limit exceeded', { email_hint: emailHint, ip: clientIp });
     return { error: 'rate_limit_exceeded' };
   }
 
@@ -44,7 +57,7 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   });
 
   if (error) {
-    logger.error('Login failed', { error: error.message, email: data.email });
+    logger.error('Login failed', { error: error.message, email_hint: emailHint });
     return { error: 'invalid_credentials' };
   }
 
@@ -59,7 +72,7 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
       const verifiedFactors = allFactors.filter((f: { status: string }) => f.status === 'verified');
 
       if (verifiedFactors.length > 0) {
-        logger.info('MFA challenge required', { email: data.email });
+        logger.info('MFA challenge required', { email_hint: emailHint });
         return {
           mfaRequired: true,
           availableFactors: verifiedFactors.map(
@@ -83,12 +96,12 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
     // If we can't verify MFA status, deny login rather than allowing
     // an attacker to bypass MFA via a service/network error.
     logger.error('MFA status check failed — blocking login (fail-closed)', {
-      email: data.email,
+      email_hint: emailHint,
       error: mfaError,
     });
     return { error: 'mfa_check_failed' };
   }
 
-  logger.info('Login success', { email: data.email });
+  logger.info('Login success', { email_hint: emailHint });
   return { success: true };
 }

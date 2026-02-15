@@ -1,3 +1,90 @@
+### Raouf: Security Remediation Follow-Up — Request Signing Replay Check Order — 2026-02-16
+
+**Scope:** Finalize request-signing hardening after initial remediation pass.
+**Type:** Security Hardening
+
+#### Changes
+
+1. **Nonce replay check ordering** (`lib/security/request-signing.ts`):
+   - Moved nonce replay evaluation to run **after** signature verification succeeds
+   - Prevents invalid-signature traffic from consuming nonce storage state
+
+#### Files Changed
+
+- Modified: `lib/security/request-signing.ts`
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test` ✅ (443/443 tests pass)
+- Workflow YAML parse check ✅
+
+---
+
+### Raouf: Security Remediation Pass — Fix Critical/High Findings (Excluding CSRF by Request) — 2026-02-16
+
+**Scope:** Implement security fixes for previously audited findings, excluding CSRF behavior changes per explicit request.
+**Type:** Security Hardening / Infrastructure / Database
+
+#### Changes
+
+1. **SSRF hardening for header scan endpoint** (`app/api/security/scan-headers/route.ts`, `lib/security/headers-scanner.ts`):
+   - Added authentication and distributed rate limiting
+   - Added strict URL validation (HTTP(S)-only, blocked credentials, blocked sensitive ports, blocked local/internal hosts)
+   - Added DNS resolution checks to block private-network targets
+   - Switched scanner fetch to manual redirects with timeout control
+
+2. **Password breach endpoint abuse protection** (`app/api/security/check-password-breach/route.ts`):
+   - Added auth-grade body size validation
+   - Added input type/length checks
+   - Added distributed rate limiting + response headers
+
+3. **Signup enumeration fix** (`app/api/auth/signup/route.ts`):
+   - Existing-account responses now return generic success message
+   - Removed direct account-existence signal through status/body
+
+4. **Login rate-limit hardening + log redaction** (`app/login/actions.ts`, `lib/security/ip.ts`, `lib/utils/rate-limit.ts`, `lib/services/rateLimitService.ts`, `lib/services/emailService.ts`):
+   - Replaced weak in-memory server-action limiter path with distributed limiter
+   - Switched to trusted IP extraction helper for server actions
+   - Added dedicated limiters for security scan and password breach checks
+   - Redacted email values in login/email logs
+
+5. **Request signing replay/tamper improvements** (`lib/security/request-signing.ts`):
+   - Signature verification now includes canonical request body
+   - Added nonce replay rejection using nonce store
+
+6. **Supabase function privilege hardening** (`supabase/migrations/20260216090000_harden_security_functions.sql`, `lib/supabase/schema.sql`):
+   - Added null-safe ownership checks (`IS DISTINCT FROM auth.uid()`) for user-scoped SECURITY DEFINER functions
+   - Added allowlist guard for dynamic table target in `restore_deleted`
+   - Removed authenticated access to low-level demo seed helpers
+   - Restricted global demo event seeding to service role
+   - Explicitly revoked PUBLIC execute and re-granted only required roles
+
+7. **CI/CD security control fixes** (`package.json`, `.github/workflows/ci-cd.yml`, `.github/workflows/production-deploy.yml`, `tools/security/check-secrets.mjs`, `tools/i18n/check-translations.mjs`):
+   - Replaced placeholder scripts with executable checks
+   - Removed duplicate/no-op security steps
+   - Rebuilt malformed production deploy workflow into valid, verifiable pipeline
+
+8. **Security documentation truthfulness update** (`SECURITY.md`, `public/security.txt`):
+   - Removed/adjusted overclaims and aligned policy statements to implemented controls
+
+#### Files Changed
+
+- Created: `supabase/migrations/20260216090000_harden_security_functions.sql`, `tools/security/check-secrets.mjs`, `tools/i18n/check-translations.mjs`
+- Modified: `app/api/security/scan-headers/route.ts`, `app/api/security/check-password-breach/route.ts`, `app/api/auth/signup/route.ts`, `app/login/actions.ts`, `app/login/__tests__/actions.test.ts`, `tests/security/login-mfa-failclosed.test.ts`, `lib/security/ip.ts`, `lib/utils/rate-limit.ts`, `lib/services/rateLimitService.ts`, `lib/services/emailService.ts`, `lib/security/request-signing.ts`, `lib/security/headers-scanner.ts`, `lib/supabase/schema.sql`, `package.json`, `.github/workflows/ci-cd.yml`, `.github/workflows/production-deploy.yml`, `SECURITY.md`, `public/security.txt`
+
+#### Verification
+
+- `npm run check:secrets` ✅
+- `npm run check:i18n` ✅ (warnings only)
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test` ✅ (443/443 tests pass)
+- Workflow YAML parse check ✅ (`ruby -e "require 'yaml'; YAML.load_file(...)"`)
+
+---
+
 ### Raouf: Privacy Policy (APP-Compliant) — Full Policy Page, Collection Notices, Legal Links — 2026-02-16
 
 **Scope:** Implement industry-grade privacy infrastructure aligned with Australian Privacy Principles (APPs).

@@ -24,8 +24,22 @@ vi.mock('@/lib/supabase/server', () => ({
     }),
 }));
 
-vi.mock('@/lib/utils/rate-limit', () => ({
-  checkRateLimit: () => ({ success: true }),
+vi.mock('next/headers', () => ({
+  headers: () => Promise.resolve(new Headers()),
+}));
+
+vi.mock('@/lib/security/ip', () => ({
+  getClientIPFromHeaders: () => '127.0.0.1',
+}));
+
+vi.mock('@/lib/services/rateLimitService', () => ({
+  loginLimiter: () =>
+    Promise.resolve({
+      allowed: true,
+      remaining: 9,
+      resetIn: 60,
+      limit: 10,
+    }),
 }));
 
 // Must import AFTER mocks

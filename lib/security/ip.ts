@@ -78,6 +78,10 @@ export interface GetClientIPOptions {
   trustForwardedFor?: boolean;
 }
 
+interface HeaderAccessor {
+  get(name: string): string | null;
+}
+
 /**
  * Securely extracts client IP address from request headers
  *
@@ -90,7 +94,10 @@ export interface GetClientIPOptions {
  * @param options - Optional configuration
  * @returns Client IP address or 'unknown'
  */
-export function getClientIP(request: NextRequest, options: GetClientIPOptions = {}): string {
+export function getClientIPFromHeaders(
+  headers: HeaderAccessor,
+  options: GetClientIPOptions = {},
+): string {
   const isProduction = process.env.NODE_ENV === 'production';
   const { trustForwardedFor = false } = options;
 
@@ -98,31 +105,35 @@ export function getClientIP(request: NextRequest, options: GetClientIPOptions = 
   if (isProduction) {
     // 1. Vercel's verified header (highest trust)
     // This header is set by Vercel's edge network and cannot be spoofed
-    const vercelIp = extractFirstIP(request.headers.get('x-vercel-forwarded-for'));
+    const vercelIp = extractFirstIP(headers.get('x-vercel-forwarded-for'));
     if (vercelIp) return vercelIp;
 
     // 2. Cloudflare's verified header
     // Set by Cloudflare when used as a CDN/proxy
-    const cfIp = request.headers.get('cf-connecting-ip');
+    const cfIp = headers.get('cf-connecting-ip');
     if (cfIp && isValidIP(cfIp)) return cfIp;
 
     // 3. Only use x-forwarded-for if explicitly trusted
     if (trustForwardedFor) {
-      const forwardedIp = extractFirstIP(request.headers.get('x-forwarded-for'));
+      const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
       if (forwardedIp) return forwardedIp;
     }
   } else {
     // In development, accept standard headers for local testing
-    const forwardedIp = extractFirstIP(request.headers.get('x-forwarded-for'));
+    const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
     if (forwardedIp) return forwardedIp;
   }
 
   // Fallback: x-real-ip (used by some proxies)
-  const realIp = request.headers.get('x-real-ip');
+  const realIp = headers.get('x-real-ip');
   if (realIp && isValidIP(realIp)) return realIp;
 
   // Last resort: return 'unknown' (fail-safe for rate limiting)
   return 'unknown';
+}
+
+export function getClientIP(request: NextRequest, options: GetClientIPOptions = {}): string {
+  return getClientIPFromHeaders(request.headers, options);
 }
 
 /**

@@ -1,18 +1,32 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { loginAction } from '../actions';
-import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { loginLimiter } from '@/lib/services/rateLimitService';
 
 // Mock dependencies
 vi.mock('@/lib/supabase/server', () => ({
   createServerClient: vi.fn(() => ({
     auth: {
+      mfa: {
+        getAuthenticatorAssuranceLevel: vi.fn().mockResolvedValue({
+          data: { currentLevel: 'aal1', nextLevel: 'aal1' },
+        }),
+        listFactors: vi.fn().mockResolvedValue({ data: { all: [] } }),
+      },
       signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
     },
   })),
 }));
 
-vi.mock('@/lib/utils/rate-limit', () => ({
-  checkRateLimit: vi.fn(),
+vi.mock('next/headers', () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
+}));
+
+vi.mock('@/lib/security/ip', () => ({
+  getClientIPFromHeaders: vi.fn().mockReturnValue('127.0.0.1'),
+}));
+
+vi.mock('@/lib/services/rateLimitService', () => ({
+  loginLimiter: vi.fn(),
 }));
 
 // Mock logger to prevent console spam during tests
@@ -35,13 +49,23 @@ describe('loginAction', () => {
   });
 
   it('blocks rate limited users', async () => {
-    vi.mocked(checkRateLimit).mockResolvedValue({ success: false, remaining: 0 });
+    vi.mocked(loginLimiter).mockResolvedValue({
+      allowed: false,
+      remaining: 0,
+      resetIn: 60,
+      limit: 10,
+    });
     const result = await loginAction({ email: 'test@uni.edu.au', password: 'password' });
     expect(result.error).toBe('rate_limit_exceeded');
   });
 
   it('succeeds with valid data', async () => {
-    vi.mocked(checkRateLimit).mockResolvedValue({ success: true, remaining: 5 });
+    vi.mocked(loginLimiter).mockResolvedValue({
+      allowed: true,
+      remaining: 9,
+      resetIn: 60,
+      limit: 10,
+    });
     const result = await loginAction({ email: 'test@uni.edu.au', password: 'password' });
     expect(result.success).toBe(true);
   });

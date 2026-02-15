@@ -341,10 +341,14 @@ export function scanRequestHeaders(
  * @returns Promise resolving to security scan result
  */
 export async function scanURLHeaders(url: string): Promise<SecurityScanResult> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
   try {
     const response = await fetch(url, {
       method: 'HEAD',
-      redirect: 'follow',
+      redirect: 'manual',
+      signal: controller.signal,
     });
 
     const results = checkAllSecurityHeaders(response.headers);
@@ -358,6 +362,8 @@ export async function scanURLHeaders(url: string): Promise<SecurityScanResult> {
       criticalIssues: ['Failed to scan URL'],
       recommendations: ['Check if URL is accessible'],
     };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

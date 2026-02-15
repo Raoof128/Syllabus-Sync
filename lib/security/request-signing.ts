@@ -168,10 +168,10 @@ function generateNonce(): string {
  * @param secretKey - The secret key used for signing
  * @returns Verification result
  */
-export function verifySignature(
+export async function verifySignature(
   request: NextRequest,
   secretKey: string
-): SignatureVerificationResult {
+): Promise<SignatureVerificationResult> {
   // Get signature headers
   const signatureHeader = request.headers.get(SIGNATURE_HEADER);
   const timestampHeader = request.headers.get(TIMESTAMP_HEADER);
@@ -215,13 +215,6 @@ export function verifySignature(
     };
   }
 
-  // Check nonce (optional but recommended)
-  if (nonceHeader) {
-    // In production, you should check if this nonce has been used before
-    // to prevent replay attacks
-    // This requires a nonce store (Redis, database, etc.)
-  }
-
   // Reconstruct canonical string
   const method = request.method;
   const path = request.nextUrl.pathname;
@@ -242,9 +235,8 @@ export function verifySignature(
     }
   }
 
-  // Get body (async, need to clone request)
-  // Note: This is a simplified version. In production, you'd need to
-  // handle the body asynchronously and clone the request.
+  // Read body from a request clone so downstream handlers can still consume the body.
+  const body = await getCanonicalBody(request);
 
   // Generate expected signature
   const expectedSignature = generateSignature({
@@ -253,12 +245,17 @@ export function verifySignature(
     path,
     query,
     headers,
-    body: '', // Body would need to be read asynchronously
+    body,
   });
 
   // Compare signatures (constant-time comparison)
   if (!constantTimeCompare(signature, expectedSignature.split(':')[1])) {
     return { valid: false, reason: 'Signature mismatch' };
+  }
+
+  // Check nonce after signature validation.
+  if (nonceHeader && isNonceUsed(nonceHeader)) {
+    return { valid: false, reason: 'Replay detected: nonce already used' };
   }
 
   return {
@@ -298,7 +295,7 @@ export function withSignatureVerification(
 ): (request: NextRequest) => Promise<NextResponse> {
   return async (request: NextRequest) => {
     // Verify signature
-    const result = verifySignature(request, secretKey);
+    const result = await verifySignature(request, secretKey);
 
     if (!result.valid) {
       console.warn('Signature verification failed:', result.reason);
@@ -316,6 +313,30 @@ export function withSignatureVerification(
     // Signature is valid, proceed with handler
     return handler(request);
   };
+}
+
+/**
+ * Build a deterministic body string for signature verification.
+ * Text-based requests are signed as plain text; binary payloads are signed as base64.
+ */
+async function getCanonicalBody(request: NextRequest): Promise<string> {
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    return '';
+  }
+
+  const requestClone = request.clone();
+  const contentType = requestClone.headers.get('content-type') ?? '';
+
+  if (
+    contentType.includes('application/json') ||
+    contentType.startsWith('text/') ||
+    contentType.includes('application/x-www-form-urlencoded')
+  ) {
+    return requestClone.text();
+  }
+
+  const rawBody = await requestClone.arrayBuffer();
+  return Buffer.from(rawBody).toString('base64');
 }
 
 // ============================================================================
@@ -338,7 +359,14 @@ export async function signFetchRequest(
 ): Promise<RequestInit> {
   const urlObj = new URL(url);
   const method = options.method || 'GET';
-  const body = options.body ? JSON.stringify(options.body) : '';
+  const body =
+    typeof options.body === 'string'
+      ? options.body
+      : options.body instanceof URLSearchParams
+        ? options.body.toString()
+        : options.body
+          ? JSON.stringify(options.body)
+          : '';
 
   // Build query parameters
   const query: Record<string, string> = {};

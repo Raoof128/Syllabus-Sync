@@ -543,7 +543,7 @@ DECLARE
   v_result jsonb;
 BEGIN
   -- SECURITY: Validate that the caller is creating their own profile
-  IF p_user_id != auth.uid() THEN
+  IF p_user_id IS DISTINCT FROM auth.uid() THEN
     RAISE EXCEPTION 'Unauthorized: Cannot create profile for another user';
   END IF;
 
@@ -572,6 +572,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant execute permission to authenticated users
+REVOKE EXECUTE ON FUNCTION create_user_profile FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION create_user_profile TO authenticated;
 
 -- ============================================================================
@@ -654,7 +655,7 @@ DECLARE
   v_result JSONB;
 BEGIN
   -- Validate user owns this request
-  IF p_user_id != auth.uid() THEN
+  IF p_user_id IS DISTINCT FROM auth.uid() THEN
     RAISE EXCEPTION 'Unauthorized: Cannot create unit for another user';
   END IF;
 
@@ -704,6 +705,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant execute permission to authenticated users
+REVOKE EXECUTE ON FUNCTION create_unit_with_schedule FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION create_unit_with_schedule TO authenticated;
 
 -- ============================================================================

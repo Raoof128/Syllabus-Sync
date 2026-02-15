@@ -18,7 +18,7 @@ Syllabus Sync implements a multi-layered security model:
 ### 1. Request Validation
 
 - **Global Security Middleware**: A root-level `middleware.ts` enforces security headers across the entire application, including HSTS, X-Frame-Options, and CSP.
-- **CSRF Protection**: All mutation endpoints (POST/PUT/DELETE) validate the `Origin` header against an allowlist of trusted domains via middleware. CSRF protection is **always enabled in production** and cannot be disabled via environment variables on Vercel.
+- **CSRF/Origin Validation**: Origin validation is enabled on mutation routes that use shared API middleware. Some authentication and integration flows rely on explicit route-level controls to preserve Supabase compatibility.
 - **Schema Validation & XSS Prevention**: All API inputs are strictly validated using `zod`. Text fields are refined to reject common XSS vectors (e.g., `<script>`, `<html>`) at the schema level.
 - **Body Size Limits**: JSON payloads are restricted to 100KB (and 10KB for auth) to prevent DoS attacks.
 - **Open Redirect Prevention**: Login redirect URLs are validated against a whitelist of allowed paths and dangerous schemes are blocked.
@@ -40,8 +40,7 @@ Syllabus Sync implements a multi-layered security model:
 
 ### 4. Code Quality
 
-- **Secrets Scanning**: Automated scripts prevent the commitment of API keys or tokens.
-- **Pre-commit Hooks**: Security-focused pre-commit hooks block `.env` files and detect hardcoded secrets.
+- **Secrets Scanning**: CI runs repository secret-pattern scanning before build/deploy stages.
 - **Dependency Audits**: Regular `npm audit` and version pinning.
 - **CI Security Checks**: Production security validation runs in CI/CD pipeline before deployment.
 
@@ -70,10 +69,10 @@ This ensures security features (CSRF, rate limiting, dev bypasses) cannot be cir
 
 ## Development vs Production
 
-| Feature          | Development                      | Production               |
-| ---------------- | -------------------------------- | ------------------------ |
-| Dev email bypass | Enabled (with DEV_BYPASS_EMAILS) | **Always disabled**      |
-| CSRF validation  | Can be disabled                  | **Always enabled**       |
-| Rate limiting    | In-memory (fallback)             | **Requires Redis**       |
-| Error details    | Exposed                          | **Hidden**               |
-| Database errors  | Detailed                         | **Generic message only** |
+| Feature                    | Development                      | Production               |
+| -------------------------- | -------------------------------- | ------------------------ |
+| Dev email bypass           | Enabled (with DEV_BYPASS_EMAILS) | **Always disabled**      |
+| Origin/CSRF route controls | Applied by middleware/route      | Applied by middleware/route |
+| Rate limiting              | In-memory (fallback)             | **Requires Redis**       |
+| Error details              | Exposed                          | **Hidden**               |
+| Database errors            | Detailed                         | **Generic message only** |

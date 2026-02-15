@@ -81,6 +81,13 @@ interface SendVerificationEmailParams {
   token: string;
 }
 
+function maskEmailForLogs(email: string): string {
+  const [localPart, domain] = email.toLowerCase().split('@');
+  if (!localPart || !domain) return 'invalid-email';
+  if (localPart.length <= 2) return `${localPart[0] ?? '*'}***@${domain}`;
+  return `${localPart.slice(0, 2)}***@${domain}`;
+}
+
 /**
  * Send a verification email via Resend.
  *
@@ -120,7 +127,7 @@ export async function sendVerificationEmail({
     }
 
     // SECURITY: Do NOT log the token or verifyUrl
-    logger.info('Verification email sent', { to });
+    logger.info('Verification email sent', { recipient_hint: maskEmailForLogs(to) });
     return { success: true };
   } catch (error) {
     logger.error('Email send error:', error);

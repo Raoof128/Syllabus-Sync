@@ -1,30 +1,21 @@
 import { headers } from 'next/headers';
-
-type RateLimitStore = Map<string, { count: number; expiresAt: number }>;
-const rateLimitMap: RateLimitStore = new Map();
+import { checkRateLimit as checkDistributedRateLimit } from '@/lib/services/rateLimitService';
+import { getClientIPFromHeaders } from '@/lib/security/ip';
 
 export async function checkRateLimit(limit: number = 10, windowMs: number = 60 * 1000) {
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for') || 'unknown';
-  const now = Date.now();
-
-  const record = rateLimitMap.get(ip);
-
-  // Clean up expired
-  if (record && now > record.expiresAt) {
-    rateLimitMap.delete(ip);
-  }
-
-  const current = rateLimitMap.get(ip) || { count: 0, expiresAt: now + windowMs };
-
-  if (current.count >= limit) {
-    return { success: false, remaining: 0 };
-  }
-
-  rateLimitMap.set(ip, {
-    count: current.count + 1,
-    expiresAt: current.expiresAt,
+  const clientIp = getClientIPFromHeaders(headersList);
+  const result = await checkDistributedRateLimit(clientIp, {
+    prefix: 'server_action',
+    windowMs,
+    maxRequests: limit,
+    failClosed: false,
   });
 
-  return { success: true, remaining: limit - (current.count + 1) };
+  return {
+    success: result.allowed,
+    remaining: result.remaining,
+    resetIn: result.resetIn,
+    limit: result.limit,
+  };
 }

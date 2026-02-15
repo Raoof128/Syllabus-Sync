@@ -197,13 +197,18 @@ export async function POST(request: NextRequest) {
 
       // Map auth errors to specific fields
       const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
-      const target = isAlreadyRegistered ? 'email' : 'root';
+      if (isAlreadyRegistered) {
+        // SECURITY: Return generic success to prevent account enumeration
+        return jsonSuccess({
+          message: GENERIC_SIGNUP_SUCCESS,
+        });
+      }
 
       return jsonError(
-        authError.message,
-        isAlreadyRegistered ? 409 : 400,
-        isAlreadyRegistered ? ERROR_CODES.CONFLICT : ERROR_CODES.BAD_REQUEST,
-        { target },
+        'Signup request could not be completed. Please try again.',
+        400,
+        ERROR_CODES.BAD_REQUEST,
+        { target: 'root' },
       );
     }
 
