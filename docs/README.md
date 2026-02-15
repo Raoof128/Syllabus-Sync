@@ -5,9 +5,15 @@ This folder contains presentation-grade project documentation for the Macquarie 
 ## Sections
 
 - `docs/operations/`: Operational runbooks and deployment guidance.
-- `docs/policies/`: Security and governance policy documents.
+- `docs/policies/`: Security, privacy, and governance policy documents.
 - `docs/database/`: Database reference artifacts and schema snapshots.
 - `docs/project/`: Internal project planning material and design sketches.
+
+## Policy Entry Points
+
+- Privacy policy: `/docs/policies/privacy-policy.md`
+- Security policy: `/SECURITY.md`
+- Vulnerability disclosure policy: `/docs/policies/security-policy.md`
 
 ## Repository Layout References
 

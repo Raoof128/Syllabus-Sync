@@ -1374,3 +1374,9 @@ Scope: README Hardening Documentation Refresh
 Summary: Reviewed and updated `README.md` to keep developer guidance current. Added explicit lint command coverage in Quality Assurance, added a `Common Development Commands` section (`dev`, `lint`, `typecheck`, `test`, `build`), and linked new security posture artifacts for reviewers.
 Files: Modified `README.md`.
 Verification: Confirmed command parity with `package.json` scripts and doc link targets for `docs/security/SECURITY_POSTURE.md` and `docs/security/SECURITY_EVIDENCE_INDEX.md` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Privacy Policy Documentation + README Wiring
+Summary: Added `docs/policies/privacy-policy.md` documenting app data collection/usage categories (account, profile, academic, notification, security/audit, MFA/passkeys, location, client storage), third-party processors, retention behavior, and user controls with implementation evidence pointers. Linked privacy policy from `README.md` and added policy entry points to `docs/README.md`.
+Files: Added `docs/policies/privacy-policy.md`; Modified `README.md`, `docs/README.md`.
+Verification: Documentation evidence review completed against relevant API routes, storage utilities, and Supabase migrations; links verified present in docs navigation ✅.

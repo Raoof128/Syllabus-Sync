@@ -318,6 +318,7 @@ Our platform maintains a defense-in-depth security architecture:
 - **[🗂️ Restructure Notes](docs/project/restructure-notes.md)** - Before/after tree and migration decisions
 - **[📁 Docs Index](docs/README.md)** - Documentation structure and usage
 - **[🔒 Security Guide](SECURITY.md)** - Security policies, vulnerability reporting, and best practices
+- **[🛡️ Privacy Policy](docs/policies/privacy-policy.md)** - What data this app collects, uses, and shares
 - **[🛡️ Security Posture Report](docs/security/SECURITY_POSTURE.md)** - Evidence-backed hardening controls and threat snapshot
 - **[🧾 Security Evidence Index](docs/security/SECURITY_EVIDENCE_INDEX.md)** - Reviewer index of security controls by file path
 

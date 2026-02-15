@@ -253,3 +253,9 @@ Scope: README Hardening Documentation Refresh
 Summary: Audited `README.md` for accuracy after the security posture documentation pass, added explicit lint guidance (`npm run lint`) in the QA setup flow, added a concise "Common Development Commands" block for day-to-day verification, and linked the newly added security documentation (`docs/security/SECURITY_POSTURE.md`, `docs/security/SECURITY_EVIDENCE_INDEX.md`) under Technical Documentation.
 Files: Modified `README.md`.
 Verification: Documentation consistency check against `package.json` scripts (`dev`, `lint`, `typecheck`, `test`, `build`, `check`) ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Privacy Policy Documentation + README Wiring
+Summary: Added a dedicated privacy policy document that explicitly describes what user/system data Syllabus Sync collects and how it is used, with direct code/schema evidence references. Wired privacy documentation into the main README technical docs list and updated docs index policy entry points for discoverability.
+Files: Added `docs/policies/privacy-policy.md`; Modified `README.md`, `docs/README.md`.
+Verification: Cross-checked policy claims against implemented code paths and schema objects in `app/api/auth/*`, `app/api/profiles/route.ts`, `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `lib/security/emailVerification.ts`, `lib/supabase/middleware.ts`, and `supabase/migrations/*` ✅.
