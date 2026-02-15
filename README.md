@@ -195,6 +195,19 @@ npm start
 ```bash
 # Run comprehensive checks before committing
 npm run check  # Runs: secrets → format → typecheck → lint → tests → build
+
+# Run lint only (fast local feedback during development)
+npm run lint
+```
+
+### **Common Development Commands**
+
+```bash
+npm run dev           # Start local development server
+npm run lint          # ESLint checks
+npm run typecheck     # TypeScript type checks (no emit)
+npm run test          # Run test suite
+npm run build         # Production build validation
 ```
 
 ---
@@ -305,6 +318,8 @@ Our platform maintains a defense-in-depth security architecture:
 - **[🗂️ Restructure Notes](docs/project/restructure-notes.md)** - Before/after tree and migration decisions
 - **[📁 Docs Index](docs/README.md)** - Documentation structure and usage
 - **[🔒 Security Guide](SECURITY.md)** - Security policies, vulnerability reporting, and best practices
+- **[🛡️ Security Posture Report](docs/security/SECURITY_POSTURE.md)** - Evidence-backed hardening controls and threat snapshot
+- **[🧾 Security Evidence Index](docs/security/SECURITY_EVIDENCE_INDEX.md)** - Reviewer index of security controls by file path
 
 ### **Development Resources**
 

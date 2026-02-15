@@ -1362,3 +1362,15 @@ No Supabase email service. No Supabase OTP. No magic links.
 - `supabase db push --dry-run --include-all -p ...` ✅
 - `supabase migration list -p ...` ✅ (local/remote fully aligned)
 - SQL verification ✅ (`missing_tables=none`, `missing_functions=none` for app-required objects)
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Security Posture Discovery & Evidence Documentation
+Summary: Completed a full repository-wide discovery pass of implemented cybersecurity controls and produced presentation-ready security documentation. Added `/docs/security/SECURITY_POSTURE.md` with executive summary, evidence-backed control catalogue (path+identifier+verification+status), STRIDE-oriented threat snapshot, AGENT/CHANGELOG security traceability mapping, and prioritized gaps that explicitly mark non-provable controls as “Not evidenced”. Added `/docs/security/SECURITY_EVIDENCE_INDEX.md` grouping security-relevant files by control area for fast reviewer navigation.
+Files: Created `/docs/security/SECURITY_POSTURE.md`, `/docs/security/SECURITY_EVIDENCE_INDEX.md`.
+Verification: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (443/443 pass), `npm run build` ✅.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: README Hardening Documentation Refresh
+Summary: Reviewed and updated `README.md` to keep developer guidance current. Added explicit lint command coverage in Quality Assurance, added a `Common Development Commands` section (`dev`, `lint`, `typecheck`, `test`, `build`), and linked new security posture artifacts for reviewers.
+Files: Modified `README.md`.
+Verification: Confirmed command parity with `package.json` scripts and doc link targets for `docs/security/SECURITY_POSTURE.md` and `docs/security/SECURITY_EVIDENCE_INDEX.md` ✅.
