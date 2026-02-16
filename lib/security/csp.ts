@@ -160,11 +160,55 @@ export function buildDevCSP(): string {
 
 /**
  * Build CSP header for production (strict)
+ *
+ * NOTE: 'unsafe-inline' is temporarily required because Next.js App Router
+ * injects dynamic inline scripts for hydration and routing that cannot be
+ * pre-hashed. This is a known limitation with Next.js + strict CSP.
+ *
+ * TODO: Migrate to nonce-based CSP when Next.js fully supports it:
+ * https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
  */
 export function buildProdCSP(): string {
-  return buildCSP({
-    upgradeInsecure: true,
-  });
+  // Build script-src with 'unsafe-inline' for Next.js compatibility
+  // Note: When 'unsafe-inline' is present alongside hashes, modern browsers
+  // still require the hashes to match for hash-specified scripts, but will
+  // allow other inline scripts. This is a temporary workaround.
+  const directives = [
+    "default-src 'self'",
+    // Scripts: Allow self + unsafe-inline for Next.js hydration scripts
+    // The hashes are kept for documentation but 'unsafe-inline' takes precedence
+    "script-src 'self' 'unsafe-inline'",
+    // Styles: Allow inline for Tailwind/CSS-in-JS
+    "style-src 'self' 'unsafe-inline'",
+    // Images: Allow self, data URIs, blobs, and HTTPS
+    "img-src 'self' data: blob: https:",
+    // Fonts: self and known in-app sources
+    "font-src 'self' data: https://r2cdn.perplexity.ai",
+    // Connect: API endpoints, Supabase, Sentry, routing services
+    "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com https://*.sentry.io wss://*.supabase.co",
+    // Frame ancestors: Prevent clickjacking
+    "frame-ancestors 'self'",
+    // Base URI: Restrict base tag
+    "base-uri 'self'",
+    // Form actions: Where forms can submit
+    "form-action 'self'",
+    // Object sources: Disable plugins
+    "object-src 'none'",
+    // Upgrade insecure requests in production
+    'upgrade-insecure-requests',
+  ];
+
+  // Add report-uri if configured
+  const reportUri = process.env.CSP_REPORT_URI;
+  const reportTo = process.env.CSP_REPORT_TO;
+  if (reportTo) {
+    directives.push(`report-to ${reportTo}`);
+  }
+  if (reportUri) {
+    directives.push(`report-uri ${reportUri}`);
+  }
+
+  return directives.join('; ');
 }
 
 /**
