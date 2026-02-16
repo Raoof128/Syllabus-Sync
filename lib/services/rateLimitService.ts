@@ -237,6 +237,18 @@ export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
+  // TESTING MODE: When ALLOW_MEMORY_RATE_LIMIT is set, bypass rate limiting entirely
+  // This is only for testing/demo deployments without Redis
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+  if (allowMemoryStore) {
+    return {
+      allowed: true,
+      remaining: config.maxRequests,
+      resetIn: Math.ceil(config.windowMs / 1000),
+      limit: config.maxRequests,
+    };
+  }
+
   const store = getStoreInstance();
   const key = config.prefix
     ? `ratelimit:${config.prefix}:${identifier}`
@@ -247,12 +259,10 @@ export async function checkRateLimit(
     process.env.VERCEL_ENV === 'production' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
   const isMemoryStore = store instanceof MemoryStore;
-  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
 
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints
   // This prevents bypass attacks when Redis is not configured
-  // UNLESS ALLOW_MEMORY_RATE_LIMIT is explicitly set (for testing/demo)
-  if (isProduction && isMemoryStore && config.failClosed && !allowMemoryStore) {
+  if (isProduction && isMemoryStore && config.failClosed) {
     logger.error(
       `SECURITY: Blocking ${config.prefix} request - no distributed rate limiting in production`,
     );
