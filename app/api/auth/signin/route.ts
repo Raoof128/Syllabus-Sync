@@ -10,6 +10,7 @@ import {
 } from '@/app/api/_lib/response';
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
+import { emailKeyPrefix } from '@/lib/security/identifiers';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -41,18 +42,7 @@ function isDevEmail(email: string): boolean {
 const GENERIC_AUTH_ERROR = 'Invalid email or password';
 
 export async function POST(request: NextRequest) {
-  // SECURITY: Rate limit by IP using shared utility (works in serverless)
   const clientIP = getClientIP(request);
-  const { allowed, remaining, resetIn } = await loginLimiter(clientIP);
-
-  if (!allowed) {
-    return jsonError(
-      `Too many login attempts. Please try again in ${Math.ceil(resetIn / 60)} minutes.`,
-      429,
-      ERROR_CODES.RATE_LIMITED,
-      { retryAfter: resetIn },
-    );
-  }
 
   try {
     // SECURITY: Enforce body size limit for auth endpoints (10KB max)
@@ -68,6 +58,20 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerClient();
     const { email, password } = parsed.data;
+
+    // SECURITY: Rate limit by IP+email (hashed) to avoid collapsing all traffic to "unknown" IPs
+    // while still providing brute-force protection for a given email on a given source.
+    const loginRateKey = `ip:${clientIP}:em:${emailKeyPrefix(email)}`;
+    const { allowed, remaining, resetIn } = await loginLimiter(loginRateKey);
+
+    if (!allowed) {
+      return jsonError(
+        `Too many login attempts. Please try again in ${Math.ceil(resetIn / 60)} minutes.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+        { retryAfter: resetIn, remaining },
+      );
+    }
 
     // Try password signin first
     let { data, error } = await supabase.auth.signInWithPassword({

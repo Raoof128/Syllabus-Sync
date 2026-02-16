@@ -98,11 +98,15 @@ export function getClientIPFromHeaders(
   headers: HeaderAccessor,
   options: GetClientIPOptions = {},
 ): string {
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Prefer Vercel's env signal when available; NODE_ENV is "production" on Vercel previews too.
+  const isRealProduction =
+    process.env.VERCEL_ENV === 'production' ||
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isVercelRuntime = Boolean(process.env.VERCEL) || Boolean(process.env.VERCEL_ENV);
   const { trustForwardedFor = false } = options;
 
   // In production, prefer verified proxy headers that cannot be spoofed
-  if (isProduction) {
+  if (isRealProduction) {
     // 1. Vercel's verified header (highest trust)
     // This header is set by Vercel's edge network and cannot be spoofed
     const vercelIp = extractFirstIP(headers.get('x-vercel-forwarded-for'));
@@ -113,8 +117,13 @@ export function getClientIPFromHeaders(
     const cfIp = headers.get('cf-connecting-ip');
     if (cfIp && isValidIP(cfIp)) return cfIp;
 
-    // 3. Only use x-forwarded-for if explicitly trusted
-    if (trustForwardedFor) {
+    // 3. Vercel commonly provides `x-real-ip` / `x-forwarded-for` on Node requests.
+    // Prefer `x-real-ip` (single value), then allow `x-forwarded-for` when we are on Vercel
+    // (Vercel sets/overwrites it at the edge) or when explicitly trusted.
+    const realIp = headers.get('x-real-ip');
+    if (realIp && isValidIP(realIp)) return realIp;
+
+    if (isVercelRuntime || trustForwardedFor) {
       const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
       if (forwardedIp) return forwardedIp;
     }
@@ -122,11 +131,13 @@ export function getClientIPFromHeaders(
     // In development, accept standard headers for local testing
     const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
     if (forwardedIp) return forwardedIp;
-  }
 
-  // Fallback: x-real-ip (used by some proxies)
-  const realIp = headers.get('x-real-ip');
-  if (realIp && isValidIP(realIp)) return realIp;
+    const realIp = headers.get('x-real-ip');
+    if (realIp && isValidIP(realIp)) return realIp;
+
+    // Local dev fallback: keep rate limiting stable rather than collapsing to a shared "unknown".
+    return '127.0.0.1';
+  }
 
   // Last resort: return 'unknown' (fail-safe for rate limiting)
   return 'unknown';

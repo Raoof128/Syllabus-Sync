@@ -1,3 +1,34 @@
+### Raouf: Fix Login Rate Limiting Bug + Debug Login UX — 2026-02-17
+
+**Scope:** Stabilize login behavior by fixing client IP extraction and rate limit keying, and improve the login page’s rate-limit feedback.
+**Type:** Fix / Security Hardening
+
+#### Changes
+
+1. **IP extraction fixes** (`lib/security/ip.ts`):
+   - Use Vercel runtime signals (`VERCEL`/`VERCEL_ENV`) to safely trust `x-forwarded-for` in production on Vercel.
+   - Prefer `x-real-ip` when present.
+   - Use a stable `127.0.0.1` fallback in local development when no headers exist.
+
+2. **Login rate limit keying** (`app/login/actions.ts`, `app/api/auth/signin/route.ts`, `lib/security/identifiers.ts`):
+   - Key login rate limits using `ip + hashed email` to avoid collapsing all traffic into a shared identifier when IP cannot be derived.
+   - Added `retryAfter` metadata to the server action result.
+
+3. **Login UI feedback** (`app/login/LoginClient.tsx`):
+   - Display a concrete retry window when the user is rate-limited.
+
+4. **Tests** (`tests/unit/security/ip.test.ts`):
+   - Added coverage for production trust rules and development fallback behavior.
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm test` ✅ (465/465 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Fix Vercel Deploy Scripts + Finalize Production Env/Cron — 2026-02-17
 
 **Scope:** Make Vercel CLI automation reliable for production deployments and ensure cron auth is configured for password-reset cleanup.

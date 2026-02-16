@@ -1,4 +1,18 @@
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: Login Page Debug + Rate Limit Bug Fix (IP Extraction + Keying)
+Summary: Fixed buggy login rate limiting caused by unstable/unknown client IP extraction in production-like environments. Updated IP extraction to safely accept `x-forwarded-for` on Vercel runtimes (and prefer `x-real-ip`), while keeping a stable `127.0.0.1` fallback for local development. Hardened login rate limiting by keying on `ip + hashed email` to avoid collapsing all traffic onto a shared identifier when IP is missing, and improved login UI feedback to show a concrete retry time when rate-limited. Added unit tests covering the IP extraction trust rules and dev fallback.
+Files: Modified `lib/security/ip.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/api/auth/signin/route.ts`. Added `lib/security/identifiers.ts`, `tests/unit/security/ip.test.ts`.
+Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm test` ✅ (465/465 pass), `npm run build` ✅.
+Follow-ups: Consider adding a second limiter dimension (pure per-IP + pure per-email) if you want stronger defense against email-rotation attacks while keeping NAT fairness.
+
+Raouf: 2026-02-17 (Australia/Sydney)
+Scope: Login Page Debug + Rate Limit Bug Fix (IP Extraction + Keying)
+Summary: Fixed buggy login rate limiting caused by unstable/unknown client IP extraction in production-like environments. Updated IP extraction to safely accept `x-forwarded-for` on Vercel runtimes (and prefer `x-real-ip`), while keeping a stable `127.0.0.1` fallback for local development. Hardened login rate limiting by keying on `ip + hashed email` to avoid collapsing all traffic onto a shared identifier when IP is missing, and improved login UI feedback to show a concrete retry time when rate-limited. Added unit tests covering the IP extraction trust rules and dev fallback.
+Files: Modified `lib/security/ip.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `app/api/auth/signin/route.ts`. Added `lib/security/identifiers.ts`, `tests/unit/security/ip.test.ts`.
+Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm test` ✅ (465/465 pass), `npm run build` ✅.
+Follow-ups: Consider adding a second limiter dimension (pure per-IP + pure per-email) if you want stronger defense against email-rotation attacks while keeping NAT fairness.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: Vercel Deploy Helper + Env Key Check Fix + Production Deployment
 Summary: Fixed the Vercel env-key validator to avoid an unsupported `--yes` flag (`vercel env ls`), added a deployment helper (`tools/vercel/deploy.mjs`) that deploys from a linked temp copy without `.git/` or pulled `.vercel/.env*` files (avoids Vercel’s “git author must have access” restriction), and updated `npm run vercel:deploy:*` scripts to use it. Verified required production env keys (including `CRON_SECRET`) are present, confirmed Supabase migrations are up to date remotely, and successfully deployed + aliased production.
 Files: Modified `tools/vercel/check-required-env.mjs`, `package.json`. Added `tools/vercel/deploy.mjs`.

@@ -5,6 +5,7 @@ import { loginSchema, LoginFormData } from './schemas/loginSchema';
 import { headers } from 'next/headers';
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIPFromHeaders } from '@/lib/security/ip';
+import { emailKeyPrefix } from '@/lib/security/identifiers';
 import { logger } from '@/lib/logger';
 
 export interface MFAFactorInfo {
@@ -17,6 +18,7 @@ export interface MFAFactorInfo {
 export interface LoginResult {
   success?: boolean;
   error?: string;
+  retryAfter?: number;
   mfaRequired?: boolean;
   availableFactors?: MFAFactorInfo[];
 }
@@ -38,15 +40,16 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   const headersList = await headers();
   const clientIp = getClientIPFromHeaders(headersList);
   const emailHint = maskEmailForLogs(result.data.email);
+  const loginRateKey = `ip:${clientIp}:em:${emailKeyPrefix(result.data.email)}`;
 
   // Log the attempt (Security)
   logger.info('Login attempt', { email_hint: emailHint });
 
   // 2. Security: Rate Limiting (5 attempts per min)
-  const limit = await loginLimiter(clientIp);
+  const limit = await loginLimiter(loginRateKey);
   if (!limit.allowed) {
     logger.warn('Login rate limit exceeded', { email_hint: emailHint, ip: clientIp });
-    return { error: 'rate_limit_exceeded' };
+    return { error: 'rate_limit_exceeded', retryAfter: limit.resetIn };
   }
 
   // 3. Auth: Supabase Login

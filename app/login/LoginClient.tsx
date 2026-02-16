@@ -100,7 +100,12 @@ export default function LoginClient() {
         if (result.error === 'invalid_credentials') {
           setGeneralError(t('loginErrorInvalidCredentials'));
         } else if (result.error === 'rate_limit_exceeded') {
-          setGeneralError(t('loginErrorTooManyRequests'));
+          const base = t('loginErrorTooManyRequests');
+          const minutes =
+            typeof result.retryAfter === 'number'
+              ? Math.max(1, Math.ceil(result.retryAfter / 60))
+              : null;
+          setGeneralError(minutes ? `${base} (${minutes} min)` : base);
         } else {
           setGeneralError(msg);
         }
