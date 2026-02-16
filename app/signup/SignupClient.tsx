@@ -109,7 +109,12 @@ export default function SignupClient() {
       const result = await response.json();
 
       if (!response.ok) {
-        setServerError(result.error || t('unexpectedError'));
+        // Handle API error response - error can be an object {code, message, details} or a string
+        const errorMessage =
+          typeof result.error === 'string'
+            ? result.error
+            : result.error?.message || t('unexpectedError');
+        setServerError(errorMessage);
         return;
       }
 

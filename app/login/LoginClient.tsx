@@ -154,6 +154,7 @@ export default function LoginClient() {
     }
 
     let active = true;
+    // Debounce passkey status check to avoid hitting rate limits while typing
     const timer = setTimeout(async () => {
       setPasskeyStatus('checking');
       try {
@@ -162,6 +163,16 @@ export default function LoginClient() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email.trim() }),
         });
+
+        // Handle rate limiting gracefully
+        if (response.status === 429) {
+          if (active) {
+            setPasskeyStatus('unavailable');
+            setMfaEnabled(false);
+          }
+          return;
+        }
+
         const result = await response.json();
         if (!active) return;
         setPasskeyStatus(result?.data?.available ? 'available' : 'unavailable');
@@ -172,7 +183,7 @@ export default function LoginClient() {
           setMfaEnabled(false);
         }
       }
-    }, 400);
+    }, 800); // Increased debounce to reduce API calls
 
     return () => {
       active = false;

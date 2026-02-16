@@ -374,3 +374,12 @@ export const securityScanLimiter = createRateLimiter({
   maxRequests: 10, // Max 10 scans per minute per user/IP
   failClosed: true,
 });
+
+/** Rate limiter for passkey status checks - more permissive than login since it's read-only */
+export const passkeyStatusLimiter = createRateLimiter({
+  prefix: 'passkey_status',
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30, // Max 30 status checks per minute (allows for email typing/autocomplete)
+  failClosed: false, // Prioritize UX - status check is not security-critical
+});
+
