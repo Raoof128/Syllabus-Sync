@@ -1,3 +1,36 @@
+### Raouf: Fix Vercel Deploy Scripts + Finalize Production Env/Cron — 2026-02-17
+
+**Scope:** Make Vercel CLI automation reliable for production deployments and ensure cron auth is configured for password-reset cleanup.
+**Type:** Fix / Operations
+
+#### Changes
+
+1. **Vercel env check fix** (`tools/vercel/check-required-env.mjs`):
+   - Removed unsupported `--yes` usage from `vercel env ls` invocation so CI/local checks work reliably.
+
+2. **Reliable Vercel CLI deploy helper** (`tools/vercel/deploy.mjs`, `package.json`):
+   - Added a deploy helper that deploys from a linked temporary copy without `.git/` or pulled `.vercel/.env*` files.
+   - Updated scripts:
+     - `npm run vercel:deploy:preview`
+     - `npm run vercel:deploy:prod`
+
+3. **Production environment + deployment** (Vercel CLI):
+   - Confirmed required production env keys are present (including `CRON_SECRET`) and deployed + aliased production successfully.
+
+4. **Supabase migration status** (Supabase CLI):
+   - Confirmed remote DB is up to date (`supabase db push --dry-run --linked`).
+
+#### Verification
+
+- `node tools/vercel/check-required-env.mjs` ✅
+- `supabase db push --dry-run --linked --yes` ✅ (up to date)
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm test` ✅ (461/461 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Add Reset Password Flow (Resend + Token Table + Vercel Cron) — 2026-02-16
 
 **Scope:** Add a user-facing reset password page and a secure token-based reset flow, delivered via Resend, aligned with the existing auth UX and security posture.

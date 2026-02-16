@@ -36,8 +36,8 @@
     "vercel:link": "vercel link",
     "vercel:env:pull": "vercel env pull .env.local",
     "vercel:env:check": "node tools/vercel/check-required-env.mjs",
-    "vercel:deploy:preview": "vercel --yes",
-    "vercel:deploy:prod": "vercel --prod --yes"
+    "vercel:deploy:preview": "node tools/vercel/deploy.mjs",
+    "vercel:deploy:prod": "node tools/vercel/deploy.mjs --prod"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

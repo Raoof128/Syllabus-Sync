@@ -27,7 +27,7 @@ const REQUIRED_KEYS = [
 ];
 
 function readEnvList(environment) {
-  const args = ['env', 'ls', environment, '--yes'];
+  const args = ['env', 'ls', environment];
 
   // Prefer explicit non-interactive auth in CI when available.
   if (process.env.VERCEL_TOKEN?.trim()) {
@@ -38,7 +38,6 @@ function readEnvList(environment) {
   }
 
   // `vercel env ls <env>` prints a table including keys; we only need to detect names.
-  // Use `--yes` to avoid prompts. If `VERCEL_TOKEN` is set, vercel will use it.
   const out = execFileSync('vercel', args, {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
