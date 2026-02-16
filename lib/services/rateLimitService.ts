@@ -383,3 +383,11 @@ export const passkeyStatusLimiter = createRateLimiter({
   failClosed: false, // Prioritize UX - status check is not security-critical
 });
 
+/** Rate limiter for passkey authentication (options + verify) - slightly more permissive than login */
+export const passkeyAuthLimiter = createRateLimiter({
+  prefix: 'passkey_auth',
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 20, // Max 20 passkey auth attempts per 15 min (more than login since it's 2-step)
+  failClosed: true, // SECURITY: Deny on store failure
+});
+

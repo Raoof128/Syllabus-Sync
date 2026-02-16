@@ -11,7 +11,7 @@ import {
   BODY_SIZE_LIMITS,
   ERROR_CODES,
 } from '@/app/api/_lib/response';
-import { loginLimiter } from '@/lib/services/rateLimitService';
+import { passkeyAuthLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { getRpId, setPasskeyCookies } from '@/app/api/auth/passkey/_lib';
 import { z } from 'zod';
@@ -23,7 +23,7 @@ const optionsSchema = z.object({
 
 export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
-  const { allowed, remaining, resetIn } = await loginLimiter(clientIP);
+  const { allowed, remaining, resetIn } = await passkeyAuthLimiter(clientIP);
 
   if (!allowed) {
     return jsonError(
