@@ -170,6 +170,20 @@ cp .env.example .env.local
 # Optional: Redis URL, OpenWeather API Key, ORS API Key
 ```
 
+Email (Resend) + Vercel notes:
+
+- Transactional email (verification) is sent via **Resend** using `RESEND_API_KEY` and `VERIFICATION_EMAIL_FROM`.
+- Vercel Cron endpoints are protected by `CRON_SECRET`.
+- Setup guide: `docs/operations/resend-vercel-setup.md`
+
+If you deploy to Vercel using the CLI, the repo includes pinned scripts:
+
+```bash
+npm run vercel:link
+VERCEL_ENVIRONMENT=production npm run vercel:env:check
+npm run vercel:deploy:prod
+```
+
 #### 3. Database Initialization
 
 Execute `docs/database/database-schema.sql` in your Supabase SQL Editor to:

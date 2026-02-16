@@ -238,18 +238,6 @@ export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
-  // TESTING MODE: When ALLOW_MEMORY_RATE_LIMIT is set, bypass rate limiting entirely
-  // This is only for testing/demo deployments without Redis
-  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
-  if (allowMemoryStore) {
-    return {
-      allowed: true,
-      remaining: config.maxRequests,
-      resetIn: Math.ceil(config.windowMs / 1000),
-      limit: config.maxRequests,
-    };
-  }
-
   const store = getStoreInstance();
   const key = config.prefix
     ? `ratelimit:${config.prefix}:${identifier}`

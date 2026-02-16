@@ -32,7 +32,12 @@
     "docker:dev": "docker compose -f infra/docker/docker-compose.yml --profile development up",
     "docker:prod": "docker compose -f infra/docker/docker-compose.yml up",
     "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
-    "build:overlays": "echo \"Unavailable: scripts directory removed\""
+    "build:overlays": "echo \"Unavailable: scripts directory removed\"",
+    "vercel:link": "vercel link",
+    "vercel:env:pull": "vercel env pull .env.local",
+    "vercel:env:check": "node tools/vercel/check-required-env.mjs",
+    "vercel:deploy:preview": "vercel --yes",
+    "vercel:deploy:prod": "vercel --prod --yes"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -70,7 +75,8 @@
     "uuid": "^13.0.0",
     "zod": "^4.3.6",
     "zustand": "^5.0.9",
-    "zxcvbn": "^4.4.2"
+    "zxcvbn": "^4.4.2",
+    "resend": "^6.9.2"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.6",
@@ -102,6 +108,7 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^4.1.18",
     "typescript": "^5",
+    "vercel": "^50.17.1",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.16"
   },
@@ -131,6 +138,9 @@
   "homepage": "https://syllabus-sync.dev",
   "author": "Pouya Alavi <pouya@syllabus-sync.dev>",
   "license": "MIT",
+  "overrides": {
+    "undici": "6.23.0"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

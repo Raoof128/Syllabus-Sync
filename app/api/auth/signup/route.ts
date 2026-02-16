@@ -83,6 +83,25 @@ const serverT = (key: string): string => {
 export async function POST(request: NextRequest) {
   const adminClient = createAdminClient();
 
+  // Production guardrails: email verification depends on Resend and service role.
+  // Fail closed in real production to avoid creating accounts that can never be verified.
+  if (isRealProduction) {
+    if (!adminClient) {
+      return jsonError(
+        'Service temporarily unavailable. Please try again later.',
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+    if (!isEmailServiceConfigured()) {
+      return jsonError(
+        'Service temporarily unavailable. Please try again later.',
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+  }
+
   // ===========================================================================
   // KILL SWITCH: Check if signups are enabled (only if admin client available)
   // ===========================================================================
@@ -312,13 +331,32 @@ export async function POST(request: NextRequest) {
     // Send custom verification email (production flow)
     // Skip for dev emails in development (they get auto-confirmed below)
     if (adminClient && !(isDevelopment && isDevEmail(email))) {
-      if (isEmailServiceConfigured()) {
-        // Fire and forget — don't block signup response on email delivery
-        createAndSendVerification(adminClient, userId, email).catch((err) => {
-          logger.error('Failed to send verification email after signup', {
+      const requireDelivery = isRealProduction;
+
+      if (requireDelivery) {
+        const verificationResult = await createAndSendVerification(adminClient, userId, email);
+
+        if (!verificationResult.success) {
+          logger.error('Verification email delivery failed during signup; rolling back user', {
             userId,
-            error: err,
           });
+
+          // Best-effort cleanup: remove app records first, then auth user.
+          await adminClient.from('email_verifications').delete().eq('user_id', userId);
+          await adminClient.from('gamification_profiles').delete().eq('user_id', userId);
+          await adminClient.from('profiles').delete().eq('id', userId);
+          await adminClient.auth.admin.deleteUser(userId);
+
+          return jsonError(
+            'Service temporarily unavailable. Please try again later.',
+            503,
+            ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+          );
+        }
+      } else if (isEmailServiceConfigured()) {
+        // Non-production: best-effort send to avoid slowing down local/dev signups.
+        createAndSendVerification(adminClient, userId, email).catch((err) => {
+          logger.error('Failed to send verification email after signup', { userId, error: err });
         });
       }
     }

@@ -97,11 +97,15 @@ export async function createAndSendVerification(
   const tokenHash = hashToken(rawToken);
   const expiresAt = getTokenExpiry();
 
-  const { error: insertError } = await adminClient.from('email_verifications').insert({
-    user_id: userId,
-    token_hash: tokenHash,
-    expires_at: expiresAt.toISOString(),
-  });
+  const { data: inserted, error: insertError } = await adminClient
+    .from('email_verifications')
+    .insert({
+      user_id: userId,
+      token_hash: tokenHash,
+      expires_at: expiresAt.toISOString(),
+    })
+    .select('id')
+    .single();
 
   if (insertError) {
     logger.error('Failed to store verification token', {
@@ -115,6 +119,11 @@ export async function createAndSendVerification(
   const result = await sendVerificationEmail({ to: email, token: rawToken });
 
   if (!result.success) {
+    // Best-effort cleanup: prevent an undelivered token from lingering.
+    // We do not attempt to restore previously invalidated tokens.
+    if (inserted?.id) {
+      await adminClient.from('email_verifications').delete().eq('id', inserted.id);
+    }
     logger.error('Verification email send failed', { userId });
     return { success: false, error: 'Failed to send verification email' };
   }

@@ -99,8 +99,23 @@ jobs:
           node-version: '22.x'
           cache: 'npm'
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+      - name: Install dependencies (includes pinned Vercel CLI)
+        run: npm ci
+
+      - name: Pull Vercel project settings
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          set -euo pipefail
+          npx vercel pull --yes --environment=production --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+
+      - name: Validate required Vercel environment keys
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_ENVIRONMENT: production
+        run: npm run vercel:env:check
 
       - name: Deploy to production
         id: deploy
@@ -110,7 +125,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           set -euo pipefail
-          deploy_output=$(vercel --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" 2>&1)
+          deploy_output=$(npx vercel --prod --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" 2>&1)
           echo "$deploy_output"
 
           deployment_url=$(echo "$deploy_output" | grep -Eo 'https://[^ ]+\.vercel\.app' | tail -n 1)

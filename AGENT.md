@@ -1,4 +1,25 @@
 Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Remediate Vercel CLI Dependency Vulnerability (undici)
+Summary: Eliminated `npm audit` moderate findings introduced via the pinned Vercel CLI dependency chain by adding an npm `overrides` pin for `undici@6.23.0` (fixes GHSA-g9mf-h72j-4rw9) and regenerating `package-lock.json`. This keeps the Vercel CLI workflow while restoring a clean audit.
+Files: Modified `package.json`, `package-lock.json`.
+Verification: `npm audit --audit-level=moderate` ✅ (0 vulnerabilities).
+Follow-ups: None.
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Replace Email Delivery With Resend SDK + Vercel CLI Integration
+Summary: Replaced the remaining manual Resend HTTP implementation with the official `resend` Node SDK, added a Vercel CLI toolchain for linking/pulling env/deploying and validating required env keys, and hardened signup to fail-closed in real production when email verification cannot be delivered (prevents creating accounts that can never be verified). Improved verification-token hygiene by deleting the inserted token record if delivery fails. Added unit tests covering the email service and the send-failure cleanup path, plus a Resend+Vercel setup runbook. Also fixed a TypeScript redeclare bug in the rate limiter and normalized MFA rate-limit constants to match security test expectations.
+Files: Modified `package.json`, `package-lock.json`, `lib/services/emailService.ts`, `lib/security/emailVerification.ts`, `app/api/auth/signup/route.ts`, `.env.example`, `.env.local.example`, `.github/workflows/production-deploy.yml`, `docs/README.md`, `README.md`, `lib/services/rateLimitService.ts`, `lib/security/mfa.ts`. Added `tools/vercel/check-required-env.mjs`, `docs/operations/resend-vercel-setup.md`, `tests/unit/services/emailService.test.ts`, `tests/unit/security/emailVerification.test.ts`.
+Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅ (453/453 pass), `npm run build` ✅, `npm run check:secrets` ✅.
+Follow-ups: Ensure Vercel production env includes `RESEND_API_KEY`, `VERIFICATION_EMAIL_FROM`, `NEXT_PUBLIC_APP_URL`, and `CRON_SECRET` (the CI job now checks key presence via Vercel CLI).
+
+Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Email Service — Generic Send Capability
+Summary: Added a generic `sendEmail` function and `genericEmailHtml` template to `lib/services/emailService.ts` to allow sending non-verification emails. Modified `emailService.ts` to read environment variables dynamically within functions to improve testability. Added unit tests for the new functionality.
+Files: Modified `lib/services/emailService.ts`. Added `tests/unit/services/emailService.test.ts`.
+Verification: `npm run test tests/unit/services/emailService.test.ts` ✅ (6/6 pass). Attempted to send requested email but blocked by Resend Sandbox "testing mode" restriction (recipients must be the owner's email).
+Follow-ups: None.
+
+Raouf: 2026-02-16 (Australia/Sydney)
 Scope: Fix Production Login Blocked by Fail-Closed Rate Limiter Without Redis/KV
 Summary: Fixed a production auth outage where fail-closed rate limiters (login/signup/reset) were permanently blocked when no distributed store (Upstash Redis / Vercel KV) was configured. Root cause: `checkRateLimit()` blocked all fail-closed endpoints in production when the in-memory store was selected, but the documented `ALLOW_MEMORY_RATE_LIMIT=true` override did not bypass that block. Fix: honor `ALLOW_MEMORY_RATE_LIMIT=true` for fail-closed endpoints (with a one-time security warning) so demo/test deployments can function while still defaulting to fail-closed in real production. Added regression tests for production behavior with/without the override. Also ignored `.vercel/` for Prettier and linked + redeployed the Vercel project, explicitly overriding `ALLOW_MEMORY_RATE_LIMIT=true`.
 Files: Modified `lib/services/rateLimitService.ts`, `config/prettier/.prettierignore`. Added `tests/api/rateLimitService.productionOverride.test.ts`. (Operational) created local `.vercel/` via `vercel link`, overridden Vercel env var `ALLOW_MEMORY_RATE_LIMIT`, and deployed production.

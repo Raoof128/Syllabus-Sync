@@ -9,6 +9,10 @@ This folder contains presentation-grade project documentation for the Macquarie 
 - `docs/database/`: Database reference artifacts and schema snapshots.
 - `docs/project/`: Internal project planning material and design sketches.
 
+## Operations Entry Points
+
+- Resend + Vercel email setup: `/docs/operations/resend-vercel-setup.md`
+
 ## Policy Entry Points
 
 - Privacy policy: `/docs/policies/privacy-policy.md`

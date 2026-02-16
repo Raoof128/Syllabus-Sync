@@ -1,3 +1,82 @@
+### Raouf: Remediate Vercel CLI Dependency Vulnerability (undici) — 2026-02-16
+
+**Scope:** Restore a clean `npm audit` after adding pinned Vercel CLI support.
+**Type:** Chore / Security Maintenance
+
+#### Changes
+
+1. **Pin patched `undici` via npm overrides** (`package.json`, `package-lock.json`):
+   - Added `overrides.undici = 6.23.0` to address GHSA-g9mf-h72j-4rw9 in the Vercel CLI dependency chain
+
+#### Verification
+
+- `npm audit --audit-level=moderate` ✅ (0 vulnerabilities)
+
+---
+
+### Raouf: Replace Email Delivery With Resend SDK + Vercel CLI Integration — 2026-02-16
+
+**Scope:** Move transactional email delivery to the official Resend SDK, add Vercel CLI setup tooling, and harden production signup so email verification is reliably deliverable.
+**Type:** Feature / Security Hardening / Operations
+
+#### Changes
+
+1. **Resend SDK integration** (`lib/services/emailService.ts`):
+   - Replaced direct HTTP calls with the official `resend` Node SDK
+   - Added robust env resolution (`NEXT_PUBLIC_APP_URL` with `VERCEL_URL` fallback) and strict config validation
+   - Preserved logging hygiene (masked recipients; never logs raw verification tokens)
+
+2. **Production-safe email verification** (`app/api/auth/signup/route.ts`, `lib/security/emailVerification.ts`):
+   - Fail-closed in real production when Resend/service-role is not configured
+   - Roll back newly created users if verification email delivery fails (prevents “unverifiable” accounts)
+   - Delete the inserted token record if email delivery fails
+
+3. **Vercel CLI toolchain + CI validation** (`tools/vercel/check-required-env.mjs`, `package.json`, `.github/workflows/production-deploy.yml`):
+   - Added pinned Vercel CLI (`vercel`) and scripts for link/env/deploy
+   - Added a Vercel env-key presence check (names only, no values) in the production deploy workflow
+
+4. **Docs + examples** (`docs/operations/resend-vercel-setup.md`, `README.md`, `docs/README.md`, `.env.example`):
+   - Added a Resend+Vercel setup runbook and documented required env vars including `CRON_SECRET`
+
+5. **Tests** (`tests/unit/services/emailService.test.ts`, `tests/unit/security/emailVerification.test.ts`):
+   - Added coverage for Resend send flows and token cleanup behavior
+
+6. **Incidental fixes found by the audit** (`lib/services/rateLimitService.ts`, `lib/security/mfa.ts`):
+   - Fixed a TypeScript redeclare bug in rate limiter logic
+   - Normalized MFA rate-limit constants to match security test expectations
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (453/453 pass)
+- `npm run build` ✅
+- `npm run check:secrets` ✅
+
+---
+
+### Raouf: Email Service — Generic Send Capability — 2026-02-16
+
+**Scope:** Add capability to send generic transactional emails.
+**Type:** Feature / Refactor
+
+#### Changes
+
+1. **Generic Email Support** (`lib/services/emailService.ts`):
+   - Added `sendEmail` function for arbitrary recipient, subject, and content.
+   - Added `genericEmailHtml` branded template.
+   - Refactored `emailService.ts` to read `process.env` within functions for dynamic configuration and easier unit testing.
+
+2. **Unit Testing** (`tests/unit/services/emailService.test.ts`):
+   - Added full test coverage for `isEmailServiceConfigured` and `sendEmail` with mocked fetch.
+
+#### Verification
+
+- `npm run test tests/unit/services/emailService.test.ts` ✅ (6/6 pass)
+
+---
+
 ### Raouf: Fix Production Auth Blocked by Fail-Closed Rate Limiter Without Redis/KV — 2026-02-16
 
 **Scope:** Unblock production login/signup/reset flows when Redis/KV is not configured, while preserving fail-closed defaults for real production.
