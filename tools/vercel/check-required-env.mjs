@@ -22,9 +22,17 @@ const REQUIRED_KEYS = [
   'VERIFICATION_EMAIL_NAME',
   // Email verification link base URL (fallbacks exist, but this is recommended)
   'NEXT_PUBLIC_APP_URL',
+  // Supabase (required for auth + security-critical operations)
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
   // Cron endpoint auth
   'CRON_SECRET',
 ];
+
+const FORBIDDEN_KEYS_BY_ENV = {
+  production: ['ALLOW_MEMORY_RATE_LIMIT'],
+};
 
 function readEnvList(environment) {
   const args = ['env', 'ls', environment];
@@ -72,6 +80,21 @@ function main() {
         'Fix:',
         `- vercel env add <KEY> ${environment}`,
         `- or set them in the Vercel dashboard: Project -> Settings -> Environment Variables`,
+      ].join('\n'),
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  const forbidden = (FORBIDDEN_KEYS_BY_ENV[environment] || []).filter((k) => output.includes(k));
+  if (forbidden.length > 0) {
+    console.error(
+      [
+        `Forbidden Vercel environment keys present for "${environment}":`,
+        ...forbidden.map((k) => `- ${k}`),
+        '',
+        'Fix:',
+        `- vercel env rm <KEY> ${environment}`,
       ].join('\n'),
     );
     process.exitCode = 1;

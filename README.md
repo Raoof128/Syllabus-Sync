@@ -70,7 +70,7 @@ graph TD
 
 #### **🛡️ Enterprise Security**
 
-- **Multi-Layer Defense:** Distributed rate limiting (Upstash Redis), CSRF protection with double-submit cookies, and Content Security Policy (CSP) with SHA-256 hashes
+- **Multi-Layer Defense:** Distributed rate limiting (Upstash Redis recommended, Supabase Postgres fallback), CSRF protection with double-submit cookies, and Content Security Policy (CSP) with SHA-256 hashes
 - **Zero-Trust Architecture:** Strict Row Level Security (RLS) policies and comprehensive input sanitization
 - **Privacy-First Design:** GDPR-compliant data handling with user-controlled export/deletion capabilities
 
@@ -143,7 +143,7 @@ graph TD
 - **Node.js 22+** (LTS version recommended)
 - **npm 10+** or **yarn 1.22+**
 - **Supabase Account** (for database, auth, and storage)
-- **Upstash Redis** (production rate limiting, optional for development)
+- **Upstash Redis** (recommended for high-traffic production rate limiting; optional)
 
 ### **Installation Process**
 

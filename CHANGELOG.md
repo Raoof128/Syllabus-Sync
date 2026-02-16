@@ -1,3 +1,42 @@
+### Raouf: Production Hardening — Distributed Rate Limiting + Cron + Env Audit — 2026-02-17
+
+**Scope:** Make the current Vercel deployment production-grade by removing serverless-per-instance rate limiting and tightening deployment env validation.
+**Type:** Fix / Security Hardening / Operations
+
+#### Changes
+
+1. **Distributed rate limiting without Redis/KV** (`lib/services/rateLimitService.ts`, `supabase/migrations/20260217093000_rate_limits.sql`):
+   - Added Supabase Postgres-backed rate limit store via service-role RPC (`ratelimit_increment`, `ratelimit_get`, `ratelimit_set`).
+   - Store selection order is now: Upstash Redis, Vercel KV, Supabase Postgres, then Memory (dev only).
+   - Added `cleanup_expired_rate_limits()` for bounded storage.
+
+2. **Cron cleanup for rate limit rows** (`app/api/security/rate-limit/cleanup/route.ts`, `vercel.json`):
+   - Added cron-protected cleanup endpoint and a daily Vercel cron schedule.
+
+3. **Vercel env validation hardened** (`tools/vercel/check-required-env.mjs`):
+   - Now checks required Supabase keys plus email + cron keys.
+   - Fails if `ALLOW_MEMORY_RATE_LIMIT` is present in production.
+
+4. **Docs updated** (`docs/operations/resend-vercel-setup.md`, `README.md`):
+   - Updated required env list and clarified rate limiting options and production posture.
+
+5. **Operational** (Supabase CLI + Vercel CLI):
+   - Applied `20260217093000_rate_limits.sql` to the linked Supabase project.
+   - Removed `ALLOW_MEMORY_RATE_LIMIT` from Vercel production environment.
+   - Deployed production and confirmed alias promotion.
+
+#### Verification
+
+- `supabase db push --linked --yes` ✅
+- `node tools/vercel/check-required-env.mjs` ✅
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm test` ✅ (465/465 pass)
+- `npm run build` ✅
+- `npm run vercel:deploy:prod` ✅
+
+---
+
 ### Raouf: Fix Vercel Deploy Helper Symlink Uploads — 2026-02-17
 
 **Scope:** Prevent Vercel production builds failing due to missing symlink targets in deploy uploads.

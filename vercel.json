@@ -7,6 +7,10 @@
     {
       "path": "/api/auth/password/cleanup",
       "schedule": "10 3 * * *"
+    },
+    {
+      "path": "/api/security/rate-limit/cleanup",
+      "schedule": "20 3 * * *"
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { createAdminClient } from '@/lib/supabase/admin';
 /**
  * Distributed Rate Limiting Service
  *
@@ -158,6 +159,71 @@ class UpstashRedisStore implements RateLimitStore {
   }
 }
 
+/**
+ * Supabase Postgres store (distributed) using the service role key.
+ *
+ * This is a pragmatic default when Redis/KV is not configured. It trades some latency
+ * for correctness across serverless instances and avoids the "memory store in prod"
+ * foot-gun. Intended for low/medium traffic production.
+ */
+class SupabasePostgresStore implements RateLimitStore {
+  private admin;
+
+  constructor() {
+    const admin = createAdminClient();
+    if (!admin) {
+      throw new Error('supabase admin client not configured');
+    }
+    this.admin = admin;
+  }
+
+  async get(key: string) {
+    try {
+      const { data, error } = await this.admin.rpc('ratelimit_get', { rl_key: key });
+      if (error) return null;
+
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row || typeof row.count !== 'number' || typeof row.reset_time_ms !== 'number')
+        return null;
+
+      return { count: row.count, resetTime: row.reset_time_ms };
+    } catch {
+      return null;
+    }
+  }
+
+  async set(key: string, data: { count: number; resetTime: number }, ttlMs: number) {
+    try {
+      await this.admin.rpc('ratelimit_set', {
+        rl_key: key,
+        rl_count: data.count,
+        rl_reset_time_ms: data.resetTime,
+        rl_ttl_ms: ttlMs,
+      });
+    } catch {
+      // Ignore set failures; caller decides fail-open/closed.
+    }
+  }
+
+  async increment(key: string, windowMs: number) {
+    const { data, error } = await this.admin.rpc('ratelimit_increment', {
+      rl_key: key,
+      rl_window_ms: windowMs,
+    });
+
+    if (error) {
+      throw new Error(error.message || 'ratelimit_increment failed');
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row || typeof row.count !== 'number' || typeof row.reset_time_ms !== 'number') {
+      throw new Error('ratelimit_increment returned invalid data');
+    }
+
+    return { count: row.count, resetTime: row.reset_time_ms };
+  }
+}
+
 // ============================================================================
 // RATE LIMITER
 // ============================================================================
@@ -182,9 +248,12 @@ function getStore(): RateLimitStore {
     return new UpstashRedisStore(kvUrl, kvToken);
   }
 
-  // SECURITY: Check for explicit override to allow memory store in production
-  // This should only be used for testing/demo deployments
-  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+  // Prefer Supabase Postgres as a distributed store when available.
+  try {
+    return new SupabasePostgresStore();
+  } catch {
+    // fall through
+  }
 
   // SECURITY: In production, require Redis - don't fall back to memory store
   // Memory store is useless in serverless environments (each instance has its own memory)
@@ -193,11 +262,16 @@ function getStore(): RateLimitStore {
     process.env.VERCEL_ENV === 'production' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
 
+  // SECURITY: Check for explicit override to allow memory store in production
+  // This should only be used for testing/demo deployments
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+
   if (isRealProduction && !allowMemoryStore) {
     logger.error(
       '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
         'In-memory rate limiting does NOT work across serverless instances.\n' +
-        'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN for proper rate limiting.\n' +
+        'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN (recommended) or KV_REST_API_URL/KV_REST_API_TOKEN.\n' +
+        'Alternatively, configure SUPABASE_SERVICE_ROLE_KEY to use the Postgres rate limit store.\n' +
         'Security-critical endpoints (login, signup, password reset) will fail-closed.\n' +
         'For testing/demo only, set ALLOW_MEMORY_RATE_LIMIT=true to bypass this check.',
     );
