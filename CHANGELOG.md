@@ -1,3 +1,26 @@
+### Raouf: Fix Vercel Deploy Helper Symlink Uploads — 2026-02-17
+
+**Scope:** Prevent Vercel production builds failing due to missing symlink targets in deploy uploads.
+**Type:** Fix / Operations
+
+#### Changes
+
+1. **Dereference symlinks in deploy helper** (`tools/vercel/deploy.mjs`):
+   - Ensure symlinked files (e.g. root `codecov.yml`) are uploaded as real files in the temp deploy workspace.
+   - Eliminates `ENOENT` build failures seen during `next build` on Vercel.
+
+2. **Production deploy**:
+   - Re-ran `npm run vercel:deploy:prod` successfully and confirmed alias promotion.
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm test` ✅ (465/465 pass)
+- `npm run vercel:deploy:prod` ✅
+
+---
+
 ### Raouf: Fix Login Rate Limiting Bug + Debug Login UX — 2026-02-17
 
 **Scope:** Stabilize login behavior by fixing client IP extraction and rate limit keying, and improve the login page’s rate-limit feedback.

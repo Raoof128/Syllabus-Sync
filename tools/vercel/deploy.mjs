@@ -69,7 +69,9 @@ function copyRepoToTemp(root) {
   fs.cpSync(root, tmpBase, {
     recursive: true,
     force: true,
-    dereference: false,
+    // Vercel packaging/build can be sensitive to symlinks; dereference to ensure
+    // root-level symlinks (e.g. `codecov.yml`) become real files in the upload.
+    dereference: true,
     filter: (src) => shouldCopy(root, src),
   });
 
