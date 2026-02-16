@@ -70,7 +70,7 @@ graph TD
 
 #### **🛡️ Enterprise Security**
 
-- **Multi-Layer Defense:** Distributed rate limiting (Upstash Redis recommended, Supabase Postgres fallback), CSRF protection with double-submit cookies, and Content Security Policy (CSP) with SHA-256 hashes
+- **Multi-Layer Defense:** Distributed rate limiting (Vercel KV / Upstash Redis in production, Supabase Postgres fallback), CSRF protection with double-submit cookies, and Content Security Policy (CSP) with SHA-256 hashes
 - **Zero-Trust Architecture:** Strict Row Level Security (RLS) policies and comprehensive input sanitization
 - **Privacy-First Design:** GDPR-compliant data handling with user-controlled export/deletion capabilities
 

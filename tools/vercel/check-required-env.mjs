@@ -26,6 +26,9 @@ const REQUIRED_KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
+  // Distributed rate limiting (required for production)
+  'KV_REST_API_URL',
+  'KV_REST_API_TOKEN',
   // Cron endpoint auth
   'CRON_SECRET',
 ];

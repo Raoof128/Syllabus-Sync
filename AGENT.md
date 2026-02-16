@@ -1,4 +1,18 @@
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: High-Traffic Production — Move Rate Limiting To Vercel KV (Upstash Redis)
+Summary: Provisioned Upstash for Redis via Vercel Marketplace and connected it to the `syllabus-sync` project, enabling Vercel KV/Redis-backed distributed rate limiting in all environments (production/preview/development). Verified the Vercel production environment now includes `KV_REST_API_URL` and `KV_REST_API_TOKEN`, updated the env-audit script to require those keys in production, and redeployed production so the runtime starts using KV/Redis instead of Postgres for rate limiting (reduces DB write load under high traffic).
+Files: Modified `tools/vercel/check-required-env.mjs`, `docs/operations/resend-vercel-setup.md`, `README.md`.
+Verification: `vercel integration list` ✅ (resource available + connected), `vercel env ls production` ✅ (KV keys present), `node tools/vercel/check-required-env.mjs` ✅, `npm run format:check` ✅, `npm run typecheck` ✅, `npm test` ✅ (465/465 pass), `npm run build` ✅, `npm run vercel:deploy:prod` ✅ (aliased).
+Follow-ups: If you later move to a paid Upstash plan, no code changes required; only the integration plan changes.
+
+Raouf: 2026-02-17 (Australia/Sydney)
+Scope: High-Traffic Production — Move Rate Limiting To Vercel KV (Upstash Redis)
+Summary: Provisioned Upstash for Redis via Vercel Marketplace and connected it to the `syllabus-sync` project, enabling Vercel KV/Redis-backed distributed rate limiting in all environments (production/preview/development). Verified the Vercel production environment now includes `KV_REST_API_URL` and `KV_REST_API_TOKEN`, updated the env-audit script to require those keys in production, and redeployed production so the runtime starts using KV/Redis instead of Postgres for rate limiting (reduces DB write load under high traffic).
+Files: Modified `tools/vercel/check-required-env.mjs`, `docs/operations/resend-vercel-setup.md`, `README.md`.
+Verification: `vercel integration list` ✅ (resource available + connected), `vercel env ls production` ✅ (KV keys present), `node tools/vercel/check-required-env.mjs` ✅, `npm run format:check` ✅, `npm run typecheck` ✅, `npm test` ✅ (465/465 pass), `npm run build` ✅, `npm run vercel:deploy:prod` ✅ (aliased).
+Follow-ups: If you later move to a paid Upstash plan, no code changes required; only the integration plan changes.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: Production Hardening — Distributed Rate Limiting + Cron + Vercel Env Audit
 Summary: Eliminated the last “not production ready” issues in the Vercel deployment by making rate limiting truly distributed without requiring Redis/KV, and tightening Vercel env validation. Implemented a Supabase Postgres-backed rate limit store (service-role RPC) used automatically when Redis/KV is not configured, removed the production `ALLOW_MEMORY_RATE_LIMIT` override from Vercel, and added a daily cron cleanup route for stale rate-limit rows. Expanded the Vercel env checker to validate the full set of required Supabase + email + cron keys and to fail if `ALLOW_MEMORY_RATE_LIMIT` is present in production. Updated runbooks/README to reflect the new production posture. Applied the new Supabase migration to the linked remote project and redeployed production.
 Files: Added `supabase/migrations/20260217093000_rate_limits.sql`, `app/api/security/rate-limit/cleanup/route.ts`. Modified `lib/services/rateLimitService.ts`, `vercel.json`, `tools/vercel/check-required-env.mjs`, `docs/operations/resend-vercel-setup.md`, `README.md`.

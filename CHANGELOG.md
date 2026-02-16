@@ -1,3 +1,31 @@
+### Raouf: Move Production Rate Limiting To Vercel KV (Upstash Redis) — 2026-02-17
+
+**Scope:** Provision a high-traffic distributed rate limiter backed by Vercel KV/Upstash Redis to reduce database write load.
+**Type:** Chore / Operations
+
+#### Changes
+
+1. **Provisioned Upstash Redis via Vercel Marketplace** (Vercel CLI / Dashboard):
+   - Connected the resource to the `syllabus-sync` project so `KV_REST_API_URL` / `KV_REST_API_TOKEN` are injected automatically.
+
+2. **Production env audit tightened** (`tools/vercel/check-required-env.mjs`):
+   - Require `KV_REST_API_URL` and `KV_REST_API_TOKEN` in production to ensure distributed rate limiting is enabled for high traffic.
+
+3. **Docs updated** (`docs/operations/resend-vercel-setup.md`, `README.md`):
+   - Clarified Vercel KV/Upstash provisioning and production expectations.
+
+4. **Production deploy**:
+   - Redeployed production so the runtime picks up KV/Redis env vars and uses KV-backed rate limiting.
+
+#### Verification
+
+- `vercel integration list` ✅ (resource available + connected)
+- `vercel env ls production` ✅ (KV keys present)
+- `node tools/vercel/check-required-env.mjs` ✅
+- `npm run vercel:deploy:prod` ✅ (aliased)
+
+---
+
 ### Raouf: Production Hardening — Distributed Rate Limiting + Cron + Env Audit — 2026-02-17
 
 **Scope:** Make the current Vercel deployment production-grade by removing serverless-per-instance rate limiting and tightening deployment env validation.

@@ -69,3 +69,6 @@ This repo includes a distributed rate limiter that prefers (in order):
 3. Supabase Postgres (default fallback if `SUPABASE_SERVICE_ROLE_KEY` is configured)
 
 Avoid setting `ALLOW_MEMORY_RATE_LIMIT` in production.
+
+For this Vercel deployment, we recommend provisioning Upstash for Redis via the Vercel Marketplace.
+It automatically injects the required `KV_*` and `REDIS_URL` environment variables into the project.
