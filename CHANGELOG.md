@@ -1,3 +1,31 @@
+### Raouf: Fix Next.js Hydration Mismatch — Home Welcome Header Name — 2026-02-16
+
+**Scope:** Eliminate `/home` hydration mismatch caused by persisted profile name rendering before hydration completes.
+**Type:** Bug Fix / SSR-Hydration Stability
+
+#### Changes
+
+1. **Defer persisted profile reads until hydration** (`features/home/hooks/useHomeUser.ts`):
+   - `getCurrentProfile()` is now only evaluated when `useHydration()` returns `true`
+   - Prevents the first client render from differing from SSR HTML (fixes `Welcome, Student!` vs `Welcome, Raoof!`)
+
+2. **Regression coverage** (`tests/home/useHomeUser.hydration.test.tsx`):
+   - Validates persisted profile names are not exposed pre-hydration
+   - Confirms persisted profile names are used once hydrated
+
+#### Files Changed
+
+- Modified: `features/home/hooks/useHomeUser.ts`
+- Added: `tests/home/useHomeUser.hydration.test.tsx`
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test` ✅ (445/445 tests pass)
+
+---
+
 ### Raouf: Security Remediation Follow-Up — Request Signing Replay Check Order — 2026-02-16
 
 **Scope:** Finalize request-signing hardening after initial remediation pass.

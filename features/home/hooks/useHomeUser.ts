@@ -10,8 +10,9 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
   const currentProfileId = useProfilesStore((state) => state.currentProfileId);
   const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
   const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
-  const currentProfile = getCurrentProfile();
   const hasHydrated = useHydration();
+  // Avoid reading persisted store state until after hydration to prevent SSR/client text mismatches.
+  const currentProfile = hasHydrated ? getCurrentProfile() : null;
 
   // Keep user state in sync with auth endpoint
   useEffect(() => {
