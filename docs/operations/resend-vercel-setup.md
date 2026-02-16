@@ -1,6 +1,6 @@
 # Resend + Vercel Setup (Email)
 
-This project sends transactional email (currently: email verification) via **Resend** and is deployed on **Vercel**.
+This project sends transactional email (email verification and password reset) via **Resend** and is deployed on **Vercel**.
 
 ## Required Environment Variables
 
@@ -48,7 +48,7 @@ VERCEL_ENVIRONMENT=production npm run vercel:env:check
 
 ## Cron Security
 
-`vercel.json` configures scheduled calls to internal routes (e.g., verification token cleanup).
+`vercel.json` configures scheduled calls to internal routes (e.g., verification/password-reset token cleanup).
 
 The cleanup route requires:
 

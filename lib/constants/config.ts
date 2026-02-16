@@ -8,6 +8,10 @@ export const API_ROUTES = {
     SIGNUP: '/api/auth/signup',
     USER: '/api/auth/user',
     PASSWORD: '/api/auth/password',
+    // Password reset (custom, via Resend)
+    PASSWORD_REQUEST_RESET: '/api/auth/password/request-reset',
+    PASSWORD_RESET: '/api/auth/password/reset',
+    PASSWORD_CLEANUP: '/api/auth/password/cleanup',
     SESSIONS: '/api/auth/sessions',
     PASSKEY_REGISTER_OPTIONS: '/api/auth/passkey/register-options',
     PASSKEY_REGISTER: '/api/auth/passkey/register',

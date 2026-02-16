@@ -56,7 +56,6 @@ export default function LoginClient() {
 
   // UI States (Preserving original UI richness)
   const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -258,18 +257,6 @@ export default function LoginClient() {
                 setGeneralError(null);
               }}
             />
-          ) : showForgotPassword ? (
-            <div className="space-y-4">
-              {/* Simplified Forgot Password UI Placeholder since we are focusing on Login Refactor */}
-              <div className="text-center">
-                <p className="text-sm">
-                  Please implement Forgot Password using shared hooks later.
-                </p>
-                <Button variant="ghost" onClick={() => setShowForgotPassword(false)}>
-                  {t('backToLogin')}
-                </Button>
-              </div>
-            </div>
           ) : (
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -322,17 +309,14 @@ export default function LoginClient() {
               </div>
 
               <div className="flex items-center justify-end text-sm">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForgotPassword(true);
-                    setGeneralError(null);
-                  }}
+                <Link
+                  href="/reset-password"
                   className="text-mq-primary hover:underline font-bold"
-                  disabled={isGlobalLoading}
+                  aria-disabled={isGlobalLoading}
+                  onClick={() => setGeneralError(null)}
                 >
                   {t('forgotPassword')}
-                </button>
+                </Link>
               </div>
 
               <div className="pt-1 sm:pt-2 flex justify-center">

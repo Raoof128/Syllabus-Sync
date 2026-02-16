@@ -1,3 +1,45 @@
+### Raouf: Add Reset Password Flow (Resend + Token Table + Vercel Cron) — 2026-02-16
+
+**Scope:** Add a user-facing reset password page and a secure token-based reset flow, delivered via Resend, aligned with the existing auth UX and security posture.
+**Type:** Feature / Security Hardening
+
+#### Changes
+
+1. **Reset password UI** (`app/reset-password/page.tsx`, `app/reset-password/reset-password-client.tsx`):
+   - Added `/reset-password` with two modes:
+   - Request link: user submits email, always receives a generic success message (anti-enumeration)
+   - Set new password: user follows token link and sets a new password (min length enforced)
+
+2. **API routes** (`app/api/auth/password/request-reset/route.ts`, `app/api/auth/password/reset/route.ts`):
+   - Request-reset endpoint uses service-role-only RPC lookup and is rate-limited by IP
+   - Reset endpoint consumes a SHA-256 token hash, atomically marks token used, then updates password via Supabase admin
+
+3. **Database migration + cleanup** (`supabase/migrations/20260216193000_password_resets.sql`, `app/api/auth/password/cleanup/route.ts`, `vercel.json`):
+   - Added `password_resets` table with hashed tokens, expiry, and indexes
+   - Added `cleanup_expired_password_resets()` SQL function (service_role only)
+   - Added cron-protected cleanup endpoint and Vercel cron schedule
+
+4. **Resend email template** (`lib/services/emailService.ts`, `lib/security/passwordReset.ts`):
+   - Added a dedicated password reset email template and send helper
+   - Ensures raw tokens are never logged and undelivered tokens are cleaned up
+
+5. **Login integration** (`app/login/LoginClient.tsx`):
+   - Removed placeholder “Forgot password” view and linked to `/reset-password`
+
+6. **Tests** (`tests/api/auth/passwordRequestReset.test.ts`, `tests/api/auth/passwordReset.test.ts`, `tests/unit/security/passwordReset.test.ts`):
+   - Added coverage for anti-enumeration, successful token consumption, and send-failure cleanup
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (461/461 pass)
+- `npm run build` ✅
+- `npm run check:secrets` ✅
+
+---
+
 ### Raouf: Remediate Vercel CLI Dependency Vulnerability (undici) — 2026-02-16
 
 **Scope:** Restore a clean `npm audit` after adding pinned Vercel CLI support.

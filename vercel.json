@@ -3,6 +3,10 @@
     {
       "path": "/api/auth/email/cleanup",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/auth/password/cleanup",
+      "schedule": "10 3 * * *"
     }
   ]
 }
