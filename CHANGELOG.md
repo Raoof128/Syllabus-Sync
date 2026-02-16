@@ -1,3 +1,31 @@
+### Raouf: Fix Production Auth Blocked by Fail-Closed Rate Limiter Without Redis/KV — 2026-02-16
+
+**Scope:** Unblock production login/signup/reset flows when Redis/KV is not configured, while preserving fail-closed defaults for real production.
+**Type:** Bug Fix / Security Hardening (operational safety)
+
+#### Changes
+
+1. **Honor `ALLOW_MEMORY_RATE_LIMIT=true` override for fail-closed endpoints** (`lib/services/rateLimitService.ts`):
+   - Fixed a logic bug where production + in-memory store caused all fail-closed limiters to be blocked forever
+   - Added a one-time warning when the override is enabled (demo/testing only)
+
+2. **Add regression coverage** (`tests/api/rateLimitService.productionOverride.test.ts`):
+   - Verifies production behavior blocks fail-closed endpoints when no distributed store is configured
+   - Verifies the explicit override allows requests (demo behavior)
+
+3. **Ignore Vercel local project metadata for formatting** (`config/prettier/.prettierignore`):
+   - Added `.vercel/` to Prettier ignore to avoid formatting failures from generated files
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test` ✅ (447/447 tests pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Fix Next.js Hydration Mismatch — Home Welcome Header Name — 2026-02-16
 
 **Scope:** Eliminate `/home` hydration mismatch caused by persisted profile name rendering before hydration completes.

@@ -218,6 +218,7 @@ function getStore(): RateLimitStore {
 
 // Singleton store instance
 let storeInstance: RateLimitStore | null = null;
+let memoryOverrideWarningShown = false;
 
 function getStoreInstance(): RateLimitStore {
   if (!storeInstance) {
@@ -259,10 +260,11 @@ export async function checkRateLimit(
     process.env.VERCEL_ENV === 'production' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
   const isMemoryStore = store instanceof MemoryStore;
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
 
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints
   // This prevents bypass attacks when Redis is not configured
-  if (isProduction && isMemoryStore && config.failClosed) {
+  if (isProduction && isMemoryStore && config.failClosed && !allowMemoryStore) {
     logger.error(
       `SECURITY: Blocking ${config.prefix} request - no distributed rate limiting in production`,
     );
@@ -272,6 +274,23 @@ export async function checkRateLimit(
       resetIn: 60,
       limit: config.maxRequests,
     };
+  }
+
+  if (
+    isProduction &&
+    isMemoryStore &&
+    config.failClosed &&
+    allowMemoryStore &&
+    !memoryOverrideWarningShown
+  ) {
+    // Explicit operator override: allow memory rate limiting in production for demos/testing.
+    // This is NOT a security boundary in serverless environments.
+    logger.warn(
+      'SECURITY WARNING: ALLOW_MEMORY_RATE_LIMIT=true in production. ' +
+        'In-memory rate limiting does not protect across serverless instances; use Redis/KV for real protection.',
+      { prefix: config.prefix ?? 'unknown' },
+    );
+    memoryOverrideWarningShown = true;
   }
 
   try {
@@ -402,4 +421,3 @@ export const passkeyAuthLimiter = createRateLimiter({
   maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
 });
-

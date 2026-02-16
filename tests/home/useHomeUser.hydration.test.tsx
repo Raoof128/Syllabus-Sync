@@ -75,4 +75,3 @@ describe('useHomeUser hydration safety', () => {
     expect(screen.getByTestId('name')).toHaveTextContent('Raoof');
   });
 });
-
