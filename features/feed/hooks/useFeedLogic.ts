@@ -51,6 +51,15 @@ export function useFeedLogic() {
   // Events store - get all events from Supabase
   const storeEvents = useEventsStore((state) => state.events);
   const removeEvent = useEventsStore((state) => state.removeEvent);
+  const loadEvents = useEventsStore((state) => state.loadEvents);
+  const eventsHasLoaded = useEventsStore((state) => state.hasLoaded);
+
+  // Ensure events are loaded (previously done eagerly in client-layout)
+  useEffect(() => {
+    if (!eventsHasLoaded) {
+      void loadEvents();
+    }
+  }, [eventsHasLoaded, loadEvents]);
 
   // Gamification store - use individual selectors to prevent re-renders
   const isDemo = useGamificationStore((state) => state.isDemo);

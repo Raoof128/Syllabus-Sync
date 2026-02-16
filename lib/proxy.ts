@@ -148,48 +148,60 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // 3. Refresh Session
+  // 3. Refresh Session — race against a hard deadline so a slow upstream
+  //    Supabase response never blocks the entire page render.
+  const PROXY_AUTH_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 12_000 : 6_000;
+
   let user = null;
   try {
-    // SECURITY: getUser() is the safest way to verify the user as it checks with the server
-    const {
-      data: { user: authUser },
-      error,
-    } = await supabase.auth.getUser();
+    const authPromise = supabase.auth.getUser();
+    const timeoutPromise = new Promise<null>((resolve) =>
+      setTimeout(() => resolve(null), PROXY_AUTH_DEADLINE_MS),
+    );
 
-    if (authUser) {
-      user = authUser;
-    } else if (error) {
-      // SILENT: Handle common refresh token failures without logging to console.
-      // These occur when a session is expired, revoked, or the token is no longer valid.
-      const isRefreshTokenError =
-        error.message?.includes('Refresh Token Not Found') ||
-        error.code === 'refresh_token_not_found' ||
-        error.status === 400;
+    const result = await Promise.race([authPromise, timeoutPromise]);
 
-      if (!isRefreshTokenError) {
-        if (isTransientProxyAuthError(new Error(error.message))) {
-          if (shouldLogTransientProxyAuthError()) {
-            console.warn('Proxy auth status: transient network/auth issue; request continuing');
+    if (result && 'data' in result) {
+      const {
+        data: { user: authUser },
+        error,
+      } = result;
+
+      if (authUser) {
+        user = authUser;
+      } else if (error) {
+        const isRefreshTokenError =
+          error.message?.includes('Refresh Token Not Found') ||
+          error.code === 'refresh_token_not_found' ||
+          error.status === 400;
+
+        if (!isRefreshTokenError) {
+          if (isTransientProxyAuthError(new Error(error.message))) {
+            if (shouldLogTransientProxyAuthError()) {
+              console.warn('Proxy auth status: transient network/auth issue; request continuing');
+            }
+          } else {
+            console.warn('Proxy auth status:', error.message);
           }
         } else {
-          // Only log unexpected auth errors
-          console.warn('Proxy auth status:', error.message);
+          try {
+            await supabase.auth.signOut({ scope: 'local' });
+          } catch {
+            // Ignore signout errors during refresh failure
+          }
         }
-      } else {
-        // Quietly clear invalid session data to prevent repeated errors
-        try {
-          await supabase.auth.signOut({ scope: 'local' });
-        } catch {
-          // Ignore signout errors during refresh failure
-        }
+      }
+    } else {
+      // Timeout — let the request through without auth context.
+      // Protected routes will show login prompt via client-side check.
+      if (shouldLogTransientProxyAuthError()) {
+        console.warn(`Proxy auth: timed out after ${PROXY_AUTH_DEADLINE_MS}ms; request continuing`);
       }
     }
   } catch (err) {
     const isRefreshError = err instanceof Error && err.message.includes('Refresh Token Not Found');
     const isTransient = isTransientProxyAuthError(err);
 
-    // Suppress noisy transient network exceptions from auth checks.
     if (isTransient) {
       if (shouldLogTransientProxyAuthError()) {
         console.warn('Proxy auth status: transient upstream failure; request continuing');

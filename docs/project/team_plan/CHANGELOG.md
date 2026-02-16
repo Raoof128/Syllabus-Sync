@@ -1,4 +1,10 @@
 Raouf: 2026-02-16 (Australia/Sydney)
+Scope: Full Performance Audit & Fix — Site Load Speed + Supabase Timeout Resolution
+Summary: Fixed 10 critical/high performance issues. Supabase timeout 8s→15s/20s, proxy auth race deadline, eliminated client-layout auth waterfall (optimistic rendering), removed duplicate CSS import, replaced framer-motion template with CSS, re-enabled webpack chunk splitting, enabled DNS prefetch, fixed CORP header, removed 12MB SW precache, lazy-loaded login bg image.
+- **Files:** `lib/supabase/fetch.ts`, `lib/proxy.ts`, `app/client-layout.tsx`, `app/layout.tsx`, `app/template.tsx`, `config/next/next.config.ts`, `public/sw.js`, `app/login/LoginClient.tsx`, `features/feed/hooks/useFeedLogic.ts`.
+- **Verification:** `npm run typecheck` ✅, `npm run lint` ✅, `npm run test` ✅ (443/443 pass).
+
+Raouf: 2026-02-16 (Australia/Sydney)
 Scope: Privacy Policy (APP-Compliant) — Full Policy Page, Collection Notices, Legal Links
 Summary: Created `/privacy` page (14-section APP-compliant policy), added APP 5 collection notice to signup, added privacy/terms links to login footer, internal link routing for privacy/terms.
 - **Files:** Created `app/privacy/page.tsx`. Modified `app/signup/SignupClient.tsx`, `app/login/LoginClient.tsx`, `lib/config.ts`.

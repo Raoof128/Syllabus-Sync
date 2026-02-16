@@ -502,9 +502,10 @@ export default function LoginClient() {
             src="/images/login-bg.png"
             alt={t('mqSignpostAlt')}
             fill
-            priority
             className="object-cover"
-            sizes="100vw"
+            sizes="(max-width: 768px) 0vw, 60vw"
+            quality={60}
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/88 via-[#0a2f3c]/82 to-[#0f172a]/90" />
           <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-12 flex flex-col justify-between text-white">

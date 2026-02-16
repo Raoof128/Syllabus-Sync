@@ -4,7 +4,8 @@
  * This prevents long hangs when upstream connections are unstable (e.g. ECONNRESET).
  */
 
-const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS = 8000;
+const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS =
+  process.env.NODE_ENV === 'development' ? 20_000 : 15_000;
 
 function toAbortError(reason: string): Error {
   const error = new Error(reason);

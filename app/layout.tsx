@@ -1,7 +1,7 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import './mq-tokens.css';
+// mq-tokens.css is already imported via globals.css — do not import again here
 import ClientLayout from './client-layout';
 import QueryProvider from '@/components/providers/QueryProvider';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';

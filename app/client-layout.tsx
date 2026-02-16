@@ -1,7 +1,7 @@
 // app/client-layout.tsx
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -11,11 +11,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { useTodosStore } from '@/lib/store/todosStore';
 import { apiRequest } from '@/lib/utils/api';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
@@ -24,38 +19,26 @@ import { LevelUpNotificationProvider } from '@/features/gamification/components/
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 // V3.1: Performance optimization - move constant arrays outside component
-// Prevents recreation on every render
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
-const PROTECTED_ROUTES = [
-  '/home',
-  '/calendar',
-  '/feed',
-  '/map',
-  '/settings',
-  '/manage-profiles',
-] as const;
 
 // V3.1: Performance optimization - run console.error override once at module load
-// Instead of checking on every error call
 if (typeof window !== 'undefined') {
   const originalConsoleError = console.error.bind(console);
   const NEXT_KEY_WARNING = 'Each child in a list should have a unique "key" prop';
   const OUTER_LAYOUT_ROUTER = 'OuterLayoutRouter';
 
   console.error = (...args: unknown[]) => {
-    // Filter out the OuterLayoutRouter key warning - this is a Next.js 16 Turbopack internal issue
     const firstArg = args[0];
     if (
       typeof firstArg === 'string' &&
       firstArg.includes(NEXT_KEY_WARNING) &&
       args.some((arg) => typeof arg === 'string' && arg.includes(OUTER_LAYOUT_ROUTER))
     ) {
-      return; // Silently ignore this specific warning
+      return;
     }
     originalConsoleError(...args);
   };
 
-  // Override console.info to suppress React DevTools promotion
   // eslint-disable-next-line no-console
   const originalConsoleInfo = console.info.bind(console);
   const REACT_DEVTOOLS_MSG = 'Download the React DevTools';
@@ -69,7 +52,6 @@ if (typeof window !== 'undefined') {
     originalConsoleInfo(...args);
   };
 
-  // Suppress specific unhandled rejections from Chrome extensions
   window.addEventListener('unhandledrejection', (event) => {
     const message = event.reason?.message || '';
     if (
@@ -90,70 +72,55 @@ const scheduleIdleTask = (callback: () => void) => {
   }
 };
 
-// V3.1: Wrapped with React.memo to prevent unnecessary re-renders
-// Using named function for better debugging in React DevTools
+// V4: Optimistic rendering — render immediately, check auth in background.
+// The proxy already handles auth redirects for protected routes, so the
+// client-side check is only needed for UI state (sidebar, header, etc.)
 function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const { t } = useTypedTranslation();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  // Start optimistically as true — proxy already protects routes server-side.
+  // This eliminates the blocking "Loading..." screen.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const router = useRouter();
   const pathname = usePathname();
   const language = useLanguageStore((state) => state.language);
 
-  // Use stable selectors to reduce subscription overhead
-  const loadUnits = useUnitsStore((state) => state.loadUnits);
-  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
-  const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
-  const loadEvents = useEventsStore((state) => state.loadEvents);
-  const loadTodos = useTodosStore((state) => state.loadTodos);
-
-  // V3.1: Performance optimization - use pre-defined constant arrays
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-  const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
-  useEffect(() => {
-    let isActive = true;
-    const supabaseConfigured = isSupabaseConfigured();
+  // Non-blocking auth check — updates UI state without blocking render
+  const checkAuth = useCallback(async () => {
+    if (!isSupabaseConfigured()) return;
 
-    const checkAuth = async () => {
-      try {
-        if (!supabaseConfigured) {
-          setIsAuthenticated(true);
-          return;
-        }
+    try {
+      const data = await apiRequest<{ user?: { id: string } }>('/api/auth/user', {
+        noRetry: true,
+      });
+      const authenticated = Boolean(data?.user?.id);
+      setIsAuthenticated(authenticated);
 
-        const data = await apiRequest<{ user?: { id: string } }>('/api/auth/user', {
-          noRetry: true,
-        });
-        if (!isActive) return;
-        const authenticated = Boolean(data?.user?.id);
-        setIsAuthenticated(authenticated);
-
-        if (authenticated && isAuthRoute) {
-          router.push('/home');
-        }
-      } catch {
-        if (!isActive) return;
-        setIsAuthenticated(true);
+      if (authenticated && isAuthRoute) {
+        router.push('/home');
       }
-    };
+    } catch {
+      // On error, keep optimistic state — proxy handles protection
+    }
+  }, [router, isAuthRoute]);
 
-    checkAuth();
+  // Run auth check in background (non-blocking)
+  useEffect(() => {
+    // Use idle callback so auth check doesn't compete with initial render
+    scheduleIdleTask(() => {
+      void checkAuth();
+    });
 
     const handleFocus = () => {
       void checkAuth();
     };
-
     window.addEventListener('focus', handleFocus);
-
-    return () => {
-      isActive = false;
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [router, pathname, isAuthRoute, isProtectedRoute]);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [checkAuth]);
 
   // Set up global error handlers
   useEffect(() => {
-    // Handle unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       errorHandler.logError(
         event.reason instanceof Error ? event.reason : new Error(String(event.reason)),
@@ -162,73 +129,27 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       );
     };
 
-    // Handle uncaught errors
     const handleError = (event: ErrorEvent) => {
       errorHandler.logError(event.error || new Error(event.message), 'UncaughtError', 'critical');
     };
 
-    // Add event listeners
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
     window.addEventListener('error', handleError);
 
-    // Register service worker for offline support
     scheduleIdleTask(() => {
       void registerServiceWorker();
     });
 
-    // Cleanup
     return () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       window.removeEventListener('error', handleError);
     };
   }, []);
 
-  // Load data when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      scheduleIdleTask(() => {
-        void loadUnits();
-        void loadDeadlines();
-        void loadNotifications();
-        void loadEvents();
-        void loadTodos();
-      });
-    }
-  }, [isAuthenticated, loadUnits, loadDeadlines, loadNotifications, loadEvents, loadTodos]);
-
   // Initialize notification scheduler for push notifications
   useNotificationScheduler();
 
-  // Show loading state while checking authentication — keep the main landmark present to avoid test flakiness
-  if (isAuthenticated === null) {
-    return (
-      <ThemeProvider>
-        <div className="flex h-screen h-[100dvh] overflow-hidden bg-mq-background layout-shell">
-          <Sidebar />
-          <div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12 layout-main relative">
-            <Header />
-            <main id="main-content" className="flex-1" role="main">
-              <div className="min-h-[60vh] flex items-center justify-center">
-                <div
-                  className="animate-pulse text-mq-content alabaster-readable"
-                  style={{
-                    color: 'var(--mq-content)',
-                    WebkitTextFillColor: 'var(--mq-content)',
-                    opacity: 1,
-                    mixBlendMode: 'normal',
-                  }}
-                >
-                  {t('loading')}
-                </div>
-              </div>
-            </main>
-          </div>
-        </div>
-      </ThemeProvider>
-    );
-  }
-
-  // Authenticated state
+  // Unauthenticated layout (login/signup pages)
   if (!isAuthenticated) {
     return (
       <ThemeProvider>

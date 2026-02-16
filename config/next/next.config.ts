@@ -59,9 +59,7 @@ const nextConfig: NextConfig = {
         splitChunks: {
           ...config.optimization?.splitChunks,
           cacheGroups: {
-            default: false,
-            vendors: false,
-            // Prevent chunk loading errors by creating stable chunks
+            // Keep Next.js default splitting intact — only add framework chunk
             framework: {
               chunks: 'all',
               name: 'framework',
@@ -108,16 +106,16 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(self), payment=(), usb=()',
           },
-          // Prevent DNS prefetching (privacy)
-          { key: 'X-DNS-Prefetch-Control', value: 'off' },
+          // Allow DNS prefetching for external resources (Supabase, APIs)
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
           // Prevent IE from executing downloads in site's context
           { key: 'X-Download-Options', value: 'noopen' },
           // Restrict Adobe Flash and PDF cross-domain access
           { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
           // Indicate this is not an Electron/webview app
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-          // Prevent loading resources from other origins
-          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+          // Allow same-site cross-origin resources (Supabase, CDNs)
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-site' },
         ],
       },
     ];

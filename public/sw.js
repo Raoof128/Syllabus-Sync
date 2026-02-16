@@ -20,16 +20,9 @@ const STATIC_ASSETS = [
   '/icons/icon-512.png',
 ];
 
-// Map assets to precache for offline support (non-sensitive public data)
+// Map assets — loaded lazily when user visits the map page, NOT precached.
+// Precaching ~12MB of PNGs was stalling first-visit performance.
 const MAP_ASSETS = [
-  '/maps/raster/mq-campus.png',
-  '/maps/raster/mq-campus.png?v=2026-02-02-1',
-  '/maps/overlays/Campus-Map_parking.png',
-  '/maps/overlays/Drinking-water.png',
-  '/maps/overlays/map_accessibility.png',
-  '/maps/overlays/map_special_permits_service_vehicles.png',
-  '/maps/overlays/Exam-Map-S22024.png',
-  '/maps/overlays/MU87371-MQ-Loop-Walk-Map-digital-June-2024.png',
   '/images/leaflet/marker-icon.png',
   '/images/leaflet/marker-icon-2x.png',
   '/images/leaflet/marker-shadow.png',
@@ -69,30 +62,12 @@ const SAFE_TO_CACHE_EXTENSIONS = [
   '.json', // Only for non-API JSON files like manifest
 ];
 
-// Install event - cache essential static assets and map assets
+// Install event - cache essential static assets only (map overlays cached on demand)
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    Promise.all([
-      caches.open(STATIC_CACHE).then((cache) => {
-        return cache.addAll(STATIC_ASSETS);
-      }),
-      caches.open(MAP_CACHE).then((cache) => {
-        // Map assets are optional - don't fail install if they're missing
-        return Promise.allSettled(
-          MAP_ASSETS.map((asset) =>
-            fetch(asset)
-              .then((response) => {
-                if (response.ok) {
-                  return cache.put(asset, response);
-                }
-              })
-              .catch(() => {
-                /* ignore failures - map will still work with network */
-              })
-          )
-        );
-      }),
-    ])
+    caches.open(STATIC_CACHE).then((cache) => {
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
   self.skipWaiting();
 });
