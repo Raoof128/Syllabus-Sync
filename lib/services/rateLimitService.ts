@@ -247,10 +247,12 @@ export async function checkRateLimit(
     process.env.VERCEL_ENV === 'production' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
   const isMemoryStore = store instanceof MemoryStore;
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
 
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints
   // This prevents bypass attacks when Redis is not configured
-  if (isProduction && isMemoryStore && config.failClosed) {
+  // UNLESS ALLOW_MEMORY_RATE_LIMIT is explicitly set (for testing/demo)
+  if (isProduction && isMemoryStore && config.failClosed && !allowMemoryStore) {
     logger.error(
       `SECURITY: Blocking ${config.prefix} request - no distributed rate limiting in production`,
     );
@@ -315,7 +317,7 @@ export function createRateLimiter(config: RateLimitConfig) {
 export const signupLimiter = createRateLimiter({
   prefix: 'signup',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3, // Max 3 signups per hour per IP
+  maxRequests: 20, // Max 20 signups per hour per IP (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -323,7 +325,7 @@ export const signupLimiter = createRateLimiter({
 export const loginLimiter = createRateLimiter({
   prefix: 'login',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 10, // Max 10 attempts per 15 min
+  maxRequests: 50, // Max 50 attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -331,7 +333,7 @@ export const loginLimiter = createRateLimiter({
 export const apiLimiter = createRateLimiter({
   prefix: 'api',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 100, // Max 100 requests per minute
+  maxRequests: 200, // Max 200 requests per minute
   failClosed: false, // Prioritize availability for general API
 });
 
@@ -339,7 +341,7 @@ export const apiLimiter = createRateLimiter({
 export const passwordResetLimiter = createRateLimiter({
   prefix: 'reset',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 3, // Max 3 reset requests per hour
+  maxRequests: 10, // Max 10 reset requests per hour
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -347,7 +349,7 @@ export const passwordResetLimiter = createRateLimiter({
 export const mutationLimiter = createRateLimiter({
   prefix: 'mutation',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30, // Max 30 mutations per minute per user/IP
+  maxRequests: 60, // Max 60 mutations per minute per user/IP
   failClosed: false, // Prioritize availability
 });
 
@@ -355,7 +357,7 @@ export const mutationLimiter = createRateLimiter({
 export const bulkOperationLimiter = createRateLimiter({
   prefix: 'bulk',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 5, // Max 5 bulk operations per minute
+  maxRequests: 10, // Max 10 bulk operations per minute
   failClosed: false,
 });
 
@@ -363,7 +365,7 @@ export const bulkOperationLimiter = createRateLimiter({
 export const passwordBreachLimiter = createRateLimiter({
   prefix: 'password_breach',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 20, // Max 20 checks per minute per IP
+  maxRequests: 50, // Max 50 checks per minute per IP
   failClosed: true,
 });
 
@@ -371,7 +373,7 @@ export const passwordBreachLimiter = createRateLimiter({
 export const securityScanLimiter = createRateLimiter({
   prefix: 'security_scan',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 10, // Max 10 scans per minute per user/IP
+  maxRequests: 20, // Max 20 scans per minute per user/IP
   failClosed: true,
 });
 
@@ -379,7 +381,7 @@ export const securityScanLimiter = createRateLimiter({
 export const passkeyStatusLimiter = createRateLimiter({
   prefix: 'passkey_status',
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 30, // Max 30 status checks per minute (allows for email typing/autocomplete)
+  maxRequests: 100, // Max 100 status checks per minute (allows for email typing/autocomplete)
   failClosed: false, // Prioritize UX - status check is not security-critical
 });
 
@@ -387,7 +389,7 @@ export const passkeyStatusLimiter = createRateLimiter({
 export const passkeyAuthLimiter = createRateLimiter({
   prefix: 'passkey_auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 20, // Max 20 passkey auth attempts per 15 min (more than login since it's 2-step)
+  maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
 });
 

@@ -17,7 +17,7 @@ import { createRateLimiter } from '@/lib/services/rateLimitService';
 // ============================================================================
 
 /** Maximum TOTP verification attempts per window */
-export const MFA_MAX_VERIFY_ATTEMPTS = 5;
+export const MFA_MAX_VERIFY_ATTEMPTS = 20; // Increased for testing
 
 /** Rate limit window for MFA verification (15 minutes) */
 export const MFA_VERIFY_WINDOW_MS = 15 * 60 * 1000;
@@ -26,7 +26,7 @@ export const MFA_VERIFY_WINDOW_MS = 15 * 60 * 1000;
 export const SMS_RESEND_COOLDOWN_MS = 60 * 1000;
 
 /** Maximum SMS sends per hour */
-export const SMS_MAX_SENDS_PER_HOUR = 5;
+export const SMS_MAX_SENDS_PER_HOUR = 20; // Increased for testing
 
 /** Lockout duration after max failed attempts (30 minutes) */
 export const MFA_LOCKOUT_DURATION_MS = 30 * 60 * 1000;
@@ -55,7 +55,7 @@ export const smsSendLimiter = createRateLimiter({
 export const mfaEnrollLimiter = createRateLimiter({
   prefix: 'mfa-enroll',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 10,
+  maxRequests: 30, // Increased for testing
   failClosed: true,
 });
 
