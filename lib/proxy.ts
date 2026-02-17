@@ -50,9 +50,11 @@ export async function proxy(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
   const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
+  const isRootPath = path === '/';
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);
-  const shouldResolveUser = isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi);
+  // Don't resolve user for root path - let AuthRedirectHandler handle it
+  const shouldResolveUser = !isRootPath && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
 
   if (path === '/@vite/client') {
     return new NextResponse('', {
