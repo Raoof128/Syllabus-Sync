@@ -249,6 +249,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthRoute && user) {
+    // Allow /reset-password even when authenticated - user needs to set new password after recovery
+    if (path.startsWith('/reset-password')) {
+      return response;
+    }
+
     // If MFA is required, allow /login to render so the user can complete the challenge.
     // Other auth routes should redirect back to /login in MFA mode.
     if (requiresMfaUpgrade) {
