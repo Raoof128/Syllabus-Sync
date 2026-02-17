@@ -20,6 +20,7 @@ import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 
 // V3.1: Performance optimization - move constant arrays outside component
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
+const PUBLIC_ROUTES = ['/terms', '/privacy', '/verify'] as const;
 
 // V3.1: Performance optimization - run console.error override once at module load
 if (typeof window !== 'undefined') {
@@ -82,14 +83,18 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const language = useLanguageStore((state) => state.language);
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
   // Start optimistically as authenticated for app pages only.
   // Auth routes (/login, /signup, /reset-password) must always render the unauth layout
   // to avoid "blink" (sidebar/header flashing) and lost toast rendering during navigation.
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !isAuthRoute);
+  // Public routes (/terms, /privacy) should also render without auth check to avoid redirects.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !isAuthRoute && !isPublicRoute);
 
   // Non-blocking auth check — updates UI state without blocking render
   const checkAuth = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
+    // Skip auth redirect for public routes - they should be accessible to everyone
+    if (isPublicRoute) return;
 
     try {
       const { user } = await getBrowserAuthSnapshot();
@@ -109,7 +114,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     } catch {
       // On error, keep optimistic state — proxy handles protection
     }
-  }, [router, isAuthRoute]);
+  }, [router, isAuthRoute, isPublicRoute]);
 
   // Run auth check in background (non-blocking)
   useEffect(() => {

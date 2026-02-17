@@ -46,9 +46,10 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
-  const publicRoutes = ['/test-weather'];
+  const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify'];
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);
   const shouldResolveUser = isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi);
