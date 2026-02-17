@@ -1,7 +1,8 @@
 // app/page.tsx
-import { redirect } from 'next/navigation';
+import AuthRedirectHandler from './AuthRedirectHandler';
 
 export default function RootPage() {
-  redirect('/home');
-  return null;
+  // The AuthRedirectHandler will check for auth tokens in hash fragment
+  // If found, it redirects appropriately. Otherwise, redirect to home.
+  return <AuthRedirectHandler fallbackRedirect="/home" />;
 }

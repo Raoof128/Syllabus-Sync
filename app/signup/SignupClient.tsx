@@ -225,7 +225,9 @@ export default function SignupClient() {
             {/* Step 1: Authentication */}
             <div className={clsx('space-y-4', step !== 'auth' && 'hidden')}>
               <div className="space-y-2">
-                <Label htmlFor="email">{t('email')}</Label>
+                <Label htmlFor="email">
+                  {t('email')} <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -237,7 +239,9 @@ export default function SignupClient() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
+                <Label htmlFor="password">
+                  {t('password')} <span className="text-red-500">*</span>
+                </Label>
                 <PasswordInput
                   id="password"
                   disabled={isSubmitting}
@@ -283,7 +287,9 @@ export default function SignupClient() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
+                <Label htmlFor="confirmPassword">
+                  {t('confirmPassword')} <span className="text-red-500">*</span>
+                </Label>
                 <PasswordInput
                   id="confirmPassword"
                   disabled={isSubmitting}
@@ -304,7 +310,7 @@ export default function SignupClient() {
                   {...register('agreedToTerms')}
                 />
                 <label htmlFor="terms" className="text-sm text-mq-content-secondary">
-                  {t('agreeToTerms')}{' '}
+                  <span className="text-red-500">*</span> {t('agreeToTerms')}{' '}
                   <a
                     href="/terms"
                     className="text-mq-primary hover:underline"
@@ -354,7 +360,9 @@ export default function SignupClient() {
             {/* Step 2: Profile */}
             <div className={clsx('space-y-4', step !== 'profile' && 'hidden')}>
               <div className="space-y-2">
-                <Label htmlFor="fullName">{t('fullName')}</Label>
+                <Label htmlFor="fullName">
+                  {t('fullName')} <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="fullName"
                   placeholder={t('enterFullName')}
@@ -379,7 +387,9 @@ export default function SignupClient() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="studentId">{t('studentId')}</Label>
+                <Label htmlFor="studentId">
+                  {t('studentId')} <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="studentId"
                   placeholder={t('studentIdPlaceholder')}

@@ -41,6 +41,9 @@ const APP_STORAGE_KEYS = [
   'syllabus-sync-language', // Language preference (optional - may want to keep)
   'syllabus-sync-onboarding', // Onboarding completion state
   'syllabus-sync-last-sync', // Last sync timestamp
+  'units-seeded', // Sample units seeding flag
+  'deadlines-seeded', // Sample deadlines seeding flag
+  'seed-disabled', // Seeding disabled flag
 ] as const;
 
 /**

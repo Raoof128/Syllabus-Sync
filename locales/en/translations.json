@@ -1832,5 +1832,13 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "validation.invalidEmail": "Please enter a valid email address",
+  "validation.passwordTooShort": "Password must be at least 12 characters",
+  "validation.passwordUppercase": "Password must contain at least one uppercase letter",
+  "validation.passwordNumber": "Password must contain at least one number",
+  "validation.termsRequired": "You must agree to the terms and conditions",
+  "validation.fullNameRequired": "Full name is required",
+  "validation.studentIdRequired": "Student ID is required",
+  "validation.passwordsMismatch": "Passwords do not match"
 }
