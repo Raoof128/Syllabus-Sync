@@ -77,14 +77,15 @@ const scheduleIdleTask = (callback: () => void) => {
 // client-side check is only needed for UI state (sidebar, header, etc.)
 function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const { t } = useTypedTranslation();
-  // Start optimistically as true — proxy already protects routes server-side.
-  // This eliminates the blocking "Loading..." screen.
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const router = useRouter();
   const pathname = usePathname();
   const language = useLanguageStore((state) => state.language);
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  // Start optimistically as authenticated for app pages only.
+  // Auth routes (/login, /signup, /reset-password) must always render the unauth layout
+  // to avoid "blink" (sidebar/header flashing) and lost toast rendering during navigation.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !isAuthRoute);
 
   // Non-blocking auth check — updates UI state without blocking render
   const checkAuth = useCallback(async () => {
@@ -150,7 +151,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   useNotificationScheduler();
 
   // Unauthenticated layout (login/signup pages)
-  if (!isAuthenticated) {
+  if (isAuthRoute || !isAuthenticated) {
     return (
       <ThemeProvider>
         <div className="flex min-h-screen bg-mq-background">

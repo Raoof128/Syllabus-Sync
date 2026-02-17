@@ -153,6 +153,7 @@ export async function proxy(request: NextRequest) {
   const PROXY_AUTH_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 12_000 : 6_000;
 
   let user = null;
+  let authResolution: 'resolved' | 'unknown' = 'unknown';
   try {
     const authPromise = supabase.auth.getUser();
     const timeoutPromise = new Promise<null>((resolve) =>
@@ -162,6 +163,7 @@ export async function proxy(request: NextRequest) {
     const result = await Promise.race([authPromise, timeoutPromise]);
 
     if (result && 'data' in result) {
+      authResolution = 'resolved';
       const {
         data: { user: authUser },
         error,
@@ -193,7 +195,8 @@ export async function proxy(request: NextRequest) {
       }
     } else {
       // Timeout — let the request through without auth context.
-      // Protected routes will show login prompt via client-side check.
+      // Protected routes should NOT hard-redirect to /login on timeout; this creates
+      // buggy redirect loops when Supabase is cold-starting or transiently slow.
       if (shouldLogTransientProxyAuthError()) {
         console.warn(`Proxy auth: timed out after ${PROXY_AUTH_DEADLINE_MS}ms; request continuing`);
       }
@@ -219,8 +222,9 @@ export async function proxy(request: NextRequest) {
   // If a user has MFA factors enrolled, Supabase may issue an aal1 session after password auth.
   // We must prevent access to protected routes until the session is upgraded to aal2.
   let requiresMfaUpgrade = false;
+  let mfaResolution: 'resolved' | 'unknown' = 'unknown';
   if (user && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi))) {
-    const MFA_AAL_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 2500 : 1500;
+    const MFA_AAL_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 4000 : 2500;
     try {
       const aalPromise = supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       const timeoutPromise = new Promise<null>((resolve) =>
@@ -230,16 +234,15 @@ export async function proxy(request: NextRequest) {
       const result = await Promise.race([aalPromise, timeoutPromise]);
 
       if (result && 'data' in result) {
+        mfaResolution = 'resolved';
         const aal = result.data;
         requiresMfaUpgrade = aal?.nextLevel === 'aal2' && aal?.currentLevel === 'aal1';
       } else {
-        // Fail-closed for protected/API routes: if we can't determine AAL quickly,
-        // treat the session as not fully authenticated.
-        requiresMfaUpgrade = isProtectedRoute || (isApiRoute && !isPublicApi);
+        // Unknown MFA status (timeout). For API routes we fail closed below.
+        // For page routes, do not redirect to /login on this path; it causes user-facing flapping.
       }
     } catch (err) {
-      logger.warn('Proxy MFA AAL check failed; enforcing MFA upgrade', { path, err });
-      requiresMfaUpgrade = isProtectedRoute || (isApiRoute && !isPublicApi);
+      logger.warn('Proxy MFA AAL check failed; MFA status unknown', { path, err });
     }
   }
 
@@ -264,6 +267,11 @@ export async function proxy(request: NextRequest) {
     !publicRoutes.some((route) => path.startsWith(route)) &&
     path !== '/home'
   ) {
+    // If auth status couldn't be resolved (timeout/transient upstream issue), do not
+    // redirect to /login. This avoids redirect loops and "blinking" UX.
+    if (authResolution === 'unknown') {
+      return response;
+    }
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', path);
     return NextResponse.redirect(redirectUrl);
@@ -277,6 +285,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // If authenticated and MFA status is unknown (timeout/error) on a non-public API route -> 503
+  if (isApiRoute && !isPublicApi && user && mfaResolution === 'unknown') {
+    const unavailableResponse = NextResponse.json(
+      { error: 'Auth temporarily unavailable', code: 'AUTH_UNAVAILABLE' },
+      { status: 503 },
+    );
+    setSecurityHeaders(unavailableResponse.headers);
+    return unavailableResponse;
+  }
+
   // If authenticated but MFA upgrade required and on non-public API route -> 403
   if (isApiRoute && !isPublicApi && user && requiresMfaUpgrade) {
     const forbiddenResponse = NextResponse.json(
@@ -285,6 +303,16 @@ export async function proxy(request: NextRequest) {
     );
     setSecurityHeaders(forbiddenResponse.headers);
     return forbiddenResponse;
+  }
+
+  // If auth status is unknown (timeout/transient upstream issue) on a non-public API route -> 503
+  if (isApiRoute && !isPublicApi && !user && authResolution === 'unknown') {
+    const unavailableResponse = NextResponse.json(
+      { error: 'Auth temporarily unavailable', code: 'AUTH_UNAVAILABLE' },
+      { status: 503 },
+    );
+    setSecurityHeaders(unavailableResponse.headers);
+    return unavailableResponse;
   }
 
   // If not authenticated and on non-public API route -> return 401

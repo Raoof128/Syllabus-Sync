@@ -346,6 +346,13 @@ export default function LoginClient() {
             </Alert>
           )}
 
+          {isSuccess && !generalError && (
+            <Alert variant="success" className="mb-3">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertDescription>{t('loginSuccess')}</AlertDescription>
+            </Alert>
+          )}
+
           {/* MFA Challenge Screen */}
           {mfaState?.required ? (
             <MFAChallenge

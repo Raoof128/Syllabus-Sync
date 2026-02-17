@@ -39,6 +39,38 @@
 
 ---
 
+### Raouf: Login/Profiles Bugfix — Stop Redirect Flapping + Fix Layout Blink — 2026-02-17
+
+**Scope:** Stabilize auth UX (login success visibility) and stop protected routes (manage profiles) from flapping back to `/login` under transient Supabase slowness.
+**Type:** Fix / UX / Reliability
+
+#### Changes
+
+1. **Client layout no longer “blinks” between authenticated/unauth layouts on `/login`** (`app/client-layout.tsx`):
+   - Always render the unauthenticated shell for auth routes (`/login`, `/signup`, `/reset-password`) to avoid sidebar/header flashing and toast resets.
+
+2. **Proxy avoids redirect loops on auth resolution timeouts** (`lib/proxy.ts`):
+   - When Supabase auth resolution times out, do not hard-redirect page routes to `/login` (prevents “manage profiles keeps bouncing to login”).
+   - Fail closed for non-public API routes with `503 AUTH_UNAVAILABLE` on auth/MFA resolution timeouts.
+   - MFA AAL check timeouts are treated as “unknown” (no page redirect flapping; API remains fail-closed).
+
+3. **Visible login success message** (`app/login/LoginClient.tsx`):
+   - Added an inline success alert so users see confirmation instead of a quick blink before redirect.
+
+#### Tests
+
+- Added proxy test coverage for auth timeout behavior (`tests/api/proxy.mfa.test.ts`).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (476/476 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Move Production Rate Limiting To Vercel KV (Upstash Redis) — 2026-02-17
 
 **Scope:** Provision a high-traffic distributed rate limiter backed by Vercel KV/Upstash Redis to reduce database write load.

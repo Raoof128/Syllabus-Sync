@@ -83,4 +83,21 @@ describe('proxy mfa enforcement', () => {
     expect(res.status).toBe(403);
     expect(json.code).toBe('MFA_REQUIRED');
   });
+
+  it('returns 503 for non-public API routes when auth status is unknown', async () => {
+    vi.useFakeTimers();
+    supabaseMocks.getUserMock.mockImplementationOnce(() => new Promise(() => {}) as any);
+
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/api/user/export');
+    const pending = proxy(req);
+    await vi.advanceTimersByTimeAsync(6000);
+    const res = await pending;
+    const json = await res.json();
+
+    expect(res.status).toBe(503);
+    expect(json.code).toBe('AUTH_UNAVAILABLE');
+    vi.useRealTimers();
+  });
 });
