@@ -104,11 +104,13 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       // Proxy handles redirecting authenticated users away from /login.
       // However, when /login is being used as an MFA upgrade step (`?mfa=1`),
       // we must not push the user away or we'll cause redirect flapping.
+      // Also, /reset-password must be accessible even when authenticated - user needs to set new password.
       const isMfaUpgradeUrl =
         typeof window !== 'undefined' &&
         new URLSearchParams(window.location.search).get('mfa') === '1';
+      const isResetPasswordPage = pathname.startsWith('/reset-password');
 
-      if (authenticated && isAuthRoute && !isMfaUpgradeUrl) {
+      if (authenticated && isAuthRoute && !isMfaUpgradeUrl && !isResetPasswordPage) {
         router.push('/home');
       }
     } catch {
