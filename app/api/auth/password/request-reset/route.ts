@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createServerClient } from '@/lib/supabase/server';
 import {
   jsonSuccess,
   jsonError,
@@ -10,10 +10,7 @@ import {
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
-import {
-  passwordResetRequestLimiter,
-  createAndSendPasswordReset,
-} from '@/lib/security/passwordReset';
+import { passwordResetRequestLimiter } from '@/lib/security/passwordReset';
 
 const requestSchema = z.object({
   email: z
@@ -31,7 +28,7 @@ const GENERIC_SUCCESS = {
 /**
  * POST /api/auth/password/request-reset
  *
- * Sends a password reset link to the user via Resend.
+ * Sends a password reset link to the user via Supabase's native email (SMTP).
  * This endpoint is anti-enumeration: it always returns success.
  */
 export async function POST(request: NextRequest) {
@@ -46,12 +43,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const adminClient = createAdminClient();
-    if (!adminClient) {
-      // Graceful degradation: do not leak whether email exists.
-      return jsonSuccess(GENERIC_SUCCESS);
-    }
-
     const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
     if (parseError) return parseError;
 
@@ -62,28 +53,21 @@ export async function POST(request: NextRequest) {
 
     const { email } = parsed.data;
 
-    // Use service-role-only RPC to avoid listUsers / system table access.
-    const { data: lookupResult, error: lookupError } = await adminClient.rpc(
-      'lookup_user_by_email',
-      { lookup_email: email },
-    );
+    // Use Supabase's native resetPasswordForEmail
+    // This sends email via the SMTP configured in Supabase dashboard
+    const supabase = await createServerClient();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    if (lookupError) {
-      logger.error('Password reset lookup error', { message: lookupError.message });
-      return jsonSuccess(GENERIC_SUCCESS);
-    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${appUrl}/reset-password`,
+    });
 
-    const userRow = Array.isArray(lookupResult) ? lookupResult[0] : lookupResult;
-    const userId = userRow?.user_id as string | undefined;
-
-    if (!userId) {
-      return jsonSuccess(GENERIC_SUCCESS);
-    }
-
-    // Best-effort send. Still return generic response on failure.
-    const sendResult = await createAndSendPasswordReset(adminClient, userId, email);
-    if (!sendResult.success) {
-      logger.warn('Password reset email not sent', { userId });
+    if (error) {
+      // Log error but return generic success for anti-enumeration
+      logger.warn('Password reset request error', {
+        message: error.message,
+        email_hint: email.substring(0, 3) + '***'
+      });
     }
 
     return jsonSuccess(GENERIC_SUCCESS);

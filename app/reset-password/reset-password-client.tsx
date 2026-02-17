@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -14,8 +14,9 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { toastUtils } from '@/lib/utils/toast';
+import { createBrowserClient } from '@/lib/supabase/client';
 
-type Mode = 'request' | 'set';
+type Mode = 'request' | 'set' | 'loading';
 
 const requestSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
@@ -23,7 +24,6 @@ const requestSchema = z.object({
 
 type RequestForm = z.infer<typeof requestSchema>;
 type SetForm = {
-  token: string;
   newPassword: string;
   confirmPassword: string;
 };
@@ -33,13 +33,42 @@ export default function ResetPasswordClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const token = searchParams.get('token');
-  const tokenValid = useMemo(() => !!token && /^[0-9a-f]{64}$/.test(token), [token]);
-  const mode: Mode = tokenValid ? 'set' : 'request';
+  // Check for Supabase auth params (code, error, error_description)
+  const code = searchParams.get('code');
+  const errorParam = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
 
-  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [mode, setMode] = useState<Mode>(code ? 'loading' : 'request');
+  const [generalError, setGeneralError] = useState<string | null>(
+    errorParam ? errorDescription || 'Invalid or expired reset link' : null
+  );
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const supabase = createBrowserClient();
+
+  // Handle Supabase auth code exchange
+  useEffect(() => {
+    if (code && mode === 'loading') {
+      const exchangeCode = async () => {
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            setGeneralError('Invalid or expired reset link. Please request a new one.');
+            setMode('request');
+          } else {
+            setIsAuthenticated(true);
+            setMode('set');
+          }
+        } catch {
+          setGeneralError('Invalid or expired reset link. Please request a new one.');
+          setMode('request');
+        }
+      };
+      exchangeCode();
+    }
+  }, [code, mode, supabase.auth]);
 
   const requestForm = useForm<RequestForm>({
     resolver: zodResolver(requestSchema),
@@ -51,23 +80,19 @@ export default function ResetPasswordClient() {
     () =>
       z
         .object({
-          token: z
-            .string()
-            .length(64)
-            .regex(/^[0-9a-f]{64}$/),
           newPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
           confirmPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
         })
         .refine((v) => v.newPassword === v.confirmPassword, {
-          message: t('passwordsDoNotMatch'),
+          message: 'Passwords do not match',
           path: ['confirmPassword'],
         }),
-    [t],
+    [],
   );
 
   const setForm = useForm<SetForm>({
     resolver: zodResolver(setSchema),
-    defaultValues: { token: tokenValid ? token! : '', newPassword: '', confirmPassword: '' },
+    defaultValues: { newPassword: '', confirmPassword: '' },
     mode: 'onSubmit',
   });
 
@@ -100,19 +125,24 @@ export default function ResetPasswordClient() {
     setGeneralError(null);
     setSuccess(false);
 
+    if (!isAuthenticated) {
+      setGeneralError('Session expired. Please request a new reset link.');
+      return;
+    }
+
     try {
-      const res = await fetch(API_ROUTES.AUTH.PASSWORD_RESET, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: data.token, newPassword: data.newPassword }),
+      // Use Supabase's updateUser to change password
+      const { error } = await supabase.auth.updateUser({
+        password: data.newPassword,
       });
 
-      const json = await res.json().catch(() => null);
-
-      if (!res.ok || !json?.data?.reset) {
-        setGeneralError(t('invalidResetLink'));
+      if (error) {
+        setGeneralError(error.message || 'Failed to update password. Please try again.');
         return;
       }
+
+      // Sign out after password change for security
+      await supabase.auth.signOut();
 
       setSuccess(true);
       toastUtils.success(t('passwordChangedSuccess'), t('loginSuccess'));
@@ -121,6 +151,17 @@ export default function ResetPasswordClient() {
       setGeneralError(t('unexpectedError'));
     }
   };
+
+  if (mode === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
+        <div className="w-full max-w-md text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-mq-primary" />
+          <p className="mt-4 text-mq-content-secondary">Verifying reset link...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
@@ -190,8 +231,6 @@ export default function ResetPasswordClient() {
             </form>
           ) : (
             <form onSubmit={setForm.handleSubmit(onSet)} className="space-y-4">
-              <input type="hidden" {...setForm.register('token')} />
-
               <div className="space-y-2">
                 <Label htmlFor="newPassword" className="text-mq-content font-bold">
                   {t('newPassword')}
@@ -263,7 +302,9 @@ export default function ResetPasswordClient() {
         </div>
 
         <p className="text-xs text-mq-content-secondary text-center mt-4">
-          {mode === 'request' ? t('revealEmailNote') : t('resetLinkExpireNote')}
+          {mode === 'request'
+            ? 'We will never reveal whether an email is registered.'
+            : 'For your security, reset links expire quickly.'}
         </p>
       </div>
     </div>

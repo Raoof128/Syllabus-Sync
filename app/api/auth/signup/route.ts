@@ -12,8 +12,6 @@ import { signupLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
-import { createAndSendVerification } from '@/lib/security/emailVerification';
-import { isEmailServiceConfigured } from '@/lib/services/emailService';
 
 // ============================================================================
 // AUDIT LOGGING HELPER
@@ -83,17 +81,9 @@ const serverT = (key: string): string => {
 export async function POST(request: NextRequest) {
   const adminClient = createAdminClient();
 
-  // Production guardrails: email verification depends on Resend and service role.
-  // Fail closed in real production to avoid creating accounts that can never be verified.
+  // Production guardrails: require service role for admin operations.
   if (isRealProduction) {
     if (!adminClient) {
-      return jsonError(
-        'Service temporarily unavailable. Please try again later.',
-        503,
-        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-      );
-    }
-    if (!isEmailServiceConfigured()) {
       return jsonError(
         'Service temporarily unavailable. Please try again later.',
         503,
@@ -193,21 +183,22 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     // adminClient already initialized at top for kill switch check
 
-    // Create auth user.
-    // Prefer admin API (service_role) so we control email confirmation and avoid
-    // triggering Supabase's built-in transactional emails in production.
+    // Create auth user using Supabase's native signUp
+    // This triggers Supabase's built-in email confirmation via configured SMTP
     let createdUser: { id: string } | null = null;
     let createdSession: unknown | null = null;
 
-    if (adminClient) {
-      const devAutoConfirm = isDevelopment && isDevEmail(email);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const devAutoConfirm = isDevelopment && isDevEmail(email);
+
+    if (devAutoConfirm && adminClient) {
+      // Development: auto-confirm dev emails using admin client
       const { data: createData, error: createError } = await adminClient.auth.admin.createUser({
         email,
         password,
-        email_confirm: devAutoConfirm,
+        email_confirm: true,
         user_metadata: {
           full_name: fullName,
-          // SECURITY: Don't store sensitive data in auth metadata
         },
       });
 
@@ -219,7 +210,6 @@ export async function POST(request: NextRequest) {
 
         const isAlreadyRegistered = createError.message.toLowerCase().includes('already');
         if (isAlreadyRegistered) {
-          // SECURITY: Return generic success to prevent account enumeration
           return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
         }
 
@@ -233,15 +223,15 @@ export async function POST(request: NextRequest) {
 
       createdUser = createData.user ? { id: createData.user.id } : null;
     } else {
+      // Production: use native signUp which sends confirmation email via Supabase SMTP
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
-            // SECURITY: Don't store sensitive data in auth metadata
           },
-          emailRedirectTo: undefined,
+          emailRedirectTo: `${appUrl}/auth/callback`,
         },
       });
 
@@ -372,38 +362,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Send custom verification email (production flow)
-    // Skip for dev emails in development (they get auto-confirmed below)
-    if (adminClient && !(isDevelopment && isDevEmail(email))) {
-      const requireDelivery = isRealProduction;
-
-      if (requireDelivery) {
-        const verificationResult = await createAndSendVerification(adminClient, userId, email);
-
-        if (!verificationResult.success) {
-          logger.error('Verification email delivery failed during signup; rolling back user', {
-            userId,
-          });
-
-          // Best-effort cleanup: remove app records first, then auth user.
-          await adminClient.from('email_verifications').delete().eq('user_id', userId);
-          await adminClient.from('gamification_profiles').delete().eq('user_id', userId);
-          await adminClient.from('profiles').delete().eq('id', userId);
-          await adminClient.auth.admin.deleteUser(userId);
-
-          return jsonError(
-            'Service temporarily unavailable. Please try again later.',
-            503,
-            ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-          );
-        }
-      } else if (isEmailServiceConfigured()) {
-        // Non-production: best-effort send to avoid slowing down local/dev signups.
-        createAndSendVerification(adminClient, userId, email).catch((err) => {
-          logger.error('Failed to send verification email after signup', { userId, error: err });
-        });
-      }
-    }
+    // Email verification is now handled by Supabase's native signUp flow
+    // which sends confirmation emails via the SMTP configured in Supabase dashboard
 
     // Auto-confirm ONLY in development AND only for developer emails
     let session = null;

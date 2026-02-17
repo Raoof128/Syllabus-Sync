@@ -1,19 +1,15 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { jsonSuccess, jsonError, jsonUnauthorized, ERROR_CODES } from '@/app/api/_lib/response';
-import {
-  emailVerifySendLimiter,
-  createAndSendVerification,
-} from '@/lib/security/emailVerification';
+import { emailVerifySendLimiter } from '@/lib/security/emailVerification';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 
 /**
  * POST /api/auth/email/send-verification
  *
- * Sends a verification email to the authenticated user.
- * Used for resending verification emails (user already signed in).
+ * Resends a verification email to the authenticated user via Supabase's native email.
+ * Uses the SMTP configured in Supabase dashboard.
  */
 export async function POST(request: NextRequest) {
   // 1. Rate limit (3 sends per hour per IP)
@@ -40,25 +36,26 @@ export async function POST(request: NextRequest) {
       return jsonUnauthorized('Authentication required');
     }
 
-    // 3. Check admin client
-    const adminClient = createAdminClient();
-    if (!adminClient) {
-      return jsonError(
-        'Email verification is not configured',
-        503,
-        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-      );
-    }
-
-    // 4. Check user has an email
+    // 3. Check user has an email
     if (!user.email) {
       return jsonError('No email address on account', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    // 5. Create token, store hash, send email
-    const result = await createAndSendVerification(adminClient, user.id, user.email);
+    // 4. Use Supabase's native resend confirmation email
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: user.email,
+      options: {
+        emailRedirectTo: `${appUrl}/auth/callback`,
+      },
+    });
 
-    if (!result.success) {
+    if (error) {
+      logger.error('Failed to resend verification email:', {
+        message: error.message,
+        email_hint: user.email.substring(0, 3) + '***',
+      });
       return jsonError('Failed to send verification email', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
