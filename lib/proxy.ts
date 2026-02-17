@@ -47,14 +47,20 @@ export async function proxy(request: NextRequest) {
   const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
   const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify'];
+
+  // Static files that should always be public (no auth check)
+  const staticFileExtensions = ['.webmanifest', '.json', '.ico', '.png', '.jpg', '.jpeg', '.svg', '.css', '.js', '.woff', '.woff2', '.ttf'];
+  const isStaticFile = staticFileExtensions.some((ext) => path.endsWith(ext));
+
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
   const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
   const isRootPath = path === '/';
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);
-  // Don't resolve user for root path - let AuthRedirectHandler handle it
-  const shouldResolveUser = !isRootPath && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
+
+  // Don't resolve user for root path, static files - let them pass through
+  const shouldResolveUser = !isRootPath && !isStaticFile && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
 
   if (path === '/@vite/client') {
     return new NextResponse('', {
