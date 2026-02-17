@@ -1840,5 +1840,7 @@
   "validation.termsRequired": "You must agree to the terms and conditions",
   "validation.fullNameRequired": "Full name is required",
   "validation.studentIdRequired": "Student ID is required",
-  "validation.passwordsMismatch": "Passwords do not match"
+  "validation.passwordsMismatch": "Passwords do not match",
+  "signupConfirmationSent": "We've sent a verification email to {{email}}. Please click the link in the email to activate your account.",
+  "signupConfirmationHint": "Didn't receive the email? Check your spam folder or try signing up again."
 }

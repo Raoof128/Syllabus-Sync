@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "Kami telah menghantar e-mel pengesahan ke {{email}}. Sila klik pautan dalam e-mel untuk mengaktifkan akaun anda.",
+  "signupConfirmationHint": "Tidak menerima e-mel? Semak folder spam anda atau cuba daftar semula."
 }

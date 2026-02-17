@@ -1833,5 +1833,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "আমরা {{email}} এ একটি যাচাইকরণ ইমেল পাঠিয়েছি। আপনার অ্যাকাউন্ট সক্রিয় করতে ইমেলের লিঙ্কে ক্লিক করুন।",
+  "signupConfirmationHint": "ইমেল পাননি? আপনার স্প্যাম ফোল্ডার চেক করুন বা আবার সাইন আপ করার চেষ্টা করুন।"
 }

@@ -1832,5 +1832,7 @@
   "newCodeSent": "Nouveau code envoyé !",
   "failedToResendCode": "Échec du renvoi du code.",
   "useSmsInstead": "Utiliser le SMS à la place",
-  "useTotpInstead": "Utiliser l'application d'authentification à la place"
+  "useTotpInstead": "Utiliser l'application d'authentification à la place",
+  "signupConfirmationSent": "Nous avons envoyé un e-mail de vérification à {{email}}. Veuillez cliquer sur le lien dans l'e-mail pour activer votre compte.",
+  "signupConfirmationHint": "Vous n'avez pas reçu l'e-mail ? Vérifiez votre dossier spam ou réessayez de vous inscrire."
 }

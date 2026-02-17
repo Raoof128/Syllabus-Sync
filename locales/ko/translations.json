@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "{{email}}로 인증 이메일을 보냈습니다. 이메일의 링크를 클릭하여 계정을 활성화하세요.",
+  "signupConfirmationHint": "이메일을 받지 못했나요? 스팸 폴더를 확인하거나 다시 가입해 보세요."
 }

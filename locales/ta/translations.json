@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "{{email}} க்கு சரிபார்ப்பு மின்னஞ்சல் அனுப்பியுள்ளோம். உங்கள் கணக்கை செயல்படுத்த மின்னஞ்சலில் உள்ள இணைப்பை கிளிக் செய்யவும்.",
+  "signupConfirmationHint": "மின்னஞ்சல் வரவில்லையா? உங்கள் ஸ்பேம் கோப்புறையை சரிபார்க்கவும் அல்லது மீண்டும் பதிவு செய்ய முயற்சிக்கவும்."
 }

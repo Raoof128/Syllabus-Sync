@@ -624,8 +624,6 @@ export default function LoginClient() {
                   <a
                     href="/privacy"
                     className="hover:underline hover:text-mq-primary"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     {t('privacyPolicy')}
                   </a>
@@ -633,8 +631,6 @@ export default function LoginClient() {
                   <a
                     href="/terms"
                     className="hover:underline hover:text-mq-primary"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     {t('termsOfService')}
                   </a>

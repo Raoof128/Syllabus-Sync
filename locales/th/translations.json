@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "เราได้ส่งอีเมลยืนยันไปที่ {{email}} กรุณาคลิกลิงก์ในอีเมลเพื่อเปิดใช้งานบัญชีของคุณ",
+  "signupConfirmationHint": "ไม่ได้รับอีเมล? ตรวจสอบโฟลเดอร์สแปมของคุณ หรือลองสมัครใหม่อีกครั้ง"
 }

@@ -1834,5 +1834,7 @@
   "newCodeSent": "新しいコードを送信しました！",
   "failedToResendCode": "コードの再送に失敗しました。",
   "useSmsInstead": "代わりにSMSを使用する",
-  "useTotpInstead": "代わりに認証アプリを使用する"
+  "useTotpInstead": "代わりに認証アプリを使用する",
+  "signupConfirmationSent": "{{email}} に確認メールを送信しました。メール内のリンクをクリックしてアカウントを有効にしてください。",
+  "signupConfirmationHint": "メールが届きませんか？迷惑メールフォルダを確認するか、もう一度登録してください。"
 }

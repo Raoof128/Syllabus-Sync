@@ -1,3 +1,28 @@
+### Raouf: Fix Privacy/Terms Navigation + Signup Confirmation — 2026-02-18
+
+**Scope:** Fix back navigation from privacy/terms pages and add email confirmation screen after signup.
+**Type:** Bugfix + Enhancement
+
+#### Changes
+
+1. **Remove `target="_blank"` from privacy/terms links** (`LoginClient.tsx`, `SignupClient.tsx`):
+   - Links on login and signup pages now open in the same tab instead of a new tab.
+   - This allows `router.back()` on the privacy/terms pages to correctly navigate back.
+
+2. **Add email confirmation screen after signup** (`SignupClient.tsx`):
+   - New `confirmation` step shows after successful signup when email verification is required.
+   - Displays the email address, instructions to check inbox/spam, and a "Go to Login" button.
+   - Replaces the previous behavior of showing a brief toast and redirecting to login.
+
+3. **New translation keys** (`locales/*/translations.json`):
+   - Added `signupConfirmationSent` and `signupConfirmationHint` to all 19 locales.
+
+#### Verification
+
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Fix Password Reset — token_hash + verifyOtp — 2026-02-18
 
 **Scope:** Fix production password reset flow — "Invalid or expired reset link" error.

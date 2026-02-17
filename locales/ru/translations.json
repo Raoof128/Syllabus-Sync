@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "Мы отправили письмо для подтверждения на {{email}}. Нажмите на ссылку в письме, чтобы активировать аккаунт.",
+  "signupConfirmationHint": "Не получили письмо? Проверьте папку «Спам» или попробуйте зарегистрироваться снова."
 }

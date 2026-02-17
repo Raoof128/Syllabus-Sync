@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "Chúng tôi đã gửi email xác minh đến {{email}}. Vui lòng nhấp vào liên kết trong email để kích hoạt tài khoản.",
+  "signupConfirmationHint": "Không nhận được email? Kiểm tra thư mục spam hoặc thử đăng ký lại."
 }

@@ -17,7 +17,7 @@ import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useProfilesStore } from '@/lib/store/profilesStore';
-import { AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { AlertTriangle, Check, Loader2, Mail } from 'lucide-react';
 import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
@@ -34,9 +34,10 @@ export default function SignupClient() {
   // Memoize schema if performance is an issue, but usually fine here
   const signupSchema = createSignupSchema(t);
 
-  const [step, setStep] = useState<'auth' | 'profile'>('auth');
+  const [step, setStep] = useState<'auth' | 'profile' | 'confirmation'>('auth');
   const [serverError, setServerError] = useState<string | null>(null);
   const [oauthLoadingProvider, setOauthLoadingProvider] = useState<'google' | 'facebook' | null>(null);
+  const [signupEmail, setSignupEmail] = useState<string>('');
 
   // Focus management
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -178,8 +179,9 @@ export default function SignupClient() {
         toastUtils.success(t('accountCreated'), t('signedInNow'));
         router.push('/home');
       } else {
-        toastUtils.success(t('accountCreated'), t('verifyEmail'));
-        router.push('/login');
+        // Show email confirmation screen
+        setSignupEmail(data.email);
+        setStep('confirmation');
       }
     } catch {
       setServerError(t('unexpectedError'));
@@ -191,59 +193,74 @@ export default function SignupClient() {
       <Card className="w-full max-w-md bg-mq-card-background border border-mq-border">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-mq-primary rounded-mq-lg flex items-center justify-center">
-              <Icons.Graduation className="w-6 h-6 text-white" />
+            <div className={clsx(
+              'w-12 h-12 rounded-mq-lg flex items-center justify-center',
+              step === 'confirmation' ? 'bg-mq-success' : 'bg-mq-primary',
+            )}>
+              {step === 'confirmation' ? (
+                <Mail className="w-6 h-6 text-white" />
+              ) : (
+                <Icons.Graduation className="w-6 h-6 text-white" />
+              )}
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            {step === 'auth' ? t('joinApp', { appName: APP_CONFIG.name }) : t('completeProfile')}
+            {step === 'confirmation'
+              ? t('accountCreated')
+              : step === 'auth'
+                ? t('joinApp', { appName: APP_CONFIG.name })
+                : t('completeProfile')}
           </CardTitle>
           <CardDescription className="text-center">
-            {step === 'auth'
-              ? t('createAccountFor', { uniName: UNIVERSITY_CONFIG.name })
-              : t('fillProfileDetails')}
+            {step === 'confirmation'
+              ? t('verifyEmail')
+              : step === 'auth'
+                ? t('createAccountFor', { uniName: UNIVERSITY_CONFIG.name })
+                : t('fillProfileDetails')}
           </CardDescription>
 
           {/* Step indicator */}
-          <div className="flex items-center justify-center gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => step === 'profile' && setStep('auth')}
-              className={clsx(
-                'flex items-center gap-1 px-2 py-1 rounded-full transition-colors',
-                step === 'auth'
-                  ? 'bg-mq-primary/10 text-mq-primary'
-                  : 'bg-mq-success/10 text-mq-success cursor-pointer hover:bg-mq-success/20',
-              )}
-              disabled={step === 'auth' || isSubmitting}
-            >
-              {step === 'profile' ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <div className="w-2 h-2 rounded-full bg-mq-primary" />
-              )}
-              <span className="text-xs font-medium">{t('stepAccount')}</span>
-            </button>
-            <div
-              className={clsx('w-8 h-0.5', step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border')}
-            />
-            <div
-              className={clsx(
-                'flex items-center gap-1 px-2 py-1 rounded-full',
-                step === 'profile'
-                  ? 'bg-mq-primary/10 text-mq-primary'
-                  : 'bg-mq-surface text-mq-content-secondary',
-              )}
-            >
+          {step !== 'confirmation' && (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => step === 'profile' && setStep('auth')}
+                className={clsx(
+                  'flex items-center gap-1 px-2 py-1 rounded-full transition-colors',
+                  step === 'auth'
+                    ? 'bg-mq-primary/10 text-mq-primary'
+                    : 'bg-mq-success/10 text-mq-success cursor-pointer hover:bg-mq-success/20',
+                )}
+                disabled={step === 'auth' || isSubmitting}
+              >
+                {step === 'profile' ? (
+                  <Check className="w-3 h-3" />
+                ) : (
+                  <div className="w-2 h-2 rounded-full bg-mq-primary" />
+                )}
+                <span className="text-xs font-medium">{t('stepAccount')}</span>
+              </button>
+              <div
+                className={clsx('w-8 h-0.5', step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border')}
+              />
               <div
                 className={clsx(
-                  'w-2 h-2 rounded-full',
-                  step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
+                  'flex items-center gap-1 px-2 py-1 rounded-full',
+                  step === 'profile'
+                    ? 'bg-mq-primary/10 text-mq-primary'
+                    : 'bg-mq-surface text-mq-content-secondary',
                 )}
-              />
-              <span className="text-xs font-medium">{t('stepProfile')}</span>
+              >
+                <div
+                  className={clsx(
+                    'w-2 h-2 rounded-full',
+                    step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
+                  )}
+                />
+                <span className="text-xs font-medium">{t('stepProfile')}</span>
+              </div>
             </div>
-          </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           {serverError && (
@@ -355,8 +372,6 @@ export default function SignupClient() {
                   <a
                     href="/terms"
                     className="text-mq-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     {t('termsOfService')}
                   </a>{' '}
@@ -364,8 +379,6 @@ export default function SignupClient() {
                   <a
                     href="/privacy"
                     className="text-mq-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     {t('privacyPolicy')}
                   </a>
@@ -381,8 +394,6 @@ export default function SignupClient() {
                 <a
                   href="/privacy"
                   className="text-mq-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   {t('privacyPolicy')}
                 </a>
@@ -557,19 +568,42 @@ export default function SignupClient() {
             </div>
           </form>
 
-          <div className="text-center text-sm text-mq-content-secondary">
-            <p>
-              {t('alreadyHaveAccount')}{' '}
-              <button
+          {/* Email Confirmation Screen */}
+          {step === 'confirmation' && (
+            <div className="space-y-4 text-center">
+              <div className="bg-mq-success/10 rounded-mq-lg p-4">
+                <p className="text-sm text-mq-content leading-relaxed">
+                  {t('signupConfirmationSent', { email: signupEmail })}
+                </p>
+              </div>
+              <div className="space-y-2 text-sm text-mq-content-secondary">
+                <p>{t('signupConfirmationHint')}</p>
+              </div>
+              <Button
                 type="button"
                 onClick={() => router.push('/login')}
-                className="text-mq-primary hover:underline font-medium"
-                disabled={isSubmitting || oauthLoadingProvider !== null}
+                className="w-full"
               >
-                {t('signIn')}
-              </button>
-            </p>
-          </div>
+                {t('goToLogin')}
+              </Button>
+            </div>
+          )}
+
+          {step !== 'confirmation' && (
+            <div className="text-center text-sm text-mq-content-secondary">
+              <p>
+                {t('alreadyHaveAccount')}{' '}
+                <button
+                  type="button"
+                  onClick={() => router.push('/login')}
+                  className="text-mq-primary hover:underline font-medium"
+                  disabled={isSubmitting || oauthLoadingProvider !== null}
+                >
+                  {t('signIn')}
+                </button>
+              </p>
+            </div>
+          )}
 
           {/* Footer */}
           <div className="pt-4 text-center text-xs text-mq-content-secondary space-y-1">
@@ -578,8 +612,6 @@ export default function SignupClient() {
               <a
                 href="/privacy"
                 className="hover:underline hover:text-mq-primary"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 {t('privacyPolicy')}
               </a>
@@ -587,8 +619,6 @@ export default function SignupClient() {
               <a
                 href="/terms"
                 className="hover:underline hover:text-mq-primary"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 {t('termsOfService')}
               </a>

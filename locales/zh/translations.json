@@ -1834,5 +1834,7 @@
   "newCodeSent": "新代码已发送！",
   "failedToResendCode": "重发代码失败。",
   "useSmsInstead": "改用短信验证",
-  "useTotpInstead": "改用身份验证器应用"
+  "useTotpInstead": "改用身份验证器应用",
+  "signupConfirmationSent": "我们已向 {{email}} 发送了验证邮件。请点击邮件中的链接以激活您的账户。",
+  "signupConfirmationHint": "没有收到邮件？请检查垃圾邮件文件夹，或重新注册。"
 }

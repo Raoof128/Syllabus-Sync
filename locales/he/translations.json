@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "שלחנו מייל אימות אל {{email}}. לחצו על הקישור במייל כדי להפעיל את החשבון שלכם.",
+  "signupConfirmationHint": "לא קיבלתם את המייל? בדקו את תיקיית הספאם או נסו להירשם שוב."
 }

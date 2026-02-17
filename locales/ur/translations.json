@@ -1834,5 +1834,7 @@
   "newCodeSent": "New code sent!",
   "failedToResendCode": "Failed to resend code.",
   "useSmsInstead": "Use SMS instead",
-  "useTotpInstead": "Use authenticator app instead"
+  "useTotpInstead": "Use authenticator app instead",
+  "signupConfirmationSent": "ہم نے {{email}} پر تصدیقی ای میل بھیجی ہے۔ اپنا اکاؤنٹ فعال کرنے کے لیے ای میل میں دیے گئے لنک پر کلک کریں۔",
+  "signupConfirmationHint": "ای میل نہیں ملی؟ اپنا سپیم فولڈر چیک کریں یا دوبارہ سائن اپ کرنے کی کوشش کریں۔"
 }
