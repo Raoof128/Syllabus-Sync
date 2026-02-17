@@ -44,13 +44,19 @@ function isPublicApiPath(path: string): boolean {
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+
+  // CRITICAL: Static files should ALWAYS be public - return immediately without any processing
+  // This prevents 401 errors on manifest.webmanifest, icons, fonts, etc.
+  const staticFileExtensions = ['.webmanifest', '.json', '.ico', '.png', '.jpg', '.jpeg', '.svg', '.css', '.js', '.woff', '.woff2', '.ttf', '.eot', '.map', '.txt', '.xml'];
+  const isStaticFile = staticFileExtensions.some((ext) => path.endsWith(ext));
+
+  if (isStaticFile) {
+    return NextResponse.next();
+  }
+
   const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
   const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify'];
-
-  // Static files that should always be public (no auth check)
-  const staticFileExtensions = ['.webmanifest', '.json', '.ico', '.png', '.jpg', '.jpeg', '.svg', '.css', '.js', '.woff', '.woff2', '.ttf'];
-  const isStaticFile = staticFileExtensions.some((ext) => path.endsWith(ext));
 
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
@@ -59,8 +65,8 @@ export async function proxy(request: NextRequest) {
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);
 
-  // Don't resolve user for root path, static files - let them pass through
-  const shouldResolveUser = !isRootPath && !isStaticFile && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
+  // Don't resolve user for root path - let it pass through
+  const shouldResolveUser = !isRootPath && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
 
   if (path === '/@vite/client') {
     return new NextResponse('', {
