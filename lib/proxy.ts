@@ -64,9 +64,14 @@ export async function proxy(request: NextRequest) {
   const isRootPath = path === '/';
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);
+  const isResetPasswordRoute = path.startsWith('/reset-password');
+  const isAuthCallbackRoute = path.startsWith('/auth/callback');
 
-  // Don't resolve user for root path - let it pass through
-  const shouldResolveUser = !isRootPath && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
+  // Don't resolve user for:
+  // - Root path (handled by AuthRedirectHandler)
+  // - Reset password (needs to be fully public for recovery flow)
+  // - Auth callback (handles OAuth/email verification)
+  const shouldResolveUser = !isRootPath && !isResetPasswordRoute && !isAuthCallbackRoute && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
 
   if (path === '/@vite/client') {
     return new NextResponse('', {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
@@ -14,19 +14,17 @@ interface AuthRedirectHandlerProps {
  * Handles auth redirects from Supabase email links.
  *
  * When users click email verification or password reset links,
- * Supabase redirects them to the root URL with tokens in the hash fragment.
- * This component detects those tokens, lets Supabase process them,
- * and redirects appropriately based on the auth event.
+ * Supabase redirects them to the configured redirect_to URL with tokens in the hash fragment.
+ * This component detects those tokens and redirects appropriately.
  */
 export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHandlerProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'processing' | 'redirecting' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const handledRef = useRef(false);
   const supabase = createBrowserClient();
 
-  // IMMEDIATE check on mount - detect recovery type and redirect before anything else
+  // Check for recovery/auth tokens on mount
   useEffect(() => {
     if (typeof window === 'undefined' || handledRef.current) return;
 
@@ -36,59 +34,53 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
     // Parse hash fragment - Supabase puts tokens here after PKCE flow
     // Format: #access_token=xxx&token_type=bearer&type=recovery&...
     const hashParams = new URLSearchParams(hash.substring(1));
-    const searchParamsLocal = new URLSearchParams(search);
+    const searchParams = new URLSearchParams(search);
 
     const typeFromHash = hashParams.get('type');
-    const typeFromSearch = searchParamsLocal.get('type');
+    const typeFromSearch = searchParams.get('type');
     const type = typeFromHash || typeFromSearch;
 
-    console.log('AuthRedirectHandler: Checking for recovery', {
-      hash: hash ? 'present' : 'none',
+    const error = hashParams.get('error') || searchParams.get('error');
+    const errorDescription = hashParams.get('error_description') || searchParams.get('error_description');
+
+    console.log('AuthRedirectHandler: Checking URL', {
+      hash: hash ? hash.substring(0, 50) + '...' : 'none',
       type,
-      typeFromHash,
-      typeFromSearch
+      error
     });
 
-    // If type=recovery is present, redirect to reset-password IMMEDIATELY
+    // Handle errors
+    if (error) {
+      console.error('AuthRedirectHandler: Error in URL', { error, errorDescription });
+      handledRef.current = true;
+      setStatus('error');
+      setErrorMessage(errorDescription || error || 'Authentication failed.');
+      return;
+    }
+
+    // If type=recovery, redirect to /reset-password with the hash
     if (type === 'recovery') {
       console.log('AuthRedirectHandler: Recovery detected, redirecting to /reset-password');
       handledRef.current = true;
       setStatus('redirecting');
-      // Pass the hash fragment to reset-password page so it can process the tokens
+      // Pass the entire hash to reset-password so it can process the tokens
       router.replace(`/reset-password${hash}`);
       return;
     }
 
-    // Check for errors
-    const error = searchParams.get('error') || hashParams.get('error');
-    const errorCode = searchParams.get('error_code') || hashParams.get('error_code');
-    const errorDescription = searchParams.get('error_description') || hashParams.get('error_description');
+    // Check if there are auth tokens in the hash
+    const hasAuthTokens = hash && (hash.includes('access_token') || hash.includes('refresh_token'));
 
-    if (error || errorCode) {
-      console.error('Auth error from URL:', { error, errorCode, errorDescription });
-      handledRef.current = true;
-      setStatus('error');
-      setErrorMessage(errorDescription || error || 'Authentication failed. Please try again.');
-      return;
-    }
-
-    // Check if there are any auth params at all
-    const hasAuthParams = hash && (
-      hash.includes('access_token') ||
-      hash.includes('refresh_token') ||
-      hash.includes('error')
-    );
-
-    // No auth params - redirect to fallback
-    if (!hasAuthParams) {
+    if (!hasAuthTokens) {
+      // No auth params - redirect to fallback
       console.log('AuthRedirectHandler: No auth params, redirecting to fallback');
       router.replace(fallbackRedirect);
       return;
     }
 
-    // Has auth params but not recovery - let Supabase handle it
+    // Has auth tokens but not recovery type - let Supabase process
     setStatus('processing');
-  }, [router, searchParams, fallbackRedirect]);
+  }, [router, fallbackRedirect]);
 
   // Listen for auth state changes from Supabase
   useEffect(() => {
@@ -98,13 +90,15 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       (event: string, session: unknown) => {
         if (handledRef.current) return;
 
-        console.log('Auth state change:', event);
+        console.log('AuthRedirectHandler: Auth state change:', event);
 
         if (event === 'PASSWORD_RECOVERY' && session) {
+          // Recovery flow - redirect to reset-password
           handledRef.current = true;
           setStatus('redirecting');
           router.replace('/reset-password');
         } else if (event === 'SIGNED_IN' && session) {
+          // Normal sign in - redirect to home
           handledRef.current = true;
           setStatus('redirecting');
           router.replace('/home');
@@ -112,19 +106,17 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       }
     );
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
 
-  // Fallback timeout - if nothing happens after 5 seconds, check session manually
+  // Fallback timeout - if nothing happens after 5 seconds, redirect to fallback
   useEffect(() => {
     if (handledRef.current || status !== 'processing') return;
 
     const timeout = setTimeout(async () => {
       if (handledRef.current) return;
 
-      console.log('AuthRedirectHandler: Timeout, checking session manually');
+      console.log('AuthRedirectHandler: Timeout, checking session');
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
@@ -132,13 +124,13 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
         setStatus('redirecting');
         router.replace('/home');
       } else {
-        // No session after timeout
-        router.replace('/login?error=session_timeout');
+        // No session - redirect to fallback
+        router.replace(fallbackRedirect);
       }
     }, 5000);
 
     return () => clearTimeout(timeout);
-  }, [status, router, supabase.auth]);
+  }, [status, router, supabase.auth, fallbackRedirect]);
 
   // Show error state
   if (status === 'error') {

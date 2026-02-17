@@ -95,6 +95,8 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     if (!isSupabaseConfigured()) return;
     // Skip auth redirect for public routes - they should be accessible to everyone
     if (isPublicRoute) return;
+    // Skip auth check for reset-password - it must be fully public for recovery flow
+    if (pathname.startsWith('/reset-password')) return;
 
     try {
       const { user } = await getBrowserAuthSnapshot();
@@ -104,19 +106,17 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       // Proxy handles redirecting authenticated users away from /login.
       // However, when /login is being used as an MFA upgrade step (`?mfa=1`),
       // we must not push the user away or we'll cause redirect flapping.
-      // Also, /reset-password must be accessible even when authenticated - user needs to set new password.
       const isMfaUpgradeUrl =
         typeof window !== 'undefined' &&
         new URLSearchParams(window.location.search).get('mfa') === '1';
-      const isResetPasswordPage = pathname.startsWith('/reset-password');
 
-      if (authenticated && isAuthRoute && !isMfaUpgradeUrl && !isResetPasswordPage) {
+      if (authenticated && isAuthRoute && !isMfaUpgradeUrl) {
         router.push('/home');
       }
     } catch {
       // On error, keep optimistic state — proxy handles protection
     }
-  }, [router, isAuthRoute, isPublicRoute]);
+  }, [router, isAuthRoute, isPublicRoute, pathname]);
 
   // Run auth check in background (non-blocking)
   useEffect(() => {
