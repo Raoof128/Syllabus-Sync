@@ -6,6 +6,13 @@ Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm run lint
 Follow-ups: If you still see occasional protected-page loads without auth context, consider increasing proxy auth deadline slightly on Vercel cold starts (tradeoff: slower first paint).
 
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: MFA Redirect Loop Fix — Prevent /login?mfa=1 Bounce Back To Dashboard
+Summary: Fixed an MFA upgrade redirect loop where clicking a protected route (e.g. Manage Profiles) triggered a proxy redirect to `/login?mfa=1`, but the client layout’s background auth check immediately pushed authenticated users off the login route back to `/home`, causing a visible “jump to login then back to dashboard” flapping. Replaced the hook-based query param read (which broke static prerender) with a client-only `window.location.search` check so `/login?mfa=1` is never auto-redirected away before the MFA challenge completes.
+Files: Modified `app/client-layout.tsx`.
+Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅ (476/476 pass), `npm run build` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: Auth Audit — Signup Payload Alignment + Honeypot Fix + MFA Enforcement + Verification Resend
 Summary: Completed a full audit of login/signup UX and related auth endpoints and fixed several production-impacting issues. (1) Aligned the signup page payload with the server-side signup schema so real signups no longer fail validation. (2) Fixed the honeypot implementation so it’s actually reachable (schema no longer rejects non-empty `_gotcha` before the route can respond with generic success). (3) Hardened MFA by enforcing AAL2 centrally in the proxy: authenticated sessions that require MFA upgrade are redirected back to `/login?mfa=1` for protected pages and blocked with `403 MFA_REQUIRED` for non-public API routes, preventing aal1 session bypass. (4) Added an unauthenticated “resend verification email” endpoint and UI button for the “Email not confirmed” case (anti-enumeration, rate-limited). (5) Fixed redirect allowlist so post-login redirects work for `/feed` and `/map`.
 Files: Modified `lib/schemas/auth.ts`, `app/signup/SignupClient.tsx`, `app/api/auth/signup/route.ts`, `lib/proxy.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`, `lib/constants/config.ts`, `lib/security/emailVerification.ts`, `locales/en/translations.json`, `lib/utils/security.ts`, `app/login/__tests__/actions.test.ts`, `CHANGELOG.md`. Added `app/api/auth/email/resend-verification/route.ts`, `tests/api/auth/signup.test.ts`, `tests/api/auth/emailResendVerification.test.ts`, `tests/api/proxy.mfa.test.ts`.

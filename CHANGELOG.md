@@ -71,6 +71,27 @@
 
 ---
 
+### Raouf: MFA Redirect Loop Fix — Prevent /login?mfa=1 Bounce — 2026-02-17
+
+**Scope:** Prevent MFA upgrade step from being interrupted by client-side redirects.
+**Type:** Fix / UX
+
+#### Changes
+
+1. **Do not redirect away from `/login?mfa=1`** (`app/client-layout.tsx`):
+   - The client layout’s background auth check previously pushed authenticated users off auth routes, which broke the MFA upgrade flow and caused flapping between login and dashboard.
+   - Implemented a client-only query check via `window.location.search` (avoids `useSearchParams` static prerender requirements).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (476/476 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Move Production Rate Limiting To Vercel KV (Upstash Redis) — 2026-02-17
 
 **Scope:** Provision a high-traffic distributed rate limiter backed by Vercel KV/Upstash Redis to reduce database write load.
