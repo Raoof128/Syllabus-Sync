@@ -5,6 +5,13 @@ Files: Modified `app/login/LoginClient.tsx`, `app/auth/callback/route.ts`, `comp
 Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅ (483/483 pass), `npm run build` ✅, `npm run check:i18n` ✅.
 
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: Full Repository i18n Audit & Fix — 100% Locale Parity + Privacy Policy + MFA UI
+Summary: Completed a comprehensive internationalisation audit and remediation across all 19 supported locales. Added 117 missing keys to all non-English locales to match the canonical English source. (1) Internationalised the entire Privacy Policy page (`/privacy`), breaking it into structured keys for all sections, tables, and links. (2) Replaced hardcoded strings in the login MFA challenge, email verification, and password reset flows with i18n keys. (3) Fixed remaining literal strings in sidebar, weather widget, and various forms (Unit, Exam, Event). (4) Synchronised all 18 non-English locales (`ar`, `bn`, `es`, `fa`, `fr`, `he`, `hi`, `id`, `it`, `ja`, `ko`, `ms`, `ru`, `ta`, `th`, `ur`, `vi`, `zh`) using high-quality translations. (5) Ensured all locales have an identical key set.
+Files: Modified `locales/*/translations.json`, `app/privacy/page.tsx`, `app/verify/page.tsx`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`, `app/login/components/MFAChallenge.tsx`, `components/layout/Sidebar.tsx`, `features/settings/components/security/SMSSetup.tsx`, `features/settings/components/security/TOTPSetup.tsx`, `features/calendar/components/CalendarHeader.tsx`, `components/layout/WeatherWidget.tsx`, `components/units/UnitForm.tsx`, `components/units/UnitDetailPanel.tsx`, `components/exams/ExamForm.tsx`, `components/exams/ExamDetailPanel.tsx`, `components/events/EventForm.tsx`, `AGENT.md`, `CHANGELOG.md`.
+Verification: `npm run check:i18n` ✅ (0 warnings, 19 locales validated), `npm test` ✅ (483/483 pass), `npm run build` ✅.
+Follow-ups: Consider internationalising the admin-only Position Editor tool if it becomes user-facing.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: CDN Cache Preservation — Skip CSRF Cookie On API Routes
 Summary: Prevented middleware from setting the CSRF cookie on `/api/*` requests. This removes `Set-Cookie` from public GET API responses (e.g. `/api/weather`, `/api/health`) which improves CDN cacheability, increases cache hit rates across clients, and further reduces Vercel Function invocations under traffic. CSRF cookie is still set for page navigations where it is useful.
 Files: Modified `lib/proxy.ts`, `AGENT.md`, `CHANGELOG.md`.

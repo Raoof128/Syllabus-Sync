@@ -35,6 +35,44 @@
 
 ---
 
+### Raouf: Full Repository i18n Audit & Fix — 100% Locale Parity + Privacy Policy + MFA UI — 2026-02-17
+
+**Scope:** Complete repository-wide internationalisation audit and remediation for all 19 locales.
+**Type:** Feature / DX / Accessibility
+
+#### Changes
+
+1. **Structured i18n for Privacy Policy** (`app/privacy/page.tsx`, `locales/*/translations.json`):
+   - Moved the entire Privacy Policy text into `translations.json`.
+   - Created 80+ keys covering all sections, bullet points, table headers/cells, and complex link structures.
+   - Preserved all functional links (OAIC, NDB, Settings, Profiles) while internationalising their text.
+
+2. **MFA and Auth UI i18n** (`app/login/components/MFAChallenge.tsx`, `features/settings/components/security/SMSSetup.tsx`, `features/settings/components/security/TOTPSetup.tsx`):
+   - Replaced all hardcoded strings in the Multi-Factor Authentication challenge and setup flows.
+   - Added keys for error messages, prompts, and success states.
+
+3. **Email and Password Reset i18n** (`app/verify/page.tsx`, `app/reset-password/reset-password-client.tsx`, `app/signup/SignupClient.tsx`):
+   - Internationalised the email verification landing page.
+   - Fixed literal strings in the password reset flow and signup collection notice.
+
+4. **General UI Polish** (`components/layout/Sidebar.tsx`, `components/layout/WeatherWidget.tsx`, `components/units/*`, `components/exams/*`, `components/events/*`):
+   - Replaced "Syllabus Sync" app name with `appName` key.
+   - Fixed "Optional", "Retry", "Filters", and other UI labels in shared components.
+
+5. **100% Locale Parity**:
+   - Synchronised all 18 non-English locales with the canonical English source.
+   - Added 117 missing/new keys to every language file (`ar`, `bn`, `es`, `fa`, `fr`, `he`, `hi`, `id`, `it`, `ja`, `ko`, `ms`, `ru`, `ta`, `th`, `ur`, `vi`, `zh`).
+
+#### Verification
+
+- `npm run check:i18n` ✅ (0 warnings, all 19 locales have identical key sets)
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (483/483 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: CDN Cache Preservation — Skip CSRF Cookie On API Routes — 2026-02-17
 
 **Scope:** Improve cacheability of public API responses to reduce Vercel Function invocations.
