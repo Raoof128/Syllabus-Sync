@@ -5,6 +5,7 @@ import { Todo } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 
 interface TodosState {
   todos: Todo[];
@@ -47,8 +48,8 @@ const isValidUUID = (id: string) => {
 const shouldSyncTodos = async (): Promise<boolean> => {
   if (!isSupabaseConfigured()) return false;
   try {
-    const data = await apiRequest<{ user?: { id?: string } }>('/api/auth/user', { noRetry: true });
-    return Boolean(data?.user?.id);
+    const { user } = await getBrowserAuthSnapshot();
+    return Boolean(user?.id);
   } catch {
     return false;
   }

@@ -59,6 +59,7 @@ export const jsonSuccess = <T = unknown>(
   data: T,
   status: number = 200,
   meta?: Partial<ApiResponse['meta']>,
+  init?: Omit<ResponseInit, 'status'>,
 ): NextResponse<ApiResponse<T>> => {
   try {
     return NextResponse.json(
@@ -70,7 +71,7 @@ export const jsonSuccess = <T = unknown>(
           ...meta,
         },
       },
-      { status },
+      { status, ...init },
     );
   } catch (error) {
     // SECURITY: If data contains circular references, JSON.stringify (used by NextResponse.json) will fail.

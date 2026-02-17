@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { apiRequest } from '@/lib/utils/api';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { useHydration } from '@/lib/hooks';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { AuthUser } from '../types';
 
 export function useHomeUser(initialUser: AuthUser | null = null) {
@@ -20,9 +20,18 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
 
     const loadUser = async () => {
       try {
-        const data = await apiRequest<{ user?: AuthUser }>('/api/auth/user', { noRetry: true });
         if (isActive) {
-          setUser(data?.user ?? null);
+          if (!isSupabaseConfigured()) {
+            setUser(null);
+            return;
+          }
+          const supabase = createBrowserClient();
+          const { data, error } = await supabase.auth.getSession();
+          if (error) {
+            setUser(null);
+            return;
+          }
+          setUser((data.session?.user as AuthUser | null) ?? null);
         }
       } catch {
         if (isActive) {
@@ -33,15 +42,16 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
 
     void loadUser();
 
-    const handleFocus = () => {
-      void loadUser();
-    };
-
-    window.addEventListener('focus', handleFocus);
+    const supabase = isSupabaseConfigured() ? createBrowserClient() : null;
+    const subscription = supabase
+      ? supabase.auth.onAuthStateChange(() => {
+          void loadUser();
+        }).data.subscription
+      : null;
 
     return () => {
       isActive = false;
-      window.removeEventListener('focus', handleFocus);
+      subscription?.unsubscribe();
     };
   }, []);
 

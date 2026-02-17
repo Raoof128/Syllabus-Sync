@@ -50,9 +50,11 @@ export const useWeather = () => {
     }
 
     try {
-      const response = await fetch(
-        `/api/weather?lat=${region.lat}&lon=${region.lon}&_t=${Date.now()}`,
-      );
+      // Do not add cache-busting query params here; we want CDN/browser caching
+      // to reduce Vercel function invocations.
+      const response = await fetch(`/api/weather?lat=${region.lat}&lon=${region.lon}`, {
+        cache: 'force-cache',
+      });
 
       if (!response.ok) {
         throw new Error('Weather service unreachable');

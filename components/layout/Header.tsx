@@ -54,6 +54,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import WeatherWidget from './WeatherWidget';
 
 const notificationIcons = {
@@ -114,11 +115,19 @@ const Header = memo(() => {
 
     const getUser = async () => {
       try {
-        const data = await apiRequest<{
-          user?: { email?: string; user_metadata?: { full_name?: string; name?: string } };
-        }>('/api/auth/user', { noRetry: true });
         if (!isActive) return;
-        setUser(data?.user ?? null);
+        if (!isSupabaseConfigured()) {
+          setUser(null);
+          return;
+        }
+
+        const supabase = createBrowserClient();
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          setUser(null);
+          return;
+        }
+        setUser((data.session?.user as typeof user) ?? null);
       } catch {
         if (!isActive) return;
         setUser(null);
@@ -131,9 +140,16 @@ const Header = memo(() => {
 
     void getUser();
 
+    const supabase = isSupabaseConfigured() ? createBrowserClient() : null;
+    const subscription = supabase
+      ? supabase.auth.onAuthStateChange(() => {
+          void getUser();
+        }).data.subscription
+      : null;
+
     const handleFocus = () => {
-      void getUser();
-      loadNotifications({ force: true });
+      // Don't force-refresh on every focus; store has its own staleness window.
+      loadNotifications();
     };
 
     window.addEventListener('focus', handleFocus);
@@ -141,6 +157,7 @@ const Header = memo(() => {
     return () => {
       isActive = false;
       window.removeEventListener('focus', handleFocus);
+      subscription?.unsubscribe();
     };
   }, [loadNotifications]);
 

@@ -17,6 +17,7 @@ const OPENMETEO_BASE_URL = 'https://api.open-meteo.com/v1';
 // Cache weather data for 5 minutes to reduce API calls while keeping data fresh
 const weatherCache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
 
 export async function GET(request: NextRequest) {
   // SECURITY: Rate limit weather API requests
@@ -65,7 +66,11 @@ export async function GET(request: NextRequest) {
   // Check cache
   const cached = weatherCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return jsonSuccess(cached.data);
+    return jsonSuccess(cached.data, 200, undefined, {
+      headers: {
+        'Cache-Control': EDGE_CACHE_CONTROL,
+      },
+    });
   }
 
   try {
@@ -130,7 +135,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return jsonSuccess(sanitizedData);
+    return jsonSuccess(sanitizedData, 200, undefined, {
+      headers: {
+        'Cache-Control': EDGE_CACHE_CONTROL,
+      },
+    });
   } catch (error) {
     logger.error('Weather API fetch error:', error);
     return jsonError('Failed to fetch weather data', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);

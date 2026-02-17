@@ -11,12 +11,12 @@ import { Toaster } from '@/components/ui/toaster';
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
-import { apiRequest } from '@/lib/utils/api';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 
 // V3.1: Performance optimization - move constant arrays outside component
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
@@ -92,10 +92,8 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     if (!isSupabaseConfigured()) return;
 
     try {
-      const data = await apiRequest<{ user?: { id: string } }>('/api/auth/user', {
-        noRetry: true,
-      });
-      const authenticated = Boolean(data?.user?.id);
+      const { user } = await getBrowserAuthSnapshot();
+      const authenticated = Boolean(user?.id);
       setIsAuthenticated(authenticated);
 
       // Proxy handles redirecting authenticated users away from /login.

@@ -6,10 +6,11 @@ import { API_ROUTES } from '@/lib/constants/config';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
-const STALE_MS = 60 * 1000; // 1 minute revalidation window
+const STALE_MS = 3 * 60 * 1000; // 3 minutes revalidation window (reduces invocations)
 let hasLoggedNetworkFallback = false;
 
 type LoadOptions = { force?: boolean };
@@ -75,9 +76,17 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
 
       if (isAuthError) {
         set({ notifications: [], hasLoaded: true, lastLoadedAt: Date.now() });
-        // Redirect to login if session is invalid
+        // Avoid redirect flapping: only redirect if we can confirm there's no session.
+        // Middleware/proxy still protects routes on navigation/refresh.
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login';
+          try {
+            const { user } = await getBrowserAuthSnapshot();
+            if (!user) {
+              window.location.href = '/login';
+            }
+          } catch {
+            // If we can't determine session client-side, do not redirect aggressively.
+          }
         }
       } else {
         const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();

@@ -5,6 +5,7 @@ import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
@@ -42,8 +43,8 @@ const isValidUUID = (id: string) => {
 const shouldSyncDeadlines = async (): Promise<boolean> => {
   if (!isSupabaseConfigured()) return false;
   try {
-    const data = await apiRequest<{ user?: { id?: string } }>('/api/auth/user', { noRetry: true });
-    return Boolean(data?.user?.id);
+    const { user } = await getBrowserAuthSnapshot();
+    return Boolean(user?.id);
   } catch {
     return false;
   }

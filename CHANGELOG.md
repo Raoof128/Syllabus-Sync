@@ -1,3 +1,40 @@
+### Raouf: Vercel Invocation Reduction — Remove Auth Polling + Cache Public GET APIs — 2026-02-17
+
+**Scope:** Reduce Vercel Function invocations by serving more from cache and making fewer runtime API calls.
+**Type:** Fix / Performance / Operations
+
+#### Changes
+
+1. **Removed repeated `/api/auth/user` invocations from UI** (`app/client-layout.tsx`, `components/layout/Header.tsx`, `features/home/hooks/useHomeUser.ts`, `lib/store/deadlinesStore.ts`, `lib/store/todosStore.ts`):
+   - UI auth checks now read Supabase browser session (`auth.getSession`) instead of calling our API.
+   - Removes multiple focus listeners and redundant auth requests that inflated function invocations.
+
+2. **Weather widget now cache-friendly** (`components/layout/weather/useWeather.ts`):
+   - Removed the `?_t=Date.now()` cache-buster so CDN/browser caching can work.
+   - Uses `fetch(..., { cache: 'force-cache' })` for stable client-side caching behavior.
+
+3. **Enabled CDN caching for public GET APIs** (`app/api/weather/route.ts`, `app/api/health/route.ts`, `app/api/_lib/response.ts`):
+   - Added `Cache-Control: public, s-maxage=...` headers for successful responses so Vercel can serve cache hits without re-running functions.
+   - Extended `jsonSuccess()` to accept optional `ResponseInit` so handlers can set cache headers consistently.
+
+4. **Reduced notification refresh churn + avoided redirect flapping** (`lib/store/notificationsStore.ts`):
+   - Increased notification staleness window to 3 minutes.
+   - Only redirects to `/login` on 401 when the client can confirm there is no active session.
+
+#### Tests
+
+- Updated hook expectations for weather fetch options (`tests/layout/useWeather.test.ts`).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (476/476 pass)
+- `npm run build` ✅
+
+---
+
 ### Raouf: Auth Audit — Signup Alignment + MFA Enforcement + Verification Resend — 2026-02-17
 
 **Scope:** Production-grade login/signup UX and related auth endpoints, including MFA enforcement and verification resend.
