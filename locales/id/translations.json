@@ -1656,7 +1656,7 @@
   "verifyingEmail": "Memverifikasi email Anda...",
   "pleaseWaitMoment": "Mohon tunggu sebentar.",
   "emailVerified": "Email Terverifikasi",
-  "emailVerifiedSuccess": "Email Anda telah berhasil diverifikasi. Anda sekarang dapat masuk.",
+  "emailVerifiedSuccess": "Email Anda telah diverifikasi! Anda sekarang dapat masuk.",
   "goToLogin": "Ke Halaman Masuk",
   "verificationFailed": "Verifikasi Gagal",
   "invalidVerificationLink": "Tautan verifikasi tidak valid atau kedaluwarsa. Silakan minta yang baru.",

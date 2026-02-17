@@ -1656,7 +1656,7 @@
   "verifyingEmail": "Verificando su correo electrónico...",
   "pleaseWaitMoment": "Por favor, espere un momento.",
   "emailVerified": "Correo Verificado",
-  "emailVerifiedSuccess": "Su correo electrónico ha sido verificado con éxito. Ahora puede iniciar sesión.",
+  "emailVerifiedSuccess": "Tu correo electrónico ha sido verificado. Ya puedes iniciar sesión.",
   "goToLogin": "Ir al Inicio de Sesión",
   "verificationFailed": "Verificación Fallida",
   "invalidVerificationLink": "Enlace de verificación inválido o caducado. Por favor, solicite uno nuevo.",

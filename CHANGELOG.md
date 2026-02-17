@@ -1,3 +1,28 @@
+### Raouf: Post-Verification Message + Login Photo Overlay — 2026-02-18
+
+**Scope:** Show email verified message on login page after signup verification + tone down login photo overlay to white.
+**Type:** Enhancement
+
+#### Changes
+
+1. **Email verified success banner** (`LoginClient.tsx`, `signup/route.ts`):
+   - After clicking the email verification link, users see "Your email has been verified! You can now sign in." on the login page.
+   - Signup API now passes `redirectTo=/login?verified=1` through the auth callback.
+   - Login page reads the `verified` query param and shows a success alert.
+
+2. **Login photo overlay toned to white** (`LoginClient.tsx`):
+   - Changed right-panel overlay from dark blue (`from-[#0f172a]/88`) to white (`from-white/40`).
+   - Updated text colors from white/alabaster to dark for readability against the lighter overlay.
+
+3. **New translation key** (`locales/*/translations.json`):
+   - Added `emailVerifiedSuccess` to all 19 locales.
+
+#### Verification
+
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Fix Privacy/Terms Navigation + Signup Confirmation — 2026-02-18
 
 **Scope:** Fix back navigation from privacy/terms pages and add email confirmation screen after signup.

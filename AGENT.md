@@ -1,4 +1,10 @@
 Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Post-verification success message on login + Login photo overlay to white
+Summary: Two fixes. (1) After clicking the email verification link, users now see a success banner "Your email has been verified! You can now sign in." on the login page. Changed signup API `emailRedirectTo` to pass `redirectTo=/login?verified=1` through the auth callback, and added a verified banner on the login page that reads the `verified` query param. Added `emailVerifiedSuccess` translation to all 19 locales. (2) Changed the login page right-panel photo overlay from dark blue (`from-[#0f172a]/88`) to white (`from-white/40`), updated text colors from white/alabaster to dark for readability.
+Files: Modified `app/login/LoginClient.tsx`, `app/api/auth/signup/route.ts`, `locales/*/translations.json`.
+Verification: `npm run typecheck` ✅.
+
+Raouf: 2026-02-18 (Australia/Sydney)
 Scope: Fix Privacy/Terms Back Navigation + Add Signup Email Confirmation Screen
 Summary: Fixed two issues. (1) Privacy Policy and Terms of Service links on login and signup pages opened in new tabs (`target="_blank"`), so the back button on those pages (`router.back()`) had no history to navigate back to. Removed `target="_blank"` from all privacy/terms links on login and signup pages so they open in the same tab. (2) After signup with email verification required, users only saw a brief toast before being redirected to login. Added a dedicated email confirmation screen (step='confirmation') on the signup page showing the email address, instructions to check inbox/spam, and a "Go to Login" button. Added `signupConfirmationSent` and `signupConfirmationHint` translation keys to all 19 locales.
 Files: Modified `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `locales/*/translations.json`.

@@ -1656,7 +1656,7 @@
   "verifyingEmail": "Vérification de votre e-mail...",
   "pleaseWaitMoment": "Veuillez patienter un instant.",
   "emailVerified": "E-mail vérifié",
-  "emailVerifiedSuccess": "Votre e-mail a été vérifié avec succès. Vous pouvez maintenant vous connecter.",
+  "emailVerifiedSuccess": "Votre e-mail a été vérifié ! Vous pouvez maintenant vous connecter.",
   "goToLogin": "Aller à la connexion",
   "verificationFailed": "Échec de la vérification",
   "invalidVerificationLink": "Lien de vérification invalide ou expiré. Veuillez en demander un nouveau.",

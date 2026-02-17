@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${appUrl}/auth/callback`,
+          emailRedirectTo: `${appUrl}/auth/callback?redirectTo=/login%3Fverified%3D1`,
         },
       });
 

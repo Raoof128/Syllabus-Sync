@@ -1656,7 +1656,7 @@
   "verifyingEmail": "Đang xác minh email của bạn...",
   "pleaseWaitMoment": "Vui lòng chờ trong giây lát.",
   "emailVerified": "Email đã được xác minh",
-  "emailVerifiedSuccess": "Email của bạn đã được xác minh thành công. Bây giờ bạn có thể đăng nhập.",
+  "emailVerifiedSuccess": "Email của bạn đã được xác minh! Bây giờ bạn có thể đăng nhập.",
   "goToLogin": "Đi đến Đăng nhập",
   "verificationFailed": "Xác minh thất bại",
   "invalidVerificationLink": "Liên kết xác minh không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.",

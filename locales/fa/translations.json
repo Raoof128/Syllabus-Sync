@@ -1656,7 +1656,7 @@
   "verifyingEmail": "در حال تایید ایمیل شما...",
   "pleaseWaitMoment": "لطفاً لحظه‌ای صبر کنید.",
   "emailVerified": "ایمیل تایید شد",
-  "emailVerifiedSuccess": "ایمیل شما با موفقیت تایید شد. اکنون می‌توانید وارد شوید.",
+  "emailVerifiedSuccess": "ایمیل شما تأیید شد! اکنون می‌توانید وارد شوید.",
   "goToLogin": "رفتن به صفحه ورود",
   "verificationFailed": "تایید ناموفق بود",
   "invalidVerificationLink": "لینک تایید نامعتبر یا منقضی شده است. لطفاً لینک جدیدی درخواست کنید.",

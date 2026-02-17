@@ -1656,7 +1656,7 @@
   "verifyingEmail": "メールアドレスを認証中...",
   "pleaseWaitMoment": "少々お待ちください。",
   "emailVerified": "メール認証完了",
-  "emailVerifiedSuccess": "メールアドレスの認証が完了しました。ログインできるようになりました。",
+  "emailVerifiedSuccess": "メールアドレスが確認されました！ログインできます。",
   "goToLogin": "ログインへ",
   "verificationFailed": "認証失敗",
   "invalidVerificationLink": "確認リンクが無効であるか、期限が切れています。新しいリンクをリクエストしてください。",

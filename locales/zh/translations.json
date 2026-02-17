@@ -1656,7 +1656,7 @@
   "verifyingEmail": "正在验证您的电子邮件...",
   "pleaseWaitMoment": "请稍候。",
   "emailVerified": "电子邮件已验证",
-  "emailVerifiedSuccess": "您的电子邮件已成功验证。您现在可以登录。",
+  "emailVerifiedSuccess": "您的邮箱已验证！现在可以登录了。",
   "goToLogin": "去登录",
   "verificationFailed": "验证失败",
   "invalidVerificationLink": "验证链接无效或已过期。请重新请求。",

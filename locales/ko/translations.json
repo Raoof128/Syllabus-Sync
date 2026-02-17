@@ -1656,7 +1656,7 @@
   "verifyingEmail": "이메일 인증 중...",
   "pleaseWaitMoment": "잠시만 기다려 주세요.",
   "emailVerified": "이메일 인증됨",
-  "emailVerifiedSuccess": "이메일 인증이 성공적으로 완료되었습니다. 이제 로그인할 수 있습니다.",
+  "emailVerifiedSuccess": "이메일이 인증되었습니다! 이제 로그인할 수 있습니다.",
   "goToLogin": "로그인으로 이동",
   "verificationFailed": "인증 실패",
   "invalidVerificationLink": "유효하지 않거나 만료된 인증 링크입니다. 새 링크를 요청해 주세요.",

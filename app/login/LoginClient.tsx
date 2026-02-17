@@ -384,6 +384,13 @@ export default function LoginClient() {
             </Alert>
           )}
 
+          {searchParams.get('verified') === '1' && !generalError && !isSuccess && (
+            <Alert variant="success" className="mb-3">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertDescription>{t('emailVerifiedSuccess')}</AlertDescription>
+            </Alert>
+          )}
+
           {isSuccess && !generalError && (
             <Alert variant="success" className="mb-3">
               <ShieldCheck className="h-4 w-4" />
@@ -641,7 +648,7 @@ export default function LoginClient() {
         </div>
 
         {/* Right Panel */}
-        <div className="hidden md:block relative md:min-h-[320px] lg:min-h-0 flex-1 lg:w-7/12 bg-black/55">
+        <div className="hidden md:block relative md:min-h-[320px] lg:min-h-0 flex-1 lg:w-7/12">
           <Image
             src="/images/login-bg.png"
             alt={t('mqSignpostAlt')}
@@ -651,16 +658,16 @@ export default function LoginClient() {
             quality={60}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/88 via-[#0a2f3c]/82 to-[#0f172a]/90" />
-          <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-12 flex flex-col justify-between text-white">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/30 to-white/45" />
+          <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-12 flex flex-col justify-between">
             <div className="space-y-3 sm:space-y-4 max-w-2xl">
-              <p className="uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs text-[color:var(--alabaster)]">
+              <p className="uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs text-mq-primary font-semibold">
                 {t('campusNavigation')}
               </p>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-[color:var(--alabaster)]">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-[#18181b]">
                 {t('loginHeroTitle')}
               </h2>
-              <p className="text-sm sm:text-base max-w-xl text-[color:var(--alabaster)]">
+              <p className="text-sm sm:text-base max-w-xl text-[#3f3f46]">
                 {t('loginHeroDescription')}
               </p>
             </div>

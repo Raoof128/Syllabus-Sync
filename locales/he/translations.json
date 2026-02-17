@@ -1656,7 +1656,7 @@
   "verifyingEmail": "מאמת את האימייל שלך...",
   "pleaseWaitMoment": "אנא המתן רגע.",
   "emailVerified": "האימייל אומת",
-  "emailVerifiedSuccess": "האימייל שלך אומת בהצלחה. כעת תוכל להתחבר.",
+  "emailVerifiedSuccess": "האימייל שלך אומת! כעת תוכלו להתחבר.",
   "goToLogin": "עבור להתחברות",
   "verificationFailed": "האימות נכשל",
   "invalidVerificationLink": "קישור אימות לא חוקי או פג תוקף. אנא בקש קישור חדש.",
