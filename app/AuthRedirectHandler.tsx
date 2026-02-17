@@ -86,6 +86,17 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       if (typeof window === 'undefined') return;
 
       const hash = window.location.hash;
+      const search = window.location.search;
+
+      // Check both hash and search params for type=recovery
+      // Supabase may send it in either location depending on the flow
+      const hashParams = new URLSearchParams(hash.substring(1));
+      const searchParamsObj = new URLSearchParams(search);
+
+      const typeFromHash = hashParams.get('type');
+      const typeFromSearch = searchParamsObj.get('type');
+      const type = typeFromHash || typeFromSearch;
+
       const hasAuthParams = hash && (
         hash.includes('access_token') ||
         hash.includes('error') ||
@@ -93,18 +104,32 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
         hash.includes('type=signup')
       );
 
-      // If no auth params in hash, redirect to fallback immediately
-      if (!hasAuthParams) {
+      // Also check URL search params for type=recovery (Supabase sometimes uses this)
+      const hasRecoveryInSearch = search.includes('type=recovery');
+
+      // If no auth params anywhere, redirect to fallback immediately
+      if (!hasAuthParams && !hasRecoveryInSearch) {
         router.replace(fallbackRedirect);
+        return;
+      }
+
+      // If type=recovery is present anywhere, redirect to reset-password immediately
+      // Don't wait for Supabase to process - let the reset-password page handle it
+      if (type === 'recovery') {
+        console.log('Recovery type detected, redirecting to reset-password');
+        setHandled(true);
+        setStatus('redirecting');
+        // Pass along any tokens in the hash
+        const resetUrl = hash ? `/reset-password${hash}` : '/reset-password';
+        router.replace(resetUrl);
         return;
       }
 
       setStatus('processing');
 
-      // Parse hash to check for errors
-      const params = new URLSearchParams(hash.substring(1));
-      const error = params.get('error');
-      const errorDescription = params.get('error_description');
+      // Check for errors in hash
+      const error = hashParams.get('error');
+      const errorDescription = hashParams.get('error_description');
 
       // Handle errors
       if (error) {
@@ -120,7 +145,6 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       if (!handled) {
         // Check session manually
         const { data: { session } } = await supabase.auth.getSession();
-        const type = params.get('type');
 
         if (session) {
           setHandled(true);
