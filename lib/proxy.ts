@@ -85,8 +85,10 @@ export async function proxy(request: NextRequest) {
 
   setSecurityHeaders(response.headers);
 
-  // Set CSRF cookie for all requests if not already present
-  if (!request.cookies.get('__Host-csrf')?.value) {
+  // Set CSRF cookie for page navigations (not API).
+  // Avoid setting cookies on public/cacheable API responses to preserve CDN caching
+  // and reduce Vercel function invocations.
+  if (!isApiRoute && !request.cookies.get('__Host-csrf')?.value) {
     setCSRFCookie(response);
   }
 

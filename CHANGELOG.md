@@ -1,3 +1,23 @@
+### Raouf: CDN Cache Preservation — Skip CSRF Cookie On API Routes — 2026-02-17
+
+**Scope:** Improve cacheability of public API responses to reduce Vercel Function invocations.
+**Type:** Fix / Performance
+
+#### Changes
+
+1. **Do not set CSRF cookie on `/api/*`** (`lib/proxy.ts`):
+   - Middleware no longer adds `Set-Cookie` for CSRF on API requests.
+   - Preserves CDN caching for public GET APIs like `/api/weather` and `/api/health`.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅
+- `npm run build` ✅
+
+---
+
 ### Raouf: Vercel Invocation Reduction — Remove Auth Polling + Cache Public GET APIs — 2026-02-17
 
 **Scope:** Reduce Vercel Function invocations by serving more from cache and making fewer runtime API calls.

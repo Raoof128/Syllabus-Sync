@@ -1,4 +1,10 @@
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: CDN Cache Preservation — Skip CSRF Cookie On API Routes
+Summary: Prevented middleware from setting the CSRF cookie on `/api/*` requests. This removes `Set-Cookie` from public GET API responses (e.g. `/api/weather`, `/api/health`) which improves CDN cacheability, increases cache hit rates across clients, and further reduces Vercel Function invocations under traffic. CSRF cookie is still set for page navigations where it is useful.
+Files: Modified `lib/proxy.ts`, `AGENT.md`, `CHANGELOG.md`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, `npm run build` ✅.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: Vercel Invocation Reduction — Remove Auth Polling + Enable CDN Caching For Public GET APIs
 Summary: Reduced Vercel Serverless Function invocations by eliminating repeated `/api/auth/user` calls from the client UI (multiple focus listeners + redundant checks) and moving UI auth state to Supabase browser session reads (`auth.getSession`) instead. Removed the weather widget cache-busting query param and enabled edge/CDN caching headers for public `GET` APIs (`/api/weather`, `/api/health`) so subsequent requests can be served from cache without re-running functions. Also reduced notification refresh frequency (3-minute staleness window) and prevented 401-driven redirect flapping by only redirecting to `/login` when the client can confirm there is no session.
 Files: Added `lib/supabase/browserSession.ts`. Modified `app/client-layout.tsx`, `components/layout/Header.tsx`, `features/home/hooks/useHomeUser.ts`, `lib/store/deadlinesStore.ts`, `lib/store/todosStore.ts`, `lib/store/notificationsStore.ts`, `components/layout/weather/useWeather.ts`, `app/api/_lib/response.ts`, `app/api/weather/route.ts`, `app/api/health/route.ts`, `tests/layout/useWeather.test.ts`, `CHANGELOG.md`.
