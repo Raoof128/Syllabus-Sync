@@ -58,6 +58,17 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       return;
     }
 
+    // PKCE flow: Supabase may redirect here with ?code= if the redirect URL
+    // was stripped to root. Forward to /auth/callback for server-side code exchange.
+    const codeParam = searchParams.get('code');
+    if (codeParam) {
+      console.log('AuthRedirectHandler: PKCE code detected, forwarding to /auth/callback');
+      handledRef.current = true;
+      setStatus('redirecting');
+      window.location.href = `/auth/callback${search}`;
+      return;
+    }
+
     // If type=recovery, redirect to /reset-password with the hash
     if (type === 'recovery') {
       console.log('AuthRedirectHandler: Recovery detected, redirecting to /reset-password');

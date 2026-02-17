@@ -58,10 +58,11 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    // Redirect directly to /reset-password - Supabase will add tokens in hash fragment
-    // The reset-password page listens for PASSWORD_RECOVERY event
+    // Redirect to /auth/callback with type=recovery so the server-side callback
+    // can exchange the PKCE code and redirect to /reset-password.
+    // NOTE: This URL must be in Supabase Dashboard → Authentication → URL Configuration → Redirect URLs.
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/reset-password`,
+      redirectTo: `${appUrl}/auth/callback?type=recovery`,
     });
 
     if (error) {

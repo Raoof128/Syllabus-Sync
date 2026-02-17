@@ -33,8 +33,9 @@ export default function ResetPasswordClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Check for Supabase auth params (code, error, error_description)
+  // Check for Supabase auth params (code, error, error_description, recovery)
   const code = searchParams.get('code');
+  const recovery = searchParams.get('recovery'); // Set by /auth/callback after server-side code exchange
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
@@ -71,9 +72,12 @@ export default function ResetPasswordClient() {
       } else if (code) {
         // We have a code from the callback, go to loading
         setMode('loading');
+      } else if (recovery) {
+        // Code was already exchanged server-side by /auth/callback, check session
+        setMode('loading');
       }
     }
-  }, [code, hashChecked]);
+  }, [code, recovery, hashChecked]);
 
   // Handle Supabase auth - check for existing session or exchange code
   useEffect(() => {

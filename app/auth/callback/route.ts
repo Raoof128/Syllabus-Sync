@@ -41,36 +41,46 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=missing_code', requestUrl.origin));
   }
 
-  // For password recovery, redirect to reset-password page with the code
-  // The reset-password page will handle the code exchange and show the new password form
-  if (type === 'recovery') {
-    const resetUrl = new URL('/reset-password', requestUrl.origin);
-    resetUrl.searchParams.set('code', code);
-    return NextResponse.redirect(resetUrl);
-  }
-
+   // Always exchange the code for a session first (PKCE handshake).
+  // This sets the session cookie so downstream pages have auth context.
   const supabase = await createServerClient();
-
-  // The handshake: Exchange temporary code for permanent session
-  // This validates the code with Supabase and sets the session cookie
-  const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
   if (exchangeError) {
-    // Log error but redirect to login - user can try again
     console.error('Auth callback code exchange error:', exchangeError.message);
+    // For recovery, redirect back to reset-password with error
+    if (type === 'recovery') {
+      const resetUrl = new URL('/reset-password', requestUrl.origin);
+      resetUrl.searchParams.set('error', 'verification_failed');
+      resetUrl.searchParams.set('error_description', 'Invalid or expired reset link. Please request a new one.');
+      return NextResponse.redirect(resetUrl);
+    }
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'verification_failed');
     return NextResponse.redirect(loginUrl);
   }
 
-  // Check if this was a password recovery flow by examining the session
-  // Supabase sets a special recovery flag in the session when it's a password recovery
-  // A more reliable check: if redirectTo was /reset-password, honor it
-  if (rawRedirect === '/reset-password' || redirectTo === '/reset-password') {
-    return NextResponse.redirect(new URL('/reset-password', requestUrl.origin));
+  // Detect password recovery flow:
+  // 1. Explicit type=recovery param (set by our resetPasswordForEmail redirectTo)
+  if (type === 'recovery') {
+    return NextResponse.redirect(new URL('/reset-password?recovery=1', requestUrl.origin));
   }
 
-  // Redirect to the validated target after successful verification/OAuth.
+  // 2. Fallback: check if recovery was recently requested (handles case where
+  //    Supabase stripped our query params from redirect_to)
+  if (data?.user?.recovery_sent_at) {
+    const recoveryTime = new Date(data.user.recovery_sent_at).getTime();
+    if (Date.now() - recoveryTime < 10 * 60 * 1000) {
+      return NextResponse.redirect(new URL('/reset-password?recovery=1', requestUrl.origin));
+    }
+  }
+
+  // 3. Honor explicit redirectTo pointing to reset-password
+  if (rawRedirect === '/reset-password' || redirectTo === '/reset-password') {
+    return NextResponse.redirect(new URL('/reset-password?recovery=1', requestUrl.origin));
+  }
+
+  // Normal flow: redirect to the validated target.
   // The session cookie is now set and the proxy will recognize the user.
   return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
 }

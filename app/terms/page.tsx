@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
 export default function TermsPage() {
+  const router = useRouter();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -12,12 +14,12 @@ export default function TermsPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">
-            <Link
-              href="/home"
+            <button
+              onClick={() => router.back()}
               className="text-sm text-mq-primary hover:underline inline-flex items-center gap-1"
             >
               &larr; Back to {APP_CONFIG.name}
-            </Link>
+            </button>
             <h1 className="text-3xl font-bold text-mq-content">Terms of Service</h1>
             <p className="text-sm text-mq-content-secondary">Last updated: February 2026</p>
           </div>

@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function PrivacyPolicyPage() {
   const { t } = useTypedTranslation();
+  const router = useRouter();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -14,12 +16,12 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">
-            <Link
-              href="/home"
+            <button
+              onClick={() => router.back()}
               className="text-sm text-mq-primary hover:underline inline-flex items-center gap-1"
             >
               &larr; {t('privacy_back_to', { appName: APP_CONFIG.name })}
-            </Link>
+            </button>
             <h1 className="text-3xl font-bold text-mq-content">{t('privacy_title')}</h1>
             <p className="text-sm text-mq-content-secondary">{t('privacy_last_updated')}</p>
           </div>
