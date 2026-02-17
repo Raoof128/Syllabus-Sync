@@ -270,7 +270,7 @@ export default function ResetPasswordClient() {
                 )}
               </div>
 
-              <Button className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+              <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <span className="inline-flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -339,7 +339,7 @@ export default function ResetPasswordClient() {
                 )}
               </div>
 
-              <Button className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+              <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <span className="inline-flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
