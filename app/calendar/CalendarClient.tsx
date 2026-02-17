@@ -1196,7 +1196,7 @@ export default function CalendarClient() {
         event={selectedEvent}
         open={eventDetailOpen}
         onOpenChange={setEventDetailOpen}
-        onEdit={(event) => {
+        onEdit={selectedEvent?.sourcePublicEventId ? undefined : (event) => {
           setEventDetailOpen(false);
           openEditEvent(event);
         }}

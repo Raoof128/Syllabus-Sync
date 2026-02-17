@@ -47,7 +47,11 @@ export async function GET(request: Request) {
   const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
   if (exchangeError) {
-    console.error('Auth callback code exchange error:', exchangeError.message);
+    console.error('Auth callback code exchange error:', {
+      message: exchangeError.message,
+      status: (exchangeError as Record<string, unknown>).status,
+      code: (exchangeError as Record<string, unknown>).code,
+    });
     // For recovery, redirect back to reset-password with error
     if (type === 'recovery') {
       const resetUrl = new URL('/reset-password', requestUrl.origin);
@@ -57,6 +61,9 @@ export async function GET(request: Request) {
     }
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'verification_failed');
+    if (isValidRedirect(rawRedirect)) {
+      loginUrl.searchParams.set('redirectTo', rawRedirect!);
+    }
     return NextResponse.redirect(loginUrl);
   }
 

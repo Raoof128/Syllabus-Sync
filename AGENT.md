@@ -1,4 +1,29 @@
 Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Fix Google OAuth Flow — Supabase Redirect URL Allowlist + Error Feedback
+Summary: Root-caused and fixed the Google OAuth flow bug. The Supabase `uri_allow_list` only contained `syllabus-sync-perkycoders.vercel.app` URLs but the canonical Vercel production URL is `syllabus-sync-ashy.vercel.app`. When users accessed from the canonical URL, the OAuth callback was rejected by Supabase (URL not in allowlist), the `code_verifier` PKCE cookie was lost across domains, and `exchangeCodeForSession` failed silently. Fixes: (1) Updated Supabase `site_url` to `https://syllabus-sync-ashy.vercel.app` and added both Vercel domain patterns to `uri_allow_list` via Management API. (2) Updated Vercel `NEXT_PUBLIC_APP_URL` from `syllabus-sync-perkycoders` to `syllabus-sync-ashy`. (3) Added OAuth error feedback on the login page — `callbackError` query param is now read and displayed with translated messages for `oauth_failed` and `verification_failed` states. (4) Improved callback route error logging with status/code details and `redirectTo` preservation on error redirects. (5) Added `oauthSignInFailed` and `oauthSessionExpired` translation keys across all 19 locales. (6) Updated OAuth setup docs to reflect Google-only config.
+Files: Modified `app/login/LoginClient.tsx`, `app/auth/callback/route.ts`, `locales/*/translations.json`, `docs/operations/supabase-oauth-setup.md`. Supabase Management API: updated `site_url` and `uri_allow_list`. Vercel env: updated `NEXT_PUBLIC_APP_URL`.
+Verification: `npm run typecheck` ✅, `npm run check:i18n` ✅ (pre-existing validation.* gaps only).
+Follow-ups: When custom domain `syllabus-sync.app` DNS is configured, add it to Supabase `uri_allow_list` and update `NEXT_PUBLIC_APP_URL`.
+
+Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Simplify OAuth to Google-only
+Summary: Removed Apple OAuth, simplified to Google-only on both login and signup pages. Changed OAuth state from provider union type to simple boolean (`oauthLoading`). Renamed `handleOAuthLogin` to `handleGoogleLogin`. Changed from 2-column grid layout to single full-width Google button. Removed `loginWithApple` translation key from all 19 locales.
+Files: Modified `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `locales/*/translations.json`.
+Verification: `npm run typecheck` ✅.
+
+Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Replace Facebook OAuth with Apple OAuth
+Summary: Removed Facebook OAuth login and replaced it with Apple (Sign in with Apple) on both login and signup pages. Updated the OAuth provider type from `'google' | 'facebook'` to `'google' | 'apple'` in both `LoginClient.tsx` and `SignupClient.tsx`. Replaced the Facebook SVG icon with the Apple logo SVG. Renamed the translation key `loginWithFacebook` to `loginWithApple` across all 19 locales. The Supabase Apple provider must be enabled in the Supabase Dashboard with proper credentials (Services ID, Team ID, Key ID, Private Key).
+Files: Modified `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `locales/*/translations.json`.
+Verification: `npm run typecheck` ✅.
+
+Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Disable edit for public feed events on calendar
+Summary: Events added from the Events feed tab (with `sourcePublicEventId`) are now non-editable on the calendar. The EventDetailPanel no longer shows the pencil/edit icon for these events. User-created events remain fully editable. The EventsWidget sidebar already had this logic; this change extends it to the detail modal opened from DayView, AgendaView, and WeekView.
+Files: Modified `app/calendar/CalendarClient.tsx`.
+Verification: `npm run typecheck` ✅.
+
+Raouf: 2026-02-18 (Australia/Sydney)
 Scope: Post-verification success message on login + Login photo overlay to white
 Summary: Two fixes. (1) After clicking the email verification link, users now see a success banner "Your email has been verified! You can now sign in." on the login page. Changed signup API `emailRedirectTo` to pass `redirectTo=/login?verified=1` through the auth callback, and added a verified banner on the login page that reads the `verified` query param. Added `emailVerifiedSuccess` translation to all 19 locales. (2) Changed the login page right-panel photo overlay from dark blue (`from-[#0f172a]/88`) to white (`from-white/40`), updated text colors from white/alabaster to dark for readability.
 Files: Modified `app/login/LoginClient.tsx`, `app/api/auth/signup/route.ts`, `locales/*/translations.json`.

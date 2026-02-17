@@ -36,14 +36,14 @@ export default function SignupClient() {
 
   const [step, setStep] = useState<'auth' | 'profile' | 'confirmation'>('auth');
   const [serverError, setServerError] = useState<string | null>(null);
-  const [oauthLoadingProvider, setOauthLoadingProvider] = useState<'google' | 'facebook' | null>(null);
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [signupEmail, setSignupEmail] = useState<string>('');
 
   // Focus management
   const fullNameRef = useRef<HTMLInputElement>(null);
 
   // OAuth login handler
-  const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
+  const handleGoogleLogin = async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(
         t('loginErrorFailed'),
@@ -55,7 +55,7 @@ export default function SignupClient() {
     if (typeof window === 'undefined') return;
 
     setServerError(null);
-    setOauthLoadingProvider(provider);
+    setOauthLoading(true);
 
     try {
       const supabase = createBrowserClient();
@@ -65,7 +65,7 @@ export default function SignupClient() {
       callbackUrl.searchParams.set('redirectTo', '/home');
 
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
         },
@@ -73,11 +73,11 @@ export default function SignupClient() {
 
       if (error) {
         toastUtils.error(t('loginErrorFailed'), error.message);
-        setOauthLoadingProvider(null);
+        setOauthLoading(false);
       }
     } catch {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
-      setOauthLoadingProvider(null);
+      setOauthLoading(false);
     }
   };
 
@@ -403,7 +403,7 @@ export default function SignupClient() {
                 type="button"
                 onClick={handleNextStep}
                 className="w-full"
-                disabled={isSubmitting || oauthLoadingProvider !== null}
+                disabled={isSubmitting || oauthLoading}
               >
                 {t('next')}
               </Button>
@@ -420,66 +420,42 @@ export default function SignupClient() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 w-full flex items-center justify-center gap-2"
-                  onClick={() => handleOAuthLogin('google')}
-                  disabled={isSubmitting || oauthLoadingProvider !== null}
-                >
-                  {oauthLoadingProvider === 'google' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <svg
-                      className="h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 533.5 544.3"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fill="#4285F4"
-                        d="M533.5 278.4c0-17.4-1.5-34.1-4.3-50.4H272.1v95.4h146.9c-6.3 34-25 62.8-53.4 82.1v68.2h86.5c50.7-46.7 81.4-115.5 81.4-195.3z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M272.1 544.3c72.4 0 133.1-23.9 177.5-64.9l-86.5-68.2c-24.1 16.2-55 25.7-90.9 25.7-69.9 0-129.3-47.2-150.5-110.7H34.1v69.6c44.5 88.3 136.1 148.5 238 148.5z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M121.6 325.9c-10-29.6-10-61.5 0-91.1v-69.6H34.1c-44.5 88.3-44.5 192.1 0 280.4l87.5-69.7z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M272.1 107.7c37.1-.6 72.6 12.8 99.8 37.8l74.5-74.5C405.1 24 345.4 0 272.1 0 170.2 0 78.6 60.2 34.1 148.5l87.5 69.7c21.1-63.5 80.6-110.7 150.5-110.7z"
-                      />
-                    </svg>
-                  )}
-                  <span className="text-sm font-medium">Google</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 w-full flex items-center justify-center gap-2"
-                  onClick={() => handleOAuthLogin('facebook')}
-                  disabled={isSubmitting || oauthLoadingProvider !== null}
-                >
-                  {oauthLoadingProvider === 'facebook' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <svg
-                      className="h-4 w-4 text-[#1877F2]"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.333v21.334C0 23.403.597 24 1.325 24h11.495v-9.294H9.847v-3.622h2.973V8.413c0-2.937 1.793-4.54 4.413-4.54 1.255 0 2.332.093 2.646.135v3.07l-1.818.001c-1.428 0-1.704.678-1.704 1.674v2.195h3.406l-.444 3.622h-2.962V24h5.805C23.403 24 24 23.403 24 22.667V1.333C24 .597 23.403 0 22.675 0z" />
-                    </svg>
-                  )}
-                  <span className="text-sm font-medium">Facebook</span>
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full flex items-center justify-center gap-2"
+                onClick={handleGoogleLogin}
+                disabled={isSubmitting || oauthLoading}
+              >
+                {oauthLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <svg
+                    className="h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 533.5 544.3"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill="#4285F4"
+                      d="M533.5 278.4c0-17.4-1.5-34.1-4.3-50.4H272.1v95.4h146.9c-6.3 34-25 62.8-53.4 82.1v68.2h86.5c50.7-46.7 81.4-115.5 81.4-195.3z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M272.1 544.3c72.4 0 133.1-23.9 177.5-64.9l-86.5-68.2c-24.1 16.2-55 25.7-90.9 25.7-69.9 0-129.3-47.2-150.5-110.7H34.1v69.6c44.5 88.3 136.1 148.5 238 148.5z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M121.6 325.9c-10-29.6-10-61.5 0-91.1v-69.6H34.1c-44.5 88.3-44.5 192.1 0 280.4l87.5-69.7z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M272.1 107.7c37.1-.6 72.6 12.8 99.8 37.8l74.5-74.5C405.1 24 345.4 0 272.1 0 170.2 0 78.6 60.2 34.1 148.5l87.5 69.7c21.1-63.5 80.6-110.7 150.5-110.7z"
+                    />
+                  </svg>
+                )}
+                <span className="text-sm font-medium">Google</span>
+              </Button>
             </div>
 
             {/* Step 2: Profile */}
@@ -597,7 +573,7 @@ export default function SignupClient() {
                   type="button"
                   onClick={() => router.push('/login')}
                   className="text-mq-primary hover:underline font-medium"
-                  disabled={isSubmitting || oauthLoadingProvider !== null}
+                  disabled={isSubmitting || oauthLoading}
                 >
                   {t('signIn')}
                 </button>

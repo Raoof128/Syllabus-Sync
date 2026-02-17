@@ -61,9 +61,7 @@ export default function LoginClient() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
-  const [oauthLoadingProvider, setOauthLoadingProvider] = useState<'google' | 'facebook' | null>(
-    null,
-  );
+  const [oauthLoading, setOauthLoading] = useState(false);
 
   // MFA Challenge State
   const [mfaState, setMfaState] = useState<{
@@ -83,10 +81,11 @@ export default function LoginClient() {
   const rawRedirect = searchParams.get('redirectTo');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
   const forceMfa = searchParams.get('mfa') === '1';
+  const callbackError = searchParams.get('error');
 
   // Computed
   const isGlobalLoading =
-    isSubmitting || isPasskeyLoading || isSuccess || oauthLoadingProvider !== null;
+    isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
   const isError = !!generalError || Object.keys(errors).length > 0;
 
   const onSubmit = async (data: LoginFormData) => {
@@ -288,7 +287,7 @@ export default function LoginClient() {
     };
   }, [email]);
 
-  const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
+  const handleGoogleLogin = async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(
         t('loginErrorFailed'),
@@ -300,7 +299,7 @@ export default function LoginClient() {
     if (typeof window === 'undefined') return;
 
     setGeneralError(null);
-    setOauthLoadingProvider(provider);
+    setOauthLoading(true);
 
     try {
       const supabase = createBrowserClient();
@@ -311,7 +310,7 @@ export default function LoginClient() {
       callbackUrl.searchParams.set('redirectTo', redirectTo);
 
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
         },
@@ -319,11 +318,11 @@ export default function LoginClient() {
 
       if (error) {
         toastUtils.error(t('loginErrorFailed'), error.message);
-        setOauthLoadingProvider(null);
+        setOauthLoading(false);
       }
     } catch {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
-      setOauthLoadingProvider(null);
+      setOauthLoading(false);
     }
   };
 
@@ -388,6 +387,19 @@ export default function LoginClient() {
             <Alert variant="success" className="mb-3">
               <ShieldCheck className="h-4 w-4" />
               <AlertDescription>{t('emailVerifiedSuccess')}</AlertDescription>
+            </Alert>
+          )}
+
+          {callbackError && !generalError && !isSuccess && (
+            <Alert variant="error" className="mb-3">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                {callbackError === 'oauth_failed'
+                  ? t('oauthSignInFailed')
+                  : callbackError === 'verification_failed'
+                    ? t('oauthSessionExpired')
+                    : t('loginErrorFailed')}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -572,13 +584,16 @@ export default function LoginClient() {
                 <div className="h-px flex-1 bg-mq-border" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 w-full min-w-0 rounded-full flex items-center justify-center gap-2 px-3 text-xs sm:text-sm font-bold"
-                  onClick={() => handleOAuthLogin('google')}
-                >
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 w-full min-w-0 rounded-full flex items-center justify-center gap-2 px-3 text-xs sm:text-sm font-bold"
+                onClick={handleGoogleLogin}
+                disabled={oauthLoading}
+              >
+                {oauthLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
                   <svg
                     className="h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
@@ -602,26 +617,9 @@ export default function LoginClient() {
                       d="M272.1 107.7c37.1-.6 72.6 12.8 99.8 37.8l74.5-74.5C405.1 24 345.4 0 272.1 0 170.2 0 78.6 60.2 34.1 148.5l87.5 69.7c21.1-63.5 80.6-110.7 150.5-110.7z"
                     />
                   </svg>
-                  {t('loginWithGoogle')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-12 w-full min-w-0 rounded-full flex items-center justify-center gap-2 px-3 text-xs sm:text-sm font-bold"
-                  onClick={() => handleOAuthLogin('facebook')}
-                >
-                  <svg
-                    className="h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M22.675 0h-21.35C.597 0 0 .597 0 1.333v21.334C0 23.403.597 24 1.325 24h11.495v-9.294H9.847v-3.622h2.973V8.413c0-2.937 1.793-4.54 4.413-4.54 1.255 0 2.332.093 2.646.135v3.07l-1.818.001c-1.428 0-1.704.678-1.704 1.674v2.195h3.406l-.444 3.622h-2.962V24h5.805C23.403 24 24 23.403 24 22.667V1.333C24 .597 23.403 0 22.675 0z" />
-                  </svg>
-                  {t('loginWithFacebook')}
-                </Button>
-              </div>
+                )}
+                {t('loginWithGoogle')}
+              </Button>
 
               <div className="pt-4 text-center text-xs text-mq-content font-medium space-y-1">
                 <div>

@@ -1,3 +1,112 @@
+### Raouf: Fix Google OAuth Flow — 2026-02-18
+
+**Scope:** Fix Google OAuth sign-in (redirect URL allowlist + error feedback).
+**Type:** Bugfix
+
+#### Root Cause
+
+The Supabase `uri_allow_list` only contained `syllabus-sync-perkycoders.vercel.app` URLs, but the canonical Vercel production URL is `syllabus-sync-ashy.vercel.app`. When users accessed from the canonical URL:
+
+1. `handleGoogleLogin()` constructed callback URL using `window.location.origin` (`syllabus-sync-ashy.vercel.app`)
+2. Supabase rejected this callback URL (not in allowlist)
+3. The PKCE `code_verifier` cookie was set on `syllabus-sync-ashy.vercel.app` but Supabase redirected to `syllabus-sync-perkycoders.vercel.app`
+4. Cookie lost across domains, `exchangeCodeForSession` failed
+
+#### Changes
+
+1. **Supabase auth config** (Management API):
+   - Updated `site_url` to `https://syllabus-sync-ashy.vercel.app`
+   - Added both Vercel domains to `uri_allow_list` with callback, confirm, and reset-password paths
+
+2. **Vercel env var** (`NEXT_PUBLIC_APP_URL`):
+   - Changed from `syllabus-sync-perkycoders.vercel.app` to `syllabus-sync-ashy.vercel.app`
+
+3. **OAuth error feedback** (`LoginClient.tsx`):
+   - Login page now reads `error` query param from callback redirects
+   - Displays translated error messages for `oauth_failed` and `verification_failed`
+
+4. **Callback error handling** (`app/auth/callback/route.ts`):
+   - Enhanced error logging with status/code details
+   - Preserves `redirectTo` param on `verification_failed` error redirects
+
+5. **Translations** (`locales/*/translations.json`):
+   - Added `oauthSignInFailed` and `oauthSessionExpired` keys across all 19 locales
+
+6. **OAuth setup docs** (`docs/operations/supabase-oauth-setup.md`):
+   - Updated to reflect Google-only config
+   - Documented that every domain serving the app must be in the allowlist
+
+#### Verification
+
+- `npm run typecheck` pass
+- `npm run check:i18n` pass (pre-existing `validation.*` gaps only)
+
+---
+
+### Raouf: Simplify OAuth to Google-only — 2026-02-18
+
+**Scope:** Remove Apple OAuth, keep only Google sign-in.
+**Type:** Enhancement
+
+#### Changes
+
+1. Removed Apple OAuth button from login and signup pages
+2. Simplified OAuth state from provider union to boolean (`oauthLoading`)
+3. Renamed `handleOAuthLogin` to `handleGoogleLogin`
+4. Changed from 2-column grid to single full-width Google button
+5. Removed `loginWithApple` from all 19 locales
+
+---
+
+### Raouf: Replace Facebook OAuth with Apple OAuth — 2026-02-18
+
+**Scope:** Remove Facebook OAuth login, add Apple Sign-In instead.
+**Type:** Enhancement
+
+#### Changes
+
+1. **Replace Facebook with Apple on login page** (`LoginClient.tsx`):
+   - Changed OAuth provider type from `'google' | 'facebook'` to `'google' | 'apple'`.
+   - Replaced Facebook SVG icon with Apple logo SVG.
+   - Button now calls `handleOAuthLogin('apple')` and displays `loginWithApple` translation.
+
+2. **Replace Facebook with Apple on signup page** (`SignupClient.tsx`):
+   - Same provider type and icon changes as login page.
+
+3. **Updated translations** (`locales/*/translations.json`):
+   - Renamed `loginWithFacebook` to `loginWithApple` across all 19 locales.
+
+#### Verification
+
+- `npm run typecheck` ✅
+
+#### Note
+
+Apple OAuth requires enabling the Apple provider in the Supabase Dashboard with:
+- Services ID, Team ID, Key ID, and Private Key from Apple Developer Console.
+- Supabase callback URL added to Apple's redirect URI allowlist.
+
+---
+
+### Raouf: Disable Edit for Public Feed Events on Calendar — 2026-02-18
+
+**Scope:** Events added from the Events feed tab should not be editable on the calendar.
+**Type:** Enhancement
+
+#### Changes
+
+1. **Conditional edit permission in EventDetailPanel** (`CalendarClient.tsx`):
+   - Events with `sourcePublicEventId` (added from the public Events feed) no longer pass `onEdit` to `EventDetailPanel`.
+   - This hides the pencil/edit icon in the detail modal for feed-sourced events.
+   - User-created events (no `sourcePublicEventId`) remain fully editable.
+   - The `EventsWidget` sidebar already had this logic; this change extends it to the detail modal opened from all calendar views (DayView, AgendaView, WeekView).
+
+#### Verification
+
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Post-Verification Message + Login Photo Overlay — 2026-02-18
 
 **Scope:** Show email verified message on login page after signup verification + tone down login photo overlay to white.
