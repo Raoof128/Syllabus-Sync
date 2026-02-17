@@ -1,28 +1,42 @@
-### Raouf: Fix Password Reset — 2026-02-18
+### Raouf: Fix Password Reset — token_hash + verifyOtp — 2026-02-18
 
 **Scope:** Fix production password reset flow — "Invalid or expired reset link" error.
 **Type:** Bugfix
 
+#### Root Cause
+
+Supabase's PKCE flow for `resetPasswordForEmail()` doesn't work reliably in Next.js on Vercel. The `code_verifier` cookie is set server-side during the API call but is not available when the user clicks the email link later (different request context / browser tab). Multiple PKCE-based approaches failed.
+
+#### Solution
+
+Used the [official Supabase recommendation](https://github.com/orgs/supabase/discussions/28655): `token_hash` + `verifyOtp` instead of PKCE `exchangeCodeForSession`.
+
 #### Changes
 
-1. **Redirect directly to /reset-password** (`app/api/auth/password/request-reset/route.ts`):
-   - Changed `redirectTo` from `/auth/callback?type=recovery` to `/reset-password`.
-   - Supabase GoTrue strips query params from `redirect_to` URLs ([gotrue-js#116](https://github.com/supabase/gotrue-js/issues/116)), so `?type=recovery` was lost. The auth callback couldn't detect the recovery flow.
-   - The PKCE flow appends `?code=xxx` to `/reset-password` and the client component handles `exchangeCodeForSession` directly.
+1. **New `/auth/confirm` route handler** (`app/auth/confirm/route.ts`):
+   - Server-side route that receives `token_hash`, `type`, and `next` query params from the email link.
+   - Calls `supabase.auth.verifyOtp({ type, token_hash })` to establish a session without PKCE.
+   - Redirects to `/reset-password?recovery=1` on success.
 
-2. **Vercel env var fix** (`NEXT_PUBLIC_APP_URL`):
+2. **Updated Supabase recovery email template** (Management API):
+   - Changed from `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`.
+   - This constructs the URL directly using `token_hash` instead of relying on PKCE code exchange.
+
+3. **Proxy skip-auth for `/auth/confirm`** (`lib/proxy.ts`):
+   - Added `/auth/confirm` to the list of routes that skip user resolution in middleware.
+
+4. **Dedicated recovery callback** (`app/auth/callback/recovery/route.ts`):
+   - Created as a fallback PKCE handler for the `/auth/callback/recovery` redirect path.
+
+5. **Vercel env var fix** (`NEXT_PUBLIC_APP_URL`):
    - Removed trailing `\n` (newline) from the production environment variable.
 
-3. **Client layout auth redirect fix** (`app/client-layout.tsx`):
+6. **Client layout auth redirect fix** (`app/client-layout.tsx`):
    - Added exception so `/reset-password` is not auto-redirected away by background auth check.
-
-4. **Supabase redirect URL allowlist** (Management API):
-   - Added `/auth/callback?type=recovery` and wildcard patterns as safety net.
 
 #### Verification
 
 - `npm run typecheck` ✅
-- `npm run lint` — pre-existing errors only
 
 ---
 
