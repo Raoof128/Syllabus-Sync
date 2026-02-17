@@ -12,8 +12,8 @@ export const config = {
      * Match all request paths except for the ones starting with:
      * - _next/ (all Next.js internals, including HMR websocket endpoints)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder static assets
      */
-    '/((?!_next/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|woff2?|ttf|eot|ico|json|txt)$).*)',
   ],
 };
