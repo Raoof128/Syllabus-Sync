@@ -58,14 +58,12 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    // Redirect to /auth/callback so the code exchange happens SERVER-SIDE.
+    // Use a DEDICATED recovery callback path so the server knows this is a
+    // password reset without relying on query params (GoTrue strips them).
     // The PKCE code_verifier is stored in a server cookie during this call,
-    // so only the server Route Handler can complete the exchange — the browser
-    // client cannot access it.
-    // NOTE: Do NOT append query params — Supabase GoTrue strips them
-    // (see gotrue-js#116). The callback detects recovery via recovery_sent_at.
+    // so only a server Route Handler can complete the exchange.
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/auth/callback`,
+      redirectTo: `${appUrl}/auth/callback/recovery`,
     });
 
     if (error) {
