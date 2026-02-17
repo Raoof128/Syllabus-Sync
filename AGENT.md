@@ -1,3 +1,9 @@
+Raouf: 2026-02-18 (Australia/Sydney)
+Scope: Fix Password Reset — Broken Redirect Sends Users to Login Instead of Reset Form
+Summary: Fixed production password reset flow where clicking the email link redirected users to the login page instead of showing the "set new password" form. Two root causes: (1) `NEXT_PUBLIC_APP_URL` on Vercel had a trailing `\n` (newline character) which corrupted the Supabase `redirectTo` URL, causing Supabase to fall back to the site URL base path instead of `/reset-password`. Removed and re-set the env var cleanly. (2) The client layout's background auth check detected that the user became authenticated (via the code-for-session exchange) while on an auth route (`/reset-password`) and immediately redirected them to `/home` before they could set a new password. Added an exception so `/reset-password?code=...` is not auto-redirected away.
+Files: Modified `app/client-layout.tsx`. Vercel env var `NEXT_PUBLIC_APP_URL` re-set without trailing newline.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, Vercel redeploy triggered.
+
 Raouf: 2026-02-17 (Australia/Sydney)
 Scope: OAuth Login — Enable Google/Facebook via Supabase + Harden Callback Redirects
 Summary: Enabled real Supabase OAuth sign-in for Google and Facebook on the login page. Implemented a hardened `/auth/callback` handler that exchanges the `code` for a session and redirects to a validated `redirectTo` destination (prevents open redirects), and handles provider error params safely. Added test coverage for callback redirect behavior. Documented Supabase OAuth provider setup (redirect URLs + provider dashboard notes) and linked it from the main README. Resolved lint/type issues uncovered during the audit (React hook dependencies, missing translation hook), and synchronized translations for newly referenced UI strings. Ignored local translation key dump artifacts (`*_keys.txt`) to keep the repo clean.

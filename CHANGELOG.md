@@ -1,3 +1,26 @@
+### Raouf: Fix Password Reset Redirect — 2026-02-18
+
+**Scope:** Fix production password reset flow that redirected users to login instead of the reset form.
+**Type:** Bugfix
+
+#### Changes
+
+1. **Vercel env var fix** (`NEXT_PUBLIC_APP_URL`):
+   - Removed trailing `\n` (newline) from the production environment variable that was corrupting the Supabase `redirectTo` URL.
+   - Re-set the variable cleanly via `vercel env add`.
+
+2. **Client layout auth redirect fix** (`app/client-layout.tsx`):
+   - Added exception for `/reset-password?code=...` so the background auth check does not redirect the user to `/home` after the code-for-session exchange creates a session.
+   - Added `pathname` to the `useCallback` dependency array to satisfy lint rules.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅
+
+---
+
 ### Raouf: OAuth Login — Google/Facebook via Supabase + Callback Hardening — 2026-02-17
 
 **Scope:** Enable production OAuth login providers and secure callback behavior.
