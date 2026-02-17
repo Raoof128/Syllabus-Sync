@@ -1,23 +1,28 @@
-### Raouf: Fix Password Reset Redirect — 2026-02-18
+### Raouf: Fix Password Reset — 2026-02-18
 
-**Scope:** Fix production password reset flow that redirected users to login instead of the reset form.
+**Scope:** Fix production password reset flow — "Invalid or expired reset link" error.
 **Type:** Bugfix
 
 #### Changes
 
-1. **Vercel env var fix** (`NEXT_PUBLIC_APP_URL`):
-   - Removed trailing `\n` (newline) from the production environment variable that was corrupting the Supabase `redirectTo` URL.
-   - Re-set the variable cleanly via `vercel env add`.
+1. **Redirect directly to /reset-password** (`app/api/auth/password/request-reset/route.ts`):
+   - Changed `redirectTo` from `/auth/callback?type=recovery` to `/reset-password`.
+   - Supabase GoTrue strips query params from `redirect_to` URLs ([gotrue-js#116](https://github.com/supabase/gotrue-js/issues/116)), so `?type=recovery` was lost. The auth callback couldn't detect the recovery flow.
+   - The PKCE flow appends `?code=xxx` to `/reset-password` and the client component handles `exchangeCodeForSession` directly.
 
-2. **Client layout auth redirect fix** (`app/client-layout.tsx`):
-   - Added exception for `/reset-password?code=...` so the background auth check does not redirect the user to `/home` after the code-for-session exchange creates a session.
-   - Added `pathname` to the `useCallback` dependency array to satisfy lint rules.
+2. **Vercel env var fix** (`NEXT_PUBLIC_APP_URL`):
+   - Removed trailing `\n` (newline) from the production environment variable.
+
+3. **Client layout auth redirect fix** (`app/client-layout.tsx`):
+   - Added exception so `/reset-password` is not auto-redirected away by background auth check.
+
+4. **Supabase redirect URL allowlist** (Management API):
+   - Added `/auth/callback?type=recovery` and wildcard patterns as safety net.
 
 #### Verification
 
 - `npm run typecheck` ✅
-- `npm run lint` ✅
-- `npm test` ✅
+- `npm run lint` — pre-existing errors only
 
 ---
 

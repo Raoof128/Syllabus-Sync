@@ -58,11 +58,12 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    // Redirect to /auth/callback with type=recovery so the server-side callback
-    // can exchange the PKCE code and redirect to /reset-password.
-    // NOTE: This URL must be in Supabase Dashboard → Authentication → URL Configuration → Redirect URLs.
+    // Redirect directly to /reset-password. Supabase PKCE flow will append ?code=xxx
+    // to this URL. The reset-password client component handles exchangeCodeForSession.
+    // NOTE: Do NOT use query params in redirectTo — Supabase GoTrue strips them.
+    // See: https://github.com/supabase/gotrue-js/issues/116
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/auth/callback?type=recovery`,
+      redirectTo: `${appUrl}/reset-password`,
     });
 
     if (error) {

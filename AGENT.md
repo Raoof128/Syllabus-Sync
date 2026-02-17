@@ -1,8 +1,8 @@
 Raouf: 2026-02-18 (Australia/Sydney)
-Scope: Fix Password Reset — Broken Redirect Sends Users to Login Instead of Reset Form
-Summary: Fixed production password reset flow where clicking the email link redirected users to the login page instead of showing the "set new password" form. Two root causes: (1) `NEXT_PUBLIC_APP_URL` on Vercel had a trailing `\n` (newline character) which corrupted the Supabase `redirectTo` URL, causing Supabase to fall back to the site URL base path instead of `/reset-password`. Removed and re-set the env var cleanly. (2) The client layout's background auth check detected that the user became authenticated (via the code-for-session exchange) while on an auth route (`/reset-password`) and immediately redirected them to `/home` before they could set a new password. Added an exception so `/reset-password?code=...` is not auto-redirected away.
-Files: Modified `app/client-layout.tsx`. Vercel env var `NEXT_PUBLIC_APP_URL` re-set without trailing newline.
-Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅, Vercel redeploy triggered.
+Scope: Fix Password Reset — Redirect Directly to /reset-password (Bypass GoTrue Query Param Stripping)
+Summary: Fixed production password reset flow which showed "Invalid or expired reset link" error. Root cause: `resetPasswordForEmail()` had `redirectTo` set to `/auth/callback?type=recovery`, but Supabase GoTrue strips query parameters from `redirect_to` URLs (see gotrue-js#116). The `type=recovery` param was lost, so the auth callback couldn't identify the recovery flow and the code exchange failed or went to the wrong page. Fix: changed `redirectTo` to point directly to `/reset-password` — the PKCE flow appends `?code=xxx` and the client component handles `exchangeCodeForSession` client-side. Also added recovery callback URLs and wildcard patterns to the Supabase redirect URL allowlist via Management API. Earlier in the same session: fixed `NEXT_PUBLIC_APP_URL` env var (trailing `\n`) on Vercel and added `/reset-password` exception to client-layout auth redirect.
+Files: Modified `app/api/auth/password/request-reset/route.ts`, `app/client-layout.tsx`. Updated Supabase project auth config (uri_allow_list) via Management API. Vercel env var `NEXT_PUBLIC_APP_URL` re-set without trailing newline.
+Verification: `npm run typecheck` ✅, `npm run lint` — pre-existing errors only (not from this change).
 
 Raouf: 2026-02-17 (Australia/Sydney)
 Scope: OAuth Login — Enable Google/Facebook via Supabase + Harden Callback Redirects
