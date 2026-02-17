@@ -3,22 +3,21 @@ import { isValidRedirect } from '@/lib/utils/security';
 import { NextResponse } from 'next/server';
 
 /**
- * Email Verification Callback Handler
+ * Auth Callback Handler
  *
- * This route handles the OAuth/email verification callback from Supabase.
- * When a user clicks the verification link in their email, Supabase redirects
- * them here with a temporary `code` parameter. We exchange this code for a
- * permanent session cookie.
+ * This route handles OAuth/email verification/password recovery callbacks from Supabase.
+ * When a user clicks a link in their email, Supabase redirects them here with
+ * a temporary `code` parameter. We exchange this code for a session.
  *
- * SECURITY: This is the "Key Exchange" - the temporary code is single-use
- * and time-limited. Exchanging it for a session cookie establishes the user's
- * authenticated state securely.
+ * For password recovery, we redirect to /reset-password with the code.
+ * For other flows (signup verification, OAuth), we redirect to the target page.
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
+  const type = requestUrl.searchParams.get('type'); // Supabase sends type=recovery for password reset
   const rawRedirect =
     requestUrl.searchParams.get('redirectTo') ?? requestUrl.searchParams.get('next');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
@@ -40,6 +39,14 @@ export async function GET(request: Request) {
   // If no code is present, there is nothing to exchange. Send the user back to login.
   if (!code) {
     return NextResponse.redirect(new URL('/login?error=missing_code', requestUrl.origin));
+  }
+
+  // For password recovery, redirect to reset-password page with the code
+  // The reset-password page will handle the code exchange and show the new password form
+  if (type === 'recovery') {
+    const resetUrl = new URL('/reset-password', requestUrl.origin);
+    resetUrl.searchParams.set('code', code);
+    return NextResponse.redirect(resetUrl);
   }
 
   const supabase = await createServerClient();

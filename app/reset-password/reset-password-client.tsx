@@ -16,7 +16,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { toastUtils } from '@/lib/utils/toast';
 import { createBrowserClient } from '@/lib/supabase/client';
 
-type Mode = 'request' | 'set' | 'loading';
+type Mode = 'request' | 'set' | 'loading' | 'success';
 
 const requestSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
@@ -39,20 +39,8 @@ export default function ResetPasswordClient() {
   const errorDescription = searchParams.get('error_description');
 
   // Check if we have recovery params (code or hash fragment will be handled)
-  // Also check for hash fragment on client side (used by some Supabase flows)
   const [hasHashFragment, setHasHashFragment] = useState(false);
-
-  useEffect(() => {
-    // Check for hash fragment containing access_token or type=recovery
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash && (hash.includes('access_token') || hash.includes('type=recovery'))) {
-        setHasHashFragment(true);
-      }
-    }
-  }, []);
-
-  const hasRecoveryParams = !!code || hasHashFragment;
+  const [hashChecked, setHashChecked] = useState(false);
 
   const [mode, setMode] = useState<Mode>('request');
   const [generalError, setGeneralError] = useState<string | null>(
@@ -65,23 +53,39 @@ export default function ResetPasswordClient() {
 
   const supabase = createBrowserClient();
 
-  // Set to loading mode when we have recovery params
+  // Check for hash fragment on mount (Supabase sends tokens in hash for password recovery)
   useEffect(() => {
-    if (hasRecoveryParams && mode === 'request' && !authChecked) {
-      setMode('loading');
+    if (typeof window !== 'undefined' && !hashChecked) {
+      setHashChecked(true);
+      const hash = window.location.hash;
+      if (hash) {
+        // Parse hash fragment for access_token and type
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get('access_token');
+        const type = params.get('type');
+
+        if (accessToken && type === 'recovery') {
+          setHasHashFragment(true);
+          setMode('loading');
+        }
+      } else if (code) {
+        // We have a code from the callback, go to loading
+        setMode('loading');
+      }
     }
-  }, [hasRecoveryParams, mode, authChecked]);
+  }, [code, hashChecked]);
 
   // Handle Supabase auth - check for existing session or exchange code
   useEffect(() => {
     const handleAuth = async () => {
+      if (authChecked) return;
       setAuthChecked(true);
 
-      // First check if user already has a session (from hash fragment auto-handling)
+      // First check if user already has a session (from hash fragment auto-handling by Supabase)
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
-        // User is authenticated (session from hash fragment or previous auth)
+        // User is authenticated (Supabase auto-handled the hash fragment)
         setIsAuthenticated(true);
         setMode('set');
         return;
@@ -92,33 +96,50 @@ export default function ResetPasswordClient() {
         try {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
+            console.error('Code exchange error:', error.message);
             setGeneralError('Invalid or expired reset link. Please request a new one.');
             setMode('request');
           } else {
             setIsAuthenticated(true);
             setMode('set');
           }
-        } catch {
+        } catch (err) {
+          console.error('Code exchange exception:', err);
           setGeneralError('Invalid or expired reset link. Please request a new one.');
           setMode('request');
         }
         return;
       }
 
-      // No code and no session, stay in request mode
-      setMode('request');
+      // Check again for session (hash fragment might have been processed)
+      const { data: { session: sessionAfter } } = await supabase.auth.getSession();
+      if (sessionAfter) {
+        setIsAuthenticated(true);
+        setMode('set');
+        return;
+      }
+
+      // No code, no hash fragment, no session - stay in request mode
+      if (!hasHashFragment) {
+        setMode('request');
+      }
     };
 
     if (mode === 'loading') {
-      handleAuth();
+      // Small delay to let Supabase process hash fragment
+      setTimeout(handleAuth, 500);
     }
-  }, [code, mode, supabase.auth]);
+  }, [code, mode, supabase.auth, authChecked, hasHashFragment]);
 
-  // Also listen for auth state changes (handles hash fragment recovery)
+  // Listen for auth state changes (handles hash fragment recovery)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: string, session: unknown) => {
         if (event === 'PASSWORD_RECOVERY' && session) {
+          setIsAuthenticated(true);
+          setMode('set');
+        } else if (event === 'SIGNED_IN' && session && mode === 'loading') {
+          // User signed in via recovery token
           setIsAuthenticated(true);
           setMode('set');
         }
@@ -126,7 +147,7 @@ export default function ResetPasswordClient() {
     );
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, [supabase.auth, mode]);
 
   const requestForm = useForm<RequestForm>({
     resolver: zodResolver(requestSchema),
@@ -181,7 +202,6 @@ export default function ResetPasswordClient() {
 
   const onSet = async (data: SetForm) => {
     setGeneralError(null);
-    setSuccess(false);
 
     if (!isAuthenticated) {
       setGeneralError('Session expired. Please request a new reset link.');
@@ -202,20 +222,50 @@ export default function ResetPasswordClient() {
       // Sign out after password change for security
       await supabase.auth.signOut();
 
-      setSuccess(true);
-      toastUtils.success(t('passwordChangedSuccess'), t('loginSuccess'));
-      setTimeout(() => router.push('/login'), 800);
+      // Show success page
+      setMode('success');
     } catch {
       setGeneralError(t('unexpectedError'));
     }
   };
 
+  // Loading state
   if (mode === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
         <div className="w-full max-w-md text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-mq-primary" />
           <p className="mt-4 text-mq-content-secondary">Verifying reset link...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state - password changed
+  if (mode === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
+        <div className="w-full max-w-md">
+          <div className="rounded-2xl border border-mq-border bg-mq-card-background shadow-sm p-6 sm:p-8 text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle2 className="h-10 w-10 text-green-600" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-xl font-bold text-mq-content">Password Changed!</h1>
+              <p className="text-sm text-mq-content-secondary">
+                Your password has been successfully updated. Please login with your new password.
+              </p>
+            </div>
+            <Button
+              type="button"
+              className="w-full h-12 rounded-xl font-bold"
+              onClick={() => router.push('/login')}
+            >
+              Login
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -346,7 +396,7 @@ export default function ResetPasswordClient() {
                     {t('loading')}
                   </span>
                 ) : (
-                  t('resetPassword')
+                  'Change Password'
                 )}
               </Button>
 
