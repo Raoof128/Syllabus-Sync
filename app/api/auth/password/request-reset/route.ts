@@ -58,8 +58,10 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+    // The redirectTo should be the auth callback with type=recovery
+    // Supabase will append the code parameter to this URL
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/reset-password`,
+      redirectTo: `${appUrl}/auth/callback?type=recovery`,
     });
 
     if (error) {

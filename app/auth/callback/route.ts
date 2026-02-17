@@ -63,6 +63,13 @@ export async function GET(request: Request) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Check if this was a password recovery flow by examining the session
+  // Supabase sets a special recovery flag in the session when it's a password recovery
+  // A more reliable check: if redirectTo was /reset-password, honor it
+  if (rawRedirect === '/reset-password' || redirectTo === '/reset-password') {
+    return NextResponse.redirect(new URL('/reset-password', requestUrl.origin));
+  }
+
   // Redirect to the validated target after successful verification/OAuth.
   // The session cookie is now set and the proxy will recognize the user.
   return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
