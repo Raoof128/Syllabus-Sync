@@ -1,4 +1,10 @@
 Raouf: 2026-02-17 (Australia/Sydney)
+Scope: OAuth Login — Enable Google/Facebook via Supabase + Harden Callback Redirects
+Summary: Enabled real Supabase OAuth sign-in for Google and Facebook on the login page. Implemented a hardened `/auth/callback` handler that exchanges the `code` for a session and redirects to a validated `redirectTo` destination (prevents open redirects), and handles provider error params safely. Added test coverage for callback redirect behavior. Documented Supabase OAuth provider setup (redirect URLs + provider dashboard notes) and linked it from the main README. Resolved lint/type issues uncovered during the audit (React hook dependencies, missing translation hook), and synchronized translations for newly referenced UI strings. Ignored local translation key dump artifacts (`*_keys.txt`) to keep the repo clean.
+Files: Modified `app/login/LoginClient.tsx`, `app/auth/callback/route.ts`, `components/layout/WeatherWidget.tsx`, `features/settings/components/security/SMSSetup.tsx`, `app/reset-password/reset-password-client.tsx`, `app/privacy/page.tsx`, `README.md`, `.gitignore`, `locales/*/translations.json`. Added `tests/api/auth/callback.test.ts`, `docs/operations/supabase-oauth-setup.md`.
+Verification: `npm run format:check` ✅, `npm run typecheck` ✅, `npm run lint` ✅, `npm test` ✅ (483/483 pass), `npm run build` ✅, `npm run check:i18n` ✅.
+
+Raouf: 2026-02-17 (Australia/Sydney)
 Scope: CDN Cache Preservation — Skip CSRF Cookie On API Routes
 Summary: Prevented middleware from setting the CSRF cookie on `/api/*` requests. This removes `Set-Cookie` from public GET API responses (e.g. `/api/weather`, `/api/health`) which improves CDN cacheability, increases cache hit rates across clients, and further reduces Vercel Function invocations under traffic. CSRF cookie is still set for page navigations where it is useful.
 Files: Modified `lib/proxy.ts`, `AGENT.md`, `CHANGELOG.md`.

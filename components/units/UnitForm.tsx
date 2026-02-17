@@ -345,7 +345,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
               />
-              <p className="text-xs text-mq-content-tertiary">Optional</p>
+              <p className="text-xs text-mq-content-tertiary">{t('optional')}</p>
             </div>
           </div>
 

@@ -150,9 +150,9 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <div className="flex items-center gap-3 flex-1">
             <Shield className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
-              <p className="text-mq-sm font-medium text-mq-content">Authenticator App (TOTP)</p>
+              <p className="text-mq-sm font-medium text-mq-content">{t('authenticatorApp')}</p>
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
-                Use an authenticator app like Google Authenticator or Authy
+                {t('authenticatorAppDesc')}
               </p>
             </div>
           </div>
@@ -168,7 +168,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                   handleStartSetup();
                 }
               }}
-              label="Authenticator App (TOTP)"
+              label={t('authenticatorApp')}
               testId="toggle-totp"
             />
             <span className="text-mq-xs text-mq-content-secondary">
@@ -182,7 +182,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-success">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               <span>
-                Active since {new Date(totpFactors[0].createdAt).toLocaleDateString()}
+                {t('activeSince', { date: new Date(totpFactors[0].createdAt).toLocaleDateString() })}
               </span>
             </div>
           </div>
@@ -200,12 +200,10 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              {step === 'qr' ? 'Set Up Authenticator App' : 'Verify Setup'}
+              {step === 'qr' ? t('setUpAuthenticator') : t('verifySetup')}
             </DialogTitle>
             <DialogDescription>
-              {step === 'qr'
-                ? 'Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)'
-                : 'Enter the 6-digit code from your authenticator app to confirm setup.'}
+              {step === 'qr' ? t('scanQrCode') : t('enterTotpCode')}
             </DialogDescription>
           </DialogHeader>
 
@@ -228,7 +226,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               {/* Manual Secret */}
               <div className="space-y-2">
                 <p className="text-xs text-mq-content-secondary text-center">
-                  Can&apos;t scan? Enter this code manually:
+                  {t('cantScanEnterManually')}
                 </p>
                 <div className="flex flex-wrap items-center gap-2 justify-center">
                   <code className="max-w-full break-all text-xs bg-mq-card-background px-3 py-1.5 rounded border border-mq-border font-mono tracking-wider select-all">
@@ -285,16 +283,16 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <Button variant="ghost" onClick={resetSetup} disabled={isLoading}>
               {t('cancel')}
             </Button>
-            {step === 'qr' && <Button onClick={() => setStep('verify')}>Continue</Button>}
+            {step === 'qr' && <Button onClick={() => setStep('verify')}>{t('continue')}</Button>}
             {step === 'verify' && (
               <Button onClick={handleVerify} disabled={isLoading || verifyCode.length !== 6}>
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Verifying...
+                    {t('verifying')}
                   </>
                 ) : (
-                  'Verify & Enable'
+                  t('verifyAndEnable')
                 )}
               </Button>
             )}
@@ -313,15 +311,14 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-mq-success">
               <ShieldCheck className="h-5 w-5" />
-              2FA Enabled!
+              {t('mfaEnabledTitle')}
             </DialogTitle>
             <DialogDescription>
-              Your account is now protected with two-factor authentication. You will need your
-              authenticator app each time you sign in.
+              {t('mfaEnabledDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={resetSetup}>Done</Button>
+            <Button onClick={resetSetup}>{t('done')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -332,19 +329,17 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldOff className="h-5 w-5 text-red-500" />
-              Disable Two-Factor Authentication?
+              {t('disableMfaTitle')}
             </DialogTitle>
             <DialogDescription>
-              This will remove the authenticator app requirement from your account. Your account will
-              be less secure.
+              {t('disableMfaDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-mq-lg border border-red-500/20">
               <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
               <p className="text-mq-sm text-mq-content-secondary">
-                Without 2FA, anyone with your password can access your account. This action requires
-                current session verification.
+                {t('mfaSecurityWarning')}
               </p>
             </div>
           </div>
@@ -363,7 +358,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                   {t('processing')}
                 </>
               ) : (
-                'Disable 2FA'
+                t('disableMfaAction')
               )}
             </Button>
           </DialogFooter>

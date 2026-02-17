@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server';
+import { isValidRedirect } from '@/lib/utils/security';
 import { NextResponse } from 'next/server';
 
 /**
@@ -16,22 +17,46 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+  const error = requestUrl.searchParams.get('error');
+  const errorDescription = requestUrl.searchParams.get('error_description');
+  const rawRedirect =
+    requestUrl.searchParams.get('redirectTo') ?? requestUrl.searchParams.get('next');
+  const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
 
-  if (code) {
-    const supabase = await createServerClient();
-
-    // The handshake: Exchange temporary code for permanent session
-    // This validates the code with Supabase and sets the session cookie
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (error) {
-      // Log error but redirect to login - user can try again
-      console.error('Email verification error:', error.message);
-      return NextResponse.redirect(new URL('/login?error=verification_failed', request.url));
+  // OAuth providers can redirect back with error query params.
+  if (error || errorDescription) {
+    console.error('OAuth callback error:', {
+      error,
+      errorDescription,
+    });
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', 'oauth_failed');
+    if (isValidRedirect(rawRedirect)) {
+      loginUrl.searchParams.set('redirectTo', rawRedirect!);
     }
+    return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect to home (dashboard) after successful verification
-  // The session cookie is now set and middleware will recognize the user
-  return NextResponse.redirect(new URL('/home', request.url));
+  // If no code is present, there is nothing to exchange. Send the user back to login.
+  if (!code) {
+    return NextResponse.redirect(new URL('/login?error=missing_code', requestUrl.origin));
+  }
+
+  const supabase = await createServerClient();
+
+  // The handshake: Exchange temporary code for permanent session
+  // This validates the code with Supabase and sets the session cookie
+  const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (exchangeError) {
+    // Log error but redirect to login - user can try again
+    console.error('Auth callback code exchange error:', exchangeError.message);
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', 'verification_failed');
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Redirect to the validated target after successful verification/OAuth.
+  // The session cookie is now set and the proxy will recognize the user.
+  return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
 }

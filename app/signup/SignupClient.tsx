@@ -134,7 +134,7 @@ export default function SignupClient() {
 
       // Check if we got a session back
       if (result.data?.session) {
-        toastUtils.success(t('accountCreated'), 'You are now signed in!');
+        toastUtils.success(t('accountCreated'), t('signedInNow'));
         router.push('/home');
       } else {
         toastUtils.success(t('accountCreated'), t('verifyEmail'));
@@ -330,9 +330,7 @@ export default function SignupClient() {
 
               {/* APP 5 Collection Notice */}
               <p className="text-xs text-mq-content-secondary leading-relaxed">
-                We collect your name, email, student ID, course, and year to create and manage your
-                account, provide the Service, and maintain security. Our service providers
-                (including cloud hosting) may process data outside Australia.{' '}
+                {t('collectionNotice')}{' '}
                 <a
                   href="/privacy"
                   className="text-mq-primary hover:underline"

@@ -175,6 +175,7 @@ Email (Resend) + Vercel notes:
 - Transactional email (verification) is sent via **Resend** using `RESEND_API_KEY` and `VERIFICATION_EMAIL_FROM`.
 - Vercel Cron endpoints are protected by `CRON_SECRET`.
 - Setup guide: `docs/operations/resend-vercel-setup.md`
+- OAuth setup: `docs/operations/supabase-oauth-setup.md`
 
 If you deploy to Vercel using the CLI, the repo includes pinned scripts:
 
@@ -339,6 +340,7 @@ Our platform maintains a defense-in-depth security architecture:
 ### **Development Resources**
 
 - **[🚀 Deployment Checklist](docs/operations/deployment-checklist.md)** - Production deployment guidelines and validation steps
+- **[🔐 Supabase OAuth Setup](docs/operations/supabase-oauth-setup.md)** - Google/Facebook OAuth configuration and redirect URLs
 - **[🎨 Design Sketches](docs/project/sketch/)** - Project concept and UI sketches
 
 ## 👥 Core Development Team

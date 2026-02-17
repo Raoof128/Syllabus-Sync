@@ -171,7 +171,7 @@ export default function ExamDetailPanel({
                 <GraduationCap className="h-3.5 w-3.5" />
                 {t('type' as TranslationKey)}
               </div>
-              <p className="font-medium text-sm">Exam</p>
+              <p className="font-medium text-sm">{t('exam')}</p>
             </div>
 
             {/* Priority */}

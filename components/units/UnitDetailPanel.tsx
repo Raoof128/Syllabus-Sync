@@ -264,19 +264,19 @@ export default function UnitDetailPanel({
             <div className="text-2xl font-bold" style={{ color: unit.color }}>
               {stats.total}
             </div>
-            <div className="text-xs text-mq-content-secondary">Total</div>
+            <div className="text-xs text-mq-content-secondary">{t('totalLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-            <div className="text-xs text-mq-content-secondary">Completed</div>
+            <div className="text-xs text-mq-content-secondary">{t('completed')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-blue-600">{stats.upcoming}</div>
-            <div className="text-xs text-mq-content-secondary">Upcoming</div>
+            <div className="text-xs text-mq-content-secondary">{t('upcomingLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
-            <div className="text-xs text-mq-content-secondary">Overdue</div>
+            <div className="text-xs text-mq-content-secondary">{t('overdueLabel')}</div>
           </div>
         </div>
 

@@ -16,6 +16,7 @@ import { toastUtils } from '@/lib/utils/toast';
 import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { API_ROUTES } from '@/lib/constants/config';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
@@ -60,6 +61,9 @@ export default function LoginClient() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [oauthLoadingProvider, setOauthLoadingProvider] = useState<'google' | 'facebook' | null>(
+    null,
+  );
 
   // MFA Challenge State
   const [mfaState, setMfaState] = useState<{
@@ -81,7 +85,8 @@ export default function LoginClient() {
   const forceMfa = searchParams.get('mfa') === '1';
 
   // Computed
-  const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess;
+  const isGlobalLoading =
+    isSubmitting || isPasskeyLoading || isSuccess || oauthLoadingProvider !== null;
   const isError = !!generalError || Object.keys(errors).length > 0;
 
   const onSubmit = async (data: LoginFormData) => {
@@ -283,10 +288,43 @@ export default function LoginClient() {
     };
   }, [email]);
 
-  // OAuth Placeholder
-  const handleOAuthLogin = (provider: 'google' | 'facebook') => {
-    const providerName = provider === 'google' ? t('loginWithGoogle') : t('loginWithFacebook');
-    toastUtils.info(t('featureComingSoon'), t('oauthComingSoon', { provider: providerName }));
+  const handleOAuthLogin = async (provider: 'google' | 'facebook') => {
+    if (!isSupabaseConfigured()) {
+      toastUtils.error(
+        t('loginErrorFailed'),
+        'Supabase is not configured. OAuth sign-in is disabled.',
+      );
+      return;
+    }
+
+    if (typeof window === 'undefined') return;
+
+    setGeneralError(null);
+    setOauthLoadingProvider(provider);
+
+    try {
+      const supabase = createBrowserClient();
+
+      // Ensure Supabase returns to our callback route, which performs the secure code exchange
+      // and then redirects the user to the validated `redirectTo` path.
+      const callbackUrl = new URL('/auth/callback', window.location.origin);
+      callbackUrl.searchParams.set('redirectTo', redirectTo);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: callbackUrl.toString(),
+        },
+      });
+
+      if (error) {
+        toastUtils.error(t('loginErrorFailed'), error.message);
+        setOauthLoadingProvider(null);
+      }
+    } catch {
+      toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
+      setOauthLoadingProvider(null);
+    }
   };
 
   return (

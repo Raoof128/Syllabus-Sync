@@ -133,7 +133,7 @@ export default function CalendarHeader({
             onClick={onToggleFilters}
           >
             <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filters</span>
+            <span className="hidden sm:inline">{t('filters')}</span>
           </Button>
         </div>
       </div>

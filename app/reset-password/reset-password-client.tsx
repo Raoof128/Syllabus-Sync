@@ -59,10 +59,10 @@ export default function ResetPasswordClient() {
           confirmPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
         })
         .refine((v) => v.newPassword === v.confirmPassword, {
-          message: 'Passwords do not match',
+          message: t('passwordsDoNotMatch'),
           path: ['confirmPassword'],
         }),
-    [],
+    [t],
   );
 
   const setForm = useForm<SetForm>({
@@ -110,7 +110,7 @@ export default function ResetPasswordClient() {
       const json = await res.json().catch(() => null);
 
       if (!res.ok || !json?.data?.reset) {
-        setGeneralError('Invalid or expired reset link. Please request a new one.');
+        setGeneralError(t('invalidResetLink'));
         return;
       }
 
@@ -263,9 +263,7 @@ export default function ResetPasswordClient() {
         </div>
 
         <p className="text-xs text-mq-content-secondary text-center mt-4">
-          {mode === 'request'
-            ? 'We will never reveal whether an email is registered.'
-            : 'For your security, reset links expire quickly.'}
+          {mode === 'request' ? t('revealEmailNote') : t('resetLinkExpireNote')}
         </p>
       </div>
     </div>

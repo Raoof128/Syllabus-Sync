@@ -57,7 +57,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
 
   const handleEnrollPhone = useCallback(async () => {
     if (!phone || !/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
-      setVerifyError('Enter a valid phone number (e.g., +61412345678)');
+      setVerifyError(t('invalidPhone'));
       return;
     }
 
@@ -72,10 +72,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       const result = await res.json();
 
       if (!res.ok || !result?.data?.factorId || !result?.data?.challengeId) {
-        setVerifyError(
-          result?.error?.message ||
-            'Failed to send SMS. Check your phone number.',
-        );
+        setVerifyError(result?.error?.message || t('failedToSendSms'));
         return;
       }
 
@@ -99,7 +96,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [phone]);
+  }, [phone, t]);
 
   const handleVerify = useCallback(async () => {
     if (!factorId || !challengeId || verifyCode.length !== 6) return;
@@ -120,10 +117,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       }
 
       setStep('success');
-      toastUtils.success(t('security'), 'SMS verification enabled!');
+      toastUtils.success(t('security'), t('smsEnabledTitle'));
       onStatusChange();
     } catch {
-      setVerifyError('Verification failed');
+      setVerifyError(t('verificationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +183,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
 
       setShowDisableDialog(false);
       setDisableFactorId(null);
-      toastUtils.success(t('security'), 'SMS verification disabled.');
+      toastUtils.success(t('security'), `${t('disableSmsAction')} ${t('disabled').toLowerCase()}.`);
       onStatusChange();
     } catch {
       toastUtils.error(t('error'), t('tryAgainLater'));
@@ -215,7 +212,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-mq-content">
-                  SMS Verification (Fallback)
+                  {t('smsVerification')}
                 </h3>
                 {isEnabled ? (
                   <Badge className="bg-mq-success/20 text-mq-success">
@@ -228,7 +225,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 )}
               </div>
               <p className="text-mq-sm text-mq-content-secondary">
-                Receive a verification code via SMS as a backup method.
+                {t('smsVerificationDesc')}
               </p>
             </div>
           </div>
@@ -260,7 +257,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
               <CheckCircle className="h-4 w-4 text-mq-success" />
               <span>
-                Phone ending in {phoneFactors[0].phone?.slice(-4) ?? '****'}
+                {t('phoneEndingIn', { last4: phoneFactors[0].phone?.slice(-4) ?? '****' })}
               </span>
             </div>
           </div>
@@ -279,13 +276,13 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             <DialogTitle className="flex items-center gap-2">
               <Smartphone className="h-5 w-5" />
               {step === 'phone'
-                ? 'Set Up SMS Verification'
-                : 'Enter Verification Code'}
+                ? t('setUpSms')
+                : t('enterSmsCode')}
             </DialogTitle>
             <DialogDescription>
               {step === 'phone'
-                ? 'Enter your phone number to receive verification codes via SMS.'
-                : 'Enter the 6-digit code sent to your phone.'}
+                ? t('enterPhoneDesc')
+                : t('enterSmsCodeDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -311,8 +308,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
               <div className="flex items-start gap-2 p-3 bg-mq-info/10 rounded-lg">
                 <Info className="h-4 w-4 text-mq-info flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-mq-content-secondary">
-                  Standard SMS rates may apply. Use E.164 format with country
-                  code (e.g., +61 for Australia).
+                  {t('smsRatesNotice')}
                 </p>
               </div>
             </div>
@@ -351,8 +347,8 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                   className="text-xs"
                 >
                   {resendCooldown > 0
-                    ? `Resend in ${resendCooldown}s`
-                    : 'Resend Code'}
+                    ? t('resendIn', { seconds: resendCooldown })
+                    : t('resendCode')}
                 </Button>
               </div>
             </div>
@@ -374,10 +370,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Sending...
+                    {t('sending')}
                   </>
                 ) : (
-                  'Send Code'
+                  t('resendCode')
                 )}
               </Button>
             )}
@@ -389,10 +385,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Verifying...
+                    {t('verifying')}
                   </>
                 ) : (
-                  'Verify & Enable'
+                  t('verifyAndEnable')
                 )}
               </Button>
             )}
@@ -411,15 +407,14 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-mq-success">
               <CheckCircle className="h-5 w-5" />
-              SMS Verification Enabled!
+              {t('smsEnabledTitle')}
             </DialogTitle>
             <DialogDescription>
-              You can now use SMS as a backup verification method when signing
-              in.
+              {t('smsEnabledDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={resetSetup}>Done</Button>
+            <Button onClick={resetSetup}>{t('done')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -430,10 +425,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-500" />
-              Disable SMS Verification?
+              {t('disableSmsTitle')}
             </DialogTitle>
             <DialogDescription>
-              This will remove SMS as a backup verification method.
+              {t('disableSmsDesc')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -455,7 +450,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                   {t('processing')}
                 </>
               ) : (
-                'Disable SMS'
+                t('disableSmsAction')
               )}
             </Button>
           </DialogFooter>

@@ -16,8 +16,10 @@ import {
 } from 'lucide-react';
 import { useWeather } from './weather/useWeather';
 import { SYDNEY_REGIONS } from './weather/constants';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 const WeatherWidget = memo(() => {
+  const { t } = useTypedTranslation();
   const { weatherData, loading, error, selectedRegion, handleRegionChange, retry } = useWeather();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -99,7 +101,7 @@ const WeatherWidget = memo(() => {
         className="h-7 px-3 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 flex items-center justify-center gap-1 shadow-sm text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors"
       >
         <AlertCircle className="w-3 h-3" aria-hidden="true" />
-        <span className="text-[9px] font-medium">Retry</span>
+        <span className="text-[9px] font-medium">{t('retry')}</span>
       </button>
     );
   }

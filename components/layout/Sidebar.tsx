@@ -273,7 +273,7 @@ const Sidebar = memo(() => {
               className="h-12 w-auto"
               style={{ objectFit: 'contain', borderRadius: '8px', width: 'auto' }}
             />
-            <span className="text-sm font-semibold text-mq-content">Syllabus Sync</span>
+            <span className="text-sm font-semibold text-mq-content">{t('appName')}</span>
           </Link>
         </div>
 

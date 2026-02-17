@@ -57,9 +57,9 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       });
       setChallengeId(data.challengeId);
     } catch {
-      setError('Failed to send code. Please try again.');
+      setError(t('failedToSendCode' as TranslationKey));
     }
-  }, [selectedFactor]);
+  }, [selectedFactor, t]);
 
   // When switching to SMS factor, create a challenge (triggers SMS send).
   useEffect(() => {
@@ -75,7 +75,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     if (!selectedFactor || code.length !== 6) return;
 
     if (attemptsLeft <= 0) {
-      setError('Too many attempts. Please try again later.');
+      setError(t('tooManyAttempts' as TranslationKey));
       return;
     }
 
@@ -100,21 +100,19 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       if (!result?.verified) {
         setAttemptsLeft((prev) => prev - 1);
         if (attemptsLeft <= 1) {
-          setError('Too many failed attempts. Please sign in again.');
+          setError(t('tooManyFailedAttempts' as TranslationKey));
           setTimeout(onCancel, 2000);
         } else {
-          setError(
-            `Invalid code. ${attemptsLeft - 1} attempt${attemptsLeft - 1 === 1 ? '' : 's'} remaining.`,
-          );
+          setError(t('invalidCodeAttempts' as TranslationKey, { count: attemptsLeft - 1 }));
         }
         return;
       }
 
       // Success — session upgraded to aal2 via server-side cookies
-      toastUtils.success(t('welcomeBack'), 'Identity verified.');
+      toastUtils.success(t('welcomeBack'), t('identityVerified' as TranslationKey));
       onSuccess();
     } catch {
-      setError('Verification failed. Please try again.');
+      setError(t('mfaVerificationFailed' as TranslationKey));
     } finally {
       setIsLoading(false);
     }
@@ -137,7 +135,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
 
     try {
       await createChallenge();
-      toastUtils.success(t('security'), 'New code sent!');
+      toastUtils.success(t('security'), t('newCodeSent' as TranslationKey));
 
       // Start cooldown
       setResendCooldown(60);
@@ -151,7 +149,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
         });
       }, 1000);
     } catch {
-      setError('Failed to resend code.');
+      setError(t('failedToResendCode' as TranslationKey));
     }
   }, [selectedFactor, resendCooldown, t, createChallenge]);
 
@@ -167,11 +165,15 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
             <Shield className="h-7 w-7 sm:h-8 sm:w-8 text-mq-primary" />
           </div>
         </div>
-        <h2 className="text-lg sm:text-xl font-bold text-mq-content">Two-Step Verification</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-mq-content">
+          {t('twoStepVerification' as TranslationKey)}
+        </h2>
         <p className="text-xs sm:text-sm text-mq-content-secondary">
           {selectedFactor?.type === 'totp'
-            ? 'Enter the 6-digit code from your authenticator app.'
-            : `Enter the code sent to ****${selectedFactor?.phone?.slice(-4) ?? ''}.`}
+            ? t('mfaTotpPrompt' as TranslationKey)
+            : t('mfaSmsPrompt' as TranslationKey, {
+                last4: selectedFactor?.phone?.slice(-4) ?? '',
+              })}
         </p>
       </div>
 
@@ -215,10 +217,10 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            Verifying...
+            {t('verifying' as TranslationKey)}
           </>
         ) : (
-          'Verify'
+          t('verify' as TranslationKey)
         )}
       </Button>
 
@@ -232,7 +234,9 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
             disabled={resendCooldown > 0}
             className="text-xs"
           >
-            {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code'}
+            {resendCooldown > 0
+              ? t('resendIn' as TranslationKey, { seconds: resendCooldown })
+              : t('resendCode' as TranslationKey)}
           </Button>
         </div>
       )}
@@ -247,7 +251,9 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
             onClick={() => switchFactor(selectedFactor?.type === 'totp' ? 'phone' : 'totp')}
           >
             <Smartphone className="h-3 w-3 mr-1" />
-            {selectedFactor?.type === 'totp' ? 'Use SMS instead' : 'Use authenticator app instead'}
+            {selectedFactor?.type === 'totp'
+              ? t('useSmsInstead' as TranslationKey)
+              : t('useTotpInstead' as TranslationKey)}
           </Button>
         </div>
       )}

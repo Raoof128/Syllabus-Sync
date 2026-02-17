@@ -1,3 +1,40 @@
+### Raouf: OAuth Login — Google/Facebook via Supabase + Callback Hardening — 2026-02-17
+
+**Scope:** Enable production OAuth login providers and secure callback behavior.
+**Type:** Feat / Security / UX
+
+#### Changes
+
+1. **Google + Facebook OAuth login** (`app/login/LoginClient.tsx`):
+   - Implemented `supabase.auth.signInWithOAuth()` for Google and Facebook buttons.
+   - Uses `/auth/callback` for the code exchange and passes a validated `redirectTo` destination.
+
+2. **Hardened auth callback** (`app/auth/callback/route.ts`):
+   - Validates `redirectTo` (prevents open redirects) and supports `next` fallback param.
+   - Handles provider `error`/`error_description` query params and redirects to `/login?error=oauth_failed`.
+   - Redirects to `/login?error=missing_code` when no code is present.
+
+3. **Tests + docs**:
+   - Added callback redirect tests (`tests/api/auth/callback.test.ts`).
+   - Added Supabase OAuth setup runbook (`docs/operations/supabase-oauth-setup.md`) and linked from `README.md`.
+
+4. **Stability fixes discovered during audit**:
+   - Fixed React Hook dependency/lint issues (`app/reset-password/reset-password-client.tsx`, `features/settings/components/security/SMSSetup.tsx`).
+   - Fixed missing translation hook usage in the weather widget (`components/layout/WeatherWidget.tsx`).
+   - Synchronized translation files for newly referenced UI strings (`locales/*/translations.json`).
+   - Ignored local translation key dump artifacts (`*_keys.txt`) (`.gitignore`).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (483/483 pass)
+- `npm run build` ✅
+- `npm run check:i18n` ✅
+
+---
+
 ### Raouf: CDN Cache Preservation — Skip CSRF Cookie On API Routes — 2026-02-17
 
 **Scope:** Improve cacheability of public API responses to reduce Vercel Function invocations.

@@ -78,6 +78,9 @@ next-env.d.ts
 # ignore exported zip artifacts
 syllabus-sync_*.zip
 
+# i18n key dumps (local artifacts)
+*_keys.txt
+
 # Supabase generated files (track migrations for version control)
 src/
 supabase/*
