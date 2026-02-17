@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 const challengeVerifySchema = z.object({
   factorId: z.string().uuid(),
+  challengeId: z.string().uuid().optional(),
   code: z
     .string()
     .length(6)
@@ -58,30 +59,35 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid verification payload', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    const { factorId, code } = parsed.data;
+    const { factorId, challengeId, code } = parsed.data;
 
     if (!isValidTOTPCode(code)) {
       return jsonError('Invalid verification code format', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    // Create challenge
-    const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
-      factorId,
-    });
-
-    if (challengeError || !challenge) {
-      logger.error('MFA login challenge error:', {
-        userId: user.id,
+    let effectiveChallengeId = challengeId;
+    if (!effectiveChallengeId) {
+      // Create challenge (required for phone factors; safe for TOTP)
+      const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
         factorId,
-        error: challengeError?.message,
       });
-      return jsonError('Failed to create verification challenge', 400, ERROR_CODES.BAD_REQUEST);
+
+      if (challengeError || !challenge) {
+        logger.error('MFA login challenge error:', {
+          userId: user.id,
+          factorId,
+          error: challengeError?.message,
+        });
+        return jsonError('Failed to create verification challenge', 400, ERROR_CODES.BAD_REQUEST);
+      }
+
+      effectiveChallengeId = challenge.id;
     }
 
     // Verify code
     const { error: verifyError } = await supabase.auth.mfa.verify({
       factorId,
-      challengeId: challenge.id,
+      challengeId: effectiveChallengeId,
       code,
     });
 

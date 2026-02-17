@@ -18,6 +18,44 @@
 
 ---
 
+### Raouf: MFA Logic Audit + Fix — Correct SMS Challenge Flow + Resend Without Lockout + Fail-Closed Unenroll — 2026-02-17
+
+**Scope:** Fix MFA correctness/security issues across login and settings (TOTP + SMS).
+**Type:** Fix / Security Hardening
+
+#### Changes
+
+1. **Proper SMS MFA challenge flow** (`app/api/auth/mfa/sms/enroll/route.ts`, `app/api/auth/mfa/sms/verify/route.ts`, `features/settings/components/security/SMSSetup.tsx`):
+   - SMS enrollment now creates an initial challenge and returns `challengeId` so a code is actually sent.
+   - SMS verification now requires and uses the provided `challengeId` (no longer creates a new challenge at verify-time).
+   - Resend uses a new challenge call instead of enrolling new factors.
+
+2. **Resend without consuming verify attempts** (`app/api/auth/mfa/challenge/route.ts`, `app/login/components/MFAChallenge.tsx`):
+   - Added `/api/auth/mfa/challenge` so SMS resend can occur without calling verify with a dummy code (prevents accidental lockouts).
+   - Login MFA UI auto-sends an SMS challenge when a phone factor is selected and stores the `challengeId` for verification.
+
+3. **Fail-closed MFA disable** (`app/api/auth/mfa/unenroll/route.ts`):
+   - If verified factors exist, unenroll requires `aal2`.
+   - If factor status or AAL cannot be validated due to upstream errors, the endpoint fails closed (`503`) rather than allowing MFA disable.
+
+4. **Challenge-verify now supports external challengeId** (`app/api/auth/mfa/challenge-verify/route.ts`):
+   - Accepts optional `challengeId` to verify an already-created phone challenge.
+
+#### Tests
+
+- Added SMS flow tests (enroll returns `challengeId`; verify uses provided `challengeId`) (`tests/security/mfa-sms-flow.test.ts`).
+- Added unenroll fail-closed tests (`tests/security/mfa-unenroll-failclosed.test.ts`).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅
+- `npm run build` ✅
+
+---
+
 ### Raouf: Vercel Invocation Reduction — Remove Auth Polling + Cache Public GET APIs — 2026-02-17
 
 **Scope:** Reduce Vercel Function invocations by serving more from cache and making fewer runtime API calls.

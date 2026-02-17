@@ -7,6 +7,7 @@ import { Shield, Loader2, AlertTriangle, Smartphone, ArrowLeft } from 'lucide-re
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { toastUtils } from '@/lib/utils/toast';
 import { API_ROUTES } from '@/lib/constants/config';
+import { apiRequest } from '@/lib/utils/api';
 
 export interface MFAFactorInfo {
   id: string;
@@ -31,6 +32,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFactor, setSelectedFactor] = useState<MFAFactorInfo | null>(null);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
 
@@ -40,6 +42,34 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     const phoneFactor = factors.find((f) => f.type === 'phone');
     setSelectedFactor(totpFactor || phoneFactor || null);
   }, [factors]);
+
+  const createChallenge = useCallback(async () => {
+    if (!selectedFactor) return;
+    if (selectedFactor.type !== 'phone') return;
+
+    setError(null);
+    try {
+      const data = await apiRequest<{ challengeId: string }>(API_ROUTES.AUTH.MFA_CHALLENGE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ factorId: selectedFactor.id }),
+        noRetry: true,
+      });
+      setChallengeId(data.challengeId);
+    } catch {
+      setError('Failed to send code. Please try again.');
+    }
+  }, [selectedFactor]);
+
+  // When switching to SMS factor, create a challenge (triggers SMS send).
+  useEffect(() => {
+    setChallengeId(null);
+    setCode('');
+    setError(null);
+    if (selectedFactor?.type === 'phone') {
+      void createChallenge();
+    }
+  }, [selectedFactor, createChallenge]);
 
   const handleVerify = useCallback(async () => {
     if (!selectedFactor || code.length !== 6) return;
@@ -56,26 +86,25 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       // SECURITY: Route through server-side API to enforce server-side rate
       // limiting (5 attempts / 15 min) instead of calling Supabase MFA API
       // directly from the browser which bypasses our rate limiter.
-      const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
+      const result = await apiRequest<{ verified: boolean }>(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           factorId: selectedFactor.id,
+          challengeId: selectedFactor.type === 'phone' ? challengeId : undefined,
           code: code.trim(),
         }),
+        noRetry: true,
       });
 
-      const result = await res.json();
-
-      if (!res.ok || !result?.data?.verified) {
+      if (!result?.verified) {
         setAttemptsLeft((prev) => prev - 1);
         if (attemptsLeft <= 1) {
           setError('Too many failed attempts. Please sign in again.');
           setTimeout(onCancel, 2000);
         } else {
           setError(
-            result?.error?.message ??
-              `Invalid code. ${attemptsLeft - 1} attempt${attemptsLeft - 1 === 1 ? '' : 's'} remaining.`,
+            `Invalid code. ${attemptsLeft - 1} attempt${attemptsLeft - 1 === 1 ? '' : 's'} remaining.`,
           );
         }
         return;
@@ -89,7 +118,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     } finally {
       setIsLoading(false);
     }
-  }, [selectedFactor, code, attemptsLeft, t, onSuccess, onCancel]);
+  }, [selectedFactor, code, attemptsLeft, t, onSuccess, onCancel, challengeId]);
 
   const switchFactor = useCallback(
     (type: 'totp' | 'phone') => {
@@ -107,20 +136,8 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     if (!selectedFactor || selectedFactor.type !== 'phone' || resendCooldown > 0) return;
 
     try {
-      // Use server-side challenge-verify endpoint to trigger SMS resend
-      // by creating a new challenge for the phone factor
-      const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factorId: selectedFactor.id, code: '000000' }),
-      });
-      // We expect this to fail (wrong code), but it triggers the SMS send
-      // via the challenge creation step. The error is expected.
-      if (res.status !== 429) {
-        toastUtils.success(t('security'), 'New code sent!');
-      } else {
-        setError('Too many attempts. Please wait before retrying.');
-      }
+      await createChallenge();
+      toastUtils.success(t('security'), 'New code sent!');
 
       // Start cooldown
       setResendCooldown(60);
@@ -136,7 +153,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     } catch {
       setError('Failed to resend code.');
     }
-  }, [selectedFactor, resendCooldown, t]);
+  }, [selectedFactor, resendCooldown, t, createChallenge]);
 
   const hasMultipleFactorTypes =
     factors.some((f) => f.type === 'totp') && factors.some((f) => f.type === 'phone');

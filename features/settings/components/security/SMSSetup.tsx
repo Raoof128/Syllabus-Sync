@@ -37,6 +37,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState('');
   const [factorId, setFactorId] = useState<string | null>(null);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
   const [verifyCode, setVerifyCode] = useState('');
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
@@ -70,7 +71,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       });
       const result = await res.json();
 
-      if (!res.ok || !result?.data?.factorId) {
+      if (!res.ok || !result?.data?.factorId || !result?.data?.challengeId) {
         setVerifyError(
           result?.error?.message ||
             'Failed to send SMS. Check your phone number.',
@@ -79,6 +80,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       }
 
       setFactorId(result.data.factorId);
+      setChallengeId(result.data.challengeId);
       setStep('verify');
 
       // Start resend cooldown
@@ -100,7 +102,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
   }, [phone]);
 
   const handleVerify = useCallback(async () => {
-    if (!factorId || verifyCode.length !== 6) return;
+    if (!factorId || !challengeId || verifyCode.length !== 6) return;
 
     setIsLoading(true);
     setVerifyError(null);
@@ -108,7 +110,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       const res = await fetch(API_ROUTES.AUTH.MFA_SMS_VERIFY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factorId, code: verifyCode }),
+        body: JSON.stringify({ factorId, challengeId, code: verifyCode }),
       });
       const result = await res.json();
 
@@ -125,7 +127,42 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [factorId, verifyCode, t, onStatusChange]);
+  }, [factorId, challengeId, verifyCode, t, onStatusChange]);
+
+  const handleResend = useCallback(async () => {
+    if (!factorId || resendCooldown > 0) return;
+    setIsLoading(true);
+    setVerifyError(null);
+    try {
+      const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ factorId }),
+      });
+      const result = await res.json();
+      if (!res.ok || !result?.data?.challengeId) {
+        setVerifyError(result?.error?.message || 'Failed to resend code');
+        return;
+      }
+      setChallengeId(result.data.challengeId);
+      setVerifyCode('');
+
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch {
+      setVerifyError('Failed to resend code');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [factorId, resendCooldown]);
 
   const handleDisable = useCallback(async () => {
     if (!disableFactorId) return;
@@ -162,6 +199,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     setStep('idle');
     setPhone('');
     setFactorId(null);
+    setChallengeId(null);
     setVerifyCode('');
     setVerifyError(null);
   }, []);
@@ -309,7 +347,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                   variant="ghost"
                   size="sm"
                   disabled={resendCooldown > 0}
-                  onClick={handleEnrollPhone}
+                  onClick={handleResend}
                   className="text-xs"
                 >
                   {resendCooldown > 0
@@ -346,7 +384,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             {step === 'verify' && (
               <Button
                 onClick={handleVerify}
-                disabled={isLoading || verifyCode.length !== 6}
+                disabled={isLoading || !challengeId || verifyCode.length !== 6}
               >
                 {isLoading ? (
                   <>

@@ -45,17 +45,6 @@ export async function POST(request: NextRequest) {
       return jsonUnauthorized('Authentication required');
     }
 
-    // Check current AAL — require aal2 to disable MFA (re-authentication)
-    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-
-    if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
-      return jsonError(
-        'Re-authentication required to disable MFA. Please verify your identity first.',
-        403,
-        ERROR_CODES.FORBIDDEN,
-      );
-    }
-
     const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
     if (parseError) return parseError;
 
@@ -65,6 +54,49 @@ export async function POST(request: NextRequest) {
     }
 
     const { factorId } = parsed.data;
+
+    // If MFA is active (verified factors exist), require aal2 to unenroll.
+    // SECURITY: Fail closed if we cannot determine AAL/factors.
+    const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError) {
+      logger.error('MFA unenroll list factors error:', {
+        userId: user.id,
+        error: factorsError.message,
+      });
+      return jsonError(
+        'Unable to verify MFA status. Please try again.',
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+
+    const verifiedFactors =
+      (factorsData?.all ?? []).filter((f: { status: string }) => f.status === 'verified') ?? [];
+
+    if (verifiedFactors.length > 0) {
+      const { data: aal, error: aalError } =
+        await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+      if (aalError || !aal) {
+        logger.error('MFA unenroll AAL check error:', {
+          userId: user.id,
+          error: aalError?.message,
+        });
+        return jsonError(
+          'Unable to verify identity level. Please try again.',
+          503,
+          ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+        );
+      }
+
+      if (aal.currentLevel !== 'aal2') {
+        return jsonError(
+          'Re-authentication required to disable MFA. Please verify your identity first.',
+          403,
+          ERROR_CODES.FORBIDDEN,
+        );
+      }
+    }
 
     const { error: unenrollError } = await supabase.auth.mfa.unenroll({
       factorId,

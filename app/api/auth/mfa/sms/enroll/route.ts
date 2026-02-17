@@ -92,9 +92,29 @@ export async function POST(request: NextRequest) {
       factorId: data.id,
     });
 
+    // Create initial challenge to trigger the SMS send.
+    const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
+      factorId: data.id,
+    });
+
+    if (challengeError || !challenge) {
+      logger.error('SMS MFA challenge error:', {
+        userId: user.id,
+        factorId: data.id,
+        error: challengeError?.message,
+      });
+      return jsonError(
+        'Failed to send verification code. Please try again.',
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+
     return jsonSuccess({
       factorId: data.id,
       phone: `****${phone.slice(-4)}`,
+      challengeId: challenge.id,
+      expiresAt: (challenge as { expires_at?: string }).expires_at,
     });
   } catch (error) {
     logger.error('SMS enroll error:', error);

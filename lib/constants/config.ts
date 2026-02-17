@@ -21,6 +21,7 @@ export const API_ROUTES = {
     MFA_STATUS: '/api/auth/mfa/status',
     MFA_ENROLL: '/api/auth/mfa/enroll',
     MFA_VERIFY: '/api/auth/mfa/verify',
+    MFA_CHALLENGE: '/api/auth/mfa/challenge',
     MFA_CHALLENGE_VERIFY: '/api/auth/mfa/challenge-verify',
     MFA_UNENROLL: '/api/auth/mfa/unenroll',
     MFA_SMS_ENROLL: '/api/auth/mfa/sms/enroll',

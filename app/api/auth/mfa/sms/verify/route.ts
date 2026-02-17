@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 const smsVerifySchema = z.object({
   factorId: z.string().uuid(),
+  challengeId: z.string().uuid(),
   code: z
     .string()
     .min(6)
@@ -59,24 +60,11 @@ export async function POST(request: NextRequest) {
     }
 
     const { factorId, code } = parsed.data;
-
-    // Create challenge and verify
-    const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
-      factorId,
-    });
-
-    if (challengeError || !challenge) {
-      logger.error('SMS challenge error:', {
-        userId: user.id,
-        factorId,
-        error: challengeError?.message,
-      });
-      return jsonError('Failed to create SMS challenge', 400, ERROR_CODES.BAD_REQUEST);
-    }
+    const { challengeId } = parsed.data;
 
     const { error: verifyError } = await supabase.auth.mfa.verify({
       factorId,
-      challengeId: challenge.id,
+      challengeId,
       code,
     });
 
