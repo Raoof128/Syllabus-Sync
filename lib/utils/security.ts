@@ -5,7 +5,10 @@ import zxcvbn from 'zxcvbn';
 // Centralized whitelist - easier to manage
 export const SAFE_REDIRECT_PATHS = [
   '/dashboard',
+  '/home',
   '/calendar',
+  '/feed',
+  '/map',
   '/units',
   '/manage-profiles',
   '/settings',

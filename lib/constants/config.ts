@@ -27,6 +27,7 @@ export const API_ROUTES = {
     MFA_SMS_VERIFY: '/api/auth/mfa/sms/verify',
     // Email verification routes (custom, via Resend)
     EMAIL_SEND_VERIFICATION: '/api/auth/email/send-verification',
+    EMAIL_RESEND_VERIFICATION: '/api/auth/email/resend-verification',
     EMAIL_VERIFY: '/api/auth/email/verify',
     EMAIL_CLEANUP: '/api/auth/email/cleanup',
     // WebAuthn routes (enhanced, DB-backed)

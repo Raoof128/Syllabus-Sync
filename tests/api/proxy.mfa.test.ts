@@ -1,0 +1,86 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
+
+const supabaseMocks = vi.hoisted(() => ({
+  getUserMock: vi.fn(),
+  signOutMock: vi.fn(),
+  getAalMock: vi.fn(),
+}));
+
+vi.mock('@supabase/ssr', () => ({
+  createServerClient: vi.fn(() => ({
+    auth: {
+      getUser: supabaseMocks.getUserMock,
+      signOut: supabaseMocks.signOutMock,
+      mfa: {
+        getAuthenticatorAssuranceLevel: supabaseMocks.getAalMock,
+      },
+    },
+  })),
+}));
+
+describe('proxy mfa enforcement', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'eyJ.test';
+
+    supabaseMocks.getUserMock.mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    });
+
+    supabaseMocks.getAalMock.mockResolvedValue({
+      data: { currentLevel: 'aal1', nextLevel: 'aal2' },
+      error: null,
+    });
+  });
+
+  it('redirects protected routes to /login?mfa=1 when aal2 upgrade is required', async () => {
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/calendar');
+    const res = await proxy(req);
+
+    expect(res.status).toBeGreaterThanOrEqual(300);
+    const location = res.headers.get('location');
+    expect(location).toContain('/login');
+    expect(location).toContain('mfa=1');
+    expect(location).toContain('redirectTo=%2Fcalendar');
+  });
+
+  it('allows /login to render when aal2 upgrade is required (no redirect to /home)', async () => {
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/login?mfa=1');
+    const res = await proxy(req);
+
+    expect(res.headers.get('location')).toBeNull();
+  });
+
+  it('redirects authenticated users away from /login when no mfa upgrade is required', async () => {
+    supabaseMocks.getAalMock.mockResolvedValueOnce({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2' },
+      error: null,
+    });
+
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/login');
+    const res = await proxy(req);
+
+    expect(res.headers.get('location')).toContain('/home');
+  });
+
+  it('returns 403 for non-public API routes when aal2 upgrade is required', async () => {
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/api/user/export');
+    const res = await proxy(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(403);
+    expect(json.code).toBe('MFA_REQUIRED');
+  });
+});

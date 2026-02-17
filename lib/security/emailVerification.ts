@@ -37,6 +37,18 @@ export const emailVerifySendLimiter = createRateLimiter({
   failClosed: true,
 });
 
+/**
+ * Rate limiter for unauthenticated resend requests (keyed by ip+email hash).
+ * We keep this separate from the authenticated resend limiter to avoid allowing
+ * anonymous abuse of the user-scoped endpoint.
+ */
+export const emailVerifyResendLimiter = createRateLimiter({
+  prefix: 'email-verify-resend',
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: EMAIL_VERIFY_MAX_SENDS_PER_HOUR,
+  failClosed: true,
+});
+
 // ============================================================================
 // TOKEN FUNCTIONS
 // ============================================================================

@@ -2,17 +2,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { loginAction } from '../actions';
 import { loginLimiter } from '@/lib/services/rateLimitService';
 
+const supabaseMocks = vi.hoisted(() => ({
+  signInWithPasswordMock: vi.fn().mockResolvedValue({ error: null }),
+  getAalMock: vi.fn().mockResolvedValue({
+    data: { currentLevel: 'aal1', nextLevel: 'aal1' },
+  }),
+  listFactorsMock: vi.fn().mockResolvedValue({ data: { all: [] } }),
+}));
+
 // Mock dependencies
 vi.mock('@/lib/supabase/server', () => ({
   createServerClient: vi.fn(() => ({
     auth: {
       mfa: {
-        getAuthenticatorAssuranceLevel: vi.fn().mockResolvedValue({
-          data: { currentLevel: 'aal1', nextLevel: 'aal1' },
-        }),
-        listFactors: vi.fn().mockResolvedValue({ data: { all: [] } }),
+        getAuthenticatorAssuranceLevel: supabaseMocks.getAalMock,
+        listFactors: supabaseMocks.listFactorsMock,
       },
-      signInWithPassword: vi.fn().mockResolvedValue({ error: null }),
+      signInWithPassword: supabaseMocks.signInWithPasswordMock,
     },
   })),
 }));
@@ -41,6 +47,11 @@ vi.mock('@/lib/logger', () => ({
 describe('loginAction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    supabaseMocks.signInWithPasswordMock.mockResolvedValue({ error: null });
+    supabaseMocks.getAalMock.mockResolvedValue({
+      data: { currentLevel: 'aal1', nextLevel: 'aal1' },
+    });
+    supabaseMocks.listFactorsMock.mockResolvedValue({ data: { all: [] } });
   });
 
   it('blocks invalid email formats', async () => {
@@ -68,5 +79,21 @@ describe('loginAction', () => {
     });
     const result = await loginAction({ email: 'test@uni.edu.au', password: 'password' });
     expect(result.success).toBe(true);
+  });
+
+  it('maps email-not-confirmed to a dedicated error code', async () => {
+    vi.mocked(loginLimiter).mockResolvedValue({
+      allowed: true,
+      remaining: 9,
+      resetIn: 60,
+      limit: 10,
+    });
+
+    supabaseMocks.signInWithPasswordMock.mockResolvedValue({
+      error: { message: 'Email not confirmed' },
+    });
+
+    const result = await loginAction({ email: 'test@uni.edu.au', password: 'password' });
+    expect(result.error).toBe('email_not_confirmed');
   });
 });

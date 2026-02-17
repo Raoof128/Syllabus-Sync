@@ -22,7 +22,9 @@ export const createSignupSchema = (t: (key: any) => string) => {
         message: t('validation.termsRequired'),
       }),
       // Hidden honeypot field
-      _gotcha: z.string().max(0, 'Bot detected'),
+      // NOTE: This field must *not* fail validation when populated, otherwise the
+      // server-side honeypot branch becomes unreachable. We validate type/size only.
+      _gotcha: z.string().max(200).optional().default(''),
 
       // Profile fields with sanitization
       fullName: z.string().trim().min(1, t('validation.fullNameRequired')).transform(stripHtmlTags),

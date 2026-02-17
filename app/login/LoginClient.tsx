@@ -15,6 +15,7 @@ import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { API_ROUTES } from '@/lib/constants/config';
 import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
@@ -51,13 +52,14 @@ export default function LoginClient() {
   });
 
   // Check email for UI states
-  // eslint-disable-next-line react-hooks/incompatible-library
   const email = watch('email');
 
   // UI States (Preserving original UI richness)
   const [showPassword, setShowPassword] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showResendVerification, setShowResendVerification] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
 
   // MFA Challenge State
   const [mfaState, setMfaState] = useState<{
@@ -76,6 +78,7 @@ export default function LoginClient() {
   // Redirect Logic
   const rawRedirect = searchParams.get('redirectTo');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
+  const forceMfa = searchParams.get('mfa') === '1';
 
   // Computed
   const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess;
@@ -84,6 +87,7 @@ export default function LoginClient() {
   const onSubmit = async (data: LoginFormData) => {
     setGeneralError(null);
     setIsSuccess(false);
+    setShowResendVerification(false);
 
     try {
       const result = await loginAction(data);
@@ -99,6 +103,9 @@ export default function LoginClient() {
         // Fallback for specific known errors to maintain current UI behavior
         if (result.error === 'invalid_credentials') {
           setGeneralError(t('loginErrorInvalidCredentials'));
+        } else if (result.error === 'email_not_confirmed') {
+          setGeneralError(t('loginErrorEmailNotConfirmed'));
+          setShowResendVerification(true);
         } else if (result.error === 'rate_limit_exceeded') {
           const base = t('loginErrorTooManyRequests');
           const minutes =
@@ -135,6 +142,29 @@ export default function LoginClient() {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email || !email.includes('@')) return;
+    setIsResendingVerification(true);
+    try {
+      const res = await fetch(API_ROUTES.AUTH.EMAIL_RESEND_VERIFICATION, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      // Always treat as success to avoid account enumeration in UI copy.
+      if (res.status === 429) {
+        toastUtils.error(t('loginErrorFailed'), t('loginErrorTooManyRequests'));
+      } else {
+        toastUtils.success(t('verifyEmail'), t('verificationEmailSent'));
+      }
+    } catch {
+      toastUtils.error(t('loginErrorFailed'), t('loginErrorFailed'));
+    } finally {
+      setIsResendingVerification(false);
+    }
+  };
+
   // Passkey Login Handler
   const handlePasskeyLogin = () => {
     setGeneralError(null);
@@ -143,6 +173,64 @@ export default function LoginClient() {
       setTimeout(() => router.push(redirectTo), 800);
     });
   };
+
+  // If the proxy detected an aal1 session that must be upgraded to aal2, automatically
+  // load factors and show the MFA challenge on the login page.
+  useEffect(() => {
+    if (!forceMfa) return;
+    if (mfaState?.required) return;
+
+    let active = true;
+
+    const loadMfaStatus = async () => {
+      try {
+        const res = await fetch(API_ROUTES.AUTH.MFA_STATUS, { method: 'GET' });
+        if (!res.ok) return;
+
+        const json: unknown = await res.json();
+        if (!active) return;
+        if (typeof json !== 'object' || json === null) return;
+
+        const data = (json as Record<string, unknown>).data;
+        if (typeof data !== 'object' || data === null) return;
+
+        const currentLevel = (data as Record<string, unknown>).currentLevel;
+        const nextLevel = (data as Record<string, unknown>).nextLevel;
+
+        const needsUpgrade =
+          nextLevel === 'aal2' && (currentLevel === 'aal1' || typeof currentLevel !== 'string');
+
+        if (!needsUpgrade) return;
+
+        const factorsVal = (data as Record<string, unknown>).factors;
+        const factors = Array.isArray(factorsVal) ? factorsVal : [];
+
+        const verified = factors
+          .filter((f): f is Record<string, unknown> => typeof f === 'object' && f !== null)
+          .filter((f) => f.status === 'verified')
+          .map(
+            (f): MFAFactorInfo => ({
+              id: String(f.id ?? ''),
+              type: f.type === 'phone' ? 'phone' : 'totp',
+              name: typeof f.friendlyName === 'string' ? f.friendlyName : undefined,
+              phone: typeof f.phone === 'string' ? f.phone : undefined,
+            }),
+          )
+          .filter((f) => Boolean(f.id));
+
+        if (verified.length > 0) {
+          setMfaState({ required: true, factors: verified });
+        }
+      } catch {
+        // Ignore; user can retry by signing in again.
+      }
+    };
+
+    loadMfaStatus();
+    return () => {
+      active = false;
+    };
+  }, [forceMfa, mfaState?.required]);
 
   // Passkey & Security Status Effect
   useEffect(() => {
@@ -239,7 +327,22 @@ export default function LoginClient() {
           {generalError && (
             <Alert variant="error" className="mb-3">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>{generalError}</AlertDescription>
+              <AlertDescription>
+                <div className="space-y-2">
+                  <div>{generalError}</div>
+                  {showResendVerification && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 w-full rounded-full font-bold"
+                      onClick={handleResendVerification}
+                      disabled={isGlobalLoading || isResendingVerification || !email}
+                    >
+                      {isResendingVerification ? t('loading') : t('resendVerificationEmail')}
+                    </Button>
+                  )}
+                </div>
+              </AlertDescription>
             </Alert>
           )}
 

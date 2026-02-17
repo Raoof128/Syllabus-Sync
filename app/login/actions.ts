@@ -60,7 +60,15 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   });
 
   if (error) {
-    logger.error('Login failed', { error: error.message, email_hint: emailHint });
+    const message = error.message ?? '';
+    logger.error('Login failed', { error: message, email_hint: emailHint });
+
+    // Email-not-confirmed is only returned after correct credentials, so this
+    // does not leak account existence. It enables a resend-verification UX.
+    if (message.toLowerCase().includes('email not confirmed')) {
+      return { error: 'email_not_confirmed' };
+    }
+
     return { error: 'invalid_credentials' };
   }
 

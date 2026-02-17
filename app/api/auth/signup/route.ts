@@ -27,7 +27,7 @@ async function logAuthEvent(
   // Skip logging if admin client is not available (graceful degradation)
   if (!supabaseAdmin) return;
 
-  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown';
+  const ip = getClientIP(req);
   const ua = req.headers.get('user-agent') ?? 'unknown';
 
   // Fire and forget (don't await this, don't slow down the user)
@@ -193,49 +193,93 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerClient();
     // adminClient already initialized at top for kill switch check
 
-    // Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
+    // Create auth user.
+    // Prefer admin API (service_role) so we control email confirmation and avoid
+    // triggering Supabase's built-in transactional emails in production.
+    let createdUser: { id: string } | null = null;
+    let createdSession: unknown | null = null;
+
+    if (adminClient) {
+      const devAutoConfirm = isDevelopment && isDevEmail(email);
+      const { data: createData, error: createError } = await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: devAutoConfirm,
+        user_metadata: {
           full_name: fullName,
           // SECURITY: Don't store sensitive data in auth metadata
         },
-        emailRedirectTo: undefined,
-      },
-    });
-
-    // Handle auth errors with specific field mapping
-    if (authError) {
-      logger.warn('Signup auth error:', {
-        email: `${email.substring(0, 3)}***`,
-        code: authError.status,
-        message: authError.message,
       });
 
-      // Map auth errors to specific fields
-      const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
-      if (isAlreadyRegistered) {
-        // SECURITY: Return generic success to prevent account enumeration
-        return jsonSuccess({
-          message: GENERIC_SIGNUP_SUCCESS,
+      if (createError) {
+        logger.warn('Signup admin createUser error:', {
+          email: `${email.substring(0, 3)}***`,
+          message: createError.message,
         });
+
+        const isAlreadyRegistered = createError.message.toLowerCase().includes('already');
+        if (isAlreadyRegistered) {
+          // SECURITY: Return generic success to prevent account enumeration
+          return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
+        }
+
+        return jsonError(
+          'Signup request could not be completed. Please try again.',
+          400,
+          ERROR_CODES.BAD_REQUEST,
+          { target: 'root' },
+        );
       }
 
-      return jsonError(
-        'Signup request could not be completed. Please try again.',
-        400,
-        ERROR_CODES.BAD_REQUEST,
-        { target: 'root' },
-      );
+      createdUser = createData.user ? { id: createData.user.id } : null;
+    } else {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            // SECURITY: Don't store sensitive data in auth metadata
+          },
+          emailRedirectTo: undefined,
+        },
+      });
+
+      createdSession = authData.session ?? null;
+
+      // Handle auth errors with specific field mapping
+      if (authError) {
+        logger.warn('Signup auth error:', {
+          email: `${email.substring(0, 3)}***`,
+          code: authError.status,
+          message: authError.message,
+        });
+
+        // Map auth errors to specific fields
+        const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
+        if (isAlreadyRegistered) {
+          // SECURITY: Return generic success to prevent account enumeration
+          return jsonSuccess({
+            message: GENERIC_SIGNUP_SUCCESS,
+          });
+        }
+
+        return jsonError(
+          'Signup request could not be completed. Please try again.',
+          400,
+          ERROR_CODES.BAD_REQUEST,
+          { target: 'root' },
+        );
+      }
+
+      createdUser = authData.user ? { id: authData.user.id } : null;
     }
 
-    if (!authData.user) {
+    if (!createdUser) {
       throw new Error('User creation failed silently');
     }
 
-    const userId = authData.user.id;
+    const userId = createdUser.id;
     let profileCreated = false;
 
     // Create profile atomically using admin client
@@ -363,28 +407,23 @@ export async function POST(request: NextRequest) {
 
     // Auto-confirm ONLY in development AND only for developer emails
     let session = null;
-    if (authData.user && !authData.session && isDevelopment && isDevEmail(email)) {
+    if (!createdSession && isDevelopment && isDevEmail(email)) {
       if (adminClient) {
-        logger.info(`Development mode: auto-confirming developer email`);
-
-        const { error: confirmError } = await adminClient.auth.admin.updateUserById(userId, {
-          email_confirm: true,
-        });
-
-        if (!confirmError) {
-          // Create session for auto-confirmed user
-          const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword(
-            {
-              email,
-              password,
-            },
-          );
-
-          if (!sessionError && sessionData.session) {
-            session = sessionData.session;
-          }
-        }
+        logger.info(`Development mode: ensuring developer email is confirmed`);
+        await adminClient.auth.admin.updateUserById(userId, { email_confirm: true });
       }
+
+      // Create session for auto-confirmed user
+      const { data: sessionData, error: sessionError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!sessionError && sessionData.session) {
+        session = sessionData.session;
+      }
+    } else if (createdSession) {
+      session = createdSession;
     }
 
     // AUDIT: Log successful signup
@@ -403,7 +442,7 @@ export async function POST(request: NextRequest) {
     // SECURITY: Always return generic success to prevent account enumeration
     const response = jsonSuccess({
       message: GENERIC_SIGNUP_SUCCESS,
-      data: session ? { session, user: authData.user } : undefined,
+      data: session ? { session, user: createdUser } : undefined,
     });
     response.headers.set('X-RateLimit-Remaining', remaining.toString());
     return response;

@@ -22,7 +22,8 @@ import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
 
-type SignupFormData = z.infer<ReturnType<typeof createSignupSchema>>;
+// react-hook-form expects the schema *input* shape, not the transformed output.
+type SignupFormData = z.input<ReturnType<typeof createSignupSchema>>;
 
 export default function SignupClient() {
   const { t } = useTypedTranslation();
@@ -95,14 +96,13 @@ export default function SignupClient() {
         body: JSON.stringify({
           email: data.email,
           password: data.password,
-          options: {
-            data: {
-              full_name: data.fullName,
-              student_id: data.studentId,
-              course: data.course,
-              year: data.year,
-            },
-          },
+          confirmPassword: data.confirmPassword,
+          agreedToTerms: data.agreedToTerms,
+          _gotcha: data._gotcha,
+          fullName: data.fullName,
+          studentId: data.studentId,
+          course: data.course,
+          year: data.year,
         }),
       });
 

@@ -1,3 +1,44 @@
+### Raouf: Auth Audit — Signup Alignment + MFA Enforcement + Verification Resend — 2026-02-17
+
+**Scope:** Production-grade login/signup UX and related auth endpoints, including MFA enforcement and verification resend.
+**Type:** Fix / Security Hardening
+
+#### Changes
+
+1. **Signup payload + honeypot correctness** (`app/signup/SignupClient.tsx`, `lib/schemas/auth.ts`, `app/api/auth/signup/route.ts`):
+   - Aligned the signup page request body with the server-side schema (fixes production signup validation failures).
+   - Fixed honeypot reachability by allowing non-empty `_gotcha` to pass schema validation so the API can return generic success for bots.
+   - Updated signup to prefer Supabase Admin `createUser()` when service-role is available (better control; avoids triggering Supabase transactional emails).
+
+2. **MFA enforcement (AAL2) centralized in proxy** (`lib/proxy.ts`, `app/login/LoginClient.tsx`):
+   - Enforced MFA upgrade for protected routes and non-public API routes (`403 MFA_REQUIRED`) to prevent aal1 session bypass.
+   - Added `/login?mfa=1` auto-challenge behavior when the proxy detects a session that must be upgraded.
+
+3. **Resend verification email for unconfirmed accounts** (`app/api/auth/email/resend-verification/route.ts`, `app/login/actions.ts`, `app/login/LoginClient.tsx`):
+   - Added an unauthenticated anti-enumeration resend endpoint, rate-limited by `ip + hashed email`.
+   - Added UI support for the “Email not confirmed” login state, including a resend button and success messaging.
+
+4. **Redirect allowlist fixes** (`lib/utils/security.ts`):
+   - Added `/feed` and `/map` to safe redirect paths so `redirectTo` works for all protected routes.
+
+#### Tests
+
+- Added API tests for signup payload + honeypot behavior (`tests/api/auth/signup.test.ts`).
+- Added API tests for resend-verification endpoint behavior (`tests/api/auth/emailResendVerification.test.ts`).
+- Added proxy tests covering MFA enforcement redirects and API blocking (`tests/api/proxy.mfa.test.ts`).
+- Extended login action tests for `email_not_confirmed` (`app/login/__tests__/actions.test.ts`).
+
+#### Verification
+
+- `npm run format:check` ✅
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` ✅ (475/475 pass)
+- `npm run build` ✅
+- `npm run check:secrets` ✅
+
+---
+
 ### Raouf: Move Production Rate Limiting To Vercel KV (Upstash Redis) — 2026-02-17
 
 **Scope:** Provision a high-traffic distributed rate limiter backed by Vercel KV/Upstash Redis to reduce database write load.

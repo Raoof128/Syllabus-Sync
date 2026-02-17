@@ -492,6 +492,8 @@
   "passwordTooShort": "Password must be at least 8 characters",
   "accountCreated": "Account created!",
   "verifyEmail": "Please check your email to verify your account.",
+  "resendVerificationEmail": "Resend verification email",
+  "verificationEmailSent": "Verification email sent. Please check your inbox.",
   "joinApp": "Join {{appName}}",
   "createAccountFor": "Create your account for {{uniName}}",
   "creatingAccount": "Creating account...",

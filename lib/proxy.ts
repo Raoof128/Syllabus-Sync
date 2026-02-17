@@ -215,8 +215,46 @@ export async function proxy(request: NextRequest) {
 
   // Logic:
   // If authenticated and on auth route -> redirect to /home
+  // MFA enforcement:
+  // If a user has MFA factors enrolled, Supabase may issue an aal1 session after password auth.
+  // We must prevent access to protected routes until the session is upgraded to aal2.
+  let requiresMfaUpgrade = false;
+  if (user && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi))) {
+    const MFA_AAL_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 2500 : 1500;
+    try {
+      const aalPromise = supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), MFA_AAL_DEADLINE_MS),
+      );
+
+      const result = await Promise.race([aalPromise, timeoutPromise]);
+
+      if (result && 'data' in result) {
+        const aal = result.data;
+        requiresMfaUpgrade = aal?.nextLevel === 'aal2' && aal?.currentLevel === 'aal1';
+      } else {
+        // Fail-closed for protected/API routes: if we can't determine AAL quickly,
+        // treat the session as not fully authenticated.
+        requiresMfaUpgrade = isProtectedRoute || (isApiRoute && !isPublicApi);
+      }
+    } catch (err) {
+      logger.warn('Proxy MFA AAL check failed; enforcing MFA upgrade', { path, err });
+      requiresMfaUpgrade = isProtectedRoute || (isApiRoute && !isPublicApi);
+    }
+  }
+
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/home', request.url));
+    // If MFA is required, allow /login to render so the user can complete the challenge.
+    // Other auth routes should redirect back to /login in MFA mode.
+    if (requiresMfaUpgrade) {
+      if (!path.startsWith('/login')) {
+        const redirectUrl = new URL('/login', request.url);
+        redirectUrl.searchParams.set('mfa', '1');
+        return NextResponse.redirect(redirectUrl);
+      }
+    } else {
+      return NextResponse.redirect(new URL('/home', request.url));
+    }
   }
 
   // Temporary: Disable authentication for home page
@@ -229,6 +267,24 @@ export async function proxy(request: NextRequest) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', path);
     return NextResponse.redirect(redirectUrl);
+  }
+
+  // If authenticated but MFA upgrade required and on protected route -> redirect to /login MFA step
+  if (isProtectedRoute && user && requiresMfaUpgrade) {
+    const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('mfa', '1');
+    redirectUrl.searchParams.set('redirectTo', path);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // If authenticated but MFA upgrade required and on non-public API route -> 403
+  if (isApiRoute && !isPublicApi && user && requiresMfaUpgrade) {
+    const forbiddenResponse = NextResponse.json(
+      { error: 'MFA required', code: 'MFA_REQUIRED' },
+      { status: 403 },
+    );
+    setSecurityHeaders(forbiddenResponse.headers);
+    return forbiddenResponse;
   }
 
   // If not authenticated and on non-public API route -> return 401
