@@ -38,20 +38,57 @@ export default function ResetPasswordClient() {
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
-  const [mode, setMode] = useState<Mode>(code ? 'loading' : 'request');
+  // Check if we have recovery params (code or hash fragment will be handled)
+  // Also check for hash fragment on client side (used by some Supabase flows)
+  const [hasHashFragment, setHasHashFragment] = useState(false);
+
+  useEffect(() => {
+    // Check for hash fragment containing access_token or type=recovery
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash && (hash.includes('access_token') || hash.includes('type=recovery'))) {
+        setHasHashFragment(true);
+      }
+    }
+  }, []);
+
+  const hasRecoveryParams = !!code || hasHashFragment;
+
+  const [mode, setMode] = useState<Mode>('request');
   const [generalError, setGeneralError] = useState<string | null>(
     errorParam ? errorDescription || 'Invalid or expired reset link' : null
   );
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const supabase = createBrowserClient();
 
-  // Handle Supabase auth code exchange
+  // Set to loading mode when we have recovery params
   useEffect(() => {
-    if (code && mode === 'loading') {
-      const exchangeCode = async () => {
+    if (hasRecoveryParams && mode === 'request' && !authChecked) {
+      setMode('loading');
+    }
+  }, [hasRecoveryParams, mode, authChecked]);
+
+  // Handle Supabase auth - check for existing session or exchange code
+  useEffect(() => {
+    const handleAuth = async () => {
+      setAuthChecked(true);
+
+      // First check if user already has a session (from hash fragment auto-handling)
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // User is authenticated (session from hash fragment or previous auth)
+        setIsAuthenticated(true);
+        setMode('set');
+        return;
+      }
+
+      // If we have a code, exchange it for a session
+      if (code) {
         try {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
@@ -65,10 +102,31 @@ export default function ResetPasswordClient() {
           setGeneralError('Invalid or expired reset link. Please request a new one.');
           setMode('request');
         }
-      };
-      exchangeCode();
+        return;
+      }
+
+      // No code and no session, stay in request mode
+      setMode('request');
+    };
+
+    if (mode === 'loading') {
+      handleAuth();
     }
   }, [code, mode, supabase.auth]);
+
+  // Also listen for auth state changes (handles hash fragment recovery)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: string, session: unknown) => {
+        if (event === 'PASSWORD_RECOVERY' && session) {
+          setIsAuthenticated(true);
+          setMode('set');
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   const requestForm = useForm<RequestForm>({
     resolver: zodResolver(requestSchema),
