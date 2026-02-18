@@ -60,6 +60,7 @@ export default function AssignmentForm({
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Get selected unit for reference
   const selectedUnit = useMemo(() => {
@@ -147,6 +148,8 @@ export default function AssignmentForm({
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    setIsSaving(true);
+
     const [year, month, day] = dueDate.split('-').map(Number);
     const timeParts = dueTime ? dueTime.split(':') : [];
     const parsedHours = Number(timeParts[0]);
@@ -174,21 +177,25 @@ export default function AssignmentForm({
       createdAt: editAssignment?.createdAt || new Date(),
     };
 
-    const result = await saveWithRetry(assignmentData);
-    if (result !== null) {
-      if (editAssignment) {
-        toastUtils.success(
-          t('assignmentUpdated' as TranslationKey) || 'Assignment Updated',
-          `"${assignmentData.title}" has been updated successfully.`,
-        );
-      } else {
-        toastUtils.success(
-          t('assignmentAdded' as TranslationKey) || 'Assignment Added',
-          `"${assignmentData.title}" has been added successfully.`,
-        );
+    try {
+      const result = await saveWithRetry(assignmentData);
+      if (result !== null) {
+        if (editAssignment) {
+          toastUtils.success(
+            t('assignmentUpdated' as TranslationKey) || 'Assignment Updated',
+            `"${assignmentData.title}" has been updated successfully.`,
+          );
+        } else {
+          toastUtils.success(
+            t('assignmentAdded' as TranslationKey) || 'Assignment Added',
+            `"${assignmentData.title}" has been added successfully.`,
+          );
+        }
+        onOpenChange(false);
+        resetForm();
       }
-      onOpenChange(false);
-      resetForm();
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -411,13 +418,15 @@ export default function AssignmentForm({
               </Button>
             )}
             <div className="flex-1" />
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
               {t('cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={units.length === 0}>
-              {editAssignment
-                ? t('saveChanges')
-                : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+            <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
+              {isSaving
+                ? (t('savingChanges' as TranslationKey) || 'Saving...')
+                : editAssignment
+                  ? t('saveChanges')
+                  : (t('addAssignment' as TranslationKey) || 'Add Assignment')}
             </Button>
           </DialogFooter>
         </DialogContent>

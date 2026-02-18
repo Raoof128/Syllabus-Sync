@@ -52,18 +52,20 @@ interface FormState {
   color: string;
   errors: { [key: string]: string };
   showDeleteConfirm: boolean;
+  isSaving: boolean;
 }
 
 // Form actions
 type FormAction =
   | {
       type: 'SET_FIELD';
-      field: keyof Omit<FormState, 'errors' | 'showDeleteConfirm'>;
+      field: keyof Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'>;
       value: string | Event['category'];
     }
   | { type: 'SET_ERRORS'; errors: { [key: string]: string } }
   | { type: 'SET_DELETE_CONFIRM'; value: boolean }
-  | { type: 'RESET'; values: Omit<FormState, 'errors' | 'showDeleteConfirm'> };
+  | { type: 'SET_SAVING'; value: boolean }
+  | { type: 'RESET'; values: Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'> };
 
 // Helper to convert time string to HH:MM format for native time input
 function convertTo24HourFormat(timeStr: string | undefined): string {
@@ -95,7 +97,7 @@ function convertTo24HourFormat(timeStr: string | undefined): string {
 // Helper to get initial form values
 function getInitialValues(
   editEvent?: Event | null,
-): Omit<FormState, 'errors' | 'showDeleteConfirm'> {
+): Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'> {
   if (editEvent) {
     const parsedDate = new Date(editEvent.startAt);
     // Convert time to HH:MM format for native time input
@@ -136,8 +138,10 @@ function formReducer(state: FormState, action: FormAction): FormState {
       return { ...state, errors: action.errors };
     case 'SET_DELETE_CONFIRM':
       return { ...state, showDeleteConfirm: action.value };
+    case 'SET_SAVING':
+      return { ...state, isSaving: action.value };
     case 'RESET':
-      return { ...action.values, errors: {}, showDeleteConfirm: false };
+      return { ...action.values, errors: {}, showDeleteConfirm: false, isSaving: false };
     default:
       return state;
   }
@@ -154,6 +158,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     ...getInitialValues(editEvent),
     errors: {},
     showDeleteConfirm: false,
+    isSaving: false,
   });
 
   const {
@@ -167,6 +172,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     color,
     errors,
     showDeleteConfirm,
+    isSaving,
   } = formState;
 
   // Reset form when editEvent changes - use key prop pattern instead of useEffect
@@ -255,6 +261,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    dispatch({ type: 'SET_SAVING', value: true });
+
     const [year, month, day] = date.split('-').map(Number);
     const dateObj = new Date(year, month - 1, day);
 
@@ -297,15 +305,18 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       color,
     };
 
-    if (editEvent) {
-      await updateEvent(editEvent.id, eventData);
-      toastUtils.success(t('eventUpdated'), t('eventUpdatedMsg'));
-    } else {
-      await addEvent(eventData);
-      toastUtils.success(t('eventCreated'), t('eventCreatedMsg'));
+    try {
+      if (editEvent) {
+        await updateEvent(editEvent.id, eventData);
+        toastUtils.success(t('eventUpdated'), t('eventUpdatedMsg'));
+      } else {
+        await addEvent(eventData);
+        toastUtils.success(t('eventCreated'), t('eventCreatedMsg'));
+      }
+      onOpenChange(false);
+    } finally {
+      dispatch({ type: 'SET_SAVING', value: false });
     }
-
-    onOpenChange(false);
   };
 
   const handleDelete = () => {
@@ -501,10 +512,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               </Button>
             </div>
           )}
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
             {t('cancel')}
           </Button>
-          <Button onClick={handleSave}>{editEvent ? t('save') : t('addEvent')}</Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving
+              ? (t('savingChanges' as TranslationKey) || 'Saving...')
+              : editEvent
+                ? t('save')
+                : t('addEvent')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

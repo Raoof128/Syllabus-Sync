@@ -130,8 +130,9 @@ export default function ItemActionButtons({
   const iconSizeClass = variant === 'detail' ? 'h-4.5 w-4.5' : 'h-4 w-4';
 
   const baseButtonClass = cn(
-    'p-0 inline-flex items-center justify-center rounded transition-colors',
+    'p-0 inline-flex items-center justify-center rounded-lg transition-all duration-200',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
+    'text-mq-content-secondary hover:text-mq-content',
     buttonSizeClass,
   );
 
@@ -151,7 +152,7 @@ export default function ItemActionButtons({
           <Button
             variant="ghost"
             size="icon"
-            className={cn(baseButtonClass, 'hover:bg-mq-hover-background')}
+            className={cn(baseButtonClass, 'hover:bg-mq-primary/10 hover:text-mq-primary dark:hover:bg-mq-primary/20')}
             tabIndex={-1}
           >
             <Navigation className={iconSizeClass} aria-hidden="true" />
@@ -164,7 +165,7 @@ export default function ItemActionButtons({
         <button
           type="button"
           onClick={handleEditClick}
-          className={cn(baseButtonClass, 'hover:bg-mq-hover-background')}
+          className={cn(baseButtonClass, 'hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400')}
           title={t('calendarEditItem', { title: itemTitle }) as string}
           aria-label={t('calendarEditItem', { title: itemTitle }) as string}
         >
@@ -177,7 +178,7 @@ export default function ItemActionButtons({
         <button
           type="button"
           onClick={handleDeleteClick}
-          className={cn(baseButtonClass, 'hover:bg-red-100 dark:hover:bg-red-950/30')}
+          className={cn(baseButtonClass, 'hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400')}
           title={t('calendarDeleteItem', { title: itemTitle }) as string}
           aria-label={t('calendarDeleteItem', { title: itemTitle }) as string}
         >
@@ -192,8 +193,8 @@ export default function ItemActionButtons({
         className={cn(
           baseButtonClass,
           isNotificationActive
-            ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-900/40'
-            : 'hover:bg-mq-hover-background',
+            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800/40'
+            : 'hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400',
         )}
         title={
           isNotificationActive

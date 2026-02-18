@@ -60,6 +60,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Get selected unit for reference
   const selectedUnit = useMemo(() => {
@@ -164,6 +165,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    setIsSaving(true);
+
     const [year, month, day] = dueDate.split('-').map(Number);
     const timeParts = dueTime ? dueTime.split(':') : [];
     const parsedHours = Number(timeParts[0]);
@@ -193,21 +196,25 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       createdAt: editExam?.createdAt || new Date(),
     };
 
-    const result = await saveWithRetry(examData);
-    if (result !== null) {
-      if (editExam) {
-        toastUtils.success(
-          t('examUpdated' as TranslationKey) || 'Exam Updated',
-          `"${examData.title}" has been updated successfully.`,
-        );
-      } else {
-        toastUtils.success(
-          t('examAdded' as TranslationKey) || 'Exam Added',
-          `"${examData.title}" has been added successfully.`,
-        );
+    try {
+      const result = await saveWithRetry(examData);
+      if (result !== null) {
+        if (editExam) {
+          toastUtils.success(
+            t('examUpdated' as TranslationKey) || 'Exam Updated',
+            `"${examData.title}" has been updated successfully.`,
+          );
+        } else {
+          toastUtils.success(
+            t('examAdded' as TranslationKey) || 'Exam Added',
+            `"${examData.title}" has been added successfully.`,
+          );
+        }
+        onOpenChange(false);
+        resetForm();
       }
-      onOpenChange(false);
-      resetForm();
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -464,11 +471,15 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
               </Button>
             )}
             <div className="flex-1" />
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
               {t('cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={units.length === 0}>
-              {editExam ? t('saveChanges') : t('addExam' as TranslationKey) || 'Add Exam'}
+            <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
+              {isSaving
+                ? (t('savingChanges' as TranslationKey) || 'Saving...')
+                : editExam
+                  ? t('saveChanges')
+                  : (t('addExam' as TranslationKey) || 'Add Exam')}
             </Button>
           </DialogFooter>
         </DialogContent>

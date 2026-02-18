@@ -67,6 +67,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Save operation with retry logic
   const performSave = useCallback(
@@ -173,22 +174,27 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
       createdAt: editDeadline?.createdAt || new Date(),
     };
 
-    const result = await saveWithRetry(deadlineData);
-    if (result !== null) {
-      // Success - show toast and close form
-      if (editDeadline) {
-        toastUtils.success(
-          t('deadlineUpdated'),
-          `"${deadlineData.title}" has been updated successfully.`,
-        );
-      } else {
-        toastUtils.success(
-          t('deadlineAdded'),
-          `"${deadlineData.title}" has been added successfully.`,
-        );
+    setIsSaving(true);
+    try {
+      const result = await saveWithRetry(deadlineData);
+      if (result !== null) {
+        // Success - show toast and close form
+        if (editDeadline) {
+          toastUtils.success(
+            t('deadlineUpdated'),
+            `"${deadlineData.title}" has been updated successfully.`,
+          );
+        } else {
+          toastUtils.success(
+            t('deadlineAdded'),
+            `"${deadlineData.title}" has been added successfully.`,
+          );
+        }
+        onOpenChange(false);
+        resetForm();
       }
-      onOpenChange(false);
-      resetForm();
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -437,16 +443,20 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
 
           <DialogFooter className="flex gap-2">
             {editDeadline && (
-              <Button variant="destructive" onClick={handleDelete}>
+              <Button variant="destructive" onClick={handleDelete} disabled={isSaving}>
                 {t('delete')}
               </Button>
             )}
             <div className="flex-1" />
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
               {t('cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={units.length === 0}>
-              {editDeadline ? t('saveChanges') : t('addDeadline')}
+            <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
+              {isSaving
+                ? (t('savingChanges' as TranslationKey) || 'Saving...')
+                : editDeadline
+                  ? t('saveChanges')
+                  : t('addDeadline')}
             </Button>
           </DialogFooter>
         </DialogContent>

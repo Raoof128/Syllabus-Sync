@@ -430,7 +430,7 @@ const Header = memo(() => {
                           {/* Action buttons */}
                           <div className="flex flex-col gap-1 mr-2 mt-2">
                             {/* Mark as read button - only for unread notifications */}
-                            {!notification.read && (
+                            {!notification.read ? (
                               <button
                                 type="button"
                                 onClick={(event) => {
@@ -444,21 +444,22 @@ const Header = memo(() => {
                               >
                                 <Check className="h-4 w-4" aria-hidden="true" />
                               </button>
+                            ) : (
+                              /* Delete button - only for read notifications */
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  removeNotification(notification.id);
+                                }}
+                                className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                                aria-label={t('deleteNotification')}
+                                title={t('deleteNotification')}
+                              >
+                                <X className="h-4 w-4" aria-hidden="true" />
+                              </button>
                             )}
-                            {/* Delete button - for all notifications */}
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                removeNotification(notification.id);
-                              }}
-                              className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                              aria-label={t('deleteNotification')}
-                              title={t('deleteNotification')}
-                            >
-                              <X className="h-4 w-4" aria-hidden="true" />
-                            </button>
                           </div>
                         </div>
                       </DropdownMenuItem>

@@ -1865,5 +1865,6 @@
   "reminderCustom": "Custom date & time",
   "class": "Class",
   "exam": "Exam",
-  "todo": "To-Do"
+  "todo": "To-Do",
+  "savingChanges": "Saving..."
 }
