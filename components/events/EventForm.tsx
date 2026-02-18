@@ -27,7 +27,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { format, isValid } from 'date-fns';
-import { Clock } from 'lucide-react';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import { cn } from '@/lib/utils';
@@ -66,17 +65,50 @@ type FormAction =
   | { type: 'SET_DELETE_CONFIRM'; value: boolean }
   | { type: 'RESET'; values: Omit<FormState, 'errors' | 'showDeleteConfirm'> };
 
+// Helper to convert time string to HH:MM format for native time input
+function convertTo24HourFormat(timeStr: string | undefined): string {
+  if (!timeStr) return '';
+
+  // If already in HH:MM format (24-hour), return as is
+  const time24Match = timeStr.match(/^(\d{2}):(\d{2})$/);
+  if (time24Match) {
+    return timeStr;
+  }
+
+  // Try to parse 12-hour format like "2:00 PM" or "2:00 PM - 4:00 PM"
+  const time12Match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (time12Match) {
+    let hours = parseInt(time12Match[1], 10);
+    const minutes = time12Match[2];
+    const meridiem = time12Match[3].toUpperCase();
+
+    if (meridiem === 'PM' && hours < 12) hours += 12;
+    if (meridiem === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Try parsing from startAt date if available
+  return '';
+}
+
 // Helper to get initial form values
 function getInitialValues(
   editEvent?: Event | null,
 ): Omit<FormState, 'errors' | 'showDeleteConfirm'> {
   if (editEvent) {
     const parsedDate = new Date(editEvent.startAt);
+    // Convert time to HH:MM format for native time input
+    let timeValue = convertTo24HourFormat(editEvent.time);
+    // If time couldn't be parsed from string, try to get it from startAt
+    if (!timeValue && isValid(parsedDate)) {
+      timeValue = format(parsedDate, 'HH:mm');
+    }
     return {
       title: editEvent.title,
       description: editEvent.description,
       date: isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : '',
-      time: editEvent.time,
+      time: timeValue,
       building: editEvent.building || '',
       room: editEvent.room || '', // Load optional room
       category: editEvent.category,
@@ -363,20 +395,16 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-time">
                 {t('time')} <span className="text-mq-error">*</span>
               </Label>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
-                <Input
-                  id="event-time"
-                  type="text"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  placeholder={t('exampleTime')}
-                  aria-invalid={Boolean(errors.time)}
-                  aria-required="true"
-                  aria-describedby={errors.time ? 'event-time-error' : undefined}
-                  className={errors.time ? 'border-mq-error' : ''}
-                />
-              </div>
+              <Input
+                id="event-time"
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                aria-invalid={Boolean(errors.time)}
+                aria-required="true"
+                aria-describedby={errors.time ? 'event-time-error' : undefined}
+                className={errors.time ? 'border-mq-error' : ''}
+              />
               {errors.time && (
                 <p id="event-time-error" className="text-xs text-mq-error" role="alert">
                   {errors.time}

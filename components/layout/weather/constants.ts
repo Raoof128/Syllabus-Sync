@@ -41,7 +41,11 @@ export const WEATHER_CODE_LABELS: Record<number, string> = {
   99: 'Thunderstorm with heavy hail',
 };
 
-export const mapWeatherCode = (code: number): string => {
+export const mapWeatherCode = (code: number, isDay: boolean = true): string => {
+  // For clear conditions at night, return "Clear" instead of "Clear sky"
+  if (!isDay && code === 0) {
+    return 'Clear';
+  }
   return WEATHER_CODE_LABELS[code] || 'Windy';
 };
 

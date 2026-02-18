@@ -19,7 +19,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 }));
 
 vi.mock('@/lib/supabase/server', () => ({
-  createServerClient: () => createServerClientMock(),
+  createServerClient: async () => createServerClientMock(),
 }));
 
 vi.mock('@/lib/services/rateLimitService', async (importOriginal) => {
@@ -91,8 +91,14 @@ describe('signup API', () => {
   it('accepts the signup client payload (camelCase fields)', async () => {
     const adminClient = makeAdminClient();
     createAdminClientMock.mockReturnValue(adminClient);
-    createServerClientMock.mockResolvedValue({
-      auth: { signInWithPassword: vi.fn() },
+
+    // Mock the server client with signUp that returns a user
+    const signUpMock = vi.fn().mockResolvedValue({
+      data: { user: { id: 'user-1' }, session: null },
+      error: null,
+    });
+    createServerClientMock.mockReturnValue({
+      auth: { signUp: signUpMock },
       from: vi.fn(),
     });
 
@@ -119,14 +125,20 @@ describe('signup API', () => {
 
     expect(res.status).toBe(200);
     expect(json.success).toBe(true);
-    expect(adminClient.auth.admin.createUser).toHaveBeenCalled();
+    // In non-dev mode, it uses supabase.auth.signUp instead of admin createUser
+    expect(signUpMock).toHaveBeenCalled();
   });
 
   it('treats the honeypot as a generic success and skips account creation', async () => {
     const adminClient = makeAdminClient();
     createAdminClientMock.mockReturnValue(adminClient);
-    createServerClientMock.mockResolvedValue({
-      auth: { signInWithPassword: vi.fn() },
+
+    const signUpMock = vi.fn().mockResolvedValue({
+      data: { user: { id: 'user-1' }, session: null },
+      error: null,
+    });
+    createServerClientMock.mockReturnValue({
+      auth: { signUp: signUpMock },
       from: vi.fn(),
     });
 
@@ -153,6 +165,7 @@ describe('signup API', () => {
 
     expect(res.status).toBe(200);
     expect(json.success).toBe(true);
-    expect(adminClient.auth.admin.createUser).not.toHaveBeenCalled();
+    // Honeypot should prevent signup from happening
+    expect(signUpMock).not.toHaveBeenCalled();
   });
 });

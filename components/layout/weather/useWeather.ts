@@ -75,15 +75,16 @@ export const useWeather = () => {
         throw new Error('Invalid weather data');
       }
 
-      const condition = mapWeatherCode(weatherCode);
-      const vibe = determineVibe(weatherCode, isDayValue === 1);
+      const isDay = isDayValue === 1;
+      const condition = mapWeatherCode(weatherCode, isDay);
+      const vibe = determineVibe(weatherCode, isDay);
 
       const newData: WeatherData = {
         temp: Math.round(tempValue),
         condition,
         location: region.name,
         vibe,
-        isDay: isDayValue === 1,
+        isDay,
         timestamp: Date.now(),
       };
 

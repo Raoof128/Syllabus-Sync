@@ -396,20 +396,20 @@ export default function CalendarClient() {
             <div className="flex flex-wrap items-center gap-2 lg:gap-3">
               <div className="flex flex-wrap bg-mq-card-background rounded-lg p-1 border border-mq-border">
                 <Button
-                  variant={view === 'week' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setView('week')}
-                  className="text-sm"
-                >
-                  {t('weekView')}
-                </Button>
-                <Button
                   variant={view === 'day' ? 'secondary' : 'ghost'}
                   size="sm"
                   onClick={() => setView('day')}
                   className="text-sm"
                 >
                   {t('dayView')}
+                </Button>
+                <Button
+                  variant={view === 'week' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setView('week')}
+                  className="text-sm"
+                >
+                  {t('weekView')}
                 </Button>
                 <Button
                   variant={view === 'agenda' ? 'secondary' : 'ghost'}
