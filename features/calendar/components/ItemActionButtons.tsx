@@ -29,6 +29,8 @@ interface ItemActionButtonsProps {
   dateTime?: Date | string | null;
   /** Item color for visual indication */
   itemColor?: string;
+  /** Class schedule for units - array of day/time objects */
+  unitSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
   /** Whether notification is currently enabled for this item */
   notificationEnabled?: boolean;
   /** Callback when edit is clicked */
@@ -53,6 +55,7 @@ export default function ItemActionButtons({
   room,
   dateTime,
   itemColor,
+  unitSchedule,
   notificationEnabled = false,
   onEdit,
   onDelete,
@@ -152,7 +155,7 @@ export default function ItemActionButtons({
           <Button
             variant="ghost"
             size="icon"
-            className={cn(baseButtonClass, 'hover:bg-mq-primary/10 hover:text-mq-primary dark:hover:bg-mq-primary/20')}
+            className={cn(baseButtonClass, 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500')}
             tabIndex={-1}
           >
             <Navigation className={iconSizeClass} aria-hidden="true" />
@@ -223,6 +226,7 @@ export default function ItemActionButtons({
         itemTitle={itemTitle}
         itemDate={itemDate}
         itemColor={itemColor}
+        unitSchedule={unitSchedule}
       />
     </div>
   );

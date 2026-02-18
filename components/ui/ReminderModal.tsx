@@ -37,6 +37,8 @@ interface ReminderModalProps {
   itemTitle: string;
   itemDate?: Date; // The date/time of the item (for reference)
   itemColor?: string; // Optional color for visual indication
+  /** Class schedule for units - array of day/time strings */
+  unitSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
 }
 
 const TIMING_OPTIONS: { value: ReminderTiming; label: string }[] = [
@@ -58,6 +60,7 @@ export default function ReminderModal({
   itemTitle,
   itemDate,
   itemColor,
+  unitSchedule,
 }: ReminderModalProps) {
   const { t } = useTypedTranslation();
   const { addReminder, updateReminder, removeReminder, getReminderForItem } = useRemindersStore();
@@ -174,7 +177,11 @@ export default function ReminderModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-mq-primary" />
@@ -195,7 +202,22 @@ export default function ReminderModal({
               {getItemTypeLabel(itemType)}
             </div>
             <div className="font-semibold text-mq-content">{itemTitle}</div>
-            {itemDate && (
+            {/* Show class schedule for units */}
+            {itemType === 'unit' && unitSchedule && unitSchedule.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <div className="text-xs text-mq-content-tertiary uppercase font-medium">
+                  {t('classSchedule' as any) || 'Class Schedule'}
+                </div>
+                {unitSchedule.map((schedule, idx) => (
+                  <div key={idx} className="flex items-center gap-1 text-sm text-mq-content-secondary">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>{schedule.day}: {schedule.startTime} - {schedule.endTime}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Show date for other item types */}
+            {itemType !== 'unit' && itemDate && (
               <div className="flex items-center gap-1 text-sm text-mq-content-secondary mt-1">
                 <CalendarIcon className="h-3.5 w-3.5" />
                 {format(itemDate, 'PPP p')}

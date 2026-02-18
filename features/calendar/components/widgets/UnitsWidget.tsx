@@ -120,6 +120,8 @@ export default function UnitsWidget({
                       building={unit.location?.building}
                       room={unit.location?.room}
                       unitCode={unit.code}
+                      itemColor={unit.color}
+                      unitSchedule={unit.schedule}
                       notificationEnabled={unit.notificationEnabled}
                       onEdit={() => onEditUnit(unit)}
                       onDelete={() => onDeleteUnit(unit)}

@@ -205,7 +205,6 @@ export default function CalendarClient() {
     setTodoToDelete,
 
     // Actions
-    openEditDeadline,
     openAddAssignment,
     openEditAssignment,
     openAssignmentDetail,
@@ -225,7 +224,7 @@ export default function CalendarClient() {
     useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs);
 
   // 6. Getters Hook
-  const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort, formatLocalized } =
+  const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort } =
     useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
 
   // Local Helpers
@@ -293,13 +292,6 @@ export default function CalendarClient() {
     }
   };
 
-  const handleEditDeadlineFromPanel = (deadline: Deadline) => {
-    if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
-      openEditExam(deadline);
-    } else {
-      openEditAssignment(deadline);
-    }
-  };
 
   const handleUnitDetailOpenChange = (open: boolean) => {
     setUnitDetailOpen(open);
@@ -611,7 +603,15 @@ export default function CalendarClient() {
                 setSelectedUnit(u);
                 setUnitDetailOpen(true);
               }}
-              onDeadlineClick={(d) => openEditDeadline(d)}
+              onDeadlineClick={(d) => {
+                if (d.type === 'Exam' || d.type === 'Quiz') {
+                  setSelectedExam(d);
+                  setExamDetailOpen(true);
+                } else {
+                  setSelectedAssignment(d);
+                  setAssignmentDetailOpen(true);
+                }
+              }}
               onEventClick={handleEventClick}
             />
           )}
@@ -627,7 +627,15 @@ export default function CalendarClient() {
                 setSelectedUnit(u);
                 setUnitDetailOpen(true);
               }}
-              onDeadlineClick={(d) => openEditDeadline(d)}
+              onDeadlineClick={(d) => {
+                if (d.type === 'Exam' || d.type === 'Quiz') {
+                  setSelectedExam(d);
+                  setExamDetailOpen(true);
+                } else {
+                  setSelectedAssignment(d);
+                  setAssignmentDetailOpen(true);
+                }
+              }}
               onEventClick={handleEventClick}
             />
           )}
@@ -703,7 +711,15 @@ export default function CalendarClient() {
         unit={selectedUnit}
         open={unitDetailOpen}
         onOpenChange={handleUnitDetailOpenChange}
-        onEditDeadline={handleEditDeadlineFromPanel}
+        onEditDeadline={(deadline) => {
+          if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
+            setSelectedExam(deadline);
+            setExamDetailOpen(true);
+          } else {
+            setSelectedAssignment(deadline);
+            setAssignmentDetailOpen(true);
+          }
+        }}
         onEditUnit={() => {
           if (selectedUnit) {
             handleUnitDetailOpenChange(false);
@@ -1170,6 +1186,14 @@ export default function CalendarClient() {
           setAssignmentDetailOpen(false);
           handleDeleteAssignment(assignment);
         }}
+        onUnitClick={(unitCode) => {
+          const clickedUnit = units.find((u) => u.code === unitCode);
+          if (clickedUnit) {
+            setAssignmentDetailOpen(false);
+            setSelectedUnit(clickedUnit);
+            setUnitDetailOpen(true);
+          }
+        }}
       />
 
       {/* Exam Detail Panel */}
@@ -1184,6 +1208,14 @@ export default function CalendarClient() {
         onDelete={(exam) => {
           setExamDetailOpen(false);
           handleDeleteExam(exam);
+        }}
+        onUnitClick={(unitCode) => {
+          const clickedUnit = units.find((u) => u.code === unitCode);
+          if (clickedUnit) {
+            setExamDetailOpen(false);
+            setSelectedUnit(clickedUnit);
+            setUnitDetailOpen(true);
+          }
         }}
       />
 

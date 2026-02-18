@@ -32,6 +32,8 @@ interface ExamDetailPanelProps {
   onOpenChange: (open: boolean) => void;
   onEdit?: (exam: Deadline) => void;
   onDelete?: (exam: Deadline) => void;
+  /** Called when the associated unit is clicked - opens unit detail panel */
+  onUnitClick?: (unitCode: string) => void;
 }
 
 export default function ExamDetailPanel({
@@ -40,6 +42,7 @@ export default function ExamDetailPanel({
   onOpenChange,
   onEdit,
   onDelete,
+  onUnitClick,
 }: ExamDetailPanelProps) {
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const units = useUnitsStore((state) => state.units);
@@ -256,14 +259,31 @@ export default function ExamDetailPanel({
 
           {/* Unit Association */}
           {unit && (
-            <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background">
+            <div
+              className={cn(
+                "p-4 rounded-lg border border-mq-border bg-mq-card-background",
+                onUnitClick && "cursor-pointer hover:border-mq-primary/50 hover:bg-mq-hover-background transition-colors"
+              )}
+              onClick={() => onUnitClick?.(unit.code)}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && onUnitClick) {
+                  e.preventDefault();
+                  onUnitClick(unit.code);
+                }
+              }}
+              role={onUnitClick ? "button" : undefined}
+              tabIndex={onUnitClick ? 0 : undefined}
+            >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
                   <BookOpen className="h-3.5 w-3.5" />
                   Associated Unit
                 </div>
                 {unit.location?.building && (
-                  <Link href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}>
+                  <Link
+                    href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Button
                       variant="ghost"
                       size="icon"

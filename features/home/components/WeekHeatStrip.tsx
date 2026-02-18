@@ -143,7 +143,7 @@ export default function WeekHeatStrip() {
   const totalEvents = weekData.reduce((sum, day) => sum + day.eventCount, 0);
 
   return (
-    <CardSolid className="p-4 sm:p-5 mb-6 overflow-hidden">
+    <CardSolid className="p-4 sm:p-5 mb-6 overflow-visible">
       <div className="flex items-center justify-between mb-3 gap-2">
         <h3 className="text-sm font-semibold text-mq-content shrink-0">
           {t('weekAtAGlance') || 'Week Ahead'}
@@ -196,7 +196,7 @@ export default function WeekHeatStrip() {
         </div>
       </div>
 
-      <div className="flex justify-between items-end h-24 gap-2 sm:gap-4">
+      <div className="flex justify-between items-end h-24 gap-2 sm:gap-4 relative">
         {weekData.map((day, i) => (
           <Link
             key={i}
@@ -204,7 +204,15 @@ export default function WeekHeatStrip() {
             className="flex-1 flex flex-col justify-end h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none"
             aria-label={`${day.fullDate}: ${day.classCount} classes, ${day.examCount} exams, ${day.assignmentCount} assignments, ${day.eventCount} events`}
           >
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[160px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+            {/* Tooltip - positioned to stay within bounds */}
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[140px] sm:max-w-[160px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center whitespace-nowrap"
+              style={{
+                // Ensure tooltip doesn't overflow on edges
+                left: i === 0 ? '0' : i === 6 ? 'auto' : '50%',
+                right: i === 6 ? '0' : 'auto',
+                transform: i === 0 ? 'translateX(0)' : i === 6 ? 'translateX(0)' : 'translateX(-50%)',
+              }}
+            >
               <p className="font-bold">{day.fullDate}</p>
               <p>
                 {day.classCount} {day.classCount === 1 ? 'class' : 'classes'}
