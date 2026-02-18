@@ -51,6 +51,16 @@ export function useCalendarGetters(
     (date: Date) => formatLocalized(date, { month: 'long', year: 'numeric' }),
     [formatLocalized],
   );
+  const formatWeekRange = useCallback(
+    (startDate: Date) => {
+      const start = dayjs(startDate);
+      const end = start.add(6, 'day');
+      const startStr = formatLocalized(start.toDate(), { day: 'numeric', month: 'short' });
+      const endStr = formatLocalized(end.toDate(), { day: 'numeric', month: 'short' });
+      return `${startStr} - ${endStr}`;
+    },
+    [formatLocalized],
+  );
   const formatWeekdayLong = useCallback(
     (date: Date) => formatLocalized(date, { weekday: 'long' }),
     [formatLocalized],
@@ -103,6 +113,7 @@ export function useCalendarGetters(
     formatLocalized,
     formatDayNumber,
     formatMonthYear,
+    formatWeekRange,
     formatWeekdayLong,
     formatWeekdayShort,
     formatTimeShort,

@@ -22,8 +22,8 @@ export function useCalendarView() {
     return null;
   }, [searchParams]);
 
-  // View State
-  const [view, setView] = useState<CalendarView>('week');
+  // View State - default to 'day' view
+  const [view, setView] = useState<CalendarView>('day');
 
   // Current Week Start
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {

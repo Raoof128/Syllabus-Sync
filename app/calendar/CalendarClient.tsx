@@ -225,7 +225,7 @@ export default function CalendarClient() {
     useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs);
 
   // 6. Getters Hook
-  const { formatDayNumber, formatMonthYear, formatWeekdayShort, formatTimeShort, formatLocalized } =
+  const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort, formatLocalized } =
     useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
 
   // Local Helpers
@@ -384,12 +384,7 @@ export default function CalendarClient() {
                 {formatMonthYear(currentWeekStart)}
               </h1>
               <p className="text-mq-content-secondary mt-1">
-                {t('weekOf')}{' '}
-                {formatLocalized(currentWeekStart, {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {formatWeekRange(currentWeekStart)}
               </p>
             </div>
 

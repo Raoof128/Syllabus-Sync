@@ -199,6 +199,9 @@ export default function UnitDetailPanel({
                 itemId={unit.id}
                 itemTitle={unit.code}
                 unitCode={unit.code}
+                itemColor={unit.color}
+                building={unit.location?.building}
+                room={unit.location?.room}
                 onEdit={onEditUnit}
                 onDelete={onDeleteUnit}
                 variant="detail"

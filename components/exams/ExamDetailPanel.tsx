@@ -156,6 +156,9 @@ export default function ExamDetailPanel({
               itemTitle={exam.title}
               unitCode={exam.unitCode}
               dateTime={exam.dueDate}
+              itemColor={color}
+              building={exam.building}
+              room={exam.room}
               onEdit={onEdit ? () => onEdit(exam) : undefined}
               onDelete={onDelete ? () => onDelete(exam) : undefined}
               variant="detail"

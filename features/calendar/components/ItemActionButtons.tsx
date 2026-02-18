@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import ReminderModal from '@/components/ui/ReminderModal';
+import { useRemindersStore, ReminderItemType } from '@/lib/store/remindersStore';
 
 export type ItemType = 'assignment' | 'exam' | 'event' | 'unit' | 'todo';
 
@@ -26,6 +27,8 @@ interface ItemActionButtonsProps {
   unitCode?: string;
   /** Due date/start time for notification scheduling */
   dateTime?: Date | string | null;
+  /** Item color for visual indication */
+  itemColor?: string;
   /** Whether notification is currently enabled for this item */
   notificationEnabled?: boolean;
   /** Callback when edit is clicked */
@@ -43,11 +46,13 @@ interface ItemActionButtonsProps {
 }
 
 export default function ItemActionButtons({
-  itemType: _itemType,
+  itemType,
   itemId,
   itemTitle,
   building,
   room,
+  dateTime,
+  itemColor,
   notificationEnabled = false,
   onEdit,
   onDelete,
@@ -57,6 +62,25 @@ export default function ItemActionButtons({
   stopPropagation = true,
 }: ItemActionButtonsProps) {
   const { t } = useTypedTranslation();
+  const [reminderModalOpen, setReminderModalOpen] = useState(false);
+  const { getReminderForItem } = useRemindersStore();
+
+  // Map ItemType to ReminderItemType
+  const reminderItemType: ReminderItemType = itemType as ReminderItemType;
+
+  // Check if reminder exists in store
+  const hasReminder = !!getReminderForItem(itemId, reminderItemType);
+
+  // Combine with legacy notificationEnabled prop
+  const isNotificationActive = hasReminder || notificationEnabled;
+
+  // Parse dateTime to Date
+  const itemDate = useMemo(() => {
+    if (!dateTime) return undefined;
+    if (dateTime instanceof Date) return dateTime;
+    const parsed = new Date(dateTime);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  }, [dateTime]);
 
   // Navigation URL
   const navigationUrl = useMemo(() => {
@@ -68,31 +92,13 @@ export default function ItemActionButtons({
     return `/map?${params.toString()}`;
   }, [building, room]);
 
-  // Handle notify button click - toggle and sync with DB via callback
+  // Handle notify button click - open reminder modal
   const handleNotifyClick = useCallback(
     (e: React.MouseEvent) => {
       if (stopPropagation) e.stopPropagation();
-
-      const newState = !notificationEnabled;
-
-      // Call the callback to update the database
-      onToggleNotification?.(newState);
-
-      if (newState) {
-        toastUtils.success(
-          t('reminderSet' as TranslationKey) || 'Notification Enabled',
-          `${itemTitle}`,
-          { id: `notification-enabled-${itemId}` },
-        );
-      } else {
-        toastUtils.info(
-          t('reminderCancelled' as TranslationKey) || 'Notification Disabled',
-          `${itemTitle}`,
-          { id: `notification-disabled-${itemId}` },
-        );
-      }
+      setReminderModalOpen(true);
     },
-    [stopPropagation, notificationEnabled, onToggleNotification, itemId, itemTitle, t],
+    [stopPropagation],
   );
 
   // Click handlers that optionally stop propagation
@@ -179,33 +185,44 @@ export default function ItemActionButtons({
         </button>
       )}
 
-      {/* Notify/Reminder Button - Simple Toggle */}
+      {/* Notify/Reminder Button - Opens Modal */}
       <button
         type="button"
         onClick={handleNotifyClick}
         className={cn(
           baseButtonClass,
-          notificationEnabled
+          isNotificationActive
             ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-900/40'
             : 'hover:bg-mq-hover-background',
         )}
         title={
-          notificationEnabled
-            ? t('cancelReminder' as TranslationKey) || 'Click to disable notification'
-            : t('setReminder' as TranslationKey) || 'Click to enable notification'
+          isNotificationActive
+            ? t('editReminder' as TranslationKey) || 'Edit reminder'
+            : t('setReminder' as TranslationKey) || 'Set reminder'
         }
         aria-label={
-          notificationEnabled
-            ? t('cancelReminder' as TranslationKey) || 'Disable notification'
-            : t('setReminder' as TranslationKey) || 'Enable notification'
+          isNotificationActive
+            ? t('editReminder' as TranslationKey) || 'Edit reminder'
+            : t('setReminder' as TranslationKey) || 'Set reminder'
         }
       >
-        {notificationEnabled ? (
+        {isNotificationActive ? (
           <Bell className={cn(iconSizeClass, 'fill-current')} aria-hidden="true" />
         ) : (
           <Bell className={iconSizeClass} aria-hidden="true" />
         )}
       </button>
+
+      {/* Reminder Modal */}
+      <ReminderModal
+        open={reminderModalOpen}
+        onOpenChange={setReminderModalOpen}
+        itemId={itemId}
+        itemType={reminderItemType}
+        itemTitle={itemTitle}
+        itemDate={itemDate}
+        itemColor={itemColor}
+      />
     </div>
   );
 }

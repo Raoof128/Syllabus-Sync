@@ -12,16 +12,13 @@ import {
   Circle,
   AlertCircle,
   CalendarDays,
-  Bell,
-  Edit2,
-  Trash2,
 } from 'lucide-react';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
+import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 
 interface TodoDetailPanelProps {
   todo: Todo | null;
@@ -29,7 +26,6 @@ interface TodoDetailPanelProps {
   onOpenChange: (open: boolean) => void;
   onEdit?: (todo: Todo) => void;
   onDelete?: (todo: Todo) => void;
-  onNotify?: (todo: Todo) => void;
 }
 
 export default function TodoDetailPanel({
@@ -38,7 +34,6 @@ export default function TodoDetailPanel({
   onOpenChange,
   onEdit,
   onDelete,
-  onNotify,
 }: TodoDetailPanelProps) {
   const toggleComplete = useTodosStore((state) => state.toggleComplete);
   const { t } = useTypedTranslation();
@@ -145,45 +140,18 @@ export default function TodoDetailPanel({
               </button>
             </div>
 
-            {/* Action buttons - Bell, Edit, Delete (no Navigate for Todos) */}
-            <div className="flex items-center gap-1">
-              {onNotify && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={() => onNotify(todo)}
-                  title={tOr('setReminder', 'Set reminder')}
-                >
-                  <Bell className="h-4 w-4" />
-                </Button>
-              )}
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEdit(todo);
-                  }}
-                  title={tOr('edit', 'Edit')}
-                >
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-500"
-                  onClick={() => onDelete(todo)}
-                  title={t('delete')}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            {/* Action buttons using ItemActionButtons for consistency */}
+            <ItemActionButtons
+              itemType="todo"
+              itemId={todo.id}
+              itemTitle={todo.title}
+              dateTime={todo.dueDate}
+              itemColor={color}
+              onEdit={onEdit ? () => onEdit(todo) : undefined}
+              onDelete={onDelete ? () => onDelete(todo) : undefined}
+              variant="detail"
+              stopPropagation={false}
+            />
           </div>
 
           {/* Info Cards */}

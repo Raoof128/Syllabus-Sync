@@ -137,6 +137,9 @@ export default function EventDetailPanel({
               itemId={event.id}
               itemTitle={event.title}
               dateTime={event.startAt}
+              itemColor={event.color}
+              building={event.building}
+              room={event.room}
               onEdit={onEdit ? () => onEdit(event) : undefined}
               onDelete={onDelete ? () => onDelete(event) : undefined}
               variant="detail"

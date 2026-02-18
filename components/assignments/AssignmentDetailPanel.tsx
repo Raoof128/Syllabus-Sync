@@ -160,6 +160,7 @@ export default function AssignmentDetailPanel({
               itemTitle={assignment.title}
               unitCode={assignment.unitCode}
               dateTime={assignment.dueDate}
+              itemColor={color}
               onEdit={onEdit ? () => onEdit(assignment) : undefined}
               onDelete={onDelete ? () => onDelete(assignment) : undefined}
               variant="detail"
