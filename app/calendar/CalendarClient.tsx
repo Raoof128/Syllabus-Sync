@@ -1130,7 +1130,8 @@ export default function CalendarClient() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     setTodoDialogOpen(false);
                     setEditingTodo(null);
                   }}

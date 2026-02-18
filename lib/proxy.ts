@@ -60,7 +60,6 @@ export async function proxy(request: NextRequest) {
 
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
-  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
   const isRootPath = path === '/';
   const isApiRoute = path.startsWith('/api/');
   const isPublicApi = isPublicApiPath(path);

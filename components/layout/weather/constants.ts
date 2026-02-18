@@ -46,7 +46,16 @@ export const mapWeatherCode = (code: number): string => {
 };
 
 export const determineVibe = (weatherCode: number, isDay: boolean): Vibe => {
-  if (!isDay) return 'night';
+  // At night, show 'night' vibe for clear/cloudy conditions, but show actual weather for rain/snow/thunder
+  if (!isDay) {
+    // Show 'night' for clear/cloudy conditions
+    if (weatherCode === 0 || [1, 2, 3].includes(weatherCode)) return 'night';
+    // For severe weather, show the actual weather condition even at night
+    if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) return 'rainy';
+    if ([71, 73, 75, 77, 85, 86].includes(weatherCode)) return 'snowy';
+    if ([95, 96, 99].includes(weatherCode)) return 'thunder';
+    return 'night'; // Default to night for windy or other conditions at night
+  }
   if (weatherCode === 0) return 'sunny';
   if ([1, 2, 3].includes(weatherCode)) return 'cloudy';
   if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(weatherCode)) return 'rainy';

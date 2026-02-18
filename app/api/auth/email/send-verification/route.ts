@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       logger.error('Failed to resend verification email:', {
         message: error.message,
-        email_hint: user.email.substring(0, 3) + '***',
+        email_hint: `${user.email.substring(0, 3)}***`,
       });
       return jsonError('Failed to send verification email', 500, ERROR_CODES.INTERNAL_ERROR);
     }

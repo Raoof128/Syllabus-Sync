@@ -163,7 +163,10 @@ export default function TodoDetailPanel({
                   variant="ghost"
                   size="icon"
                   className="h-9 w-9"
-                  onClick={() => onEdit(todo)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onEdit(todo);
+                  }}
                   title={tOr('edit', 'Edit')}
                 >
                   <Edit2 className="h-4 w-4" />

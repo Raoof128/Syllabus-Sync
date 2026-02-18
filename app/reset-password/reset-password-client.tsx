@@ -57,7 +57,8 @@ export default function ResetPasswordClient() {
   // Check for hash fragment on mount (Supabase sends tokens in hash for password recovery)
   useEffect(() => {
     if (typeof window !== 'undefined' && !hashChecked) {
-      setHashChecked(true);
+      // Use queueMicrotask to avoid calling setState synchronously in effect
+      queueMicrotask(() => setHashChecked(true));
       const hash = window.location.hash;
       if (hash) {
         // Parse hash fragment for access_token and type
@@ -66,15 +67,17 @@ export default function ResetPasswordClient() {
         const type = params.get('type');
 
         if (accessToken && type === 'recovery') {
-          setHasHashFragment(true);
-          setMode('loading');
+          queueMicrotask(() => {
+            setHasHashFragment(true);
+            setMode('loading');
+          });
         }
       } else if (code) {
         // We have a code from the callback, go to loading
-        setMode('loading');
+        queueMicrotask(() => setMode('loading'));
       } else if (recovery) {
         // Code was already exchanged server-side by /auth/callback, check session
-        setMode('loading');
+        queueMicrotask(() => setMode('loading'));
       }
     }
   }, [code, recovery, hashChecked]);

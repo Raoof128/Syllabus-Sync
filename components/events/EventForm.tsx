@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { format, isValid } from 'date-fns';
+import { Clock } from 'lucide-react';
 import { UNIT_COLORS } from '@/lib/config';
 import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
 import { cn } from '@/lib/utils';
@@ -362,17 +363,20 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               <Label htmlFor="event-time">
                 {t('time')} <span className="text-mq-error">*</span>
               </Label>
-              <Input
-                id="event-time"
-                type="text"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                placeholder={t('exampleTime')}
-                aria-invalid={Boolean(errors.time)}
-                aria-required="true"
-                aria-describedby={errors.time ? 'event-time-error' : undefined}
-                className={errors.time ? 'border-mq-error' : ''}
-              />
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
+                <Input
+                  id="event-time"
+                  type="text"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  placeholder={t('exampleTime')}
+                  aria-invalid={Boolean(errors.time)}
+                  aria-required="true"
+                  aria-describedby={errors.time ? 'event-time-error' : undefined}
+                  className={errors.time ? 'border-mq-error' : ''}
+                />
+              </div>
               {errors.time && (
                 <p id="event-time-error" className="text-xs text-mq-error" role="alert">
                   {errors.time}

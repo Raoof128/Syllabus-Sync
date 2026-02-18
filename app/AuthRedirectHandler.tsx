@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
+import { logger } from '@/lib/logger';
 
 interface AuthRedirectHandlerProps {
   fallbackRedirect: string;
@@ -23,6 +24,16 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const handledRef = useRef(false);
   const supabase = createBrowserClient();
+
+  // Memoized handler for setting error state
+  const handleError = useCallback((message: string) => {
+    handledRef.current = true;
+    // Use queueMicrotask to avoid calling setState synchronously in effect
+    queueMicrotask(() => {
+      setStatus('error');
+      setErrorMessage(message);
+    });
+  }, []);
 
   // Check for recovery/auth tokens on mount
   useEffect(() => {
@@ -43,18 +54,16 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
     const error = hashParams.get('error') || searchParams.get('error');
     const errorDescription = hashParams.get('error_description') || searchParams.get('error_description');
 
-    console.log('AuthRedirectHandler: Checking URL', {
-      hash: hash ? hash.substring(0, 50) + '...' : 'none',
+    logger.info('AuthRedirectHandler: Checking URL', {
+      hash: hash ? `${hash.substring(0, 50)}...` : 'none',
       type,
       error
     });
 
     // Handle errors
     if (error) {
-      console.error('AuthRedirectHandler: Error in URL', { error, errorDescription });
-      handledRef.current = true;
-      setStatus('error');
-      setErrorMessage(errorDescription || error || 'Authentication failed.');
+      logger.error('AuthRedirectHandler: Error in URL', { error, errorDescription });
+      handleError(errorDescription || error || 'Authentication failed.');
       return;
     }
 
@@ -62,18 +71,18 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
     // was stripped to root. Forward to /auth/callback for server-side code exchange.
     const codeParam = searchParams.get('code');
     if (codeParam) {
-      console.log('AuthRedirectHandler: PKCE code detected, forwarding to /auth/callback');
+      logger.info('AuthRedirectHandler: PKCE code detected, forwarding to /auth/callback');
       handledRef.current = true;
-      setStatus('redirecting');
+      queueMicrotask(() => setStatus('redirecting'));
       window.location.href = `/auth/callback${search}`;
       return;
     }
 
     // If type=recovery, redirect to /reset-password with the hash
     if (type === 'recovery') {
-      console.log('AuthRedirectHandler: Recovery detected, redirecting to /reset-password');
+      logger.info('AuthRedirectHandler: Recovery detected, redirecting to /reset-password');
       handledRef.current = true;
-      setStatus('redirecting');
+      queueMicrotask(() => setStatus('redirecting'));
       // Pass the entire hash to reset-password so it can process the tokens
       router.replace(`/reset-password${hash}`);
       return;
@@ -84,14 +93,14 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
 
     if (!hasAuthTokens) {
       // No auth params - redirect to fallback
-      console.log('AuthRedirectHandler: No auth params, redirecting to fallback');
+      logger.info('AuthRedirectHandler: No auth params, redirecting to fallback');
       router.replace(fallbackRedirect);
       return;
     }
 
     // Has auth tokens but not recovery type - let Supabase process
-    setStatus('processing');
-  }, [router, fallbackRedirect]);
+    queueMicrotask(() => setStatus('processing'));
+  }, [router, fallbackRedirect, handleError]);
 
   // Listen for auth state changes from Supabase
   useEffect(() => {
@@ -101,17 +110,17 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       (event: string, session: unknown) => {
         if (handledRef.current) return;
 
-        console.log('AuthRedirectHandler: Auth state change:', event);
+        logger.info('AuthRedirectHandler: Auth state change:', { event });
 
         if (event === 'PASSWORD_RECOVERY' && session) {
           // Recovery flow - redirect to reset-password
           handledRef.current = true;
-          setStatus('redirecting');
+          queueMicrotask(() => setStatus('redirecting'));
           router.replace('/reset-password');
         } else if (event === 'SIGNED_IN' && session) {
           // Normal sign in - redirect to home
           handledRef.current = true;
-          setStatus('redirecting');
+          queueMicrotask(() => setStatus('redirecting'));
           router.replace('/home');
         }
       }
@@ -127,7 +136,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
     const timeout = setTimeout(async () => {
       if (handledRef.current) return;
 
-      console.log('AuthRedirectHandler: Timeout, checking session');
+      logger.info('AuthRedirectHandler: Timeout, checking session');
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {

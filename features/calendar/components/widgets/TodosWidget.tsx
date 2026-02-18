@@ -148,7 +148,10 @@ export default function TodosWidget({
                               : '#3b82f6',
                         borderLeftWidth: '4px',
                       }}
-                      onClick={() => onOpenTodoDetail(todo)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onOpenTodoDetail(todo);
+                      }}
                       onKeyDown={(e) => handleKeyDown(e, () => onOpenTodoDetail(todo))}
                       role="button"
                       tabIndex={0}
