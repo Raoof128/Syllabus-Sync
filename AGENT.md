@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Mandatory Course & Year + 3× Logos + Honeypot Security Fix
+Summary: (1) Made course and year required in auth schema (z.string().trim().min(1, ...)). Added * required markers on labels in SignupClient. (2) Tripled logo sizes: signup 80→240px, reset-password 72→216px (both occurrences). (3) Security fix in signup API route: honeypot check now runs on raw body BEFORE Zod schema validation. Previously empty course/year caused 400 before honeypot check, leaking schema info to bots. Now bots always get fake 200 regardless of other field values. Fixed 1 test failure (honeypot test that was getting 400 instead of 200).
+Files: Modified `lib/schemas/auth.ts`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`, `app/api/auth/signup/route.ts`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Dynamic Year Range + MQ Logo on Signup & Reset Password
 Summary: (1) Year selector in signup is now dynamic: watches selected course → looks up DEGREE_TYPE_LABELS → maps to DEGREE_MAX_YEARS → generates Year 1..N options. useEffect resets year field when user switches to a shorter degree type. Added DEGREE_MAX_YEARS to lib/data/mq-courses.ts. Removed static ACADEMIC_YEARS constant from SignupClient. (2) Replaced graduation cap icon with MQ_Logo_Final.png (80×80) in signup card header; email confirmation step keeps Mail icon. Added MQ logo (72×72) above title in reset-password main card and above checkmark in success state.
 Files: Modified `lib/data/mq-courses.ts`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.

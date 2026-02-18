@@ -236,8 +236,8 @@ export default function SignupClient() {
               <Image
                 src="/MQ_Logo_Final.png"
                 alt="Macquarie University"
-                width={80}
-                height={80}
+                width={240}
+                height={240}
                 className="object-contain"
                 priority
               />
@@ -542,7 +542,7 @@ export default function SignupClient() {
               </div>
               {/* Course — searchable combobox from MQ 2026 catalogue */}
               <div className="space-y-2">
-                <Label htmlFor="course">{t('course')}</Label>
+                <Label htmlFor="course">{t('course')} <span className="text-red-500">*</span></Label>
                 <Controller
                   name="course"
                   control={control}
@@ -562,7 +562,7 @@ export default function SignupClient() {
 
               {/* Year of Study */}
               <div className="space-y-2">
-                <Label htmlFor="year">{t('year')}</Label>
+                <Label htmlFor="year">{t('year')} <span className="text-red-500">*</span></Label>
                 <Controller
                   name="year"
                   control={control}

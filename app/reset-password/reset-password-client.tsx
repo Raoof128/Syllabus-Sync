@@ -259,8 +259,8 @@ export default function ResetPasswordClient() {
               <Image
                 src="/MQ_Logo_Final.png"
                 alt="Macquarie University"
-                width={72}
-                height={72}
+                width={216}
+                height={216}
                 className="object-contain"
                 priority
               />

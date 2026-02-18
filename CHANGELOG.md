@@ -1,3 +1,26 @@
+### Raouf: Mandatory Course & Year + 3× Logos on Signup & Reset Password — 2026-02-19
+
+**Scope:** (1) Course and Year fields mandatory in signup. (2) MQ logo tripled in size on both pages. (3) Honeypot check moved before schema validation in signup API route.
+**Type:** Enhancement + Security Improvement
+
+#### Changes
+
+1. **`lib/schemas/auth.ts`** — `course` and `year` changed from `optional()` to `z.string().trim().min(1, ...)` (required)
+
+2. **`app/signup/SignupClient.tsx`** — Added `*` required markers on Course and Year labels; logo 80×80 → 240×240
+
+3. **`app/reset-password/reset-password-client.tsx`** — Both logo instances 72×72 → 216×216
+
+4. **`app/api/auth/signup/route.ts`** (security fix) — Moved honeypot check to run on raw body **before** Zod schema validation. Previously, bots with an empty `course`/`year` would get a 400 validation error (leaking schema info) instead of a fake 200. Now: `_gotcha` is checked first on the raw body, bots get `200 success` regardless of any other field values.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass — honeypot test fixed)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+
+---
+
 ### Raouf: Dynamic Year Range + MQ Logo on Signup & Reset Password — 2026-02-19
 
 **Scope:** (1) Year selector in signup is now dynamic based on selected course/degree type. (2) MQ logo replaces graduation icon on signup; added to reset-password card.

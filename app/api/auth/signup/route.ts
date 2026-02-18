@@ -141,6 +141,21 @@ export async function POST(request: NextRequest) {
     const { data: body, error: bodyError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
     if (bodyError) return bodyError;
 
+    // SECURITY: Honeypot check on raw body — before schema validation so bots are silently
+    // deflected even when they omit optional fields, revealing nothing about what we validate.
+    const rawBody = body as Record<string, unknown>;
+    const gotchaValue = rawBody._gotcha;
+    if (gotchaValue && String(gotchaValue).length > 0) {
+      logger.warn('Honeypot triggered - bot detected', { ip: clientIP });
+      logAuthEvent(
+        adminClient,
+        'honeypot_triggered',
+        { ip: clientIP, gotcha_value: gotchaValue },
+        request,
+      );
+      return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
+    }
+
     // Use shared schema with server-side translation
     const schema = createSignupSchema(serverT);
     const parsed = schema.safeParse(body);
@@ -160,25 +175,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { email, password, fullName, studentId, course, year, _gotcha } = parsed.data;
-
-    // SECURITY: Server-side honeypot check
-    if (_gotcha && _gotcha.length > 0) {
-      // Lie to the bot - return generic success so they leave
-      logger.warn('Honeypot triggered - bot detected', { ip: clientIP });
-
-      // AUDIT: Log honeypot trigger
-      logAuthEvent(
-        adminClient,
-        'honeypot_triggered',
-        { ip: clientIP, gotcha_value: _gotcha },
-        request,
-      );
-
-      return jsonSuccess({
-        message: GENERIC_SIGNUP_SUCCESS,
-      });
-    }
+    const { email, password, fullName, studentId, course, year } = parsed.data;
 
     const supabase = await createServerClient();
     // adminClient already initialized at top for kill switch check

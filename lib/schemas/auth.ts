@@ -29,8 +29,8 @@ export const createSignupSchema = (t: (key: any) => string) => {
       // Profile fields with sanitization
       fullName: z.string().trim().min(1, t('validation.fullNameRequired')).transform(stripHtmlTags),
       studentId: z.string().trim().min(1, t('validation.studentIdRequired')),
-      course: z.string().optional(),
-      year: z.string().optional(),
+      course: z.string().trim().min(1, 'Course is required'),
+      year: z.string().trim().min(1, 'Year of study is required'),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('validation.passwordsMismatch'),
