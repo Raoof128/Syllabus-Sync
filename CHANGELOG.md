@@ -1,3 +1,71 @@
+### Raouf: Dynamic Year Range + MQ Logo on Signup & Reset Password — 2026-02-19
+
+**Scope:** (1) Year selector in signup is now dynamic based on selected course/degree type. (2) MQ logo replaces graduation icon on signup; added to reset-password card.
+**Type:** Enhancement
+
+#### Changes
+
+1. **`lib/data/mq-courses.ts`** — Added `DEGREE_MAX_YEARS` map:
+   - Bachelor → 3, Bachelor (Honours) → 4, Master → 2, Master by Research → 3
+   - Graduate Certificate → 1, Graduate Diploma → 2, Diploma → 2, Other → 8
+
+2. **`app/signup/SignupClient.tsx`**:
+   - Added `useMemo`, `useEffect`, `Image` imports; added `getValues`/`setValue` to form
+   - Removed static `ACADEMIC_YEARS` constant + `TranslationKey` import
+   - `selectedCourse = watch('course')` drives `maxYear` via useMemo
+   - `academicYears` array generated as `[Year 1 … Year N]` from `maxYear`
+   - `useEffect` resets `year` field to `''` when selected course changes to a type with fewer years
+   - Year Controller now uses dynamic `academicYears` (shows only valid options for the degree)
+   - Replaced graduation cap icon with `<Image src="/MQ_Logo_Final.png" ...>` (80×80px); confirmation step keeps Mail icon
+
+3. **`app/reset-password/reset-password-client.tsx`**:
+   - Added `Image` import
+   - MQ logo (72×72px) added above the title in the main request/set card
+   - MQ logo also added above the checkmark in the success state
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+
+---
+
+### Raouf: Signup Course & Year Selectors from MQ 2026 Catalogue — 2026-02-19
+
+**Scope:** Replace plain text inputs for course and year in the signup form with a searchable combobox (177 MQ courses) and a Select dropdown.
+**Type:** Feature
+
+#### Changes
+
+1. **`lib/data/mq-courses.ts`** (new) — Static data file with all 177 MQ 2026 courses (code, name, type, faculty). Includes `DEGREE_TYPE_LABELS` map for simplified display labels and `DEGREE_TYPE_ORDER` for group ordering.
+
+2. **`app/signup/components/CourseCombobox.tsx`** (new) — Searchable combobox component:
+   - Click trigger opens a dropdown with a live search input
+   - Filters by course name or code as the user types
+   - Results are grouped by simplified degree level (Bachelor, Bachelor (Honours), Master, Master by Research, Graduate Certificate, Graduate Diploma, Diploma, Other)
+   - Shows result count while filtering
+   - Clear (✕) button to deselect
+   - Keyboard: Escape closes the dropdown
+   - Fully styled with MQ design tokens
+
+3. **`app/signup/SignupClient.tsx`**:
+   - Added `Controller` import from react-hook-form
+   - Added `CourseCombobox`, `Select`/`SelectContent`/`SelectItem`/`SelectTrigger`/`SelectValue`, and `TranslationKey` imports
+   - Added `ACADEMIC_YEARS` constant (same values as AcademicInfoCard)
+   - Added `control` to form destructure
+   - Replaced `course` plain `Input` → `CourseCombobox` via `Controller`
+   - Replaced `year` plain `Input` → `Select` dropdown via `Controller` (consistent with manage-profiles AcademicInfoCard)
+   - Changed layout from `grid grid-cols-2` to stacked `space-y-2` blocks (combobox is too wide for half-width)
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+
+---
+
 ### Raouf: Student ID Input Hard-Cap at 8 Characters — 2026-02-19
 
 **Scope:** Add `maxLength={8}` + `inputMode="numeric"` to Student ID input field.

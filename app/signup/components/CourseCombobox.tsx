@@ -1,0 +1,188 @@
+'use client';
+
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { ChevronDown, Search, X } from 'lucide-react';
+import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
+import { cn } from '@/lib/utils';
+
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  error?: boolean;
+};
+
+export function CourseCombobox({ value, onChange, disabled, error }: Props) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (open) setTimeout(() => searchRef.current?.focus(), 30);
+  }, [open]);
+
+  // Filter courses by query (name or code)
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return MQ_COURSES;
+    return MQ_COURSES.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q),
+    );
+  }, [query]);
+
+  // Group filtered results by simplified degree label, in defined order
+  const grouped = useMemo(() => {
+    const map = new Map<string, typeof MQ_COURSES>();
+    for (const course of filtered) {
+      const label = DEGREE_TYPE_LABELS[course.type] ?? course.type;
+      if (!map.has(label)) map.set(label, []);
+      map.get(label)!.push(course);
+    }
+    // Sort groups by preferred order
+    const ordered = new Map<string, typeof MQ_COURSES>();
+    for (const label of DEGREE_TYPE_ORDER) {
+      if (map.has(label)) ordered.set(label, map.get(label)!);
+    }
+    // Append any remaining labels not in the order list
+    for (const [label, courses] of map) {
+      if (!ordered.has(label)) ordered.set(label, courses);
+    }
+    return ordered;
+  }, [filtered]);
+
+  const handleSelect = (name: string) => {
+    onChange(name);
+    setOpen(false);
+    setQuery('');
+  };
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange('');
+    setQuery('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') setOpen(false);
+  };
+
+  const totalResults = filtered.length;
+
+  return (
+    <div ref={containerRef} className="relative" onKeyDown={handleKeyDown}>
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => !disabled && setOpen((v) => !v)}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={cn(
+          'flex w-full items-center justify-between gap-2 rounded-mq border px-3 py-2 text-sm',
+          'bg-mq-input-background text-mq-content',
+          'transition-[color,box-shadow] outline-none',
+          'focus-visible:ring-[3px] focus-visible:border-mq-focus focus-visible:ring-mq-focus/40',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          'h-9',
+          error ? 'border-red-500' : 'border-mq-border',
+          open && 'border-mq-focus ring-[3px] ring-mq-focus/40',
+        )}
+      >
+        <span className={cn('truncate text-left flex-1', !value && 'text-mq-content-tertiary')}>
+          {value || 'Select your course…'}
+        </span>
+        <span className="flex items-center gap-0.5 shrink-0">
+          {value && (
+            <span
+              role="button"
+              tabIndex={-1}
+              onClick={handleClear}
+              aria-label="Clear selection"
+              className="p-0.5 rounded hover:bg-mq-hover-background text-mq-content-secondary hover:text-mq-content transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </span>
+          )}
+          <ChevronDown
+            className={cn('h-4 w-4 opacity-50 transition-transform duration-150', open && 'rotate-180')}
+          />
+        </span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div
+          role="listbox"
+          aria-label="Course list"
+          className="absolute z-50 w-full mt-1 rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
+        >
+          {/* Search */}
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-mq-border">
+            <Search className="h-3.5 w-3.5 shrink-0 text-mq-content-tertiary" />
+            <input
+              ref={searchRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search courses…"
+              className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
+            />
+            {query && (
+              <span className="text-xs text-mq-content-secondary shrink-0">
+                {totalResults} result{totalResults !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+
+          {/* Course list */}
+          <div className="max-h-64 overflow-y-auto py-1">
+            {grouped.size === 0 ? (
+              <div className="px-3 py-6 text-sm text-mq-content-secondary text-center">
+                No courses match &ldquo;{query}&rdquo;
+              </div>
+            ) : (
+              Array.from(grouped.entries()).map(([label, courses]) => (
+                <div key={label}>
+                  {/* Group header */}
+                  <div className="px-3 pt-2 pb-0.5 text-xs font-semibold tracking-wider uppercase text-mq-content-tertiary">
+                    {label}
+                  </div>
+                  {courses.map((course) => (
+                    <button
+                      key={course.code}
+                      type="button"
+                      role="option"
+                      aria-selected={value === course.name}
+                      onClick={() => handleSelect(course.name)}
+                      className={cn(
+                        'w-full text-left px-3 py-1.5 text-sm transition-colors',
+                        value === course.name
+                          ? 'bg-mq-primary/10 text-mq-primary font-medium'
+                          : 'text-mq-content hover:bg-mq-hover-background',
+                      )}
+                    >
+                      {course.name}
+                    </button>
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

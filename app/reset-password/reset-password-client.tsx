@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 import { Loader2, CheckCircle2, XCircle, Eye, EyeOff, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
@@ -255,8 +256,18 @@ export default function ResetPasswordClient() {
         <div className="w-full max-w-md">
           <div className="rounded-2xl border border-mq-border bg-mq-card-background shadow-sm p-6 sm:p-8 text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle2 className="h-10 w-10 text-green-600" />
+              <Image
+                src="/MQ_Logo_Final.png"
+                alt="Macquarie University"
+                width={72}
+                height={72}
+                className="object-contain"
+                priority
+              />
+            </div>
+            <div className="flex justify-center">
+              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle2 className="h-9 w-9 text-green-600" />
               </div>
             </div>
             <div className="space-y-2">
@@ -279,6 +290,16 @@ export default function ResetPasswordClient() {
     <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-mq-border bg-mq-card-background shadow-sm p-6 sm:p-8 space-y-6">
+          <div className="flex justify-center">
+            <Image
+              src="/MQ_Logo_Final.png"
+              alt="Macquarie University"
+              width={72}
+              height={72}
+              className="object-contain"
+              priority
+            />
+          </div>
           <div className="space-y-2">
             <h1 className="text-xl font-bold text-mq-content">{t('resetPassword')}</h1>
             <p className="text-sm text-mq-content-secondary">

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import Image from 'next/image';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/mq/button';
@@ -11,7 +12,6 @@ import { Input } from '@/components/ui/mq/input';
 import { PasswordInput } from '@/components/ui/custom/PasswordInput';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/mq/alert';
-import { Icons } from '@/components/ui/icons';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { API_ROUTES } from '@/lib/constants/config';
 import { toastUtils } from '@/lib/utils/toast';
@@ -22,9 +22,19 @@ import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { CourseCombobox } from './components/CourseCombobox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
 
 // react-hook-form expects the schema *input* shape, not the transformed output.
 type SignupFormData = z.input<ReturnType<typeof createSignupSchema>>;
+
 
 export default function SignupClient() {
   const { t } = useTypedTranslation();
@@ -86,6 +96,9 @@ export default function SignupClient() {
     handleSubmit,
     trigger,
     watch,
+    control,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -107,6 +120,28 @@ export default function SignupClient() {
   const password = watch('password');
   // Calculate strength strictly for UI feedback
   const passwordStrength = password ? calculatePasswordStrength(password) : null;
+
+  // Dynamic year range based on selected course type
+  const selectedCourse = watch('course');
+  const maxYear = useMemo(() => {
+    if (!selectedCourse) return 8; // No course selected — show all
+    const course = MQ_COURSES.find((c) => c.name === selectedCourse);
+    const label = course ? (DEGREE_TYPE_LABELS[course.type] ?? 'Other') : 'Other';
+    return DEGREE_MAX_YEARS[label] ?? 8;
+  }, [selectedCourse]);
+
+  const academicYears = useMemo(
+    () => Array.from({ length: maxYear }, (_, i) => ({ value: String(i + 1), label: `Year ${i + 1}` })),
+    [maxYear],
+  );
+
+  // Reset year if it's now out of range (e.g., switched from Bachelor→Grad Cert)
+  useEffect(() => {
+    const currentYear = Number(getValues('year'));
+    if (currentYear > maxYear) {
+      setValue('year', '');
+    }
+  }, [maxYear, getValues, setValue]);
 
   const handleNextStep = async () => {
     // Validate only auth fields
@@ -193,16 +228,20 @@ export default function SignupClient() {
       <Card className="w-full max-w-md bg-mq-card-background border border-mq-border">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className={clsx(
-              'w-12 h-12 rounded-mq-lg flex items-center justify-center',
-              step === 'confirmation' ? 'bg-mq-success' : 'bg-mq-primary',
-            )}>
-              {step === 'confirmation' ? (
+            {step === 'confirmation' ? (
+              <div className="w-12 h-12 rounded-full bg-mq-success flex items-center justify-center">
                 <Mail className="w-6 h-6 text-white" />
-              ) : (
-                <Icons.Graduation className="w-6 h-6 text-white" />
-              )}
-            </div>
+              </div>
+            ) : (
+              <Image
+                src="/MQ_Logo_Final.png"
+                alt="Macquarie University"
+                width={80}
+                height={80}
+                className="object-contain"
+                priority
+              />
+            )}
           </div>
           <CardTitle className="text-2xl text-center">
             {step === 'confirmation'
@@ -501,25 +540,54 @@ export default function SignupClient() {
                   <p className="text-xs text-red-500">{errors.studentId.message}</p>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="course">{t('course')}</Label>
-                  <Input
-                    id="course"
-                    placeholder={t('coursePlaceholder')}
-                    disabled={isSubmitting}
-                    {...register('course')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">{t('year')}</Label>
-                  <Input
-                    id="year"
-                    placeholder={t('yearPlaceholder')}
-                    disabled={isSubmitting}
-                    {...register('year')}
-                  />
-                </div>
+              {/* Course — searchable combobox from MQ 2026 catalogue */}
+              <div className="space-y-2">
+                <Label htmlFor="course">{t('course')}</Label>
+                <Controller
+                  name="course"
+                  control={control}
+                  render={({ field }) => (
+                    <CourseCombobox
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      disabled={isSubmitting}
+                      error={!!errors.course}
+                    />
+                  )}
+                />
+                {errors.course && (
+                  <p className="text-xs text-red-500">{errors.course.message}</p>
+                )}
+              </div>
+
+              {/* Year of Study */}
+              <div className="space-y-2">
+                <Label htmlFor="year">{t('year')}</Label>
+                <Controller
+                  name="year"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={field.onChange}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger className={clsx('w-full', errors.year && 'border-red-500')}>
+                        <SelectValue placeholder={t('yearPlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {academicYears.map((y) => (
+                          <SelectItem key={y.value} value={y.value}>
+                            {y.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.year && (
+                  <p className="text-xs text-red-500">{errors.year.message}</p>
+                )}
               </div>
 
               <div className="flex gap-2">

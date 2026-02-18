@@ -1,4 +1,18 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Dynamic Year Range + MQ Logo on Signup & Reset Password
+Summary: (1) Year selector in signup is now dynamic: watches selected course → looks up DEGREE_TYPE_LABELS → maps to DEGREE_MAX_YEARS → generates Year 1..N options. useEffect resets year field when user switches to a shorter degree type. Added DEGREE_MAX_YEARS to lib/data/mq-courses.ts. Removed static ACADEMIC_YEARS constant from SignupClient. (2) Replaced graduation cap icon with MQ_Logo_Final.png (80×80) in signup card header; email confirmation step keeps Mail icon. Added MQ logo (72×72) above title in reset-password main card and above checkmark in success state.
+Files: Modified `lib/data/mq-courses.ts`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Signup Course & Year Selectors from MQ 2026 Catalogue
+Summary: Replaced plain text inputs for course and year in the signup form with a searchable combobox (177 courses) and a Select dropdown. Created lib/data/mq-courses.ts with all 177 MQ 2026 courses grouped by degree level. Created app/signup/components/CourseCombobox.tsx — a custom searchable combobox that filters by name/code as user types, groups results by degree level (Bachelor, Master, etc.), shows result count, and has a clear button. Updated SignupClient.tsx to use Controller with the new combobox for course and a Radix Select for year (consistent with AcademicInfoCard in manage-profiles).
+Files: Created `lib/data/mq-courses.ts`, `app/signup/components/CourseCombobox.tsx`. Modified `app/signup/SignupClient.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
+Follow-ups: Could add same combobox to manage-profiles AcademicInfoCard to replace its plain course input.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Student ID Input Hard-Cap at 8 Characters
 Summary: Added maxLength={8} and inputMode="numeric" to the Student ID <Input> in PersonalInfoCard.tsx. The Zod schema already enforced exactly 8 digits via regex; this adds the browser-level hard stop so users cannot type past 8 characters, and triggers the numeric keyboard on mobile devices.
 Files: Modified `app/manage-profiles/components/PersonalInfoCard.tsx`.
