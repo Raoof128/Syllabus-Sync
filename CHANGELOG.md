@@ -1,3 +1,38 @@
+### Raouf: Connect Auth & Profile Pages — 2026-02-19
+
+**Scope:** Wire up navigation connections between login, signup, reset-password, manage-profiles, and settings.
+**Type:** Bugfix + Enhancement
+
+#### Issues Fixed
+
+1. **`manage-profiles` — missing back button (main gap)**
+   - Page had no way to return to Settings or any previous page; users were stranded
+   - Added `← Settings` link (`Link href="/settings"`) at the top of the page using `ArrowLeft` icon and `t('settings')` key
+
+2. **`reset-password-client.tsx` — 4 hardcoded English strings**
+   - `'Verifying reset link...'` → `t('verifying')`
+   - `'Password Changed!'` → `t('passwordChangedSuccess')`
+   - `'Login'` button on success screen → `t('backToLogin')`
+   - `'Change Password'` submit button → `t('changePassword')`
+   - `'For your security, reset links expire quickly.'` → `t('resetLinkExpireNote')`
+
+3. **`PrivacySettings.tsx` — Privacy Policy uses `window.open` for internal route**
+   - `window.open(EXTERNAL_LINKS.privacy, '_blank')` opened `/privacy` in a new tab inconsistently with every other page (login/signup use same-tab navigation)
+   - Changed to `router.push('/privacy')` — keeps user in the same browsing context
+   - Removed now-unused `EXTERNAL_LINKS` import
+
+4. **`tests/settings/PrivacySettings.test.tsx`**
+   - Updated privacy policy test assertion from `mockWindowOpen` to `mockRouterPush('/privacy')`
+   - Added stable `mockRouterPush` reference to `next/navigation` mock
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Weather Widget Audit & Live Fix — 2026-02-19
 
 **Scope:** Full audit of weather widget — fix stale data bug, add auto-refresh, clean up env.

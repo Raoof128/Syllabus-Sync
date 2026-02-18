@@ -7,7 +7,8 @@ import { AcademicInfoCard } from './components/AcademicInfoCard';
 import { ReminderSettings } from './components/ReminderSettings';
 import { useProfileManager } from './hooks/useProfileManager';
 import { Button } from '@/components/ui/mq/button';
-import { Save, Loader2, User as UserIcon } from 'lucide-react'; // Renamed User to UserIcon to avoid conflict
+import { Save, Loader2, User as UserIcon, ArrowLeft } from 'lucide-react'; // Renamed User to UserIcon to avoid conflict
+import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useRouter } from 'next/navigation';
 import { ProfileSkeleton } from './components/ProfileSkeleton';
@@ -55,7 +56,19 @@ export default function ManageProfilesPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6">
+    <div className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
+      {/* Back to Settings */}
+      <div className="mb-4 sm:mb-6">
+        <Link
+          href="/settings"
+          className="inline-flex items-center gap-1.5 text-sm text-mq-content-secondary hover:text-mq-content transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t('settings')}
+        </Link>
+      </div>
+
+      <div className="space-y-4 sm:space-y-6">
       <ProfileHeader profile={currentProfile} isSaving={isSaving} />
 
       {/* Pass the FORM object down to cards */}
@@ -80,6 +93,7 @@ export default function ManageProfilesPage() {
           </Button>
         </div>
       )}
+      </div>
     </div>
   );
 }

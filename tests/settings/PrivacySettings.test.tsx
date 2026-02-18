@@ -4,10 +4,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import PrivacySettings from '@/features/settings/components/PrivacySettings';
 
-// Mock next/navigation
+// Mock next/navigation — share a stable push reference so tests can assert on it
+const mockRouterPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockRouterPush,
     replace: vi.fn(),
     refresh: vi.fn(),
     back: vi.fn(),
@@ -497,7 +498,7 @@ describe('PrivacySettings', () => {
   });
 
   // Privacy policy test
-  it('opens privacy policy link when button is clicked', () => {
+  it('navigates to privacy policy page when button is clicked', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -507,11 +508,7 @@ describe('PrivacySettings', () => {
 
     fireEvent.click(screen.getByTestId('privacy-policy-button'));
 
-    expect(mockWindowOpen).toHaveBeenCalledWith(
-      'https://example.com/privacy',
-      '_blank',
-      'noopener,noreferrer',
-    );
+    expect(mockRouterPush).toHaveBeenCalledWith('/privacy');
   });
 
   // Export dialog tests

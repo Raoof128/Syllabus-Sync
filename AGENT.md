@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Connect Auth & Profile Pages — Back Button + Hardcoded Text + Privacy Link Fix
+Summary: Full audit of navigation connections between login, signup, reset-password, manage-profiles, and settings. (1) manage-profiles had no back button — stranded users with no way to return to Settings. Added `← Settings` link at top of page using ArrowLeft icon + t('settings'). (2) reset-password-client.tsx had 4 hardcoded English strings with matching translation keys: fixed 'Verifying reset link...'→t('verifying'), 'Password Changed!'→t('passwordChangedSuccess'), 'Login'→t('backToLogin'), 'Change Password'→t('changePassword'), 'For your security...'→t('resetLinkExpireNote'). (3) PrivacySettings.tsx privacy policy button used window.open(_blank) for internal /privacy route — inconsistent with login/signup which navigate same-tab. Changed to router.push('/privacy'), removed unused EXTERNAL_LINKS import. Updated PrivacySettings.test.tsx to assert on mockRouterPush('/privacy') instead of mockWindowOpen.
+Files: Modified `app/manage-profiles/page.tsx`, `app/reset-password/reset-password-client.tsx`, `features/settings/components/PrivacySettings.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app).
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Weather Widget Audit & Live Fix — Remove force-cache Bug + Auto-Refresh
 Summary: Full audit of the weather widget. Root cause: `cache: 'force-cache'` on the `/api/weather` fetch caused the browser to return its HTTP cache indefinitely (ignoring `max-age=0`), freezing weather data until browser cache eviction. Fix: removed `cache: 'force-cache'` so default fetch behavior applies — browser revalidates per max-age=0, Vercel Edge CDN still caches via s-maxage=300 reducing origin invocations. Also added a 10-minute setInterval auto-refresh so weather stays current in long-lived sessions. Cleaned up unused `NEXT_PUBLIC_OPENWEATHER_API_KEY` in .env.example (widget uses Open-Meteo, no key required). Updated useWeather test to remove the force-cache assertion.
 Files: Modified `components/layout/weather/useWeather.ts`, `tests/layout/useWeather.test.ts`, `.env.example`.

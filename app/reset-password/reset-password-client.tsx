@@ -242,7 +242,7 @@ export default function ResetPasswordClient() {
       <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
         <div className="w-full max-w-md text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-mq-primary" />
-          <p className="mt-4 text-mq-content-secondary">Verifying reset link...</p>
+          <p className="mt-4 text-mq-content-secondary">{t('verifying')}</p>
         </div>
       </div>
     );
@@ -260,17 +260,14 @@ export default function ResetPasswordClient() {
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-xl font-bold text-mq-content">Password Changed!</h1>
-              <p className="text-sm text-mq-content-secondary">
-                Your password has been successfully updated. Please login with your new password.
-              </p>
+              <h1 className="text-xl font-bold text-mq-content">{t('passwordChangedSuccess')}</h1>
             </div>
             <Button
               type="button"
               className="w-full h-12 rounded-xl font-bold"
               onClick={() => router.push('/login')}
             >
-              Login
+              {t('backToLogin')}
             </Button>
           </div>
         </div>
@@ -403,7 +400,7 @@ export default function ResetPasswordClient() {
                     {t('loading')}
                   </span>
                 ) : (
-                  'Change Password'
+                  t('changePassword')
                 )}
               </Button>
 
@@ -419,7 +416,7 @@ export default function ResetPasswordClient() {
         <p className="text-xs text-mq-content-secondary text-center mt-4">
           {mode === 'request'
             ? 'We will never reveal whether an email is registered.'
-            : 'For your security, reset links expire quickly.'}
+            : t('resetLinkExpireNote')}
         </p>
       </div>
     </div>

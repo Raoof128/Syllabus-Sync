@@ -1,10 +1,10 @@
 'use client';
 
 import { memo, useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Shield, Loader2, MessageSquare } from 'lucide-react';
-import { EXTERNAL_LINKS } from '@/lib/config';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { ChangePasswordDialog } from './privacy/ChangePasswordDialog';
@@ -23,6 +23,7 @@ type PrivacySettingsProps = {
 };
 
 const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
+  const router = useRouter();
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showSessionsDialog, setShowSessionsDialog] = useState(false);
   const [factors, setFactors] = useState<MFAFactor[]>([]);
@@ -112,9 +113,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   variant="ghost"
                   size="sm"
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() =>
-                    window.open(EXTERNAL_LINKS.privacy, '_blank', 'noopener,noreferrer')
-                  }
+                  onClick={() => router.push('/privacy')}
                   data-testid="privacy-policy-button"
                 >
                   {t('view')}
