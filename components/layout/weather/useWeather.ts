@@ -50,11 +50,10 @@ export const useWeather = () => {
     }
 
     try {
-      // Do not add cache-busting query params here; we want CDN/browser caching
-      // to reduce Vercel function invocations.
-      const response = await fetch(`/api/weather?lat=${region.lat}&lon=${region.lon}`, {
-        cache: 'force-cache',
-      });
+      // Use default fetch behavior (no force-cache) so weather data is always
+      // revalidated against the server once localStorage cache expires.
+      // The Vercel Edge CDN (s-maxage=300) still caches at the network level.
+      const response = await fetch(`/api/weather?lat=${region.lat}&lon=${region.lon}`);
 
       if (!response.ok) {
         throw new Error('Weather service unreachable');
@@ -107,6 +106,14 @@ export const useWeather = () => {
   // Fetch weather when region changes
   useEffect(() => {
     fetchWeather(selectedRegion);
+  }, [selectedRegion, fetchWeather]);
+
+  // Auto-refresh every 10 minutes for long-lived sessions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchWeather(selectedRegion, true);
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [selectedRegion, fetchWeather]);
 
   const handleRegionChange = useCallback((region: SydneyRegion) => {

@@ -145,7 +145,6 @@ describe('useWeather Hook', () => {
     // Verify fetch was called with new coordinates
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining(`lat=${newRegion.lat}&lon=${newRegion.lon}`),
-      expect.objectContaining({ cache: 'force-cache' }),
     );
   });
 

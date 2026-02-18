@@ -1,3 +1,32 @@
+### Raouf: Weather Widget Audit & Live Fix — 2026-02-19
+
+**Scope:** Full audit of weather widget — fix stale data bug, add auto-refresh, clean up env.
+**Type:** Bugfix + Enhancement
+
+#### Root Cause
+
+`useWeather.ts` used `cache: 'force-cache'` on the `fetch('/api/weather')` call. With the server sending `Cache-Control: max-age=0`, `force-cache` instructs the browser to use its HTTP cache regardless of expiry — meaning once the browser caches a weather response, it is **never re-fetched from the network** even when the 5-minute localStorage TTL expires. Weather data was effectively frozen until the browser evicted its HTTP cache.
+
+#### Changes
+
+1. **`components/layout/weather/useWeather.ts`**:
+   - Removed `cache: 'force-cache'` from `fetch` call — browser now uses default behavior (revalidates per `max-age=0`, Vercel Edge CDN still caches via `s-maxage=300`).
+   - Added 10-minute `setInterval` auto-refresh effect so weather stays current in long-lived sessions without relying on page reloads.
+
+2. **`tests/layout/useWeather.test.ts`**:
+   - Updated fetch assertion that previously expected `cache: 'force-cache'` to match updated (no-option) call.
+
+3. **`.env.example`**:
+   - Removed stale `NEXT_PUBLIC_OPENWEATHER_API_KEY` section (widget uses Open-Meteo which is free and needs no API key) and replaced with a clear note.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Fix Google OAuth Flow — 2026-02-18
 
 **Scope:** Fix Google OAuth sign-in (redirect URL allowlist + error feedback).
