@@ -34,13 +34,11 @@ export default function ResetPasswordClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Check for Supabase auth params (code, error, error_description, recovery)
   const code = searchParams.get('code');
-  const recovery = searchParams.get('recovery'); // Set by /auth/callback after server-side code exchange
+  const recovery = searchParams.get('recovery');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
-  // Check if we have recovery params (code or hash fragment will be handled)
   const [hasHashFragment, setHasHashFragment] = useState(false);
   const [hashChecked, setHashChecked] = useState(false);
 
@@ -55,14 +53,12 @@ export default function ResetPasswordClient() {
 
   const supabase = createBrowserClient();
 
-  // Check for hash fragment on mount (Supabase sends tokens in hash for password recovery)
+  // Check for hash fragment on mount
   useEffect(() => {
     if (typeof window !== 'undefined' && !hashChecked) {
-      // Use queueMicrotask to avoid calling setState synchronously in effect
       queueMicrotask(() => setHashChecked(true));
       const hash = window.location.hash;
       if (hash) {
-        // Parse hash fragment for access_token and type
         const params = new URLSearchParams(hash.substring(1));
         const accessToken = params.get('access_token');
         const type = params.get('type');
@@ -74,32 +70,27 @@ export default function ResetPasswordClient() {
           });
         }
       } else if (code) {
-        // We have a code from the callback, go to loading
         queueMicrotask(() => setMode('loading'));
       } else if (recovery) {
-        // Code was already exchanged server-side by /auth/callback, check session
         queueMicrotask(() => setMode('loading'));
       }
     }
   }, [code, recovery, hashChecked]);
 
-  // Handle Supabase auth - check for existing session or exchange code
+  // Handle Supabase auth
   useEffect(() => {
     const handleAuth = async () => {
       if (authChecked) return;
       setAuthChecked(true);
 
-      // First check if user already has a session (from hash fragment auto-handling by Supabase)
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
-        // User is authenticated (Supabase auto-handled the hash fragment)
         setIsAuthenticated(true);
         setMode('set');
         return;
       }
 
-      // If we have a code, exchange it for a session
       if (code) {
         try {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -119,7 +110,6 @@ export default function ResetPasswordClient() {
         return;
       }
 
-      // Check again for session (hash fragment might have been processed)
       const { data: { session: sessionAfter } } = await supabase.auth.getSession();
       if (sessionAfter) {
         setIsAuthenticated(true);
@@ -127,19 +117,17 @@ export default function ResetPasswordClient() {
         return;
       }
 
-      // No code, no hash fragment, no session - stay in request mode
       if (!hasHashFragment) {
         setMode('request');
       }
     };
 
     if (mode === 'loading') {
-      // Small delay to let Supabase process hash fragment
       setTimeout(handleAuth, 500);
     }
   }, [code, mode, supabase.auth, authChecked, hasHashFragment]);
 
-  // Listen for auth state changes (handles hash fragment recovery)
+  // Listen for auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: string, session: unknown) => {
@@ -147,7 +135,6 @@ export default function ResetPasswordClient() {
           setIsAuthenticated(true);
           setMode('set');
         } else if (event === 'SIGNED_IN' && session && mode === 'loading') {
-          // User signed in via recovery token
           setIsAuthenticated(true);
           setMode('set');
         }
@@ -217,7 +204,6 @@ export default function ResetPasswordClient() {
     }
 
     try {
-      // Use Supabase's updateUser to change password
       const { error } = await supabase.auth.updateUser({
         password: data.newPassword,
       });
@@ -227,34 +213,39 @@ export default function ResetPasswordClient() {
         return;
       }
 
-      // Sign out after password change for security
       await supabase.auth.signOut();
-
-      // Show success page
       setMode('success');
     } catch {
       setGeneralError(t('unexpectedError'));
     }
   };
 
-  // Loading state
+  // ── Loading state ──
   if (mode === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
-        <div className="w-full max-w-md text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-mq-primary" />
-          <p className="mt-4 text-mq-content-secondary">{t('verifying')}</p>
+      <div className="relative min-h-[100dvh] bg-mq-background flex items-center justify-center">
+        <div className="fixed inset-0 overflow-hidden">
+          <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+        </div>
+        <div className="relative z-10 text-center">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-mq-primary" />
+          <p className="mt-4 text-mq-content-secondary font-medium">{t('verifying')}</p>
         </div>
       </div>
     );
   }
 
-  // Success state - password changed
+  // ── Success state ──
   if (mode === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
-        <div className="w-full max-w-md">
-          <div className="rounded-2xl border border-mq-border bg-mq-card-background shadow-sm p-6 sm:p-8 text-center space-y-6">
+      <div className="relative min-h-[100dvh] bg-mq-background flex items-center justify-center px-4 py-8">
+        <div className="fixed inset-0 overflow-hidden">
+          <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+        </div>
+        <div className="relative z-10 w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-mq-card-background/85 backdrop-blur-xl border border-mq-border/30 rounded-2xl shadow-[0_18px_70px_rgba(0,0,0,0.3)] p-8 text-center space-y-6">
             <div className="flex justify-center">
               <Image
                 src="/MQ_Logo_Final.png"
@@ -266,8 +257,8 @@ export default function ResetPasswordClient() {
               />
             </div>
             <div className="flex justify-center">
-              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle2 className="h-9 w-9 text-green-600" />
+              <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/20 flex items-center justify-center">
+                <CheckCircle2 className="h-9 w-9 text-green-500" />
               </div>
             </div>
             <div className="space-y-2">
@@ -286,159 +277,170 @@ export default function ResetPasswordClient() {
     );
   }
 
+  // ── Request / Set form ──
   return (
-    <div className="min-h-screen flex items-center justify-center bg-mq-background px-4 py-6">
-      <div className="w-full max-w-md">
-        <div className="rounded-2xl border border-mq-border bg-mq-card-background shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex justify-center">
-            <Image
-              src="/MQ_Logo_Final.png"
-              alt="Macquarie University"
-              width={72}
-              height={72}
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold text-mq-content">{t('resetPassword')}</h1>
-            <p className="text-sm text-mq-content-secondary">
-              {mode === 'request' ? t('forgotPasswordDesc') : t('changePasswordDesc')}
-            </p>
-          </div>
+    <div className="relative min-h-[100dvh] bg-mq-background">
+      {/* Fixed background */}
+      <div className="fixed inset-0 overflow-hidden">
+        <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+      </div>
 
-          {generalError && (
-            <Alert variant="error">
-              <XCircle className="h-4 w-4" />
-              <AlertDescription>{generalError}</AlertDescription>
-            </Alert>
-          )}
+      {/* Scrollable content */}
+      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-4 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="w-full max-w-md">
+          <div className="bg-mq-card-background/85 backdrop-blur-xl border border-mq-border/30 rounded-2xl shadow-[0_18px_70px_rgba(0,0,0,0.3)] p-6 sm:p-8 space-y-6">
+            <div className="flex justify-center">
+              <Image
+                src="/MQ_Logo_Final.png"
+                alt="Macquarie University"
+                width={216}
+                height={216}
+                className="object-contain"
+                priority
+              />
+            </div>
 
-          {success && mode === 'request' && (
-            <Alert>
-              <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>{t('resetPasswordSentDesc')}</AlertDescription>
-            </Alert>
-          )}
+            <div className="space-y-1 text-center">
+              <h1 className="text-xl font-bold text-mq-content">{t('resetPassword')}</h1>
+              <p className="text-sm text-mq-content-secondary">
+                {mode === 'request' ? t('forgotPasswordDesc') : t('changePasswordDesc')}
+              </p>
+            </div>
 
-          {mode === 'request' ? (
-            <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-mq-content font-bold">
-                  {t('email')}
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    disabled={isSubmitting}
-                    className="h-12 rounded-xl pr-10"
-                    {...requestForm.register('email')}
-                  />
-                  <Mail className="h-4 w-4 text-mq-content-secondary absolute right-3 top-1/2 -translate-y-1/2" />
+            {generalError && (
+              <Alert variant="error">
+                <XCircle className="h-4 w-4" />
+                <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
+            )}
+
+            {success && mode === 'request' && (
+              <Alert>
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertDescription>{t('resetPasswordSentDesc')}</AlertDescription>
+              </Alert>
+            )}
+
+            {mode === 'request' ? (
+              <form onSubmit={requestForm.handleSubmit(onRequest)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-mq-content font-bold">
+                    {t('email')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      disabled={isSubmitting}
+                      className="h-12 rounded-xl pr-10"
+                      {...requestForm.register('email')}
+                    />
+                    <Mail className="h-4 w-4 text-mq-content-secondary absolute right-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                  {requestForm.formState.errors.email?.message && (
+                    <p className="text-xs text-red-500 font-medium ml-1">
+                      {requestForm.formState.errors.email.message}
+                    </p>
+                  )}
                 </div>
-                {requestForm.formState.errors.email?.message && (
-                  <p className="text-xs text-red-500 font-medium ml-1">
-                    {requestForm.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
 
-              <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {t('loading')}
-                  </span>
-                ) : (
-                  t('resetPassword')
-                )}
-              </Button>
+                <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t('loading')}
+                    </span>
+                  ) : (
+                    t('resetPassword')
+                  )}
+                </Button>
 
-              <div className="text-center text-sm">
-                <Link href="/login" className="text-mq-primary hover:underline font-bold">
-                  {t('backToLogin')}
-                </Link>
-              </div>
-            </form>
-          ) : (
-            <form onSubmit={setForm.handleSubmit(onSet)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-mq-content font-bold">
-                  {t('newPassword')}
-                </Label>
-                <div className="relative">
+                <div className="text-center text-sm">
+                  <Link href="/login" className="text-mq-primary hover:underline font-bold">
+                    {t('backToLogin')}
+                  </Link>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={setForm.handleSubmit(onSet)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword" className="text-mq-content font-bold">
+                    {t('newPassword')}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      disabled={isSubmitting}
+                      className="h-12 rounded-xl pr-10"
+                      {...setForm.register('newPassword')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content hover:text-mq-primary transition-colors"
+                      aria-label={showPassword ? t('hidePassword') : t('showPassword')}
+                      aria-pressed={showPassword}
+                      disabled={isSubmitting}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {setForm.formState.errors.newPassword?.message && (
+                    <p className="text-xs text-red-500 font-medium ml-1">
+                      {setForm.formState.errors.newPassword.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-mq-content font-bold">
+                    {t('confirmPassword')}
+                  </Label>
                   <Input
-                    id="newPassword"
+                    id="confirmPassword"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
                     disabled={isSubmitting}
-                    className="h-12 rounded-xl pr-10"
-                    {...setForm.register('newPassword')}
+                    className="h-12 rounded-xl"
+                    {...setForm.register('confirmPassword')}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content hover:text-mq-primary transition-colors"
-                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
-                    aria-pressed={showPassword}
-                    disabled={isSubmitting}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                  {setForm.formState.errors.confirmPassword?.message && (
+                    <p className="text-xs text-red-500 font-medium ml-1">
+                      {setForm.formState.errors.confirmPassword.message}
+                    </p>
+                  )}
                 </div>
-                {setForm.formState.errors.newPassword?.message && (
-                  <p className="text-xs text-red-500 font-medium ml-1">
-                    {setForm.formState.errors.newPassword.message}
-                  </p>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-mq-content font-bold">
-                  {t('confirmPassword')}
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  className="h-12 rounded-xl"
-                  {...setForm.register('confirmPassword')}
-                />
-                {setForm.formState.errors.confirmPassword?.message && (
-                  <p className="text-xs text-red-500 font-medium ml-1">
-                    {setForm.formState.errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
+                <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t('loading')}
+                    </span>
+                  ) : (
+                    t('changePassword')
+                  )}
+                </Button>
 
-              <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {t('loading')}
-                  </span>
-                ) : (
-                  t('changePassword')
-                )}
-              </Button>
+                <div className="text-center text-sm">
+                  <Link href="/login" className="text-mq-primary hover:underline font-bold">
+                    {t('backToLogin')}
+                  </Link>
+                </div>
+              </form>
+            )}
+          </div>
 
-              <div className="text-center text-sm">
-                <Link href="/login" className="text-mq-primary hover:underline font-bold">
-                  {t('backToLogin')}
-                </Link>
-              </div>
-            </form>
-          )}
+          <p className="text-xs text-mq-content-secondary text-center mt-4">
+            {mode === 'request'
+              ? 'We will never reveal whether an email is registered.'
+              : t('resetLinkExpireNote')}
+          </p>
         </div>
-
-        <p className="text-xs text-mq-content-secondary text-center mt-4">
-          {mode === 'request'
-            ? 'We will never reveal whether an email is registered.'
-            : t('resetLinkExpireNote')}
-        </p>
       </div>
     </div>
   );

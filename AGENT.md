@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Frontend Redesign — Terms, Privacy, Signup, Reset Password to Match Login Aesthetic
+Summary: Redesigned 4 pages to match the login page aesthetic. (1) Terms and Privacy: replaced plain layout with a styled MQ-branded header banner (dark blue gradient + MQ red accent bar), sticky sidebar table-of-contents (desktop), numbered section badges (MQ red), hover left-border accent on each section, MQ logo in footer, themed table for third-party services section. (2) Signup: replaced plain Card + bg-mq-background with a fixed background image (login-bg.png + gradient overlay), glass card (backdrop-blur-xl, bg-mq-card-background/85, shadow-[0_18px_70px_rgba(0,0,0,0.3)], border border-mq-border/30), animate-in fade-in entry, inputs h-12 rounded-xl, buttons h-12 rounded-xl/full font-bold, Google button rounded-full matching login. (3) Reset Password: same background + glass card treatment across all 3 states (loading, success, request/set). All logo sizes preserved (240px signup, 216px reset-password).
+Files: Modified `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Mandatory Course & Year + 3× Logos + Honeypot Security Fix
 Summary: (1) Made course and year required in auth schema (z.string().trim().min(1, ...)). Added * required markers on labels in SignupClient. (2) Tripled logo sizes: signup 80→240px, reset-password 72→216px (both occurrences). (3) Security fix in signup API route: honeypot check now runs on raw body BEFORE Zod schema validation. Previously empty course/year caused 400 before honeypot check, leaking schema info to bots. Now bots always get fake 200 regardless of other field values. Fixed 1 test failure (honeypot test that was getting 400 instead of 200).
 Files: Modified `lib/schemas/auth.ts`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`, `app/api/auth/signup/route.ts`.

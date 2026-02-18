@@ -1,3 +1,25 @@
+### Raouf: Frontend Redesign — Terms, Privacy, Signup, Reset Password — 2026-02-19
+
+**Scope:** Redesign 4 pages to match the login page aesthetic (glass-morphism, background image, MQ branding, animated entries).
+**Type:** UI Enhancement
+
+#### Changes
+
+1. **`app/terms/page.tsx`** — Dark MQ blue header banner with red accent bar + "Legal Document" label, sticky desktop sidebar TOC (numbered sections), numbered section badges (MQ red), hover left-border accent per section, MQ logo in footer. Removed plain `prose` layout.
+
+2. **`app/privacy/page.tsx`** — Same header/sidebar/section treatment as Terms. Themed table for third-party services with hover rows. Contact section uses a styled highlighted card. All i18n keys preserved.
+
+3. **`app/signup/SignupClient.tsx`** — Replaced plain `Card` on `bg-mq-background` with: fixed background (login-bg.png + gradient overlay), glass card (`backdrop-blur-xl`, `bg-mq-card-background/85`, `shadow-[0_18px_70px_rgba(0,0,0,0.3)]`), `animate-in fade-in slide-in-from-bottom-4 duration-500`. Inputs upgraded to `h-12 rounded-xl`, primary button `h-12 rounded-xl font-bold`, Google OAuth button `rounded-full` (matching login). Removed `Card`/`CardContent`/`CardHeader` imports.
+
+4. **`app/reset-password/reset-password-client.tsx`** — Same background + glass card treatment across all 3 states (loading spinner, success checkmark, request/set form). MQ logos preserved at 216px.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+
+---
+
 ### Raouf: Mandatory Course & Year + 3× Logos on Signup & Reset Password — 2026-02-19
 
 **Scope:** (1) Course and Year fields mandatory in signup. (2) MQ logo tripled in size on both pages. (3) Honeypot check moved before schema validation in signup API route.
