@@ -64,6 +64,8 @@ export function PersonalInfoCard({ form, email, disabled }: Props) {
                 id="studentId"
                 {...register('studentId')}
                 placeholder="12345678"
+                maxLength={8}
+                inputMode="numeric"
                 disabled={disabled}
                 className={errors.studentId ? 'border-red-500' : ''}
                 aria-invalid={!!errors.studentId}

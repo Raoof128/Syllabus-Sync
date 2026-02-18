@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Student ID Input Hard-Cap at 8 Characters
+Summary: Added maxLength={8} and inputMode="numeric" to the Student ID <Input> in PersonalInfoCard.tsx. The Zod schema already enforced exactly 8 digits via regex; this adds the browser-level hard stop so users cannot type past 8 characters, and triggers the numeric keyboard on mobile devices.
+Files: Modified `app/manage-profiles/components/PersonalInfoCard.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Profile Sync with Login — Always Fetch on Mount + Skeleton Until hasLoaded
 Summary: manage-profiles was not synced with login data. (1) useProfileManager fetched only when !hasLoaded — on re-visits within the same session, stale data was shown without re-fetching from DB. Fixed with useRef(false) mount guard so fetchProfile() is always called on mount. Used useRef not useState to avoid double-fetch in React Strict Mode. (2) Skeleton condition was `isProfileLoading && !hasLoaded` — on re-visits (hasLoaded: true) the page rendered immediately showing localStorage profile data that has email:'' and studentId:'' stripped for security, causing a visible blank-field flash. Changed to `!hasLoaded` so skeleton shows until DB fetch completes. Removed now-unused isProfileLoading from page destructure.
 Files: Modified `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/page.tsx`.

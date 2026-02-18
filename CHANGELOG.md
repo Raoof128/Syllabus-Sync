@@ -1,3 +1,20 @@
+### Raouf: Student ID Input Hard-Cap at 8 Characters — 2026-02-19
+
+**Scope:** Add `maxLength={8}` + `inputMode="numeric"` to Student ID input field.
+**Type:** Enhancement
+
+#### Change
+
+- `PersonalInfoCard.tsx` — Student ID `<Input>` now has `maxLength={8}` (browser-level hard stop) and `inputMode="numeric"` (numeric keyboard on mobile). Zod schema already enforced exactly 8 digits via regex; this adds the UI-level constraint so users can't type past the limit.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+
+---
+
 ### Raouf: Profile Sync with Login — 2026-02-19
 
 **Scope:** Ensure manage-profiles always fetches fresh data from DB on entry; eliminate stale localStorage flash.
