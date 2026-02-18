@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Sync Signup ↔ Manage Profile — Course Combobox + Year Values
+Summary: Fixed two critical mismatches between signup and manage-profile. (1) AcademicInfoCard.tsx: replaced plain <Input> for course with CourseCombobox (same 177-course MQ catalog used on signup), wrapped via Controller. Replaced static ACADEMIC_YEARS ("1st Year", "2nd Year"…"PhD") with dynamic year range (Year 1..N based on selected course, values "1", "2", etc.) matching signup exactly. (2) useProfileManager.ts: added YEAR_LEGACY_MAP + normalizeYear() to convert old-format year values ("1st Year" → "1", "2nd Year" → "2" etc.) applied in all three form.reset() call sites. Existing users with old year values now see them correctly mapped; new signup users see their chosen course + year immediately in manage-profile.
+Files: Modified `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Frontend Redesign — Terms, Privacy, Signup, Reset Password to Match Login Aesthetic
 Summary: Redesigned 4 pages to match the login page aesthetic. (1) Terms and Privacy: replaced plain layout with a styled MQ-branded header banner (dark blue gradient + MQ red accent bar), sticky sidebar table-of-contents (desktop), numbered section badges (MQ red), hover left-border accent on each section, MQ logo in footer, themed table for third-party services section. (2) Signup: replaced plain Card + bg-mq-background with a fixed background image (login-bg.png + gradient overlay), glass card (backdrop-blur-xl, bg-mq-card-background/85, shadow-[0_18px_70px_rgba(0,0,0,0.3)], border border-mq-border/30), animate-in fade-in entry, inputs h-12 rounded-xl, buttons h-12 rounded-xl/full font-bold, Google button rounded-full matching login. (3) Reset Password: same background + glass card treatment across all 3 states (loading, success, request/set). All logo sizes preserved (240px signup, 216px reset-password).
 Files: Modified `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.

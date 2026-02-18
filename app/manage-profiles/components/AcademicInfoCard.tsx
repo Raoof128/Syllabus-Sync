@@ -1,8 +1,8 @@
 'use client';
 
-import { UseFormReturn } from 'react-hook-form';
+import { useMemo, useEffect } from 'react';
+import { UseFormReturn, Controller } from 'react-hook-form';
 import { ProfileFormValues } from '../schema';
-import { Input } from '@/components/ui/mq/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -15,18 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { GraduationCap } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { TranslationKey } from '@/lib/i18n/translations';
-
-// Academic year options
-const ACADEMIC_YEARS = [
-  { value: '1st Year', labelKey: 'academicYear_1' },
-  { value: '2nd Year', labelKey: 'academicYear_2' },
-  { value: '3rd Year', labelKey: 'academicYear_3' },
-  { value: '4th Year', labelKey: 'academicYear_4' },
-  { value: '5th Year', labelKey: 'academicYear_5' },
-  { value: 'Postgraduate', labelKey: 'academicYear_postgrad' },
-  { value: 'PhD', labelKey: 'academicYear_phd' },
-];
+import { CourseCombobox } from '@/app/signup/components/CourseCombobox';
+import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
 
 interface Props {
   form: UseFormReturn<ProfileFormValues>;
@@ -36,12 +26,39 @@ interface Props {
 export function AcademicInfoCard({ form, disabled }: Props) {
   const { t } = useTypedTranslation();
   const {
-    register,
+    control,
     setValue,
     watch,
     formState: { errors },
   } = form;
-  const currentYear = watch('year'); // Subscribe to year changes
+
+  const selectedCourse = watch('course');
+  const currentYear = watch('year');
+
+  // Dynamic year range — same logic as signup page
+  const maxYear = useMemo(() => {
+    if (!selectedCourse) return 8;
+    const course = MQ_COURSES.find((c) => c.name === selectedCourse);
+    const label = course ? (DEGREE_TYPE_LABELS[course.type] ?? 'Other') : 'Other';
+    return DEGREE_MAX_YEARS[label] ?? 8;
+  }, [selectedCourse]);
+
+  const academicYears = useMemo(
+    () =>
+      Array.from({ length: maxYear }, (_, i) => ({
+        value: String(i + 1),
+        label: `Year ${i + 1}`,
+      })),
+    [maxYear],
+  );
+
+  // Reset year when course changes to a shorter degree type
+  useEffect(() => {
+    const currentYearNum = Number(currentYear);
+    if (currentYearNum > maxYear) {
+      setValue('year', '', { shouldValidate: true });
+    }
+  }, [maxYear, currentYear, setValue]);
 
   return (
     <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
@@ -53,21 +70,25 @@ export function AcademicInfoCard({ form, disabled }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Course */}
+            {/* Course — searchable combobox (same as signup) */}
             <div className="space-y-2">
               <Label htmlFor="course">{t('course')}</Label>
-              <Input
-                id="course"
-                {...register('course')}
-                placeholder={t('coursePlaceholder')}
-                disabled={disabled}
-                className={errors.course ? 'border-red-500' : ''}
-                aria-invalid={!!errors.course}
+              <Controller
+                name="course"
+                control={control}
+                render={({ field }) => (
+                  <CourseCombobox
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    disabled={disabled}
+                    error={!!errors.course}
+                  />
+                )}
               />
               {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
             </div>
 
-            {/* Year Select - Connecting UI to RHF */}
+            {/* Year Select — dynamic based on course, values match signup */}
             <div className="space-y-2">
               <Label>{t('year')}</Label>
               <Select
@@ -79,9 +100,9 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                   <SelectValue placeholder={t('yearPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {ACADEMIC_YEARS.map((year) => (
+                  {academicYears.map((year) => (
                     <SelectItem key={year.value} value={year.value}>
-                      {t(year.labelKey as TranslationKey)}
+                      {year.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

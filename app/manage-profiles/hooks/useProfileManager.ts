@@ -9,6 +9,24 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { logger } from '@/lib/logger';
 
+// Map legacy year format (old manage-profile values) → numeric format used by signup
+// Ensures existing users whose year was stored as "1st Year" still see correct data
+const YEAR_LEGACY_MAP: Record<string, string> = {
+  '1st Year': '1',
+  '2nd Year': '2',
+  '3rd Year': '3',
+  '4th Year': '4',
+  '5th Year': '5',
+  '6th Year': '6',
+  '7th Year': '7',
+  '8th Year': '8',
+};
+
+function normalizeYear(year: string | undefined | null): string {
+  if (!year) return '';
+  return YEAR_LEGACY_MAP[year] ?? year;
+}
+
 export function useProfileManager() {
   const { t } = useTypedTranslation();
 
@@ -51,7 +69,7 @@ export function useProfileManager() {
       name: currentProfile?.name || '',
       studentId: currentProfile?.studentId || '',
       course: currentProfile?.course || '',
-      year: currentProfile?.year || '',
+      year: normalizeYear(currentProfile?.year),
     },
     mode: 'onChange', // Validate as they type
   });
@@ -65,14 +83,14 @@ export function useProfileManager() {
     }
   }, [fetchProfile, initializeNotifications]);
 
-  // Load data into form when profile is fetched
+  // Load data into form when profile is fetched (normalize legacy year values)
   useEffect(() => {
     if (currentProfile) {
       form.reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
-        year: currentProfile.year || '',
+        year: normalizeYear(currentProfile.year),
       });
     }
   }, [currentProfile, form]);
@@ -92,12 +110,11 @@ export function useProfileManager() {
     } catch (error) {
       logger.error('Failed to update profile in server action:', error);
       toastUtils.error(t('error'), 'Database connection failed');
-      // Revert optimistic state roughly handled by re-render, but resetting form is good
       form.reset({
         name: currentProfile.name || '',
         studentId: currentProfile.studentId || '',
         course: currentProfile.course || '',
-        year: currentProfile.year || '',
+        year: normalizeYear(currentProfile.year),
       });
       return;
     }

@@ -1,3 +1,37 @@
+### Raouf: Sync Signup ↔ Manage Profile — Course Combobox + Year Values — 2026-02-19
+
+**Scope:** Fix two critical data-sync mismatches between signup and manage-profile.
+**Type:** Bug Fix
+
+#### Root Causes
+
+1. **Course field mismatch** — Signup uses `CourseCombobox` (177-course MQ catalog), manage-profile used a plain `<Input>`. Users could not update their course from the catalog in manage-profile.
+
+2. **Year value mismatch (critical)** — Signup stored `"1"`, `"2"`, `"3"` etc. Manage-profile Select options were `"1st Year"`, `"2nd Year"`, … `"PhD"`. Users who signed up with "Year 2" (stored as `"2"`) saw an empty year field in manage-profile because `"2"` didn't match any option.
+
+#### Changes
+
+1. **`app/manage-profiles/components/AcademicInfoCard.tsx`**:
+   - Replaced plain `<Input>` course field with `CourseCombobox` via `Controller` (same component as signup)
+   - Removed static `ACADEMIC_YEARS` constant and `TranslationKey` import
+   - Added dynamic year range computed from selected course via `useMemo` (same logic as signup)
+   - Year values now `"1"`, `"2"`, … `"N"` — exact match with signup's stored values
+   - Added `useEffect` to reset year when course changes to shorter degree type
+
+2. **`app/manage-profiles/hooks/useProfileManager.ts`**:
+   - Added `YEAR_LEGACY_MAP` (`"1st Year"` → `"1"`, `"2nd Year"` → `"2"`, etc.)
+   - Added `normalizeYear()` helper
+   - Applied normalization in all 3 `form.reset()` call sites (initial defaultValues, profile fetch effect, error-revert in onSubmit)
+   - Existing users with old-format year values now see them correctly mapped; new users see signup data immediately
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+
+---
+
 ### Raouf: Frontend Redesign — Terms, Privacy, Signup, Reset Password — 2026-02-19
 
 **Scope:** Redesign 4 pages to match the login page aesthetic (glass-morphism, background image, MQ branding, animated entries).
