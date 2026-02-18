@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Profile Sync with Login — Always Fetch on Mount + Skeleton Until hasLoaded
+Summary: manage-profiles was not synced with login data. (1) useProfileManager fetched only when !hasLoaded — on re-visits within the same session, stale data was shown without re-fetching from DB. Fixed with useRef(false) mount guard so fetchProfile() is always called on mount. Used useRef not useState to avoid double-fetch in React Strict Mode. (2) Skeleton condition was `isProfileLoading && !hasLoaded` — on re-visits (hasLoaded: true) the page rendered immediately showing localStorage profile data that has email:'' and studentId:'' stripped for security, causing a visible blank-field flash. Changed to `!hasLoaded` so skeleton shows until DB fetch completes. Removed now-unused isProfileLoading from page destructure.
+Files: Modified `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/page.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app).
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Connect Auth & Profile Pages — Back Button + Hardcoded Text + Privacy Link Fix
 Summary: Full audit of navigation connections between login, signup, reset-password, manage-profiles, and settings. (1) manage-profiles had no back button — stranded users with no way to return to Settings. Added `← Settings` link at top of page using ArrowLeft icon + t('settings'). (2) reset-password-client.tsx had 4 hardcoded English strings with matching translation keys: fixed 'Verifying reset link...'→t('verifying'), 'Password Changed!'→t('passwordChangedSuccess'), 'Login'→t('backToLogin'), 'Change Password'→t('changePassword'), 'For your security...'→t('resetLinkExpireNote'). (3) PrivacySettings.tsx privacy policy button used window.open(_blank) for internal /privacy route — inconsistent with login/signup which navigate same-tab. Changed to router.push('/privacy'), removed unused EXTERNAL_LINKS import. Updated PrivacySettings.test.tsx to assert on mockRouterPush('/privacy') instead of mockWindowOpen.
 Files: Modified `app/manage-profiles/page.tsx`, `app/reset-password/reset-password-client.tsx`, `features/settings/components/PrivacySettings.tsx`, `tests/settings/PrivacySettings.test.tsx`.

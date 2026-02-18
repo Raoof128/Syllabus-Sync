@@ -1,4 +1,4 @@
-import { useEffect, useOptimistic, startTransition } from 'react';
+import { useEffect, useOptimistic, startTransition, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -27,6 +27,9 @@ export function useProfileManager() {
   } = useProfilesStore();
   const { initialize: initializeNotifications } = useNotificationPreferencesStore();
 
+  // Prevent double-fetch in React Strict Mode (effects run twice in dev)
+  const fetchedOnMount = useRef(false);
+
   // 1. Setup Optimistic State
   // This hook holds the "truth" + any pending changes
   const [optimisticProfile, addOptimisticUpdate] = useOptimistic(
@@ -53,13 +56,14 @@ export function useProfileManager() {
     mode: 'onChange', // Validate as they type
   });
 
-  // Initial Data Fetching
+  // Always fetch fresh profile from DB on mount so the page is in sync with login
   useEffect(() => {
-    if (!hasLoaded && !isProfileLoading) {
+    if (!fetchedOnMount.current) {
+      fetchedOnMount.current = true;
       fetchProfile();
+      initializeNotifications();
     }
-    initializeNotifications();
-  }, [hasLoaded, isProfileLoading, fetchProfile, initializeNotifications]);
+  }, [fetchProfile, initializeNotifications]);
 
   // Load data into form when profile is fetched
   useEffect(() => {

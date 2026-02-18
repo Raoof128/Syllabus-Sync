@@ -23,36 +23,33 @@ export default function ManageProfilesPage() {
     isSaving,
     isDirty,
     isValid,
-    isProfileLoading,
     hasLoaded,
   } = useProfileManager();
 
-  if (isProfileLoading && !hasLoaded) return <ProfileSkeleton />;
+  // Show skeleton until the DB fetch completes — prevents stale localStorage data from flashing
+  if (!hasLoaded) return <ProfileSkeleton />;
 
   if (!currentProfile) {
-    if (hasLoaded) {
-      return (
-        <div className="container mx-auto max-w-4xl px-3 py-4 sm:p-6">
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-              <div className="text-center py-10 sm:py-12">
-                <div className="text-mq-content-tertiary">
-                  <UserIcon className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4" />
-                </div>
-                <h2 className="text-mq-lg sm:text-mq-xl font-semibold text-mq-content mb-2">
-                  {t('noProfilesYet')}
-                </h2>
-                <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-                  {t('signInToManageProfile')}
-                </p>
-                <Button onClick={() => router.push('/login')}>{t('signIn')}</Button>
+    return (
+      <div className="container mx-auto max-w-4xl px-3 py-4 sm:p-6">
+        <MagicCard isLiquidEnhanced>
+          <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+            <div className="text-center py-10 sm:py-12">
+              <div className="text-mq-content-tertiary">
+                <UserIcon className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4" />
               </div>
+              <h2 className="text-mq-lg sm:text-mq-xl font-semibold text-mq-content mb-2">
+                {t('noProfilesYet')}
+              </h2>
+              <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
+                {t('signInToManageProfile')}
+              </p>
+              <Button onClick={() => router.push('/login')}>{t('signIn')}</Button>
             </div>
-          </MagicCard>
-        </div>
-      );
-    }
-    return <ProfileSkeleton />;
+          </div>
+        </MagicCard>
+      </div>
+    );
   }
 
   return (

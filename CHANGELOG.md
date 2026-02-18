@@ -1,3 +1,33 @@
+### Raouf: Profile Sync with Login — 2026-02-19
+
+**Scope:** Ensure manage-profiles always fetches fresh data from DB on entry; eliminate stale localStorage flash.
+**Type:** Bugfix
+
+#### Issues Fixed
+
+1. **`useProfileManager.ts` — stale profile on re-visit**
+   - `fetchProfile()` was gated on `!hasLoaded`, so second and subsequent visits within the same session showed cached (potentially stale) profile data without re-fetching from DB
+   - Replaced with a `useRef(false)` mount guard — always fetches from DB on every mount, regardless of `hasLoaded`
+   - Used `useRef` (not state) to prevent the double-fetch React Strict Mode causes in development
+
+2. **`page.tsx` — stale localStorage fields flash before fetch completes**
+   - Skeleton condition was `isProfileLoading && !hasLoaded` — on re-visits (`hasLoaded: true`) the page rendered immediately with localStorage data that has `email: ''` and `studentId: ''` stripped for security, causing a visible blank-field flash
+   - Changed to `!hasLoaded`: skeleton shows until the DB fetch sets `hasLoaded: true`, so users never see the stripped localStorage state
+   - Removed now-unused `isProfileLoading` from the destructure
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test:ci` ✅ (483/483 pass)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+
+#### Files Changed
+
+- `app/manage-profiles/hooks/useProfileManager.ts` — added `useRef` import, `fetchedOnMount` ref, always-fetch on mount
+- `app/manage-profiles/page.tsx` — skeleton condition `!hasLoaded`, removed unused `isProfileLoading`
+
+---
+
 ### Raouf: Connect Auth & Profile Pages — 2026-02-19
 
 **Scope:** Wire up navigation connections between login, signup, reset-password, manage-profiles, and settings.
