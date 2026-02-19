@@ -129,7 +129,17 @@ export function useProfileManager() {
 
     if (result.success) {
       // Sync the permanent store
-      await updateStoreProfile(currentProfile.id, data);
+      const updatedProfile = await updateStoreProfile(currentProfile.id, data);
+      if (!updatedProfile) {
+        toastUtils.error(t('error'), 'Failed to persist profile changes');
+        form.reset({
+          name: currentProfile.name || '',
+          studentId: normalizeStudentId(currentProfile.studentId),
+          course: currentProfile.course || '',
+          year: normalizeYear(currentProfile.year),
+        });
+        return;
+      }
       toastUtils.success('Saved', t('profileUpdatedMsg') || 'Profile updated successfully');
       // Reset form to clean "dirty" state
       form.reset(data);

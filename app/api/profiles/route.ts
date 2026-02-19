@@ -117,19 +117,20 @@ export async function PUT(request: Request) {
     }
 
     const updates = validation.data;
+    const updatePayload: Record<string, string | null> = {
+      updated_at: new Date().toISOString(),
+    };
+    if ('full_name' in updates) updatePayload.full_name = updates.full_name ?? null;
+    if ('student_id' in updates) updatePayload.student_id = updates.student_id ?? null;
+    if ('course' in updates) updatePayload.course = updates.course ?? null;
+    if ('year' in updates) updatePayload.year = updates.year ?? null;
+    if ('avatar_url' in updates) updatePayload.avatar_url = updates.avatar_url ?? null;
 
     // SECURITY: Only allow updating safe fields (full_name, student_id, course, year, avatar_url)
     // email is protected by DB trigger (cannot be changed)
     const { data: profile, error: updateError } = await supabase
       .from('profiles')
-      .update({
-        full_name: updates.full_name,
-        student_id: updates.student_id,
-        course: updates.course,
-        year: updates.year,
-        avatar_url: updates.avatar_url,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('id', user.id)
       .select()
       .single();

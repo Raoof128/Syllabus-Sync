@@ -1,3 +1,44 @@
+### Raouf: Legacy Account Course Persistence Fix + Profile Payload Hardening — 2026-02-19
+
+**Scope:** Fix old accounts whose course updates reverted after save; harden profile update payload handling; add regression coverage; redeploy production.
+**Type:** Profile / API / Reliability
+
+#### Changes
+
+1. **`app/api/profiles/route.ts`**
+   - Replaced static update object with conditional payload builder for `PUT /api/profiles`.
+   - Only fields explicitly present in request body are included in DB update (`full_name`, `student_id`, `course`, `year`, `avatar_url`) plus `updated_at`.
+   - Prevents accidental immutable-field trigger hits (notably `student_id`) when users update only course/year.
+
+2. **`app/manage-profiles/hooks/useProfileManager.ts`**
+   - Updated save flow to verify `updateStoreProfile(...)` result before showing success.
+   - If persistence fails, now shows explicit error toast and resets form to current server-backed profile state instead of falsely reporting success.
+
+3. **Regression tests**
+   - Added **`tests/api/profiles.route.test.ts`**:
+     - verifies `student_id` is omitted when updating course/year only.
+     - verifies immutable-field DB rejection returns `403`.
+
+#### Verification
+
+- `npm run test -- tests/api/profiles.route.test.ts` ✅ (2 tests passed)
+- `npm run check` ✅
+  - secrets check passed
+  - format check passed
+  - typecheck passed
+  - lint passed
+  - tests passed (66 files, 484 tests)
+  - build passed
+
+#### Deployment
+
+- `npm run vercel:deploy:prod` ✅
+- Inspect: `https://vercel.com/perkycoders/syllabus-sync/5FuuGXjwQ3CPjbJuyr6iaJTy9s1m`
+- Production deployment: `https://syllabus-sync-bhngwvn4t-perkycoders.vercel.app`
+- Production alias: `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Home-Only Re-Login Redirect + Legacy Profile Course Edit Fix — 2026-02-19
 
 **Scope:** Enforce home redirect after re-login; unblock legacy account course edits; run full checks and redeploy.
