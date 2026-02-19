@@ -15,19 +15,51 @@ type Props = {
 export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
 
-  // Close dropdown on outside click
+  // Compute fixed-position coords from trigger's bounding rect
+  const updateDropdownPosition = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  };
+
+  // Close dropdown on outside click (check both trigger and dropdown)
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        triggerRef.current && !triggerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Reposition dropdown on scroll or resize while open
+  useEffect(() => {
+    if (!open) return;
+    const update = () => updateDropdownPosition();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [open]);
 
   // Focus search input when dropdown opens
   useEffect(() => {
@@ -51,17 +83,21 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
       if (!map.has(label)) map.set(label, []);
       map.get(label)!.push(course);
     }
-    // Sort groups by preferred order
     const ordered = new Map<string, typeof MQ_COURSES>();
     for (const label of DEGREE_TYPE_ORDER) {
       if (map.has(label)) ordered.set(label, map.get(label)!);
     }
-    // Append any remaining labels not in the order list
     for (const [label, courses] of map) {
       if (!ordered.has(label)) ordered.set(label, courses);
     }
     return ordered;
   }, [filtered]);
+
+  const handleToggle = () => {
+    if (disabled) return;
+    if (!open) updateDropdownPosition();
+    setOpen((v) => !v);
+  };
 
   const handleSelect = (name: string) => {
     onChange(name);
@@ -82,11 +118,12 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   const totalResults = filtered.length;
 
   return (
-    <div ref={containerRef} className="relative" onKeyDown={handleKeyDown}>
+    <div className="relative" onKeyDown={handleKeyDown}>
       {/* Trigger button */}
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => !disabled && setOpen((v) => !v)}
+        onClick={handleToggle}
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -122,12 +159,14 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
         </span>
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown — rendered at fixed position to escape overflow:hidden parents */}
       {open && (
         <div
+          ref={dropdownRef}
           role="listbox"
           aria-label="Course list"
-          className="absolute z-50 w-full mt-1 rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
+          style={dropdownStyle}
+          className="rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
         >
           {/* Search */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-mq-border">
@@ -156,7 +195,6 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
             ) : (
               Array.from(grouped.entries()).map(([label, courses]) => (
                 <div key={label}>
-                  {/* Group header */}
                   <div className="px-3 pt-2 pb-0.5 text-xs font-semibold tracking-wider uppercase text-mq-content-tertiary">
                     {label}
                   </div>

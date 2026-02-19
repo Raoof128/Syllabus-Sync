@@ -90,6 +90,22 @@ const normalizeAvatarExtension = (mimeType: string) => {
   return rawExtension.replace('svg+xml', 'svg');
 };
 
+/**
+ * Convert a data: URI to a Blob without using fetch().
+ * fetch(dataUrl) is blocked by CSP's connect-src which doesn't allow data: URIs.
+ */
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [header, base64] = dataUrl.split(',');
+  const mimeMatch = header.match(/:(.*?);/);
+  const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mimeType });
+}
+
 async function uploadAvatarToStorage(dataUrl: string, profileId: string): Promise<string | null> {
   if (typeof window === 'undefined') {
     return null;
@@ -102,8 +118,7 @@ async function uploadAvatarToStorage(dataUrl: string, profileId: string): Promis
       return null;
     }
 
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
+    const blob = dataUrlToBlob(dataUrl);
     const mimeType = blob.type || 'image/png';
     const extension = normalizeAvatarExtension(mimeType);
     const filename = `${crypto.randomUUID()}.${extension}`;

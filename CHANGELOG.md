@@ -2458,3 +2458,22 @@ Scope: Additional Proxy/Auth Noise & Latency Reduction
 Summary: Optimized proxy auth flow by bypassing Supabase user lookup on routes that do not need user context, improving response times for public endpoints and reducing unnecessary upstream auth calls. Added throttled transient network-error handling in API auth middleware to reduce repeated `fetch failed`/`ECONNRESET` logging while preserving unauthenticated fallback behavior.
 Files: Modified `lib/proxy.ts`, `app/api/_lib/middleware.ts`.
 Verification: Targeted ESLint pass ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Frontend Redesign — Terms, Privacy, Signup, Reset Password
+Summary: Redesigned four pages to match the login page glass-morphism aesthetic and MQ branding. Terms of Service and Privacy Policy received a dark MQ blue header banner, sticky desktop sidebar TOC, numbered section badges, and hover left-border accent. Signup and Reset Password received a fixed background image (`login-bg.png`) with gradient overlay, glass card (`backdrop-blur-xl`, `bg-mq-card-background/85`, 30% opacity border, heavy shadow), and `animate-in fade-in slide-in-from-bottom-4` entry animation.
+Files: Modified `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Signup ↔ Manage Profile Sync (Course + Year)
+Summary: Connected the signup and manage-profile pages so course/year choices are consistent and interoperable. Replaced the plain `<Input>` course field in `AcademicInfoCard` with `CourseCombobox` (same component used in signup). Replaced the static `ACADEMIC_YEARS` array with a `useMemo`-computed dynamic year range that respects the selected degree's max years (via `DEGREE_MAX_YEARS` from `mq-courses`), matching signup logic exactly. Added a `useEffect` to auto-reset year when the user picks a shorter degree. Added `YEAR_LEGACY_MAP` + `normalizeYear()` in `useProfileManager` to convert old-format year values (`"1st Year"` → `"1"`) for backward compatibility with existing users.
+Files: Modified `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: CSP Avatar Upload Fix + CourseCombobox Dropdown Fixed Position
+Summary: Fixed two production bugs: (1) Avatar uploads were blocked by CSP `connect-src` which does not allow `data:` URIs — replaced `fetch(dataUrl)` with `dataUrlToBlob()`, a pure-JS helper that parses the base64 data URL using `atob()` + `Uint8Array` and constructs a `Blob` without any network call. (2) `CourseCombobox` dropdown was clipped by the `MagicCard` ancestor's `overflow: hidden` CSS — switched the dropdown from `position: absolute z-50` to `position: fixed` with coords computed from `triggerRef.current.getBoundingClientRect()`; added scroll and resize listeners to reposition while open, and updated the outside-click handler to check both trigger and dropdown refs.
+Files: Modified `lib/store/profilesStore.ts`, `app/signup/components/CourseCombobox.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+Follow-ups: None — both fixes are self-contained with no architectural side-effects.

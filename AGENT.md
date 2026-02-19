@@ -561,3 +561,21 @@ Scope: Additional Proxy/Auth Noise & Latency Reduction
 Summary: Reduced proxy/auth overhead and transient error noise further by skipping proxy user-resolution for routes that do not require user context (especially public API routes like `/api/auth/*`, `/api/health`, `/api/weather`). Added transient network error throttling in shared API auth middleware (`requireAuth`, `optionalAuth`, `requireAuthWithRateLimit`) so ECONNRESET/fetch-failed conditions are treated as temporary upstream failures without repeated console spam.
 Files: Modified `lib/proxy.ts`, `app/api/_lib/middleware.ts`.
 Verification: `npx eslint --config config/eslint/eslint.config.mjs lib/proxy.ts app/api/_lib/middleware.ts lib/supabase/server.ts` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Frontend Redesign — Terms, Privacy, Signup, Reset Password
+Summary: Redesigned four pages to match the login page glass-morphism aesthetic and MQ branding. Terms of Service and Privacy Policy received a dark MQ blue header banner, sticky desktop sidebar TOC, numbered section badges, and hover left-border accent. Signup and Reset Password received a fixed background image (`login-bg.png`) with gradient overlay, glass card (`backdrop-blur-xl`, `bg-mq-card-background/85`, 30% opacity border, heavy shadow), and `animate-in fade-in slide-in-from-bottom-4` entry animation.
+Files: Modified `app/terms/page.tsx`, `app/privacy/page.tsx`, `app/signup/SignupClient.tsx`, `app/reset-password/reset-password-client.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Signup ↔ Manage Profile Sync (Course + Year)
+Summary: Connected the signup and manage-profile pages so course/year choices are consistent and interoperable. Replaced plain `<Input>` course field in `AcademicInfoCard` with `CourseCombobox`. Added dynamic year range matching signup logic. Added `YEAR_LEGACY_MAP` + `normalizeYear()` for backward compatibility with existing users whose year was stored in `"Nth Year"` format.
+Files: Modified `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: CSP Avatar Upload Fix + CourseCombobox Dropdown Fixed Position
+Summary: Fixed CSP `connect-src` blocking `data:` URI avatar uploads by replacing `fetch(dataUrl)` with `dataUrlToBlob()` (pure-JS atob+Uint8Array Blob construction). Fixed CourseCombobox dropdown clipped by `overflow:hidden` ancestor by switching to `position: fixed` with `getBoundingClientRect()` coords + scroll/resize repositioning listeners.
+Files: Modified `lib/store/profilesStore.ts`, `app/signup/components/CourseCombobox.tsx`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
