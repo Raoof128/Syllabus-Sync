@@ -1,4 +1,19 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Google Maps Toggle + In-App Navigate Embed on Map Page
+Summary: Implemented a full campus/google map view switcher on `/map`. Added `MapViewToggle` UI (campus vs google), wired `mapView` state into `MapClient`, and conditionally render campus map stack (Leaflet + HUD + layer controls) only in campus mode. Added new `GoogleMapEmbed` component for in-app Google Maps with two modes: `view` (campus explore) and `directions` (`saddr=My+Location` to MQ). Added mode-switch controls (`Navigate` and `Back to Map`) and forced iframe remount via `key={mode}` to guarantee reload on mode change.
+Files: Added `features/map/components/MapViewToggle.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `tests/map/GoogleMapEmbed.test.tsx`. Modified `features/map/components/MapClient.tsx`, `locales/en/translations.json`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm run test -- tests/map` ✅ (9 files, 67 tests), `npm run check:i18n` ✅ (warnings-only parity output), `npm run check` ✅ (67 files, 487 tests, build), `npm run vercel:deploy:prod` ✅.
+Deployment: Inspect URL `https://vercel.com/perkycoders/syllabus-sync/FUaYDNGgYCLjCKe3zN1tfs5deeQ6`; production URL `https://syllabus-sync-cx38jd22c-perkycoders.vercel.app`; aliased to `https://syllabus-sync-ashy.vercel.app`.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Map View Toggle Scaffolding (Step 1)
+Summary: Added new `MapViewToggle` component for campus/google map switching UI with a11y `aria-pressed`, tokenized MQ styling, and translation-driven labels.
+Files: Added `features/map/components/MapViewToggle.tsx`.
+Verification: Pending full verification after wiring into `MapClient`.
+Follow-ups: Continue with Google embed component, MapClient integration, translations, tests, and deployment.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Legacy Account Course Persistence Fix + Profile API Payload Hardening + Regression Test + Redeploy
 Summary: Fixed the old-account issue where course changes appeared saved but later reverted. Root cause was DB immutability protection on `student_id` being accidentally tripped when profile updates included omitted fields as undefined/null-equivalent payload keys. Hardened `PUT /api/profiles` to build an explicit conditional payload (only include fields present in request body + `updated_at`). Updated manage-profile save flow to detect store/API persistence failure and show an error instead of false success, with form rollback to current profile values for consistency. Added API regression tests to prevent recurrence.
 Files: Modified `app/api/profiles/route.ts`, `app/manage-profiles/hooks/useProfileManager.ts`. Added `tests/api/profiles.route.test.ts`.

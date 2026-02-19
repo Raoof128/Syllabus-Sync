@@ -33,6 +33,8 @@ import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
+import { MapViewToggle, type MapView } from './MapViewToggle';
+import { GoogleMapEmbed } from './GoogleMapEmbed';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -100,6 +102,7 @@ export default function MapClient() {
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
   const hasAutoNavigatedRef = useRef(false);
+  const [mapView, setMapView] = useState<MapView>('campus');
 
   // Use map store for overlay persistence
   const {
@@ -345,216 +348,240 @@ export default function MapClient() {
 
         {/* Header */}
         <header className="mb-6">
-          <h1 className="mb-2 text-mq-2xl font-bold text-mq-content sm:text-mq-3xl">{t('map')}</h1>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-mq-2xl font-bold text-mq-content sm:text-mq-3xl">
+              {t('campusMap')}
+            </h1>
+            <MapViewToggle activeView={mapView} onViewChange={setMapView} />
+          </div>
           <p className="text-mq-content-secondary">
             {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
           </p>
         </header>
 
-        {/* Map Overlay Layers */}
-        <div className="mb-4">
-          <MagicCard isLiquidEnhanced>
-            <div className="mq-magic-card-content p-4 bg-mq-card-background border border-mq-border">
-              <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex min-w-0 items-start gap-3">
-                  <Layers className="h-5 w-5" />
-                  <div className="min-w-0">
-                    <p className="text-mq-sm font-medium text-mq-content">{t('mapLayers')}</p>
-                    <p className="text-mq-xs text-mq-content-secondary">{t('mapLayersDesc')}</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                  {activeOverlays.length > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {activeOverlays.length} {t('active')}
-                    </Badge>
-                  )}
-                  <Button
-                    variant={showOverlayPanel ? 'primary' : 'secondary'}
-                    size="sm"
-                    onClick={() => setShowOverlayPanel(!showOverlayPanel)}
-                    ref={overlayToggleButtonRef}
-                    aria-expanded={showOverlayPanel}
-                    aria-controls="map-overlays-panel"
-                    className="gap-2 whitespace-nowrap"
-                  >
-                    <Layers className="h-4 w-4" />
-                    {showOverlayPanel ? t('hideLayers') : t('showLayers')}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Overlay Toggle Buttons */}
-              {showOverlayPanel && (
-                <div
-                  id="map-overlays-panel"
-                  ref={overlaysContainerRef}
-                  onKeyDown={handleOverlayPanelKeyDown}
-                  role="group"
-                  aria-label={t('mapLayers')}
-                  tabIndex={-1}
-                  className="space-y-3 pt-3 border-t border-mq-border"
-                >
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                    {mapOverlays.map((overlay) => {
-                      const Icon = OVERLAY_ICONS[overlay.id];
-                      const isActive = activeOverlays.includes(overlay.id);
-                      return (
-                        <m.button
-                          key={overlay.id}
-                          onClick={() => {
-                            toggleOverlay(overlay.id);
-                            triggerHaptic('tap', 'light');
-                          }}
-                          aria-pressed={isActive}
-                          whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
-                          whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                          className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
-                            isActive
-                              ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
-                              : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
-                          }`}
-                        >
-                          {/* Ripple Effect */}
-                          {isActive && !prefersReducedMotion && (
-                            <m.div
-                              className="absolute inset-0 bg-mq-primary/5 rounded-mq-lg pointer-events-none"
-                              initial={{ scale: 0, opacity: 0.5 }}
-                              animate={{ scale: 1.5, opacity: 0 }}
-                              transition={{ duration: 0.5 }}
-                            />
-                          )}
-
-                          <m.div
-                            animate={
-                              isActive && !prefersReducedMotion
-                                ? {
-                                    scale: [1, 1.2, 1],
-                                    rotate: [0, 5, -5, 0],
-                                  }
-                                : undefined
-                            }
-                            transition={prefersReducedMotion ? undefined : { duration: 0.4 }}
-                          >
-                            <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
-                          </m.div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-mq-sm font-medium truncate">{t(overlay.labelKey)}</p>
-                            <p className="text-mq-xs text-mq-content-secondary truncate">
-                              {t(overlay.descKey)}
-                            </p>
-                          </div>
-                          <AnimatePresence>
-                            {isActive && (
-                              <m.div
-                                initial={{ x: 10, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                exit={{ x: 10, opacity: 0 }}
-                              >
-                                <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-                              </m.div>
-                            )}
-                          </AnimatePresence>
-                        </m.button>
-                      );
-                    })}
-                  </div>
-                  {activeOverlays.length > 0 && (
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {mapView === 'campus' && (
+          <>
+            {/* Map Overlay Layers */}
+            <div className="mb-4">
+              <MagicCard isLiquidEnhanced>
+                <div className="mq-magic-card-content p-4 bg-mq-card-background border border-mq-border">
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <Layers className="h-5 w-5" />
+                      <div className="min-w-0">
+                        <p className="text-mq-sm font-medium text-mq-content">{t('mapLayers')}</p>
+                        <p className="text-mq-xs text-mq-content-secondary">{t('mapLayersDesc')}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                      {activeOverlays.length > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {activeOverlays.length} {t('active')}
+                        </Badge>
+                      )}
                       <Button
-                        variant="ghost"
+                        variant={showOverlayPanel ? 'primary' : 'secondary'}
                         size="sm"
-                        onClick={copyShareableURL}
-                        className="gap-1 text-mq-info"
-                        title={t('copyShareableURL')}
+                        onClick={() => setShowOverlayPanel(!showOverlayPanel)}
+                        ref={overlayToggleButtonRef}
+                        aria-expanded={showOverlayPanel}
+                        aria-controls="map-overlays-panel"
+                        className="gap-2 whitespace-nowrap"
                       >
-                        <LinkIcon className="h-4 w-4" />
-                        {t('copyLink')}
+                        <Layers className="h-4 w-4" />
+                        {showOverlayPanel ? t('hideLayers') : t('showLayers')}
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={clearOverlays} className="gap-1">
-                        <X className="h-4 w-4" />
-                        {t('clearAll')}
-                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Overlay Toggle Buttons */}
+                  {showOverlayPanel && (
+                    <div
+                      id="map-overlays-panel"
+                      ref={overlaysContainerRef}
+                      onKeyDown={handleOverlayPanelKeyDown}
+                      role="group"
+                      aria-label={t('mapLayers')}
+                      tabIndex={-1}
+                      className="space-y-3 pt-3 border-t border-mq-border"
+                    >
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {mapOverlays.map((overlay) => {
+                          const Icon = OVERLAY_ICONS[overlay.id];
+                          const isActive = activeOverlays.includes(overlay.id);
+                          return (
+                            <m.button
+                              key={overlay.id}
+                              onClick={() => {
+                                toggleOverlay(overlay.id);
+                                triggerHaptic('tap', 'light');
+                              }}
+                              aria-pressed={isActive}
+                              whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
+                              whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                              className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
+                                isActive
+                                  ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
+                                  : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
+                              }`}
+                            >
+                              {/* Ripple Effect */}
+                              {isActive && !prefersReducedMotion && (
+                                <m.div
+                                  className="absolute inset-0 bg-mq-primary/5 rounded-mq-lg pointer-events-none"
+                                  initial={{ scale: 0, opacity: 0.5 }}
+                                  animate={{ scale: 1.5, opacity: 0 }}
+                                  transition={{ duration: 0.5 }}
+                                />
+                              )}
+
+                              <m.div
+                                animate={
+                                  isActive && !prefersReducedMotion
+                                    ? {
+                                        scale: [1, 1.2, 1],
+                                        rotate: [0, 5, -5, 0],
+                                      }
+                                    : undefined
+                                }
+                                transition={prefersReducedMotion ? undefined : { duration: 0.4 }}
+                              >
+                                <Icon className={`h-5 w-5 flex-shrink-0 ${overlay.color}`} />
+                              </m.div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-mq-sm font-medium truncate">
+                                  {t(overlay.labelKey)}
+                                </p>
+                                <p className="text-mq-xs text-mq-content-secondary truncate">
+                                  {t(overlay.descKey)}
+                                </p>
+                              </div>
+                              <AnimatePresence>
+                                {isActive && (
+                                  <m.div
+                                    initial={{ x: 10, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    exit={{ x: 10, opacity: 0 }}
+                                  >
+                                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                                  </m.div>
+                                )}
+                              </AnimatePresence>
+                            </m.button>
+                          );
+                        })}
+                      </div>
+                      {activeOverlays.length > 0 && (
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={copyShareableURL}
+                            className="gap-1 text-mq-info"
+                            title={t('copyShareableURL')}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                            {t('copyLink')}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearOverlays}
+                            className="gap-1"
+                          >
+                            <X className="h-4 w-4" />
+                            {t('clearAll')}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
+              </MagicCard>
             </div>
-          </MagicCard>
-        </div>
 
-        {/* Map */}
-        <MagicCard isLiquidEnhanced className="mb-6">
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-            <Card className="border border-mq-border bg-mq-card-background">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="min-w-0 break-words">{t('interactiveCampusMap')}</CardTitle>
-                  <p className="text-xs text-mq-content-tertiary hidden md:block">
-                    {t('mapPanZoomHint')}
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div
-                  ref={mapContainerRef}
-                  className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border"
-                >
-                  {/* Real Map (with smooth fade-in when ready) */}
-                  <div
-                    className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
-                  >
-                    <TranslatedMapErrorBoundary>
-                      <Suspense fallback={null}>
-                        <CampusMap
-                          ref={campusMapRef}
-                          selectedBuilding={selectedBuilding}
-                          activeOverlays={activeOverlays}
-                          onLocationStatusChange={setLocationStatus}
-                          onNavStateChange={setNavState}
-                          onMapReady={() => setIsMapReady(true)}
-                        />
-                      </Suspense>
-                    </TranslatedMapErrorBoundary>
-                  </div>
-
-                  {/* Skeleton Overlay (fades out when map is ready) */}
-                  <AnimatePresence>
-                    {!isMapReady && (
-                      <m.div
-                        initial={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-0 z-10"
-                      >
-                        <MapLoadingSkeleton />
-                      </m.div>
-                    )}
-                  </AnimatePresence>
-
-                  {mapLoadTimedOut && (
-                    <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
-                      <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
-                        {safeT('mapLoadSlow', 'Map is taking longer than expected to load.')}
+            {/* Map */}
+            <MagicCard isLiquidEnhanced className="mb-6">
+              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+                <Card className="border border-mq-border bg-mq-card-background">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="min-w-0 break-words">
+                        {t('interactiveCampusMap')}
+                      </CardTitle>
+                      <p className="text-xs text-mq-content-tertiary hidden md:block">
+                        {t('mapPanZoomHint')}
                       </p>
                     </div>
-                  )}
+                  </CardHeader>
+                  <CardContent>
+                    <div
+                      ref={mapContainerRef}
+                      className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border"
+                    >
+                      {/* Real Map (with smooth fade-in when ready) */}
+                      <div
+                        className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
+                      >
+                        <TranslatedMapErrorBoundary>
+                          <Suspense fallback={null}>
+                            <CampusMap
+                              ref={campusMapRef}
+                              selectedBuilding={selectedBuilding}
+                              activeOverlays={activeOverlays}
+                              onLocationStatusChange={setLocationStatus}
+                              onNavStateChange={setNavState}
+                              onMapReady={() => setIsMapReady(true)}
+                            />
+                          </Suspense>
+                        </TranslatedMapErrorBoundary>
+                      </div>
 
-                  {/* HUD overlays - loaded immediately, sits on top */}
-                  <CampusMapHUD
-                    selectedBuilding={selectedBuilding}
-                    buildings={sidebarBuildings}
-                    buildingSearch={buildingSearch}
-                    setBuildingSearch={setBuildingSearch}
-                    onCopyShare={copyShareableURL}
-                    onExport={handleExport}
-                    onStartNavigation={() => campusMapRef.current?.startNavigation()}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                      {/* Skeleton Overlay (fades out when map is ready) */}
+                      <AnimatePresence>
+                        {!isMapReady && (
+                          <m.div
+                            initial={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute inset-0 z-10"
+                          >
+                            <MapLoadingSkeleton />
+                          </m.div>
+                        )}
+                      </AnimatePresence>
+
+                      {mapLoadTimedOut && (
+                        <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
+                          <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
+                            {safeT('mapLoadSlow', 'Map is taking longer than expected to load.')}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* HUD overlays - loaded immediately, sits on top */}
+                      <CampusMapHUD
+                        selectedBuilding={selectedBuilding}
+                        buildings={sidebarBuildings}
+                        buildingSearch={buildingSearch}
+                        setBuildingSearch={setBuildingSearch}
+                        onCopyShare={copyShareableURL}
+                        onExport={handleExport}
+                        onStartNavigation={() => campusMapRef.current?.startNavigation()}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </MagicCard>
+          </>
+        )}
+
+        {mapView === 'google' && (
+          <div className="mb-6">
+            <GoogleMapEmbed />
           </div>
-        </MagicCard>
+        )}
       </section>
     </LazyMotion>
   );

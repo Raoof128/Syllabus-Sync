@@ -1,3 +1,80 @@
+### Raouf: Google Maps Toggle + In-App Navigate Embed — 2026-02-19
+
+**Scope:** Add a full campus/google map switch on `/map` with in-app Google navigation mode.
+**Type:** Map / UX / Integration
+
+#### Changes
+
+1. **New `MapViewToggle` component**
+   - Added **`features/map/components/MapViewToggle.tsx`**.
+   - Provides pill-style campus/google toggle with icons and `aria-pressed` accessibility.
+   - Uses translation-driven labels and existing MQ tokenized styles.
+
+2. **New `GoogleMapEmbed` component**
+   - Added **`features/map/components/GoogleMapEmbed.tsx`**.
+   - Implements two in-app modes:
+     - `view`: MQ campus embed
+     - `directions`: directions embed with `saddr=My+Location` and MQ destination
+   - Adds `Navigate` ↔ `Back to Map` controls in a top bar.
+   - Uses `key={mode}` on iframe to force reliable remount/reload when switching modes.
+
+3. **Map page integration**
+   - Modified **`features/map/components/MapClient.tsx`**:
+     - Added `mapView` state (`campus | google`).
+     - Added header toggle (`MapViewToggle`) next to map title.
+     - Campus mode renders existing Leaflet map + HUD + overlay controls.
+     - Google mode renders `GoogleMapEmbed`.
+     - Overlay/layer controls are hidden when in Google mode.
+
+4. **Translations**
+   - Modified **`locales/en/translations.json`** with new keys:
+     - `googleMaps`
+     - `mapViewToggle`
+     - `navigateToMQ`
+     - `directions`
+     - `backToMap`
+     - `googleMapsIframeLabel`
+     - `directionsIframeLabel`
+
+5. **Tests**
+   - Added **`tests/map/GoogleMapEmbed.test.tsx`**:
+     - default view-mode iframe render
+     - navigate to directions mode
+     - return back to view mode
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test -- tests/map` ✅ (9 files, 67 tests)
+- `npm run check:i18n` ✅ (warnings-only key parity output)
+- `npm run check` ✅ (67 files, 487 tests, build passed)
+- `npm run vercel:deploy:prod` ✅
+
+#### Deployment
+
+- Inspect: `https://vercel.com/perkycoders/syllabus-sync/FUaYDNGgYCLjCKe3zN1tfs5deeQ6`
+- Production deployment: `https://syllabus-sync-cx38jd22c-perkycoders.vercel.app`
+- Production alias: `https://syllabus-sync-ashy.vercel.app`
+
+### Raouf: Map View Toggle Scaffolding (Step 1) — 2026-02-19
+
+**Scope:** Add map view toggle component as foundation for campus/google switch.
+**Type:** Map / UX
+
+#### Changes
+
+1. **`features/map/components/MapViewToggle.tsx`**
+   - Added `MapViewToggle` with `campus` and `google` options.
+   - Implemented icon + label pill controls with `aria-pressed` for accessibility.
+   - Uses existing MQ token classes and `useTypedTranslation()` keys.
+
+#### Verification
+
+- Pending final validation after full map flow wiring.
+
+---
+
 ### Raouf: Legacy Account Course Persistence Fix + Profile Payload Hardening — 2026-02-19
 
 **Scope:** Fix old accounts whose course updates reverted after save; harden profile update payload handling; add regression coverage; redeploy production.
