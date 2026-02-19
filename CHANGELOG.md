@@ -1,3 +1,44 @@
+### Raouf: Fix Google Maps Embed CSP + Rename Map Labels — 2026-02-19
+
+**Scope:** Restore Google Maps embed functionality on `/map` and rename map labels to “Campus Map”.
+**Type:** Security / Map / UX
+
+#### Changes
+
+1. **CSP frame allowlist fix**
+   - Modified **`lib/security/csp.ts`** to add:
+     - `frame-src 'self' https://www.google.com https://maps.google.com`
+   - Applied in:
+     - `buildCSP()`
+     - `buildDevCSP()`
+     - `buildProdCSP()`
+   - Root cause addressed: Google iframe was blocked by CSP fallback (`default-src 'self'`) because no frame-src directive existed.
+
+2. **Google embed URL host normalization**
+   - Modified **`features/map/components/GoogleMapEmbed.tsx`**:
+     - changed embed hosts from `maps.google.com` to `www.google.com/maps` for consistent CSP host matching and embed behavior.
+
+3. **Label rename to Campus Map**
+   - Modified **`locales/en/translations.json`**:
+     - `map`: `"Campus Map"`
+     - `campusMap`: `"Campus Map"`
+     - `interactiveCampusMap`: `"Campus Map"`
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test -- tests/map/GoogleMapEmbed.test.tsx` ✅ (3 tests passed)
+- `npm run vercel:deploy:prod` ✅
+
+#### Deployment
+
+- Inspect: `https://vercel.com/perkycoders/syllabus-sync/E7Vsgr2oQ3bVLW1x2UTKqvff8Ubq`
+- Production deployment: `https://syllabus-sync-l2fjpjbh1-perkycoders.vercel.app`
+- Production alias: `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Google Maps Toggle + In-App Navigate Embed — 2026-02-19
 
 **Scope:** Add a full campus/google map switch on `/map` with in-app Google navigation mode.

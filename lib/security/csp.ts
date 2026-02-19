@@ -102,6 +102,9 @@ export function buildCSP(options: CSPOptions = {}): string {
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
 
+    // Frame sources: Allow embedded Google Maps in-app
+    "frame-src 'self' https://www.google.com https://maps.google.com",
+
     // Base URI: Restrict base tag
     "base-uri 'self'",
 
@@ -147,6 +150,8 @@ export function buildDevCSP(): string {
     "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
     // Frame ancestors
     "frame-ancestors 'self'",
+    // Frame sources
+    "frame-src 'self' https://www.google.com https://maps.google.com",
     // Base URI
     "base-uri 'self'",
     // Form actions
@@ -188,6 +193,8 @@ export function buildProdCSP(): string {
     "connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com https://*.sentry.io wss://*.supabase.co",
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
+    // Frame sources: allow Google Maps embed
+    "frame-src 'self' https://www.google.com https://maps.google.com",
     // Base URI: Restrict base tag
     "base-uri 'self'",
     // Form actions: Where forms can submit

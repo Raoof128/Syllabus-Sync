@@ -7,9 +7,9 @@ import { UNIVERSITY_CONFIG } from '@/lib/config';
 
 const MQ_QUERY = 'Macquarie+University+Sydney+NSW+Australia';
 
-const EMBED_VIEW_URL = `https://maps.google.com/maps?q=${MQ_QUERY}&z=16&ie=UTF8&iwloc=&output=embed`;
+const EMBED_VIEW_URL = `https://www.google.com/maps?q=${MQ_QUERY}&z=16&ie=UTF8&iwloc=&output=embed`;
 
-const EMBED_DIRECTIONS_URL = `https://maps.google.com/maps?saddr=My+Location&daddr=${MQ_QUERY}&z=14&ie=UTF8&output=embed`;
+const EMBED_DIRECTIONS_URL = `https://www.google.com/maps?saddr=My+Location&daddr=${MQ_QUERY}&z=14&ie=UTF8&output=embed`;
 
 type MapMode = 'view' | 'directions';
 

@@ -1,4 +1,12 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Fix Google Maps Embed Blocking + Rename Map Labels to Campus Map
+Summary: Resolved Google map not loading on site by updating CSP directives to explicitly allow embedded frames from `https://www.google.com` and `https://maps.google.com` in all CSP builders (`buildCSP`, `buildDevCSP`, `buildProdCSP`). Updated Google embed URLs to `www.google.com/maps` for consistent frame host matching. Renamed map-related labels as requested: `map` → `Campus Map`, `campusMap` → `Campus Map`, and `interactiveCampusMap` → `Campus Map`.
+Files: Modified `lib/security/csp.ts`, `features/map/components/GoogleMapEmbed.tsx`, `locales/en/translations.json`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx` ✅ (3/3), `npm run vercel:deploy:prod` ✅.
+Deployment: Inspect URL `https://vercel.com/perkycoders/syllabus-sync/E7Vsgr2oQ3bVLW1x2UTKqvff8Ubq`; production URL `https://syllabus-sync-l2fjpjbh1-perkycoders.vercel.app`; aliased to `https://syllabus-sync-ashy.vercel.app`.
+Follow-ups: If Google Maps still fails in a specific browser, capture CSP violation details from `/api/csp-report` logs to verify host pattern coverage.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Google Maps Toggle + In-App Navigate Embed on Map Page
 Summary: Implemented a full campus/google map view switcher on `/map`. Added `MapViewToggle` UI (campus vs google), wired `mapView` state into `MapClient`, and conditionally render campus map stack (Leaflet + HUD + layer controls) only in campus mode. Added new `GoogleMapEmbed` component for in-app Google Maps with two modes: `view` (campus explore) and `directions` (`saddr=My+Location` to MQ). Added mode-switch controls (`Navigate` and `Back to Map`) and forced iframe remount via `key={mode}` to guarantee reload on mode change.
 Files: Added `features/map/components/MapViewToggle.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `tests/map/GoogleMapEmbed.test.tsx`. Modified `features/map/components/MapClient.tsx`, `locales/en/translations.json`.
