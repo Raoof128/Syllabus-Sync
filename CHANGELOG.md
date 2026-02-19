@@ -1,3 +1,51 @@
+### Raouf: Google View Building List + Selected Destination Sync — 2026-02-19
+
+**Scope:** Make Google map view support the same building search/select behavior as campus view.
+**Type:** Map / UX / Navigation
+
+#### Changes
+
+1. **Google mode now includes building list/search controls**
+   - Modified **`features/map/components/MapClient.tsx`** to render `CampusMapHUD` in Google view as well.
+   - Users can now search/select buildings while viewing Google map embed.
+
+2. **Selected building drives Google embed destination**
+   - Modified **`features/map/components/GoogleMapEmbed.tsx`**:
+     - Added props for `selectedBuilding` and `destinationLabel`.
+     - Uses selected building GPS coordinates as destination in:
+       - view mode embed query (`q=...`)
+       - directions mode destination (`daddr=...`)
+     - Keeps default MQ destination when no building is selected.
+
+3. **Preserve Google view while selecting buildings**
+   - Modified **`features/map/components/CampusMapHUD.tsx`**:
+     - `buildMapHref` now preserves `view` query param in generated map links.
+     - Prevents fallback to campus view when selecting buildings in Google mode.
+
+4. **Remove dead primary nav action in Google mode**
+   - Modified **`features/map/components/CampusMapHUD.tsx`**:
+     - Primary `Navigate on Campus` button now renders only when `onStartNavigation` callback exists.
+     - Avoids a no-op action in Google mode.
+
+5. **Regression tests**
+   - Modified **`tests/map/GoogleMapEmbed.test.tsx`**:
+     - Added test verifying selected building coordinates are used in iframe destination URL.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm run test -- tests/map/GoogleMapEmbed.test.tsx` ✅ (4 tests passed)
+- `npm run vercel:deploy:prod` ✅
+
+#### Deployment
+
+- Inspect: `https://vercel.com/perkycoders/syllabus-sync/DfrZxx1UDipnUHRp6r9VjuYTbdQm`
+- Production deployment: `https://syllabus-sync-gwyo2gnyc-perkycoders.vercel.app`
+- Production alias: `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Fix Google Maps Embed CSP + Rename Map Labels — 2026-02-19
 
 **Scope:** Restore Google Maps embed functionality on `/map` and rename map labels to “Campus Map”.

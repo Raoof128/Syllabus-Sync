@@ -1,4 +1,12 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Google View Building List/Selection Parity with Campus Map
+Summary: Implemented building-list parity for Google map view. (1) Reused `CampusMapHUD` in Google mode so search/list/select logic is available there too. (2) Updated `GoogleMapEmbed` to accept selected building destination and dynamically target selected building GPS coordinates in both explore and directions embed URLs. (3) Preserved `view=google` during building selection links so selecting a building does not switch back to campus view. (4) Removed no-op primary navigation button in selected-building card when on-campus navigation callback is unavailable (Google mode). (5) Added regression test covering selected-building coordinate destination in Google embed.
+Files: Modified `features/map/components/MapClient.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`, `tests/map/GoogleMapEmbed.test.tsx`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx` ✅ (4/4), `npm run vercel:deploy:prod` ✅.
+Deployment: Inspect URL `https://vercel.com/perkycoders/syllabus-sync/DfrZxx1UDipnUHRp6r9VjuYTbdQm`; production URL `https://syllabus-sync-gwyo2gnyc-perkycoders.vercel.app`; aliased to `https://syllabus-sync-ashy.vercel.app`.
+Follow-ups: Optional UX refinement: in Google mode, hide the export/share toolbar from `CampusMapHUD` if you want a cleaner Google-only control set.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Fix Google Maps Embed Blocking + Rename Map Labels to Campus Map
 Summary: Resolved Google map not loading on site by updating CSP directives to explicitly allow embedded frames from `https://www.google.com` and `https://maps.google.com` in all CSP builders (`buildCSP`, `buildDevCSP`, `buildProdCSP`). Updated Google embed URLs to `www.google.com/maps` for consistent frame host matching. Renamed map-related labels as requested: `map` → `Campus Map`, `campusMap` → `Campus Map`, and `interactiveCampusMap` → `Campus Map`.
 Files: Modified `lib/security/csp.ts`, `features/map/components/GoogleMapEmbed.tsx`, `locales/en/translations.json`.

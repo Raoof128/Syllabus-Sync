@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Navigation, ArrowLeft } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
+import type { Building } from '@/features/map/lib/buildings';
 
 const MQ_QUERY = 'Macquarie+University+Sydney+NSW+Australia';
 
@@ -13,15 +14,24 @@ const EMBED_DIRECTIONS_URL = `https://www.google.com/maps?saddr=My+Location&dadd
 
 type MapMode = 'view' | 'directions';
 
-export function GoogleMapEmbed() {
+interface GoogleMapEmbedProps {
+  selectedBuilding?: Building;
+  destinationLabel?: string;
+}
+
+export function GoogleMapEmbed({ selectedBuilding, destinationLabel }: GoogleMapEmbedProps) {
   const { t } = useTypedTranslation();
   const [mode, setMode] = useState<MapMode>('view');
+  const destinationQuery = selectedBuilding?.location
+    ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
+    : MQ_QUERY;
+  const resolvedDestinationLabel = destinationLabel || UNIVERSITY_CONFIG.name;
 
   return (
     <div className="relative flex h-full min-h-[520px] flex-col overflow-hidden rounded-xl border border-mq-border">
       <div className="flex shrink-0 items-center justify-between border-b border-mq-border bg-mq-card-background px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-mq-content">{UNIVERSITY_CONFIG.name}</span>
+          <span className="text-sm font-semibold text-mq-content">{resolvedDestinationLabel}</span>
           <span className="hidden text-xs text-mq-content-secondary sm:inline">
             · {mode === 'directions' ? t('directions') : t('googleMaps')}
           </span>
@@ -52,10 +62,14 @@ export function GoogleMapEmbed() {
         key={mode}
         title={
           mode === 'directions'
-            ? 'Directions to Macquarie University'
-            : 'Google Maps — Macquarie University'
+            ? `Directions to ${resolvedDestinationLabel}`
+            : `Google Maps — ${resolvedDestinationLabel}`
         }
-        src={mode === 'view' ? EMBED_VIEW_URL : EMBED_DIRECTIONS_URL}
+        src={
+          mode === 'view'
+            ? EMBED_VIEW_URL.replace(MQ_QUERY, destinationQuery)
+            : EMBED_DIRECTIONS_URL.replace(MQ_QUERY, destinationQuery)
+        }
         className="min-h-[460px] w-full flex-1 border-0"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"

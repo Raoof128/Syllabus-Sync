@@ -27,4 +27,23 @@ describe('GoogleMapEmbed', () => {
     fireEvent.click(screen.getByRole('button', { name: 'backToMap' }));
     expect(screen.getByTitle('Google Maps — Macquarie University')).toBeTruthy();
   });
+
+  it('uses selected building coordinates as destination when provided', () => {
+    render(
+      <GoogleMapEmbed
+        selectedBuilding={{
+          id: '18WW',
+          name: '18 Wallys Walk',
+          position: [0, 0],
+          translationKey: 'building_18WW_name',
+          descriptionKey: 'building_18WW_desc',
+          location: { lat: -33.7734389, lng: 151.1134919 },
+        }}
+        destinationLabel="18 Wallys Walk"
+      />,
+    );
+
+    const iframe = screen.getByTitle('Google Maps — 18 Wallys Walk');
+    expect(iframe.getAttribute('src')).toContain('-33.7734389,151.1134919');
+  });
 });

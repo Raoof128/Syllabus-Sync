@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useCallback, useState } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import {
   Search,
   Share2,
@@ -61,17 +61,16 @@ export default function CampusMapHUD({
     return () => mediaQuery.removeEventListener('change', syncExpandedState);
   }, []);
 
-  const buildMapHref = useCallback(
-    (buildingId?: string) => {
-      const params = new URLSearchParams();
-      if (layersParam) params.set('layers', layersParam);
-      if (buildingId) params.set('building', buildingId);
+  const buildMapHref = (buildingId?: string) => {
+    const params = new URLSearchParams();
+    if (layersParam) params.set('layers', layersParam);
+    const viewParam = searchParams.get('view');
+    if (viewParam) params.set('view', viewParam);
+    if (buildingId) params.set('building', buildingId);
 
-      const qs = params.toString();
-      return qs ? `/map?${qs}` : '/map';
-    },
-    [layersParam],
-  );
+    const qs = params.toString();
+    return qs ? `/map?${qs}` : '/map';
+  };
 
   // Cmd/Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
@@ -345,19 +344,19 @@ export default function CampusMapHUD({
 
                 {/* Navigation Buttons */}
                 <div className="flex flex-col gap-2 pt-2">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="w-full gap-2"
-                    onClick={() => {
-                      if (onStartNavigation) {
+                  {onStartNavigation && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="w-full gap-2"
+                      onClick={() => {
                         onStartNavigation();
-                      }
-                    }}
-                  >
-                    <Navigation className="h-4 w-4" />
-                    {t('navigateOnCampus')}
-                  </Button>
+                      }}
+                    >
+                      <Navigation className="h-4 w-4" />
+                      {t('navigateOnCampus')}
+                    </Button>
+                  )}
                   <Button
                     variant="secondary"
                     size="sm"

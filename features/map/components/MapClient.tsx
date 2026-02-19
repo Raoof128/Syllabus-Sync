@@ -102,7 +102,7 @@ export default function MapClient() {
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
   const hasAutoNavigatedRef = useRef(false);
-  const [mapView, setMapView] = useState<MapView>('campus');
+  const mapView: MapView = searchParams.get('view') === 'google' ? 'google' : 'campus';
 
   // Use map store for overlay persistence
   const {
@@ -255,6 +255,20 @@ export default function MapClient() {
     }
   }, [activeOverlays, selectedBuildingId, t]);
 
+  const handleMapViewChange = useCallback(
+    (nextView: MapView) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (nextView === 'google') {
+        params.set('view', 'google');
+      } else {
+        params.delete('view');
+      }
+      const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+      window.history.replaceState({}, '', newUrl);
+    },
+    [searchParams],
+  );
+
   const handleExport = useCallback(() => {
     try {
       const link = document.createElement('a');
@@ -352,7 +366,7 @@ export default function MapClient() {
             <h1 className="text-mq-2xl font-bold text-mq-content sm:text-mq-3xl">
               {t('campusMap')}
             </h1>
-            <MapViewToggle activeView={mapView} onViewChange={setMapView} />
+            <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
           </div>
           <p className="text-mq-content-secondary">
             {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
@@ -578,8 +592,21 @@ export default function MapClient() {
         )}
 
         {mapView === 'google' && (
-          <div className="mb-6">
-            <GoogleMapEmbed />
+          <div className="relative mb-6">
+            <GoogleMapEmbed
+              selectedBuilding={selectedBuilding}
+              destinationLabel={
+                selectedBuilding ? t(selectedBuilding.translationKey) : UNIVERSITY_CONFIG.name
+              }
+            />
+            <CampusMapHUD
+              selectedBuilding={selectedBuilding}
+              buildings={sidebarBuildings}
+              buildingSearch={buildingSearch}
+              setBuildingSearch={setBuildingSearch}
+              onCopyShare={copyShareableURL}
+              onExport={handleExport}
+            />
           </div>
         )}
       </section>
