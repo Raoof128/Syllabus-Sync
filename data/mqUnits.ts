@@ -3,18 +3,18 @@
 // This file contains all MQ units for use in the unit search/dropdown feature
 
 export interface MQUnit {
-  code: string;           // Unit code e.g., "COMP1170"
-  title: string;          // Unit title e.g., "3D Modelling and Animation"
-  creditPoints: number;   // Credit points (usually 10)
-  level: number;          // Unit level (1000, 2000, 3000, etc.)
-  school: string;         // Faculty/School offering the unit
-  unitType: string;       // Unit type (Undergraduate, Postgraduate, etc.)
-  description: string;    // Unit description
-  sessions: string;       // Available sessions (Session 1, Session 2, etc.)
-  locations: string;      // Campus locations
-  deliveryMode: string;   // Delivery mode (In person, Online, etc.)
-  prerequisites: string;  // Prerequisites
-  handbookUrl: string;    // Link to handbook page
+  code: string; // Unit code e.g., "COMP1170"
+  title: string; // Unit title e.g., "3D Modelling and Animation"
+  creditPoints: number; // Credit points (usually 10)
+  level: number; // Unit level (1000, 2000, 3000, etc.)
+  school: string; // Faculty/School offering the unit
+  unitType: string; // Unit type (Undergraduate, Postgraduate, etc.)
+  description: string; // Unit description
+  sessions: string; // Available sessions (Session 1, Session 2, etc.)
+  locations: string; // Campus locations
+  deliveryMode: string; // Delivery mode (In person, Online, etc.)
+  prerequisites: string; // Prerequisites
+  handbookUrl: string; // Link to handbook page
 }
 
 // Import the MQ unit data
@@ -62,7 +62,7 @@ export function searchMQUnits(query: string, limit: number = 20): MQUnit[] {
     // All query words appear in code + title combined
     else {
       const combined = `${codeNorm} ${titleNorm}`;
-      const allWordsMatch = queryWords.every(word => combined.includes(word));
+      const allWordsMatch = queryWords.every((word) => combined.includes(word));
       if (allWordsMatch) {
         score = 50;
       }
@@ -98,4 +98,3 @@ export function getMQUnitsBySchool(school: string): MQUnit[] {
   const normalizedSchool = school.toLowerCase();
   return mqUnits.filter((unit) => unit.school.toLowerCase().includes(normalizedSchool));
 }
-

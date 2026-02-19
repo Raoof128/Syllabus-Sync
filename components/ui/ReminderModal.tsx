@@ -184,6 +184,7 @@ export default function ReminderModal({
     addNotification,
     onOpenChange,
     t,
+    tStr,
   ]);
 
   const getItemTypeLabel = (type: ReminderItemType): string => {

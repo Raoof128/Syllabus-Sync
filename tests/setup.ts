@@ -102,6 +102,11 @@ if (typeof HTMLAnchorElement !== 'undefined') {
   HTMLAnchorElement.prototype.click = function () {};
 }
 
+// JSDOM does not implement scrollIntoView — stub it so components that call it don't throw
+if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}
+
 if (typeof window !== 'undefined') {
   const currentLocation = window.location;
   const safeLocation = {

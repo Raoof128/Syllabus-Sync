@@ -97,6 +97,7 @@ const Header = memo(() => {
 
   // Error boundary for notifications
   const [notificationError, setNotificationError] = useState<Error | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
 
   useEffect(() => {
     const handleNotificationError = (event: CustomEvent) => {
@@ -190,6 +191,11 @@ const Header = memo(() => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Reset avatar error state when the avatar URL changes
+  useEffect(() => {
+    setAvatarError(false);
+  }, [currentProfile?.avatar]);
 
   // Only calculate notifications on client to avoid hydration mismatch
   const unreadNotifications = isClient ? notifications.filter((n) => !n.read) : [];
@@ -506,11 +512,9 @@ const Header = memo(() => {
               >
                 <div
                   className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-sm group-hover:shadow-md shrink-0"
-                  style={{
-                    backgroundColor: currentProfile?.avatar ? 'transparent' : BRAND_COLORS.primary,
-                  }}
+                  style={{ backgroundColor: BRAND_COLORS.primary }}
                 >
-                  {currentProfile?.avatar ? (
+                  {currentProfile?.avatar && !avatarError ? (
                     <Image
                       src={currentProfile.avatar}
                       alt={
@@ -521,6 +525,8 @@ const Header = memo(() => {
                       width={32}
                       height={32}
                       className="w-full h-full object-cover"
+                      unoptimized
+                      onError={() => setAvatarError(true)}
                     />
                   ) : displayName ? (
                     <span className="text-white font-bold text-xs sm:text-sm">

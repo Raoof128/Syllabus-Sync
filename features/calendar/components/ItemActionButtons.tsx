@@ -96,14 +96,11 @@ export default function ItemActionButtons({
 
   // Handle notify button click - open reminder modal
   // Always stop propagation for bell to prevent parent dialog interference
-  const handleNotifyClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      setReminderModalOpen(true);
-    },
-    [],
-  );
+  const handleNotifyClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setReminderModalOpen(true);
+  }, []);
 
   // Click handlers that optionally stop propagation
   const handleEditClick = useCallback(
@@ -147,7 +144,10 @@ export default function ItemActionButtons({
         <Link
           href={navigationUrl}
           onClick={handleNavLinkClick}
-          className={cn(baseButtonClass, 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400')}
+          className={cn(
+            baseButtonClass,
+            'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400',
+          )}
           aria-label={t('navigateToBuildingAria', { building: building || '' }) as string}
           title={
             t('navigateTo' as TranslationKey, { location: building || '' }) ||

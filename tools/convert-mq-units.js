@@ -48,7 +48,7 @@ if (!fs.existsSync(csvPath)) {
 }
 
 const csvContent = fs.readFileSync(csvPath, 'utf-8');
-const lines = csvContent.split('\n').filter(line => line.trim());
+const lines = csvContent.split('\n').filter((line) => line.trim());
 
 if (lines.length < 2) {
   console.error('CSV file appears to be empty or has no data rows');
@@ -127,4 +127,3 @@ export const mqUnitsData: MQUnit[] = ${JSON.stringify(units, null, 2)};
 
 fs.writeFileSync(outputPath, tsContent, 'utf-8');
 console.log(`Generated TypeScript file: ${outputPath}`);
-

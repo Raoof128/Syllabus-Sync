@@ -148,7 +148,7 @@ export default function UnitDetailPanel({
                 backgroundColor: `${unit.color}25`,
                 color: unit.color,
                 borderColor: `${unit.color}50`,
-                textShadow: 'none'
+                textShadow: 'none',
               }}
             >
               {deadline.type}
@@ -170,10 +170,14 @@ export default function UnitDetailPanel({
           variant="neutral"
           className={cn(
             'text-[10px]',
-            deadline.priority === 'Urgent' && 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
-            deadline.priority === 'High' && 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
-            deadline.priority === 'Medium' && 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
-            deadline.priority === 'Low' && 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
+            deadline.priority === 'Urgent' &&
+              'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+            deadline.priority === 'High' &&
+              'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+            deadline.priority === 'Medium' &&
+              'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+            deadline.priority === 'Low' &&
+              'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
           )}
         >
           {deadline.priority}
@@ -272,11 +276,15 @@ export default function UnitDetailPanel({
             <div className="text-xs text-mq-content-secondary">{t('totalLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.completed}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {stats.completed}
+            </div>
             <div className="text-xs text-mq-content-secondary">{t('completed')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.upcoming}</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              {stats.upcoming}
+            </div>
             <div className="text-xs text-mq-content-secondary">{t('upcomingLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">

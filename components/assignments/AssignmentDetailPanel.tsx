@@ -144,7 +144,9 @@ export default function AssignmentDetailPanel({
                   className={cn(
                     'text-sm font-medium',
                     assignment.completed && 'text-green-600 dark:text-green-400',
-                    status === 'overdue' && !assignment.completed && 'text-red-600 dark:text-red-400',
+                    status === 'overdue' &&
+                      !assignment.completed &&
+                      'text-red-600 dark:text-red-400',
                   )}
                 >
                   {assignment.completed

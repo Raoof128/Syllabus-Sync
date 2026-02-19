@@ -39,9 +39,7 @@ export default function UnitAutocomplete({
   onSelect,
   error,
   codePlaceholder,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   namePlaceholder: _namePlaceholder,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   required: _required = false,
   disabled = false,
   className,
@@ -186,7 +184,10 @@ export default function UnitAutocomplete({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-mono font-semibold text-sm">{selectedMQUnit.code}</span>
-              <Badge variant={getLevelBadgeVariant(selectedMQUnit.level)} className="text-[10px] h-5">
+              <Badge
+                variant={getLevelBadgeVariant(selectedMQUnit.level)}
+                className="text-[10px] h-5"
+              >
                 {selectedMQUnit.unitType}
               </Badge>
             </div>
@@ -263,7 +264,9 @@ export default function UnitAutocomplete({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
-            placeholder={codePlaceholder || tOr('searchMQUnit', 'Search MQ units by code or name...')}
+            placeholder={
+              codePlaceholder || tOr('searchMQUnit', 'Search MQ units by code or name...')
+            }
             disabled={disabled}
             className={cn('pl-10', error && 'border-red-500')}
           />
@@ -305,7 +308,10 @@ export default function UnitAutocomplete({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono font-semibold text-sm">{unit.code}</span>
-                    <Badge variant={getLevelBadgeVariant(unit.level)} className="text-[10px] h-4 px-1">
+                    <Badge
+                      variant={getLevelBadgeVariant(unit.level)}
+                      className="text-[10px] h-4 px-1"
+                    >
                       {unit.level}
                     </Badge>
                   </div>
@@ -324,7 +330,10 @@ export default function UnitAutocomplete({
           {/* Option to enter custom unit if allowed */}
           {allowCustom && query.length > 0 && (
             <li className="border-t border-mq-border px-3 py-2 text-xs text-mq-content-secondary">
-              {tOr('customUnitHint', "Can't find your unit? Enter the code and name manually below.")}
+              {tOr(
+                'customUnitHint',
+                "Can't find your unit? Enter the code and name manually below.",
+              )}
             </li>
           )}
         </ul>
@@ -339,4 +348,3 @@ export default function UnitAutocomplete({
     </div>
   );
 }
-
