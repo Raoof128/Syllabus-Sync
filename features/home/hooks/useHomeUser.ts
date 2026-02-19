@@ -28,15 +28,13 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
           const supabase = createBrowserClient();
           const { data, error } = await supabase.auth.getSession();
           if (error) {
-            setUser(null);
+            // Keep previous user state on transient auth fetch errors
             return;
           }
           setUser((data.session?.user as AuthUser | null) ?? null);
         }
       } catch {
-        if (isActive) {
-          setUser(null);
-        }
+        // Keep previous user state on transient errors
       }
     };
 

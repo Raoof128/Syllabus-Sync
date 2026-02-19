@@ -28,6 +28,16 @@ function shouldLogTransientProxyAuthError(): boolean {
   return true;
 }
 
+function isRefreshTokenMissingError(error: { message?: string; code?: string | null }): boolean {
+  const message = (error.message || '').toLowerCase();
+  const code = (error.code || '').toLowerCase();
+  return (
+    code === 'refresh_token_not_found' ||
+    message.includes('refresh token not found') ||
+    message.includes('invalid refresh token')
+  );
+}
+
 function isPublicApiPath(path: string): boolean {
   return (
     path.startsWith('/api/auth/') ||
@@ -217,10 +227,7 @@ export async function proxy(request: NextRequest) {
       if (authUser) {
         user = authUser;
       } else if (error) {
-        const isRefreshTokenError =
-          error.message?.includes('Refresh Token Not Found') ||
-          error.code === 'refresh_token_not_found' ||
-          error.status === 400;
+        const isRefreshTokenError = isRefreshTokenMissingError(error);
 
         if (!isRefreshTokenError) {
           if (isTransientProxyAuthError(new Error(error.message))) {

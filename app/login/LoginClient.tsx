@@ -83,6 +83,7 @@ export default function LoginClient() {
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
   const forceMfa = searchParams.get('mfa') === '1';
   const callbackError = searchParams.get('error');
+  const logoutReason = searchParams.get('reason');
 
   // Computed
   const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
@@ -309,17 +310,27 @@ export default function LoginClient() {
       const callbackUrl = new URL('/auth/callback', window.location.origin);
       callbackUrl.searchParams.set('redirectTo', redirectTo);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
         toastUtils.error(t('loginErrorFailed'), error.message);
         setOauthLoading(false);
+        return;
       }
+
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
+      }
+
+      toastUtils.error(t('loginErrorFailed'), t('oauthSignInFailed'));
+      setOauthLoading(false);
     } catch {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);
@@ -400,6 +411,13 @@ export default function LoginClient() {
                     ? t('oauthSessionExpired')
                     : t('loginErrorFailed')}
               </AlertDescription>
+            </Alert>
+          )}
+
+          {logoutReason === 'inactive' && !generalError && !isSuccess && (
+            <Alert variant="error" className="mb-3">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{t('sessionExpiredInactivity')}</AlertDescription>
             </Alert>
           )}
 

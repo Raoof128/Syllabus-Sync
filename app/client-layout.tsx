@@ -1,7 +1,7 @@
 // app/client-layout.tsx
 'use client';
 
-import React, { useEffect, useState, memo, useCallback } from 'react';
+import React, { useEffect, useState, memo, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -13,10 +13,14 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
+import { useInactivityLogout } from '@/lib/hooks/useInactivityLogout';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
+import { apiRequest } from '@/lib/utils/api';
+import { API_ROUTES } from '@/lib/constants/config';
 
 // V3.1: Performance optimization - move constant arrays outside component
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
@@ -87,6 +91,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
   const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
   const isPostAuthRoute = POST_AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const inactivityLogoutInProgressRef = useRef(false);
   // Start optimistically as authenticated for app pages only.
   // Auth routes (/login, /signup, /reset-password) must always render the unauth layout
   // to avoid "blink" (sidebar/header flashing) and lost toast rendering during navigation.
@@ -108,7 +113,10 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith('/reset-password')) return;
 
     try {
-      const { user } = await getBrowserAuthSnapshot();
+      const { user, resolution } = await getBrowserAuthSnapshot();
+      if (resolution === 'unknown') {
+        return;
+      }
       const authenticated = Boolean(user?.id);
       setIsAuthenticated(authenticated);
 
@@ -174,6 +182,32 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
 
   // Initialize notification scheduler for push notifications
   useNotificationScheduler();
+
+  const handleInactivityLogout = useCallback(async () => {
+    if (inactivityLogoutInProgressRef.current) return;
+    inactivityLogoutInProgressRef.current = true;
+
+    try {
+      await resetAllStores();
+      clearAllClientStorage();
+      await apiRequest(API_ROUTES.AUTH.LOGOUT, {
+        method: 'POST',
+        noRetry: true,
+      });
+    } catch {
+      // Best-effort cleanup; always redirect to enforce logout UX.
+    } finally {
+      router.replace('/login?reason=inactive');
+    }
+  }, [router]);
+
+  useInactivityLogout({
+    enabled: isAuthenticated && !isAuthRoute && !isPublicRoute && !isPostAuthRoute,
+    timeoutMs: 5 * 60 * 1000,
+    onTimeout: () => {
+      void handleInactivityLogout();
+    },
+  });
 
   // Unauthenticated layout (login/signup pages + post-auth steps like /onboarding)
   if (isAuthRoute || isPostAuthRoute || !isAuthenticated) {

@@ -38,6 +38,16 @@ function shouldLogTransientAuthError(): boolean {
   return true;
 }
 
+function isRefreshTokenMissingError(error: { message?: string; code?: string | null }): boolean {
+  const message = (error.message || '').toLowerCase();
+  const code = (error.code || '').toLowerCase();
+  return (
+    code === 'refresh_token_not_found' ||
+    message.includes('refresh token not found') ||
+    message.includes('invalid refresh token')
+  );
+}
+
 /**
  * Require authentication for API routes
  * SECURITY: For mutation methods, also validates CSRF origin header
@@ -64,10 +74,7 @@ export const requireAuth = async (
 
     if (error || !user) {
       // SILENT: Do not log refresh token failures as they are expected when sessions expire
-      const isRefreshError =
-        error?.message?.includes('Refresh Token Not Found') ||
-        error?.code === 'refresh_token_not_found' ||
-        error?.status === 400;
+      const isRefreshError = error ? isRefreshTokenMissingError(error) : false;
 
       if (error && !isRefreshError) {
         if (isTransientAuthNetworkError(new Error(error.message))) {
@@ -106,10 +113,7 @@ export const optionalAuth = async (
     } = await supabase.auth.getUser();
 
     if (error) {
-      const isRefreshError =
-        error.message?.includes('Refresh Token Not Found') ||
-        error.code === 'refresh_token_not_found' ||
-        error.status === 400;
+      const isRefreshError = isRefreshTokenMissingError(error);
 
       if (!isRefreshError) {
         if (isTransientAuthNetworkError(new Error(error.message))) {
@@ -184,10 +188,7 @@ export const requireAuthWithRateLimit = async (
 
     if (error || !user) {
       // SILENT: Do not log refresh token failures as they are expected when sessions expire
-      const isRefreshError =
-        error?.message?.includes('Refresh Token Not Found') ||
-        error?.code === 'refresh_token_not_found' ||
-        error?.status === 400;
+      const isRefreshError = error ? isRefreshTokenMissingError(error) : false;
 
       if (error && !isRefreshError) {
         if (isTransientAuthNetworkError(new Error(error.message))) {

@@ -1,3 +1,56 @@
+### Raouf: Full Auth Session Audit — Google OAuth + False Signout + Inactivity Logout — 2026-02-19
+
+**Scope:** Full production auth/session audit and hardening.
+**Type:** Auth / Security / Session Management
+
+#### Changes
+
+1. **Google OAuth reliability (`app/login/LoginClient.tsx`)**:
+   - Switched Google sign-in to deterministic redirect behavior using `skipBrowserRedirect: true`.
+   - Added explicit `window.location.assign(data.url)` redirect.
+   - Added fallback error handling when OAuth URL is missing.
+
+2. **Post-logout user feedback (`app/login/LoginClient.tsx`, `locales/en/translations.json`)**:
+   - Added `reason=inactive` login-page banner.
+   - Added translation key: `sessionExpiredInactivity`.
+
+3. **False sign-out prevention (proxy + API auth middleware)**:
+   - **`lib/proxy.ts`**: Replaced broad refresh-token detection (`status === 400`) with strict refresh-token-missing checks (`code/message`).
+   - **`app/api/_lib/middleware.ts`**: Applied the same strict refresh-token-missing detection in auth guards.
+   - This prevents non-refresh 400 auth errors from triggering local signout behavior.
+
+4. **Transient auth failure hardening (`lib/supabase/browserSession.ts`, `app/client-layout.tsx`)**:
+   - Added auth resolution metadata (`resolved | unknown`) to browser auth snapshots.
+   - `client-layout` now ignores unknown/transient auth snapshots instead of flipping to unauthenticated UI state.
+
+5. **Aggressive redirect mitigation (`lib/store/notificationsStore.ts`)**:
+   - Notification auth fallback now redirects to `/login` only when auth resolution is confirmed (`resolved`) and user is absent.
+
+6. **Header identity stability (`features/home/hooks/useHomeUser.ts`)**:
+   - Prevented transient `getSession` failures from nulling user state.
+
+7. **5-minute inactivity logout (`lib/hooks/useInactivityLogout.ts`, `app/client-layout.tsx`)**:
+   - Added reusable inactivity hook with activity-event tracking and timer reset.
+   - Wired global inactivity logout for authenticated app routes (5 minutes).
+   - On timeout: clears stores/storage, calls `/api/auth/signout`, and redirects to `/login?reason=inactive`.
+
+8. **Regression tests**:
+   - Added **`tests/hooks/useInactivityLogout.test.ts`** (timeout, reset-on-activity, disabled behavior).
+   - Updated **`tests/api/proxy.mfa.test.ts`** with regression case ensuring non-refresh 400 auth errors do **not** force local signout.
+
+#### Verification
+
+- `npm run test -- tests/api/proxy.mfa.test.ts tests/hooks/useInactivityLogout.test.ts tests/api/auth/callback.test.ts` ✅ (12 tests passed)
+- `npm run check` ✅
+  - secrets check passed
+  - format check passed
+  - typecheck passed
+  - lint passed
+  - tests passed (65 files, 482 tests)
+  - build passed (all routes)
+
+---
+
 ### Raouf: Settings Password Back-Navigation + Map Haptics Relocation — 2026-02-19
 
 **Scope:** Implement requested settings UX updates for reset-password back flow and map haptics placement.

@@ -80,8 +80,8 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         // Middleware/proxy still protects routes on navigation/refresh.
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
           try {
-            const { user } = await getBrowserAuthSnapshot();
-            if (!user) {
+            const { user, resolution } = await getBrowserAuthSnapshot();
+            if (resolution === 'resolved' && !user) {
               window.location.href = '/login';
             }
           } catch {

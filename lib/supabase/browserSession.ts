@@ -6,6 +6,7 @@ import { createBrowserClient, isSupabaseConfigured } from './client';
 export type BrowserAuthSnapshot = {
   session: Session | null;
   user: User | null;
+  resolution: 'resolved' | 'unknown';
 };
 
 /**
@@ -15,16 +16,15 @@ export type BrowserAuthSnapshot = {
  */
 export async function getBrowserAuthSnapshot(): Promise<BrowserAuthSnapshot> {
   if (!isSupabaseConfigured()) {
-    return { session: null, user: null };
+    return { session: null, user: null, resolution: 'resolved' };
   }
 
   const supabase = createBrowserClient();
   const { data, error } = await supabase.auth.getSession();
 
   if (error) {
-    return { session: null, user: null };
+    return { session: null, user: null, resolution: 'unknown' };
   }
 
-  return { session: data.session ?? null, user: data.session?.user ?? null };
+  return { session: data.session ?? null, user: data.session?.user ?? null, resolution: 'resolved' };
 }
-

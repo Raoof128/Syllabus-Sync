@@ -100,4 +100,23 @@ describe('proxy mfa enforcement', () => {
     expect(json.code).toBe('AUTH_UNAVAILABLE');
     vi.useRealTimers();
   });
+
+  it('does not force local signout for non-refresh 400 auth errors', async () => {
+    supabaseMocks.getUserMock.mockResolvedValueOnce({
+      data: { user: null },
+      error: {
+        message: 'Bad Request',
+        status: 400,
+        code: 'unexpected_error',
+      },
+    });
+
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/calendar');
+    const res = await proxy(req);
+
+    expect(supabaseMocks.signOutMock).not.toHaveBeenCalled();
+    expect(res.headers.get('location')).toContain('/login');
+  });
 });
