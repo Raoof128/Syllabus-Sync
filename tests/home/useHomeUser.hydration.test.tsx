@@ -14,6 +14,7 @@ function makeProfile(name: string) {
     name,
     email: 'student@example.com',
     studentId: '12345678',
+    faculty: 'Science',
     course: 'Test Course',
     year: '1',
     preferences: {

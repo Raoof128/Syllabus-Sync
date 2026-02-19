@@ -24,6 +24,7 @@ interface DbProfile {
   email: string;
   full_name: string | null;
   student_id: string | null;
+  faculty: string | null;
   course: string | null;
   year: string | null;
   avatar_url: string | null;
@@ -47,6 +48,7 @@ export interface UserProfile {
   studentId: string;
   avatar?: string;
   // Profile fields stored in Supabase
+  faculty: string;
   course: string;
   year: string;
   // Local-only fields (not stored in Supabase)
@@ -157,6 +159,7 @@ function mapDbToClient(db: DbProfile, existing?: Partial<UserProfile>): UserProf
     studentId: db.student_id || '',
     avatar: db.avatar_url || undefined,
     // Profile fields from database
+    faculty: db.faculty || '',
     course: db.course || '',
     year: db.year || '',
     // Local-only fields from existing profile or use defaults
@@ -187,6 +190,9 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
     if (trimmed) {
       dbUpdates.student_id = trimmed;
     }
+  }
+  if (updates.faculty !== undefined) {
+    dbUpdates.faculty = updates.faculty || null;
   }
   if (updates.course !== undefined) {
     dbUpdates.course = updates.course || null;

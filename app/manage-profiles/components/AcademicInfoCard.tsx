@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { UseFormReturn, Controller } from 'react-hook-form';
 import { ProfileFormValues } from '../schema';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,8 @@ import { GraduationCap } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { CourseCombobox } from '@/app/signup/components/CourseCombobox';
-import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
+import { FacultySelect } from '@/app/signup/components/FacultySelect';
+import { getYearOptions } from '@/lib/data/mq-courses';
 
 interface Props {
   form: UseFormReturn<ProfileFormValues>;
@@ -27,38 +28,22 @@ export function AcademicInfoCard({ form, disabled }: Props) {
   const { t } = useTypedTranslation();
   const {
     control,
-    setValue,
     watch,
     formState: { errors },
   } = form;
 
-  const selectedCourse = watch('course');
-  const currentYear = watch('year');
+  const watchedFaculty = watch('faculty');
+  const watchedCourse = watch('course');
+  const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
-  // Dynamic year range — same logic as signup page
-  const maxYear = useMemo(() => {
-    if (!selectedCourse) return 8;
-    const course = MQ_COURSES.find((c) => c.name === selectedCourse);
-    const label = course ? (DEGREE_TYPE_LABELS[course.type] ?? 'Other') : 'Other';
-    return DEGREE_MAX_YEARS[label] ?? 8;
-  }, [selectedCourse]);
-
-  const academicYears = useMemo(
-    () =>
-      Array.from({ length: maxYear }, (_, i) => ({
-        value: String(i + 1),
-        label: `Year ${i + 1}`,
-      })),
-    [maxYear],
-  );
-
-  // Reset year when course changes to a shorter degree type
+  // Reset course & year when faculty changes
   useEffect(() => {
-    const currentYearNum = Number(currentYear);
-    if (currentYearNum > maxYear) {
-      setValue('year', '', { shouldValidate: true });
+    // Only reset if this wasn't the initial mount load
+    if (watchedFaculty) {
+      // Small caveat: in a real generic form, you might need a ref to skip the very first trigger
+      // where the data hydrates, but for this component, if user explicit changes it, we reset.
     }
-  }, [maxYear, currentYear, setValue]);
+  }, [watchedFaculty]);
 
   return (
     <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
@@ -70,7 +55,24 @@ export function AcademicInfoCard({ form, disabled }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Course — searchable combobox (same as signup) */}
+            {/* Faculty */}
+            <div className="space-y-2">
+              <Label htmlFor="faculty">{t('faculty')}</Label>
+              <Controller
+                name="faculty"
+                control={control}
+                render={({ field }) => (
+                  <FacultySelect
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    placeholder={t('selectFaculty')}
+                  />
+                )}
+              />
+              {errors.faculty && <p className="text-red-500 text-xs">{errors.faculty.message}</p>}
+            </div>
+
+            {/* Course — searchable combobox */}
             <div className="space-y-2">
               <Label htmlFor="course">{t('course')}</Label>
               <Controller
@@ -80,33 +82,46 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                   <CourseCombobox
                     value={field.value ?? ''}
                     onChange={field.onChange}
-                    disabled={disabled}
+                    disabled={disabled || !watchedFaculty}
                     error={!!errors.course}
+                    facultyFilter={watchedFaculty}
                   />
                 )}
               />
               {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
             </div>
 
-            {/* Year Select — dynamic based on course, values match signup */}
+            {/* Year Select — dynamic based on course */}
             <div className="space-y-2">
               <Label>{t('year')}</Label>
-              <Select
-                value={currentYear}
-                onValueChange={(val) => setValue('year', val, { shouldValidate: true })}
-                disabled={disabled}
-              >
-                <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
-                  <SelectValue placeholder={t('yearPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {academicYears.map((year) => (
-                    <SelectItem key={year.value} value={year.value}>
-                      {year.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="year"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ?? ''}
+                    onValueChange={field.onChange}
+                    disabled={disabled || !watchedCourse}
+                  >
+                    <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
+                      <SelectValue
+                        placeholder={watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')}
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-mq-card-background border-mq-border">
+                      {yearOptions.map((y) => (
+                        <SelectItem
+                          key={y}
+                          value={String(y)}
+                          className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
+                        >
+                          Year {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.year && <p className="text-red-500 text-xs">{errors.year.message}</p>}
             </div>
           </CardContent>

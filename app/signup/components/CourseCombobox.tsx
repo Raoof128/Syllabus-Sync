@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, startTransition } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
-import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
+import { getCoursesByFaculty, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -11,9 +11,10 @@ type Props = {
   onChange: (value: string) => void;
   disabled?: boolean;
   error?: boolean;
+  facultyFilter?: string;
 };
 
-export function CourseCombobox({ value, onChange, disabled, error }: Props) {
+export function CourseCombobox({ value, onChange, disabled, error, facultyFilter }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -78,22 +79,21 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
 
   // Filter courses by query (name or code)
   const filtered = useMemo(() => {
+    const pool = facultyFilter ? getCoursesByFaculty(facultyFilter) : getCoursesByFaculty('');
     const q = query.trim().toLowerCase();
-    if (!q) return MQ_COURSES;
-    return MQ_COURSES.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q),
-    );
-  }, [query]);
+    if (!q) return pool;
+    return pool.filter((c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+  }, [query, facultyFilter]);
 
   // Group filtered results by simplified degree label, in defined order
   const grouped = useMemo(() => {
-    const map = new Map<string, typeof MQ_COURSES>();
+    const map = new Map<string, typeof filtered>();
     for (const course of filtered) {
       const label = DEGREE_TYPE_LABELS[course.type] ?? course.type;
       if (!map.has(label)) map.set(label, []);
       map.get(label)!.push(course);
     }
-    const ordered = new Map<string, typeof MQ_COURSES>();
+    const ordered = new Map<string, typeof filtered>();
     for (const label of DEGREE_TYPE_ORDER) {
       if (map.has(label)) ordered.set(label, map.get(label)!);
     }
@@ -150,7 +150,7 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
         )}
       >
         <span className={cn('truncate text-left flex-1', !value && 'text-mq-content-tertiary')}>
-          {value || 'Select your course…'}
+          {value || (facultyFilter ? 'Select your course…' : 'Select a faculty first')}
         </span>
         <span className="flex items-center gap-0.5 shrink-0">
           {value && (

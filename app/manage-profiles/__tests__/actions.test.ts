@@ -16,6 +16,7 @@ describe('Profile Server Actions', () => {
     const invalidData = {
       name: 'Raouf',
       studentId: '123', // Too short (needs 8 digits)
+      faculty: 'Science',
       course: 'Cyber Security',
       year: '1st Year',
     };
@@ -33,6 +34,7 @@ describe('Profile Server Actions', () => {
     const validData = {
       name: 'Raouf',
       studentId: '12345678',
+      faculty: 'Science',
       course: 'Cyber Security',
       year: '1st Year',
     };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
@@ -23,6 +23,7 @@ import clsx from 'clsx';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { CourseCombobox } from './components/CourseCombobox';
+import { FacultySelect } from './components/FacultySelect';
 import {
   Select,
   SelectContent,
@@ -30,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
+import { getYearOptions } from '@/lib/data/mq-courses';
 
 // react-hook-form expects the schema *input* shape, not the transformed output.
 type SignupFormData = z.input<ReturnType<typeof createSignupSchema>>;
@@ -94,8 +95,9 @@ export default function SignupClient() {
     trigger,
     watch,
     control,
-    getValues,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -107,6 +109,7 @@ export default function SignupClient() {
       agreedToTerms: false,
       fullName: '',
       studentId: '',
+      faculty: '',
       course: '',
       year: '',
       _gotcha: '',
@@ -117,28 +120,20 @@ export default function SignupClient() {
   const password = watch('password');
   const passwordStrength = password ? calculatePasswordStrength(password) : null;
 
-  // Dynamic year range based on selected course type
-  const selectedCourse = watch('course');
-  const maxYear = useMemo(() => {
-    if (!selectedCourse) return 8;
-    const course = MQ_COURSES.find((c) => c.name === selectedCourse);
-    const label = course ? (DEGREE_TYPE_LABELS[course.type] ?? 'Other') : 'Other';
-    return DEGREE_MAX_YEARS[label] ?? 8;
-  }, [selectedCourse]);
+  const watchedFaculty = watch('faculty');
+  const watchedCourse = watch('course');
+  const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
-  const academicYears = useMemo(
-    () =>
-      Array.from({ length: maxYear }, (_, i) => ({ value: String(i + 1), label: `Year ${i + 1}` })),
-    [maxYear],
-  );
-
-  // Reset year if now out of range
+  // Reset course when faculty changes:
   useEffect(() => {
-    const currentYear = Number(getValues('year'));
-    if (currentYear > maxYear) {
-      setValue('year', '');
-    }
-  }, [maxYear, getValues, setValue]);
+    setValue('course', '');
+    setValue('year', '');
+  }, [watchedFaculty, setValue]);
+
+  // Reset year when course changes:
+  useEffect(() => {
+    setValue('year', '');
+  }, [watchedCourse, setValue]);
 
   const handleNextStep = async () => {
     const isValid = await trigger([
@@ -170,6 +165,7 @@ export default function SignupClient() {
           _gotcha: data._gotcha,
           fullName: data.fullName,
           studentId: data.studentId,
+          faculty: data.faculty,
           course: data.course,
           year: data.year,
         }),
@@ -190,6 +186,7 @@ export default function SignupClient() {
         name: data.fullName,
         email: data.email,
         studentId: data.studentId,
+        faculty: data.faculty || '',
         course: data.course || '',
         year: data.year || '',
         preferences: {
@@ -542,6 +539,27 @@ export default function SignupClient() {
                     )}
                   </div>
 
+                  {/* Faculty */}
+                  <div className="space-y-2">
+                    <Label htmlFor="faculty" className="font-bold text-mq-content">
+                      {t('faculty')} <span className="text-red-500">*</span>
+                    </Label>
+                    <Controller
+                      name="faculty"
+                      control={control}
+                      render={({ field }) => (
+                        <FacultySelect
+                          value={field.value ?? ''}
+                          onChange={field.onChange}
+                          placeholder={t('selectFaculty')}
+                        />
+                      )}
+                    />
+                    {errors.faculty && (
+                      <p className="text-xs text-red-500">{errors.faculty.message}</p>
+                    )}
+                  </div>
+
                   {/* Course — searchable combobox */}
                   <div className="space-y-2">
                     <Label htmlFor="course" className="font-bold text-mq-content">
@@ -554,8 +572,9 @@ export default function SignupClient() {
                         <CourseCombobox
                           value={field.value ?? ''}
                           onChange={field.onChange}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || !watchedFaculty}
                           error={!!errors.course}
+                          facultyFilter={watchedFaculty}
                         />
                       )}
                     />
@@ -576,20 +595,28 @@ export default function SignupClient() {
                         <Select
                           value={field.value ?? ''}
                           onValueChange={field.onChange}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || !watchedCourse}
                         >
                           <SelectTrigger
                             className={clsx(
-                              'w-full h-12 rounded-xl',
+                              'w-full h-12 rounded-xl border-mq-border focus:ring-[3px] focus:border-mq-focus focus:ring-mq-focus/40 bg-mq-input-background',
                               errors.year && 'border-red-500',
                             )}
                           >
-                            <SelectValue placeholder={t('yearPlaceholder')} />
+                            <SelectValue
+                              placeholder={
+                                watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')
+                              }
+                            />
                           </SelectTrigger>
-                          <SelectContent>
-                            {academicYears.map((y) => (
-                              <SelectItem key={y.value} value={y.value}>
-                                {y.label}
+                          <SelectContent className="bg-mq-card-background border-mq-border overflow-hidden">
+                            {yearOptions.map((y) => (
+                              <SelectItem
+                                key={y}
+                                value={String(y)}
+                                className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
+                              >
+                                Year {y}
                               </SelectItem>
                             ))}
                           </SelectContent>

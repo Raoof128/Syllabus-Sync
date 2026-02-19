@@ -1108,3 +1108,43 @@ export const MQ_COURSES: MQCourse[] = [
   },
   { code: 'C000440', name: 'UniReady', type: 'Non AQF', faculty: 'Macquarie University College' },
 ];
+
+/** Max study years by internal degree type key */
+export const DEGREE_TYPE_MAX_YEARS: Record<string, number> = {
+  bachelor: 3,
+  bachelor_honours: 4,
+  bachelor_double: 5,
+  master: 2,
+  master_research: 2,
+  master_professional: 2,
+  graduate_certificate: 1,
+  graduate_diploma: 1,
+  diploma: 1,
+  phd: 4,
+  other: 3,
+};
+
+/** Return sorted unique faculty names from the course list */
+export function getFaculties(): string[] {
+  return Array.from(new Set(MQ_COURSES.map((c) => c.faculty).filter(Boolean))).sort();
+}
+
+/** Return only courses belonging to a faculty */
+export function getCoursesByFaculty(faculty: string): MQCourse[] {
+  if (!faculty) return MQ_COURSES;
+  return MQ_COURSES.filter((c) => c.faculty === faculty);
+}
+
+/** Return max years (1–N) for a given course code (or name, the original code used code) */
+export function getMaxYearsForCourse(courseCode: string): number {
+  const course = MQ_COURSES.find((c) => c.code === courseCode || c.name === courseCode);
+  if (!course) return 3;
+  // Fallback to original DEGREE_MAX_YEARS since the prompt's type mapping refers to original string types
+  return DEGREE_MAX_YEARS[DEGREE_TYPE_LABELS[course.type] || course.type] ?? 3;
+}
+
+/** Return [1, 2, … maxYears] for a course */
+export function getYearOptions(courseCode: string): number[] {
+  const max = getMaxYearsForCourse(courseCode);
+  return Array.from({ length: max }, (_, i) => i + 1);
+}

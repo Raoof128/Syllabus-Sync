@@ -1,4 +1,12 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Cascading Selects for Faculty and Course
+Summary: Implemented a cascading dropdown system for faculty, course, and academic year selection. (1) Created FacultySelect component and updated CourseCombobox to accept a facultyFilter prop. (2) Refactored the signup form (SignupClient.tsx) and profile management (AcademicInfoCard.tsx) to implement cascading logic: selecting a faculty filters courses, and selecting a course filters years. (3) Updated auth.ts and manage-profiles/schema.ts Zod schemas to require a faculty field. (4) Updated DbProfile and UserProfile interfaces in profilesStore.ts and the Supabase signup API route to insert and persist the new faculty field. (5) Updated translations.json to include new internationalization keys for the faculty inputs, and cleaned up duplicate keys to ensure JSON validity. (6) Updated test suite mocks (Signup API, useHomeUser, actions.test.ts) to include the new faculty field, preventing type or validation errors. 
+Files: Modified `locales/en/translations.json`, `app/signup/SignupClient.tsx`, `app/signup/components/CourseCombobox.tsx`, `app/signup/components/FacultySelect.tsx`, `app/api/auth/signup/route.ts`, `lib/schemas/auth.ts`, `lib/store/profilesStore.ts`, `app/manage-profiles/schema.ts`, `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/__tests__/actions.test.ts`, `tests/api/auth/signup.test.ts`, `tests/home/useHomeUser.hydration.test.tsx`.
+Verification: `npm run check` pipeline (formatter, typecheck, lint, test) entirely passed. All 488 integrated suite assertions succeeded smoothly under `test`.
+Deployment: N/A locally queued.
+Follow-ups: None.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Google Map Exact Visual/Size Parity
 Summary: Audited Google View logic and aligned it 1:1 with Campus View responsive layout wrappers to fix visual sizing divergence and HUD interaction overlap bugs. (1) Wrapped GoogleMapEmbed inside the exact same MagicCard layer container logic as Campus map view constraints. (2) Removed hardcoded min-height constraints from GoogleMapEmbed itself. (3) Added `isGoogleMode` awareness into CampusMapHUD to shift the user interface components (Search, Share export toolbars) cleanly down and safely out of clipping bounds with the inline internal Google destination switcher toolbar (`Directions ↔ Back to Map`).
 Files: Modified `features/map/components/MapClient.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`.

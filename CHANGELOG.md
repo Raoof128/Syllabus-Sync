@@ -1,3 +1,24 @@
+### Raouf: Cascading Selects for Faculty and Course — 2026-02-19
+
+**Scope:** Signup and Profile Management Forms
+**Type:** Feature / UX
+
+#### Changes
+
+1. **Faculty Select Implementation**
+   - Added `FacultySelect` component and updated `CourseCombobox` to filter by faculty.
+   - Implemented cascading logic in `SignupClient.tsx` and `AcademicInfoCard.tsx` where selecting a faculty updates available courses, and selecting a course updates available years.
+
+2. **Schema and Database Updates**
+   - Updated Zod validation schemas in `auth.ts` and `manage-profiles/schema.ts` to require `faculty`.
+   - Updated `DbProfile` and `UserProfile` definitions in `profilesStore.ts`.
+   - Updated Supabase API route `app/api/auth/signup/route.ts` to insert the `faculty` field.
+
+3. **Internationalization and Testing**
+   - Added new keys to `locales/en/translations.json` and removed duplicates.
+   - Updated mock data in tests (`actions.test.ts`, `useHomeUser.hydration.test.tsx`, `signup.test.ts`) to include the `faculty` field.
+   - Verified that all unit tests, format, and typechecks pass successfully.
+
 ### Raouf: Google Map Exact Visual/Size Parity — 2026-02-19
 
 **Scope:** Google Map Parity

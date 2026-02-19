@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { email, password, fullName, studentId, course, year } = parsed.data;
+    const { email, password, fullName, studentId, faculty, course, year } = parsed.data;
 
     const supabase = await createServerClient();
     // adminClient already initialized at top for kill switch check
@@ -277,6 +277,7 @@ export async function POST(request: NextRequest) {
           email,
           full_name: fullName,
           student_id: studentId,
+          faculty: faculty || null,
           course: course || null,
           year: year || null,
         },
@@ -344,6 +345,7 @@ export async function POST(request: NextRequest) {
           email,
           full_name: fullName,
           student_id: studentId,
+          faculty: faculty || null,
           course: course || null,
           year: year || null,
         },

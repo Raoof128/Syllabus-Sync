@@ -11,6 +11,8 @@ export const profileSchema = z.object({
 
   course: z.string().min(2, 'Course name is required'),
 
+  faculty: z.string().min(2, 'Faculty is required'),
+
   year: z.string().min(1, 'Please select a year'),
 });
 

@@ -29,6 +29,7 @@ export const createSignupSchema = (t: (key: any) => string) => {
       // Profile fields with sanitization
       fullName: z.string().trim().min(1, t('validation.fullNameRequired')).transform(stripHtmlTags),
       studentId: z.string().trim().min(1, t('validation.studentIdRequired')),
+      faculty: z.string().trim().min(1, t('facultyRequired')),
       course: z.string().trim().min(1, t('courseRequired')),
       year: z.string().trim().min(1, t('yearRequired')),
     })
