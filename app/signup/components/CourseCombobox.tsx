@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
 import { cn } from '@/lib/utils';
@@ -19,6 +20,10 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
+
+  // Only render portal on the client
+  useEffect(() => { setMounted(true); }, []);
 
   // Compute fixed-position coords from trigger's bounding rect
   const updateDropdownPosition = () => {
@@ -52,6 +57,7 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   // Reposition dropdown on scroll or resize while open
   useEffect(() => {
     if (!open) return;
+    updateDropdownPosition();
     const update = () => updateDropdownPosition();
     window.addEventListener('scroll', update, true);
     window.addEventListener('resize', update);
@@ -59,6 +65,7 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Focus search input when dropdown opens
@@ -159,8 +166,8 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
         </span>
       </button>
 
-      {/* Dropdown — rendered at fixed position to escape overflow:hidden parents */}
-      {open && (
+      {/* Dropdown — portalled to document.body to escape overflow:hidden & stacking contexts */}
+      {open && mounted && createPortal(
         <div
           ref={dropdownRef}
           role="listbox"
@@ -220,7 +227,7 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
             )}
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }

@@ -579,3 +579,9 @@ Scope: CSP Avatar Upload Fix + CourseCombobox Dropdown Fixed Position
 Summary: Fixed CSP `connect-src` blocking `data:` URI avatar uploads by replacing `fetch(dataUrl)` with `dataUrlToBlob()` (pure-JS atob+Uint8Array Blob construction). Fixed CourseCombobox dropdown clipped by `overflow:hidden` ancestor by switching to `position: fixed` with `getBoundingClientRect()` coords + scroll/resize repositioning listeners.
 Files: Modified `lib/store/profilesStore.ts`, `app/signup/components/CourseCombobox.tsx`.
 Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass).
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Post-OAuth Onboarding Gate + CourseCombobox Portal Fix + Avatar Upload Fix
+Summary: OAuth callback now checks profile completeness and redirects to /onboarding when course/year are missing. CourseCombobox dropdown moved to React createPortal(document.body) — eliminates all overflow/event hierarchy issues. Avatars storage bucket migration created with RLS. ProfileHeader file input now resets on change to allow re-uploading same file; profile.id captured before async FileReader callback.
+Files: Modified `app/auth/callback/route.ts`, `app/signup/components/CourseCombobox.tsx`, `app/manage-profiles/components/ProfileHeader.tsx`. Created `app/onboarding/page.tsx`, `app/onboarding/OnboardingClient.tsx`, `app/api/auth/onboarding/route.ts`, `supabase/migrations/20260219000000_avatars_storage_bucket.sql`.
+Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), deployed ✅.

@@ -21,6 +21,8 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    // Reset input immediately so the same file can be re-selected after failure
+    event.target.value = '';
     if (!file) return;
 
     // Security Check: 2MB Limit
@@ -29,12 +31,13 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
       return;
     }
 
+    const profileId = profile.id;
     const reader = new FileReader();
     reader.onload = async (e) => {
       const result = e.target?.result as string;
       setIsAvatarSaving(true);
       try {
-        const updated = await updateProfile(profile.id, { avatar: result });
+        const updated = await updateProfile(profileId, { avatar: result });
         if (updated) {
           toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
         }

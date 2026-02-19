@@ -87,6 +87,27 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/reset-password?recovery=1', requestUrl.origin));
   }
 
+  // For OAuth sign-ins (not email/magic-link), check if profile is complete.
+  // Skip this for email-based flows where the user already went through signup.
+  const isOAuthSignIn =
+    data?.user?.app_metadata?.provider &&
+    data.user.app_metadata.provider !== 'email';
+
+  if (isOAuthSignIn) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('course, year')
+      .eq('id', data.user.id)
+      .maybeSingle();
+
+    const isIncomplete = !profile?.course || !profile?.year;
+    if (isIncomplete) {
+      const onboardingUrl = new URL('/onboarding', requestUrl.origin);
+      onboardingUrl.searchParams.set('next', redirectTo);
+      return NextResponse.redirect(onboardingUrl);
+    }
+  }
+
   // Normal flow: redirect to the validated target.
   // The session cookie is now set and the proxy will recognize the user.
   return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
