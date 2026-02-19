@@ -13,7 +13,6 @@ import { Alert, AlertDescription } from '@/components/ui/mq/alert';
 import { Button } from '@/components/ui/mq/button';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
-import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { API_ROUTES } from '@/lib/constants/config';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
@@ -79,8 +78,7 @@ export default function LoginClient() {
   const [mfaEnabled, setMfaEnabled] = useState(false);
 
   // Redirect Logic
-  const rawRedirect = searchParams.get('redirectTo');
-  const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
+  const redirectTo = '/home';
   const forceMfa = searchParams.get('mfa') === '1';
   const callbackError = searchParams.get('error');
   const logoutReason = searchParams.get('reason');

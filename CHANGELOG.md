@@ -1,3 +1,43 @@
+### Raouf: Home-Only Re-Login Redirect + Legacy Profile Course Edit Fix — 2026-02-19
+
+**Scope:** Enforce home redirect after re-login; unblock legacy account course edits; run full checks and redeploy.
+**Type:** Auth / Profile / Reliability
+
+#### Changes
+
+1. **`app/login/LoginClient.tsx`**
+   - Removed redirect-path reuse for login route query (`redirectTo`).
+   - Forced post-login navigation target to `/home` for all login success paths:
+     - Password login success
+     - Passkey login success
+     - MFA challenge completion success
+     - Google OAuth callback target constructed from login page
+   - Outcome: after logout and login, user always lands on Home.
+
+2. **`app/manage-profiles/hooks/useProfileManager.ts`**
+   - Added `normalizeStudentId()` to sanitize legacy invalid IDs when hydrating/resetting form state.
+   - Legacy/pre-deploy profiles with non-8-digit student IDs no longer block form validation for course/year updates.
+   - Existing strict validation remains enforced for new edits (`^\d{8}$` or empty).
+
+#### Verification
+
+- `npm run check` ✅
+  - secrets check passed
+  - format check passed
+  - typecheck passed
+  - lint passed
+  - tests passed (65 files, 482 tests)
+  - build passed
+
+#### Deployment
+
+- `npm run vercel:deploy:prod` ✅
+- Inspect: `https://vercel.com/perkycoders/syllabus-sync/BEWhTuzZQAjntipeUS3MKXundD4E`
+- Production deployment: `https://syllabus-sync-dnhto9826-perkycoders.vercel.app`
+- Production alias: `https://syllabus-sync-ashy.vercel.app`
+
+---
+
 ### Raouf: Full Auth Session Audit — Google OAuth + False Signout + Inactivity Logout — 2026-02-19
 
 **Scope:** Full production auth/session audit and hardening.

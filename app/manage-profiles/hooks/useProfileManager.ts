@@ -27,6 +27,14 @@ function normalizeYear(year: string | undefined | null): string {
   return YEAR_LEGACY_MAP[year] ?? year;
 }
 
+function normalizeStudentId(studentId: string | undefined | null): string {
+  if (!studentId) return '';
+  const trimmed = studentId.trim();
+  // Legacy accounts may contain non-standard IDs; keep form valid so other
+  // fields (like course/year) can still be edited.
+  return /^\d{8}$/.test(trimmed) ? trimmed : '';
+}
+
 export function useProfileManager() {
   const { t } = useTypedTranslation();
 
@@ -67,7 +75,7 @@ export function useProfileManager() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: currentProfile?.name || '',
-      studentId: currentProfile?.studentId || '',
+      studentId: normalizeStudentId(currentProfile?.studentId),
       course: currentProfile?.course || '',
       year: normalizeYear(currentProfile?.year),
     },
@@ -88,7 +96,7 @@ export function useProfileManager() {
     if (currentProfile) {
       form.reset({
         name: currentProfile.name || '',
-        studentId: currentProfile.studentId || '',
+        studentId: normalizeStudentId(currentProfile.studentId),
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
       });
@@ -112,7 +120,7 @@ export function useProfileManager() {
       toastUtils.error(t('error'), 'Database connection failed');
       form.reset({
         name: currentProfile.name || '',
-        studentId: currentProfile.studentId || '',
+        studentId: normalizeStudentId(currentProfile.studentId),
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
       });
