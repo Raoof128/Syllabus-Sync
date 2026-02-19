@@ -47,7 +47,24 @@ export async function proxy(request: NextRequest) {
 
   // CRITICAL: Static files should ALWAYS be public - return immediately without any processing
   // This prevents 401 errors on manifest.webmanifest, icons, fonts, etc.
-  const staticFileExtensions = ['.webmanifest', '.json', '.ico', '.png', '.jpg', '.jpeg', '.svg', '.css', '.js', '.woff', '.woff2', '.ttf', '.eot', '.map', '.txt', '.xml'];
+  const staticFileExtensions = [
+    '.webmanifest',
+    '.json',
+    '.ico',
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.svg',
+    '.css',
+    '.js',
+    '.woff',
+    '.woff2',
+    '.ttf',
+    '.eot',
+    '.map',
+    '.txt',
+    '.xml',
+  ];
   const isStaticFile = staticFileExtensions.some((ext) => path.endsWith(ext));
 
   if (isStaticFile) {
@@ -72,7 +89,12 @@ export async function proxy(request: NextRequest) {
   // - Reset password (needs to be fully public for recovery flow)
   // - Auth callback (handles OAuth/email verification)
   // - Auth confirm (handles token_hash verification for password recovery)
-  const shouldResolveUser = !isRootPath && !isResetPasswordRoute && !isAuthCallbackRoute && !isAuthConfirmRoute && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
+  const shouldResolveUser =
+    !isRootPath &&
+    !isResetPasswordRoute &&
+    !isAuthCallbackRoute &&
+    !isAuthConfirmRoute &&
+    (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi));
 
   if (path === '/@vite/client') {
     return new NextResponse('', {

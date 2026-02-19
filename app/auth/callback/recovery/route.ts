@@ -32,7 +32,10 @@ export async function GET(request: Request) {
     console.error('Recovery callback code exchange error:', error.message);
     const resetUrl = new URL('/reset-password', requestUrl.origin);
     resetUrl.searchParams.set('error', 'verification_failed');
-    resetUrl.searchParams.set('error_description', 'Invalid or expired reset link. Please request a new one.');
+    resetUrl.searchParams.set(
+      'error_description',
+      'Invalid or expired reset link. Please request a new one.',
+    );
     return NextResponse.redirect(resetUrl);
   }
 

@@ -423,10 +423,10 @@ export default function AssignmentForm({
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
               {isSaving
-                ? (t('savingChanges' as TranslationKey) || 'Saving...')
+                ? t('savingChanges' as TranslationKey) || 'Saving...'
                 : editAssignment
                   ? t('saveChanges')
-                  : (t('addAssignment' as TranslationKey) || 'Add Assignment')}
+                  : t('addAssignment' as TranslationKey) || 'Add Assignment'}
             </Button>
           </DialogFooter>
         </DialogContent>

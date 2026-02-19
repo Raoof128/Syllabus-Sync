@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       // Log error but return generic success for anti-enumeration
       logger.warn('Password reset request error', {
         message: error.message,
-        email_hint: `${email.substring(0, 3)}***`
+        email_hint: `${email.substring(0, 3)}***`,
       });
     }
 

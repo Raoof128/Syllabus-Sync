@@ -110,9 +110,12 @@ export const useWeather = () => {
 
   // Auto-refresh every 10 minutes for long-lived sessions
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchWeather(selectedRegion, true);
-    }, 10 * 60 * 1000);
+    const interval = setInterval(
+      () => {
+        fetchWeather(selectedRegion, true);
+      },
+      10 * 60 * 1000,
+    );
     return () => clearInterval(interval);
   }, [selectedRegion, fetchWeather]);
 

@@ -84,8 +84,7 @@ export default function LoginClient() {
   const callbackError = searchParams.get('error');
 
   // Computed
-  const isGlobalLoading =
-    isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
+  const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
   const isError = !!generalError || Object.keys(errors).length > 0;
 
   const onSubmit = async (data: LoginFormData) => {
@@ -626,17 +625,11 @@ export default function LoginClient() {
                   © {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
                 </div>
                 <div className="text-mq-content-secondary">
-                  <a
-                    href="/privacy"
-                    className="hover:underline hover:text-mq-primary"
-                  >
+                  <a href="/privacy" className="hover:underline hover:text-mq-primary">
                     {t('privacyPolicy')}
                   </a>
                   {' · '}
-                  <a
-                    href="/terms"
-                    className="hover:underline hover:text-mq-primary"
-                  >
+                  <a href="/terms" className="hover:underline hover:text-mq-primary">
                     {t('termsOfService')}
                   </a>
                 </div>

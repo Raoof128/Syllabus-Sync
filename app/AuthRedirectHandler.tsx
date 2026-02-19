@@ -20,7 +20,9 @@ interface AuthRedirectHandlerProps {
  */
 export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHandlerProps) {
   const router = useRouter();
-  const [status, setStatus] = useState<'loading' | 'processing' | 'redirecting' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'processing' | 'redirecting' | 'error'>(
+    'loading',
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const handledRef = useRef(false);
   const supabase = createBrowserClient();
@@ -52,12 +54,13 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
     const type = typeFromHash || typeFromSearch;
 
     const error = hashParams.get('error') || searchParams.get('error');
-    const errorDescription = hashParams.get('error_description') || searchParams.get('error_description');
+    const errorDescription =
+      hashParams.get('error_description') || searchParams.get('error_description');
 
     logger.info('AuthRedirectHandler: Checking URL', {
       hash: hash ? `${hash.substring(0, 50)}...` : 'none',
       type,
-      error
+      error,
     });
 
     // Handle errors
@@ -106,25 +109,25 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
   useEffect(() => {
     if (handledRef.current) return;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: string, session: unknown) => {
-        if (handledRef.current) return;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string, session: unknown) => {
+      if (handledRef.current) return;
 
-        logger.info('AuthRedirectHandler: Auth state change:', { event });
+      logger.info('AuthRedirectHandler: Auth state change:', { event });
 
-        if (event === 'PASSWORD_RECOVERY' && session) {
-          // Recovery flow - redirect to reset-password
-          handledRef.current = true;
-          queueMicrotask(() => setStatus('redirecting'));
-          router.replace('/reset-password');
-        } else if (event === 'SIGNED_IN' && session) {
-          // Normal sign in - redirect to home
-          handledRef.current = true;
-          queueMicrotask(() => setStatus('redirecting'));
-          router.replace('/home');
-        }
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        // Recovery flow - redirect to reset-password
+        handledRef.current = true;
+        queueMicrotask(() => setStatus('redirecting'));
+        router.replace('/reset-password');
+      } else if (event === 'SIGNED_IN' && session) {
+        // Normal sign in - redirect to home
+        handledRef.current = true;
+        queueMicrotask(() => setStatus('redirecting'));
+        router.replace('/home');
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, [router, supabase.auth]);
@@ -137,7 +140,9 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       if (handledRef.current) return;
 
       logger.info('AuthRedirectHandler: Timeout, checking session');
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (session) {
         handledRef.current = true;
@@ -166,7 +171,8 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
             <div className="space-y-2">
               <h1 className="text-xl font-bold text-mq-content">Link Expired or Invalid</h1>
               <p className="text-sm text-mq-content-secondary">
-                {errorMessage || 'The password reset link has expired or is invalid. Please request a new one.'}
+                {errorMessage ||
+                  'The password reset link has expired or is invalid. Please request a new one.'}
               </p>
             </div>
             <div className="space-y-3">

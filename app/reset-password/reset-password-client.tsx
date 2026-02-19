@@ -44,7 +44,7 @@ export default function ResetPasswordClient() {
 
   const [mode, setMode] = useState<Mode>('request');
   const [generalError, setGeneralError] = useState<string | null>(
-    errorParam ? errorDescription || 'Invalid or expired reset link' : null
+    errorParam ? errorDescription || 'Invalid or expired reset link' : null,
   );
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -83,7 +83,9 @@ export default function ResetPasswordClient() {
       if (authChecked) return;
       setAuthChecked(true);
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (session) {
         setIsAuthenticated(true);
@@ -110,7 +112,9 @@ export default function ResetPasswordClient() {
         return;
       }
 
-      const { data: { session: sessionAfter } } = await supabase.auth.getSession();
+      const {
+        data: { session: sessionAfter },
+      } = await supabase.auth.getSession();
       if (sessionAfter) {
         setIsAuthenticated(true);
         setMode('set');
@@ -129,17 +133,17 @@ export default function ResetPasswordClient() {
 
   // Listen for auth state changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: string, session: unknown) => {
-        if (event === 'PASSWORD_RECOVERY' && session) {
-          setIsAuthenticated(true);
-          setMode('set');
-        } else if (event === 'SIGNED_IN' && session && mode === 'loading') {
-          setIsAuthenticated(true);
-          setMode('set');
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string, session: unknown) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        setIsAuthenticated(true);
+        setMode('set');
+      } else if (event === 'SIGNED_IN' && session && mode === 'loading') {
+        setIsAuthenticated(true);
+        setMode('set');
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, [supabase.auth, mode]);
@@ -225,7 +229,15 @@ export default function ResetPasswordClient() {
     return (
       <div className="relative min-h-[100dvh] bg-mq-background flex items-center justify-center">
         <div className="fixed inset-0 overflow-hidden">
-          <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+          <Image
+            src="/images/login-bg.png"
+            alt=""
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={60}
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
         </div>
         <div className="relative z-10 text-center">
@@ -241,7 +253,15 @@ export default function ResetPasswordClient() {
     return (
       <div className="relative min-h-[100dvh] bg-mq-background flex items-center justify-center px-4 py-8">
         <div className="fixed inset-0 overflow-hidden">
-          <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+          <Image
+            src="/images/login-bg.png"
+            alt=""
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={60}
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
         </div>
         <div className="relative z-10 w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -282,7 +302,15 @@ export default function ResetPasswordClient() {
     <div className="relative min-h-[100dvh] bg-mq-background">
       {/* Fixed background */}
       <div className="fixed inset-0 overflow-hidden">
-        <Image src="/images/login-bg.png" alt="" fill className="object-cover" priority sizes="100vw" quality={60} />
+        <Image
+          src="/images/login-bg.png"
+          alt=""
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+          quality={60}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
       </div>
 
@@ -346,7 +374,11 @@ export default function ResetPasswordClient() {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-xl font-bold"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? (
                     <span className="inline-flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -415,7 +447,11 @@ export default function ResetPasswordClient() {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full h-12 rounded-xl font-bold" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-xl font-bold"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? (
                     <span className="inline-flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />

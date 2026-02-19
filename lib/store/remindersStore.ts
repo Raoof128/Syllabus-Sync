@@ -56,7 +56,7 @@ export function calculateReminderDate(
   targetDate: Date,
   timing: ReminderTiming,
   customDate?: string,
-  customTime?: string
+  customTime?: string,
 ): Date {
   if (timing === 'custom' && customDate) {
     const [year, month, day] = customDate.split('-').map(Number);
@@ -97,15 +97,24 @@ export function calculateReminderDate(
 // Get timing label for display
 export function getTimingLabel(timing: ReminderTiming): string {
   switch (timing) {
-    case '15min': return '15 minutes before';
-    case '30min': return '30 minutes before';
-    case '1hour': return '1 hour before';
-    case '2hours': return '2 hours before';
-    case '1day': return '1 day before';
-    case '2days': return '2 days before';
-    case '1week': return '1 week before';
-    case 'custom': return 'Custom time';
-    default: return timing;
+    case '15min':
+      return '15 minutes before';
+    case '30min':
+      return '30 minutes before';
+    case '1hour':
+      return '1 hour before';
+    case '2hours':
+      return '2 hours before';
+    case '1day':
+      return '1 day before';
+    case '2days':
+      return '2 days before';
+    case '1week':
+      return '1 week before';
+    case 'custom':
+      return 'Custom time';
+    default:
+      return timing;
   }
 }
 
@@ -133,9 +142,7 @@ export const useRemindersStore = create<RemindersState>()(
 
       updateReminder: (id, updates) => {
         set((state) => ({
-          reminders: state.reminders.map((r) =>
-            r.id === id ? { ...r, ...updates } : r
-          ),
+          reminders: state.reminders.map((r) => (r.id === id ? { ...r, ...updates } : r)),
         }));
       },
 
@@ -147,7 +154,7 @@ export const useRemindersStore = create<RemindersState>()(
 
       getReminderForItem: (itemId, itemType) => {
         return get().reminders.find(
-          (r) => r.itemId === itemId && r.itemType === itemType && r.enabled
+          (r) => r.itemId === itemId && r.itemType === itemType && r.enabled,
         );
       },
 
@@ -156,16 +163,13 @@ export const useRemindersStore = create<RemindersState>()(
       },
 
       getPendingReminders: () => {
-        const now = new Date();
-        return get().reminders.filter(
-          (r) => r.enabled && !r.notifiedAt
-        );
+        return get().reminders.filter((r) => r.enabled && !r.notifiedAt);
       },
 
       markAsNotified: (id) => {
         set((state) => ({
           reminders: state.reminders.map((r) =>
-            r.id === id ? { ...r, notifiedAt: new Date() } : r
+            r.id === id ? { ...r, notifiedAt: new Date() } : r,
           ),
         }));
       },
@@ -176,7 +180,7 @@ export const useRemindersStore = create<RemindersState>()(
 
         set((state) => ({
           reminders: state.reminders.filter(
-            (r) => !r.notifiedAt || new Date(r.notifiedAt) > oneWeekAgo
+            (r) => !r.notifiedAt || new Date(r.notifiedAt) > oneWeekAgo,
           ),
         }));
       },
@@ -194,7 +198,6 @@ export const useRemindersStore = create<RemindersState>()(
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-    }
-  )
+    },
+  ),
 );
-

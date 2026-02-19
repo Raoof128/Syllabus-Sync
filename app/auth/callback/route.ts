@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=missing_code', requestUrl.origin));
   }
 
-   // Always exchange the code for a session first (PKCE handshake).
+  // Always exchange the code for a session first (PKCE handshake).
   // This sets the session cookie so downstream pages have auth context.
   const supabase = await createServerClient();
   const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -56,7 +56,10 @@ export async function GET(request: Request) {
     if (type === 'recovery') {
       const resetUrl = new URL('/reset-password', requestUrl.origin);
       resetUrl.searchParams.set('error', 'verification_failed');
-      resetUrl.searchParams.set('error_description', 'Invalid or expired reset link. Please request a new one.');
+      resetUrl.searchParams.set(
+        'error_description',
+        'Invalid or expired reset link. Please request a new one.',
+      );
       return NextResponse.redirect(resetUrl);
     }
     const loginUrl = new URL('/login', requestUrl.origin);
@@ -90,8 +93,7 @@ export async function GET(request: Request) {
   // For OAuth sign-ins (not email/magic-link), check if profile is complete.
   // Skip this for email-based flows where the user already went through signup.
   const isOAuthSignIn =
-    data?.user?.app_metadata?.provider &&
-    data.user.app_metadata.provider !== 'email';
+    data?.user?.app_metadata?.provider && data.user.app_metadata.provider !== 'email';
 
   if (isOAuthSignIn) {
     const { data: profile } = await supabase

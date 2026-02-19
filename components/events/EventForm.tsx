@@ -517,7 +517,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving
-              ? (t('savingChanges' as TranslationKey) || 'Saving...')
+              ? t('savingChanges' as TranslationKey) || 'Saving...'
               : editEvent
                 ? t('save')
                 : t('addEvent')}

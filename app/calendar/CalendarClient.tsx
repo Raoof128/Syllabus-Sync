@@ -292,7 +292,6 @@ export default function CalendarClient() {
     }
   };
 
-
   const handleUnitDetailOpenChange = (open: boolean) => {
     setUnitDetailOpen(open);
   };
@@ -375,9 +374,7 @@ export default function CalendarClient() {
               <h1 className="text-2xl font-bold text-mq-content lg:text-3xl">
                 {formatMonthYear(currentWeekStart)}
               </h1>
-              <p className="text-mq-content-secondary mt-1">
-                {formatWeekRange(currentWeekStart)}
-              </p>
+              <p className="text-mq-content-secondary mt-1">{formatWeekRange(currentWeekStart)}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 lg:gap-3">
@@ -1225,10 +1222,14 @@ export default function CalendarClient() {
         event={selectedEvent}
         open={eventDetailOpen}
         onOpenChange={setEventDetailOpen}
-        onEdit={selectedEvent?.sourcePublicEventId ? undefined : (event) => {
-          setEventDetailOpen(false);
-          openEditEvent(event);
-        }}
+        onEdit={
+          selectedEvent?.sourcePublicEventId
+            ? undefined
+            : (event) => {
+                setEventDetailOpen(false);
+                openEditEvent(event);
+              }
+        }
         onDelete={(event) => {
           setEventDetailOpen(false);
           handleDeleteEvent(event);

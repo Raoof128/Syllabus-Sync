@@ -65,7 +65,6 @@ export default function PrivacyPolicyPage() {
       {/* Body */}
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-[220px_1fr] lg:gap-12">
-
           {/* Sticky sidebar TOC — desktop only */}
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-1">
@@ -89,11 +88,15 @@ export default function PrivacyPolicyPage() {
 
           {/* Main content */}
           <div className="space-y-8">
-
             {/* 1. Purpose and Scope */}
-            <section id="section-1" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-1"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">1</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  1
+                </span>
                 {t('privacy_s1_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
@@ -105,15 +108,29 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 2. What Personal Information We Collect */}
-            <section id="section-2" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-2"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">2</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  2
+                </span>
                 {t('privacy_s2_title')}
               </h2>
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_a_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_a_li1','privacy_s2_a_li2','privacy_s2_a_li3','privacy_s2_a_li4','privacy_s2_a_li5','privacy_s2_a_li6'] as const).map((k) => (
+                {(
+                  [
+                    'privacy_s2_a_li1',
+                    'privacy_s2_a_li2',
+                    'privacy_s2_a_li3',
+                    'privacy_s2_a_li4',
+                    'privacy_s2_a_li5',
+                    'privacy_s2_a_li6',
+                  ] as const
+                ).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
@@ -123,7 +140,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_b_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_b_li1','privacy_s2_b_li2'] as const).map((k) => (
+                {(['privacy_s2_b_li1', 'privacy_s2_b_li2'] as const).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
@@ -133,7 +150,14 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_c_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_c_li1','privacy_s2_c_li2','privacy_s2_c_li3','privacy_s2_c_li4'] as const).map((k) => (
+                {(
+                  [
+                    'privacy_s2_c_li1',
+                    'privacy_s2_c_li2',
+                    'privacy_s2_c_li3',
+                    'privacy_s2_c_li4',
+                  ] as const
+                ).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
@@ -143,7 +167,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_d_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_d_li1','privacy_s2_d_li2'] as const).map((k) => (
+                {(['privacy_s2_d_li1', 'privacy_s2_d_li2'] as const).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
@@ -153,87 +177,142 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_e_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_e_li1','privacy_s2_e_li2','privacy_s2_e_li3'] as const).map((k) => (
-                  <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
-                    {t(k)}
-                  </li>
-                ))}
+                {(['privacy_s2_e_li1', 'privacy_s2_e_li2', 'privacy_s2_e_li3'] as const).map(
+                  (k) => (
+                    <li
+                      key={k}
+                      className="flex items-start gap-2 text-sm text-mq-content-secondary"
+                    >
+                      <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
+                      {t(k)}
+                    </li>
+                  ),
+                )}
               </ul>
 
               <h3 className="text-sm font-semibold text-mq-content">{t('privacy_s2_f_title')}</h3>
               <ul className="space-y-1.5">
-                {(['privacy_s2_f_li1','privacy_s2_f_li2','privacy_s2_f_li3'] as const).map((k) => (
-                  <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
-                    {t(k)}
-                  </li>
-                ))}
+                {(['privacy_s2_f_li1', 'privacy_s2_f_li2', 'privacy_s2_f_li3'] as const).map(
+                  (k) => (
+                    <li
+                      key={k}
+                      className="flex items-start gap-2 text-sm text-mq-content-secondary"
+                    >
+                      <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
+                      {t(k)}
+                    </li>
+                  ),
+                )}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s2_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s2_footer')}
+              </p>
             </section>
 
             {/* 3. How We Collect */}
-            <section id="section-3" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-3"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">3</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  3
+                </span>
                 {t('privacy_s3_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s3_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s3_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s3_li1','privacy_s3_li2'] as const).map((k) => (
+                {(['privacy_s3_li1', 'privacy_s3_li2'] as const).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s3_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s3_footer')}
+              </p>
             </section>
 
             {/* 4. Why We Collect and How We Use */}
-            <section id="section-4" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-4"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">4</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  4
+                </span>
                 {t('privacy_s4_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s4_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s4_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s4_li1','privacy_s4_li2','privacy_s4_li3','privacy_s4_li4','privacy_s4_li5','privacy_s4_li6'] as const).map((k) => (
+                {(
+                  [
+                    'privacy_s4_li1',
+                    'privacy_s4_li2',
+                    'privacy_s4_li3',
+                    'privacy_s4_li4',
+                    'privacy_s4_li5',
+                    'privacy_s4_li6',
+                  ] as const
+                ).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s4_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s4_footer')}
+              </p>
             </section>
 
             {/* 5. Disclosure */}
-            <section id="section-5" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-5"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">5</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  5
+                </span>
                 {t('privacy_s5_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s5_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s5_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s5_li1','privacy_s5_li2','privacy_s5_li3'] as const).map((k) => (
+                {(['privacy_s5_li1', 'privacy_s5_li2', 'privacy_s5_li3'] as const).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s5_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s5_footer')}
+              </p>
             </section>
 
             {/* 6. Overseas Disclosure and Third-Party Services */}
-            <section id="section-6" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-6"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">6</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  6
+                </span>
                 {t('privacy_s6_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s6_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s6_p1')}
+              </p>
 
               <div className="overflow-x-auto rounded-xl border border-mq-border">
                 <table className="w-full text-sm">
@@ -252,10 +331,26 @@ export default function PrivacyPolicyPage() {
                   </thead>
                   <tbody className="divide-y divide-mq-border">
                     {[
-                      ['privacy_s6_table_r1_c1','privacy_s6_table_r1_c2','privacy_s6_table_r1_c3'],
-                      ['privacy_s6_table_r2_c1','privacy_s6_table_r2_c2','privacy_s6_table_r2_c3'],
-                      ['privacy_s6_table_r3_c1','privacy_s6_table_r3_c2','privacy_s6_table_r3_c3'],
-                      ['privacy_s6_table_r4_c1','privacy_s6_table_r4_c2','privacy_s6_table_r4_c3'],
+                      [
+                        'privacy_s6_table_r1_c1',
+                        'privacy_s6_table_r1_c2',
+                        'privacy_s6_table_r1_c3',
+                      ],
+                      [
+                        'privacy_s6_table_r2_c1',
+                        'privacy_s6_table_r2_c2',
+                        'privacy_s6_table_r2_c3',
+                      ],
+                      [
+                        'privacy_s6_table_r3_c1',
+                        'privacy_s6_table_r3_c2',
+                        'privacy_s6_table_r3_c3',
+                      ],
+                      [
+                        'privacy_s6_table_r4_c1',
+                        'privacy_s6_table_r4_c2',
+                        'privacy_s6_table_r4_c3',
+                      ],
                     ].map((row, i) => (
                       <tr key={i} className="hover:bg-mq-card-background/50 transition-colors">
                         {row.map((cell) => (
@@ -271,73 +366,124 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 7. Security */}
-            <section id="section-7" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-7"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">7</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  7
+                </span>
                 {t('privacy_s7_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s7_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s7_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s7_li1','privacy_s7_li2','privacy_s7_li3','privacy_s7_li4','privacy_s7_li5','privacy_s7_li6','privacy_s7_li7','privacy_s7_li8','privacy_s7_li9'] as const).map((k) => (
+                {(
+                  [
+                    'privacy_s7_li1',
+                    'privacy_s7_li2',
+                    'privacy_s7_li3',
+                    'privacy_s7_li4',
+                    'privacy_s7_li5',
+                    'privacy_s7_li6',
+                    'privacy_s7_li7',
+                    'privacy_s7_li8',
+                    'privacy_s7_li9',
+                  ] as const
+                ).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s7_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s7_footer')}
+              </p>
             </section>
 
             {/* 8. Data Retention */}
-            <section id="section-8" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-8"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">8</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  8
+                </span>
                 {t('privacy_s8_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s8_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s8_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s8_li1','privacy_s8_li2','privacy_s8_li3','privacy_s8_li4'] as const).map((k) => (
+                {(
+                  ['privacy_s8_li1', 'privacy_s8_li2', 'privacy_s8_li3', 'privacy_s8_li4'] as const
+                ).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s8_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s8_footer')}
+              </p>
             </section>
 
             {/* 9. Cookies and Analytics */}
-            <section id="section-9" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-9"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">9</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  9
+                </span>
                 {t('privacy_s9_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s9_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s9_p1')}
+              </p>
               <ul className="space-y-1.5">
-                {(['privacy_s9_li1','privacy_s9_li2','privacy_s9_li3'] as const).map((k) => (
+                {(['privacy_s9_li1', 'privacy_s9_li2', 'privacy_s9_li3'] as const).map((k) => (
                   <li key={k} className="flex items-start gap-2 text-sm text-mq-content-secondary">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
                     {t(k)}
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s9_footer')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s9_footer')}
+              </p>
             </section>
 
             {/* 10. Access and Correction */}
-            <section id="section-10" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-10"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">10</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  10
+                </span>
                 {t('privacy_s10_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s10_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s10_p1')}
+              </p>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
                 {t('privacy_s10_p2_part1')}{' '}
                 <Link href="/settings" className="text-mq-primary hover:underline font-medium">
                   {t('settings')}
                 </Link>{' '}
                 {t('privacy_s10_p2_part2')}{' '}
-                <Link href="/manage-profiles" className="text-mq-primary hover:underline font-medium">
+                <Link
+                  href="/manage-profiles"
+                  className="text-mq-primary hover:underline font-medium"
+                >
                   {t('manageProfiles')}
                 </Link>
                 {t('privacy_s10_p2_part3')}{' '}
@@ -352,9 +498,14 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 11. Complaints */}
-            <section id="section-11" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-11"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">11</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  11
+                </span>
                 {t('privacy_s11_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
@@ -382,9 +533,14 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 12. Notifiable Data Breaches */}
-            <section id="section-12" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-12"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">12</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  12
+                </span>
                 {t('privacy_s12_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
@@ -402,9 +558,14 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 13. Children and Education */}
-            <section id="section-13" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-13"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">13</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  13
+                </span>
                 {t('privacy_s13_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
@@ -413,12 +574,19 @@ export default function PrivacyPolicyPage() {
             </section>
 
             {/* 14. Changes */}
-            <section id="section-14" className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300">
+            <section
+              id="section-14"
+              className="space-y-3 border-l-2 border-mq-border/40 hover:border-mq-primary/50 pl-5 transition-colors duration-300"
+            >
               <h2 className="text-lg font-bold text-mq-content flex items-center gap-3">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">14</span>
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
+                  14
+                </span>
                 {t('privacy_s14_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_s14_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_s14_p1')}
+              </p>
             </section>
 
             {/* Contact card */}
@@ -427,12 +595,16 @@ export default function PrivacyPolicyPage() {
                 <span className="h-1.5 w-4 rounded-full bg-mq-primary" />
                 {t('privacy_contact_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('privacy_contact_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('privacy_contact_p1')}
+              </p>
               <div className="bg-mq-card-background border border-mq-border rounded-xl p-4 space-y-1 text-sm text-mq-content-secondary">
                 <p>
                   <strong className="text-mq-content">{APP_CONFIG.name}</strong>
                 </p>
-                <p>{t('privacy_contact_email', { supportEmail: UNIVERSITY_CONFIG.supportEmail })}</p>
+                <p>
+                  {t('privacy_contact_email', { supportEmail: UNIVERSITY_CONFIG.supportEmail })}
+                </p>
                 <p>{UNIVERSITY_CONFIG.name}</p>
               </div>
             </section>

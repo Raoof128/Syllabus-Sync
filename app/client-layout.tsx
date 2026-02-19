@@ -88,7 +88,9 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   // Auth routes (/login, /signup, /reset-password) must always render the unauth layout
   // to avoid "blink" (sidebar/header flashing) and lost toast rendering during navigation.
   // Public routes (/terms, /privacy) should also render without auth check to avoid redirects.
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !isAuthRoute && !isPublicRoute);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => !isAuthRoute && !isPublicRoute,
+  );
 
   // Non-blocking auth check — updates UI state without blocking render
   const checkAuth = useCallback(async () => {

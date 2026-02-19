@@ -341,6 +341,7 @@ The Supabase `uri_allow_list` only contained `syllabus-sync-perkycoders.vercel.a
 #### Note
 
 Apple OAuth requires enabling the Apple provider in the Supabase Dashboard with:
+
 - Services ID, Team ID, Key ID, and Private Key from Apple Developer Console.
 - Supabase callback URL added to Apple's redirect URI allowlist.
 
@@ -2484,3 +2485,10 @@ Summary: (1) Onboarding gate: Modified `app/auth/callback/route.ts` to detect OA
 Files: Modified `app/auth/callback/route.ts`, `app/signup/components/CourseCombobox.tsx`, `app/manage-profiles/components/ProfileHeader.tsx`. Created `app/onboarding/page.tsx`, `app/onboarding/OnboardingClient.tsx`, `app/api/auth/onboarding/route.ts`, `supabase/migrations/20260219000000_avatars_storage_bucket.sql`.
 Verification: `npm run typecheck` ✅, `npm run test:ci` ✅ (483/483 pass), `npm run vercel:deploy:prod` ✅.
 Follow-ups: Run `supabase db push` to apply the avatars bucket migration to production. Consider skipping the onboarding gate for `email` provider sign-ups where signup already captures course/year.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Full Check Clean — Lint Errors + Avatar Remote Pattern
+Summary: Resolved all 20 ESLint errors and 7 warnings exposed by `npm run check`. (1) `next.config.ts`: Added `remotePatterns` for `*.supabase.co` so Next.js `<Image>` can serve avatar URLs from Supabase Storage via the optimization proxy. (2) `remindersStore.ts`: Removed unused `const now = new Date()` from `getPendingReminders`. (3) `ItemActionButtons.tsx`: Renamed never-used destructured prop `onToggleNotification` to `_onToggleNotification`. (4) `CourseCombobox.tsx`: Removed unused eslint-disable comment; moved `onKeyDown` to trigger `<button>`; added keyboard handler to clear `<span role="button">`; wrapped `setMounted(true)` in `startTransition()` to satisfy react-hooks/set-state-in-effect. (5) `ReminderModal.tsx`: Added `startTransition` import; wrapped both `useEffect` setState blocks in `startTransition()`; introduced `tStr = t as (key: string) => string` helper to avoid 16× `as any` casts throughout the component. (6) `AssignmentDetailPanel.tsx` + `ExamDetailPanel.tsx`: Changed always-present `onClick`/`onKeyDown`/`role`/`tabIndex` on unit association `<div>` to a conditional spread `{...(onUnitClick && { … })}` — interactive attributes only render when the element is truly interactive, satisfying no-static-element-interactions rule.
+Files: Modified `config/next/next.config.ts`, `lib/store/remindersStore.ts`, `features/calendar/components/ItemActionButtons.tsx`, `app/signup/components/CourseCombobox.tsx`, `components/ui/ReminderModal.tsx`, `components/assignments/AssignmentDetailPanel.tsx`, `components/exams/ExamDetailPanel.tsx`.
+Verification: `npm run typecheck` ✅ (0 errors), `npm run lint` ✅ (0 errors, 0 warnings), `npm run test:ci` ✅ (483/483 pass), `npm run build` ✅ (all 23 routes built including /onboarding).
+Follow-ups: Run `supabase db push` to apply the avatars bucket migration to production.

@@ -16,15 +16,8 @@ import { ProfileSkeleton } from './components/ProfileSkeleton';
 export default function ManageProfilesPage() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const {
-    currentProfile,
-    form,
-    saveProfile,
-    isSaving,
-    isDirty,
-    isValid,
-    hasLoaded,
-  } = useProfileManager();
+  const { currentProfile, form, saveProfile, isSaving, isDirty, isValid, hasLoaded } =
+    useProfileManager();
 
   // Show skeleton until the DB fetch completes — prevents stale localStorage data from flashing
   if (!hasLoaded) return <ProfileSkeleton />;
@@ -66,30 +59,30 @@ export default function ManageProfilesPage() {
       </div>
 
       <div className="space-y-4 sm:space-y-6">
-      <ProfileHeader profile={currentProfile} isSaving={isSaving} />
+        <ProfileHeader profile={currentProfile} isSaving={isSaving} />
 
-      {/* Pass the FORM object down to cards */}
-      <PersonalInfoCard form={form} email={currentProfile.email} disabled={isSaving} />
+        {/* Pass the FORM object down to cards */}
+        <PersonalInfoCard form={form} email={currentProfile.email} disabled={isSaving} />
 
-      <AcademicInfoCard form={form} disabled={isSaving} />
+        <AcademicInfoCard form={form} disabled={isSaving} />
 
-      {/* Reminders stay separate from Zod form for instant toggling */}
-      <ReminderSettings disabled={isSaving} />
+        {/* Reminders stay separate from Zod form for instant toggling */}
+        <ReminderSettings disabled={isSaving} />
 
-      {/* Save Button only shows if form is dirty (changed) */}
-      {isDirty && (
-        <div className="flex justify-center pt-2 animate-in fade-in slide-in-from-bottom-4">
-          <Button
-            onClick={saveProfile}
-            disabled={isSaving || !isValid}
-            size="lg"
-            className="w-full sm:w-auto shadow-lg flex items-center gap-2"
-          >
-            {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-            {isSaving ? t('saving') : t('saveChanges')}
-          </Button>
-        </div>
-      )}
+        {/* Save Button only shows if form is dirty (changed) */}
+        {isDirty && (
+          <div className="flex justify-center pt-2 animate-in fade-in slide-in-from-bottom-4">
+            <Button
+              onClick={saveProfile}
+              disabled={isSaving || !isValid}
+              size="lg"
+              className="w-full sm:w-auto shadow-lg flex items-center gap-2"
+            >
+              {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
+              {isSaving ? t('saving') : t('saveChanges')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

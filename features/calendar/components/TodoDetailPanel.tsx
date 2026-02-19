@@ -5,14 +5,7 @@ import { Todo } from '@/lib/types';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
-import {
-  CheckSquare,
-  Clock,
-  CheckCircle2,
-  Circle,
-  AlertCircle,
-  CalendarDays,
-} from 'lucide-react';
+import { CheckSquare, Clock, CheckCircle2, Circle, AlertCircle, CalendarDays } from 'lucide-react';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';

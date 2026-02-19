@@ -77,6 +77,13 @@ const nextConfig: NextConfig = {
   // Optimize images
   images: {
     formats: ['image/webp', 'image/avif'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
   },
 
   // Enable compression

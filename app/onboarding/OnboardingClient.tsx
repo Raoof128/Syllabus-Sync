@@ -76,7 +76,9 @@ export default function OnboardingClient() {
       }
       router.push(next);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setServerError(
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+      );
     }
   };
 
@@ -108,9 +110,7 @@ export default function OnboardingClient() {
                   <GraduationCap className="h-7 w-7 text-mq-primary" />
                 </div>
               </div>
-              <h1 className="text-2xl font-bold text-mq-content mb-2">
-                One more thing 👋
-              </h1>
+              <h1 className="text-2xl font-bold text-mq-content mb-2">One more thing 👋</h1>
               <p className="text-sm text-mq-content-secondary">
                 Tell us your course and year so we can personalise your experience.
               </p>
@@ -132,9 +132,7 @@ export default function OnboardingClient() {
                     />
                   )}
                 />
-                {errors.course && (
-                  <p className="text-xs text-red-500">{errors.course.message}</p>
-                )}
+                {errors.course && <p className="text-xs text-red-500">{errors.course.message}</p>}
               </div>
 
               {/* Year */}
@@ -160,14 +158,10 @@ export default function OnboardingClient() {
                     </Select>
                   )}
                 />
-                {errors.year && (
-                  <p className="text-xs text-red-500">{errors.year.message}</p>
-                )}
+                {errors.year && <p className="text-xs text-red-500">{errors.year.message}</p>}
               </div>
 
-              {serverError && (
-                <p className="text-sm text-red-500 text-center">{serverError}</p>
-              )}
+              {serverError && <p className="text-sm text-red-500 text-center">{serverError}</p>}
 
               <Button
                 type="submit"

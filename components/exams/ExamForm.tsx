@@ -476,10 +476,10 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
               {isSaving
-                ? (t('savingChanges' as TranslationKey) || 'Saving...')
+                ? t('savingChanges' as TranslationKey) || 'Saving...'
                 : editExam
                   ? t('saveChanges')
-                  : (t('addExam' as TranslationKey) || 'Add Exam')}
+                  : t('addExam' as TranslationKey) || 'Add Exam'}
             </Button>
           </DialogFooter>
         </DialogContent>

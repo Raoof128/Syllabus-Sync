@@ -38,7 +38,10 @@ export async function GET(request: NextRequest) {
     console.error('Token verification error:', error.message);
     const errorUrl = new URL('/reset-password', request.url);
     errorUrl.searchParams.set('error', 'verification_failed');
-    errorUrl.searchParams.set('error_description', 'Invalid or expired reset link. Please request a new one.');
+    errorUrl.searchParams.set(
+      'error_description',
+      'Invalid or expired reset link. Please request a new one.',
+    );
     return NextResponse.redirect(errorUrl);
   }
 

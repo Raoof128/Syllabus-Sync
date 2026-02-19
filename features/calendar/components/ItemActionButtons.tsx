@@ -58,7 +58,7 @@ export default function ItemActionButtons({
   notificationEnabled = false,
   onEdit,
   onDelete,
-  onToggleNotification,
+  onToggleNotification: _onToggleNotification,
   variant = 'compact',
   className,
   stopPropagation = true,
@@ -163,7 +163,10 @@ export default function ItemActionButtons({
         <button
           type="button"
           onClick={handleEditClick}
-          className={cn(baseButtonClass, 'hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400')}
+          className={cn(
+            baseButtonClass,
+            'hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400',
+          )}
           title={t('calendarEditItem', { title: itemTitle }) as string}
           aria-label={t('calendarEditItem', { title: itemTitle }) as string}
         >
@@ -176,7 +179,10 @@ export default function ItemActionButtons({
         <button
           type="button"
           onClick={handleDeleteClick}
-          className={cn(baseButtonClass, 'hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400')}
+          className={cn(
+            baseButtonClass,
+            'hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400',
+          )}
           title={t('calendarDeleteItem', { title: itemTitle }) as string}
           aria-label={t('calendarDeleteItem', { title: itemTitle }) as string}
         >

@@ -34,7 +34,6 @@ import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-
 // react-hook-form expects the schema *input* shape, not the transformed output.
 type SignupFormData = z.input<ReturnType<typeof createSignupSchema>>;
 
-
 export default function SignupClient() {
   const { t } = useTypedTranslation();
   const router = useRouter();
@@ -127,7 +126,8 @@ export default function SignupClient() {
   }, [selectedCourse]);
 
   const academicYears = useMemo(
-    () => Array.from({ length: maxYear }, (_, i) => ({ value: String(i + 1), label: `Year ${i + 1}` })),
+    () =>
+      Array.from({ length: maxYear }, (_, i) => ({ value: String(i + 1), label: `Year ${i + 1}` })),
     [maxYear],
   );
 
@@ -230,7 +230,6 @@ export default function SignupClient() {
       <div className="relative z-10 flex min-h-[100dvh] items-start sm:items-center justify-center px-4 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="w-full max-w-md">
           <div className="bg-mq-card-background/85 backdrop-blur-xl border border-mq-border/30 rounded-2xl shadow-[0_18px_70px_rgba(0,0,0,0.3)] overflow-hidden">
-
             {/* Card Header */}
             <div className="px-6 pt-8 pb-4 space-y-3">
               <div className="flex items-center justify-center">
@@ -289,7 +288,10 @@ export default function SignupClient() {
                     {t('stepAccount')}
                   </button>
                   <div
-                    className={clsx('w-8 h-0.5 rounded-full', step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border')}
+                    className={clsx(
+                      'w-8 h-0.5 rounded-full',
+                      step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
+                    )}
                   />
                   <div
                     className={clsx(
@@ -371,7 +373,9 @@ export default function SignupClient() {
                               key={idx}
                               className={clsx(
                                 'flex-1 rounded-full transition-colors',
-                                idx <= passwordStrength.score ? passwordStrength.color : 'bg-mq-border',
+                                idx <= passwordStrength.score
+                                  ? passwordStrength.color
+                                  : 'bg-mq-border',
                               )}
                             />
                           ))}
@@ -393,7 +397,9 @@ export default function SignupClient() {
                         </div>
                       </div>
                     )}
-                    <p className="text-xs text-mq-content-secondary mt-1">{t('passwordMinLength')}</p>
+                    <p className="text-xs text-mq-content-secondary mt-1">
+                      {t('passwordMinLength')}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -469,11 +475,28 @@ export default function SignupClient() {
                     {oauthLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3" aria-hidden="true">
-                        <path fill="#4285F4" d="M533.5 278.4c0-17.4-1.5-34.1-4.3-50.4H272.1v95.4h146.9c-6.3 34-25 62.8-53.4 82.1v68.2h86.5c50.7-46.7 81.4-115.5 81.4-195.3z"/>
-                        <path fill="#34A853" d="M272.1 544.3c72.4 0 133.1-23.9 177.5-64.9l-86.5-68.2c-24.1 16.2-55 25.7-90.9 25.7-69.9 0-129.3-47.2-150.5-110.7H34.1v69.6c44.5 88.3 136.1 148.5 238 148.5z"/>
-                        <path fill="#FBBC05" d="M121.6 325.9c-10-29.6-10-61.5 0-91.1v-69.6H34.1c-44.5 88.3-44.5 192.1 0 280.4l87.5-69.7z"/>
-                        <path fill="#EA4335" d="M272.1 107.7c37.1-.6 72.6 12.8 99.8 37.8l74.5-74.5C405.1 24 345.4 0 272.1 0 170.2 0 78.6 60.2 34.1 148.5l87.5 69.7c21.1-63.5 80.6-110.7 150.5-110.7z"/>
+                      <svg
+                        className="h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 533.5 544.3"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fill="#4285F4"
+                          d="M533.5 278.4c0-17.4-1.5-34.1-4.3-50.4H272.1v95.4h146.9c-6.3 34-25 62.8-53.4 82.1v68.2h86.5c50.7-46.7 81.4-115.5 81.4-195.3z"
+                        />
+                        <path
+                          fill="#34A853"
+                          d="M272.1 544.3c72.4 0 133.1-23.9 177.5-64.9l-86.5-68.2c-24.1 16.2-55 25.7-90.9 25.7-69.9 0-129.3-47.2-150.5-110.7H34.1v69.6c44.5 88.3 136.1 148.5 238 148.5z"
+                        />
+                        <path
+                          fill="#FBBC05"
+                          d="M121.6 325.9c-10-29.6-10-61.5 0-91.1v-69.6H34.1c-44.5 88.3-44.5 192.1 0 280.4l87.5-69.7z"
+                        />
+                        <path
+                          fill="#EA4335"
+                          d="M272.1 107.7c37.1-.6 72.6 12.8 99.8 37.8l74.5-74.5C405.1 24 345.4 0 272.1 0 170.2 0 78.6 60.2 34.1 148.5l87.5 69.7c21.1-63.5 80.6-110.7 150.5-110.7z"
+                        />
                       </svg>
                     )}
                     <span>{t('loginWithGoogle')}</span>
@@ -554,7 +577,12 @@ export default function SignupClient() {
                           onValueChange={field.onChange}
                           disabled={isSubmitting}
                         >
-                          <SelectTrigger className={clsx('w-full h-12 rounded-xl', errors.year && 'border-red-500')}>
+                          <SelectTrigger
+                            className={clsx(
+                              'w-full h-12 rounded-xl',
+                              errors.year && 'border-red-500',
+                            )}
+                          >
                             <SelectValue placeholder={t('yearPlaceholder')} />
                           </SelectTrigger>
                           <SelectContent>
@@ -567,9 +595,7 @@ export default function SignupClient() {
                         </Select>
                       )}
                     />
-                    {errors.year && (
-                      <p className="text-xs text-red-500">{errors.year.message}</p>
-                    )}
+                    {errors.year && <p className="text-xs text-red-500">{errors.year.message}</p>}
                   </div>
 
                   <div className="flex gap-2 pt-2">
@@ -584,7 +610,10 @@ export default function SignupClient() {
                     </Button>
                     <Button
                       type="submit"
-                      className={clsx('flex-1 h-12 rounded-xl font-bold', isSubmitting ? 'opacity-50 cursor-not-allowed' : '')}
+                      className={clsx(
+                        'flex-1 h-12 rounded-xl font-bold',
+                        isSubmitting ? 'opacity-50 cursor-not-allowed' : '',
+                      )}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
@@ -633,7 +662,9 @@ export default function SignupClient() {
 
               {/* Footer */}
               <div className="pt-2 text-center text-xs text-mq-content-secondary space-y-1">
-                <div>&copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}</div>
+                <div>
+                  &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
+                </div>
                 <div>
                   <a href="/privacy" className="hover:underline hover:text-mq-primary">
                     {t('privacyPolicy')}

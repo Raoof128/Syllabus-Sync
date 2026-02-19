@@ -228,18 +228,21 @@ export default function AssignmentDetailPanel({
           {unit && (
             <div
               className={cn(
-                "p-4 rounded-lg border border-mq-border bg-mq-card-background",
-                onUnitClick && "cursor-pointer hover:border-mq-primary/50 hover:bg-mq-hover-background transition-colors"
+                'p-4 rounded-lg border border-mq-border bg-mq-card-background',
+                onUnitClick &&
+                  'cursor-pointer hover:border-mq-primary/50 hover:bg-mq-hover-background transition-colors',
               )}
-              onClick={() => onUnitClick?.(unit.code)}
-              onKeyDown={(e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && onUnitClick) {
-                  e.preventDefault();
-                  onUnitClick(unit.code);
-                }
-              }}
-              role={onUnitClick ? "button" : undefined}
-              tabIndex={onUnitClick ? 0 : undefined}
+              {...(onUnitClick && {
+                role: 'button' as const,
+                tabIndex: 0,
+                onClick: () => onUnitClick(unit.code),
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onUnitClick(unit.code);
+                  }
+                },
+              })}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs">

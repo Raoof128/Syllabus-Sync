@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, startTransition } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
@@ -22,8 +22,10 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const [mounted, setMounted] = useState(false);
 
-  // Only render portal on the client
-  useEffect(() => { setMounted(true); }, []);
+  // Only render portal on the client (startTransition defers setState out of the effect body)
+  useEffect(() => {
+    startTransition(() => setMounted(true));
+  }, []);
 
   // Compute fixed-position coords from trigger's bounding rect
   const updateDropdownPosition = () => {
@@ -44,8 +46,10 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
-        triggerRef.current && !triggerRef.current.contains(target) &&
-        dropdownRef.current && !dropdownRef.current.contains(target)
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
       ) {
         setOpen(false);
       }
@@ -65,7 +69,6 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Focus search input when dropdown opens
@@ -125,12 +128,13 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
   const totalResults = filtered.length;
 
   return (
-    <div className="relative" onKeyDown={handleKeyDown}>
+    <div className="relative">
       {/* Trigger button */}
       <button
         ref={triggerRef}
         type="button"
         onClick={handleToggle}
+        onKeyDown={handleKeyDown}
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -154,6 +158,13 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
               role="button"
               tabIndex={-1}
               onClick={handleClear}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onChange('');
+                  setQuery('');
+                }
+              }}
               aria-label="Clear selection"
               className="p-0.5 rounded hover:bg-mq-hover-background text-mq-content-secondary hover:text-mq-content transition-colors"
             >
@@ -161,73 +172,79 @@ export function CourseCombobox({ value, onChange, disabled, error }: Props) {
             </span>
           )}
           <ChevronDown
-            className={cn('h-4 w-4 opacity-50 transition-transform duration-150', open && 'rotate-180')}
+            className={cn(
+              'h-4 w-4 opacity-50 transition-transform duration-150',
+              open && 'rotate-180',
+            )}
           />
         </span>
       </button>
 
       {/* Dropdown — portalled to document.body to escape overflow:hidden & stacking contexts */}
-      {open && mounted && createPortal(
-        <div
-          ref={dropdownRef}
-          role="listbox"
-          aria-label="Course list"
-          style={dropdownStyle}
-          className="rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
-        >
-          {/* Search */}
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-mq-border">
-            <Search className="h-3.5 w-3.5 shrink-0 text-mq-content-tertiary" />
-            <input
-              ref={searchRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search courses…"
-              className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
-            />
-            {query && (
-              <span className="text-xs text-mq-content-secondary shrink-0">
-                {totalResults} result{totalResults !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
+      {open &&
+        mounted &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            role="listbox"
+            aria-label="Course list"
+            style={dropdownStyle}
+            className="rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
+          >
+            {/* Search */}
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-mq-border">
+              <Search className="h-3.5 w-3.5 shrink-0 text-mq-content-tertiary" />
+              <input
+                ref={searchRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search courses…"
+                className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
+              />
+              {query && (
+                <span className="text-xs text-mq-content-secondary shrink-0">
+                  {totalResults} result{totalResults !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
 
-          {/* Course list */}
-          <div className="max-h-64 overflow-y-auto py-1">
-            {grouped.size === 0 ? (
-              <div className="px-3 py-6 text-sm text-mq-content-secondary text-center">
-                No courses match &ldquo;{query}&rdquo;
-              </div>
-            ) : (
-              Array.from(grouped.entries()).map(([label, courses]) => (
-                <div key={label}>
-                  <div className="px-3 pt-2 pb-0.5 text-xs font-semibold tracking-wider uppercase text-mq-content-tertiary">
-                    {label}
-                  </div>
-                  {courses.map((course) => (
-                    <button
-                      key={course.code}
-                      type="button"
-                      role="option"
-                      aria-selected={value === course.name}
-                      onClick={() => handleSelect(course.name)}
-                      className={cn(
-                        'w-full text-left px-3 py-1.5 text-sm transition-colors',
-                        value === course.name
-                          ? 'bg-mq-primary/10 text-mq-primary font-medium'
-                          : 'text-mq-content hover:bg-mq-hover-background',
-                      )}
-                    >
-                      {course.name}
-                    </button>
-                  ))}
+            {/* Course list */}
+            <div className="max-h-64 overflow-y-auto py-1">
+              {grouped.size === 0 ? (
+                <div className="px-3 py-6 text-sm text-mq-content-secondary text-center">
+                  No courses match &ldquo;{query}&rdquo;
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      , document.body)}
+              ) : (
+                Array.from(grouped.entries()).map(([label, courses]) => (
+                  <div key={label}>
+                    <div className="px-3 pt-2 pb-0.5 text-xs font-semibold tracking-wider uppercase text-mq-content-tertiary">
+                      {label}
+                    </div>
+                    {courses.map((course) => (
+                      <button
+                        key={course.code}
+                        type="button"
+                        role="option"
+                        aria-selected={value === course.name}
+                        onClick={() => handleSelect(course.name)}
+                        className={cn(
+                          'w-full text-left px-3 py-1.5 text-sm transition-colors',
+                          value === course.name
+                            ? 'bg-mq-primary/10 text-mq-primary font-medium'
+                            : 'text-mq-content hover:bg-mq-hover-background',
+                        )}
+                      >
+                        {course.name}
+                      </button>
+                    ))}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
