@@ -16,7 +16,6 @@ import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { toastUtils } from '@/lib/utils/toast';
 import { createBrowserClient } from '@/lib/supabase/client';
-
 type Mode = 'request' | 'set' | 'loading' | 'success';
 
 const requestSchema = z.object({
@@ -43,15 +42,17 @@ export default function ResetPasswordClient() {
   const [hashChecked, setHashChecked] = useState(false);
 
   const [mode, setMode] = useState<Mode>('request');
+  const tStr = t as (key: string) => string;
+
   const [generalError, setGeneralError] = useState<string | null>(
-    errorParam ? errorDescription || 'Invalid or expired reset link' : null,
+    errorParam ? errorDescription || tStr('invalidResetLink') : null,
   );
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
-  const supabase = createBrowserClient();
+  const [supabase] = useState(() => createBrowserClient());
 
   // Check for hash fragment on mount
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function ResetPasswordClient() {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
             console.error('Code exchange error:', error.message);
-            setGeneralError('Invalid or expired reset link. Please request a new one.');
+            setGeneralError(tStr('invalidResetLink'));
             setMode('request');
           } else {
             setIsAuthenticated(true);
@@ -106,7 +107,7 @@ export default function ResetPasswordClient() {
           }
         } catch (err) {
           console.error('Code exchange exception:', err);
-          setGeneralError('Invalid or expired reset link. Please request a new one.');
+          setGeneralError(tStr('invalidResetLink'));
           setMode('request');
         }
         return;
@@ -162,10 +163,10 @@ export default function ResetPasswordClient() {
           confirmPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
         })
         .refine((v) => v.newPassword === v.confirmPassword, {
-          message: 'Passwords do not match',
+          message: tStr('passwordsDoNotMatch'),
           path: ['confirmPassword'],
         }),
-    [],
+    [tStr],
   );
 
   const setForm = useForm<SetForm>({
@@ -203,7 +204,7 @@ export default function ResetPasswordClient() {
     setGeneralError(null);
 
     if (!isAuthenticated) {
-      setGeneralError('Session expired. Please request a new reset link.');
+      setGeneralError(tStr('sessionExpiredResetLink'));
       return;
     }
 
@@ -213,7 +214,7 @@ export default function ResetPasswordClient() {
       });
 
       if (error) {
-        setGeneralError(error.message || 'Failed to update password. Please try again.');
+        setGeneralError(error.message || tStr('failedToUpdatePassword'));
         return;
       }
 
@@ -472,9 +473,7 @@ export default function ResetPasswordClient() {
           </div>
 
           <p className="text-xs text-mq-content-secondary text-center mt-4">
-            {mode === 'request'
-              ? 'We will never reveal whether an email is registered.'
-              : t('resetLinkExpireNote')}
+            {mode === 'request' ? tStr('revealEmailNote') : t('resetLinkExpireNote')}
           </p>
         </div>
       </div>

@@ -17,7 +17,7 @@ import { isValidRedirect } from '@/lib/utils/security';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { API_ROUTES } from '@/lib/constants/config';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
-import { loginSchema, type LoginFormData } from './schemas/loginSchema';
+import { createLoginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
 import { MFAChallenge } from './components/MFAChallenge';
@@ -38,13 +38,14 @@ export default function LoginClient() {
   const { loginWithPasskey, isPasskeyLoading } = usePasskeyLogin();
 
   // Form Management
+  const localLoginSchema = createLoginSchema(t);
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(localLoginSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -622,16 +623,16 @@ export default function LoginClient() {
 
               <div className="pt-4 text-center text-xs text-mq-content font-medium space-y-1">
                 <div>
-                  © {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
+                  &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
                 </div>
                 <div className="text-mq-content-secondary">
-                  <a href="/privacy" className="hover:underline hover:text-mq-primary">
+                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
                     {t('privacyPolicy')}
-                  </a>
+                  </Link>
                   {' · '}
-                  <a href="/terms" className="hover:underline hover:text-mq-primary">
+                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
                     {t('termsOfService')}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </form>

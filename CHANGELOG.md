@@ -1,3 +1,31 @@
+### Raouf: Auth Pages Production Audit — i18n, Links, Metadata — 2026-02-19
+
+**Scope:** Full production audit of login, signup, and reset-password pages.
+**Type:** Hardening / i18n / Bug Fix
+
+#### Changes
+
+1. **`reset-password-client.tsx`**: Replaced 6 hardcoded English strings with `t()` calls using existing translation keys (`invalidResetLink`, `revealEmailNote`, `sessionExpiredResetLink`, `failedToUpdatePassword`, `passwordsDoNotMatch`). Fixed `createBrowserClient()` called at render level — now wrapped in `useState()` initializer to create once. Added `tStr` pattern.
+
+2. **`loginSchema.ts`**: Added `createLoginSchema(t)` factory alongside default `loginSchema` fallback. Validation messages now use i18n keys (`loginEmailRequired`, `loginValidEmail`, `loginPasswordRequired`).
+
+3. **`LoginClient.tsx`**: Uses `createLoginSchema(t)` for translated validation. Footer `<a>` tags replaced with Next.js `<Link>` for client-side navigation.
+
+4. **`SignupClient.tsx`**: All 5 footer/inline `<a href="/privacy">` and `<a href="/terms">` tags replaced with `<Link>` components. Added `Link` import.
+
+5. **`signup/page.tsx`**: Added missing `openGraph` metadata (login and reset-password already had it).
+
+6. **`lib/schemas/auth.ts`**: Replaced 2 hardcoded English messages (`'Course is required'`, `'Year of study is required'`) with `t('courseRequired')` and `t('yearRequired')`.
+
+7. **`locales/en/translations.json`**: Added 7 new translation keys for all hardcoded strings.
+
+#### Verification
+
+- `npm run check` ✅ (64 test files, 478 tests passing)
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+
+---
+
 ### Raouf: Auth Flow Wiring + Security Card Cleanup + Test Fix — 2026-02-19
 
 **Scope:** Complete auth flow for /onboarding post-auth route; clean up settings/security page; fix test suite.

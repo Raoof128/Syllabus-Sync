@@ -1875,5 +1875,12 @@
   "savingChanges": "Saving...",
   "classSchedule": "Class Schedule",
   "assignment": "Assignment",
-  "event": "Event"
+  "event": "Event",
+  "sessionExpiredResetLink": "Session expired. Please request a new reset link.",
+  "failedToUpdatePassword": "Failed to update password. Please try again.",
+  "loginEmailRequired": "Email is required",
+  "loginPasswordRequired": "Password is required",
+  "loginValidEmail": "Please enter a valid university email",
+  "courseRequired": "Course is required",
+  "yearRequired": "Year of study is required"
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
 import Image from 'next/image';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -428,13 +429,13 @@ export default function SignupClient() {
                     />
                     <label htmlFor="terms" className="text-sm text-mq-content-secondary">
                       <span className="text-red-500">*</span> {t('agreeToTerms')}{' '}
-                      <a href="/terms" className="text-mq-primary hover:underline font-medium">
+                      <Link href="/terms" className="text-mq-primary hover:underline font-medium">
                         {t('termsOfService')}
-                      </a>{' '}
+                      </Link>{' '}
                       {t('and')}{' '}
-                      <a href="/privacy" className="text-mq-primary hover:underline font-medium">
+                      <Link href="/privacy" className="text-mq-primary hover:underline font-medium">
                         {t('privacyPolicy')}
-                      </a>
+                      </Link>
                     </label>
                   </div>
                   {errors.agreedToTerms && (
@@ -444,9 +445,9 @@ export default function SignupClient() {
                   {/* APP 5 Collection Notice */}
                   <p className="text-xs text-mq-content-secondary leading-relaxed">
                     {t('collectionNotice')}{' '}
-                    <a href="/privacy" className="text-mq-primary hover:underline font-medium">
+                    <Link href="/privacy" className="text-mq-primary hover:underline font-medium">
                       {t('privacyPolicy')}
-                    </a>
+                    </Link>
                   </p>
 
                   <Button
@@ -666,13 +667,13 @@ export default function SignupClient() {
                   &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
                 </div>
                 <div>
-                  <a href="/privacy" className="hover:underline hover:text-mq-primary">
+                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
                     {t('privacyPolicy')}
-                  </a>
+                  </Link>
                   {' · '}
-                  <a href="/terms" className="hover:underline hover:text-mq-primary">
+                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
                     {t('termsOfService')}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
