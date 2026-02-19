@@ -1,3 +1,27 @@
+### Raouf: Settings Password Back-Navigation + Map Haptics Relocation — 2026-02-19
+
+**Scope:** Implement requested settings UX updates for reset-password back flow and map haptics placement.
+**Type:** UX / Settings / Navigation
+
+#### Changes
+
+1. **`features/settings/components/PrivacySettings.tsx`**: Updated Change Password action route from `/reset-password` to `/reset-password?from=settings` so origin context is preserved.
+2. **`app/reset-password/reset-password-client.tsx`**: Added settings-origin awareness (`from=settings`), with dynamic `backHref` and `backLabel`. All back controls now point to `/settings/security` with `backToSettings` when entered from settings; default behavior remains back to login.
+3. **`locales/en/translations.json`**: Added `backToSettings` translation key.
+4. **`app/settings/general/page.tsx`**: Moved `MapSettings` into General settings (next to notifications).
+5. **`app/settings/experience/page.tsx`**: Removed `MapSettings` and `QuickActions` (actions section) from Experience settings.
+6. **`tests/settings/PrivacySettings.test.tsx`**: Updated expected route to `/reset-password?from=settings`.
+7. **`app/reset-password/reset-password-client.tsx`**: Added missing `tStr` dependency in auth `useEffect` to satisfy `react-hooks/exhaustive-deps`.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm run test -- tests/settings/PrivacySettings.test.tsx` ✅ (18 tests passed)
+- `npm run test -- tests/settings/SettingsRoutesIntegrity.test.ts` ✅ (2 tests passed)
+- `npm run lint` ✅
+
+---
+
 ### Raouf: Auth Pages Production Audit — i18n, Links, Metadata — 2026-02-19
 
 **Scope:** Full production audit of login, signup, and reset-password pages.

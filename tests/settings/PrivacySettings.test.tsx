@@ -261,8 +261,8 @@ describe('PrivacySettings', () => {
     expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
   });
 
-  // Password navigation test (dialog was removed; button now navigates to /reset-password)
-  it('navigates to /reset-password when change password button is clicked', () => {
+  // Password navigation test (button now navigates to /reset-password from settings context)
+  it('navigates to /reset-password?from=settings when change password button is clicked', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -272,7 +272,7 @@ describe('PrivacySettings', () => {
 
     fireEvent.click(screen.getByTestId('change-password-button'));
 
-    expect(mockRouterPush).toHaveBeenCalledWith('/reset-password');
+    expect(mockRouterPush).toHaveBeenCalledWith('/reset-password?from=settings');
   });
 
   // Sessions dialog tests

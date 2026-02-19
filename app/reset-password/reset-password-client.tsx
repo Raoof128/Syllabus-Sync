@@ -35,8 +35,12 @@ export default function ResetPasswordClient() {
 
   const code = searchParams.get('code');
   const recovery = searchParams.get('recovery');
+  const from = searchParams.get('from');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+  const isFromSettings = from === 'settings';
+  const backHref = isFromSettings ? '/settings/security' : '/login';
+  const backLabel = isFromSettings ? t('backToSettings') : t('backToLogin');
 
   const [hasHashFragment, setHasHashFragment] = useState(false);
   const [hashChecked, setHashChecked] = useState(false);
@@ -130,7 +134,7 @@ export default function ResetPasswordClient() {
     if (mode === 'loading') {
       setTimeout(handleAuth, 500);
     }
-  }, [code, mode, supabase.auth, authChecked, hasHashFragment]);
+  }, [code, mode, supabase.auth, authChecked, hasHashFragment, tStr]);
 
   // Listen for auth state changes
   useEffect(() => {
@@ -288,9 +292,9 @@ export default function ResetPasswordClient() {
             <Button
               type="button"
               className="w-full h-12 rounded-xl font-bold"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push(backHref)}
             >
-              {t('backToLogin')}
+              {backLabel}
             </Button>
           </div>
         </div>
@@ -391,8 +395,8 @@ export default function ResetPasswordClient() {
                 </Button>
 
                 <div className="text-center text-sm">
-                  <Link href="/login" className="text-mq-primary hover:underline font-bold">
-                    {t('backToLogin')}
+                  <Link href={backHref} className="text-mq-primary hover:underline font-bold">
+                    {backLabel}
                   </Link>
                 </div>
               </form>
@@ -464,8 +468,8 @@ export default function ResetPasswordClient() {
                 </Button>
 
                 <div className="text-center text-sm">
-                  <Link href="/login" className="text-mq-primary hover:underline font-bold">
-                    {t('backToLogin')}
+                  <Link href={backHref} className="text-mq-primary hover:underline font-bold">
+                    {backLabel}
                   </Link>
                 </div>
               </form>

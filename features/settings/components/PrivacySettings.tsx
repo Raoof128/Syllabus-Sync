@@ -73,7 +73,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   variant="ghost"
                   size="sm"
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => router.push('/reset-password')}
+                  onClick={() => router.push('/reset-password?from=settings')}
                   data-testid="change-password-button"
                 >
                   {t('changePassword')}

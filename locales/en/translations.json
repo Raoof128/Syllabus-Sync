@@ -1469,6 +1469,7 @@
   "loadingContent": "Loading content...",
   "sendResetLink": "Send Reset Link",
   "backToLogin": "Back to Login",
+  "backToSettings": "Back to Settings",
   "emailRequired": "Please enter your email address",
   "gamification_level_1": "Freshman",
   "gamification_level_2": "Eager Learner",
