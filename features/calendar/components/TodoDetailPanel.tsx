@@ -118,17 +118,17 @@ export default function TodoDetailPanel({
                 }
               >
                 {todo.completed ? (
-                  <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                  <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                 ) : status === 'overdue' ? (
-                  <AlertCircle className="h-6 w-6 text-red-600" />
+                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 ) : (
                   <Circle className="h-6 w-6 text-mq-content-secondary" />
                 )}
                 <span
                   className={cn(
                     'text-sm font-medium',
-                    todo.completed && 'text-emerald-600',
-                    status === 'overdue' && !todo.completed && 'text-red-600',
+                    todo.completed && 'text-emerald-600 dark:text-emerald-400',
+                    status === 'overdue' && !todo.completed && 'text-red-600 dark:text-red-400',
                   )}
                 >
                   {todo.completed

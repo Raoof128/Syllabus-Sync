@@ -3,7 +3,6 @@
 import { useMemo, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -96,12 +95,14 @@ export default function ItemActionButtons({
   }, [building, room]);
 
   // Handle notify button click - open reminder modal
+  // Always stop propagation for bell to prevent parent dialog interference
   const handleNotifyClick = useCallback(
     (e: React.MouseEvent) => {
-      if (stopPropagation) e.stopPropagation();
+      e.stopPropagation();
+      e.preventDefault();
       setReminderModalOpen(true);
     },
-    [stopPropagation],
+    [],
   );
 
   // Click handlers that optionally stop propagation
@@ -146,20 +147,14 @@ export default function ItemActionButtons({
         <Link
           href={navigationUrl}
           onClick={handleNavLinkClick}
+          className={cn(baseButtonClass, 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400')}
           aria-label={t('navigateToBuildingAria', { building: building || '' }) as string}
           title={
             t('navigateTo' as TranslationKey, { location: building || '' }) ||
             `Navigate to ${building}`
           }
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(baseButtonClass, 'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-500')}
-            tabIndex={-1}
-          >
-            <Navigation className={iconSizeClass} aria-hidden="true" />
-          </Button>
+          <Navigation className={iconSizeClass} aria-hidden="true" />
         </Link>
       )}
 

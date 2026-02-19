@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Unit } from '@/lib/types';
 import { CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
-import { MapPin, Clock, Edit, Trash2 } from 'lucide-react';
+import { MapPin, Clock, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { CardSolid } from '@/features/home/components/HomeCard';
 import { formatScheduleTime } from '@/lib/utils/locale';
+import { getMQUnitByCode } from '@/data/mqUnits';
 
 interface UnitCardProps {
   unit: Unit;
@@ -29,6 +30,9 @@ const UnitCard = React.memo(
     isHighlighted = false,
   }: UnitCardProps) => {
     const { t, language } = useTypedTranslation();
+
+    // Look up MQ unit info for additional details
+    const mqUnitInfo = useMemo(() => getMQUnitByCode(unit.code), [unit.code]);
 
     const DAY_SHORT: { [key: string]: string } = {
       Monday: t('mon'),
@@ -211,6 +215,28 @@ const UnitCard = React.memo(
               ))}
             </div>
           </div>
+
+          {/* MQ Unit Info - School/Faculty and Handbook Link */}
+          {mqUnitInfo && (
+            <div className="flex items-center justify-between text-mq-xs text-mq-content-tertiary pt-2 border-t border-mq-border">
+              <span className="truncate flex-1" title={mqUnitInfo.school}>
+                {mqUnitInfo.school}
+              </span>
+              {mqUnitInfo.handbookUrl && (
+                <a
+                  href={mqUnitInfo.handbookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-mq-primary hover:underline ml-2 shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Open ${unit.code} in MQ Handbook`}
+                >
+                  <span className="hidden sm:inline">Handbook</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+          )}
 
           {/* Color indicator */}
           <div className="flex items-center gap-2 text-mq-xs text-mq-content-tertiary pt-2 border-t border-mq-border mt-auto">

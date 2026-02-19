@@ -137,7 +137,7 @@ export default function AssignmentsWidget({
                           }}
                           className={cn(
                             'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                            assignment.completed ? 'text-green-600' : '',
+                            assignment.completed && 'text-green-600 dark:text-green-400',
                           )}
                         >
                           {assignment.completed ? (

@@ -133,7 +133,7 @@ export default function ExamsWidget({
                           }}
                           className={cn(
                             'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                            exam.completed ? 'text-green-600' : '',
+                            exam.completed && 'text-green-600 dark:text-green-400',
                           )}
                         >
                           {exam.completed ? (

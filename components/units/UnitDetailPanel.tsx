@@ -20,7 +20,6 @@ import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
-import { Button } from '@/components/ui/mq/button';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 
 interface UnitDetailPanelProps {
@@ -124,12 +123,12 @@ export default function UnitDetailPanel({
             e.stopPropagation();
             toggleComplete(deadline.id);
           }}
-          className="flex-shrink-0"
+          className="shrink-0"
         >
           {deadline.completed ? (
-            <CheckCircle2 className="h-5 w-5" />
+            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
           ) : status === 'overdue' ? (
-            <AlertCircle className="h-5 w-5" />
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
           ) : (
             <Circle className="h-5 w-5 text-mq-content-secondary hover:text-mq-primary" />
           )}
@@ -144,8 +143,13 @@ export default function UnitDetailPanel({
             </h4>
             <Badge
               variant="neutral"
-              className="text-[10px] px-1.5 py-0"
-              style={{ backgroundColor: `${unit.color}20`, color: unit.color }}
+              className="text-[10px] px-1.5 py-0.5 border font-medium"
+              style={{
+                backgroundColor: `${unit.color}25`,
+                color: unit.color,
+                borderColor: `${unit.color}50`,
+                textShadow: 'none'
+              }}
             >
               {deadline.type}
             </Badge>
@@ -166,10 +170,10 @@ export default function UnitDetailPanel({
           variant="neutral"
           className={cn(
             'text-[10px]',
-            deadline.priority === 'Urgent' && 'bg-red-100 text-red-700',
-            deadline.priority === 'High' && 'bg-orange-100 text-orange-700',
-            deadline.priority === 'Medium' && 'bg-yellow-100 text-yellow-700',
-            deadline.priority === 'Low' && 'bg-green-100 text-green-700',
+            deadline.priority === 'Urgent' && 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+            deadline.priority === 'High' && 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+            deadline.priority === 'Medium' && 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+            deadline.priority === 'Low' && 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
           )}
         >
           {deadline.priority}
@@ -239,15 +243,12 @@ export default function UnitDetailPanel({
                 <MapPin className="h-3.5 w-3.5" />
                 Unit Location
               </div>
-              <Link href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-11 min-w-11"
-                  aria-label={`Navigate to ${unit.location.building} on campus map`}
-                >
-                  <Navigation className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                </Button>
+              <Link
+                href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
+                className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
+                aria-label={`Navigate to ${unit.location.building} on campus map`}
+              >
+                <Navigation className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
             <div className="flex items-center gap-3">
@@ -264,22 +265,22 @@ export default function UnitDetailPanel({
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 gap-3 py-3 sm:grid-cols-4">
-          <div className="text-center p-2 rounded-lg bg-mq-background-secondary">
+          <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold" style={{ color: unit.color }}>
               {stats.total}
             </div>
             <div className="text-xs text-mq-content-secondary">{t('totalLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.completed}</div>
             <div className="text-xs text-mq-content-secondary">{t('completed')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-blue-600">{stats.upcoming}</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.upcoming}</div>
             <div className="text-xs text-mq-content-secondary">{t('upcomingLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.overdue}</div>
             <div className="text-xs text-mq-content-secondary">{t('overdueLabel')}</div>
           </div>
         </div>

@@ -143,6 +143,17 @@ export default function ReminderModal({
       // Disable/remove reminder
       removeReminder(existingReminderId);
       setExistingReminderId(null);
+
+      // Create a notification to show the reminder was removed
+      addNotification({
+        title: t('reminderRemoved' as any) || 'Reminder Removed',
+        message: `Reminder for "${itemTitle}" has been removed`,
+        type: 'system',
+        read: false,
+        link: undefined,
+        relatedId: itemId,
+      });
+
       toastUtils.success(t('success'), t('reminderRemoved' as any) || 'Reminder removed');
     }
 

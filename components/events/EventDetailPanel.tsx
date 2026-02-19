@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { Button } from '@/components/ui/mq/button';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
@@ -217,15 +216,12 @@ export default function EventDetailPanel({
                   <MapPin className="h-3.5 w-3.5" />
                   Event Location
                 </div>
-                <Link href={`/map?building=${event.building.toLowerCase()}&autonav=true`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-11 min-w-11"
-                    aria-label={`Navigate to ${event.building} on campus map`}
-                  >
-                    <Navigation className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
-                  </Button>
+                <Link
+                  href={`/map?building=${event.building.toLowerCase()}&autonav=true`}
+                  className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
+                  aria-label={`Navigate to ${event.building} on campus map`}
+                >
+                  <Navigation className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </div>
               <div className="flex items-center gap-3 mt-2">

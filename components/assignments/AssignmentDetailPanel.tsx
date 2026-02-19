@@ -20,7 +20,6 @@ import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { Button } from '@/components/ui/mq/button';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
@@ -135,17 +134,17 @@ export default function AssignmentDetailPanel({
                 aria-label={assignment.completed ? t('markIncomplete') : t('markAsCompleted')}
               >
                 {assignment.completed ? (
-                  <CheckCircle2 className="h-6 w-6" />
+                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                 ) : status === 'overdue' ? (
-                  <AlertCircle className="h-6 w-6" />
+                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 ) : (
                   <Circle className="h-6 w-6 text-mq-content-secondary" />
                 )}
                 <span
                   className={cn(
                     'text-sm font-medium',
-                    assignment.completed && 'text-green-600',
-                    status === 'overdue' && !assignment.completed && 'text-red-600',
+                    assignment.completed && 'text-green-600 dark:text-green-400',
+                    status === 'overdue' && !assignment.completed && 'text-red-600 dark:text-red-400',
                   )}
                 >
                   {assignment.completed
@@ -251,21 +250,13 @@ export default function AssignmentDetailPanel({
                   <Link
                     href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
                     onClick={(e) => e.stopPropagation()}
+                    className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
+                    aria-label={
+                      t('navigateToBuildingAria', { building: unit.location.building }) ||
+                      `Navigate to ${unit.location.building} on campus map`
+                    }
                   >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="p-1 inline-flex items-center justify-center hover:bg-mq-hover-background rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-[44px] min-w-[44px]"
-                      aria-label={
-                        t('navigateToBuildingAria', { building: unit.location.building }) ||
-                        `Navigate to ${unit.location.building} on campus map`
-                      }
-                    >
-                      <Navigation
-                        className="h-4 w-4 text-mq-content-secondary"
-                        aria-hidden="true"
-                      />
-                    </Button>
+                    <Navigation className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 )}
               </div>

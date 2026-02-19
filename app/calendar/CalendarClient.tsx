@@ -1101,7 +1101,8 @@ export default function CalendarClient() {
                       required
                     />
                   </div>
-                  <div className="flex items-center gap-2 w-full sm:w-32">
+                  <div className="flex items-center gap-2 w-full sm:w-36">
+                    <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
                     <input
                       type="time"
                       value={editTodoDueTime}

@@ -878,7 +878,7 @@
   "buildingLabel": "Building",
   "roomLabel": "Room",
   "classTimesLabel": "Class Times",
-  "unitCodeHelp": "Use the official unit code (letters + numbers).",
+  "unitCodeHelp": "Search for an MQ unit or enter a custom code.",
   "invalidUnitCodeFormat": "Invalid format. Must be 2-6 letters followed by 0-4 numbers (e.g. COMP1000).",
   "buildingHelp": "Use the campus building code from the map list.",
   "titleHelp": "Keep titles short for calendar readability.",
@@ -890,6 +890,12 @@
   "roomPlaceholder": "e.g., 204",
   "titlePlaceholder": "e.g., Assignment 1",
   "addClassTime": "Add Class Time",
+  "searchMQUnit": "Search MQ units by code or name...",
+  "noUnitsFound": "No units found matching your search",
+  "typeToSearchUnits": "Type to search MQ units...",
+  "customUnit": "Custom",
+  "customUnitHint": "Can't find your unit? The code and name will be entered manually.",
+  "noName": "No name",
   "dueTime": "Due Time",
   "markAsCompleted": "Mark as completed",
   "deleteDeadlineConfirm": "Delete Deadline",
@@ -1866,5 +1872,8 @@
   "class": "Class",
   "exam": "Exam",
   "todo": "To-Do",
-  "savingChanges": "Saving..."
+  "savingChanges": "Saving...",
+  "classSchedule": "Class Schedule",
+  "assignment": "Assignment",
+  "event": "Event"
 }

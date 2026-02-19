@@ -32,6 +32,7 @@ import {
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
+import UnitAutocomplete from '@/components/ui/UnitAutocomplete';
 
 interface UnitFormProps {
   open: boolean;
@@ -273,52 +274,74 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         </DialogHeader>
 
         <div className="space-y-6 py-4 flex-1 overflow-y-auto min-h-0 pr-1">
-          {/* Unit Code */}
+          {/* MQ Unit Search - Combined Code and Name */}
           <div className="space-y-2">
-            <Label htmlFor="code">
-              {t('unitCodeLabel')} <span className="text-mq-error">*</span>
+            <Label>
+              {t('unitCodeLabel')} & {t('unitNameLabel')} <span className="text-mq-error">*</span>
             </Label>
-            <Input
-              id="code"
-              placeholder={t('unitCodePlaceholder')}
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              aria-describedby={codeDescribedBy}
-              aria-invalid={Boolean(errors.code)}
-              aria-required="true"
-              className={errors.code ? 'border-mq-error' : ''}
+            <UnitAutocomplete
+              codeValue={code}
+              nameValue={name}
+              onSelect={(selectedCode, selectedName) => {
+                setCode(selectedCode);
+                setName(selectedName);
+              }}
+              error={errors.code || errors.name}
+              required
+              allowCustom
             />
             <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
               {t('unitCodeHelp')}
             </p>
-            {errors.code && (
-              <p id="unit-code-error" className="text-sm text-mq-error">
-                {errors.code}
-              </p>
-            )}
           </div>
 
-          {/* Unit Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              {t('unitNameLabel')} <span className="text-mq-error">*</span>
-            </Label>
-            <Input
-              id="name"
-              placeholder={t('unitNamePlaceholder')}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              aria-required="true"
-              aria-invalid={Boolean(errors.name)}
-              aria-describedby={errors.name ? 'unit-name-error' : undefined}
-              className={errors.name ? 'border-mq-error' : ''}
-            />
-            {errors.name && (
-              <p id="unit-name-error" className="text-sm text-mq-error" role="alert">
-                {errors.name}
-              </p>
-            )}
-          </div>
+          {/* Manual Unit Code Input (shown when custom entry needed) */}
+          {!code && (
+            <div className="space-y-2">
+              <Label htmlFor="code">
+                {t('unitCodeLabel')} <span className="text-mq-error">*</span>
+              </Label>
+              <Input
+                id="code"
+                placeholder={t('unitCodePlaceholder')}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                aria-describedby={codeDescribedBy}
+                aria-invalid={Boolean(errors.code)}
+                aria-required="true"
+                className={errors.code ? 'border-mq-error' : ''}
+              />
+              {errors.code && (
+                <p id="unit-code-error" className="text-sm text-mq-error">
+                  {errors.code}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Manual Unit Name Input (shown when custom entry needed) */}
+          {!name && code && (
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                {t('unitNameLabel')} <span className="text-mq-error">*</span>
+              </Label>
+              <Input
+                id="name"
+                placeholder={t('unitNamePlaceholder')}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                aria-required="true"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? 'unit-name-error' : undefined}
+                className={errors.name ? 'border-mq-error' : ''}
+              />
+              {errors.name && (
+                <p id="unit-name-error" className="text-sm text-mq-error" role="alert">
+                  {errors.name}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Location (Building and optional Room) */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
