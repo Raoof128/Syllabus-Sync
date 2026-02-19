@@ -28,7 +28,7 @@ export function GoogleMapEmbed({ selectedBuilding, destinationLabel }: GoogleMap
   const resolvedDestinationLabel = destinationLabel || UNIVERSITY_CONFIG.name;
 
   return (
-    <div className="relative flex h-full min-h-[520px] flex-col overflow-hidden rounded-xl border border-mq-border">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-mq-card-background">
       <div className="flex shrink-0 items-center justify-between border-b border-mq-border bg-mq-card-background px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-mq-content">{resolvedDestinationLabel}</span>
@@ -70,7 +70,7 @@ export function GoogleMapEmbed({ selectedBuilding, destinationLabel }: GoogleMap
             ? EMBED_VIEW_URL.replace(MQ_QUERY, destinationQuery)
             : EMBED_DIRECTIONS_URL.replace(MQ_QUERY, destinationQuery)
         }
-        className="min-h-[460px] w-full flex-1 border-0"
+        className="h-full w-full flex-1 border-0"
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
         aria-label={mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')}

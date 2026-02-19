@@ -513,26 +513,28 @@ export default function MapClient() {
                 </div>
               </MagicCard>
             </div>
+          </>
+        )}
 
-            {/* Map */}
-            <MagicCard isLiquidEnhanced className="mb-6">
-              <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-                <Card className="border border-mq-border bg-mq-card-background">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="min-w-0 break-words">
-                        {t('interactiveCampusMap')}
-                      </CardTitle>
-                      <p className="text-xs text-mq-content-tertiary hidden md:block">
-                        {t('mapPanZoomHint')}
-                      </p>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div
-                      ref={mapContainerRef}
-                      className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border"
-                    >
+        {/* Combined Map Wrapper */}
+        <MagicCard isLiquidEnhanced className="mb-6">
+          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
+            <Card className="border border-mq-border bg-mq-card-background">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="min-w-0 break-words">{t('interactiveCampusMap')}</CardTitle>
+                  <p className="text-xs text-mq-content-tertiary hidden md:block">
+                    {t('mapPanZoomHint')}
+                  </p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div
+                  ref={mapContainerRef}
+                  className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border bg-mq-background-secondary"
+                >
+                  {mapView === 'campus' ? (
+                    <>
                       {/* Real Map (with smooth fade-in when ready) */}
                       <div
                         className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
@@ -572,43 +574,40 @@ export default function MapClient() {
                           </p>
                         </div>
                       )}
-
-                      {/* HUD overlays - loaded immediately, sits on top */}
-                      <CampusMapHUD
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 z-[50]">
+                      <GoogleMapEmbed
                         selectedBuilding={selectedBuilding}
-                        buildings={sidebarBuildings}
-                        buildingSearch={buildingSearch}
-                        setBuildingSearch={setBuildingSearch}
-                        onCopyShare={copyShareableURL}
-                        onExport={handleExport}
-                        onStartNavigation={() => campusMapRef.current?.startNavigation()}
+                        destinationLabel={
+                          selectedBuilding
+                            ? t(selectedBuilding.translationKey)
+                            : UNIVERSITY_CONFIG.name
+                        }
                       />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </MagicCard>
-          </>
-        )}
+                  )}
 
-        {mapView === 'google' && (
-          <div className="relative mb-6">
-            <GoogleMapEmbed
-              selectedBuilding={selectedBuilding}
-              destinationLabel={
-                selectedBuilding ? t(selectedBuilding.translationKey) : UNIVERSITY_CONFIG.name
-              }
-            />
-            <CampusMapHUD
-              selectedBuilding={selectedBuilding}
-              buildings={sidebarBuildings}
-              buildingSearch={buildingSearch}
-              setBuildingSearch={setBuildingSearch}
-              onCopyShare={copyShareableURL}
-              onExport={handleExport}
-            />
+                  {/* HUD overlays - loaded immediately, sits on top */}
+                  <CampusMapHUD
+                    selectedBuilding={selectedBuilding}
+                    buildings={sidebarBuildings}
+                    buildingSearch={buildingSearch}
+                    setBuildingSearch={setBuildingSearch}
+                    onCopyShare={copyShareableURL}
+                    onExport={mapView === 'campus' ? handleExport : undefined}
+                    onStartNavigation={
+                      mapView === 'campus'
+                        ? () => campusMapRef.current?.startNavigation()
+                        : undefined
+                    }
+                    isGoogleMode={mapView === 'google'}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        )}
+        </MagicCard>
       </section>
     </LazyMotion>
   );

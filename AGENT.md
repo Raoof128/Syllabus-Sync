@@ -1,4 +1,12 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Google Map Exact Visual/Size Parity
+Summary: Audited Google View logic and aligned it 1:1 with Campus View responsive layout wrappers to fix visual sizing divergence and HUD interaction overlap bugs. (1) Wrapped GoogleMapEmbed inside the exact same MagicCard layer container logic as Campus map view constraints. (2) Removed hardcoded min-height constraints from GoogleMapEmbed itself. (3) Added `isGoogleMode` awareness into CampusMapHUD to shift the user interface components (Search, Share export toolbars) cleanly down and safely out of clipping bounds with the inline internal Google destination switcher toolbar (`Directions ↔ Back to Map`).
+Files: Modified `features/map/components/MapClient.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`.
+Verification: `npm run check` pipeline (formatter, typecheck, lint, test) entirely passed. All 488 integrated suite assertions succeeded smoothly under `test`.
+Deployment: N/A locally queued.
+Follow-ups: Container and component dimensions are 1:1 parity safe across responsive constraints with zero functional overlays clipping interactions.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Google View Building List/Selection Parity with Campus Map
 Summary: Implemented building-list parity for Google map view. (1) Reused `CampusMapHUD` in Google mode so search/list/select logic is available there too. (2) Updated `GoogleMapEmbed` to accept selected building destination and dynamically target selected building GPS coordinates in both explore and directions embed URLs. (3) Preserved `view=google` during building selection links so selecting a building does not switch back to campus view. (4) Removed no-op primary navigation button in selected-building card when on-campus navigation callback is unavailable (Google mode). (5) Added regression test covering selected-building coordinate destination in Google embed.
 Files: Modified `features/map/components/MapClient.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`, `tests/map/GoogleMapEmbed.test.tsx`.

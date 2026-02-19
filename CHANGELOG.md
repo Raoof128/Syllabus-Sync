@@ -1,3 +1,18 @@
+### Raouf: Google Map Exact Visual/Size Parity — 2026-02-19
+
+**Scope:** Google Map Parity
+**Type:** Map / UX / Layout Parity
+
+#### Changes
+
+1. **Unified Responsive Container Sizing**
+   - Modified **`features/map/components/MapClient.tsx`** to migrate conditionally split maps into a single unified `MagicCard`/`Card` structural wrapper so switching map views retains exactly identical layout, styling, and headers.
+   - Removed implicit and hardcoded borders (`min-h-[520px]`, `rounded-xl`, `border`) in **`features/map/components/GoogleMapEmbed.tsx`** to allow it to dynamically stretch and conform seamlessly to the unified CampusMap's responsive container (`clamp()` sizings).
+
+2. **Google Mode Navigation HUD Deconflict**
+   - Modified **`features/map/components/CampusMapHUD.tsx`** to accept an `isGoogleMode` awareness tracking prop.
+   - Shifted all absolute positioned top floating controls (Places button, Search Input, Share/Export actions) down from `top-3` to `top-14` when loaded exactly inside the Google mode iframe to preserve and unhide the embedded Google "Directions Navigation" top header bar.
+
 ### Raouf: Google View Building List + Selected Destination Sync — 2026-02-19
 
 **Scope:** Make Google map view support the same building search/select behavior as campus view.

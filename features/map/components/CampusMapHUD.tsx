@@ -29,6 +29,7 @@ type Props = {
   onCopyShare: () => void;
   onExport?: () => void;
   onStartNavigation?: () => void;
+  isGoogleMode?: boolean;
 };
 
 import { LayeredCard } from './LayeredCard';
@@ -41,6 +42,7 @@ export default function CampusMapHUD({
   onCopyShare,
   onExport,
   onStartNavigation,
+  isGoogleMode,
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -98,7 +100,12 @@ export default function CampusMapHUD({
     <div className="absolute inset-0 z-[1100] pointer-events-none">
       {/* Mobile quick access button for building search/panel */}
       {!isPlacesPanelExpanded && (
-        <div className="absolute top-3 left-3 pointer-events-auto sm:hidden">
+        <div
+          className={cn(
+            'absolute left-3 pointer-events-auto sm:hidden',
+            isGoogleMode ? 'top-14' : 'top-3',
+          )}
+        >
           <Button
             variant="secondary"
             size="sm"
@@ -117,7 +124,9 @@ export default function CampusMapHUD({
       )}
 
       {/* Top-right actions - Floating Toolbar */}
-      <div className="absolute top-3 right-3 pointer-events-auto">
+      <div
+        className={cn('absolute right-3 pointer-events-auto', isGoogleMode ? 'top-14' : 'top-3')}
+      >
         <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
           <Button
             variant="ghost"
@@ -147,7 +156,8 @@ export default function CampusMapHUD({
       {/* Left sidebar */}
       <div
         className={cn(
-          'absolute top-3 left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]',
+          'absolute left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]',
+          isGoogleMode ? 'top-14' : 'top-3',
           !isPlacesPanelExpanded && 'hidden sm:flex',
         )}
       >
