@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Bell, BellOff, Mail, Calendar, Info, AlertTriangle } from 'lucide-react';
@@ -11,19 +11,14 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { REMINDER_TIMING_OPTIONS } from '../constants';
 import { ToggleControl } from './ToggleControl';
 import { NotificationRow } from './NotificationRow';
+import { useHydration } from '@/lib/hooks/useHydration';
 
 type NotificationSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-// Helper for detecting client-side rendering without setState in effect
-const emptySubscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
-
 const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
-  // Use useSyncExternalStore to detect client without setState in effect
-  const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+  const isClient = useHydration();
 
   // Use individual selectors to prevent infinite re-renders
   const permissionStatus = useNotificationPreferencesStore((state) => state.permissionStatus);

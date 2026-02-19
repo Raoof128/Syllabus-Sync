@@ -23,16 +23,9 @@
 // ============================================================================
 'use client';
 
-import { memo, useSyncExternalStore, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
-
-// ============================================================================
-// CLIENT-SIDE DETECTION
-// ============================================================================
-
-const emptySubscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
+import { useHydration } from '@/lib/hooks/useHydration';
 
 // ============================================================================
 // BLOB CONFIGURATIONS
@@ -300,7 +293,7 @@ const MovingMeshBackground = memo(
     const prefersReducedMotion = useReducedMotion();
 
     // Client-side detection to prevent hydration mismatch
-    const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+    const isClient = useHydration();
 
     // Dark mode detection for blend mode switching
     const [isDarkMode, setIsDarkMode] = useState(false);

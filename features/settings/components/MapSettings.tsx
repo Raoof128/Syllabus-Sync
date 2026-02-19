@@ -7,34 +7,11 @@ import { useMapStore } from '@/lib/store/mapStore';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { ToggleControl } from './ToggleControl';
 
 type MapSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
-
-type ToggleControlProps = {
-  checked: boolean;
-  onToggle: () => void;
-  label: string;
-  testId?: string;
-};
-
-const ToggleControl = ({ checked, onToggle, label, testId }: ToggleControlProps) => (
-  <button
-    type="button"
-    role="switch"
-    aria-checked={checked}
-    aria-label={label}
-    onClick={onToggle}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mq-primary ${checked ? 'bg-mq-primary border-mq-primary' : 'bg-mq-background border-mq-border'}`}
-    data-testid={testId}
-  >
-    <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${checked ? 'translate-x-6' : 'translate-x-1'}`}
-      aria-hidden="true"
-    />
-  </button>
-);
 
 const MapSettings = memo(({ t }: MapSettingsProps) => {
   const { hapticFeedbackEnabled, toggleHapticFeedback } = useMapStore();

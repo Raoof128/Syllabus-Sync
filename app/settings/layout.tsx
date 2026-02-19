@@ -1,8 +1,8 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useHydration } from '@/lib/hooks/useHydration';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { SettingsSectionBoundary } from '@/features/settings/components/SettingsSectionBoundary';
 import { cn } from '@/lib/utils';
@@ -11,13 +11,6 @@ import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 import { SettingsSkeleton } from '@/features/settings/components';
-
-const useIsClient = () =>
-  useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
 
 const SECTIONS: {
   id: string;
@@ -66,7 +59,7 @@ const SECTIONS: {
 export const SETTINGS_SECTION_PATHS = SECTIONS.map((section) => section.path);
 
 function SettingsLayout({ children }: { children?: React.ReactNode }) {
-  const isClient = useIsClient();
+  const isClient = useHydration();
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useTypedTranslation();

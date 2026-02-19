@@ -1,21 +1,18 @@
 // lib/hooks/useHydration.ts
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 /**
  * Hook to track client-side hydration status.
  * Returns true once the component has mounted on the client.
- * Useful for avoiding hydration mismatches with localStorage-based stores.
+ * Uses useSyncExternalStore so it is safe in concurrent mode and never
+ * triggers the react-hooks/set-state-in-effect lint rule.
  */
 export function useHydration(): boolean {
-  const [hydrated, setHydrated] = useState(false);
-
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  return hydrated;
+  return useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 }

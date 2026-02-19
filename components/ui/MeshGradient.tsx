@@ -17,13 +17,9 @@
 // ============================================================================
 'use client';
 
-import { memo, useSyncExternalStore } from 'react';
+import { memo } from 'react';
 import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
-
-// Helper for detecting client-side rendering without setState in effect
-const emptySubscribe = () => () => {};
-const getClientSnapshot = () => true;
-const getServerSnapshot = () => false;
+import { useHydration } from '@/lib/hooks/useHydration';
 
 /**
  * MeshGradient Component
@@ -39,8 +35,7 @@ const getServerSnapshot = () => false;
  */
 const MeshGradient = memo(() => {
   const prefersReducedMotion = useReducedMotion();
-  // Use useSyncExternalStore to detect client without setState in effect
-  const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
+  const isClient = useHydration();
 
   // Static fallback for SSR and reduced motion preference
   if (!isClient || prefersReducedMotion) {
