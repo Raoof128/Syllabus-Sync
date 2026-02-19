@@ -73,7 +73,7 @@ export async function proxy(request: NextRequest) {
 
   const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
-  const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify'];
+  const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify', '/onboarding'];
 
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));

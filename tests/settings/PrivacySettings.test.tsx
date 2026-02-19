@@ -261,8 +261,8 @@ describe('PrivacySettings', () => {
     expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
   });
 
-  // Password dialog tests
-  it('opens password dialog when change password button is clicked', () => {
+  // Password navigation test (dialog was removed; button now navigates to /reset-password)
+  it('navigates to /reset-password when change password button is clicked', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -272,129 +272,7 @@ describe('PrivacySettings', () => {
 
     fireEvent.click(screen.getByTestId('change-password-button'));
 
-    expect(screen.getByTestId('password-dialog')).toBeInTheDocument();
-    expect(screen.getByTestId('current-password-input')).toBeInTheDocument();
-    expect(screen.getByTestId('new-password-input')).toBeInTheDocument();
-    expect(screen.getByTestId('confirm-password-input')).toBeInTheDocument();
-  });
-
-  it('toggles current password visibility', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    const input = screen.getByTestId('current-password-input');
-    expect(input).toHaveAttribute('type', 'password');
-
-    fireEvent.click(screen.getByTestId('toggle-current-password'));
-    expect(input).toHaveAttribute('type', 'text');
-
-    fireEvent.click(screen.getByTestId('toggle-current-password'));
-    expect(input).toHaveAttribute('type', 'password');
-  });
-
-  it('shows password strength indicator when typing new password', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    const newPasswordInput = screen.getByTestId('new-password-input');
-    fireEvent.change(newPasswordInput, { target: { value: 'test' } });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('password-strength')).toBeInTheDocument();
-      expect(screen.getByText('Weak')).toBeInTheDocument();
-    });
-  });
-
-  it('shows strong password indicator for complex passwords', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    const newPasswordInput = screen.getByTestId('new-password-input');
-    fireEvent.change(newPasswordInput, { target: { value: 'MyStr0ng!Pass' } });
-
-    expect(screen.getByText('Strong')).toBeInTheDocument();
-  });
-
-  it('shows password mismatch error', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    fireEvent.change(screen.getByTestId('new-password-input'), {
-      target: { value: 'password123' },
-    });
-    fireEvent.change(screen.getByTestId('confirm-password-input'), {
-      target: { value: 'different123' },
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
-    });
-  });
-
-  it('calls API when password form is submitted', async () => {
-    // First call for MFA status, then password change
-    mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, data: { factors: [] } }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    fireEvent.change(screen.getByTestId('current-password-input'), {
-      target: { value: 'currentPassword' },
-    });
-    fireEvent.change(screen.getByTestId('new-password-input'), {
-      target: { value: 'newPassword123!' },
-    });
-    fireEvent.change(screen.getByTestId('confirm-password-input'), {
-      target: { value: 'newPassword123!' },
-    });
-
-    fireEvent.click(screen.getByTestId('submit-password-change'));
-
-    await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/auth/password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword: 'currentPassword',
-          newPassword: 'newPassword123!',
-        }),
-      });
-    });
+    expect(mockRouterPush).toHaveBeenCalledWith('/reset-password');
   });
 
   // Sessions dialog tests

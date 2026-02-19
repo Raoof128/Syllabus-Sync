@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Shield, Loader2, MessageSquare } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { ChangePasswordDialog } from './privacy/ChangePasswordDialog';
 import { SessionsList } from './privacy/SessionsList';
 import { DataManagement } from './privacy/DataManagement';
 import { BiometricToggle } from './security/BiometricToggle';
@@ -24,7 +23,6 @@ type PrivacySettingsProps = {
 
 const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
   const router = useRouter();
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showSessionsDialog, setShowSessionsDialog] = useState(false);
   const [factors, setFactors] = useState<MFAFactor[]>([]);
   const [isLoadingMFA, setIsLoadingMFA] = useState(true);
@@ -75,7 +73,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   variant="ghost"
                   size="sm"
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => setShowPasswordDialog(true)}
+                  onClick={() => router.push('/reset-password')}
                   data-testid="change-password-button"
                 >
                   {t('changePassword')}
@@ -170,7 +168,6 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
         </Card>
       </MagicCard>
 
-      <ChangePasswordDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog} t={t} />
       <SessionsList open={showSessionsDialog} onOpenChange={setShowSessionsDialog} t={t} />
     </>
   );

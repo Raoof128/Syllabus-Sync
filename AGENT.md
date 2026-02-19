@@ -1,4 +1,11 @@
 Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Auth Flow Wiring + Security Card Cleanup + Test Fix
+Summary: (1) client-layout.tsx: added POST_AUTH_ROUTES=['/onboarding'] — renders no sidebar/header but never redirects authenticated users away. Updated initial isAuthenticated state, checkAuth, render condition, and useCallback dep array. (2) lib/proxy.ts: added /onboarding to publicRoutes. (3) lib/utils/security.ts: added /onboarding to SAFE_REDIRECT_PATHS. (4) PrivacySettings.tsx: removed ChangePasswordDialog entirely; change-password button now calls router.push('/reset-password'). (5) settings/security/page.tsx: removed extra SecuritySettings card, kept only PrivacySettings. (6) tests/settings/PrivacySettings.test.tsx: replaced 6 failing dialog-specific tests with single test asserting router.push('/reset-password') called on button click.
+Files: Modified `app/client-layout.tsx`, `lib/proxy.ts`, `lib/utils/security.ts`, `features/settings/components/PrivacySettings.tsx`, `app/settings/security/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.
+Verification: `npm run check` ✅ (64 test files, 478 tests), `npm run vercel:deploy:prod` ✅.
+Follow-ups: supabase db push avatars migration to production.
+
+Raouf: 2026-02-19 (Australia/Sydney)
 Scope: Sync Signup ↔ Manage Profile — Course Combobox + Year Values
 Summary: Fixed two critical mismatches between signup and manage-profile. (1) AcademicInfoCard.tsx: replaced plain <Input> for course with CourseCombobox (same 177-course MQ catalog used on signup), wrapped via Controller. Replaced static ACADEMIC_YEARS ("1st Year", "2nd Year"…"PhD") with dynamic year range (Year 1..N based on selected course, values "1", "2", etc.) matching signup exactly. (2) useProfileManager.ts: added YEAR_LEGACY_MAP + normalizeYear() to convert old-format year values ("1st Year" → "1", "2nd Year" → "2" etc.) applied in all three form.reset() call sites. Existing users with old year values now see them correctly mapped; new signup users see their chosen course + year immediately in manage-profile.
 Files: Modified `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`.

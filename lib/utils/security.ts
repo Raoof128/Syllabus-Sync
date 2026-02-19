@@ -13,6 +13,7 @@ export const SAFE_REDIRECT_PATHS = [
   '/manage-profiles',
   '/settings',
   '/setup',
+  '/onboarding',
 ] as const;
 
 export function isValidRedirect(url: string | null): boolean {

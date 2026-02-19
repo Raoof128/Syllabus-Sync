@@ -1,3 +1,29 @@
+### Raouf: Auth Flow Wiring + Security Card Cleanup + Test Fix — 2026-02-19
+
+**Scope:** Complete auth flow for /onboarding post-auth route; clean up settings/security page; fix test suite.
+**Type:** Auth / Routing / Bug Fix
+
+#### Changes
+
+1. **`app/client-layout.tsx`**: Added `POST_AUTH_ROUTES = ['/onboarding']` — renders without sidebar/header but never redirects away authenticated users. Updated initial `isAuthenticated` state and `checkAuth` to skip post-auth routes. Added to render condition and `useCallback` dep array.
+
+2. **`lib/proxy.ts`**: Added `/onboarding` to `publicRoutes` so the proxy never redirects users away from onboarding.
+
+3. **`lib/utils/security.ts`**: Added `/onboarding` to `SAFE_REDIRECT_PATHS` whitelist.
+
+4. **`features/settings/components/PrivacySettings.tsx`**: Removed `ChangePasswordDialog` and its state. Change Password button now calls `router.push('/reset-password')` — sends users to the dedicated reset-password page.
+
+5. **`app/settings/security/page.tsx`**: Removed extra `SecuritySettings` card (duplicate). Page now renders only `PrivacySettings`.
+
+6. **`tests/settings/PrivacySettings.test.tsx`**: Updated 6 dialog-specific tests to match new behavior — single test asserts `router.push('/reset-password')` is called on button click.
+
+#### Verification
+
+- `npm run check` ✅ (64 test files, 478 tests passing)
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+
+---
+
 ### Raouf: Sync Signup ↔ Manage Profile — Course Combobox + Year Values — 2026-02-19
 
 **Scope:** Fix two critical data-sync mismatches between signup and manage-profile.
@@ -2499,3 +2525,9 @@ Summary: (1) Header avatar broken: added `unoptimized` prop and `onError` / `ava
 Files: Modified `components/layout/Header.tsx`, `data/mqUnitsData.ts`, `data/mqUnits.ts`, `components/ui/ReminderModal.tsx`, `components/ui/UnitAutocomplete.tsx`, `components/assignments/AssignmentDetailPanel.tsx`, `components/units/UnitDetailPanel.tsx`, `features/calendar/components/ItemActionButtons.tsx`, `tests/setup.ts`, `tools/convert-mq-units.js`.
 Verification: `npm run typecheck` ✅ (0 errors), `npm run lint` ✅ (0 errors, 0 warnings), `npm run test:ci` ✅ (483/483 pass), `npm run build` ✅ (all 23 routes).
 Follow-ups: Run `supabase db push` to apply avatars bucket migration. Consider adding `scrollIntoView` polyfill to a shared test utility rather than setup.ts if more components need it.
+
+Raouf: 2026-02-19 (Australia/Sydney)
+Scope: Settings Audit + Duplicate Function Elimination
+Summary: Full audit of all 7 settings pages — all imports valid, no broken functionality, error boundaries in place. Found and eliminated two classes of duplication: (1) `ToggleControl` component was identically redefined in `MapSettings.tsx` as a local component instead of being imported from the canonical `ToggleControl.tsx` — removed the duplicate, added import. (2) The `useSyncExternalStore` client-detection pattern (`emptySubscribe / getClientSnapshot / getServerSnapshot`) was copy-pasted into 4 separate files (`settings/layout.tsx`, `MeshGradient.tsx`, `MovingMeshBackground.tsx`, `NotificationSettings.tsx`) and also existed as a flawed `useState+useEffect` version in `useHydration.ts`. Rewrote `useHydration.ts` to use `useSyncExternalStore` (concurrent-safe, no set-state-in-effect hack), then replaced all 4 inline patterns with a simple `useHydration()` call.
+Files: Modified `lib/hooks/useHydration.ts`, `features/settings/components/NotificationSettings.tsx`, `features/settings/components/MapSettings.tsx`, `components/ui/MeshGradient.tsx`, `components/ui/MovingMeshBackground.tsx`, `app/settings/layout.tsx`.
+Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm run test:ci` ✅ (483/483), `npm run build` ✅.
