@@ -295,54 +295,6 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
             </p>
           </div>
 
-          {/* Manual Unit Code Input (shown when custom entry needed) */}
-          {!code && (
-            <div className="space-y-2">
-              <Label htmlFor="code">
-                {t('unitCodeLabel')} <span className="text-mq-error">*</span>
-              </Label>
-              <Input
-                id="code"
-                placeholder={t('unitCodePlaceholder')}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                aria-describedby={codeDescribedBy}
-                aria-invalid={Boolean(errors.code)}
-                aria-required="true"
-                className={errors.code ? 'border-mq-error' : ''}
-              />
-              {errors.code && (
-                <p id="unit-code-error" className="text-sm text-mq-error">
-                  {errors.code}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Manual Unit Name Input (shown when custom entry needed) */}
-          {!name && code && (
-            <div className="space-y-2">
-              <Label htmlFor="name">
-                {t('unitNameLabel')} <span className="text-mq-error">*</span>
-              </Label>
-              <Input
-                id="name"
-                placeholder={t('unitNamePlaceholder')}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                aria-required="true"
-                aria-invalid={Boolean(errors.name)}
-                aria-describedby={errors.name ? 'unit-name-error' : undefined}
-                className={errors.name ? 'border-mq-error' : ''}
-              />
-              {errors.name && (
-                <p id="unit-name-error" className="text-sm text-mq-error" role="alert">
-                  {errors.name}
-                </p>
-              )}
-            </div>
-          )}
-
           {/* Location (Building and optional Room) */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">

@@ -1,3 +1,23 @@
+### Raouf: Weather Logic Upgrade & UX Simplification — 2026-02-20
+
+**Scope:** Map / Weather widget & Unit selection logic.
+**Type:** Feature / Bug Fix
+
+#### Changes
+
+1. **Weather Widget Open-Meteo Logic Upgrade:**
+   - Modified `app/api/weather/route.ts` to utilize the `models=best_match` Open-Meteo param, routing automatically to the highest fidelity local weather model (such as BoM for Australia).
+   - Upgraded the query parameters to use the modern `current=temperature_2m,weather_code,is_day` standard, completely replacing the obsolete `current_weather=true` query. 
+   - Restructured the backend response dynamically mapping `current` back to `current_weather` object shape, ensuring backwards compatibility on the frontend widget and passing all tests without breaking the caching mechanism.
+2. **Simplified Unit Code Input:**
+   - Modified `components/units/UnitForm.tsx` to completely remove the legacy `<input id="code">` fallback manual input block. Extracted the manual component logic as `UnitAutocomplete` now governs standalone selection securely under its `allowCustom` capability.
+
+#### Verification
+- Web searches performed to ascertain Open-Meteo best model parameters.
+- Built without type errors and all automated tests passed consistently.
+- `npm run check` ✅ (Secrets, Format, Typecheck, Lint, Tests, Build).
+- Ready for `npm run dev` local testing and `vercel:deploy:prod`.
+
 ### Raouf: Academic Course Duration Integrity Fixes — 2026-02-20
 
 **Scope:** Academic Profile and Config Correctness.

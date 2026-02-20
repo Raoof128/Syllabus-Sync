@@ -74,13 +74,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch weather data from Open-Meteo API
+    // Fetch weather data from Open-Meteo API using best models
     const weatherUrl = new URL(`${OPENMETEO_BASE_URL}/forecast`);
     weatherUrl.searchParams.set('latitude', latitude.toString());
     weatherUrl.searchParams.set('longitude', longitude.toString());
-    weatherUrl.searchParams.set('current_weather', 'true');
-    weatherUrl.searchParams.set('hourly', 'temperature_2m');
-    weatherUrl.searchParams.set('timezone', 'auto');
+    weatherUrl.searchParams.set('current', 'temperature_2m,weather_code,is_day');
+    weatherUrl.searchParams.set('timezone', 'Australia/Sydney');
+    weatherUrl.searchParams.set('models', 'best_match'); // Automatically picks most accurate local model (e.g. BoM for Australia)
 
     const response = await fetch(weatherUrl.toString(), {
       headers: {
@@ -106,15 +106,13 @@ export async function GET(request: NextRequest) {
     const weatherData = await response.json();
 
     // SECURITY: Only return safe, sanitized data to the client
+    // We map Open-Meteo's new `current` object back to `current_weather` shape to maintain compatibility
     const sanitizedData = {
       current_weather: {
-        temperature: weatherData.current_weather?.temperature,
-        weathercode: weatherData.current_weather?.weathercode,
-        is_day: weatherData.current_weather?.is_day,
-      },
-      hourly: {
-        time: weatherData.hourly?.time,
-        temperature_2m: weatherData.hourly?.temperature_2m,
+        temperature:
+          weatherData.current?.temperature_2m ?? weatherData.current_weather?.temperature,
+        weathercode: weatherData.current?.weather_code ?? weatherData.current_weather?.weathercode,
+        is_day: weatherData.current?.is_day ?? weatherData.current_weather?.is_day,
       },
       timezone: weatherData.timezone,
     };

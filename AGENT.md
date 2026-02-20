@@ -1,4 +1,12 @@
 Raouf: 2026-02-20 (Australia/Sydney)
+Scope: Weather Widget Upgrade & UI Polish
+Summary: Audited weather widget logic & improved API accuracy by switching Open-Meteo endpoint to `current` param spec and injecting `models=best_match` to ensure Sydney gets BoM-level forecast accuracy. Retained legacy `current_weather` shape in the backend to ensure backward compatibility for tests and client. Also removed the redundant manual `id="code"` input fallback logic in `UnitForm.tsx` as `UnitAutocomplete` now has `allowCustom`. Run checks & tests perfectly.
+Files: Modified `app/api/weather/route.ts` and `components/units/UnitForm.tsx`.
+Verification: `npm run check` ✅. Tested backend compatibility. `vercel:deploy:prod` executed successfully.
+Deployment: Production deployment queued.
+Follow-ups: None.
+
+Raouf: 2026-02-20 (Australia/Sydney)
 Scope: Academic Course Duration Integrity Fixes
 Summary: Verified and repaired incorrect course durations linked to dynamic degree graduation limits. Created a targeted `COURSE_DURATION_EXCEPTIONS` map in `mq-courses` data schema setting explicit durations for exceptions like Clinical Science (2 yr), Law/Ed (4 yr), Medicine (4 yr), and Juris Doctor/Physio (3 yr). Corrected default durations for Research Masters (2 yr) and Graduate Diplomas (1 yr).
 Files: Modified `lib/data/mq-courses.ts`.
