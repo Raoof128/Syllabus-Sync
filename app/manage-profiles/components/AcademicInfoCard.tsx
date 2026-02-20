@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { UseFormReturn, Controller } from 'react-hook-form';
 import { ProfileFormValues } from '../schema';
 import { Label } from '@/components/ui/label';
@@ -29,6 +29,7 @@ export function AcademicInfoCard({ form, disabled }: Props) {
   const {
     control,
     watch,
+    setValue,
     formState: { errors },
   } = form;
 
@@ -36,14 +37,25 @@ export function AcademicInfoCard({ form, disabled }: Props) {
   const watchedCourse = watch('course');
   const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
+  // Skip reset on initial hydration so we don't wipe loaded profile data
+  const isInitialMount = useRef(true);
+
   // Reset course & year when faculty changes
   useEffect(() => {
-    // Only reset if this wasn't the initial mount load
-    if (watchedFaculty) {
-      // Small caveat: in a real generic form, you might need a ref to skip the very first trigger
-      // where the data hydrates, but for this component, if user explicit changes it, we reset.
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  }, [watchedFaculty]);
+    setValue('course', '');
+    setValue('year', '');
+  }, [watchedFaculty, setValue]);
+
+  // Reset year when course changes
+  useEffect(() => {
+    if (!watchedCourse) {
+      setValue('year', '');
+    }
+  }, [watchedCourse, setValue]);
 
   return (
     <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">

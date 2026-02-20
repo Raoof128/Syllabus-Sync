@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CourseCombobox } from '@/app/signup/components/CourseCombobox';
 import { FacultySelect } from '@/app/signup/components/FacultySelect';
-import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
+import { getYearOptions } from '@/lib/data/mq-courses';
 import {
   Select,
   SelectContent,
@@ -68,21 +68,7 @@ export default function OnboardingClient() {
     setValue('year', '');
   }, [selectedCourse, setValue]);
 
-  const maxYear = useMemo(() => {
-    if (!selectedCourse) return 8;
-    const course = MQ_COURSES.find((c) => c.name === selectedCourse);
-    const label = course ? (DEGREE_TYPE_LABELS[course.type] ?? 'Other') : 'Other';
-    return DEGREE_MAX_YEARS[label] ?? 8;
-  }, [selectedCourse]);
-
-  const yearOptions = useMemo(
-    () =>
-      Array.from({ length: maxYear }, (_, i) => ({
-        value: String(i + 1),
-        label: t('yearNumber', { year: i + 1 }),
-      })),
-    [maxYear, t],
-  );
+  const yearOptions = selectedCourse ? getYearOptions(selectedCourse) : [];
 
   const onSubmit = async (data: FormData) => {
     setServerError('');
@@ -184,16 +170,24 @@ export default function OnboardingClient() {
                   name="year"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={!selectedCourse}
+                    >
                       <SelectTrigger
                         className={`h-12 rounded-xl ${errors.year ? 'border-red-500' : ''}`}
                       >
-                        <SelectValue placeholder={t('selectYearPlaceholder')} />
+                        <SelectValue
+                          placeholder={
+                            selectedCourse ? t('yearPlaceholder') : t('selectCourseFirst')
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {yearOptions.map((y) => (
-                          <SelectItem key={y.value} value={y.value}>
-                            {y.label}
+                          <SelectItem key={y} value={String(y)}>
+                            {t('yearNumber', { year: y })}
                           </SelectItem>
                         ))}
                       </SelectContent>
