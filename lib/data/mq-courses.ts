@@ -30,11 +30,28 @@ export const DEGREE_MAX_YEARS: Record<string, number> = {
   Bachelor: 3,
   'Bachelor (Honours)': 4,
   Master: 2,
-  'Master by Research': 3,
+  'Master by Research': 2,
   'Graduate Certificate': 1,
-  'Graduate Diploma': 2,
-  Diploma: 2,
+  'Graduate Diploma': 1,
+  Diploma: 1,
   Other: 8,
+};
+
+/** Specific course duration overrides (in years) for courses that deviate from the standard degree type duration */
+export const COURSE_DURATION_EXCEPTIONS: Record<string, number> = {
+  // Bachelor Exceptions
+  C000132: 4, // Bachelor of Laws
+  C000020: 2, // Bachelor of Clinical Science
+  C000426: 4, // Bachelor of Education (Early Childhood and Primary)
+  C000425: 4, // Bachelor of Education (Early Childhood)
+  C000423: 4, // Bachelor of Education (Primary)
+  C000424: 4, // Bachelor of Education (Secondary)
+
+  // Masters by Coursework (Extended) / Other Masters exceptions
+  C000076: 4, // Doctor of Medicine
+  C000077: 3, // Doctor of Physiotherapy
+  C000075: 3, // Juris Doctor
+  C000408: 1, // Master of Research in Arts
 };
 
 /** Preferred order of simplified degree labels in the dropdown */
@@ -1139,6 +1156,11 @@ export function getCoursesByFaculty(faculty: string): MQCourse[] {
 export function getMaxYearsForCourse(courseCode: string): number {
   const course = MQ_COURSES.find((c) => c.code === courseCode || c.name === courseCode);
   if (!course) return 3;
+
+  if (course.code in COURSE_DURATION_EXCEPTIONS) {
+    return COURSE_DURATION_EXCEPTIONS[course.code];
+  }
+
   // Fallback to original DEGREE_MAX_YEARS since the prompt's type mapping refers to original string types
   return DEGREE_MAX_YEARS[DEGREE_TYPE_LABELS[course.type] || course.type] ?? 3;
 }

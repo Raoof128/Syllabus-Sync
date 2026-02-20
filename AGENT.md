@@ -1,4 +1,12 @@
 Raouf: 2026-02-20 (Australia/Sydney)
+Scope: Academic Course Duration Integrity Fixes
+Summary: Verified and repaired incorrect course durations linked to dynamic degree graduation limits. Created a targeted `COURSE_DURATION_EXCEPTIONS` map in `mq-courses` data schema setting explicit durations for exceptions like Clinical Science (2 yr), Law/Ed (4 yr), Medicine (4 yr), and Juris Doctor/Physio (3 yr). Corrected default durations for Research Masters (2 yr) and Graduate Diplomas (1 yr).
+Files: Modified `lib/data/mq-courses.ts`.
+Verification: Real-world MQ fact verification via search_web. `npm run check` ✅.
+Deployment: N/A locally queued.
+Follow-ups: None.
+
+Raouf: 2026-02-20 (Australia/Sydney)
 Scope: Google Map & Campus Map Logic Parity Audit
 Summary: Completed full audit of campus vs google map logic and fixed missing parity. (1) Added `allow="geolocation"` attribute to `GoogleMapEmbed` iframe so the `saddr=My+Location` directions parameter functions properly. (2) Passed `onNavStateChange={setNavState}` from `MapClient` to `GoogleMapEmbed` so `RouteAnnouncer` screen reader successfully announces navigation status in Google mode. (3) Added `isNavigating` prop to `CampusMapHUD` to hide the primary "Navigate" start button when navigation is already active to align UX. (4) Cleaned up unused `onStopNavigation` prop instantiation inside `MapClient`'s HUD wrapper.
 Files: Modified `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/MapClient.tsx`, `features/map/components/CampusMapHUD.tsx`.

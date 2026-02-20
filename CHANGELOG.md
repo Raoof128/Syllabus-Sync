@@ -1,3 +1,20 @@
+### Raouf: Academic Course Duration Integrity Fixes — 2026-02-20
+
+**Scope:** Academic Profile and Config Correctness.
+**Type:** Feature / Bug Fix
+
+#### Changes
+
+1. **Duration Overrides for Exceptions:**
+   - Modified `lib/data/mq-courses.ts` to add a `COURSE_DURATION_EXCEPTIONS` map defining exact durations for degrees that deviate from generic labels.
+   - Updated Medical (4), Physiotherapy (3), Juris Doctor (3), Clinical Science (2), Laws (4), and various Education degrees (4) strictly to actual Macquarie University durations.
+2. **Refined Default Term Durations:**
+   - Modified `DEGREE_MAX_YEARS` inside `lib/data/mq-courses.ts` where 'Master by Research' dropped from 3 to 2, and 'Graduate Diploma' / 'Diploma' dropped from 2 to 1 (0.8 ~ 1) based on MQ curriculum.
+
+#### Verification
+- Web searches performed to ensure real-world correctness at MQ Uni Sydney.
+- `npm run check` ✅ (Secrets, Format, Typecheck, Lint, Tests, Build).
+
 ### Raouf: Google Map & Campus Map Logic Parity Audit — 2026-02-20
 
 **Scope:** Map unification and logic parity.
@@ -14,6 +31,7 @@
    - Cleaned up the unused `onStopNavigation` prop initialization in the HUD from `MapClient` to align exactly with structural layout intent.
 
 #### Verification
+
 - `npm run check` ✅ (Secrets, Format, Typecheck, Lint, Tests, Build).
 
 ### Raouf: Vercel Deploy Fix & Core Page i18n Completion — 2026-02-20
