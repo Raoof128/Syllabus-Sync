@@ -19,14 +19,21 @@ import { Button } from '@/components/ui/mq/button';
 import { Label } from '@/components/ui/label';
 import { isValidRedirect } from '@/lib/utils/security';
 import { GraduationCap, ArrowRight, Loader2 } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { TranslationKey } from '@/lib/i18n/translations';
 
-const schema = z.object({
-  course: z.string().min(1, 'Please select your course'),
-  year: z.string().min(1, 'Please select your year'),
-});
-type FormData = z.infer<typeof schema>;
+const createSchema = (
+  t: (key: TranslationKey, options?: Record<string, string | number>) => string,
+) =>
+  z.object({
+    course: z.string().min(1, t('pleaseSelectCourse' as TranslationKey)),
+    year: z.string().min(1, t('pleaseSelectYear' as TranslationKey)),
+  });
+type FormData = z.infer<ReturnType<typeof createSchema>>;
 
 export default function OnboardingClient() {
+  const { t } = useTypedTranslation();
+  const schema = createSchema(t);
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawNext = searchParams.get('next') ?? '/home';
@@ -57,9 +64,9 @@ export default function OnboardingClient() {
     () =>
       Array.from({ length: maxYear }, (_, i) => ({
         value: String(i + 1),
-        label: `Year ${i + 1}`,
+        label: t('yearNumber', { year: i + 1 }),
       })),
-    [maxYear],
+    [maxYear, t],
   );
 
   const onSubmit = async (data: FormData) => {
@@ -72,13 +79,11 @@ export default function OnboardingClient() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error?.message || 'Failed to save');
+        throw new Error(body?.error?.message || t('failedToSave'));
       }
       router.push(next);
     } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : 'Something went wrong. Please try again.',
-      );
+      setServerError(err instanceof Error ? err.message : t('unexpectedError'));
     }
   };
 
@@ -110,17 +115,15 @@ export default function OnboardingClient() {
                   <GraduationCap className="h-7 w-7 text-mq-primary" />
                 </div>
               </div>
-              <h1 className="text-2xl font-bold text-mq-content mb-2">One more thing 👋</h1>
-              <p className="text-sm text-mq-content-secondary">
-                Tell us your course and year so we can personalise your experience.
-              </p>
+              <h1 className="text-2xl font-bold text-mq-content mb-2">{t('onboardingTitle')}</h1>
+              <p className="text-sm text-mq-content-secondary">{t('onboardingDesc')}</p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-8 space-y-5">
               {/* Course */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-mq-content">Course</Label>
+                <Label className="text-sm font-medium text-mq-content">{t('course')}</Label>
                 <Controller
                   name="course"
                   control={control}
@@ -137,7 +140,7 @@ export default function OnboardingClient() {
 
               {/* Year */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-mq-content">Year of Study</Label>
+                <Label className="text-sm font-medium text-mq-content">{t('yearOfStudy')}</Label>
                 <Controller
                   name="year"
                   control={control}
@@ -146,7 +149,7 @@ export default function OnboardingClient() {
                       <SelectTrigger
                         className={`h-12 rounded-xl ${errors.year ? 'border-red-500' : ''}`}
                       >
-                        <SelectValue placeholder="Select your year…" />
+                        <SelectValue placeholder={t('selectYearPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
                         {yearOptions.map((y) => (
@@ -172,7 +175,7 @@ export default function OnboardingClient() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    Continue
+                    {t('continue')}
                     <ArrowRight className="h-5 w-5" />
                   </>
                 )}

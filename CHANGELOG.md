@@ -1,3 +1,61 @@
+### Raouf: Repository-wide i18n Audit & Hardcoded Content Sweep — 2026-02-20
+
+**Scope:** Internationalisation (i18n) & UI Audit
+**Type:** Audit / Refactor / UX
+
+#### Changes
+
+1. **Comprehensive UI Internationalization**
+   - Performed a full sweep for hardcoded content on the **Map**, **Login**, **Signup**, **Reset Password**, **Privacy**, and **Terms** pages.
+   - Synchronized all 19 locales to 100% key parity with the English source, adding 85+ new keys.
+   - Fully internationalized the **Terms of Service** and **Privacy Policy** templates, replacing static blocks with locale-aware keys.
+   - Provided native-quality translations for core locales (ar, es, zh) for all newly added strings.
+
+2. **Refactoring & Component Hardening**
+   - **Map Page**: Fixed hardcoded strings in `MapClient.tsx`, the Map skeleton, and the `PositionEditorClient.tsx` admin tool. Replaced `safeT` fallbacks with canonical i18n keys.
+   - **Authentication flow**: Removed hardcoded "Security Methods", "2FA Enabled/Off", and biometric labels from the Login page. Standardized logo `alt` tags across all auth pages.
+   - **Signup**: Internationalized the `FacultySelect` placeholder and synchronized year formatting strings.
+   - **Onboarding**: Completed full translation coverage for the post-OAuth onboarding gate.
+
+3. **Code Quality & Maintenance**
+   - Eliminated unused `safeT` hooks and imports.
+   - Fixed multiple TypeScript errors related to dynamic translation key lookups and missing keys.
+   - Created and utilized automated scripts to maintain key parity across 19 JSON translation files.
+
+#### Verification
+
+- `npm run check:i18n`: 19 locales validated, 0 missing keys.
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+
+### Raouf: Repository-wide i18n Audit & Fix — 2026-02-20
+
+**Scope:** Internationalisation (i18n)
+**Type:** Audit / Refactor / UX
+
+#### Changes
+
+1. **Locale Synchronization**
+   - Synchronized all 19 locales to 100% key parity with the English source.
+   - Added 65 missing/new keys related to Google Maps, Faculty selects, Onboarding, and Form Validations.
+   - Provided accurate native-quality translations for Arabic, Spanish, and Chinese.
+
+2. **Hardcoded String Elimination**
+   - Refactored `app/signup/SignupClient.tsx` to use `t('yearNumber')` and `t('copyright')`.
+   - Refactored `app/manage-profiles/components/AcademicInfoCard.tsx` to use `t('yearNumber')`.
+   - Refactored `app/onboarding/OnboardingClient.tsx` to use `useTypedTranslation` and i18n keys for all UI labels, placeholders, and validation messages.
+   - Updated `features/map/components/GoogleMapEmbed.tsx` to translate iframe titles using `t('googleMapsDirectionsTo')` and `t('googleMapsViewAt')`.
+
+3. **Translation Tooling**
+   - Created `tools/check-i18n.js` for automated key parity verification.
+   - Created `tools/update-translations.js` for batch merging and synchronization of locale files.
+
+#### Verification
+
+- `node tools/check-i18n.js`: 0 missing keys, 0 extra keys across all 18 locales.
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+
 ### Raouf: Cascading Selects for Faculty and Course — 2026-02-19
 
 **Scope:** Signup and Profile Management Forms

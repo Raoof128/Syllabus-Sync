@@ -534,7 +534,7 @@ export default function LoginClient() {
                 <div className="rounded-xl border border-mq-border bg-mq-card-background/50 p-3 space-y-2 min-w-0">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-mq-content-secondary">
                     <Shield className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t('securityMethods' as Parameters<typeof t>[0]) || 'Security Methods'}
+                    {t('securityMethods')}
                   </div>
 
                   <div className="flex flex-wrap gap-2">
@@ -567,9 +567,7 @@ export default function LoginClient() {
                       }`}
                     >
                       <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-                      {mfaEnabled
-                        ? t('twoFactorAuth' as Parameters<typeof t>[0]) || '2FA Enabled'
-                        : t('twoFactorAuthOff' as Parameters<typeof t>[0]) || '2FA Off'}
+                      {mfaEnabled ? t('twoFactorAuth') : t('twoFactorAuthOff')}
                     </span>
                   </div>
                 </div>

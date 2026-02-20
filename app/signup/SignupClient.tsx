@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useTransition, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
@@ -96,8 +96,6 @@ export default function SignupClient() {
     watch,
     control,
     setValue,
-    setError,
-    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -238,7 +236,7 @@ export default function SignupClient() {
                 ) : (
                   <Image
                     src="/MQ_Logo_Final.png"
-                    alt="Macquarie University"
+                    alt={t('mqLogoAlt')}
                     width={240}
                     height={240}
                     className="object-contain"
@@ -616,7 +614,7 @@ export default function SignupClient() {
                                 value={String(y)}
                                 className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
                               >
-                                Year {y}
+                                {t('yearNumber', { year: y })}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -690,9 +688,7 @@ export default function SignupClient() {
 
               {/* Footer */}
               <div className="pt-2 text-center text-xs text-mq-content-secondary space-y-1">
-                <div>
-                  &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
-                </div>
+                <div>{t('copyright', { year: new Date().getFullYear() })}</div>
                 <div>
                   <Link href="/privacy" className="hover:underline hover:text-mq-primary">
                     {t('privacyPolicy')}

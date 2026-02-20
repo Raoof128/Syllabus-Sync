@@ -62,8 +62,8 @@ export function GoogleMapEmbed({ selectedBuilding, destinationLabel }: GoogleMap
         key={mode}
         title={
           mode === 'directions'
-            ? `Directions to ${resolvedDestinationLabel}`
-            : `Google Maps — ${resolvedDestinationLabel}`
+            ? t('googleMapsDirectionsTo', { destination: resolvedDestinationLabel })
+            : t('googleMapsViewAt', { destination: resolvedDestinationLabel })
         }
         src={
           mode === 'view'

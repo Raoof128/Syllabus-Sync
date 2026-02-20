@@ -115,7 +115,7 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                           value={String(y)}
                           className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
                         >
-                          Year {y}
+                          {t('yearNumber', { year: y })}
                         </SelectItem>
                       ))}
                     </SelectContent>

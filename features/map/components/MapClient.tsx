@@ -29,7 +29,6 @@ import { buildings, getBuildingById } from '@/features/map/lib/buildings';
 import { mapOverlays, type MapOverlayId } from '@/features/map/lib/mapOverlays';
 import { useMapStore, parseOverlaysFromURL, overlaysToURLParam } from '@/lib/store/mapStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
@@ -63,7 +62,6 @@ import type { LocationStatus, CampusMapRef } from './CampusMap';
 
 export default function MapClient() {
   const { t } = useTypedTranslation();
-  const { safeT } = useSafeTranslation();
   const prefersReducedMotion = useReducedMotion();
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -276,11 +274,11 @@ export default function MapClient() {
       link.download = 'campus-map.png';
       link.rel = 'noopener';
       link.click();
-      toastUtils.success(safeT('export', 'Export'), safeT('downloadStarted', 'Download started'));
+      toastUtils.success(t('export'), t('downloadStarted'));
     } catch {
       toastUtils.error(t('error'), t('tryAgain'));
     }
-  }, [safeT, t]);
+  }, [t]);
 
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
@@ -350,7 +348,7 @@ export default function MapClient() {
           href="#map-search-input"
           className="absolute -top-[9999px] -left-[9999px] focus:top-2 focus:left-2 focus:z-[2000] px-4 py-2 bg-mq-primary text-white font-bold rounded-mq-lg shadow-lg transition-all focus:outline-none"
         >
-          {safeT('skipToSearch', 'Skip to Search')}
+          {t('skipToSearch')}
         </a>
 
         {/* Route Announcer for Screen Readers */}
@@ -570,7 +568,7 @@ export default function MapClient() {
                       {mapLoadTimedOut && (
                         <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
                           <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
-                            {safeT('mapLoadSlow', 'Map is taking longer than expected to load.')}
+                            {t('mapLoadSlow')}
                           </p>
                         </div>
                       )}

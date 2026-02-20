@@ -485,10 +485,10 @@ export default function PositionEditorClient() {
         <div className="border-b border-gray-200 p-4 dark:border-gray-700">
           <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <MapPin className="h-5 w-5 text-red-600" />
-            Position Editor
+            {t('positionEditor')}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Drag markers to correct positions
+            {t('dragMarkersToCorrect')}
           </p>
         </div>
 
@@ -513,7 +513,7 @@ export default function PositionEditorClient() {
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
+                  {cat === 'all' ? t('allCategories') : cat}
                 </option>
               ))}
             </select>
@@ -534,8 +534,8 @@ export default function PositionEditorClient() {
 
         {/* Stats */}
         <div className="border-b border-gray-200 px-4 py-2 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
-          <span>{filteredBuildings.length} buildings</span>
-          <span className="text-amber-600 dark:text-amber-400">{positionChanges.size} changed</span>
+          <span>{filteredBuildings.length} {t('buildingsLabel')}</span>
+          <span className="text-amber-600 dark:text-amber-400">{positionChanges.size} {t('changedLabel')}</span>
         </div>
 
         {/* Building List */}
@@ -587,13 +587,13 @@ export default function PositionEditorClient() {
               className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               <ChevronLeft className="h-4 w-4" />
-              Prev
+              {t('prev')}
             </button>
             <button
               onClick={() => navigateBuilding('next')}
               className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
-              Next
+              {t('next')}
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
@@ -604,7 +604,7 @@ export default function PositionEditorClient() {
             className="w-full flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             <RotateCcw className="h-4 w-4" />
-            Reset All Changes
+            {t('resetAllChanges')}
           </button>
         </div>
       </div>
@@ -652,7 +652,7 @@ export default function PositionEditorClient() {
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white">{selectedBuilding.name}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  ID: {selectedBuilding.id}
+                  {t('id')}: {selectedBuilding.id}
                 </p>
               </div>
               <button
@@ -665,13 +665,13 @@ export default function PositionEditorClient() {
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">Original:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('original')}</span>
                 <span className="font-mono text-gray-900 dark:text-white">
                   [{selectedBuilding.position.join(', ')}]
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">Current:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('current')}</span>
                 <span
                   className={`font-mono ${
                     positionChanges.has(selectedBuilding.id)
@@ -684,7 +684,7 @@ export default function PositionEditorClient() {
               </div>
               {positionChanges.has(selectedBuilding.id) && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Delta:</span>
+                  <span className="text-gray-500 dark:text-gray-400">{t('delta')}</span>
                   <span className="font-mono text-blue-600 dark:text-blue-400">
                     [{getCurrentPosition(selectedBuilding)[0] - selectedBuilding.position[0]},{' '}
                     {getCurrentPosition(selectedBuilding)[1] - selectedBuilding.position[1]}]
@@ -700,12 +700,12 @@ export default function PositionEditorClient() {
                 className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 <RotateCcw className="h-4 w-4" />
-                Reset
+                {t('reset')}
               </button>
             </div>
 
             <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
-              Drag the marker or click on the map to move
+              {t('dragToMoveHint')}
             </p>
           </div>
         )}
@@ -719,9 +719,9 @@ export default function PositionEditorClient() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white">
-                  {positionChanges.size} Changes
+                  {positionChanges.size} {t('changes')}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Ready to save</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('readyToSave')}</p>
               </div>
             </div>
 
@@ -741,7 +741,7 @@ export default function PositionEditorClient() {
                 {saveStatus === 'saving' && (
                   <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
                 )}
-                <span>{saveMessage || 'Saving changes...'}</span>
+                <span>{saveMessage || t('savingChangesEllipsis')}</span>
               </div>
             )}
 
@@ -754,12 +754,12 @@ export default function PositionEditorClient() {
               {saveStatus === 'saving' ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
+                  {t('saving')}
                 </>
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  Save to buildings.ts
+                  {t('saveToBuildingsFile')}
                 </>
               )}
             </button>
@@ -773,12 +773,12 @@ export default function PositionEditorClient() {
                 {copied ? (
                   <>
                     <Check className="h-4 w-4" />
-                    Copied!
+                    {t('copied')}
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4" />
-                    Copy
+                    {t('copy')}
                   </>
                 )}
               </button>
@@ -798,7 +798,7 @@ export default function PositionEditorClient() {
           <div className="absolute bottom-4 right-4 z-[1000] bg-green-600 text-white rounded-xl shadow-xl p-4 flex items-center gap-3">
             <CheckCircle2 className="h-6 w-6" />
             <div>
-              <div className="font-bold">Changes Saved!</div>
+              <div className="font-bold">{t('changesSaved')}</div>
               <div className="text-sm text-green-100">{saveMessage}</div>
             </div>
           </div>
@@ -806,10 +806,10 @@ export default function PositionEditorClient() {
 
         {/* Help Panel */}
         <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
-          <div className="font-medium mb-1">Keyboard Shortcuts</div>
-          <div>← → Navigate buildings</div>
-          <div>R Reset selected</div>
-          <div>Esc Deselect</div>
+          <div className="font-medium mb-1">{t('keyboardShortcutsTitle')}</div>
+          <div>{t('navigateBuildings')}</div>
+          <div>{t('resetSelected')}</div>
+          <div>{t('deselect')}</div>
         </div>
       </div>
     </div>

@@ -5,21 +5,23 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
-const SECTIONS = [
-  'Acceptance of Terms',
-  'Description of Service',
-  'User Accounts',
-  'Acceptable Use',
-  'Intellectual Property',
-  'Privacy',
-  'Disclaimer of Warranties',
-  'Limitation of Liability',
-  'Changes to Terms',
-  'Contact Us',
-];
+const SECTION_TITLES = [
+  'terms_s1_title',
+  'terms_s2_title',
+  'terms_s3_title',
+  'terms_s4_title',
+  'terms_s5_title',
+  'terms_s6_title',
+  'terms_s7_title',
+  'terms_s8_title',
+  'terms_s9_title',
+  'terms_s10_title',
+] as const;
 
 export default function TermsPage() {
+  const { t } = useTypedTranslation();
   const router = useRouter();
   const currentYear = new Date().getFullYear();
 
@@ -33,18 +35,18 @@ export default function TermsPage() {
             className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to {APP_CONFIG.name}
+            {t('terms_back_to', { appName: APP_CONFIG.name })}
           </button>
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-[0.2em] text-mq-primary font-semibold">
-                Legal Document
+                {t('terms_legal_doc')}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-                Terms of Service
+                {t('terms_title')}
               </h1>
-              <p className="text-sm text-white/50">Last updated: February 2026</p>
+              <p className="text-sm text-white/50">{t('terms_last_updated')}</p>
             </div>
             <div className="hidden sm:flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white/10 border border-white/15">
               <Shield className="h-6 w-6 text-mq-primary" />
@@ -63,9 +65,9 @@ export default function TermsPage() {
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-1">
               <p className="text-xs uppercase tracking-[0.15em] font-semibold text-mq-content-secondary mb-3">
-                Sections
+                {t('terms_sections')}
               </p>
-              {SECTIONS.map((title, i) => (
+              {SECTION_TITLES.map((key, i) => (
                 <a
                   key={i}
                   href={`#section-${i + 1}`}
@@ -74,7 +76,7 @@ export default function TermsPage() {
                   <span className="text-xs font-bold text-mq-primary/60 group-hover:text-mq-primary w-5 flex-shrink-0">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="truncate">{title}</span>
+                  <span className="truncate">{t(key)}</span>
                 </a>
               ))}
             </div>
@@ -91,11 +93,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   1
                 </span>
-                Acceptance of Terms
+                {t('terms_s1_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                By accessing or using {APP_CONFIG.name}, you agree to be bound by these Terms of
-                Service. If you do not agree to these terms, please do not use the application.
+                {t('terms_s1_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -108,13 +109,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   2
                 </span>
-                Description of Service
+                {t('terms_s2_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {APP_CONFIG.name} is a student productivity application designed to help{' '}
-                {UNIVERSITY_CONFIG.name} students manage their academic schedules, deadlines, and
-                campus activities. The service is provided &ldquo;as is&rdquo; and we reserve the
-                right to modify or discontinue features at any time.
+                {t('terms_s2_p1', { appName: APP_CONFIG.name, uniName: UNIVERSITY_CONFIG.name })}
               </p>
             </section>
 
@@ -127,12 +125,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   3
                 </span>
-                User Accounts
+                {t('terms_s3_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                You are responsible for maintaining the confidentiality of your account credentials
-                and for all activities that occur under your account. You agree to notify us
-                immediately of any unauthorized use of your account.
+                {t('terms_s3_p1')}
               </p>
             </section>
 
@@ -145,23 +141,19 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   4
                 </span>
-                Acceptable Use
+                {t('terms_s4_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">You agree not to:</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('terms_s4_p1')}</p>
               <ul className="space-y-2">
-                {[
-                  'Use the service for any unlawful purpose',
-                  'Attempt to gain unauthorized access to any part of the service',
-                  'Interfere with or disrupt the service or servers',
-                  'Share your account credentials with others',
-                  'Upload malicious content or code',
-                ].map((item) => (
+                {(
+                  ['terms_s4_li1', 'terms_s4_li2', 'terms_s4_li3', 'terms_s4_li4', 'terms_s4_li5'] as const
+                ).map((key) => (
                   <li
-                    key={item}
+                    key={key}
                     className="flex items-start gap-2 text-sm text-mq-content-secondary"
                   >
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-mq-primary/60" />
-                    {item}
+                    {t(key)}
                   </li>
                 ))}
               </ul>
@@ -176,12 +168,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   5
                 </span>
-                Intellectual Property
+                {t('terms_s5_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                The service and its original content, features, and functionality are owned by{' '}
-                {APP_CONFIG.name} and are protected by international copyright, trademark, and other
-                intellectual property laws.
+                {t('terms_s5_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -194,15 +184,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   6
                 </span>
-                Privacy
+                {t('terms_s6_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                Your use of {APP_CONFIG.name} is also governed by our{' '}
-                <Link href="/privacy" className="text-mq-primary hover:underline font-medium">
-                  Privacy Policy
-                </Link>
-                . Please review our Privacy Policy to understand how we collect, use, and protect
-                your information.
+                {t('terms_s6_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -215,12 +200,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   7
                 </span>
-                Disclaimer of Warranties
+                {t('terms_s7_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; WITHOUT WARRANTIES OF ANY KIND, EITHER
-                EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED,
-                SECURE, OR ERROR-FREE.
+                {t('terms_s7_p1')}
               </p>
             </section>
 
@@ -233,12 +216,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   8
                 </span>
-                Limitation of Liability
+                {t('terms_s8_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                IN NO EVENT SHALL {APP_CONFIG.name.toUpperCase()} BE LIABLE FOR ANY INDIRECT,
-                INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO
-                YOUR USE OF THE SERVICE.
+                {t('terms_s8_p1', { appNameCaps: APP_CONFIG.name.toUpperCase() })}
               </p>
             </section>
 
@@ -251,12 +232,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   9
                 </span>
-                Changes to Terms
+                {t('terms_s9_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                We reserve the right to modify these terms at any time. We will notify users of any
-                material changes by posting the new terms on this page. Your continued use of the
-                service after such modifications constitutes acceptance of the updated terms.
+                {t('terms_s9_p1')}
               </p>
             </section>
 
@@ -269,15 +248,15 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   10
                 </span>
-                Contact Us
+                {t('terms_s10_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                If you have any questions about these Terms of Service, please contact us at{' '}
+                {t('terms_s10_p1')}{' '}
                 <a
-                  href="mailto:support@syllabussync.app"
+                  href={`mailto:${UNIVERSITY_CONFIG.supportEmail}`}
                   className="text-mq-primary hover:underline font-medium"
                 >
-                  support@syllabussync.app
+                  {UNIVERSITY_CONFIG.supportEmail}
                 </a>
               </p>
             </section>
@@ -287,22 +266,22 @@ export default function TermsPage() {
               <div className="flex items-center gap-2">
                 <Image
                   src="/MQ_Logo_Final.png"
-                  alt="Macquarie University"
+                  alt={t('mqLogoAlt')}
                   width={32}
                   height={32}
                   className="object-contain opacity-70"
                 />
                 <p className="text-xs text-mq-content-secondary">
-                  &copy; {currentYear} {APP_CONFIG.name}. All rights reserved.
+                  {t('terms_footer_copy', { year: currentYear, appName: APP_CONFIG.name })}
                 </p>
               </div>
               <div className="flex items-center gap-3 text-xs text-mq-content-secondary">
                 <Link href="/terms" className="text-mq-primary font-medium">
-                  Terms
+                  {t('termsFooter')}
                 </Link>
                 <span className="text-mq-border">·</span>
                 <Link href="/privacy" className="hover:text-mq-primary transition-colors">
-                  Privacy Policy
+                  {t('privacyFooter')}
                 </Link>
               </div>
             </div>

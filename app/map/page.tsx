@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import MapClient from '@/features/map/components/MapClient';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Campus Map`,
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
 
 // Skeleton loader for map page - mimics map layout
 function MapSkeleton() {
+  const { t } = useTypedTranslation();
   return (
     <div className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:p-4">
       {/* Header skeleton */}
@@ -46,7 +48,7 @@ function MapSkeleton() {
       <div className="bg-mq-card-background rounded-mq-lg border border-mq-border p-4 mb-6">
         <div className="h-8 bg-mq-background-secondary rounded-mq w-48 mb-4" />
         <div className="h-96 md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] max-h-[70vh] bg-mq-background-secondary rounded-mq-lg flex items-center justify-center">
-          <div className="text-mq-content-tertiary">Loading map...</div>
+          <div className="text-mq-content-tertiary">{t('loadingMap')}</div>
         </div>
       </div>
 

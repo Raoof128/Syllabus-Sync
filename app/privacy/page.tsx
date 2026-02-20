@@ -45,7 +45,7 @@ export default function PrivacyPolicyPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-[0.2em] text-mq-primary font-semibold">
-                Legal Document
+                {t('terms_legal_doc')}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
                 {t('privacy_title')}
@@ -69,7 +69,7 @@ export default function PrivacyPolicyPage() {
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-1">
               <p className="text-xs uppercase tracking-[0.15em] font-semibold text-mq-content-secondary mb-3">
-                Sections
+                {t('terms_sections')}
               </p>
               {SECTION_KEYS.map((key, i) => (
                 <a
@@ -614,22 +614,22 @@ export default function PrivacyPolicyPage() {
               <div className="flex items-center gap-2">
                 <Image
                   src="/MQ_Logo_Final.png"
-                  alt="Macquarie University"
+                  alt={t('mqLogoAlt')}
                   width={32}
                   height={32}
                   className="object-contain opacity-70"
                 />
                 <p className="text-xs text-mq-content-secondary">
-                  &copy; {currentYear} {APP_CONFIG.name} &mdash; {UNIVERSITY_CONFIG.name}
+                  {t('terms_footer_copy', { year: currentYear, appName: APP_CONFIG.name })}
                 </p>
               </div>
               <div className="flex items-center gap-3 text-xs text-mq-content-secondary">
                 <Link href="/terms" className="hover:text-mq-primary transition-colors">
-                  {t('termsOfService')}
+                  {t('termsFooter')}
                 </Link>
                 <span className="text-mq-border">·</span>
                 <Link href="/privacy" className="text-mq-primary font-medium">
-                  {t('privacyPolicy')}
+                  {t('privacyFooter')}
                 </Link>
               </div>
             </div>

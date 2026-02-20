@@ -274,7 +274,7 @@ export default function ResetPasswordClient() {
             <div className="flex justify-center">
               <Image
                 src="/MQ_Logo_Final.png"
-                alt="Macquarie University"
+                alt={t('mqLogoAlt')}
                 width={216}
                 height={216}
                 className="object-contain"
@@ -326,7 +326,7 @@ export default function ResetPasswordClient() {
             <div className="flex justify-center">
               <Image
                 src="/MQ_Logo_Final.png"
-                alt="Macquarie University"
+                alt={t('mqLogoAlt')}
                 width={216}
                 height={216}
                 className="object-contain"

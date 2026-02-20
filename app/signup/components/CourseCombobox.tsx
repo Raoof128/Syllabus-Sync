@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { getCoursesByFaculty, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
 import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 type Props = {
   value: string;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function CourseCombobox({ value, onChange, disabled, error, facultyFilter }: Props) {
+  const { t } = useTypedTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -150,7 +152,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
         )}
       >
         <span className={cn('truncate text-left flex-1', !value && 'text-mq-content-tertiary')}>
-          {value || (facultyFilter ? 'Select your course…' : 'Select a faculty first')}
+          {value || (facultyFilter ? t('selectCoursePlaceholder') : t('selectFacultyFirst'))}
         </span>
         <span className="flex items-center gap-0.5 shrink-0">
           {value && (
@@ -165,7 +167,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
                   setQuery('');
                 }
               }}
-              aria-label="Clear selection"
+              aria-label={t('clearSelection')}
               className="p-0.5 rounded hover:bg-mq-hover-background text-mq-content-secondary hover:text-mq-content transition-colors"
             >
               <X className="h-3 w-3" />
@@ -187,7 +189,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
           <div
             ref={dropdownRef}
             role="listbox"
-            aria-label="Course list"
+            aria-label={t('courseList')}
             style={dropdownStyle}
             className="rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
           >
@@ -199,12 +201,12 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search courses…"
+                placeholder={t('searchCoursesPlaceholder')}
                 className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
               />
               {query && (
                 <span className="text-xs text-mq-content-secondary shrink-0">
-                  {totalResults} result{totalResults !== 1 ? 's' : ''}
+                  {totalResults} {t('results')}
                 </span>
               )}
             </div>
@@ -213,7 +215,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
             <div className="max-h-64 overflow-y-auto py-1">
               {grouped.size === 0 ? (
                 <div className="px-3 py-6 text-sm text-mq-content-secondary text-center">
-                  No courses match &ldquo;{query}&rdquo;
+                  {t('noCoursesMatch')} &ldquo;{query}&rdquo;
                 </div>
               ) : (
                 Array.from(grouped.entries()).map(([label, courses]) => (
