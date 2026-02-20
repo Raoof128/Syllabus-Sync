@@ -1,3 +1,31 @@
+### Raouf: Vercel Deploy Fix & Core Page i18n Completion — 2026-02-20
+
+**Scope:** Deployment & Internationalisation (i18n)
+**Type:** Bug Fix / Audit / Refactor
+
+#### Changes
+
+1. **Deployment Fix (Next.js Prerendering)**
+   - Fixed a build-time error where `useTypedTranslation` was accidentally called in a Server Component (`app/map/page.tsx`).
+   - Extracted the map page skeleton into a dedicated Client Component (`features/map/components/MapPageSkeleton.tsx`) to support localized loading states during static generation.
+   - Successfully verified the fix with a clean `npm run build` and redeployed to production.
+
+2. **Full Page i18n Remediation**
+   - Completed a comprehensive sweep for hardcoded content on the **Terms of Service**, **Privacy Policy**, and **Position Editor** (Admin) pages.
+   - Internationalized all section headers, list items, and legal templates, replacing 50+ static blocks with locale-aware keys.
+   - Standardized university logo `alt` tags and copyright footers across all authentication and informational pages.
+   - Synchronized 100+ translation keys across all 19 supported locales to maintain parity.
+
+3. **Code Cleanup**
+   - Removed unused `useSafeTranslation` imports and hooks.
+   - Resolved all remaining ESLint and TypeScript warnings in the modified files.
+
+#### Verification
+
+- `npm run vercel:deploy:prod` ✅ (Deployment Successful)
+- `npm run build` ✅
+- `node tools/i18n/check-translations.mjs` ✅ (0 missing keys)
+
 ### Raouf: Repository-wide i18n Audit & Hardcoded Content Sweep — 2026-02-20
 
 **Scope:** Internationalisation (i18n) & UI Audit

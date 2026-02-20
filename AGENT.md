@@ -1,4 +1,12 @@
 Raouf: 2026-02-20 (Australia/Sydney)
+Scope: Vercel Deploy Fix & Core Page i18n Completion
+Summary: Resolved a critical deployment blocker and finished repository-wide internationalisation. (1) Fixed builds by moving the translated Map skeleton into a Client Component (`MapPageSkeleton.tsx`), resolving a Next.js prerender error in `app/map/page.tsx`. (2) Completed the hardcoded content sweep for Terms of Service, Privacy Policy, and Admin tools. (3) Synchronized all 100+ new translation keys across 19 locales. (4) Successfully redeployed the project to Vercel production.
+Files: Modified `app/map/page.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`, `features/map/components/MapClient.tsx`, `features/map/position-editor/PositionEditorClient.tsx`. Created `features/map/components/MapPageSkeleton.tsx`.
+Verification: `npm run build` passes locally. Vercel deployment successful. i18n key parity confirmed at 100%.
+Deployment: Production URL: https://syllabus-sync-ashy.vercel.app
+Follow-ups: None.
+
+Raouf: 2026-02-20 (Australia/Sydney)
 Scope: Repository-wide i18n Audit & Hardcoded Content Sweep
 Summary: Completed a full repository-wide internationalisation audit and synchronization pass, specifically targeting hardcoded content on Map, Login, Signup, Reset Password, Privacy, and Terms pages. (1) Synchronized 85+ missing/new keys across all 18 non-English locales to achieve 100% key parity with the English source. (2) Fully internationalized the Terms of Service and Privacy Policy templates. (3) Replaced hardcoded UI strings in Map components, auth flows, and onboarding with i18n keys and `useTypedTranslation`. (4) Standardized accessibility attributes (aria-labels, alt tags) to use translated strings.
 Files: Modified `locales/*/translations.json`, `app/signup/SignupClient.tsx`, `app/login/LoginClient.tsx`, `app/reset-password/reset-password-client.tsx`, `app/privacy/page.tsx`, `app/terms/page.tsx`, `features/map/components/MapClient.tsx`, `features/map/position-editor/PositionEditorClient.tsx`, `app/map/page.tsx`.
