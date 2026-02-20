@@ -12,6 +12,7 @@
    - Modified `DEGREE_MAX_YEARS` inside `lib/data/mq-courses.ts` where 'Master by Research' dropped from 3 to 2, and 'Graduate Diploma' / 'Diploma' dropped from 2 to 1 (0.8 ~ 1) based on MQ curriculum.
 
 #### Verification
+
 - Web searches performed to ensure real-world correctness at MQ Uni Sydney.
 - `npm run check` ✅ (Secrets, Format, Typecheck, Lint, Tests, Build).
 
