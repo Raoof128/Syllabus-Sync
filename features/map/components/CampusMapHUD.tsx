@@ -30,6 +30,7 @@ type Props = {
   onExport?: () => void;
   onStartNavigation?: () => void;
   onStopNavigation?: () => void;
+  isNavigating?: boolean;
   isGoogleMode?: boolean;
 };
 
@@ -44,6 +45,7 @@ export default function CampusMapHUD({
   onExport,
   onStartNavigation,
   onStopNavigation: _onStopNavigation,
+  isNavigating,
   isGoogleMode,
 }: Props) {
   const { t } = useTypedTranslation();
@@ -356,7 +358,7 @@ export default function CampusMapHUD({
 
                 {/* Navigation Buttons - consistent for both Campus and Google views */}
                 <div className="flex flex-col gap-2 pt-2">
-                  {onStartNavigation && (
+                  {onStartNavigation && !isNavigating && (
                     <Button
                       variant="primary"
                       size="sm"

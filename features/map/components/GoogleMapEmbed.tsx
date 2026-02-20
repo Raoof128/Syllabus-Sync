@@ -119,6 +119,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
             mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')
           }
           allowFullScreen
+          allow="geolocation"
         />
       </div>
     );

@@ -1,3 +1,21 @@
+### Raouf: Google Map & Campus Map Logic Parity Audit — 2026-02-20
+
+**Scope:** Map unification and logic parity.
+**Type:** Audit / Bug Fix / UX
+
+#### Changes
+
+1. **Geolocation Fix for Google Maps Embed:**
+   - Modified `features/map/components/GoogleMapEmbed.tsx` to include the `allow="geolocation"` iframe attribute. This fixes the directions mode URL parameter (`saddr=My+Location`) which would otherwise fail without explicit browser permission to access location.
+2. **Screen Reader Action Routing Parity:**
+   - Modified `features/map/components/MapClient.tsx` to pass the `onNavStateChange={setNavState}` callback explicitly to `GoogleMapEmbed`. This links the Google Maps UI interactions into the central `navState` and finally enables the `RouteAnnouncer` to verbally announce navigation status changes logically alike to Campus view.
+3. **HUD Navigation State Disambiguation:**
+   - Modified `features/map/components/CampusMapHUD.tsx` to accept an `isNavigating` boolean prop and conditionally hide the primary "Navigate" button when active (`!isNavigating`). This prevents confusing duplicate interactions where a user could repeatedly click "Navigate" while already in directions or navigation overlay mode across both Campus and Google views.
+   - Cleaned up the unused `onStopNavigation` prop initialization in the HUD from `MapClient` to align exactly with structural layout intent.
+
+#### Verification
+- `npm run check` ✅ (Secrets, Format, Typecheck, Lint, Tests, Build).
+
 ### Raouf: Vercel Deploy Fix & Core Page i18n Completion — 2026-02-20
 
 **Scope:** Deployment & Internationalisation (i18n)

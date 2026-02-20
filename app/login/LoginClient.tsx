@@ -411,7 +411,8 @@ export default function LoginClient() {
                         ? t('oauthCodeExchangeFailed')
                         : t('loginErrorFailed')}
                   </div>
-                  {(callbackError === 'oauth_failed' || callbackError === 'verification_failed') && (
+                  {(callbackError === 'oauth_failed' ||
+                    callbackError === 'verification_failed') && (
                     <Button
                       type="button"
                       variant="outline"

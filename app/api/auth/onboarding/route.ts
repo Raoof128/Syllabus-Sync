@@ -23,19 +23,17 @@ export async function POST(req: NextRequest) {
 
   if (!user) return jsonError('Unauthorized', 401);
 
-  const { error } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        id: user.id,
-        email: user.email,
-        full_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
-        faculty: parsed.data.faculty,
-        course: parsed.data.course,
-        year: parsed.data.year,
-      },
-      { onConflict: 'id' },
-    );
+  const { error } = await supabase.from('profiles').upsert(
+    {
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
+      faculty: parsed.data.faculty,
+      course: parsed.data.course,
+      year: parsed.data.year,
+    },
+    { onConflict: 'id' },
+  );
 
   if (error) return jsonError('Failed to update profile', 500);
 

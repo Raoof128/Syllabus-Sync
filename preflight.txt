@@ -1,0 +1,24 @@
+# Raouf Change Protocol - Preflight
+
+## AGENT Constraints Summary:
+- Execute changes minimalistically and consistently.
+- Always check and update `agent.md`/`AGENT.md` using the exact "Raouf:" template format.
+- Ensure all recent changes are similarly added to `CHANGELOG.md` with proper scope and type.
+- Verify through tests, lint, and typechecks before and after each logical change.
+- Never write to or alter the agent instructions directly, only append to the log.
+- Do not make generic aesthetic changes without explicit direction.
+
+## CHANGELOG Context Summary:
+- Recently unified Campus Map and Google Map navigation logic (`startNavigation`/`stopNavigation` via Ref).
+- Added `isGoogleMode` awareness tracking to `CampusMapHUD` to adjust UI.
+- Updated GoogleMapEmbed to use building coordinate for directions destination (`daddr`).
+- Ensured container layouts and dimension breakpoints match between the two modes exactly.
+- Added exact map-building selection synchronization to both views.
+
+## 🧠 Plan (Full Audit Path)
+1. **Fix Geolocation Iframe Issue**: The Google Map iframe lacks the `allow="geolocation"` attribute in `GoogleMapEmbed.tsx`. For the directions link to operate correctly (`saddr=My+Location`), the iframe must have permission to fetch the user's location, exactly as the Campus Map natively does.
+2. **Fix Screen-Reader Navigation State**: In `MapClient.tsx`, the `onNavStateChange={setNavState}` callback is passed to `CampusMap.tsx` but *omitted* for `GoogleMapEmbed.tsx`. This leaves the `RouteAnnouncer` disabled in Google mode because the parent never receives the `isNavigating` state transition.
+3. **Fix Unused HUD Hook**: `MapClient.tsx` passes `onStopNavigation` to `CampusMapHUD.tsx` during Google mode, but `CampusMapHUD.tsx` does not utilize it. The button resides in `GoogleMapEmbed.tsx` instead. Will clean this orphaned prop wiring to align the code logically.
+
+## Next Steps
+Use `multi_replace_file_content` and `replace_file_content` on these files to apply the 3 audit fixes, then verify with `npm run check`.

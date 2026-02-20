@@ -584,6 +584,7 @@ export default function MapClient() {
                             ? t(selectedBuilding.translationKey)
                             : UNIVERSITY_CONFIG.name
                         }
+                        onNavStateChange={setNavState}
                       />
                     </div>
                   )}
@@ -601,11 +602,7 @@ export default function MapClient() {
                         ? () => campusMapRef.current?.startNavigation()
                         : () => googleMapRef.current?.startNavigation()
                     }
-                    onStopNavigation={
-                      mapView === 'google'
-                        ? () => googleMapRef.current?.stopNavigation()
-                        : undefined
-                    }
+                    isNavigating={navState?.isNavigating || false}
                     isGoogleMode={mapView === 'google'}
                   />
                 </div>
