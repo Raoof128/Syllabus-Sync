@@ -143,10 +143,18 @@ export default function TermsPage() {
                 </span>
                 {t('terms_s4_title')}
               </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">{t('terms_s4_p1')}</p>
+              <p className="text-sm text-mq-content-secondary leading-relaxed">
+                {t('terms_s4_p1')}
+              </p>
               <ul className="space-y-2">
                 {(
-                  ['terms_s4_li1', 'terms_s4_li2', 'terms_s4_li3', 'terms_s4_li4', 'terms_s4_li5'] as const
+                  [
+                    'terms_s4_li1',
+                    'terms_s4_li2',
+                    'terms_s4_li3',
+                    'terms_s4_li4',
+                    'terms_s4_li5',
+                  ] as const
                 ).map((key) => (
                   <li
                     key={key}

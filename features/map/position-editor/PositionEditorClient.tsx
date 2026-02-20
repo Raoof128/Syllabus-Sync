@@ -487,9 +487,7 @@ export default function PositionEditorClient() {
             <MapPin className="h-5 w-5 text-red-600" />
             {t('positionEditor')}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t('dragMarkersToCorrect')}
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('dragMarkersToCorrect')}</p>
         </div>
 
         {/* Search & Filter */}
@@ -534,8 +532,12 @@ export default function PositionEditorClient() {
 
         {/* Stats */}
         <div className="border-b border-gray-200 px-4 py-2 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
-          <span>{filteredBuildings.length} {t('buildingsLabel')}</span>
-          <span className="text-amber-600 dark:text-amber-400">{positionChanges.size} {t('changedLabel')}</span>
+          <span>
+            {filteredBuildings.length} {t('buildingsLabel')}
+          </span>
+          <span className="text-amber-600 dark:text-amber-400">
+            {positionChanges.size} {t('changedLabel')}
+          </span>
         </div>
 
         {/* Building List */}
@@ -704,9 +706,7 @@ export default function PositionEditorClient() {
               </button>
             </div>
 
-            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
-              {t('dragToMoveHint')}
-            </p>
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">{t('dragToMoveHint')}</p>
           </div>
         )}
 

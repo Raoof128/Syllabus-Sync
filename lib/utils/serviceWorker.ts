@@ -12,16 +12,15 @@ export const registerServiceWorker = async () => {
       scope: '/',
     });
 
-    registration.addEventListener('updatefound', () => {
-      const newWorker = registration.installing;
-      if (newWorker) {
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // New content is available; UI notification hook can be added here.
-          }
+    // Check for updates periodically (every 60 minutes)
+    setInterval(
+      () => {
+        registration.update().catch(() => {
+          // Silently ignore update check failures
         });
-      }
-    });
+      },
+      60 * 60 * 1000,
+    );
   } catch (error) {
     errorHandler.logError(
       error instanceof Error ? error : new Error('Service Worker registration failed'),

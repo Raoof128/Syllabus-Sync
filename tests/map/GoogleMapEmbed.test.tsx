@@ -3,7 +3,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { GoogleMapEmbed } from '@/features/map/components/GoogleMapEmbed';
 
 vi.mock('@/lib/hooks/useTypedTranslation', () => ({
-  useTypedTranslation: () => ({ t: (k: string) => k }),
+  useTypedTranslation: () => ({
+    t: (k: string, params?: Record<string, string | number>) => {
+      if (k === 'googleMapsViewAt' && params?.destination)
+        return `Google Maps — ${params.destination}`;
+      if (k === 'googleMapsDirectionsTo' && params?.destination)
+        return `Directions to ${params.destination}`;
+      return k;
+    },
+  }),
 }));
 
 describe('GoogleMapEmbed', () => {

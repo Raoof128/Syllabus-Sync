@@ -5,9 +5,9 @@
 // SECURITY: This service worker implements a strict caching policy to prevent
 // sensitive data from being cached and exposed after logout or on shared devices.
 
-const CACHE_NAME = 'syllabus-sync-v5'; // Bump version for cache invalidation
-const STATIC_CACHE = 'syllabus-sync-static-v5';
-const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v5';
+const CACHE_NAME = 'syllabus-sync-v6'; // Bump version for cache invalidation
+const STATIC_CACHE = 'syllabus-sync-static-v6';
+const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v6';
 const MAP_CACHE = 'syllabus-sync-map-v1'; // Dedicated cache for map assets
 
 // SECURITY: Only cache truly static assets - NO HTML pages that may contain user data
@@ -18,6 +18,7 @@ const STATIC_ASSETS = [
   '/MQ_Logo_Final.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/offline', // Offline fallback page - safe to precache (no user data)
 ];
 
 // Map assets — loaded lazily when user visits the map page, NOT precached.
@@ -91,8 +92,15 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// SECURITY: Handle cache clear message from app (on logout)
+// Handle messages from the app
 self.addEventListener('message', (event) => {
+  // Skip waiting and activate immediately when app requests it
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+    return;
+  }
+
+  // SECURITY: Handle cache clear message from app (on logout)
   if (event.data && event.data.type === 'CLEAR_ALL_CACHES') {
     event.waitUntil(
       caches.keys().then((cacheNames) => {
@@ -157,17 +165,22 @@ function getOfflineResponse(request) {
     request.mode === 'navigate' || request.destination === 'document';
 
   if (isDocumentRequest) {
-    return new Response(
-      '<!doctype html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>Offline</h1><p>Please reconnect and try again.</p></body></html>',
-      {
-        status: 503,
-        statusText: 'Offline',
-        headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-          'Cache-Control': 'no-store',
-        },
-      }
-    );
+    // Try to serve the precached offline page first
+    return caches.match('/offline').then((cachedOffline) => {
+      if (cachedOffline) return cachedOffline;
+      // Fallback: inline HTML if offline page isn't cached yet
+      return new Response(
+        '<!doctype html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>Offline</h1><p>Please reconnect and try again.</p></body></html>',
+        {
+          status: 503,
+          statusText: 'Offline',
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store',
+          },
+        }
+      );
+    });
   }
 
   const acceptHeader = request.headers.get('accept') || '';
@@ -208,7 +221,8 @@ self.addEventListener('fetch', (event) => {
   if (!isCacheable(url)) {
     event.respondWith(
       fetch(request).catch(() => {
-        return getOfflineResponse(request);
+        // getOfflineResponse may return a Promise (for document requests)
+        return Promise.resolve(getOfflineResponse(request));
       })
     );
     return;

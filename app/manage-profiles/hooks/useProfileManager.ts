@@ -76,6 +76,7 @@ export function useProfileManager() {
     defaultValues: {
       name: currentProfile?.name || '',
       studentId: normalizeStudentId(currentProfile?.studentId),
+      faculty: currentProfile?.faculty || '',
       course: currentProfile?.course || '',
       year: normalizeYear(currentProfile?.year),
     },
@@ -97,6 +98,7 @@ export function useProfileManager() {
       form.reset({
         name: currentProfile.name || '',
         studentId: normalizeStudentId(currentProfile.studentId),
+        faculty: currentProfile.faculty || '',
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
       });
@@ -121,6 +123,7 @@ export function useProfileManager() {
       form.reset({
         name: currentProfile.name || '',
         studentId: normalizeStudentId(currentProfile.studentId),
+        faculty: currentProfile.faculty || '',
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
       });
@@ -135,6 +138,7 @@ export function useProfileManager() {
         form.reset({
           name: currentProfile.name || '',
           studentId: normalizeStudentId(currentProfile.studentId),
+          faculty: currentProfile.faculty || '',
           course: currentProfile.course || '',
           year: normalizeYear(currentProfile.year),
         });

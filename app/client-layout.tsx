@@ -14,6 +14,8 @@ import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
 import { useInactivityLogout } from '@/lib/hooks/useInactivityLogout';
+import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt';
+import { useSWUpdate } from '@/lib/hooks/useSWUpdate';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
@@ -21,6 +23,7 @@ import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
 import { apiRequest } from '@/lib/utils/api';
 import { API_ROUTES } from '@/lib/constants/config';
+import SyncConflictDialog from '@/components/sync/SyncConflictDialog';
 
 // V3.1: Performance optimization - move constant arrays outside component
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
@@ -183,6 +186,10 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   // Initialize notification scheduler for push notifications
   useNotificationScheduler();
 
+  // PWA: Install prompt and service worker update detection
+  const { canInstall, promptInstall, dismissPrompt } = useInstallPrompt();
+  const { updateAvailable, applyUpdate } = useSWUpdate();
+
   const handleInactivityLogout = useCallback(async () => {
     if (inactivityLogoutInProgressRef.current) return;
     inactivityLogoutInProgressRef.current = true;
@@ -240,7 +247,51 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
               <p>{t('copyright', { year: new Date().getFullYear() })}</p>
             </footer>
             <OfflineIndicator />
+
+            {/* PWA Install Prompt */}
+            {canInstall && (
+              <div
+                role="alert"
+                className="fixed bottom-4 right-4 z-50 max-w-sm rounded-mq-lg border border-mq-border bg-mq-card-background p-4 shadow-mq-lg animate-in slide-in-from-bottom-4 fade-in"
+              >
+                <p className="text-sm font-medium text-mq-content">{t('installApp')}</p>
+                <p className="mt-1 text-xs text-mq-content-secondary">{t('installAppDesc')}</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => void promptInstall()}
+                    className="rounded-mq-lg bg-mq-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-mq-primary/90"
+                  >
+                    {t('install')}
+                  </button>
+                  <button
+                    onClick={dismissPrompt}
+                    className="rounded-mq-lg bg-mq-background-secondary px-3 py-1.5 text-xs font-medium text-mq-content-secondary transition-colors hover:bg-mq-hover-background"
+                  >
+                    {t('dismiss')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SW Update Notification */}
+            {updateAvailable && (
+              <div
+                role="alert"
+                className="fixed top-4 right-4 z-50 max-w-sm rounded-mq-lg border border-mq-info bg-mq-info/10 p-4 shadow-mq-lg animate-in slide-in-from-top-4 fade-in"
+              >
+                <p className="text-sm font-medium text-mq-content">{t('updateAvailable')}</p>
+                <p className="mt-1 text-xs text-mq-content-secondary">{t('updateAvailableDesc')}</p>
+                <button
+                  onClick={applyUpdate}
+                  className="mt-3 rounded-mq-lg bg-mq-info px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-mq-info/90"
+                >
+                  {t('updateNow')}
+                </button>
+              </div>
+            )}
+
             <Toaster />
+            <SyncConflictDialog />
           </div>
         </div>
       </LevelUpNotificationProvider>

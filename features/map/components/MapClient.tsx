@@ -33,7 +33,7 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
-import { GoogleMapEmbed } from './GoogleMapEmbed';
+import { GoogleMapEmbed, type GoogleMapRef } from './GoogleMapEmbed';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -66,6 +66,7 @@ export default function MapClient() {
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
+  const googleMapRef = useRef<GoogleMapRef>(null);
   const overlayToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const wasOverlayOpenRef = useRef(false);
 
@@ -576,6 +577,7 @@ export default function MapClient() {
                   ) : (
                     <div className="absolute inset-0 z-[50]">
                       <GoogleMapEmbed
+                        ref={googleMapRef}
                         selectedBuilding={selectedBuilding}
                         destinationLabel={
                           selectedBuilding
@@ -597,6 +599,11 @@ export default function MapClient() {
                     onStartNavigation={
                       mapView === 'campus'
                         ? () => campusMapRef.current?.startNavigation()
+                        : () => googleMapRef.current?.startNavigation()
+                    }
+                    onStopNavigation={
+                      mapView === 'google'
+                        ? () => googleMapRef.current?.stopNavigation()
                         : undefined
                     }
                     isGoogleMode={mapView === 'google'}

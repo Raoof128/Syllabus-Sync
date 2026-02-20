@@ -21,6 +21,7 @@ import { logger } from '@/lib/logger';
 const UpdateProfileSchema = z.object({
   full_name: z.string().min(1).max(100).optional(),
   student_id: z.string().min(1).max(20).optional(),
+  faculty: z.string().max(100).nullable().optional(),
   course: z.string().max(100).nullable().optional(),
   year: z.string().max(20).nullable().optional(),
   avatar_url: z.string().url().max(500).nullable().optional(),
@@ -122,11 +123,12 @@ export async function PUT(request: Request) {
     };
     if ('full_name' in updates) updatePayload.full_name = updates.full_name ?? null;
     if ('student_id' in updates) updatePayload.student_id = updates.student_id ?? null;
+    if ('faculty' in updates) updatePayload.faculty = updates.faculty ?? null;
     if ('course' in updates) updatePayload.course = updates.course ?? null;
     if ('year' in updates) updatePayload.year = updates.year ?? null;
     if ('avatar_url' in updates) updatePayload.avatar_url = updates.avatar_url ?? null;
 
-    // SECURITY: Only allow updating safe fields (full_name, student_id, course, year, avatar_url)
+    // SECURITY: Only allow updating safe fields (full_name, student_id, faculty, course, year, avatar_url)
     // email is protected by DB trigger (cannot be changed)
     const { data: profile, error: updateError } = await supabase
       .from('profiles')

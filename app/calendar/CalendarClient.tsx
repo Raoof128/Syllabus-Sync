@@ -33,6 +33,8 @@ import { useCalendarFiltering } from '@/features/calendar/hooks/useCalendarFilte
 import { useCalendarDialogs } from '@/features/calendar/hooks/useCalendarDialogs';
 import { useCalendarHighlights } from '@/features/calendar/hooks/useCalendarHighlights';
 import { useCalendarGetters } from '@/features/calendar/hooks/useCalendarGetters';
+import { useLiveCollaboration } from '@/features/calendar/hooks/useLiveCollaboration';
+import { useProfilesStore } from '@/lib/store/profilesStore';
 
 dayjs.extend(isoWeek);
 
@@ -227,6 +229,20 @@ export default function CalendarClient() {
   const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort } =
     useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
 
+  // 7. Live Collaboration Hook - activates when a shared schedule is selected
+  // scheduleId is null until shared schedules feature is enabled (no-op when null)
+  const currentProfile = useProfilesStore((s) => {
+    const id = s.currentProfileId;
+    return id ? (s.profiles.find((p) => p.id === id) ?? null) : null;
+  });
+  const collabUserProfile = currentProfile
+    ? { id: currentProfile.id, name: currentProfile.name, avatar: currentProfile.avatar }
+    : null;
+  const { activeUsers } = useLiveCollaboration(
+    null, // scheduleId — set to a real ID when shared schedules UI is built
+    collabUserProfile,
+  );
+
   // Local Helpers
   const handleDeleteAssignment = (assignment: Deadline) => {
     setAssignmentToDelete(assignment);
@@ -416,6 +432,33 @@ export default function CalendarClient() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+
+              {/* Active collaborators indicator */}
+              {activeUsers.length > 0 && (
+                <div
+                  className="flex items-center gap-1"
+                  aria-label={`${activeUsers.length} active collaborators`}
+                >
+                  <div className="flex -space-x-2">
+                    {activeUsers.slice(0, 4).map((user) => (
+                      <div
+                        key={user.id}
+                        className="w-7 h-7 rounded-full border-2 border-mq-card-background flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ backgroundColor: user.color }}
+                        title={user.name}
+                      >
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                    ))}
+                    {activeUsers.length > 4 && (
+                      <div className="w-7 h-7 rounded-full border-2 border-mq-card-background bg-mq-content-secondary flex items-center justify-center text-[10px] font-bold text-white">
+                        +{activeUsers.length - 4}
+                      </div>
+                    )}
+                  </div>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+              )}
 
               <Button
                 variant={isFiltersOpen ? 'secondary' : 'outline'}

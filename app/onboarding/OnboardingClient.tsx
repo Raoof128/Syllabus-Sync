@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/mq/button';
 import { Label } from '@/components/ui/label';
 import { isValidRedirect } from '@/lib/utils/security';
-import { GraduationCap, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 
@@ -110,10 +110,15 @@ export default function OnboardingClient() {
           <div className="bg-mq-card-background/85 backdrop-blur-xl border border-mq-border/30 rounded-2xl shadow-[0_18px_70px_rgba(0,0,0,0.3)] overflow-hidden">
             {/* Header */}
             <div className="px-6 pt-8 pb-6 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-2xl bg-mq-primary/10 border border-mq-primary/20 flex items-center justify-center">
-                  <GraduationCap className="h-7 w-7 text-mq-primary" />
-                </div>
+              <div className="flex items-center justify-center mb-4">
+                <Image
+                  src="/MQ_Logo_Final.png"
+                  alt={t('mqLogoAlt')}
+                  width={216}
+                  height={216}
+                  className="object-contain"
+                  priority
+                />
               </div>
               <h1 className="text-2xl font-bold text-mq-content mb-2">{t('onboardingTitle')}</h1>
               <p className="text-sm text-mq-content-secondary">{t('onboardingDesc')}</p>

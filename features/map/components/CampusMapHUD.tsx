@@ -29,6 +29,7 @@ type Props = {
   onCopyShare: () => void;
   onExport?: () => void;
   onStartNavigation?: () => void;
+  onStopNavigation?: () => void;
   isGoogleMode?: boolean;
 };
 
@@ -42,6 +43,7 @@ export default function CampusMapHUD({
   onCopyShare,
   onExport,
   onStartNavigation,
+  onStopNavigation: _onStopNavigation,
   isGoogleMode,
 }: Props) {
   const { t } = useTypedTranslation();
@@ -352,7 +354,7 @@ export default function CampusMapHUD({
                   </Badge>
                 )}
 
-                {/* Navigation Buttons */}
+                {/* Navigation Buttons - consistent for both Campus and Google views */}
                 <div className="flex flex-col gap-2 pt-2">
                   {onStartNavigation && (
                     <Button
@@ -364,27 +366,29 @@ export default function CampusMapHUD({
                       }}
                     >
                       <Navigation className="h-4 w-4" />
-                      {t('navigateOnCampus')}
+                      {isGoogleMode ? t('navigate') : t('navigateOnCampus')}
                     </Button>
                   )}
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full gap-2 touch-optimized"
-                    onClick={() => {
-                      const gps = selectedBuilding.location;
-                      if (gps) {
-                        window.open(
-                          `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
-                          '_blank',
-                          'noopener,noreferrer',
-                        );
-                      }
-                    }}
-                  >
-                    <Search className="h-4 w-4" />
-                    {t('navigateToGoogleMaps')}
-                  </Button>
+                  {!isGoogleMode && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full gap-2 touch-optimized"
+                      onClick={() => {
+                        const gps = selectedBuilding.location;
+                        if (gps) {
+                          window.open(
+                            `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
+                            '_blank',
+                            'noopener,noreferrer',
+                          );
+                        }
+                      }}
+                    >
+                      <Search className="h-4 w-4" />
+                      {t('navigateToGoogleMaps')}
+                    </Button>
+                  )}
                 </div>
               </div>
             </LayeredCard>
