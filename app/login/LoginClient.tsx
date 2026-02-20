@@ -403,11 +403,29 @@ export default function LoginClient() {
             <Alert variant="error" className="mb-3">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                {callbackError === 'oauth_failed'
-                  ? t('oauthSignInFailed')
-                  : callbackError === 'verification_failed'
-                    ? t('oauthSessionExpired')
-                    : t('loginErrorFailed')}
+                <div className="space-y-2">
+                  <div>
+                    {callbackError === 'oauth_failed'
+                      ? t('oauthSignInFailed')
+                      : callbackError === 'verification_failed'
+                        ? t('oauthCodeExchangeFailed')
+                        : t('loginErrorFailed')}
+                  </div>
+                  {(callbackError === 'oauth_failed' || callbackError === 'verification_failed') && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-9 w-full rounded-full font-bold text-xs"
+                      onClick={handleGoogleLogin}
+                      disabled={oauthLoading}
+                    >
+                      {oauthLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                      ) : null}
+                      {t('tryAgain')}
+                    </Button>
+                  )}
+                </div>
               </AlertDescription>
             </Alert>
           )}

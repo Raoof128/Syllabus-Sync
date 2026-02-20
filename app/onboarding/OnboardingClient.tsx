@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CourseCombobox } from '@/app/signup/components/CourseCombobox';
+import { FacultySelect } from '@/app/signup/components/FacultySelect';
 import { MQ_COURSES, DEGREE_TYPE_LABELS, DEGREE_MAX_YEARS } from '@/lib/data/mq-courses';
 import {
   Select,
@@ -26,6 +27,7 @@ const createSchema = (
   t: (key: TranslationKey, options?: Record<string, string | number>) => string,
 ) =>
   z.object({
+    faculty: z.string().min(1, t('pleaseSelectFaculty' as TranslationKey)),
     course: z.string().min(1, t('pleaseSelectCourse' as TranslationKey)),
     year: z.string().min(1, t('pleaseSelectYear' as TranslationKey)),
   });
@@ -45,13 +47,26 @@ export default function OnboardingClient() {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { course: '', year: '' },
+    defaultValues: { faculty: '', course: '', year: '' },
   });
 
+  const selectedFaculty = watch('faculty');
   const selectedCourse = watch('course');
+
+  // Reset course and year when faculty changes
+  useEffect(() => {
+    setValue('course', '');
+    setValue('year', '');
+  }, [selectedFaculty, setValue]);
+
+  // Reset year when course changes
+  useEffect(() => {
+    setValue('year', '');
+  }, [selectedCourse, setValue]);
 
   const maxYear = useMemo(() => {
     if (!selectedCourse) return 8;
@@ -126,6 +141,23 @@ export default function OnboardingClient() {
 
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-8 space-y-5">
+              {/* Faculty */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-mq-content">{t('faculty')}</Label>
+                <Controller
+                  name="faculty"
+                  control={control}
+                  render={({ field }) => (
+                    <FacultySelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t('selectFaculty')}
+                    />
+                  )}
+                />
+                {errors.faculty && <p className="text-xs text-red-500">{errors.faculty.message}</p>}
+              </div>
+
               {/* Course */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-mq-content">{t('course')}</Label>
@@ -136,7 +168,9 @@ export default function OnboardingClient() {
                     <CourseCombobox
                       value={field.value}
                       onChange={field.onChange}
+                      disabled={!selectedFaculty}
                       error={!!errors.course}
+                      facultyFilter={selectedFaculty}
                     />
                   )}
                 />

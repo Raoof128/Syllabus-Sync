@@ -98,11 +98,11 @@ export async function GET(request: Request) {
   if (isOAuthSignIn) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('course, year')
+      .select('faculty, course, year')
       .eq('id', data.user.id)
       .maybeSingle();
 
-    const isIncomplete = !profile?.course || !profile?.year;
+    const isIncomplete = !profile?.faculty || !profile?.course || !profile?.year;
     if (isIncomplete) {
       const onboardingUrl = new URL('/onboarding', requestUrl.origin);
       onboardingUrl.searchParams.set('next', redirectTo);

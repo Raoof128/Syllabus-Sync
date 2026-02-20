@@ -72,17 +72,27 @@ export default function SignupClient() {
       const callbackUrl = new URL('/auth/callback', window.location.origin);
       callbackUrl.searchParams.set('redirectTo', '/home');
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
         toastUtils.error(t('loginErrorFailed'), error.message);
         setOauthLoading(false);
+        return;
       }
+
+      if (data?.url) {
+        window.location.assign(data.url);
+        return;
+      }
+
+      toastUtils.error(t('loginErrorFailed'), t('oauthSignInFailed'));
+      setOauthLoading(false);
     } catch {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);

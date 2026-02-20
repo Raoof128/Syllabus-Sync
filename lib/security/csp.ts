@@ -108,8 +108,8 @@ export function buildCSP(options: CSPOptions = {}): string {
     // Base URI: Restrict base tag
     "base-uri 'self'",
 
-    // Form actions: Where forms can submit
-    "form-action 'self'",
+    // Form actions: Where forms can submit (Google OAuth may POST back)
+    "form-action 'self' https://accounts.google.com",
 
     // Object sources: Disable plugins
     "object-src 'none'",
@@ -154,8 +154,8 @@ export function buildDevCSP(): string {
     "frame-src 'self' https://www.google.com https://maps.google.com",
     // Base URI
     "base-uri 'self'",
-    // Form actions
-    "form-action 'self'",
+    // Form actions (Google OAuth may POST back)
+    "form-action 'self' https://accounts.google.com",
     // Object sources
     "object-src 'none'",
   ];
@@ -197,8 +197,8 @@ export function buildProdCSP(): string {
     "frame-src 'self' https://www.google.com https://maps.google.com",
     // Base URI: Restrict base tag
     "base-uri 'self'",
-    // Form actions: Where forms can submit
-    "form-action 'self'",
+    // Form actions: Where forms can submit (Google OAuth may POST back)
+    "form-action 'self' https://accounts.google.com",
     // Object sources: Disable plugins
     "object-src 'none'",
     // Upgrade insecure requests in production

@@ -1,18 +1,17 @@
 'use client';
 
-import type { User, Session } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { createBrowserClient, isSupabaseConfigured } from './client';
 
 export type BrowserAuthSnapshot = {
-  session: Session | null;
+  session: null;
   user: User | null;
   resolution: 'resolved' | 'unknown';
 };
 
 /**
- * Returns the current Supabase browser session/user without calling our own API.
- * This avoids extra Vercel function invocations from `/api/auth/user` when the UI
- * only needs client-side auth state.
+ * Returns the current Supabase browser user validated against the server.
+ * Uses `getUser()` instead of `getSession()` to avoid stale/expired local tokens.
  */
 export async function getBrowserAuthSnapshot(): Promise<BrowserAuthSnapshot> {
   if (!isSupabaseConfigured()) {
@@ -20,11 +19,11 @@ export async function getBrowserAuthSnapshot(): Promise<BrowserAuthSnapshot> {
   }
 
   const supabase = createBrowserClient();
-  const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getUser();
 
   if (error) {
     return { session: null, user: null, resolution: 'unknown' };
   }
 
-  return { session: data.session ?? null, user: data.session?.user ?? null, resolution: 'resolved' };
+  return { session: null, user: data.user ?? null, resolution: 'resolved' };
 }
