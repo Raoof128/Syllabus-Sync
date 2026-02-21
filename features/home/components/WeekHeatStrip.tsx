@@ -206,7 +206,7 @@ export default function WeekHeatStrip() {
           >
             {/* Tooltip - positioned to stay within bounds */}
             <div
-              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[140px] sm:max-w-[160px] bg-mq-content text-mq-background text-xs p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center whitespace-nowrap"
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max min-w-[120px] max-w-[180px] sm:max-w-[200px] bg-mq-content text-mq-background text-xs px-3 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center"
               style={{
                 // Ensure tooltip doesn't overflow on edges
                 left: i === 0 ? '0' : i === 6 ? 'auto' : '50%',
@@ -215,7 +215,7 @@ export default function WeekHeatStrip() {
                   i === 0 ? 'translateX(0)' : i === 6 ? 'translateX(0)' : 'translateX(-50%)',
               }}
             >
-              <p className="font-bold">{day.fullDate}</p>
+              <p className="font-bold whitespace-nowrap">{day.fullDate}</p>
               <p>
                 {day.classCount} {day.classCount === 1 ? 'class' : 'classes'}
               </p>
