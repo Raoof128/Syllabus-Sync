@@ -240,8 +240,9 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                             unit={unit}
                             showActions={false}
                             onClick={(clickedUnit) => {
+                              const today = new Date().toISOString().split('T')[0];
                               router.push(
-                                `/calendar?highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
+                                `/calendar?date=${today}&highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
                               );
                             }}
                           />
