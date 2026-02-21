@@ -14,8 +14,6 @@ type AboutSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-import { useRouter } from 'next/navigation';
-...
 const AboutSettings = memo(({ t }: AboutSettingsProps) => {
   const router = useRouter();
   const handleViewDocumentation = useCallback(() => {

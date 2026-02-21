@@ -66,8 +66,10 @@ vi.mock('@/lib/constants/config', () => ({
 }));
 
 // Mock security components that use react-query
-vi.mock('@/features/settings/components/security/BiometricToggle', () => ({
-  BiometricToggle: () => <div data-testid="biometric-toggle">Biometric Toggle</div>,
+vi.mock('@/features/settings/components/security/PasskeySecuritySection', () => ({
+  PasskeySecuritySection: () => (
+    <div data-testid="passkey-security-section">Passkey & Biometric Login</div>
+  ),
 }));
 
 vi.mock('@/features/settings/components/security/TOTPSetup', () => ({
@@ -76,10 +78,6 @@ vi.mock('@/features/settings/components/security/TOTPSetup', () => ({
 
 vi.mock('@/features/settings/components/security/SMSSetup', () => ({
   SMSSetup: () => <div data-testid="sms-setup">SMS Setup</div>,
-}));
-
-vi.mock('@/features/settings/components/security/PasskeyManager', () => ({
-  PasskeyManager: () => <div data-testid="passkey-manager">Passkey Manager</div>,
 }));
 
 // Mock useSessionManager hook

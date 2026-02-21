@@ -36,6 +36,22 @@ const languageAriaLabelKeys: Record<Language, TranslationKey> = {
   it: 'switchToItalian',
   fr: 'switchToFrench',
   he: 'switchToHebrew',
+  de: 'switchToGerman',
+  da: 'switchToDanish',
+  sv: 'switchToSwedish',
+  tr: 'switchToTurkish',
+  pt: 'switchToPortuguese',
+  nl: 'switchToDutch',
+  pl: 'switchToPolish',
+  no: 'switchToNorwegian',
+  fi: 'switchToFinnish',
+  el: 'switchToGreek',
+  ro: 'switchToRomanian',
+  cs: 'switchToCzech',
+  hu: 'switchToHungarian',
+  uk: 'switchToUkrainian',
+  ne: 'switchToNepali',
+  si: 'switchToSinhala',
 };
 
 type AppearanceSettingsProps = {

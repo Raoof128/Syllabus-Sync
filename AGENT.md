@@ -1,10 +1,10 @@
 Raouf: 2026-02-21 (Australia/Sydney)
-Scope: Settings UI Consolidation & UX Refinement
-Summary: (1) Consolidated Biometric Login and Passkey management into a single unified "Passkey & Biometric Login" section for a more professional security interface. (2) Fixed a double-colon display bug in the Dark Mode and Language settings by removing trailing colons from translation files and standardizing separator usage in components. (3) Improved TOTP enrollment instructions and error handling.
-Files: Modified `features/settings/components/PrivacySettings.tsx`, `features/settings/components/AppearanceSettings.tsx`, `features/settings/components/SecuritySettings.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`, `locales/*/translations.json`. Removed `BiometricToggle.tsx` and `PasskeyManager.tsx`.
-Verification: Visual audit of labels confirmed "Current: [value]" formatting. Manual verification of unified passkey component structure.
+Scope: Full System Integrity & i18n Mapping Completion
+Summary: (1) Fixed all issues discovered by `npm run check`, including a syntax error in `AboutSettings.tsx`. (2) Completed the i18n mapping for 16 new languages across `Clock.tsx`, `AppearanceSettings.tsx`, and `locale.ts`. (3) Resolved test failures by renaming and updating test files to match the new component structure (`AboutSettings`, `PasskeySecuritySection`). (4) Standardized "Current:" label formatting across all locales.
+Files: Modified `components/layout/Clock.tsx`, `features/settings/components/AppearanceSettings.tsx`, `lib/utils/locale.ts`, `locales/*/translations.json`, `features/settings/components/AboutSettings.tsx`, `features/settings/components/security/TOTPSetup.tsx`, `features/map/position-editor/PositionEditorClient.tsx`. Renamed and updated several test files.
+Verification: `npm run check` ✅ (Secrets, Format, Typecheck, Lint, 490/490 Tests, Build).
 Deployment: N/A locally queued.
-Follow-ups: Ensure all locales have updated "current" keys without colons (automated script run).
+Follow-ups: None.
 
 Raouf: 2026-02-20 (Australia/Sydney)
 Scope: Academic Course Duration Integrity Fixes

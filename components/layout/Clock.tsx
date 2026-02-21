@@ -26,6 +26,22 @@ const localeMap: Record<Language, string> = {
   it: 'it-IT',
   fr: 'fr-FR',
   he: 'he-IL',
+  de: 'de-DE',
+  da: 'da-DK',
+  sv: 'sv-SE',
+  tr: 'tr-TR',
+  pt: 'pt-PT',
+  nl: 'nl-NL',
+  pl: 'pl-PL',
+  no: 'nb-NO',
+  fi: 'fi-FI',
+  el: 'el-GR',
+  ro: 'ro-RO',
+  cs: 'cs-CZ',
+  hu: 'hu-HU',
+  uk: 'uk-UA',
+  ne: 'ne-NP',
+  si: 'si-LK',
 };
 
 /**

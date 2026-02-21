@@ -102,7 +102,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       setStep('success');
       toastUtils.success(t('security'), 'Two-factor authentication enabled!');
       onStatusChange();
-    } catch (error) {
+    } catch {
       setVerifyError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);

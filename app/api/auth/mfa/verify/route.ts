@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create challenge then verify
-    logger.info('Creating MFA challenge for enrollment verification', { userId: user.id, factorId });
+    logger.info('Creating MFA challenge for enrollment verification', {
+      userId: user.id,
+      factorId,
+    });
     const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
       factorId,
     });
@@ -71,7 +74,11 @@ export async function POST(request: NextRequest) {
         factorId,
         error: challengeError?.message,
       });
-      return jsonError('Failed to create verification challenge. Please refresh and try again.', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        'Failed to create verification challenge. Please refresh and try again.',
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
     logger.info('Verifying MFA code', { userId: user.id, factorId, challengeId: challenge.id });
@@ -87,7 +94,11 @@ export async function POST(request: NextRequest) {
         factorId,
         error: verifyError?.message,
       });
-      return jsonError('Invalid verification code. Please check your app and try again.', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        'Invalid verification code. Please check your app and try again.',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     logger.info('MFA TOTP verified successfully', { userId: user.id });

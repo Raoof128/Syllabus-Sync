@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BiometricToggle } from '@/features/settings/components/security/BiometricToggle';
+import { PasskeySecuritySection } from '@/features/settings/components/security/PasskeySecuritySection';
 import { vi, describe, it, expect } from 'vitest';
 
 // Mock useBiometrics hook since it's used in the component
@@ -15,11 +15,11 @@ vi.mock('@/lib/hooks/useBiometrics', () => ({
   }),
 }));
 
-describe('BiometricToggle', () => {
+describe('PasskeySecuritySection', () => {
   const mockT = (key: string) => key;
 
   it('shows enabled state correctly', () => {
-    render(<BiometricToggle t={mockT} />);
+    render(<PasskeySecuritySection t={mockT} />);
     // Component uses ToggleControl (role="switch") instead of a button
     const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
     expect(toggle).toBeInTheDocument();
@@ -27,10 +27,15 @@ describe('BiometricToggle', () => {
   });
 
   it('calls toggle function when clicked', () => {
-    render(<BiometricToggle t={mockT} />);
+    render(<PasskeySecuritySection t={mockT} />);
     const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
     fireEvent.click(toggle);
     // It should open the enable dialog
     expect(screen.getByText('enableBiometricDesc')).toBeInTheDocument();
+  });
+
+  it('renders passkeys list header', () => {
+    render(<PasskeySecuritySection t={mockT} />);
+    expect(screen.getByText('Registered Devices & Keys')).toBeInTheDocument();
   });
 });

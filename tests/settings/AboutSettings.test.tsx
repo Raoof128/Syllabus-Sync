@@ -1,7 +1,7 @@
-// tests/settings/HelpSupport.test.tsx
+// tests/settings/AboutSettings.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import HelpSupport from '@/features/settings/components/HelpSupport';
+import { AboutSettings } from '@/features/settings/components';
 
 // Mock toast utils
 vi.mock('@/lib/utils/toast', () => ({
@@ -17,6 +17,13 @@ vi.mock('@/lib/utils/toast', () => ({
 vi.mock('@/lib/config', () => ({
   APP_CONFIG: {
     version: '1.0.0',
+    name: 'Syllabus Sync',
+    description: 'Campus navigation and schedule management',
+  },
+  UNIVERSITY_CONFIG: {
+    name: 'Macquarie University',
+    shortName: 'MQ',
+    supportEmail: 'support@mq.edu.au',
   },
   EXTERNAL_LINKS: {
     documentation: 'https://docs.example.com',
@@ -31,10 +38,18 @@ Object.defineProperty(window, 'open', {
   writable: true,
 });
 
-describe('HelpSupport', () => {
+// Mock useRouter
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
+describe('AboutSettings', () => {
   const mockT = vi.fn((key: string) => {
     const translations: Record<string, string> = {
-      helpSupport: 'Help & Support',
+      settings_about: 'About',
+      helpSupport: 'About Syllabus Sync',
       aboutTitle: 'About',
       version: 'Version',
       aboutDesc: 'Campus navigation and schedule management app',
@@ -46,6 +61,9 @@ describe('HelpSupport', () => {
       feedbackDesc: 'Help us improve by sharing your thoughts',
       sendFeedback: 'Send Feedback',
       feedbackPreparing: 'Preparing feedback form...',
+      privacyPolicy: 'Privacy Policy',
+      privacyPolicyDesc: 'View our privacy policy',
+      view: 'View',
     };
     return translations[key] || key;
   });
@@ -58,23 +76,31 @@ describe('HelpSupport', () => {
     vi.clearAllMocks();
   });
 
-  it('renders help support card', () => {
-    render(<HelpSupport {...defaultProps} />);
+  it('renders about settings card', () => {
+    render(<AboutSettings {...defaultProps} />);
 
-    expect(screen.getByTestId('help-support')).toBeInTheDocument();
-    expect(screen.getByText('Help & Support')).toBeInTheDocument();
+    expect(screen.getByTestId('about-settings')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'About', level: 2 })).toBeInTheDocument();
   });
 
   it('renders about section with version', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
-    expect(screen.getByText('About')).toBeInTheDocument();
+    // Use a more specific query since "About" appears multiple times
+    expect(screen.getByRole('heading', { name: 'About', level: 3 })).toBeInTheDocument();
     expect(screen.getByText(/Version 1.0.0/)).toBeInTheDocument();
     expect(screen.getByText(/Campus navigation and schedule management app/)).toBeInTheDocument();
   });
 
+  it('renders privacy policy section', () => {
+    render(<AboutSettings {...defaultProps} />);
+
+    expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
+    expect(screen.getByText('View our privacy policy')).toBeInTheDocument();
+  });
+
   it('renders need help section', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     expect(screen.getByText('Need Help?')).toBeInTheDocument();
     expect(
@@ -83,14 +109,14 @@ describe('HelpSupport', () => {
   });
 
   it('renders view documentation button', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     expect(screen.getByTestId('view-documentation-button')).toBeInTheDocument();
     expect(screen.getByText('View Documentation')).toBeInTheDocument();
   });
 
   it('opens documentation link when button is clicked', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('view-documentation-button'));
 
@@ -102,7 +128,7 @@ describe('HelpSupport', () => {
   });
 
   it('renders feedback section', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     // Use getAllByText since "Send Feedback" appears multiple times (heading + button)
     expect(screen.getAllByText('Send Feedback').length).toBeGreaterThanOrEqual(1);
@@ -110,21 +136,21 @@ describe('HelpSupport', () => {
   });
 
   it('renders send feedback button', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     expect(screen.getByTestId('send-feedback-button')).toBeInTheDocument();
   });
 
   it('has proper region role for accessibility', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
-    expect(screen.getByRole('region', { name: 'Help & Support' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'About' })).toBeInTheDocument();
   });
 
   it('renders section headings as h3 elements', () => {
-    render(<HelpSupport {...defaultProps} />);
+    render(<AboutSettings {...defaultProps} />);
 
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings.length).toBeGreaterThanOrEqual(2);
+    expect(headings.length).toBeGreaterThanOrEqual(3); // About, Privacy Policy, Need Help, Feedback
   });
 });
