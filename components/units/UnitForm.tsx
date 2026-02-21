@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
 import { UNIT_COLORS } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
@@ -53,6 +54,7 @@ const DAYS: DayOfWeek[] = [
 export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
   const { t } = useTypedTranslation();
   const { addUnit, updateUnit } = useUnitsStore();
+  const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
 
   // Form state
   const [code, setCode] = useState('');
@@ -220,9 +222,10 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    const newCode = code.trim().toUpperCase();
     const unitData: Unit = {
       id: editUnit?.id || uuidv4(),
-      code: code.trim().toUpperCase(),
+      code: newCode,
       name: name.trim(),
       color,
       location: {
@@ -232,6 +235,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       schedule,
       createdAt: editUnit?.createdAt || new Date(),
     };
+
+    // If editing and the unit code changed, remove deadlines associated with the old unit
+    if (editUnit && editUnit.code.toUpperCase() !== newCode) {
+      removeDeadlinesByUnit(editUnit.id, editUnit.code);
+    }
 
     const result = await saveWithRetry(unitData);
     if (result !== null) {

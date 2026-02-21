@@ -6,12 +6,21 @@ import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { cn } from '@/lib/utils';
 import type { Building } from '@/features/map/lib/buildings';
+import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 
-const MQ_QUERY = 'Macquarie+University+Sydney+NSW+Australia';
+// Exact coordinates for Macquarie University campus center
+const MQ_COORDS = `${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`;
 
-const EMBED_VIEW_URL = `https://www.google.com/maps?q=${MQ_QUERY}&z=16&ie=UTF8&iwloc=&output=embed`;
+// Build embed URLs with exact coordinates for accuracy
+const buildViewUrl = (query: string) => {
+  // Note: Google Maps embed doesn't support dark mode via URL params directly
+  // The embed will always use Google's default styling
+  return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
+};
 
-const EMBED_DIRECTIONS_URL = `https://www.google.com/maps?saddr=My+Location&daddr=${MQ_QUERY}&dirflg=w&z=14&ie=UTF8&output=embed`;
+const buildDirectionsUrl = (destination: string) => {
+  return `https://www.google.com/maps?saddr=My+Location&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
+};
 
 type MapMode = 'view' | 'directions';
 
@@ -38,7 +47,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
       ? 'My+Location'
       : selectedBuilding?.location
         ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
-        : MQ_QUERY;
+        : MQ_COORDS;
 
     const resolvedDestinationLabel = forceCenter
       ? safeT('myLocation', 'My Location')
@@ -110,8 +119,8 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           }
           src={
             mode === 'view'
-              ? EMBED_VIEW_URL.replace(MQ_QUERY, destinationQuery)
-              : EMBED_DIRECTIONS_URL.replace(MQ_QUERY, destinationQuery)
+              ? buildViewUrl(destinationQuery)
+              : buildDirectionsUrl(destinationQuery)
           }
           className="h-full w-full flex-1 border-0"
           loading="lazy"

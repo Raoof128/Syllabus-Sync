@@ -45,6 +45,10 @@ describe('TOTP Enroll Cache-Control (Security Audit)', () => {
           error: null,
         }),
         mfa: {
+          listFactors: vi.fn().mockResolvedValue({
+            data: { totp: [], phone: [] },
+            error: null,
+          }),
           enroll: vi.fn().mockResolvedValue({
             data: {
               id: 'factor-1',

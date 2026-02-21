@@ -299,7 +299,8 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
           )}
         </div>
 
-        {/* Registered Passkeys List */}
+        {/* Registered Passkeys List - Only show if there are credentials OR biometric is not enabled */}
+        {(credentials.length > 0 || !biometricEnabled) && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-mq-content-tertiary flex items-center gap-2">
@@ -370,6 +371,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* --- Dialogs --- */}

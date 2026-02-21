@@ -203,9 +203,9 @@ export default function CampusMapHUD({
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
-                className="overflow-hidden flex flex-col"
+                className="overflow-hidden flex flex-col bg-mq-card-background"
               >
-                <div className="px-4 py-3 border-b border-mq-border/50 bg-mq-background-secondary/50">
+                <div className="px-4 py-3 border-b border-mq-border/50 bg-mq-background-secondary/50 dark:bg-mq-card-background">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
                     <input
@@ -238,7 +238,7 @@ export default function CampusMapHUD({
                 </div>
 
                 <m.div
-                  className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain bg-mq-card-background max-h-[200px] sm:max-h-[280px]"
+                  className="overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-0 overscroll-contain bg-mq-card-background dark:bg-mq-card-background max-h-[200px] sm:max-h-[280px]"
                   initial="hidden"
                   animate="visible"
                   variants={{

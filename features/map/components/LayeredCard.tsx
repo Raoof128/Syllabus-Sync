@@ -14,7 +14,9 @@ export const LayeredCard = forwardRef<HTMLDivElement, LayeredCardProps>(
         ref={ref}
         className={cn(
           // Base styles - Glassmorphism with depth
-          'bg-mq-card-background/85 backdrop-blur-xl',
+          // Light mode: 85% opacity for glass effect
+          // Dark mode: 95% opacity for better content visibility
+          'bg-mq-card-background/85 dark:bg-mq-card-background/95 backdrop-blur-xl',
           'border border-white/20 dark:border-white/10',
 
           // High Contrast Mode Overrides
@@ -22,13 +24,14 @@ export const LayeredCard = forwardRef<HTMLDivElement, LayeredCardProps>(
 
           // Soft elevation - Multi-layered shadows for 3D feel
           'shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_32px_rgba(0,0,0,0.12)]',
+          'dark:shadow-[0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)]',
 
           // Inner lighting for "thick glass" effect
           'ring-1 ring-inset ring-white/10 dark:ring-white/5',
 
           // Hover depth lift
           interactive &&
-            'transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),0_20px_48px_rgba(0,0,0,0.16)] hover:bg-mq-card-background/95',
+            'transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),0_20px_48px_rgba(0,0,0,0.16)] hover:bg-mq-card-background/95 dark:hover:bg-mq-card-background',
 
           className,
         )}
