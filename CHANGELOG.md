@@ -1,3 +1,31 @@
+### Raouf: Security UI/UX Migration & Settings Tab Rename — 2026-02-21
+
+**Scope:** Settings / Profile / Security / UX
+**Type:** Enhancement / Refactor
+
+#### Changes
+
+1. **Moved Security Actions to Profile:**
+   - Relocated "Change Password" and "Manage Sessions" from the Settings tab to the **Manage Profiles** page.
+   - Created a dedicated `SecurityCard.tsx` component for these actions in the profile management context.
+   - Updated "Change Password" description to "Update your password".
+   - Updated "Manage Sessions" description to "View and manage active sessions".
+2. **Renamed Privacy Tab to Security:**
+   - Changed the "Privacy & Security" settings tab name to **Security** globally.
+   - Updated `app/settings/layout.tsx` to use the `security` translation key for the tab label.
+   - Standardized the use of the `security` key for component titles in both Settings and Profile pages.
+3. **Cleaned up Privacy Policy Links:**
+   - Removed the "Privacy Policy" section and "View our privacy policy" links from the main Security settings card as requested.
+   - Maintained Privacy Policy availability in the "About" section for legal compliance.
+4. **Test Suite Alignment:**
+   - Created `tests/unit/components/SecurityCard.test.tsx` to verify the new component's functionality.
+   - Updated `tests/settings/PrivacySettings.test.tsx` to reflect the removal of moved sections and the title change.
+
+#### Verification
+
+- `npm run typecheck` ✅
+- `npm test` ✅ (482/482 pass)
+
 ### Raouf: Full System Quality Gate Pass — 2026-02-21
 
 **Scope:** Quality Assurance / Maintenance

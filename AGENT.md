@@ -1,4 +1,12 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Security UI/UX Migration & Settings Tab Rename
+Summary: (1) Moved "Change Password" and "Manage Sessions" sections from Privacy settings to Manage Profiles page for better logical grouping. (2) Removed "Privacy Policy" section and descriptions from the settings card as requested. (3) Renamed the "Privacy & Security" settings tab to "Security" across the application by updating translation keys and layout configuration. (4) Created a new `SecurityCard` component in `app/manage-profiles/components/` and wired it into the profile management view. (5) Updated test suite to align with the new component structure and title changes.
+Files: Created `app/manage-profiles/components/SecurityCard.tsx` and `tests/unit/components/SecurityCard.test.tsx`. Modified `app/manage-profiles/page.tsx`, `features/settings/components/PrivacySettings.tsx`, `app/settings/layout.tsx`, `locales/en/translations.json`, and `tests/settings/PrivacySettings.test.tsx`.
+Verification: `npm run typecheck` ✅, `npm test` ✅ (482/482 pass).
+Deployment: N/A locally queued.
+Follow-ups: Synchronize `privacySecurity` translation key rename across remaining 34 locales if needed (currently using `security` key which is already translated).
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Full System Integrity & i18n Mapping Completion
 Summary: (1) Fixed all issues discovered by `npm run check`, including a syntax error in `AboutSettings.tsx`. (2) Completed the i18n mapping for 16 new languages across `Clock.tsx`, `AppearanceSettings.tsx`, and `locale.ts`. (3) Resolved test failures by renaming and updating test files to match the new component structure (`AboutSettings`, `PasskeySecuritySection`). (4) Standardized "Current:" label formatting across all locales.
 Files: Modified `components/layout/Clock.tsx`, `features/settings/components/AppearanceSettings.tsx`, `lib/utils/locale.ts`, `locales/*/translations.json`, `features/settings/components/AboutSettings.tsx`, `features/settings/components/security/TOTPSetup.tsx`, `features/map/position-editor/PositionEditorClient.tsx`. Renamed and updated several test files.

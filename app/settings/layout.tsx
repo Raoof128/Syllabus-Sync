@@ -36,7 +36,7 @@ const SECTIONS: {
   {
     id: 'security',
     icon: Shield,
-    labelKey: 'settings_privacySecurity',
+    labelKey: 'security',
     color: 'text-green-500',
     path: '/settings/security',
   },

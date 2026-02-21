@@ -5,6 +5,7 @@ import { ProfileHeader } from './components/ProfileHeader';
 import { PersonalInfoCard } from './components/PersonalInfoCard';
 import { AcademicInfoCard } from './components/AcademicInfoCard';
 import { ReminderSettings } from './components/ReminderSettings';
+import { SecurityCard } from './components/SecurityCard';
 import { useProfileManager } from './hooks/useProfileManager';
 import { Button } from '@/components/ui/mq/button';
 import { Save, Loader2, User as UserIcon, ArrowLeft } from 'lucide-react'; // Renamed User to UserIcon to avoid conflict
@@ -68,6 +69,9 @@ export default function ManageProfilesPage() {
 
         {/* Reminders stay separate from Zod form for instant toggling */}
         <ReminderSettings disabled={isSaving} />
+
+        {/* Account Security & Sessions */}
+        <SecurityCard />
 
         {/* Save Button only shows if form is dirty (changed) */}
         {isDirty && (

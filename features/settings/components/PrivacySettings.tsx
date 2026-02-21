@@ -1,13 +1,11 @@
 'use client';
 
 import { memo, useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Shield, Loader2, MessageSquare } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { SessionsList } from './privacy/SessionsList';
 import { DataManagement } from './privacy/DataManagement';
 import { PasskeySecuritySection } from './security/PasskeySecuritySection';
 import { TOTPSetup } from './security/TOTPSetup';
@@ -21,8 +19,6 @@ type PrivacySettingsProps = {
 };
 
 const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
-  const router = useRouter();
-  const [showSessionsDialog, setShowSessionsDialog] = useState(false);
   const [factors, setFactors] = useState<MFAFactor[]>([]);
   const [isLoadingMFA, setIsLoadingMFA] = useState(true);
 
@@ -53,7 +49,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 security-indicator" aria-hidden="true" />
-              <span id="privacy-security-heading">{t('privacySecurity')}</span>
+              <span id="privacy-security-heading">{t('security')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent
@@ -61,65 +57,8 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
             role="region"
             aria-labelledby="privacy-security-heading"
           >
-            {/* Change Password */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">{t('changePasswordDesc')}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => router.push('/reset-password?from=settings')}
-                  data-testid="change-password-button"
-                >
-                  {t('changePassword')}
-                </Button>
-              </div>
-            </div>
-
-            {/* Manage Sessions */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">{t('manageSessionsDesc')}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => setShowSessionsDialog(true)}
-                  data-testid="manage-sessions-button"
-                >
-                  {t('manageSessions')}
-                </Button>
-              </div>
-            </div>
-
-            {/* Privacy Policy */}
-            <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-mq-content">{t('privacyPolicy')}</h3>
-                  <p className="text-mq-sm text-mq-content-secondary">{t('privacyPolicyDesc')}</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => router.push('/privacy')}
-                  data-testid="privacy-policy-button"
-                >
-                  {t('view')}
-                </Button>
-              </div>
-            </div>
-
             {/* Two-Factor Authentication & Security */}
-            <div className="pt-4 border-t border-mq-border space-y-4">
+            <div className="space-y-4">
               <h3 className="text-sm font-semibold text-mq-content flex items-center gap-2">
                 <Shield className="h-4 w-4" aria-hidden="true" />
                 {t('twoFactorAuthentication' as TranslationKey) || 'Two-Factor Authentication'}
@@ -159,12 +98,12 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
             </div>
 
             {/* Data Management (Export & Clear) */}
-            <DataManagement t={t} language={language} />
+            <div className="pt-4 border-t border-mq-border">
+              <DataManagement t={t} language={language} />
+            </div>
           </CardContent>
         </Card>
       </MagicCard>
-
-      <SessionsList open={showSessionsDialog} onOpenChange={setShowSessionsDialog} t={t} />
     </>
   );
 });

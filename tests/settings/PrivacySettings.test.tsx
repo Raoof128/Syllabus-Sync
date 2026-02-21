@@ -123,7 +123,7 @@ Object.defineProperty(URL, 'revokeObjectURL', {
 describe('PrivacySettings', () => {
   const mockT = vi.fn((key: string) => {
     const translations: Record<string, string> = {
-      privacySecurity: 'Privacy & Security',
+      security: 'Security',
       changePassword: 'Change Password',
       changePasswordDesc: 'Update your account password',
       changePasswordTitle: 'Change Password',
@@ -173,16 +173,6 @@ describe('PrivacySettings', () => {
     return translations[key] || key;
   });
 
-  const mockSessions = [
-    { id: '1', device: 'Chrome on Mac', lastActive: new Date().toISOString(), current: true },
-    {
-      id: '2',
-      device: 'Firefox on Windows',
-      lastActive: new Date(Date.now() - 86400000).toISOString(),
-      current: false,
-    },
-  ];
-
   const defaultProps = {
     t: mockT,
     units: [],
@@ -212,40 +202,7 @@ describe('PrivacySettings', () => {
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('privacy-settings')).toBeInTheDocument();
-    expect(screen.getByText('Privacy & Security')).toBeInTheDocument();
-  });
-
-  it('renders change password button', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    expect(screen.getByTestId('change-password-button')).toBeInTheDocument();
-  });
-
-  it('renders manage sessions button', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    expect(screen.getByTestId('manage-sessions-button')).toBeInTheDocument();
-  });
-
-  it('renders privacy policy button', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    expect(screen.getByTestId('privacy-policy-button')).toBeInTheDocument();
+    expect(screen.getByText('Security')).toBeInTheDocument();
   });
 
   it('renders export data button', () => {
@@ -257,134 +214,6 @@ describe('PrivacySettings', () => {
     render(<PrivacySettings {...defaultProps} />);
 
     expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
-  });
-
-  // Password navigation test (button now navigates to /reset-password from settings context)
-  it('navigates to /reset-password?from=settings when change password button is clicked', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('change-password-button'));
-
-    expect(mockRouterPush).toHaveBeenCalledWith('/reset-password?from=settings');
-  });
-
-  // Sessions dialog tests
-  it('opens sessions dialog when manage sessions button is clicked', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-
-    await waitFor(() => {
-      expect(mockFetchSessions).toHaveBeenCalled();
-    });
-
-    expect(screen.getByTestId('sessions-dialog')).toBeInTheDocument();
-  });
-
-  it('renders sessions in the dialog', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    // Set sessions to be returned by the mocked hook
-    mockSessionsData.push(...mockSessions);
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('session-1')).toBeInTheDocument();
-      expect(screen.getByTestId('session-2')).toBeInTheDocument();
-    });
-  });
-
-  it('disables sign out button for current session', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    // Set sessions to be returned by the mocked hook
-    mockSessionsData.push(...mockSessions);
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-
-    const currentSessionButton = await screen.findByTestId('end-session-1');
-    expect(currentSessionButton).toBeDisabled();
-  });
-
-  it('calls sessions API when ending a non-current session', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    // Set sessions to be returned by the mocked hook
-    mockSessionsData.push(...mockSessions);
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-    const sessionButton = await screen.findByTestId('end-session-2');
-    fireEvent.click(sessionButton);
-
-    await waitFor(() => {
-      expect(mockEndSession).toHaveBeenCalled();
-    });
-  });
-
-  it('renders end all sessions button', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    // Set sessions to be returned by the mocked hook
-    mockSessionsData.push(...mockSessions);
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-
-    expect(await screen.findByTestId('end-all-sessions-button')).toBeInTheDocument();
-  });
-
-  // Privacy policy test
-  it('navigates to privacy policy page when button is clicked', () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    fireEvent.click(screen.getByTestId('privacy-policy-button'));
-
-    expect(mockRouterPush).toHaveBeenCalledWith('/privacy');
   });
 
   // Export dialog tests
@@ -438,7 +267,7 @@ describe('PrivacySettings', () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByRole('region', { name: 'Privacy & Security' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Security' })).toBeInTheDocument();
   });
 
   it('renders section headings as h3 elements', () => {
@@ -450,27 +279,6 @@ describe('PrivacySettings', () => {
     render(<PrivacySettings {...defaultProps} />);
 
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings.length).toBeGreaterThanOrEqual(4);
-  });
-
-  it('has proper list role in sessions dialog', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true, data: { factors: [] } }),
-    });
-
-    // Set sessions to be returned by the mocked hook
-    mockSessionsData.push(...mockSessions);
-
-    render(<PrivacySettings {...defaultProps} />);
-
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('manage-sessions-button'));
-    });
-
-    await waitFor(() => {
-      expect(mockFetchSessions).toHaveBeenCalled();
-    });
-    expect(screen.getByRole('list', { name: 'Manage Sessions' })).toBeInTheDocument();
+    expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 });
