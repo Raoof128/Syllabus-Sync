@@ -81,7 +81,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const protectedRoutes = ['/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
+  const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
   const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify', '/onboarding'];
 
@@ -163,6 +163,12 @@ export async function proxy(request: NextRequest) {
         '⚠️ Supabase not configured. Running in demo mode.\n' +
           'To enable auth, update .env.local with your Supabase credentials.',
       );
+    }
+    // Even in demo mode, redirect unauthenticated users from protected routes to login
+    if (isProtectedRoute) {
+      const redirectUrl = new URL('/login', request.url);
+      redirectUrl.searchParams.set('redirectTo', path);
+      return NextResponse.redirect(redirectUrl);
     }
     return response;
   }
@@ -317,12 +323,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Temporary: Disable authentication for home page
+  // Protected route check: redirect unauthenticated users to login
   if (
     isProtectedRoute &&
     !user &&
-    !publicRoutes.some((route) => path.startsWith(route)) &&
-    path !== '/home'
+    !publicRoutes.some((route) => path.startsWith(route))
   ) {
     // If auth status couldn't be resolved (timeout/transient upstream issue), do not
     // redirect to /login. This avoids redirect loops and "blinking" UX.
