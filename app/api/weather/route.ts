@@ -3,21 +3,48 @@ import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
+import { OpenMeteoProvider } from '@/lib/weather/providers/openMeteoProvider';
+import { z } from 'zod';
+import { WeatherResult } from '@/lib/weather/types';
 
 /**
  * Weather API Proxy Endpoint
  *
- * SECURITY: This endpoint proxies requests to Open-Meteo API, keeping the API
- * communication server-side to prevent CORS issues and provide consistent
- * data formatting.
+ * SECURITY: Proxies requests to Open-Meteo API.
  */
 
-const OPENMETEO_BASE_URL = 'https://api.open-meteo.com/v1';
-
-// Cache weather data for 5 minutes to reduce API calls while keeping data fresh
-const weatherCache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+// Cache weather data for 5 minutes (current) to 15 minutes (hourly)
+const weatherCache = new Map<string, { data: WeatherResult; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes standard ttl
 const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
+
+const provider = new OpenMeteoProvider();
+
+// 4.1 Validate response schema (Sanity Checks)
+const WeatherResultSchema = z.object({
+  current: z.object({
+    temperature: z.number().min(-15).max(55),
+    apparentTemperature: z.number().min(-25).max(65),
+    precipitationProbability: z.number().min(0).max(100),
+    windSpeed: z.number().min(0).max(200),
+    weatherCode: z.number(),
+    isDay: z.boolean(),
+    condition: z.string(),
+  }),
+  hourly: z
+    .object({
+      time: z.array(z.string()),
+      temperature: z.array(z.number()),
+      precipitationProbability: z.array(z.number()),
+      weatherCode: z.array(z.number()),
+      windSpeed: z.array(z.number()),
+    })
+    .optional(),
+  timezone: z.string(),
+  source: z.string(),
+  timestamp: z.number(),
+  modelUsed: z.string().optional(),
+});
 
 export async function GET(request: NextRequest) {
   // SECURITY: Rate limit weather API requests
@@ -58,9 +85,9 @@ export async function GET(request: NextRequest) {
     return jsonError('Coordinates out of range', 400, ERROR_CODES.VALIDATION_ERROR);
   }
 
-  // Create cache key (rounded to 2 decimal places to improve cache hit rate)
-  const roundedLat = Math.round(latitude * 100) / 100;
-  const roundedLon = Math.round(longitude * 100) / 100;
+  // Create cache key (rounded to 4 decimal places, ~11m precision as requested)
+  const roundedLat = Math.round(latitude * 10000) / 10000;
+  const roundedLon = Math.round(longitude * 10000) / 10000;
   const cacheKey = `${roundedLat},${roundedLon}`;
 
   // Check cache
@@ -74,72 +101,54 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch weather data from Open-Meteo API using best models
-    const weatherUrl = new URL(`${OPENMETEO_BASE_URL}/forecast`);
-    weatherUrl.searchParams.set('latitude', latitude.toString());
-    weatherUrl.searchParams.set('longitude', longitude.toString());
-    weatherUrl.searchParams.set('current', 'temperature_2m,weather_code,is_day');
-    weatherUrl.searchParams.set('timezone', 'Australia/Sydney');
-    weatherUrl.searchParams.set('models', 'best_match'); // Automatically picks most accurate local model (e.g. BoM for Australia)
+    const start = Date.now();
 
-    const response = await fetch(weatherUrl.toString(), {
-      headers: {
-        Accept: 'application/json',
-      },
-      // Cache for 5 minutes at edge
-      next: { revalidate: 300 },
-    });
+    const weatherData = await provider.getWeather({ lat: roundedLat, lon: roundedLon });
 
-    if (!response.ok) {
-      logger.error('Open-Meteo API error:', {
-        status: response.status,
-        statusText: response.statusText,
-      });
-
-      return jsonError(
-        'Weather service temporarily unavailable',
-        503,
-        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
-      );
-    }
-
-    const weatherData = await response.json();
-
-    // SECURITY: Only return safe, sanitized data to the client
-    // We map Open-Meteo's new `current` object back to `current_weather` shape to maintain compatibility
-    const sanitizedData = {
-      current_weather: {
-        temperature:
-          weatherData.current?.temperature_2m ?? weatherData.current_weather?.temperature,
-        weathercode: weatherData.current?.weather_code ?? weatherData.current_weather?.weathercode,
-        is_day: weatherData.current?.is_day ?? weatherData.current_weather?.is_day,
-      },
-      timezone: weatherData.timezone,
-    };
+    // 4.2 Sanity thresholds via Zod
+    const validatedData = WeatherResultSchema.parse(weatherData);
 
     // Update cache
     weatherCache.set(cacheKey, {
-      data: sanitizedData,
+      data: validatedData,
       timestamp: Date.now(),
+    });
+
+    // Logging for observability (6.1)
+    logger.info('Weather fetched successfully', {
+      source: 'Open-Meteo',
+      model: validatedData.modelUsed,
+      lat: roundedLat,
+      lon: roundedLon,
+      latencyMs: Date.now() - start,
     });
 
     // Clean up old cache entries periodically
     if (Math.random() < 0.1) {
       const now = Date.now();
       for (const [key, value] of weatherCache.entries()) {
-        if (now - value.timestamp > CACHE_TTL_MS * 2) {
+        if (now - value.timestamp > CACHE_TTL_MS * 3) {
           weatherCache.delete(key);
         }
       }
     }
 
-    return jsonSuccess(sanitizedData, 200, undefined, {
+    return jsonSuccess(validatedData, 200, undefined, {
       headers: {
         'Cache-Control': EDGE_CACHE_CONTROL,
       },
     });
   } catch (error) {
-    logger.error('Weather API fetch error:', error);
+    logger.error('Weather API error:', error);
+
+    // Fallback to cache if available, even if stale (sanity check fallback)
+    if (cached) {
+      logger.info('Falling back to stale weather cache due to API error');
+      return jsonSuccess({ ...cached.data, isStaleFallback: true }, 200, undefined, {
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+    }
+
     return jsonError('Failed to fetch weather data', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
   }
 }

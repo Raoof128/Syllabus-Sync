@@ -13,6 +13,8 @@ import {
   MapPin,
   ChevronDown,
   Check,
+  Navigation,
+  Droplets,
 } from 'lucide-react';
 import { useWeather } from './weather/useWeather';
 import { SYDNEY_REGIONS } from './weather/constants';
@@ -20,7 +22,16 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 const WeatherWidget = memo(() => {
   const { t } = useTypedTranslation();
-  const { weatherData, loading, error, selectedRegion, handleRegionChange, retry } = useWeather();
+  const {
+    weatherData,
+    loading,
+    error,
+    selectedRegion,
+    handleRegionChange,
+    retry,
+    useGps,
+    enableGps,
+  } = useWeather();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Close dropdown when clicking outside
@@ -86,15 +97,15 @@ const WeatherWidget = memo(() => {
   };
   type StyleKey = keyof typeof styles;
 
-  if (loading) {
-    return (
-      <div className="h-7 px-3 rounded-full bg-mq-background-secondary animate-pulse flex items-center justify-center shadow-inner">
-        <span className="text-mq-content-tertiary font-medium text-[9px]">Loading...</span>
-      </div>
-    );
-  }
+  if (!weatherData) {
+    if (loading) {
+      return (
+        <div className="h-7 px-3 rounded-full bg-mq-background-secondary animate-pulse flex items-center justify-center shadow-inner">
+          <span className="text-mq-content-tertiary font-medium text-[9px]">Loading...</span>
+        </div>
+      );
+    }
 
-  if (error || !weatherData) {
     return (
       <button
         onClick={retry}
@@ -151,39 +162,141 @@ const WeatherWidget = memo(() => {
         <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
       </button>
 
-      {/* Location Dropdown */}
+      {/* Detailed Weather Card Dropdown */}
       {isDropdownOpen && (
-        <div className="absolute top-full right-0 mt-2 w-44 bg-mq-card-background border border-mq-border rounded-lg shadow-lg z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="px-3 py-1.5 border-b border-mq-border">
-            <span className="text-[10px] font-semibold text-mq-content-tertiary uppercase tracking-wide">
-              Select Location
-            </span>
-          </div>
-          <div className="max-h-48 overflow-y-auto">
-            {SYDNEY_REGIONS.map((region) => (
-              <button
-                key={region.id}
-                onClick={() => {
-                  handleRegionChange(region);
-                  setIsDropdownOpen(false);
-                }}
-                className={`
-                  w-full px-3 py-2 text-left text-sm flex items-center justify-between
-                  transition-colors hover:bg-mq-background-secondary
-                  ${selectedRegion.id === region.id ? 'bg-mq-primary/10 text-mq-primary font-medium' : 'text-mq-content'}
-                `}
-                role="option"
-                aria-selected={selectedRegion.id === region.id}
+        <div className="absolute top-full right-0 mt-2 w-72 bg-mq-card-background border border-mq-border rounded-xl shadow-xl z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Detailed metrics section */}
+          <div className="p-4 border-b border-mq-border bg-gradient-to-b from-mq-background-secondary/50 to-transparent">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h4 className="font-semibold text-mq-content">{weatherData.location}</h4>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-mq-primary/10 text-mq-primary uppercase tracking-wider">
+                    {weatherData.locationType === 'gps'
+                      ? 'Device GPS'
+                      : weatherData.locationType === 'saved'
+                        ? 'Saved'
+                        : 'Approx'}
+                  </span>
+                  {weatherData.timestamp && (
+                    <span className="text-[10px] text-mq-content-tertiary">
+                      Updated {Math.round((Date.now() - weatherData.timestamp) / 60000)}m ago
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div
+                className={`p-2 rounded-lg bg-gradient-to-br ${currentStyle.gradient} text-white shadow-sm`}
               >
-                <span className="flex items-center gap-2">
-                  <MapPin className="w-3 h-3 text-mq-content-tertiary" />
-                  {region.name}
+                {icon}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-2">
+              <div className="flex flex-col">
+                <span className="text-[10px] text-mq-content-tertiary font-medium">
+                  Temperature
                 </span>
-                {selectedRegion.id === region.id && (
-                  <Check className="w-4 h-4 text-mq-primary" aria-hidden="true" />
-                )}
-              </button>
-            ))}
+                <span className="text-lg font-bold text-mq-content mt-0.5 tabular-nums leading-none">
+                  {weatherData.temp}°
+                  <small className="text-xs text-mq-content-secondary line-through ml-1">
+                    {weatherData.apparentTemp}°
+                  </small>
+                </span>
+                <span className="text-[10px] text-mq-content-secondary mt-1 tracking-tight">
+                  Feels like {weatherData.apparentTemp}°C
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-mq-content-tertiary font-medium">Condition</span>
+                <span className="text-sm font-medium text-mq-content mt-1">
+                  {weatherData.condition}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-500 dark:text-blue-400">
+                  <Droplets className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-mq-content-tertiary font-medium">
+                    Rain Chance
+                  </span>
+                  <span className="text-xs font-semibold text-mq-content tabular-nums">
+                    {weatherData.precipProb ?? 0}%
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-md bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                  <Wind className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-mq-content-tertiary font-medium">Wind</span>
+                  <span className="text-xs font-semibold text-mq-content tabular-nums">
+                    {weatherData.windSpeed ?? 0} km/h
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Location Controls */}
+          <div className="p-2">
+            <div className="px-2 py-1.5 pb-2">
+              <span className="text-[10px] font-semibold text-mq-content-tertiary uppercase tracking-wider">
+                Select Location Source
+              </span>
+            </div>
+
+            <button
+              onClick={() => {
+                enableGps();
+                setIsDropdownOpen(false);
+              }}
+              className={`
+                w-full px-3 py-2 text-left text-sm flex items-center justify-between
+                transition-colors rounded-md
+                ${useGps ? 'bg-mq-primary/10 text-mq-primary font-medium' : 'text-mq-content hover:bg-mq-background-secondary'}
+              `}
+              role="option"
+              aria-selected={useGps}
+            >
+              <span className="flex items-center gap-2">
+                <Navigation
+                  className={`w-3.5 h-3.5 ${useGps ? 'text-mq-primary' : 'text-mq-content-tertiary'}`}
+                />
+                Current Location (GPS)
+              </span>
+              {useGps && <Check className="w-4 h-4 text-mq-primary" />}
+            </button>
+
+            <div className="mt-1 max-h-[140px] overflow-y-auto pr-1 stylish-scrollbar">
+              {SYDNEY_REGIONS.map((region) => {
+                const isSelected = !useGps && selectedRegion.id === region.id;
+                return (
+                  <button
+                    key={region.id}
+                    onClick={() => {
+                      handleRegionChange(region);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`
+                      w-full px-3 py-1.5 text-left text-sm flex items-center justify-between
+                      transition-colors rounded-md mt-0.5
+                      ${isSelected ? 'bg-mq-background-secondary text-mq-content font-medium' : 'text-mq-content-secondary hover:bg-mq-background-secondary/50'}
+                    `}
+                    role="option"
+                    aria-selected={isSelected}
+                  >
+                    <span className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 opacity-50" />
+                      {region.name}
+                    </span>
+                    {isSelected && <Check className="w-3.5 h-3.5 opacity-70" />}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

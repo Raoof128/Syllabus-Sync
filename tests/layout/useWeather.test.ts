@@ -38,10 +38,14 @@ describe('useWeather Hook', () => {
       ok: true,
       json: async () => ({
         data: {
-          current_weather: {
+          current: {
             temperature: 25,
-            weathercode: 0,
-            is_day: 1,
+            apparentTemperature: 25,
+            precipitationProbability: 0,
+            windSpeed: 10,
+            weatherCode: 0,
+            isDay: true,
+            condition: 'Clear sky',
           },
         },
       }),
@@ -67,8 +71,12 @@ describe('useWeather Hook', () => {
 
     expect(result.current.weatherData).toEqual({
       temp: 25,
+      apparentTemp: 25,
+      precipProb: 0,
+      windSpeed: 10,
       condition: 'Clear sky',
       location: 'Macquarie Uni',
+      locationType: 'approx',
       vibe: 'sunny',
       isDay: true,
       timestamp: expect.any(Number),
@@ -94,10 +102,14 @@ describe('useWeather Hook', () => {
       ok: true,
       json: async () => ({
         data: {
-          current_weather: {
+          current: {
             // Missing temperature
-            weathercode: 0,
-            is_day: 1,
+            apparentTemperature: 25,
+            precipitationProbability: 0,
+            windSpeed: 10,
+            weatherCode: 0,
+            isDay: true,
+            condition: 'Clear sky',
           },
         },
       }),
@@ -152,8 +164,12 @@ describe('useWeather Hook', () => {
     const region = SYDNEY_REGIONS[0];
     const cachedData = {
       temp: 20,
+      apparentTemp: 20,
+      precipProb: 0,
+      windSpeed: 10,
       condition: 'Cloudy',
       location: region.name,
+      locationType: 'approx',
       vibe: 'cloudy',
       isDay: true,
       timestamp: Date.now(), // Fresh
@@ -178,8 +194,12 @@ describe('useWeather Hook', () => {
     const region = SYDNEY_REGIONS[0];
     const expiredData = {
       temp: 20,
+      apparentTemp: 20,
+      precipProb: 0,
+      windSpeed: 10,
       condition: 'Cloudy',
       location: region.name,
+      locationType: 'approx',
       vibe: 'cloudy',
       isDay: true,
       timestamp: Date.now() - 6 * 60 * 1000, // 6 minutes ago (expired)

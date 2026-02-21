@@ -1,3 +1,27 @@
+### Raouf: Weather System 2.0 (Phase 1 & 2 Blueprint) — 2026-02-21
+
+**Scope:** Weather Integration & GPS Tiering
+**Type:** Feature Upgrade / Architecture Rewrite
+
+#### Changes
+
+1. **Location Tiering & Fallbacks:**
+   - Modified `useWeather.ts` to implement a rigid location hierarchy. Tier A tries strictly capturing `navigator.geolocation` passing `enableHighAccuracy` within a 7s timeout block. 
+   - GPS cache relies on localized `localStorage` keys for fallback, before dropping to approx region bounds. 
+2. **Weather Abstraction & Typing:**
+   - Extracted endpoint querying logic into scalable interfaces (`lib/weather/providers/openMeteoProvider.ts`) fulfilling `getWeather` with mapped normalizations (`normalize.ts`). 
+   - Wrote comprehensive Zod schema runtime validations ensuring weather limits strictly enforce bounded logic (e.g. Temps ranging exactly -15 to +55°C, parsing exactly identical precipitation and probability spans) directly inside `api/weather/route.ts` proxy endpoint.  
+3. **Data Expansion & Component Refactor:**
+   - Updated NextJS proxy `api/weather` to ingest `apparent_temperature`, `precipitation_probability`, and `wind_speed_10m`.
+   - Remodeled the `WeatherWidget.tsx` UI footprint into an expanding dropdown weather card mapping out "Feels like", raw condition text, rain likelihood %, and wind speed. Shows an exact timestamp mapping "Updated X min ago".
+4. **Cache Matching & Stale Check:**
+   - Enforced background component reload cycles within `useWeather.ts` maintaining strictly controlled timeouts overriding `AbortController`. Fallback states intercept `fetch` crashes without erasing perfectly readable staled data components across UI renders.
+
+#### Verification
+- Next.js build and test suites matched successfully. Overrode `WeatherWidget.test.tsx` and `useWeather.test.ts` to implement correctly modified payload mocks (containing exactly apparent temp & location strings).
+
+---
+
 ### Raouf: Locate Me Button & Calendar Link Fix — 2026-02-21
 
 **Scope:** Map Refinement & Navigation Fixes
@@ -7,7 +31,7 @@
 
 1. **Google Map Locate Me Button:**
    - Appended a "Center on my location" floating action button onto the Google Maps overlay mode (`GoogleMapEmbed.tsx`). Used the exact `<svg>` requested by the user.
-   - Tied button to an explicit `forceCenter` state that forces the iframe `destinationQuery` to fall back instantly to `My+Location`, correctly pinging the user's localized GPS in Google Maps View. 
+   - Tied button to an explicit `forceCenter` state that forces the iframe `destinationQuery` to fall back instantly to `My+Location`, correctly pinging the user's localized GPS in Google Maps View.
 2. **Calendar Link Persistence:**
    - Found that `dialogs` was changing on every render and prematurely nuking the `setUnitDetailOpen(true)` delayed opening sequence in `useCalendarHighlights.ts`.
    - Used explicit destructuring to inject only the stable React setter functions into the `useEffect` dependency arrays, guaranteeing that redirecting from the Home Dashboard to a Unit Card on the calendar will correctly select and expand the requested unit visually.
@@ -15,6 +39,7 @@
    - Ran checks (`npm run check`) successfully; safely bypassed typecheck errors using `useSafeTranslation`.
 
 #### Verification
+
 - Next.js build and test suites compiled.
 - Visual component dependencies stabilized and correctly hook back into API.
 

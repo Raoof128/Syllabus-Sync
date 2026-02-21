@@ -19,6 +19,8 @@ describe('WeatherWidget', () => {
     error: null,
     selectedRegion: SYDNEY_REGIONS[0],
     handleRegionChange: mockHandleRegionChange,
+    useGps: true,
+    enableGps: vi.fn(),
     retry: mockRetry,
   };
 

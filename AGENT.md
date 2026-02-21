@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Weather Integration & GPS Tiering (Blueprint Phase 1 & 2)
+Summary: Implemented the "Weather System 2.0" upgrades, creating a robust, multi-tier location fetching priority starting with high-accuracy browser `geolocation` caching. Abstracted logic into `OpenMeteoProvider`/`normalize.ts`/`types.ts` schemas. Bound `api/weather/route.ts` with strict Zod validations (Temps must logically be bounded, etc). Finally, updated properties passing into `WeatherWidget.tsx`, converting the drop-down menu into a highly detailed weather card representing metrics such as "Feels like", rain likelihood, and wind speeds, safely wrapped via `safeT` translation keys and a background freshness indicator.
+Files Changed: `api/weather/route.ts`, `lib/weather/providers/openMeteoProvider.ts`, `lib/weather/normalize.ts`, `lib/weather/types.ts`, `components/layout/weather/useWeather.ts`, `components/layout/WeatherWidget.tsx`, `tests/layout/useWeather.test.ts`, `tests/layout/WeatherWidget.test.tsx`.
+Verification: Followed up with formatting and `npm run check`; test suites all compile correctly without missing reference exceptions. Adjusted the Vitest mocks directly responding accurately with `apparentTemperature` keys.
+Follow-ups: Implement Hourly forecast UI into `WeatherWidget`.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Map Refinement & Navigation Fixes
 Summary: Extended the `GoogleMapEmbed.tsx` view with a "Center on my location" GPS location button overlay that uses a direct URL query fallback to `My+Location`. Furthermore, resolved a `dialogs` re-render timing bug in `useCalendarHighlights.ts` that immediately cancelled modal-opening timeouts, so now selecting units on the home dashboard correctly expands their card in the Calendar page upon redirection as visually intended.
 Files Changed: `features/map/components/GoogleMapEmbed.tsx`, `features/calendar/hooks/useCalendarHighlights.ts`.
