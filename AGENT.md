@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Robust Unit Deletion & Calendar Interaction Fixes
+Summary: Fixed an issue where the calendar widget highlights would disappear instantly when redirected from the Home dashboard by delaying the URL parameter clearance to 3000ms. Prevented unit cards from accidentally opening when toggling their notifications by wrapping `ReminderModal` in a div with `stopPropagation`, fixing React's portal event bubbling bug. Also guaranteed that assignments/deadlines are globally cascade-deleted in the UI the instant a unit is deleted anywhere in the app by explicitly hooking `unitsStore.ts` into `deadlinesStore.ts`.
+Files Changed: `features/calendar/hooks/useCalendarHighlights.ts`, `features/calendar/components/ItemActionButtons.tsx`, `lib/store/unitsStore.ts`.
+Verification: Followed up with formatting and checks; verified click propagation behavior and state cross-sync.
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Calendar Highlights & Notification Bubble Fix
 Summary: Fixed an issue where the calendar widget highlights would disappear instantly when redirected from the Home dashboard by delaying the URL parameter clearance to 3000ms in `useCalendarHighlights.ts`. Also prevented unit cards from accidentally opening when toggling their notifications by wrapping `ReminderModal` in a div with `stopPropagation`, fixing React's portal event bubbling bug.
 Files Changed: `features/calendar/hooks/useCalendarHighlights.ts`, `features/calendar/components/ItemActionButtons.tsx`.

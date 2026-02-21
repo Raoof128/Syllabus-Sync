@@ -8,6 +8,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest } from '@/lib/utils/api';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 
 interface UnitsState {
   units: Unit[];
@@ -173,9 +174,11 @@ export const useUnitsStore = create<UnitsState>()(
           }>(`/api/units/${id}`, { method: 'DELETE' });
 
           // If cascade delete was successful, also remove related deadlines from local state
-          // This is handled by subscribing stores or manual refresh
           if (response.cascadeDeleted && unitCode) {
-            // Dispatch a custom event that the deadlines store can listen to
+            // Explicitly sync globally first, so any component reading deadlines is updated
+            useDeadlinesStore.getState().removeDeadlinesByUnit(id, unitCode);
+
+            // Dispatch a custom event that components can listen to
             if (typeof window !== 'undefined') {
               window.dispatchEvent(
                 new CustomEvent('unit-deleted', {
@@ -192,12 +195,16 @@ export const useUnitsStore = create<UnitsState>()(
           // This happens when deleting units that were never synced to DB
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
             // Dispatch event to clean up related deadlines locally
-            if (unitCode && typeof window !== 'undefined') {
-              window.dispatchEvent(
-                new CustomEvent('unit-deleted', {
-                  detail: { unitId: id, unitCode },
-                }),
-              );
+            if (unitCode) {
+              useDeadlinesStore.getState().removeDeadlinesByUnit(id, unitCode);
+
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(
+                  new CustomEvent('unit-deleted', {
+                    detail: { unitId: id, unitCode },
+                  }),
+                );
+              }
             }
             return; // Delete successful (unit was local-only)
           }

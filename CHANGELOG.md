@@ -1,3 +1,28 @@
+### Raouf: Robust Unit Deletion & Calendar Interaction Fixes — 2026-02-21
+
+**Scope:** State Management / Calendar Refinement
+**Type:** Bug Fix / Quality Assurance
+
+#### Changes
+
+1. **Global Cascade Deletions for Units:**
+   - Updated `removeUnit` in `unitsStore.ts` to directly invoke `useDeadlinesStore.getState().removeDeadlinesByUnit(id, unitCode)`.
+   - This fixes an edge case where assignments and deadlines would only be locally cascade-deleted if the user was explicitly on the Calendar page (since the calendar hooked the `unit-deleted` event). Deleting a unit perfectly synchronizes the local UI everywhere now.
+2. **Highlight URL Param Persistence:**
+   - Modified `useCalendarHighlights.ts` to delay clearing URL search parameters (`highlightUnit`, `highlightDeadline`, `highlightTodo`, `highlightEvent`) to 3000ms.
+   - This ensures visual highlights on calendar widget items (like `UnitsWidget`) persist long enough for the user to see them when redirected from the Home dashboard, rather than disappearing instantly.
+3. **Notification Modal Propagation Fix:**
+   - Wrapped the `ReminderModal` in `ItemActionButtons.tsx` with a standard `div` configured to stop click propagation.
+   - This prevents React Portal events from bubbling up through the DOM tree to trigger parent `onClick` handlers (which was causing unit cards to open accidentally when toggling notifications in the reminders section).
+4. **Automated Validation:**
+   - Ran formatting and checks (`npm run check`) to guarantee no type definitions or linting rules were broken. All tests passed.
+
+#### Verification
+- `npm run check` passed successfully.
+- Code trace verified that `e.stopPropagation()` on the portal wrapper stops events from firing parent logic, and stores cross-sync correctly globally.
+
+---
+
 ### Raouf: Calendar Highlights & Notification Bubble Fix — 2026-02-21
 
 **Scope:** UI / Calendar Interaction / Reminders
@@ -15,6 +40,7 @@
    - Ran formatting and checks (`npm run check`) to guarantee no type definitions or linting rules were broken.
 
 #### Verification
+
 - `npm run check` passed successfully.
 - Code trace verified that `e.stopPropagation()` on the portal wrapper stops events from firing parent logic.
 
