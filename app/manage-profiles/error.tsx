@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function Error({
   error,
@@ -12,6 +13,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTypedTranslation();
   useEffect(() => {
     // Log the error to your observability service (e.g., Sentry)
     logger.error('Profile Page Crash:', error);
@@ -23,15 +25,14 @@ export default function Error({
         <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
       </div>
       <div className="space-y-2">
-        <h2 className="text-xl font-bold text-mq-content">Something went wrong</h2>
+        <h2 className="text-xl font-bold text-mq-content">{t('somethingWentWrong')}</h2>
         <p className="text-mq-content-secondary max-w-md mx-auto">
-          We couldn&apos;t load your profile settings. This has been logged for our engineering
-          team.
+          {t('errorProfileLoad')}
         </p>
       </div>
       <Button onClick={() => reset()} variant="outline" className="gap-2">
         <RefreshCcw className="h-4 w-4" />
-        Try again
+        {t('tryAgain')}
       </Button>
     </div>
   );

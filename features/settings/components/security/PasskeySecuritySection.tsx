@@ -124,7 +124,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
       const optionsResult = await optionsRes.json();
 
       if (!optionsRes.ok || !optionsResult?.data?.options) {
-        setAddPasskeyError(optionsResult?.error?.message || 'Failed to start passkey setup');
+        setAddPasskeyError(optionsResult?.error?.message || t('passkeySetupFailed'));
         return;
       }
 
@@ -150,7 +150,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
       })) as PublicKeyCredential | null;
 
       if (!credential) {
-        setAddPasskeyError('Passkey creation was cancelled.');
+        setAddPasskeyError(t('passkeyCreationCancelled'));
         return;
       }
 
@@ -178,16 +178,16 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
 
       if (!verifyRes.ok) {
         const result = await verifyRes.json();
-        setAddPasskeyError(result?.error?.message || 'Failed to register passkey');
+        setAddPasskeyError(result?.error?.message || t('passkeyRegisterFailed'));
         return;
       }
 
       setShowAddPasskeyDialog(false);
       setDeviceName('');
-      toastUtils.success(t('security'), 'Passkey added successfully!');
+      toastUtils.success(t('security'), t('passkeyAddedSuccess'));
       fetchCredentials();
     } catch (err) {
-      setAddPasskeyError(err instanceof Error ? err.message : 'Failed to add passkey');
+      setAddPasskeyError(err instanceof Error ? err.message : t('passkeyRegisterFailed'));
     } finally {
       setIsPasskeyLoading(false);
     }
@@ -205,13 +205,13 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
       });
 
       if (!res.ok) {
-        toastUtils.error(t('error'), 'Failed to remove passkey');
+        toastUtils.error(t('error'), t('failedToRemovePasskey'));
         return;
       }
 
       setShowDeletePasskeyDialog(false);
       setDeleteTarget(null);
-      toastUtils.success(t('security'), 'Passkey removed.');
+      toastUtils.success(t('security'), t('passkeyRemoved'));
       fetchCredentials();
     } catch {
       toastUtils.error(t('error'), t('tryAgainLater'));
@@ -229,9 +229,9 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
             <Fingerprint className="h-5 w-5" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-bold text-mq-content">Passkeys & Biometric Login</h3>
+            <h3 className="font-bold text-mq-content">{t('passkeysBiometricLogin')}</h3>
             <p className="text-mq-xs text-mq-content-secondary mt-0.5">
-              Sign in securely using your device&apos;s fingerprint, face recognition, or a security key.
+              {t('passkeySigninDesc')}
             </p>
           </div>
         </div>
@@ -281,7 +281,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-mq-content-tertiary flex items-center gap-2">
               <Shield className="h-3 w-3" />
-              Registered Devices & Keys
+              {t('registeredDevicesAndKeys')}
             </h4>
             <Button
               variant="ghost"
@@ -296,7 +296,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
               data-testid="add-passkey"
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
-              Add Key
+              {t('addKey')}
             </Button>
           </div>
 
@@ -306,7 +306,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
             </div>
           ) : credentials.length === 0 ? (
             <div className="py-6 text-center bg-mq-background/30 rounded-xl border border-dashed border-mq-border">
-              <p className="text-mq-xs text-mq-content-tertiary">No security keys registered yet.</p>
+              <p className="text-mq-xs text-mq-content-tertiary">{t('noSecurityKeys')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-2">
@@ -324,9 +324,9 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
                         {cred.deviceName}
                       </p>
                       <p className="text-[10px] text-mq-content-tertiary">
-                        Added {new Date(cred.createdAt).toLocaleDateString()}
+                        {t('addedOn', { date: new Date(cred.createdAt).toLocaleDateString() })}
                         {cred.lastUsedAt &&
-                          ` · Last used ${new Date(cred.lastUsedAt).toLocaleDateString()}`}
+                          ` · ${t('lastUsedOn', { date: new Date(cred.lastUsedAt).toLocaleDateString() })}`}
                       </p>
                     </div>
                   </div>
@@ -338,7 +338,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
                       setShowDeletePasskeyDialog(true);
                     }}
                     className="h-8 w-8 p-0 text-mq-content-tertiary hover:text-red-500 hover:bg-red-500/10 rounded-full"
-                    aria-label={`Remove ${cred.deviceName}`}
+                    aria-label={`${t('delete')} ${cred.deviceName}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -359,7 +359,9 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
               <Fingerprint className="h-5 w-5" />
               {t('enableBiometric')}
             </DialogTitle>
-            <DialogDescription>{t('enableBiometricDesc')}</DialogDescription>
+            <DialogHeader>
+              <DialogDescription>{t('enableBiometricDesc')}</DialogDescription>
+            </DialogHeader>
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-start gap-3 p-3 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
@@ -423,15 +425,15 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5 text-mq-primary" />
-              Add a Security Key
+              {t('addSecurityKey')}
             </DialogTitle>
             <DialogDescription>
-              Give your new key a name to identify it later (e.g. &quot;My Laptop&quot; or &quot;YubiKey&quot;).
+              {t('addSecurityKeyDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-mq-content">Device/Key Name</p>
+              <p className="text-sm font-medium text-mq-content">{t('deviceKeyName')}</p>
               <Input
                 placeholder={t('passkeyNamePlaceholder')}
                 value={deviceName}
@@ -460,12 +462,12 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
               {isPasskeyLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Registering...
+                  {t('registering')}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Register Key
+                  {t('registerKey')}
                 </>
               )}
             </Button>
@@ -479,11 +481,10 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-500">
               <Trash2 className="h-5 w-5" />
-              Remove Security Key?
+              {t('removeSecurityKey')}
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove &ldquo;{deleteTarget?.deviceName}&rdquo;? 
-              You won&apos;t be able to use this specific key to sign in anymore.
+              {t('removeSecurityKeyDesc', { name: deleteTarget?.deviceName || '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -502,10 +503,10 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
               {isPasskeyLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Removing...
+                  {t('removing')}
                 </>
               ) : (
-                'Remove Key'
+                t('removeKey')
               )}
             </Button>
           </DialogFooter>

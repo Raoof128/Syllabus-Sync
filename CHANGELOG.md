@@ -1,3 +1,32 @@
+### Raouf: Repository-wide i18n Audit & Remediation — 2026-02-21
+
+**Scope:** Internationalisation (i18n) / UX / Accessibility
+**Type:** Audit / Refactor / Feature
+
+#### Changes
+
+1. **Comprehensive i18n Parity:**
+   - Achieved 100% key parity across all 35 supported locales.
+   - Synchronized all `translations.json` files to match the English base exactly.
+   - Removed 1500+ duplicate lines and redundant keys in `en/translations.json`.
+2. **Major UI Translation Pass:**
+   - Provided high-quality translations for core navigation, settings, and authentication flows across all 35 languages.
+   - Fixed major gaps in Czech, Danish, Finnish, German, Hungarian, Norwegian, Polish, Romanian, Swedish, Turkish, and Ukrainian locales which were previously ~90% English.
+   - Added and translated 30+ new internationalization keys discovered during the codebase audit.
+3. **Hardcoded String Elimination:**
+   - Refactored 13 major components and pages to remove hardcoded English strings, replacing them with `t()` calls and `useTypedTranslation`.
+   - Internationalized auth redirect handlers, error pages, offline states, security settings, calendar agenda views, and feed statistics.
+   - Standardized accessibility `aria-label` strings across sync conflict dialogs and unit cards.
+4. **Enhanced Security Messaging:**
+   - Fully translated password strength indicators, security requirements, and data breach warning messages.
+   - Internationalized passkey and biometric setup instructions and feedback.
+
+#### Verification
+
+- `node tools/i18n/check-translations.mjs` ✅ (35 locales validated, 0 missing keys).
+- `npm run typecheck` ✅
+- Visual audit of major world languages confirmed high-quality natural translations.
+
 ### Raouf: Security UI/UX Migration & Settings Tab Rename — 2026-02-21
 
 **Scope:** Settings / Profile / Security / UX

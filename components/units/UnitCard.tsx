@@ -229,9 +229,9 @@ const UnitCard = React.memo(
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-mq-primary hover:underline ml-2 shrink-0"
                   onClick={(e) => e.stopPropagation()}
-                  aria-label={`Open ${unit.code} in MQ Handbook`}
+                  aria-label={t('openHandbookAria', { code: unit.code })}
                 >
-                  <span className="hidden sm:inline">Handbook</span>
+                  <span className="hidden sm:inline">{t('handbook')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}

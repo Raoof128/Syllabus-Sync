@@ -32,7 +32,7 @@ export default function AgendaView({
   onDeadlineClick,
   onEventClick,
 }: AgendaViewProps) {
-  const { language } = useTypedTranslation();
+  const { t, language } = useTypedTranslation();
   const startDate = dayjs(date);
 
   // Generate array of days to show
@@ -128,7 +128,7 @@ export default function AgendaView({
                 </span>
                 {isToday && (
                   <Badge variant="neutral" className="ml-2">
-                    Today
+                    {t('today')}
                   </Badge>
                 )}
               </h3>
@@ -136,7 +136,7 @@ export default function AgendaView({
 
             <div className="space-y-3">
               {items.length === 0 ? (
-                <p className="text-sm text-mq-content-tertiary italic pl-1">No items scheduled</p>
+                <p className="text-sm text-mq-content-tertiary italic pl-1">{t('noItemsScheduled')}</p>
               ) : (
                 items.map((entry, idx) => {
                   // Render logic based on type
@@ -164,7 +164,7 @@ export default function AgendaView({
                                 variant="neutral"
                                 className="text-[10px] px-1 py-0 h-4 border border-mq-primary/30 text-mq-primary bg-mq-primary/5"
                               >
-                                Class
+                                {t('class')}
                               </Badge>
                               <h4 className="font-semibold text-sm">{u.code}</h4>
                             </div>
@@ -224,7 +224,7 @@ export default function AgendaView({
                             <p className="text-xs text-mq-content-secondary">{d.unitCode}</p>
                             <div className="flex items-center gap-3 mt-2 text-[10px] text-mq-content-tertiary">
                               <span className="flex items-center gap-1">
-                                <AlertCircle className="w-3 h-3" /> Due{' '}
+                                <AlertCircle className="w-3 h-3" /> {t('due')}{' '}
                                 {dayjs(d.dueDate).format('h:mm A')}
                               </span>
                             </div>
@@ -255,7 +255,7 @@ export default function AgendaView({
                                 variant="neutral"
                                 className="text-[10px] px-1 py-0 h-4 border border-mq-success/30 text-mq-success bg-mq-success/5"
                               >
-                                Event
+                                {t('event')}
                               </Badge>
                               <h4 className="font-semibold text-sm">{e.title}</h4>
                             </div>

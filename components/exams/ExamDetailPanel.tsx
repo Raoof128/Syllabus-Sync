@@ -96,17 +96,16 @@ export default function ExamDetailPanel({
     if (exam.completed) return t('completed' as TranslationKey);
     if (isPastDue) {
       const daysPast = Math.abs(daysUntil);
-      if (daysPast === 0) return 'Exam was today';
-      if (daysPast === 1) return '1 day ago';
-      return `${daysPast} days ago`;
+      if (daysPast === 0) return t('examToday' as TranslationKey);
+      if (daysPast === 1) return t('ago_one' as TranslationKey, { count: 1 });
+      return t('ago_other' as TranslationKey, { count: daysPast });
     }
     if (hoursUntil < 24) {
-      if (hoursUntil <= 1) return 'Starting soon';
-      return `In ${hoursUntil} hours`;
+      if (hoursUntil <= 1) return t('startingSoon' as TranslationKey);
+      return t(hoursUntil === 1 ? 'inHours_one' : 'inHours_other' as TranslationKey, { count: hoursUntil });
     }
-    if (daysUntil === 1) return 'Tomorrow';
-    if (daysUntil <= 7) return `In ${daysUntil} days`;
-    return `In ${daysUntil} days`;
+    if (daysUntil === 1) return t('tomorrow' as TranslationKey);
+    return t(daysUntil === 1 ? 'inDays_one' : 'inDays_other' as TranslationKey, { count: daysUntil });
   };
 
   return (
@@ -146,8 +145,8 @@ export default function ExamDetailPanel({
                   {exam.completed
                     ? t('completed' as TranslationKey)
                     : status === 'overdue'
-                      ? 'Exam passed'
-                      : 'Mark complete'}
+                      ? t('examPassed' as TranslationKey)
+                      : t('markComplete' as TranslationKey)}
                 </span>
               </button>
             </div>
@@ -194,7 +193,7 @@ export default function ExamDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <CalendarDays className="h-3.5 w-3.5" />
-                {t('date' as TranslationKey) || 'Date'}
+                {t('date' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">{format(dueDate, 'MMM d, yyyy')}</p>
               <p className="text-xs text-mq-content-secondary">{format(dueDate, 'h:mm a')}</p>
@@ -204,7 +203,7 @@ export default function ExamDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Clock className="h-3.5 w-3.5" />
-                {t('status' as TranslationKey) || 'Status'}
+                {t('status' as TranslationKey)}
               </div>
               <p
                 className={cn(
@@ -226,13 +225,13 @@ export default function ExamDetailPanel({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
                   <MapPin className="h-3.5 w-3.5" />
-                  Exam Location
+                  {t('examLocation' as TranslationKey)}
                 </div>
                 {exam.building && (
                   <Link
                     href={`/map?building=${exam.building.toLowerCase()}&autonav=true`}
                     className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
-                    aria-label={`Navigate to ${exam.building} on campus map`}
+                    aria-label={t('navigateToBuildingAria', { building: exam.building })}
                   >
                     <Navigation className="h-4 w-4" aria-hidden="true" />
                   </Link>
@@ -243,7 +242,7 @@ export default function ExamDetailPanel({
                 <div>
                   <p className="font-semibold text-sm">{exam.building || 'TBA'}</p>
                   {exam.room && (
-                    <p className="text-xs text-mq-content-secondary">Room {exam.room}</p>
+                    <p className="text-xs text-mq-content-secondary">{t('room')} {exam.room}</p>
                   )}
                 </div>
               </div>
@@ -273,7 +272,7 @@ export default function ExamDetailPanel({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
                   <BookOpen className="h-3.5 w-3.5" />
-                  Associated Unit
+                  {t('associatedUnit' as TranslationKey)}
                 </div>
                 {unit.location?.building && (
                   <Link
@@ -281,8 +280,7 @@ export default function ExamDetailPanel({
                     onClick={(e) => e.stopPropagation()}
                     className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
                     aria-label={
-                      t('navigateToBuildingAria', { building: unit.location.building }) ||
-                      `Navigate to ${unit.location.building} on campus map`
+                      t('navigateToBuildingAria', { building: unit.location.building })
                     }
                   >
                     <Navigation className="h-4 w-4" aria-hidden="true" />
@@ -304,10 +302,10 @@ export default function ExamDetailPanel({
             <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-2">
                 <BookOpen className="h-3.5 w-3.5" />
-                Unit Code
+                {t('unitCode' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">{exam.unitCode}</p>
-              <p className="text-xs text-mq-content-tertiary mt-1">Unit details not found</p>
+              <p className="text-xs text-mq-content-tertiary mt-1">{t('unitDetailsNotFound' as TranslationKey)}</p>
             </div>
           )}
 
@@ -315,7 +313,7 @@ export default function ExamDetailPanel({
           {exam.createdAt && (
             <div className="pt-2 border-t border-mq-border">
               <p className="text-xs text-mq-content-tertiary">
-                Created {format(new Date(exam.createdAt), 'MMM d, yyyy')}
+                {t('createdOn', { date: format(new Date(exam.createdAt), 'MMM d, yyyy') })}
               </p>
             </div>
           )}

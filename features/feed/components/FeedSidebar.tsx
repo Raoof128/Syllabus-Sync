@@ -61,33 +61,30 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
   const [selectedStat, setSelectedStat] = useState<'total' | 'thisWeek' | 'freeFood' | null>(null);
 
-  // Announcements data - using hardcoded content since these are static announcements
+  // Announcements data - using internationalized content
   const announcements: Announcement[] = [
     {
       id: 'featured-calendar',
       type: 'featured',
-      title: 'Add Events to Your Calendar',
-      description: 'Click "Add to Calendar" on any event to save it to your personal calendar...',
-      fullDescription:
-        'You can add any campus event to your personal calendar with just one click. This helps you stay organized and never miss important events. Simply click the "Add to Calendar" button on any event card to save it to Google Calendar, Apple Calendar, or download an ICS file.',
+      title: t('announcementCalendarTitle'),
+      description: t('announcementCalendarDesc'),
+      fullDescription: t('announcementCalendarFull'),
     },
     {
       id: 'new-enrollment',
       type: 'new',
-      title: 'Semester 1 Enrollment Open',
-      description: 'Course enrolment for Semester 1, 2026 is now open. Check your...',
-      fullDescription:
-        'Course enrolment for Semester 1, 2026 is now open. Check your enrolled units, add new courses, or modify your timetable through the student portal. Make sure to complete your enrolment before the deadline to secure your spot in popular classes.',
+      title: t('announcementEnrollmentTitle'),
+      description: t('announcementEnrollmentDesc'),
+      fullDescription: t('announcementEnrollmentFull'),
       link: 'https://students.mq.edu.au/enrolment',
-      linkText: 'Go to Enrollment Portal',
+      linkText: t('enrollmentPortal'),
     },
     {
       id: 'info-library',
       type: 'info',
-      title: 'Library Extended Hours',
-      description: 'During exam period, the library will be open 24/7. Additional study...',
-      fullDescription:
-        'During exam period, the library will be open 24/7. Additional study spaces have been made available on levels 2 and 3. Free coffee and snacks will be provided between 10pm and 6am to support your late-night study sessions. Security patrols have also been increased for your safety.',
+      title: t('announcementLibraryTitle'),
+      description: t('announcementLibraryDesc'),
+      fullDescription: t('announcementLibraryFull'),
     },
   ];
 
@@ -376,7 +373,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               <TrendingUp className="h-5 w-5 text-mq-primary" />
               {t('eventStatistics')}
             </DialogTitle>
-            <DialogDescription>Overview of events happening on campus</DialogDescription>
+            <DialogDescription>{t('eventsOverview')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
@@ -389,7 +386,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 <span className="text-2xl font-bold text-mq-info">{stats.total}</span>
               </div>
               <p className="text-mq-sm text-mq-content-secondary">
-                Total number of upcoming campus events
+                {t('totalEventsDesc')}
               </p>
             </div>
 
@@ -402,7 +399,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 <span className="text-2xl font-bold text-mq-purple">{stats.thisWeek}</span>
               </div>
               <p className="text-mq-sm text-mq-content-secondary">
-                Events happening in the next 7 days
+                {t('thisWeekEventsDesc')}
               </p>
             </div>
 
@@ -415,14 +412,14 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 <span className="text-2xl font-bold text-mq-warning">{stats.freeFood}</span>
               </div>
               <p className="text-mq-sm text-mq-content-secondary">
-                Events with free food or refreshments
+                {t('freeFoodEventsDesc')}
               </p>
             </div>
 
             <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg">
               <Sparkles className="h-4 w-4 text-mq-primary" />
               <p className="text-mq-sm text-mq-content-secondary">
-                Click on categories below to filter events by type
+                {t('filterByCategoryDesc')}
               </p>
             </div>
           </div>
@@ -447,23 +444,22 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               </DialogHeader>
               <div className="mt-4 space-y-4">
                 <p className="text-mq-content-secondary leading-relaxed">
-                  This shows the total number of upcoming campus events across all categories.
-                  Events include career fairs, social gatherings, academic workshops, and more.
+                  {t('totalEventsDetail')}
                 </p>
                 <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
-                  <h4 className="font-medium text-mq-content mb-2">What&apos;s Included:</h4>
+                  <h4 className="font-medium text-mq-content mb-2">{t('whatsIncluded')}</h4>
                   <ul className="space-y-2 text-sm text-mq-content-secondary">
                     <li className="flex items-center gap-2">
-                      <span>💼</span> Career events and job fairs
+                      <span>💼</span> {t('careerEventsList')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>📚</span> Academic workshops and seminars
+                      <span>📚</span> {t('academicEventsList')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>🎉</span> Social events and meetups
+                      <span>🎉</span> {t('socialEventsList')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>🍕</span> Events with free food
+                      <span>🍕</span> {t('freeFoodEventsList')}
                     </li>
                   </ul>
                 </div>
@@ -485,20 +481,19 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               </DialogHeader>
               <div className="mt-4 space-y-4">
                 <p className="text-mq-content-secondary leading-relaxed">
-                  Events happening in the next 7 days. Don&apos;t miss out on these upcoming
-                  opportunities to connect, learn, and have fun on campus!
+                  {t('thisWeekEventsDetail')}
                 </p>
                 <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
-                  <h4 className="font-medium text-mq-content mb-2">Pro Tips:</h4>
+                  <h4 className="font-medium text-mq-content mb-2">{t('proTips')}</h4>
                   <ul className="space-y-2 text-sm text-mq-content-secondary">
                     <li className="flex items-center gap-2">
-                      <span>📅</span> Add events to your calendar to get reminders
+                      <span>📅</span> {t('proTipCalendar')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>🔔</span> Enable notifications for last-minute updates
+                      <span>🔔</span> {t('proTipNotifications')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>👥</span> Invite friends to join you
+                      <span>👥</span> {t('proTipFriends')}
                     </li>
                   </ul>
                 </div>
@@ -520,23 +515,22 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               </DialogHeader>
               <div className="mt-4 space-y-4">
                 <p className="text-mq-content-secondary leading-relaxed">
-                  Events featuring free food and refreshments! Perfect for students looking to grab
-                  a bite while networking or learning something new.
+                  {t('freeFoodEventsDetail')}
                 </p>
                 <div className="p-4 bg-mq-background-secondary rounded-mq-lg">
-                  <h4 className="font-medium text-mq-content mb-2">What to Expect:</h4>
+                  <h4 className="font-medium text-mq-content mb-2">{t('whatsNext')}</h4>
                   <ul className="space-y-2 text-sm text-mq-content-secondary">
                     <li className="flex items-center gap-2">
-                      <span>🍕</span> Pizza and snacks at club events
+                      <span>🍕</span> {t('expectPizza')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>☕</span> Coffee and pastries at morning seminars
+                      <span>☕</span> {t('expectCoffee')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>🍪</span> Treats at study sessions
+                      <span>🍪</span> {t('expectTreats')}
                     </li>
                     <li className="flex items-center gap-2">
-                      <span>🥤</span> Refreshments at career fairs
+                      <span>🥤</span> {t('expectRefreshments')}
                     </li>
                   </ul>
                 </div>
@@ -554,7 +548,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               <Megaphone className="h-5 w-5 text-mq-primary" />
               {t('announcements')}
             </DialogTitle>
-            <DialogDescription>Important updates and news from the university</DialogDescription>
+            <DialogDescription>{t('importantUpdates')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto">
@@ -635,7 +629,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">{t('eventCategories')}</DialogTitle>
             <DialogDescription>
-              Filter events by category to find what interests you
+              {t('filterInterestDesc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -701,7 +695,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
             <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg mt-4">
               <Info className="h-4 w-4 text-mq-content-tertiary" />
               <p className="text-mq-sm text-mq-content-secondary">
-                Click a category to filter the event feed
+                {t('clickCategoryToFilter')}
               </p>
             </div>
           </div>

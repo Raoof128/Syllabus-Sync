@@ -154,19 +154,19 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
               <DialogHeader>
                 <DialogTitle className="text-2xl">{dialogState.title}</DialogTitle>
                 <DialogDescription className="text-sm text-mq-content-secondary">
-                  {dialogState.events.length} {dialogState.events.length === 1 ? 'event' : 'events'}
+                  {t(dialogState.events.length === 1 ? 'eventsCount_one' : 'eventsCount_other', { count: dialogState.events.length })}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-3 overflow-y-auto max-h-[50vh]">
                 {dialogState.events.length === 0 ? (
-                  <p className="text-center py-8 text-mq-content-tertiary">No events found</p>
+                  <p className="text-center py-8 text-mq-content-tertiary">{t('noEventsFound')}</p>
                 ) : (
                   dialogState.events.map((event) => <EventCard key={event.id} event={event} />)
                 )}
               </div>
               <div className="flex justify-end mt-4">
                 <Button variant="outline" onClick={closeDialog}>
-                  {t('close') || 'Close'}
+                  {t('close')}
                 </Button>
               </div>
             </>
@@ -189,6 +189,7 @@ interface StatCardProps {
 }
 
 function StatCard({ icon: Icon, label, value, color, bgColor, onClick }: StatCardProps) {
+  const { t } = useTypedTranslation();
   return (
     <div
       className="flex items-center justify-between p-3 rounded-xl bg-mq-card-background border border-mq-border cursor-pointer select-none hover:shadow-md active:scale-[0.98] transition-all"
@@ -201,7 +202,7 @@ function StatCard({ icon: Icon, label, value, color, bgColor, onClick }: StatCar
       }}
       role="button"
       tabIndex={0}
-      aria-label={`View ${label}`}
+      aria-label={t('viewLabel', { label })}
     >
       <div className="flex items-center gap-3">
         <div className={cn('p-2 rounded-lg', bgColor)}>
@@ -224,6 +225,7 @@ interface CategoryBarProps {
 }
 
 function CategoryBar({ icon, label, count, total, color, onClick }: CategoryBarProps) {
+  const { t } = useTypedTranslation();
   const percentage = total > 0 ? (count / total) * 100 : 0;
 
   return (
@@ -238,7 +240,7 @@ function CategoryBar({ icon, label, count, total, color, onClick }: CategoryBarP
       }}
       role="button"
       tabIndex={0}
-      aria-label={`View ${label} events`}
+      aria-label={t('viewCategoryEvents', { label })}
     >
       <div className="flex items-center justify-between text-sm mb-1">
         <span className="flex items-center gap-1.5 text-mq-content-secondary">
@@ -263,6 +265,7 @@ interface EventCardProps {
 }
 
 function EventCard({ event }: EventCardProps) {
+  const { t } = useTypedTranslation();
   const categoryColors: Record<string, string> = {
     Career: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     Social: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
@@ -286,7 +289,7 @@ function EventCard({ event }: EventCardProps) {
   };
 
   const getTimeRange = () => {
-    if (event.allDay) return 'All Day';
+    if (event.allDay) return t('allDay');
     const start = formatTime(event.startAt);
     if (event.endAt) {
       const end = formatTime(event.endAt);

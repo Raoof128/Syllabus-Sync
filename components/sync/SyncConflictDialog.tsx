@@ -140,7 +140,7 @@ export default function SyncConflictDialog() {
           <button
             onClick={clearConflicts}
             className="rounded-lg p-2 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
-            aria-label="Close"
+            aria-label={t('close')}
           >
             <X className="h-5 w-5" />
           </button>

@@ -1,9 +1,11 @@
 // app/offline/page.tsx
 'use client';
 
-import { APP_CONFIG } from '@/lib/config';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function OfflinePage() {
+  const { t } = useTypedTranslation();
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-mq-background px-4">
       <div className="text-center max-w-md space-y-6">
@@ -25,10 +27,9 @@ export default function OfflinePage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-mq-content">You&apos;re offline</h1>
+          <h1 className="text-2xl font-bold text-mq-content">{t('youAreOffline')}</h1>
           <p className="text-mq-content-secondary text-sm leading-relaxed">
-            {APP_CONFIG.name} requires an internet connection. Please check your connection and try
-            again.
+            {t('youAreOfflineDesc')}
           </p>
         </div>
 
@@ -36,7 +37,7 @@ export default function OfflinePage() {
           onClick={() => window.location.reload()}
           className="inline-flex items-center gap-2 rounded-mq-md bg-mq-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-mq-primary/90 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-background"
         >
-          Try again
+          {t('tryAgain')}
         </button>
       </div>
     </div>

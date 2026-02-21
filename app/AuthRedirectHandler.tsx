@@ -6,6 +6,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { logger } from '@/lib/logger';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface AuthRedirectHandlerProps {
   fallbackRedirect: string;
@@ -19,6 +20,7 @@ interface AuthRedirectHandlerProps {
  * This component detects those tokens and redirects appropriately.
  */
 export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHandlerProps) {
+  const { t } = useTypedTranslation();
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'processing' | 'redirecting' | 'error'>(
     'loading',
@@ -169,10 +171,9 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-xl font-bold text-mq-content">Link Expired or Invalid</h1>
+              <h1 className="text-xl font-bold text-mq-content">{t('linkExpiredOrInvalid')}</h1>
               <p className="text-sm text-mq-content-secondary">
-                {errorMessage ||
-                  'The password reset link has expired or is invalid. Please request a new one.'}
+                {errorMessage || t('invalidResetLink')}
               </p>
             </div>
             <div className="space-y-3">
@@ -181,7 +182,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
                 className="w-full h-12 rounded-xl font-bold"
                 onClick={() => router.push('/reset-password')}
               >
-                Request New Reset Link
+                {t('requestNewResetLink')}
               </Button>
               <Button
                 type="button"
@@ -189,7 +190,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
                 className="w-full h-12 rounded-xl font-bold"
                 onClick={() => router.push('/login')}
               >
-                Back to Login
+                {t('backToLogin')}
               </Button>
             </div>
           </div>
@@ -204,9 +205,9 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
       <div className="text-center">
         <Loader2 className="h-8 w-8 animate-spin mx-auto text-mq-primary" />
         <p className="mt-4 text-mq-content-secondary">
-          {status === 'loading' && 'Loading...'}
-          {status === 'processing' && 'Verifying your request...'}
-          {status === 'redirecting' && 'Redirecting...'}
+          {status === 'loading' && t('loading')}
+          {status === 'processing' && t('verifyingRequest')}
+          {status === 'redirecting' && t('redirecting')}
         </p>
       </div>
     </div>
