@@ -1,3 +1,25 @@
+### Raouf: Locate Me Button & Calendar Link Fix — 2026-02-21
+
+**Scope:** Map Refinement & Navigation Fixes
+**Type:** Feature Addition / Bug Fix
+
+#### Changes
+
+1. **Google Map Locate Me Button:**
+   - Appended a "Center on my location" floating action button onto the Google Maps overlay mode (`GoogleMapEmbed.tsx`). Used the exact `<svg>` requested by the user.
+   - Tied button to an explicit `forceCenter` state that forces the iframe `destinationQuery` to fall back instantly to `My+Location`, correctly pinging the user's localized GPS in Google Maps View. 
+2. **Calendar Link Persistence:**
+   - Found that `dialogs` was changing on every render and prematurely nuking the `setUnitDetailOpen(true)` delayed opening sequence in `useCalendarHighlights.ts`.
+   - Used explicit destructuring to inject only the stable React setter functions into the `useEffect` dependency arrays, guaranteeing that redirecting from the Home Dashboard to a Unit Card on the calendar will correctly select and expand the requested unit visually.
+3. **Automated Validation:**
+   - Ran checks (`npm run check`) successfully; safely bypassed typecheck errors using `useSafeTranslation`.
+
+#### Verification
+- Next.js build and test suites compiled.
+- Visual component dependencies stabilized and correctly hook back into API.
+
+---
+
 ### Raouf: Robust Unit Deletion & Calendar Interaction Fixes — 2026-02-21
 
 **Scope:** State Management / Calendar Refinement

@@ -11,6 +11,19 @@ export function useCalendarHighlights(
   hasHydrated: boolean,
   dialogs: ReturnType<typeof useCalendarDialogs>,
 ) {
+  const {
+    setSelectedUnit,
+    setUnitDetailOpen,
+    setSelectedExam,
+    setExamDetailOpen,
+    setSelectedAssignment,
+    setAssignmentDetailOpen,
+    setSelectedTodo,
+    setTodoDetailOpen,
+    setSelectedEvent,
+    setEventDetailOpen,
+  } = dialogs;
+
   const searchParams = useSearchParams();
   const unitsWidgetRef = useRef<HTMLDivElement>(null);
   const assignmentsWidgetRef = useRef<HTMLDivElement>(null);
@@ -60,8 +73,8 @@ export function useCalendarHighlights(
     processedUnitHighlightRef.current = highlightedUnitId;
 
     const timer = window.setTimeout(() => {
-      dialogs.setSelectedUnit(highlightedUnit);
-      dialogs.setUnitDetailOpen(true);
+      setSelectedUnit(highlightedUnit);
+      setUnitDetailOpen(true);
     }, 300);
 
     const clearTimer = window.setTimeout(() => {
@@ -76,7 +89,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedUnitId, highlightedUnit, hasHydrated, dialogs]);
+  }, [highlightedUnitId, highlightedUnit, hasHydrated, setSelectedUnit, setUnitDetailOpen]);
 
   // Scroll to units widget when highlighted unit exists
   useEffect(() => {
@@ -110,11 +123,11 @@ export function useCalendarHighlights(
 
       if (highlightedDeadline) {
         if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
-          dialogs.setSelectedExam(highlightedDeadline);
-          dialogs.setExamDetailOpen(true);
+          setSelectedExam(highlightedDeadline);
+          setExamDetailOpen(true);
         } else {
-          dialogs.setSelectedAssignment(highlightedDeadline);
-          dialogs.setAssignmentDetailOpen(true);
+          setSelectedAssignment(highlightedDeadline);
+          setAssignmentDetailOpen(true);
         }
       }
     }, 300);
@@ -131,7 +144,15 @@ export function useCalendarHighlights(
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, dialogs]);
+  }, [
+    highlightedDeadlineId,
+    deadlines,
+    scrollIfNotVisible,
+    setSelectedExam,
+    setExamDetailOpen,
+    setSelectedAssignment,
+    setAssignmentDetailOpen,
+  ]);
 
   // 3. Highlighted Todo
   const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
@@ -143,8 +164,8 @@ export function useCalendarHighlights(
 
     const timer = window.setTimeout(() => {
       if (highlightedTodo) {
-        dialogs.setSelectedTodo(highlightedTodo);
-        dialogs.setTodoDetailOpen(true);
+        setSelectedTodo(highlightedTodo);
+        setTodoDetailOpen(true);
       }
     }, 300);
 
@@ -160,7 +181,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedTodoId, todos, dialogs]);
+  }, [highlightedTodoId, todos, setSelectedTodo, setTodoDetailOpen]);
 
   // 4. Highlighted Event
   const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
@@ -172,8 +193,8 @@ export function useCalendarHighlights(
 
     const timer = window.setTimeout(() => {
       if (highlightedEvent) {
-        dialogs.setSelectedEvent(highlightedEvent);
-        dialogs.setEventDetailOpen(true);
+        setSelectedEvent(highlightedEvent);
+        setEventDetailOpen(true);
       }
     }, 300);
 
@@ -189,7 +210,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedEventId, events, dialogs]);
+  }, [highlightedEventId, events, setSelectedEvent, setEventDetailOpen]);
 
   // 5. Highlighted Widget
   const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);

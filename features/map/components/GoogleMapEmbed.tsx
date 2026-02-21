@@ -2,7 +2,7 @@
 
 import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Navigation, ArrowLeft, MapPin } from 'lucide-react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import type { Building } from '@/features/map/lib/buildings';
 
@@ -28,12 +28,20 @@ interface GoogleMapEmbedProps {
 
 export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
   ({ selectedBuilding, destinationLabel, onNavStateChange }, ref) => {
-    const { t } = useTypedTranslation();
+    const { t, safeT } = useSafeTranslation();
     const [mode, setMode] = useState<MapMode>('view');
-    const destinationQuery = selectedBuilding?.location
-      ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
-      : MQ_QUERY;
-    const resolvedDestinationLabel = destinationLabel || UNIVERSITY_CONFIG.name;
+    const [forceCenter, setForceCenter] = useState<boolean>(false);
+
+    // If we've explicitly requested centering on user, override the building or campus query
+    const destinationQuery = forceCenter
+      ? 'My+Location'
+      : selectedBuilding?.location
+        ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
+        : MQ_QUERY;
+
+    const resolvedDestinationLabel = forceCenter
+      ? safeT('myLocation', 'My Location')
+      : destinationLabel || UNIVERSITY_CONFIG.name;
 
     // Expose navigation control via ref (same pattern as CampusMap)
     useImperativeHandle(ref, () => ({
@@ -59,6 +67,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     // Reset to view mode when building changes
     useEffect(() => {
       setMode('view');
+      setForceCenter(false);
     }, [selectedBuilding?.id]);
 
     return (
@@ -112,6 +121,38 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           allowFullScreen
           allow="geolocation"
         />
+
+        {/* Floating Action Button - Center on User */}
+        {mode === 'view' && (
+          <button
+            onClick={() => setForceCenter(true)}
+            className={
+              'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ' +
+              (selectedBuilding
+                ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
+                : 'bottom-[140px] right-4')
+            }
+            aria-label={safeT('centerOnLocation', 'Center on my location')}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <line x1="12" y1="2" x2="12" y2="4" />
+              <line x1="12" y1="20" x2="12" y2="22" />
+              <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" />
+              <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" />
+              <line x1="2" y1="12" x2="4" y2="12" />
+              <line x1="20" y1="12" x2="22" y2="12" />
+              <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" />
+              <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" />
+            </svg>
+          </button>
+        )}
       </div>
     );
   },

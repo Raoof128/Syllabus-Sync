@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Map Refinement & Navigation Fixes
+Summary: Extended the `GoogleMapEmbed.tsx` view with a "Center on my location" GPS location button overlay that uses a direct URL query fallback to `My+Location`. Furthermore, resolved a `dialogs` re-render timing bug in `useCalendarHighlights.ts` that immediately cancelled modal-opening timeouts, so now selecting units on the home dashboard correctly expands their card in the Calendar page upon redirection as visually intended.
+Files Changed: `features/map/components/GoogleMapEmbed.tsx`, `features/calendar/hooks/useCalendarHighlights.ts`.
+Verification: Followed up with formatting and `npm run check`; test suites all compile correctly without missing reference exceptions.
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Robust Unit Deletion & Calendar Interaction Fixes
 Summary: Fixed an issue where the calendar widget highlights would disappear instantly when redirected from the Home dashboard by delaying the URL parameter clearance to 3000ms. Prevented unit cards from accidentally opening when toggling their notifications by wrapping `ReminderModal` in a div with `stopPropagation`, fixing React's portal event bubbling bug. Also guaranteed that assignments/deadlines are globally cascade-deleted in the UI the instant a unit is deleted anywhere in the app by explicitly hooking `unitsStore.ts` into `deadlinesStore.ts`.
 Files Changed: `features/calendar/hooks/useCalendarHighlights.ts`, `features/calendar/components/ItemActionButtons.tsx`, `lib/store/unitsStore.ts`.
