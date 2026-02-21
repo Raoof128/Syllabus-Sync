@@ -154,7 +154,9 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
               <DialogHeader>
                 <DialogTitle className="text-2xl">{dialogState.title}</DialogTitle>
                 <DialogDescription className="text-sm text-mq-content-secondary">
-                  {t(dialogState.events.length === 1 ? 'eventsCount_one' : 'eventsCount_other', { count: dialogState.events.length })}
+                  {t(dialogState.events.length === 1 ? 'eventsCount_one' : 'eventsCount_other', {
+                    count: dialogState.events.length,
+                  })}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-3 overflow-y-auto max-h-[50vh]">

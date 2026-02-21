@@ -6,7 +6,10 @@ const BASE_LOCALE = 'en';
 const TRANSLATION_FILE = 'translations.json';
 
 async function main() {
-  const baseContent = await fs.readFile(path.join(LOCALES_DIR, BASE_LOCALE, TRANSLATION_FILE), 'utf8');
+  const baseContent = await fs.readFile(
+    path.join(LOCALES_DIR, BASE_LOCALE, TRANSLATION_FILE),
+    'utf8',
+  );
   const baseJson = JSON.parse(baseContent);
 
   const localeEntries = await fs.readdir(LOCALES_DIR, { withFileTypes: true });
@@ -20,7 +23,8 @@ async function main() {
 
     const untranslated = [];
     for (const [key, value] of Object.entries(baseJson)) {
-      if (json[key] === value && value.length > 3) { // Use length threshold to avoid small common strings like "OK"
+      if (json[key] === value && value.length > 3) {
+        // Use length threshold to avoid small common strings like "OK"
         untranslated.push(key);
       }
     }
@@ -29,7 +33,7 @@ async function main() {
       console.log(`
 Locale: ${locale}`);
       console.log(`  Likely untranslated (${untranslated.length}):`);
-      untranslated.slice(0, 10).forEach(k => console.log(`    - ${k}: "${baseJson[k]}"`));
+      untranslated.slice(0, 10).forEach((k) => console.log(`    - ${k}: "${baseJson[k]}"`));
       if (untranslated.length > 10) console.log(`    ... and ${untranslated.length - 10} more`);
     }
   }

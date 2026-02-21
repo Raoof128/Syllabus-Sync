@@ -26,9 +26,7 @@ export default function Error({
       </div>
       <div className="space-y-2">
         <h2 className="text-xl font-bold text-mq-content">{t('somethingWentWrong')}</h2>
-        <p className="text-mq-content-secondary max-w-md mx-auto">
-          {t('errorProfileLoad')}
-        </p>
+        <p className="text-mq-content-secondary max-w-md mx-auto">{t('errorProfileLoad')}</p>
       </div>
       <Button onClick={() => reset()} variant="outline" className="gap-2">
         <RefreshCcw className="h-4 w-4" />

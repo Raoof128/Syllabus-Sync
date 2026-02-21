@@ -136,7 +136,9 @@ export default function AgendaView({
 
             <div className="space-y-3">
               {items.length === 0 ? (
-                <p className="text-sm text-mq-content-tertiary italic pl-1">{t('noItemsScheduled')}</p>
+                <p className="text-sm text-mq-content-tertiary italic pl-1">
+                  {t('noItemsScheduled')}
+                </p>
               ) : (
                 items.map((entry, idx) => {
                   // Render logic based on type

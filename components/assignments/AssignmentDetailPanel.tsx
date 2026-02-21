@@ -88,10 +88,14 @@ export default function AssignmentDetailPanel({
     }
     if (hoursUntil < 24) {
       if (hoursUntil <= 1) return t('dueWithinHour' as TranslationKey);
-      return t(hoursUntil === 1 ? 'dueInHours_one' : 'dueInHours_other' as TranslationKey, { count: hoursUntil });
+      return t(hoursUntil === 1 ? 'dueInHours_one' : ('dueInHours_other' as TranslationKey), {
+        count: hoursUntil,
+      });
     }
     if (daysUntil === 1) return t('dueTomorrow' as TranslationKey);
-    return t(daysUntil === 1 ? 'dueInDays_one' : 'dueInDays_other' as TranslationKey, { count: daysUntil });
+    return t(daysUntil === 1 ? 'dueInDays_one' : ('dueInDays_other' as TranslationKey), {
+      count: daysUntil,
+    });
   };
 
   const getTypeLabel = (type: Deadline['type']) => {
@@ -255,9 +259,7 @@ export default function AssignmentDetailPanel({
                     href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
                     onClick={(e) => e.stopPropagation()}
                     className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
-                    aria-label={
-                      t('navigateToBuildingAria', { building: unit.location.building })
-                    }
+                    aria-label={t('navigateToBuildingAria', { building: unit.location.building })}
                   >
                     <Navigation className="h-4 w-4" aria-hidden="true" />
                   </Link>
@@ -284,7 +286,9 @@ export default function AssignmentDetailPanel({
                 {t('unitCode' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">{assignment.unitCode}</p>
-              <p className="text-xs text-mq-content-tertiary mt-1">{t('unitDetailsNotFound' as TranslationKey)}</p>
+              <p className="text-xs text-mq-content-tertiary mt-1">
+                {t('unitDetailsNotFound' as TranslationKey)}
+              </p>
             </div>
           )}
 

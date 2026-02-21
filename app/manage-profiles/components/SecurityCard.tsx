@@ -34,7 +34,9 @@ export const SecurityCard = memo(() => {
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('changePasswordDesc')}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">
+                      {t('changePasswordDesc')}
+                    </p>
                   </div>
                 </div>
                 <Button
@@ -57,7 +59,9 @@ export const SecurityCard = memo(() => {
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('manageSessionsDesc')}</p>
+                    <p className="text-mq-sm text-mq-content-secondary">
+                      {t('manageSessionsDesc')}
+                    </p>
                   </div>
                 </div>
                 <Button

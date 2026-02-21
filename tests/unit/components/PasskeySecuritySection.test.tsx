@@ -36,6 +36,6 @@ describe('PasskeySecuritySection', () => {
 
   it('renders passkeys list header', () => {
     render(<PasskeySecuritySection t={mockT} />);
-    expect(screen.getByText('Registered Devices & Keys')).toBeInTheDocument();
+    expect(screen.getByText('registeredDevicesAndKeys')).toBeInTheDocument();
   });
 });

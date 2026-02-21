@@ -102,10 +102,14 @@ export default function ExamDetailPanel({
     }
     if (hoursUntil < 24) {
       if (hoursUntil <= 1) return t('startingSoon' as TranslationKey);
-      return t(hoursUntil === 1 ? 'inHours_one' : 'inHours_other' as TranslationKey, { count: hoursUntil });
+      return t(hoursUntil === 1 ? 'inHours_one' : ('inHours_other' as TranslationKey), {
+        count: hoursUntil,
+      });
     }
     if (daysUntil === 1) return t('tomorrow' as TranslationKey);
-    return t(daysUntil === 1 ? 'inDays_one' : 'inDays_other' as TranslationKey, { count: daysUntil });
+    return t(daysUntil === 1 ? 'inDays_one' : ('inDays_other' as TranslationKey), {
+      count: daysUntil,
+    });
   };
 
   return (
@@ -242,7 +246,9 @@ export default function ExamDetailPanel({
                 <div>
                   <p className="font-semibold text-sm">{exam.building || 'TBA'}</p>
                   {exam.room && (
-                    <p className="text-xs text-mq-content-secondary">{t('room')} {exam.room}</p>
+                    <p className="text-xs text-mq-content-secondary">
+                      {t('room')} {exam.room}
+                    </p>
                   )}
                 </div>
               </div>
@@ -279,9 +285,7 @@ export default function ExamDetailPanel({
                     href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
                     onClick={(e) => e.stopPropagation()}
                     className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
-                    aria-label={
-                      t('navigateToBuildingAria', { building: unit.location.building })
-                    }
+                    aria-label={t('navigateToBuildingAria', { building: unit.location.building })}
                   >
                     <Navigation className="h-4 w-4" aria-hidden="true" />
                   </Link>
@@ -305,7 +309,9 @@ export default function ExamDetailPanel({
                 {t('unitCode' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">{exam.unitCode}</p>
-              <p className="text-xs text-mq-content-tertiary mt-1">{t('unitDetailsNotFound' as TranslationKey)}</p>
+              <p className="text-xs text-mq-content-tertiary mt-1">
+                {t('unitDetailsNotFound' as TranslationKey)}
+              </p>
             </div>
           )}
 

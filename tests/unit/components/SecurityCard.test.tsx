@@ -29,9 +29,8 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
 
 // Mock SessionsList component
 vi.mock('@/features/settings/components/privacy/SessionsList', () => ({
-  SessionsList: ({ open }: { open: boolean }) => (
-    open ? <div data-testid="sessions-dialog">Sessions List</div> : null
-  ),
+  SessionsList: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="sessions-dialog">Sessions List</div> : null,
 }));
 
 describe('SecurityCard', () => {

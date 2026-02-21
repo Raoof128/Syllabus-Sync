@@ -1,4 +1,12 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Full System QA & Deployment Fixes
+Summary: Addressed system integrity errors reported by `npm run check`. Fixed duplicated content and linting errors inside `PasswordStrengthIndicator.tsx` and removed an unused import in `PrivacySettings.tsx`. Updated `PasskeySecuritySection.test.tsx` to match i18n changes instead of asserting hardcoded strings. After ensuring all codebase quality checks passed, initiated a successful `vercel` deployment to production.
+Files: Modified `components/security/PasswordStrengthIndicator.tsx`, `features/settings/components/PrivacySettings.tsx`, `tests/unit/components/PasskeySecuritySection.test.tsx`.
+Verification: `npm run check` pipeline (formatter, typecheck, lint, test, build) entirely passed. `vercel deploy --prod` triggered and completed successfully.
+Deployment: Production URL: https://syllabus-sync-52umrpk59-perkycoders.vercel.app / https://syllabus-sync-ashy.vercel.app
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Repository-wide Internationalisation (i18n) Audit & Remediation
 Summary: (1) Performed a comprehensive audit of all 35 locales, identifying 100% key parity gaps and thousands of untranslated strings. (2) Deduped and cleaned up `en/translations.json` (reduced from 3763 to 2029 lines). (3) Achieved perfect key parity across all 35 locales using a parity-sync script. (4) Provided comprehensive translations for 30+ new keys and fixed major UI gaps across all supported languages, with deep coverage for major world languages (Arabic, Chinese, Spanish, French, Russian, etc.). (5) Internationalized 13 major components/pages previously containing hardcoded English strings (AuthRedirect, Offline, Security Settings, Calendar Views, Feed Stats, etc.).
 Files: Modified `locales/*/translations.json` (35 files), `app/AuthRedirectHandler.tsx`, `app/manage-profiles/error.tsx`, `app/offline/page.tsx`, `features/settings/components/PrivacySettings.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`, `features/calendar/components/AgendaView.tsx`, `features/feed/components/FeedSidebar.tsx`, `features/feed/components/QuickStats.tsx`, `components/assignments/AssignmentDetailPanel.tsx`, `components/exams/ExamDetailPanel.tsx`, `components/security/PasswordStrengthIndicator.tsx`, `components/sync/SyncConflictDialog.tsx`, `components/units/UnitCard.tsx`.

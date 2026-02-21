@@ -385,9 +385,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 </span>
                 <span className="text-2xl font-bold text-mq-info">{stats.total}</span>
               </div>
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('totalEventsDesc')}
-              </p>
+              <p className="text-mq-sm text-mq-content-secondary">{t('totalEventsDesc')}</p>
             </div>
 
             <div className="p-4 bg-mq-purple/10 rounded-mq-lg border border-mq-purple/20">
@@ -398,9 +396,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 </span>
                 <span className="text-2xl font-bold text-mq-purple">{stats.thisWeek}</span>
               </div>
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('thisWeekEventsDesc')}
-              </p>
+              <p className="text-mq-sm text-mq-content-secondary">{t('thisWeekEventsDesc')}</p>
             </div>
 
             <div className="p-4 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
@@ -411,16 +407,12 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 </span>
                 <span className="text-2xl font-bold text-mq-warning">{stats.freeFood}</span>
               </div>
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('freeFoodEventsDesc')}
-              </p>
+              <p className="text-mq-sm text-mq-content-secondary">{t('freeFoodEventsDesc')}</p>
             </div>
 
             <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg">
               <Sparkles className="h-4 w-4 text-mq-primary" />
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('filterByCategoryDesc')}
-              </p>
+              <p className="text-mq-sm text-mq-content-secondary">{t('filterByCategoryDesc')}</p>
             </div>
           </div>
         </DialogContent>
@@ -628,9 +620,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">{t('eventCategories')}</DialogTitle>
-            <DialogDescription>
-              {t('filterInterestDesc')}
-            </DialogDescription>
+            <DialogDescription>{t('filterInterestDesc')}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-2 mt-4">
@@ -694,9 +684,7 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
 
             <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg mt-4">
               <Info className="h-4 w-4 text-mq-content-tertiary" />
-              <p className="text-mq-sm text-mq-content-secondary">
-                {t('clickCategoryToFilter')}
-              </p>
+              <p className="text-mq-sm text-mq-content-secondary">{t('clickCategoryToFilter')}</p>
             </div>
           </div>
         </DialogContent>

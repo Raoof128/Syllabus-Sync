@@ -22,7 +22,7 @@ async function main() {
 
     let changed = false;
     const newJson = {};
-    
+
     // Maintain key order of baseJson
     for (const key of Object.keys(baseJson)) {
       if (json[key] === undefined) {
@@ -32,7 +32,7 @@ async function main() {
         newJson[key] = json[key];
       }
     }
-    
+
     // Also check for extra keys to remove
     for (const key of Object.keys(json)) {
       if (baseJson[key] === undefined) {

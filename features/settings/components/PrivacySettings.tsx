@@ -1,7 +1,6 @@
 'use client';
 
 import { memo, useState, useCallback, useEffect } from 'react';
-import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Shield, Loader2, MessageSquare } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
@@ -82,7 +81,9 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                       <div className="flex items-center gap-3 flex-1">
                         <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-mq-sm font-medium text-mq-content">{t('smsVerification')}</p>
+                          <p className="text-mq-sm font-medium text-mq-content">
+                            {t('smsVerification')}
+                          </p>
                           <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                             {t('smsVerificationDesc')}
                           </p>

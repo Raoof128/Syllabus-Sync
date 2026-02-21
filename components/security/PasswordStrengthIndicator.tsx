@@ -16,67 +16,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Shield, AlertCircle, Check, X } from 'lucide-react';
 import { logger } from '@/lib/logger';
-
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface PasswordStrengthResult {
-  score: number; // 0-4
-  strength: 'very weak' | 'weak' | 'fair' | 'strong' | 'very strong';
-  breachResult?: {
-    isBreached: boolean;
-    breachCount: number;
-    riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  };
-  suggestions: string[];
-}
-
-export interface PasswordStrengthIndicatorProps {
-  /** The password to analyze */
-  password: string;
-  /** Whether to check for breaches (requires API call) */
-  checkBreaches?: boolean;
-  /** Whether to show suggestions */
-  showSuggestions?: boolean;
-  /** Whether to show requirements checklist */
-  showRequirements?: boolean;
-  /** Custom class name */
-  className?: string;
-  /** Callback when strength changes */
-  onStrengthChange?: (result: PasswordStrengthResult) => void;
-}
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const MIN_PASSWORD_LENGTH = 12;
-const STRENGTH_COLORS = {
-  'very weak': 'bg-red-500',
-  weak: 'bg-orange-500',
-  fair: 'bg-yellow-500',
-  strong: 'bg-green-500',
-  'very strong': 'bg-emerald-500',
-};
-
-const STRENGTH_TEXT_COLORS = {
-  'very weak': 'text-red-500',
-  weak: 'text-orange-500',
-  fair: 'text-yellow-500',
-  strong: 'text-green-500',
-  'very strong': 'text-emerald-500',
-};
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { Shield, AlertCircle, Check, X } from 'lucide-react';
-import { logger } from '@/lib/logger';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 
 // ============================================================================
@@ -292,7 +233,7 @@ export function PasswordStrengthIndicator({
           <span
             className={`text-sm font-semibold ${STRENGTH_TEXT_COLORS[strength.strength]}`}
           >
-            {t(`strength_${strength.strength.replace(' ', '')}` as any)}
+            {t(`strength_${strength.strength.replace(' ', '')}` as TranslationKey)}
           </span>
         </div>
 
@@ -349,11 +290,10 @@ export function PasswordStrengthIndicator({
                   <X className="w-4 h-4 text-gray-400 flex-shrink-0" />
                 )}
                 <span
-                  className={`text-sm ${
-                    req.met
-                      ? 'text-green-700 dark:text-green-300'
-                      : 'text-gray-500 dark:text-gray-400'
-                  }`}
+                  className={`text-sm ${req.met
+                    ? 'text-green-700 dark:text-green-300'
+                    : 'text-gray-500 dark:text-gray-400'
+                    }`}
                 >
                   {req.label}
                 </span>

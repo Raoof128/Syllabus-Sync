@@ -5,14 +5,16 @@ const dirs = ['app', 'features', 'components'];
 
 async function walk(dir) {
   let files = await fs.readdir(dir, { withFileTypes: true });
-  files = await Promise.all(files.map(async (file) => {
-    const res = path.join(dir, file.name);
-    if (file.isDirectory()) {
-      if (file.name === 'node_modules' || file.name === '.next') return [];
-      return walk(res);
-    }
-    return res.endsWith('.tsx') ? res : [];
-  }));
+  files = await Promise.all(
+    files.map(async (file) => {
+      const res = path.join(dir, file.name);
+      if (file.isDirectory()) {
+        if (file.name === 'node_modules' || file.name === '.next') return [];
+        return walk(res);
+      }
+      return res.endsWith('.tsx') ? res : [];
+    }),
+  );
   return files.flat();
 }
 
@@ -22,14 +24,19 @@ async function main() {
 
   for (const file of files) {
     const content = await fs.readFile(file, 'utf8');
-    
+
     // Simple regex for JSX text content: >Some Text<
     const jsxTextRegex = />([^<>{}\n]+)</g;
     let match;
     while ((match = jsxTextRegex.exec(content)) !== null) {
       const text = match[1].trim();
       // Filter out things that are likely code or too short
-      if (text.length > 2 && /[A-Z]/.test(text[0]) && !text.includes('className') && !text.includes('style=')) {
+      if (
+        text.length > 2 &&
+        /[A-Z]/.test(text[0]) &&
+        !text.includes('className') &&
+        !text.includes('style=')
+      ) {
         hardcoded.push({ file, text, type: 'JSX' });
       }
     }
@@ -54,7 +61,7 @@ async function main() {
       uniqueMap.set(h.text, h);
     }
   }
-  
+
   const unique = Array.from(uniqueMap.values());
   console.log(JSON.stringify(unique, null, 2));
 }
