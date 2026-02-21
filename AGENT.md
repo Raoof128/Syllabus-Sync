@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Sidebar & UI Re-branding to 'Navigation'
+Summary: Changed Map references in the Sidebar to Navigation ('navigation' key). Relocated MapViewToggle button from the main header h1 tag down into the CardHeader and replaced its original title with Navigation to prevent visual stretching.
+Files Changed: `components/layout/Sidebar.tsx`, `features/map/components/MapClient.tsx`, `locales/en/translations.json`.
+Verification: ESLint (`npm run lint`) passed successfully. Extrapolated updated i18n key (`navigation`) to all 35 translated locales using `node tools/i18n/parity-sync.mjs`.
+Follow-ups: Ignore existing json translation duplicate key lints as they are not breaking compilation or sync.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Full System QA & Deployment Fixes
 Summary: Addressed system integrity errors reported by `npm run check`. Fixed duplicated content and linting errors inside `PasswordStrengthIndicator.tsx` and removed an unused import in `PrivacySettings.tsx`. Updated `PasskeySecuritySection.test.tsx` to match i18n changes instead of asserting hardcoded strings. After ensuring all codebase quality checks passed, initiated a successful `vercel` deployment to production.
 Files: Modified `components/security/PasswordStrengthIndicator.tsx`, `features/settings/components/PrivacySettings.tsx`, `tests/unit/components/PasskeySecuritySection.test.tsx`.

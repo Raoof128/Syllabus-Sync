@@ -1,3 +1,26 @@
+### Raouf: Sidebar & UI Re-branding to 'Navigation' — 2026-02-21
+
+**Scope:** UI / UX Customisation
+**Type:** Feature / Chore
+
+#### Changes
+
+1. **Sidebar Updates:**
+   - Modified `components/layout/Sidebar.tsx` changing the 'map' icon title to translate to 'Navigation' instead of 'Campus Map'.
+   - Added `"navigation": "Navigation"` key across all 35 `locales/*/translations.json` files and ran the parity sync tool.
+2. **Map Container Header Override:**
+   - Transported the `MapViewToggle` (Google/Campus) action from the top `h1` header and transplanted it directly onto the internal `CardHeader` beside the interactive component list.
+   - Refactored the core page `h1` wrapper header in `MapClient.tsx` from "Campus Map" to now reflect the new "Navigation" UI identity. By decoupling the toggle into the nested element it prevents stretching mobile rows.
+
+#### Verification
+
+- Evaluated Next.js rendering structure showing no visual breaks.
+- Validated via `npm run lint` solving orphaned imports. 
+- Triggered `node tools/i18n/parity-sync.mjs` resolving standard parity checks across 35 independent locale definitions assuring zero test failures.
+- `npm run check:i18n` ✅ passed perfectly.
+
+---
+
 ### Raouf: Full System QA & Deployment Fixes — 2026-02-21
 
 **Scope:** Quality Assurance / Maintenance / Deployment

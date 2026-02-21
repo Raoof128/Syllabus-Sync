@@ -21,7 +21,7 @@ import { MapLoadingSkeleton } from './MapSkeleton';
 import CampusMapHUD from './CampusMapHUD';
 import { RouteAnnouncer } from './RouteAnnouncer';
 import { APP_CONFIG } from '@/lib/config';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -363,9 +363,8 @@ export default function MapClient() {
         <header className="mb-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-mq-2xl font-bold text-mq-content sm:text-mq-3xl">
-              {t('campusMap')}
+              {t('navigation')}
             </h1>
-            <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
           </div>
           <p className="text-mq-content-secondary">
             {t('navigateCampus').replace('Macquarie University', UNIVERSITY_CONFIG.name)}
@@ -432,11 +431,10 @@ export default function MapClient() {
                               aria-pressed={isActive}
                               whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
                               whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                              className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
-                                isActive
-                                  ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
-                                  : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
-                              }`}
+                              className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${isActive
+                                ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
+                                : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
+                                }`}
                             >
                               {/* Ripple Effect */}
                               {isActive && !prefersReducedMotion && (
@@ -452,9 +450,9 @@ export default function MapClient() {
                                 animate={
                                   isActive && !prefersReducedMotion
                                     ? {
-                                        scale: [1, 1.2, 1],
-                                        rotate: [0, 5, -5, 0],
-                                      }
+                                      scale: [1, 1.2, 1],
+                                      rotate: [0, 5, -5, 0],
+                                    }
                                     : undefined
                                 }
                                 transition={prefersReducedMotion ? undefined : { duration: 0.4 }}
@@ -520,8 +518,15 @@ export default function MapClient() {
           <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
             <Card className="border border-mq-border bg-mq-card-background">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="min-w-0 break-words">{t('interactiveCampusMap')}</CardTitle>
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <h2 className="font-semibold leading-none tracking-tight text-mq-content min-w-0 break-words">
+                      {t('interactiveCampusMap')}
+                    </h2>
+                    <div className="ml-auto sm:ml-0">
+                      <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
+                    </div>
+                  </div>
                   <p className="text-xs text-mq-content-tertiary hidden md:block">
                     {t('mapPanZoomHint')}
                   </p>
