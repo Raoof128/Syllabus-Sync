@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
@@ -36,6 +36,23 @@ export function useCalendarData() {
       loadTodos();
     }
   }, [hasHydrated, loadUnits, loadDeadlines, loadEvents, loadTodos]);
+
+  // Listen for unit-deleted events to cascade delete deadlines
+  const handleUnitDeleted = useCallback(
+    (event: Event) => {
+      const customEvent = event as CustomEvent<{ unitId: string; unitCode: string }>;
+      const { unitId, unitCode } = customEvent.detail;
+      removeDeadlinesByUnit(unitId, unitCode);
+    },
+    [removeDeadlinesByUnit],
+  );
+
+  useEffect(() => {
+    window.addEventListener('unit-deleted', handleUnitDeleted);
+    return () => {
+      window.removeEventListener('unit-deleted', handleUnitDeleted);
+    };
+  }, [handleUnitDeleted]);
 
   return {
     deadlines,

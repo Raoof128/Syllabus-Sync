@@ -93,6 +93,7 @@ export default function CalendarClient() {
     todos,
     hasHydrated,
     removeDeadline,
+    removeDeadlinesByUnit,
     removeEvent,
     removeUnit,
     addTodo,
@@ -302,6 +303,9 @@ export default function CalendarClient() {
 
   const confirmDeleteUnit = () => {
     if (unitToDelete) {
+      // Remove all deadlines associated with this unit (cascade delete)
+      removeDeadlinesByUnit(unitToDelete.id, unitToDelete.code);
+      // Then remove the unit itself
       removeUnit(unitToDelete.id);
       setDeleteConfirmOpen(false);
       setUnitToDelete(null);
@@ -653,6 +657,7 @@ export default function CalendarClient() {
                 }
               }}
               onEventClick={handleEventClick}
+              onGoToToday={goToToday}
             />
           )}
 

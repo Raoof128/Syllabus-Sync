@@ -9,6 +9,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+const DISMISS_KEY = 'pwa-install-dismissed';
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
@@ -16,6 +18,10 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isDismissed, setIsDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(DISMISS_KEY) === 'true';
+  });
   const [isInstalled, setIsInstalled] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches,
   );
@@ -56,11 +62,15 @@ export function useInstallPrompt() {
 
   const dismissPrompt = useCallback(() => {
     setDeferredPrompt(null);
+    setIsDismissed(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(DISMISS_KEY, 'true');
+    }
   }, []);
 
   return {
     /** Whether the install prompt is available */
-    canInstall: !!deferredPrompt && !isInstalled,
+    canInstall: !!deferredPrompt && !isInstalled && !isDismissed,
     /** Whether the app is already installed as PWA */
     isInstalled,
     /** Trigger the native install dialog */

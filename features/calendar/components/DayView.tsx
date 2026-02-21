@@ -19,6 +19,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
 import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES } from '@/data/mqKeyDates';
+import { CalendarClock } from 'lucide-react';
 
 interface DayViewProps {
   date: Date;
@@ -28,6 +29,7 @@ interface DayViewProps {
   onUnitClick: (unit: Unit) => void;
   onDeadlineClick: (deadline: Deadline) => void;
   onEventClick: (event: Event) => void;
+  onGoToToday?: () => void;
 }
 
 export default function DayView({
@@ -38,6 +40,7 @@ export default function DayView({
   onUnitClick,
   onDeadlineClick,
   onEventClick,
+  onGoToToday,
 }: DayViewProps) {
   const { t } = useTypedTranslation();
   const dayDate = dayjs(date);
@@ -195,6 +198,17 @@ export default function DayView({
               })}
             </div>
           </div>
+        )}
+
+        {/* Back to Today Banner - shows when viewing a different date */}
+        {!isToday && onGoToToday && (
+          <button
+            onClick={onGoToToday}
+            className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 hover:bg-mq-primary/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-mq-primary"
+          >
+            <CalendarClock className="h-4 w-4" />
+            <span>{t('backToToday')}</span>
+          </button>
         )}
 
         {/* Time Grid */}
