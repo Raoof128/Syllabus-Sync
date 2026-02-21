@@ -18,6 +18,7 @@
    - Ran formatting and checks (`npm run check`) to guarantee no type definitions or linting rules were broken. All tests passed.
 
 #### Verification
+
 - `npm run check` passed successfully.
 - Code trace verified that `e.stopPropagation()` on the portal wrapper stops events from firing parent logic, and stores cross-sync correctly globally.
 
