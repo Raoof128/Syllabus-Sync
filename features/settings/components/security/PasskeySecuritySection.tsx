@@ -237,21 +237,44 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
         </div>
 
         {/* Master Biometric Toggle */}
-        <div className="bg-mq-background/50 rounded-xl p-3 border border-mq-border/50">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className="bg-mq-background/50 rounded-xl p-3 border border-mq-border/50 hover:bg-mq-background/70 hover:border-mq-primary/40 cursor-pointer transition-colors"
+          role="button"
+          tabIndex={0}
+          onClick={(e) => {
+            if (e && 'stopPropagation' in e) e.stopPropagation();
+            if (canToggleBio) {
+              if (biometricEnabled) setShowDisableBioDialog(true);
+              else setShowEnableBioDialog(true);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (canToggleBio) {
+                if (biometricEnabled) setShowDisableBioDialog(true);
+                else setShowEnableBioDialog(true);
+              }
+            }
+          }}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-none">
             <div className="min-w-0">
               <p className="text-mq-sm font-semibold text-mq-content">{t('biometricLogin')}</p>
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                 {t('biometricLoginDesc')}
               </p>
             </div>
-            <div className="flex items-center gap-2 sm:flex-shrink-0">
+            <div className="flex items-center gap-2 sm:flex-shrink-0 pointer-events-auto">
               <ToggleControl
                 checked={biometricEnabled}
-                onToggle={() =>
-                  canToggleBio &&
-                  (biometricEnabled ? setShowDisableBioDialog(true) : setShowEnableBioDialog(true))
-                }
+                onToggle={(e?: React.MouseEvent | React.KeyboardEvent) => {
+                  if (e && 'stopPropagation' in e) e.stopPropagation();
+                  if (canToggleBio) {
+                    if (biometricEnabled) setShowDisableBioDialog(true);
+                    else setShowEnableBioDialog(true);
+                  }
+                }}
                 label={t('biometricLogin')}
                 testId="toggle-biometric"
               />

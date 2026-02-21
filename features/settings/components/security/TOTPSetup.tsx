@@ -152,10 +152,34 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
     setVerifyError(null);
   }, []);
 
+  const handleToggleAction = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
+    // Prevent double triggering from the toggle control if it bubbles
+    if (e && 'stopPropagation' in e) e.stopPropagation();
+
+    if (isLoading) return;
+    if (isEnabled) {
+      setDisableFactorId(totpFactors[0]?.id ?? null);
+      setShowDisableDialog(true);
+    } else {
+      handleStartSetup();
+    }
+  }, [isLoading, isEnabled, totpFactors, handleStartSetup]);
+
   return (
     <>
-      <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleToggleAction}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleToggleAction(e);
+          }
+        }}
+        className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/40 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300 cursor-pointer hover:bg-mq-background/50"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pointer-events-none">
           <div className="flex items-center gap-3 flex-1">
             <Shield className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
@@ -165,18 +189,10 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:flex-shrink-0">
+          <div className="flex items-center gap-2 sm:flex-shrink-0 pointer-events-auto">
             <ToggleControl
               checked={isEnabled}
-              onToggle={() => {
-                if (isLoading) return;
-                if (isEnabled) {
-                  setDisableFactorId(totpFactors[0]?.id ?? null);
-                  setShowDisableDialog(true);
-                } else {
-                  handleStartSetup();
-                }
-              }}
+              onToggle={handleToggleAction}
               label={t('authenticatorApp')}
               testId="toggle-totp"
             />
