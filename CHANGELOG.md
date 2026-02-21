@@ -8,12 +8,13 @@
 1. **Test Fixes:**
    - Updated `tests/map/GoogleMapEmbed.test.tsx` to handle the removal of the internal "Navigate" button. Tests now use a `React.createRef` to programmatically trigger navigation via the component's imperative API, ensuring state is captured correctly via `act()`.
 2. **Translation Cleanup:**
-   - Resolved `Duplicate object key` warnings in `locales/en/translations.json` for `passwordStrength` and `unitDetailsNotFound` keys. 
+   - Resolved `Duplicate object key` warnings in `locales/en/translations.json` for `passwordStrength` and `unitDetailsNotFound` keys.
    - Automated cleanup via JSON parsing/stringification and re-synchronized 34 locales via `parity-sync.mjs`.
 3. **Full System Verification:**
    - Successfully executed `npm run check` covering secrets scanning, formatting, type checking, linting, unit tests, and production build generation.
 
 #### Verification
+
 - `npm run check` ✅ PASSED (including 482 unit tests and Next.js production build).
 
 ---
