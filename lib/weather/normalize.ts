@@ -29,9 +29,29 @@ export function getWeatherCondition(code: number): string {
   return 'Unknown';
 }
 
-export function normalizeOpenMeteoResponse(data: any): WeatherResult {
-  const current = data.current;
-  const hourly = data.hourly;
+interface RawOpenMeteo {
+  current?: {
+    temperature_2m: number;
+    apparent_temperature: number;
+    precipitation_probability: number;
+    wind_speed_10m: number;
+    weather_code: number;
+    is_day: number;
+  };
+  hourly?: {
+    time: string[];
+    temperature_2m: number[];
+    precipitation_probability: number[];
+    weather_code: number[];
+    wind_speed_10m: number[];
+  };
+  timezone?: string;
+}
+
+export function normalizeOpenMeteoResponse(data: unknown): WeatherResult {
+  const d = data as RawOpenMeteo;
+  const current = d.current;
+  const hourly = d.hourly;
 
   const currentData: WeatherCurrent = {
     temperature: current?.temperature_2m ?? 0,
@@ -59,7 +79,7 @@ export function normalizeOpenMeteoResponse(data: any): WeatherResult {
   return {
     current: currentData,
     hourly: hourlyData,
-    timezone: data.timezone ?? 'Australia/Sydney',
+    timezone: d.timezone ?? 'Australia/Sydney',
     source: 'open-meteo',
     timestamp: Date.now(),
     modelUsed: 'best_match', // We requested best_match

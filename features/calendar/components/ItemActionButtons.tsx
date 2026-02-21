@@ -220,8 +220,14 @@ export default function ItemActionButtons({
 
       {/* Reminder Modal */}
       <div
+        role="presentation"
         onClick={(e) => {
           if (stopPropagation) e.stopPropagation();
+        }}
+        onKeyDown={(e) => {
+          if (stopPropagation && (e.key === 'Enter' || e.key === ' ')) {
+            e.stopPropagation();
+          }
         }}
       >
         <ReminderModal

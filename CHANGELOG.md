@@ -1,3 +1,23 @@
+### Raouf: Weather System 2.0 & Component Polish — 2026-02-21
+
+**Scope:** Maintenance & UI Robustness
+**Type:** Fix / Refactor
+
+#### Changes
+
+1. **Lint & Purity Fixes:**
+   - Resolved "impure function" error in `WeatherWidget.tsx` by extracting the "Updated ago" logic into a dedicated `WeatherTimestamp` component using `useEffect` intervals.
+   - Fixed multiple accessibility warnings in `ItemActionButtons.tsx` by adding `role="presentation"` and keyboard event handlers.
+   - Refactored `GoogleMapEmbed.tsx` to use type-safe `cn` utility and template literals for dynamic class names.
+2. **Type Safety & Data Integrity:**
+   - Replaced multiple `any` instances in `normalize.ts` and `useWeather.ts` with strict interfaces (e.g., `RawOpenMeteo`) and `unknown` type guards.
+   - Added stricter runtime validation for weather payloads ensuring `temperature` is a valid number before rendering.
+3. **Test Suite Recovery:**
+   - Updated `useWeather.test.ts` to support coordinate-based cache keys and `AbortController` signals in fetch assertions.
+   - All 482 unit tests and production build (`next build`) now pass successfully.
+
+---
+
 ### Raouf: Weather System 2.0 (Phase 1 & 2 Blueprint) — 2026-02-21
 
 **Scope:** Weather Integration & GPS Tiering

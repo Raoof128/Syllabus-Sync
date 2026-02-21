@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { SydneyRegion, WeatherData } from './types';
-import { SYDNEY_REGIONS, mapWeatherCode, determineVibe } from './constants';
+import { SYDNEY_REGIONS, determineVibe } from './constants';
 import { WeatherResult } from '@/lib/weather/types';
 
 const STORAGE_KEY = 'mq-weather-region';
@@ -73,7 +73,7 @@ export const useWeather = () => {
           type: 'gps',
           name: 'Current Location',
         };
-      } catch (err) {
+      } catch {
         // Fallback to cache
       }
     }
@@ -149,7 +149,7 @@ export const useWeather = () => {
         const apiResponse = await response.json();
         const rawData = apiResponse?.data as WeatherResult;
 
-        if (!rawData || !rawData.current) {
+        if (!rawData || !rawData.current || typeof rawData.current.temperature !== 'number') {
           throw new Error('Invalid weather data');
         }
 
@@ -174,10 +174,10 @@ export const useWeather = () => {
         try {
           localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: newData }));
         } catch {}
-      } catch (err: any) {
-        if (err.name === 'AbortError') return;
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') return;
 
-        setError(err.message || 'Weather unavailable');
+        setError(err instanceof Error ? err.message : 'Weather unavailable');
 
         // Keep showing old data if it fails but mark it explicitly
       } finally {

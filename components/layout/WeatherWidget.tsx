@@ -22,16 +22,8 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 const WeatherWidget = memo(() => {
   const { t } = useTypedTranslation();
-  const {
-    weatherData,
-    loading,
-    error,
-    selectedRegion,
-    handleRegionChange,
-    retry,
-    useGps,
-    enableGps,
-  } = useWeather();
+  const { weatherData, loading, selectedRegion, handleRegionChange, retry, useGps, enableGps } =
+    useWeather();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Close dropdown when clicking outside
@@ -178,11 +170,7 @@ const WeatherWidget = memo(() => {
                         ? 'Saved'
                         : 'Approx'}
                   </span>
-                  {weatherData.timestamp && (
-                    <span className="text-[10px] text-mq-content-tertiary">
-                      Updated {Math.round((Date.now() - weatherData.timestamp) / 60000)}m ago
-                    </span>
-                  )}
+                  {weatherData.timestamp && <WeatherTimestamp timestamp={weatherData.timestamp} />}
                 </div>
               </div>
               <div
@@ -305,5 +293,21 @@ const WeatherWidget = memo(() => {
 });
 
 WeatherWidget.displayName = 'WeatherWidget';
+
+const WeatherTimestamp = memo(({ timestamp }: { timestamp: number }) => {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const diffMs = now - timestamp;
+  const mins = Math.max(0, Math.round(diffMs / 60000));
+
+  return <span className="text-[10px] text-mq-content-tertiary">Updated {mins}m ago</span>;
+});
+
+WeatherTimestamp.displayName = 'WeatherTimestamp';
 
 export default WeatherWidget;

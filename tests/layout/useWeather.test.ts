@@ -157,6 +157,7 @@ describe('useWeather Hook', () => {
     // Verify fetch was called with new coordinates
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining(`lat=${newRegion.lat}&lon=${newRegion.lon}`),
+      expect.any(Object),
     );
   });
 
@@ -176,7 +177,9 @@ describe('useWeather Hook', () => {
     };
 
     localStorageMock.getItem.mockImplementation((key) => {
-      if (key === `mq-weather-cache-${region.id}`) {
+      const roundedLat = Math.round(region.lat * 10000) / 10000;
+      const roundedLon = Math.round(region.lon * 10000) / 10000;
+      if (key === `mq-weather-cache-${roundedLat},${roundedLon}`) {
         return JSON.stringify({ timestamp: Date.now(), data: cachedData });
       }
       return null;

@@ -1,4 +1,9 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Maintenance & UI Polish
+Summary: Fixed critical React purity error in `WeatherWidget.tsx` by implementing a `WeatherTimestamp` hook-based component. Resolved multiple accessibility and type-safety lint errors (A11y roles, `cn` utility integration, and `any` removals). Fixed regression in `useWeather.test.ts` caused by the new coordinate-based caching key logic. Verified all 482 tests and production build.
+Files Changed: `components/layout/WeatherWidget.tsx`, `components/layout/weather/useWeather.ts`, `lib/weather/normalize.ts`, `features/calendar/components/ItemActionButtons.tsx`, `features/map/components/GoogleMapEmbed.tsx`, `tests/layout/useWeather.test.ts`.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Weather Integration & GPS Tiering (Blueprint Phase 1 & 2)
 Summary: Implemented the "Weather System 2.0" upgrades, creating a robust, multi-tier location fetching priority starting with high-accuracy browser `geolocation` caching. Abstracted logic into `OpenMeteoProvider`/`normalize.ts`/`types.ts` schemas. Bound `api/weather/route.ts` with strict Zod validations (Temps must logically be bounded, etc). Finally, updated properties passing into `WeatherWidget.tsx`, converting the drop-down menu into a highly detailed weather card representing metrics such as "Feels like", rain likelihood, and wind speeds, safely wrapped via `safeT` translation keys and a background freshness indicator.
 Files Changed: `api/weather/route.ts`, `lib/weather/providers/openMeteoProvider.ts`, `lib/weather/normalize.ts`, `lib/weather/types.ts`, `components/layout/weather/useWeather.ts`, `components/layout/WeatherWidget.tsx`, `tests/layout/useWeather.test.ts`, `tests/layout/WeatherWidget.test.tsx`.

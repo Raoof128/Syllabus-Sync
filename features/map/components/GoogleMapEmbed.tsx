@@ -4,6 +4,7 @@ import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Navigation, ArrowLeft, MapPin } from 'lucide-react';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
+import { cn } from '@/lib/utils';
 import type { Building } from '@/features/map/lib/buildings';
 
 const MQ_QUERY = 'Macquarie+University+Sydney+NSW+Australia';
@@ -126,12 +127,12 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
         {mode === 'view' && (
           <button
             onClick={() => setForceCenter(true)}
-            className={
-              'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50 ' +
-              (selectedBuilding
+            className={cn(
+              'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
+              selectedBuilding
                 ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
-                : 'bottom-[140px] right-4')
-            }
+                : 'bottom-[140px] right-4',
+            )}
             aria-label={safeT('centerOnLocation', 'Center on my location')}
           >
             <svg
