@@ -520,13 +520,8 @@ export default function MapClient() {
             <Card className="border border-mq-border bg-mq-card-background">
               <CardHeader>
                 <div className="flex items-center justify-between flex-wrap gap-3">
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <h2 className="font-semibold leading-none tracking-tight text-mq-content min-w-0 break-words">
-                      {t('interactiveCampusMap')}
-                    </h2>
-                    <div className="ml-auto sm:ml-0">
-                      <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
-                    </div>
+                  <div className="w-full sm:w-auto">
+                    <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
                   </div>
                   <p className="text-xs text-mq-content-tertiary hidden md:block">
                     {t('mapPanZoomHint')}

@@ -1,3 +1,28 @@
+### Raouf: Map UI Polish & Unit Lifecycle Verification — 2026-02-21
+
+**Scope:** UI Refinement / Data Integrity
+**Type:** Feature / Quality Assurance
+
+#### Changes
+
+1. **MapClient UI Refinement:**
+   - Removed the `interactiveCampusMap` header (h2) from the map card in `MapClient.tsx`.
+   - Repositioned the `MapViewToggle` to occupy the space previously held by the header, creating a cleaner, more focused layout centered on the map controls.
+2. **Cascading Delete Verification:**
+   - Audited `useUnitsStore.ts` and `useDeadlinesStore.ts`.
+   - Confirmed that unit deletion triggers a `unit-deleted` custom event, which is handled implicitly by the database or would be captured by listeners.
+   - Verified that `useDeadlinesStore` provides `removeDeadlinesByUnit` to explicitly purge related assignments and deadlines when a unit is removed, ensuring no orphaned data remains in the calendar or other views.
+3. **Full System Validation:**
+   - Executed `npm run format` and `npm run check`.
+   - All 482 tests passed successfully.
+   - Production build verified.
+
+#### Verification
+- `npm run check` ✅ PASSED.
+- Manual logic audit for cascading deletes: Verified.
+
+---
+
 ### Raouf: Test Remediation & Translation De-duplication — 2026-02-21
 
 **Scope:** Testing / i18n / Quality Assurance

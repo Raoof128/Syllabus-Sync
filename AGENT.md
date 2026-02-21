@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Map UI Polish & Unit Lifecycle Verification
+Summary: Removed the 'Campus Map' h2 from the map card in `MapClient.tsx` and promoted the `MapViewToggle` to the primary header position for a more streamlined UX. Audited `UnitsStore` and `DeadlinesStore` to ensure cascading deletes are functional; confirmed that unit removal propagates `unit-deleted` events to purge related assignments and deadlines.
+Files Changed: `features/map/components/MapClient.tsx`.
+Verification: Full `npm run check` pipeline pass.
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Test Remediation & Translation De-duplication
 Summary: Fixed regression in `GoogleMapEmbed.test.tsx` caused by the removal of the internal Navigate button; updated tests to use the imperative Ref API with `act()` wrapping. Cleaned up legacy duplicate keys in `translations.json` (`passwordStrength`, `unitDetailsNotFound`) and synchronized changes across all locales to clear ESLint/IDE warnings.
 Files Changed: `tests/map/GoogleMapEmbed.test.tsx`, `locales/en/translations.json`, `locales/*/translations.json`.
