@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Test Remediation & Translation De-duplication
+Summary: Fixed regression in `GoogleMapEmbed.test.tsx` caused by the removal of the internal Navigate button; updated tests to use the imperative Ref API with `act()` wrapping. Cleaned up legacy duplicate keys in `translations.json` (`passwordStrength`, `unitDetailsNotFound`) and synchronized changes across all locales to clear ESLint/IDE warnings.
+Files Changed: `tests/map/GoogleMapEmbed.test.tsx`, `locales/en/translations.json`, `locales/*/translations.json`.
+Verification: Full `npm run check` series passed (including build and 482 tests).
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Map Embed Refactor & Copy Adjustments
 Summary: Updated the `navigateCampus` translation key to the required new copy. Refactored the internal Google Maps embed URL linking the user location parameter mapping explicitly into the walking travel direction parameter (`dirflg=w`). Trimmed up `GoogleMapEmbed.tsx` by eliminating a standalone identical "Navigate" button since orientation features exclusively exist via `CampusMapHUD.tsx`.
 Files Changed: `locales/en/translations.json`, `features/map/components/GoogleMapEmbed.tsx`.

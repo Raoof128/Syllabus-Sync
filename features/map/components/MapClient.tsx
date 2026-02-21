@@ -431,10 +431,11 @@ export default function MapClient() {
                               aria-pressed={isActive}
                               whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
                               whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                              className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${isActive
-                                ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
-                                : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
-                                }`}
+                              className={`w-full flex items-center gap-2 p-3 rounded-mq-lg border transition-colors duration-200 text-left relative overflow-hidden ${
+                                isActive
+                                  ? 'bg-mq-primary/10 border-mq-primary text-mq-primary'
+                                  : 'bg-mq-background-secondary border-transparent hover:border-mq-border hover:bg-mq-hover-background text-mq-content'
+                              }`}
                             >
                               {/* Ripple Effect */}
                               {isActive && !prefersReducedMotion && (
@@ -450,9 +451,9 @@ export default function MapClient() {
                                 animate={
                                   isActive && !prefersReducedMotion
                                     ? {
-                                      scale: [1, 1.2, 1],
-                                      rotate: [0, 5, -5, 0],
-                                    }
+                                        scale: [1, 1.2, 1],
+                                        rotate: [0, 5, -5, 0],
+                                      }
                                     : undefined
                                 }
                                 transition={prefersReducedMotion ? undefined : { duration: 0.4 }}

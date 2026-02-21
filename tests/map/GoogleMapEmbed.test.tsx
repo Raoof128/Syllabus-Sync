@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { GoogleMapEmbed } from '@/features/map/components/GoogleMapEmbed';
+import { GoogleMapEmbed, type GoogleMapRef } from '@/features/map/components/GoogleMapEmbed';
 
 vi.mock('@/lib/hooks/useTypedTranslation', () => ({
   useTypedTranslation: () => ({
@@ -22,17 +23,30 @@ describe('GoogleMapEmbed', () => {
     expect(iframe.getAttribute('src')).toContain('output=embed');
   });
 
-  it('switches to directions mode on Navigate click', () => {
-    render(<GoogleMapEmbed />);
-    fireEvent.click(screen.getByRole('button', { name: 'navigateToMQ' }));
+  it('switches to directions mode via ref', () => {
+    const ref = React.createRef<GoogleMapRef>();
+    render(<GoogleMapEmbed ref={ref} />);
+
+    expect(ref.current).toBeTruthy();
+    act(() => {
+      ref.current?.startNavigation();
+    });
+
     const iframe = screen.getByTitle('Directions to Macquarie University');
     expect(iframe.getAttribute('src')).toContain('saddr=My+Location');
+    expect(iframe.getAttribute('src')).toContain('dirflg=w');
   });
 
-  it('switches back to view mode on Back to Map click', () => {
-    render(<GoogleMapEmbed />);
-    fireEvent.click(screen.getByRole('button', { name: 'navigateToMQ' }));
+  it('switches back to view mode via ref or back button', () => {
+    const ref = React.createRef<GoogleMapRef>();
+    render(<GoogleMapEmbed ref={ref} />);
+
+    act(() => {
+      ref.current?.startNavigation();
+    });
+
     fireEvent.click(screen.getByRole('button', { name: 'backToMap' }));
+
     expect(screen.getByTitle('Google Maps — Macquarie University')).toBeTruthy();
   });
 

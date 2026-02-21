@@ -1,3 +1,23 @@
+### Raouf: Test Remediation & Translation De-duplication — 2026-02-21
+
+**Scope:** Testing / i18n / Quality Assurance
+**Type:** Bug Fix / Maintenance
+
+#### Changes
+
+1. **Test Fixes:**
+   - Updated `tests/map/GoogleMapEmbed.test.tsx` to handle the removal of the internal "Navigate" button. Tests now use a `React.createRef` to programmatically trigger navigation via the component's imperative API, ensuring state is captured correctly via `act()`.
+2. **Translation Cleanup:**
+   - Resolved `Duplicate object key` warnings in `locales/en/translations.json` for `passwordStrength` and `unitDetailsNotFound` keys. 
+   - Automated cleanup via JSON parsing/stringification and re-synchronized 34 locales via `parity-sync.mjs`.
+3. **Full System Verification:**
+   - Successfully executed `npm run check` covering secrets scanning, formatting, type checking, linting, unit tests, and production build generation.
+
+#### Verification
+- `npm run check` ✅ PASSED (including 482 unit tests and Next.js production build).
+
+---
+
 ### Raouf: Map Embed Refactor & Copy Adjustments — 2026-02-21
 
 **Scope:** UI / Map Embed Overhaul
@@ -13,6 +33,7 @@
    - Eliminated the standalone "Navigate" button `<button>` overlay spanning inside the `GoogleMapEmbed.tsx` header ensuring user navigation flows solely exclusively routing through the global interactive `CampusMapHUD.tsx` layout panel.
 
 #### Verification
+
 - Next.js successfully compiles without orphaned components.
 - Run `npm run lint` and `node tools/i18n/parity-sync.mjs`.
 
@@ -35,7 +56,7 @@
 #### Verification
 
 - Evaluated Next.js rendering structure showing no visual breaks.
-- Validated via `npm run lint` solving orphaned imports. 
+- Validated via `npm run lint` solving orphaned imports.
 - Triggered `node tools/i18n/parity-sync.mjs` resolving standard parity checks across 35 independent locale definitions assuring zero test failures.
 - `npm run check:i18n` ✅ passed perfectly.
 

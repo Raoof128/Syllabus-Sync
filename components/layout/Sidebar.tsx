@@ -40,12 +40,12 @@ const navigation: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-    { name: 'home', href: '/home', icon: Home },
-    { name: 'calendar', href: '/calendar', icon: Calendar },
-    { name: 'navigation' as TranslationKey, href: '/map', icon: MapPin },
-    { name: 'feed', href: '/feed', icon: MessageSquare },
-    { name: 'settings', href: '/settings', icon: Settings },
-  ];
+  { name: 'home', href: '/home', icon: Home },
+  { name: 'calendar', href: '/calendar', icon: Calendar },
+  { name: 'navigation' as TranslationKey, href: '/map', icon: MapPin },
+  { name: 'feed', href: '/feed', icon: MessageSquare },
+  { name: 'settings', href: '/settings', icon: Settings },
+];
 
 /**
  * Sidebar Component
