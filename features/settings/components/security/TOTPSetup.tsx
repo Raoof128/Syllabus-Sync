@@ -187,6 +187,9 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                 Google Authenticator, Authy, or Microsoft Authenticator
               </p>
+              <p className="text-[10px] text-mq-content-tertiary mt-2 leading-relaxed opacity-90 hidden sm:block max-w-[90%]">
+                For security, your 6-digit code acts as an active mathematical signature refreshing every 30 seconds. Once used, it becomes permanently invalidated to prevent replay attacks.
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:flex-shrink-0 pointer-events-auto">
