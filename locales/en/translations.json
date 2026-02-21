@@ -750,7 +750,7 @@
   "confirmDelete": "Confirm Delete",
   "yes": "Yes",
   "no": "No",
-  "navigateCampus": "Navigate Macquarie University with ease.",
+  "navigateCampus": "Campus navigation that actually helps.",
   "navigatingTo": "Navigating to:",
   "navigationProgressAnnouncement": "Remaining: {{distance}}. Arrival: {{eta}}.",
   "navigationArrived": "You have arrived at your destination.",

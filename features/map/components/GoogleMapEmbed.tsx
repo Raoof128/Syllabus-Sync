@@ -10,7 +10,7 @@ const MQ_QUERY = 'Macquarie+University+Sydney+NSW+Australia';
 
 const EMBED_VIEW_URL = `https://www.google.com/maps?q=${MQ_QUERY}&z=16&ie=UTF8&iwloc=&output=embed`;
 
-const EMBED_DIRECTIONS_URL = `https://www.google.com/maps?saddr=My+Location&daddr=${MQ_QUERY}&z=14&ie=UTF8&output=embed`;
+const EMBED_DIRECTIONS_URL = `https://www.google.com/maps?saddr=My+Location&daddr=${MQ_QUERY}&dirflg=w&z=14&ie=UTF8&output=embed`;
 
 type MapMode = 'view' | 'directions';
 
@@ -79,16 +79,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
             </span>
           </div>
 
-          {mode === 'view' ? (
-            <button
-              onClick={() => setMode('directions')}
-              className="flex items-center gap-1.5 rounded-mq-lg bg-mq-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-mq-primary/90"
-              aria-label={t('navigateToMQ')}
-            >
-              <Navigation className="h-3.5 w-3.5" />
-              <span>{t('navigate')}</span>
-            </button>
-          ) : (
+          {mode === 'directions' && (
             <button
               onClick={() => setMode('view')}
               className="flex items-center gap-1.5 rounded-mq-lg bg-mq-background-secondary px-3 py-1.5 text-xs font-medium text-mq-content transition-colors hover:bg-mq-hover-background"

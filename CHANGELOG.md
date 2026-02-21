@@ -1,3 +1,23 @@
+### Raouf: Map Embed Refactor & Copy Adjustments — 2026-02-21
+
+**Scope:** UI / Map Embed Overhaul
+**Type:** Feature / Chore
+
+#### Changes
+
+1. **Map Hero Text Update:**
+   - Improved the `navigateCampus` i18n key translation from "Navigate Macquarie University with ease." to "Campus navigation that actually helps."
+2. **Google Maps Walking Pathway Embed:**
+   - Modified `GoogleMapEmbed.tsx` updating the `EMBED_DIRECTIONS_URL`. Injected the `dirflg=w` configuration query parameter instructing the API to yield walking directions starting immediately from `saddr=My+Location` to the dynamically selected campus building (`daddr`).
+3. **Map Extraneous Button Removal:**
+   - Eliminated the standalone "Navigate" button `<button>` overlay spanning inside the `GoogleMapEmbed.tsx` header ensuring user navigation flows solely exclusively routing through the global interactive `CampusMapHUD.tsx` layout panel.
+
+#### Verification
+- Next.js successfully compiles without orphaned components.
+- Run `npm run lint` and `node tools/i18n/parity-sync.mjs`.
+
+---
+
 ### Raouf: Sidebar & UI Re-branding to 'Navigation' — 2026-02-21
 
 **Scope:** UI / UX Customisation

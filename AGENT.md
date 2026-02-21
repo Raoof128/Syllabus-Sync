@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Map Embed Refactor & Copy Adjustments
+Summary: Updated the `navigateCampus` translation key to the required new copy. Refactored the internal Google Maps embed URL linking the user location parameter mapping explicitly into the walking travel direction parameter (`dirflg=w`). Trimmed up `GoogleMapEmbed.tsx` by eliminating a standalone identical "Navigate" button since orientation features exclusively exist via `CampusMapHUD.tsx`.
+Files Changed: `locales/en/translations.json`, `features/map/components/GoogleMapEmbed.tsx`.
+Verification: Verified through internal eslint linting script execution and i18n locale node sync execution.
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Sidebar & UI Re-branding to 'Navigation'
 Summary: Changed Map references in the Sidebar to Navigation ('navigation' key). Relocated MapViewToggle button from the main header h1 tag down into the CardHeader and replaced its original title with Navigation to prevent visual stretching.
 Files Changed: `components/layout/Sidebar.tsx`, `features/map/components/MapClient.tsx`, `locales/en/translations.json`.
