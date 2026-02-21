@@ -219,16 +219,22 @@ export default function ItemActionButtons({
       </button>
 
       {/* Reminder Modal */}
-      <ReminderModal
-        open={reminderModalOpen}
-        onOpenChange={setReminderModalOpen}
-        itemId={itemId}
-        itemType={reminderItemType}
-        itemTitle={itemTitle}
-        itemDate={itemDate}
-        itemColor={itemColor}
-        unitSchedule={unitSchedule}
-      />
+      <div
+        onClick={(e) => {
+          if (stopPropagation) e.stopPropagation();
+        }}
+      >
+        <ReminderModal
+          open={reminderModalOpen}
+          onOpenChange={setReminderModalOpen}
+          itemId={itemId}
+          itemType={reminderItemType}
+          itemTitle={itemTitle}
+          itemDate={itemDate}
+          itemColor={itemColor}
+          unitSchedule={unitSchedule}
+        />
+      </div>
     </div>
   );
 }

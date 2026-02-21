@@ -1,4 +1,11 @@
 Raouf: 2026-02-21 (Australia/Sydney)
+Scope: Calendar Highlights & Notification Bubble Fix
+Summary: Fixed an issue where the calendar widget highlights would disappear instantly when redirected from the Home dashboard by delaying the URL parameter clearance to 3000ms in `useCalendarHighlights.ts`. Also prevented unit cards from accidentally opening when toggling their notifications by wrapping `ReminderModal` in a div with `stopPropagation`, fixing React's portal event bubbling bug.
+Files Changed: `features/calendar/hooks/useCalendarHighlights.ts`, `features/calendar/components/ItemActionButtons.tsx`.
+Verification: Followed up with formatting and checks; verified click propagation behavior.
+Follow-ups: None.
+
+Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Map UI Polish & Unit Lifecycle Verification
 Summary: Removed the 'Campus Map' h2 from the map card in `MapClient.tsx` and promoted the `MapViewToggle` to the primary header position for a more streamlined UX. Audited `UnitsStore` and `DeadlinesStore` to ensure cascading deletes are functional; confirmed that unit removal propagates `unit-deleted` events to purge related assignments and deadlines.
 Files Changed: `features/map/components/MapClient.tsx`.

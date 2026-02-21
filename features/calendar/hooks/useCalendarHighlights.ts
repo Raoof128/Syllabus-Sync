@@ -62,13 +62,20 @@ export function useCalendarHighlights(
     const timer = window.setTimeout(() => {
       dialogs.setSelectedUnit(highlightedUnit);
       dialogs.setUnitDetailOpen(true);
-
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightUnit');
-      window.history.replaceState({}, '', url.toString());
     }, 300);
 
-    return () => clearTimeout(timer);
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('highlightUnit')) {
+        url.searchParams.delete('highlightUnit');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(clearTimer);
+    };
   }, [highlightedUnitId, highlightedUnit, hasHydrated, dialogs]);
 
   // Scroll to units widget when highlighted unit exists
@@ -110,13 +117,20 @@ export function useCalendarHighlights(
           dialogs.setAssignmentDetailOpen(true);
         }
       }
-
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightDeadline');
-      window.history.replaceState({}, '', url.toString());
     }, 300);
 
-    return () => clearTimeout(scrollTimer);
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('highlightDeadline')) {
+        url.searchParams.delete('highlightDeadline');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
   }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, dialogs]);
 
   // 3. Highlighted Todo
@@ -132,12 +146,20 @@ export function useCalendarHighlights(
         dialogs.setSelectedTodo(highlightedTodo);
         dialogs.setTodoDetailOpen(true);
       }
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightTodo');
-      window.history.replaceState({}, '', url.toString());
     }, 300);
 
-    return () => clearTimeout(timer);
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('highlightTodo')) {
+        url.searchParams.delete('highlightTodo');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(clearTimer);
+    };
   }, [highlightedTodoId, todos, dialogs]);
 
   // 4. Highlighted Event
@@ -153,12 +175,20 @@ export function useCalendarHighlights(
         dialogs.setSelectedEvent(highlightedEvent);
         dialogs.setEventDetailOpen(true);
       }
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlightEvent');
-      window.history.replaceState({}, '', url.toString());
     }, 300);
 
-    return () => clearTimeout(timer);
+    const clearTimer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('highlightEvent')) {
+        url.searchParams.delete('highlightEvent');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(clearTimer);
+    };
   }, [highlightedEventId, events, dialogs]);
 
   // 5. Highlighted Widget

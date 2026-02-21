@@ -1,3 +1,25 @@
+### Raouf: Calendar Highlights & Notification Bubble Fix — 2026-02-21
+
+**Scope:** UI / Calendar Interaction / Reminders
+**Type:** Bug Fix
+
+#### Changes
+
+1. **Highlight URL Param Persistence:**
+   - Modified `useCalendarHighlights.ts` to delay clearing URL search parameters (`highlightUnit`, `highlightDeadline`, `highlightTodo`, `highlightEvent`) to 3000ms.
+   - This ensures visual highlights on calendar widget items (like `UnitsWidget`) persist long enough for the user to see them when redirected from the Home dashboard, rather than disappearing instantly.
+2. **Notification Modal Propagation Fix:**
+   - Wrapped the `ReminderModal` in `ItemActionButtons.tsx` with a standard `div` configured to stop click propagation.
+   - This prevents React Portal events from bubbling up through the DOM tree to trigger parent `onClick` handlers (which was causing unit cards to open accidentally when toggling notifications in the reminders section).
+3. **Automated Validation:**
+   - Ran formatting and checks (`npm run check`) to guarantee no type definitions or linting rules were broken.
+
+#### Verification
+- `npm run check` passed successfully.
+- Code trace verified that `e.stopPropagation()` on the portal wrapper stops events from firing parent logic.
+
+---
+
 ### Raouf: Map UI Polish & Unit Lifecycle Verification — 2026-02-21
 
 **Scope:** UI Refinement / Data Integrity
@@ -18,6 +40,7 @@
    - Production build verified.
 
 #### Verification
+
 - `npm run check` ✅ PASSED.
 - Manual logic audit for cascading deletes: Verified.
 
