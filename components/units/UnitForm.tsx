@@ -259,9 +259,6 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     resetForm();
   };
 
-  const codeDescribedBy = [errors.code ? 'unit-code-error' : '', 'unit-code-help']
-    .filter(Boolean)
-    .join(' ');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
