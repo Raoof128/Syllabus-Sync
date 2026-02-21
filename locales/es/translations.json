@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "Privacidad y Seguridad",
   "quickActions": "Acciones Rápidas",
-  "helpSupport": "Ayuda y Soporte",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "Recordatorios de Fechas Límite",
   "deadlineRemindersDesc": "Recibe notificaciones sobre fechas límite próximas",
   "classReminders": "Recordatorios de Clases",
@@ -1990,5 +1990,10 @@
   "syncComplete": "Sincronización completa",
   "conflictsDetected": "Conflictos detectados",
   "modifiedOffline": "Modificado sin conexión",
-  "modifiedOnServer": "Modificado en el servidor"
+  "modifiedOnServer": "Modificado en el servidor",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

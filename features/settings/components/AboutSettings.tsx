@@ -1,19 +1,23 @@
 'use client';
 
 import { memo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Info, ExternalLink, MessageSquare } from 'lucide-react';
+import { ExternalLink, MessageSquare, BookOpen } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 
-type HelpSupportProps = {
+type AboutSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
-const HelpSupport = memo(({ t }: HelpSupportProps) => {
+import { useRouter } from 'next/navigation';
+...
+const AboutSettings = memo(({ t }: AboutSettingsProps) => {
+  const router = useRouter();
   const handleViewDocumentation = useCallback(() => {
     toastUtils.info(t('viewDocumentation'), t('documentationOpening'));
     window.open(EXTERNAL_LINKS.documentation, '_blank', 'noopener,noreferrer');
@@ -25,21 +29,35 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
   }, [t]);
 
   return (
-    <MagicCard data-testid="help-support">
+    <MagicCard data-testid="about-settings">
       <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" aria-hidden="true" />
-            <span id="help-support-heading">{t('helpSupport')}</span>
+            <BookOpen className="h-5 w-5" aria-hidden="true" />
+            <span id="about-settings-heading">{t('settings_about')}</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3" role="region" aria-labelledby="help-support-heading">
+        <CardContent className="space-y-3" role="region" aria-labelledby="about-settings-heading">
           {/* About */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
             <h3 className="font-semibold text-mq-content mb-1">{t('aboutTitle')}</h3>
             <p className="text-mq-sm text-mq-content-secondary">
               {t('version')} {APP_CONFIG.version} - {t('aboutDesc')}
             </p>
+          </div>
+
+          {/* Privacy Policy */}
+          <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
+            <h3 className="font-semibold text-mq-content mb-1">{t('privacyPolicy')}</h3>
+            <p className="text-mq-sm text-mq-content-secondary mb-2">{t('privacyPolicyDesc')}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
+              onClick={() => router.push('/privacy')}
+            >
+              {t('view')}
+            </Button>
           </div>
 
           {/* Need Help */}
@@ -79,6 +97,6 @@ const HelpSupport = memo(({ t }: HelpSupportProps) => {
   );
 });
 
-HelpSupport.displayName = 'HelpSupport';
+AboutSettings.displayName = 'AboutSettings';
 
-export default HelpSupport;
+export default AboutSettings;

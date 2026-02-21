@@ -53,11 +53,15 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
     setIsLoading(true);
     setVerifyError(null);
     try {
-      const res = await fetch(API_ROUTES.AUTH.MFA_ENROLL, { method: 'POST' });
+      // SECURITY: Fresh enrollment on every start to avoid stale factors
+      const res = await fetch(API_ROUTES.AUTH.MFA_ENROLL, {
+        method: 'POST',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
       const result = await res.json();
 
       if (!res.ok || !result?.data) {
-        toastUtils.error(t('error'), result?.error?.message || 'Failed to start setup');
+        toastUtils.error(t('error'), result?.error?.message || 'Failed to start setup. Please try again.');
         return;
       }
 
@@ -85,16 +89,21 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       });
       const result = await res.json();
 
-      if (!res.ok || !result?.data?.verified) {
-        setVerifyError(result?.error?.message || 'Invalid code. Please try again.');
+      if (!res.ok) {
+        setVerifyError(result?.error?.message || 'Verification failed. Please check your code.');
+        return;
+      }
+
+      if (!result?.data?.verified) {
+        setVerifyError('Invalid code. Please try again.');
         return;
       }
 
       setStep('success');
       toastUtils.success(t('security'), 'Two-factor authentication enabled!');
       onStatusChange();
-    } catch {
-      setVerifyError('Verification failed. Please try again.');
+    } catch (error) {
+      setVerifyError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +161,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <div className="flex-1 min-w-0">
               <p className="text-mq-sm font-medium text-mq-content">{t('authenticatorApp')}</p>
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
-                {t('authenticatorAppDesc')}
+                Google Authenticator, Authy, or Microsoft Authenticator
               </p>
             </div>
           </div>
@@ -211,7 +220,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <div className="py-4 space-y-4">
               {/* QR Code */}
               <div className="flex justify-center">
-                <div className="p-4 bg-white rounded-lg">
+                <div className="p-4 bg-white rounded-lg shadow-sm border border-mq-border/50">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={qrCode}
@@ -224,25 +233,30 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               </div>
 
               {/* Manual Secret */}
-              <div className="space-y-2">
-                <p className="text-xs text-mq-content-secondary text-center">
-                  {t('cantScanEnterManually')}
-                </p>
+              <div className="space-y-3 pt-2">
+                <div className="text-center space-y-1">
+                  <p className="text-sm font-medium text-mq-content">
+                    {t('cantScanEnterManually')}
+                  </p>
+                  <p className="text-xs text-mq-content-secondary">
+                    Type this code into your app to link it manually.
+                  </p>
+                </div>
                 <div className="flex flex-wrap items-center gap-2 justify-center">
-                  <code className="max-w-full break-all text-xs bg-mq-card-background px-3 py-1.5 rounded border border-mq-border font-mono tracking-wider select-all">
+                  <code className="max-w-full break-all text-sm bg-mq-card-background px-4 py-2 rounded-lg border border-mq-border font-mono font-bold tracking-widest text-mq-primary shadow-inner select-all">
                     {secret}
                   </code>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={copySecret}
-                    className="p-1 h-auto"
+                    className="p-2 h-auto hover:bg-mq-primary/10"
                     aria-label={t('copySecret')}
                   >
                     {secretCopied ? (
-                      <CheckCircle className="h-4 w-4 text-mq-success" />
+                      <CheckCircle className="h-5 w-5 text-mq-success" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-5 w-5" />
                     )}
                   </Button>
                 </div>

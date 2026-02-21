@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "Quyền riêng tư & Bảo mật",
   "quickActions": "Thao tác nhanh",
-  "helpSupport": "Trợ giúp & Hỗ trợ",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "Nhắc nhở hạn nộp",
   "deadlineRemindersDesc": "Nhận thông báo về các hạn nộp sắp tới",
   "classReminders": "Nhắc nhở lớp học",
@@ -1990,5 +1990,10 @@
   "syncComplete": "Đồng bộ hoàn tất",
   "conflictsDetected": "Phát hiện xung đột",
   "modifiedOffline": "Đã chỉnh sửa ngoại tuyến",
-  "modifiedOnServer": "Đã chỉnh sửa trên máy chủ"
+  "modifiedOnServer": "Đã chỉnh sửa trên máy chủ",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

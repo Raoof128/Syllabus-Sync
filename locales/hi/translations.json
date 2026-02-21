@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "गोपनीयता और सुरक्षा",
   "quickActions": "त्वरित कार्य",
-  "helpSupport": "सहायता और समर्थन",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "समय सीमा अनुस्मारक",
   "deadlineRemindersDesc": "आगामी समय सीमाओं के बारे में सूचित रहें",
   "classReminders": "कक्षा अनुस्मारक",
@@ -1990,5 +1990,10 @@
   "syncComplete": "सिंक पूर्ण",
   "conflictsDetected": "विरोध पाए गए",
   "modifiedOffline": "ऑफ़लाइन में संशोधित",
-  "modifiedOnServer": "सर्वर पर संशोधित"
+  "modifiedOnServer": "सर्वर पर संशोधित",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

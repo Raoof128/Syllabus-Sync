@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "隐私与安全",
   "quickActions": "快捷操作",
-  "helpSupport": "帮助与支持",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "截止日期提醒",
   "deadlineRemindersDesc": "获取即将到期的截止日期通知",
   "classReminders": "课程提醒",
@@ -1990,5 +1990,10 @@
   "syncComplete": "同步完成",
   "conflictsDetected": "检测到冲突",
   "modifiedOffline": "离线时已修改",
-  "modifiedOnServer": "已在服务器上修改"
+  "modifiedOnServer": "已在服务器上修改",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

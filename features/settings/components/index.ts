@@ -3,7 +3,7 @@ export { default as AppearanceSettings } from './AppearanceSettings';
 export { default as PrivacySettings } from './PrivacySettings';
 export { default as SecuritySettings } from './SecuritySettings';
 export { default as QuickActions } from './QuickActions';
-export { default as HelpSupport } from './HelpSupport';
+export { default as AboutSettings } from './AboutSettings';
 export { default as SettingsSkeleton } from './SettingsSkeleton';
 export { default as GamificationSettings } from './GamificationSettings';
 export { default as MapSettings } from './MapSettings';

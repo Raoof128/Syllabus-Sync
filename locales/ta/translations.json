@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "தனியுரிமை மற்றும் பாதுகாப்பு",
   "quickActions": "விரைவு செயல்கள்",
-  "helpSupport": "உதவி மற்றும் ஆதரவு",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "காலக்கெடு நினைவூட்டல்கள்",
   "deadlineRemindersDesc": "வரவிருக்கும் காலக்கெடுகளைப் பற்றி அறிவிக்கவும்",
   "classReminders": "வகுப்பு நினைவூட்டல்கள்",
@@ -1990,5 +1990,10 @@
   "syncComplete": "ஒத்திசைவு முடிந்தது",
   "conflictsDetected": "முரண்பாடுகள் கண்டறியப்பட்டன",
   "modifiedOffline": "ஆஃப்லைனில் மாற்றப்பட்டது",
-  "modifiedOnServer": "சர்வரில் மாற்றப்பட்டது"
+  "modifiedOnServer": "சர்வரில் மாற்றப்பட்டது",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

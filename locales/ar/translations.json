@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "الخصوصية والأمان",
   "quickActions": "إجراءات سريعة",
-  "helpSupport": "المساعدة والدعم",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "تنبيهات المواعيد النهائية",
   "deadlineRemindersDesc": "احصل على إشعارات حول المواعيد النهائية القادمة",
   "classReminders": "تنبيهات المحاضرات",
@@ -1990,5 +1990,10 @@
   "syncComplete": "اكتملت المزامنة",
   "conflictsDetected": "تم اكتشاف تعارضات",
   "modifiedOffline": "تم التعديل دون اتصال",
-  "modifiedOnServer": "تم التعديل على الخادم"
+  "modifiedOnServer": "تم التعديل على الخادم",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

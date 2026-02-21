@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "ความเป็นส่วนตัวและความปลอดภัย",
   "quickActions": "การดำเนินการด่วน",
-  "helpSupport": "ความช่วยเหลือและสนับสนุน",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "การแจ้งเตือนกำหนดส่ง",
   "deadlineRemindersDesc": "รับการแจ้งเตือนเกี่ยวกับกำหนดส่งที่ใกล้เข้ามา",
   "classReminders": "การแจ้งเตือนคลาส",
@@ -1990,5 +1990,10 @@
   "syncComplete": "ซิงค์เสร็จสมบูรณ์",
   "conflictsDetected": "ตรวจพบความขัดแย้ง",
   "modifiedOffline": "แก้ไขขณะออฟไลน์",
-  "modifiedOnServer": "แก้ไขบนเซิร์ฟเวอร์"
+  "modifiedOnServer": "แก้ไขบนเซิร์ฟเวอร์",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

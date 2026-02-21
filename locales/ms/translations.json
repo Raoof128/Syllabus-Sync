@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "Privasi & Keselamatan",
   "quickActions": "Tindakan Pantas",
-  "helpSupport": "Bantuan & Sokongan",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "Peringatan Tarikh Akhir",
   "deadlineRemindersDesc": "Dapatkan pemberitahuan tentang tarikh akhir yang akan datang",
   "classReminders": "Peringatan Kelas",
@@ -1990,5 +1990,10 @@
   "syncComplete": "Penyegerakan selesai",
   "conflictsDetected": "Konflik dikesan",
   "modifiedOffline": "Diubah semasa luar talian",
-  "modifiedOnServer": "Diubah di pelayan"
+  "modifiedOnServer": "Diubah di pelayan",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

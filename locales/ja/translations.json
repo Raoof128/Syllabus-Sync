@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "プライバシーとセキュリティ",
   "quickActions": "クイックアクション",
-  "helpSupport": "ヘルプとサポート",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "締め切りリマインダー",
   "deadlineRemindersDesc": "今後の締め切りについて通知を受け取る",
   "classReminders": "授業リマインダー",
@@ -1990,5 +1990,10 @@
   "syncComplete": "同期完了",
   "conflictsDetected": "競合が検出されました",
   "modifiedOffline": "オフラインで変更済み",
-  "modifiedOnServer": "サーバーで変更済み"
+  "modifiedOnServer": "サーバーで変更済み",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

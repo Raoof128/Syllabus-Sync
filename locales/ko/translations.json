@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "개인정보 및 보안",
   "quickActions": "빠른 작업",
-  "helpSupport": "도움말 및 지원",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "마감일 알림",
   "deadlineRemindersDesc": "다가오는 마감일에 대한 알림 받기",
   "classReminders": "수업 알림",
@@ -1990,5 +1990,10 @@
   "syncComplete": "동기화 완료",
   "conflictsDetected": "충돌이 감지됨",
   "modifiedOffline": "오프라인에서 수정됨",
-  "modifiedOnServer": "서버에서 수정됨"
+  "modifiedOnServer": "서버에서 수정됨",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }

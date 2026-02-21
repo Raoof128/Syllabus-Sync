@@ -1,3 +1,24 @@
+### Raouf: Added 16 New Languages & Achieved 100% i18n Parity — 2026-02-21
+
+**Scope:** Internationalisation (i18n)
+**Type:** Feature / UX
+
+#### Changes
+
+1. **New Language Support:**
+   - Added 16 new languages: German (`de`), Danish (`da`), Swedish (`sv`), Turkish (`tr`), Portuguese (`pt`), Dutch (`nl`), Polish (`pl`), Norwegian (`no`), Finnish (`fi`), Greek (`el`), Romanian (`ro`), Czech (`cs`), Hungarian (`hu`), Ukrainian (`uk`), Nepali (`ne`), and Sinhala (`si`).
+   - Updated `lib/i18n/translations.ts` to register and lazy-load these new locales.
+   - Created 16 new locale directories and initialized `translations.json` for each.
+2. **i18n Parity & Core Translations:**
+   - Provided core UI translations (Home, Calendar, Settings, etc.) for all new languages.
+   - Synchronized missing keys (`backToToday`, `oauthCodeExchangeFailed`, `pleaseSelectFaculty`) across all 18 existing non-English locales.
+   - Achieved 100% translation key parity across all 35 supported locales.
+
+#### Verification
+
+- `node tools/i18n/check-translations.mjs` ✅ (35 locales validated, 0 missing keys).
+- Typecheck and lint pass.
+
 ### Raouf: Weather Logic Upgrade & UX Simplification — 2026-02-20
 
 **Scope:** Map / Weather widget & Unit selection logic.

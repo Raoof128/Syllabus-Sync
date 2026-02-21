@@ -26,7 +26,23 @@ export type Language =
   | 'ms'
   | 'it'
   | 'fr'
-  | 'he';
+  | 'he'
+  | 'de'
+  | 'da'
+  | 'sv'
+  | 'tr'
+  | 'pt'
+  | 'nl'
+  | 'pl'
+  | 'no'
+  | 'fi'
+  | 'el'
+  | 'ro'
+  | 'cs'
+  | 'hu'
+  | 'uk'
+  | 'ne'
+  | 'si';
 
 export const LANGUAGE_NAMES: Record<Language, string> = {
   en: 'English',
@@ -48,13 +64,45 @@ export const LANGUAGE_NAMES: Record<Language, string> = {
   it: 'Italiano',
   fr: 'Français',
   he: 'עברית',
+  de: 'Deutsch',
+  da: 'Dansk',
+  sv: 'Svenska',
+  tr: 'Türkçe',
+  pt: 'Português',
+  nl: 'Nederlands',
+  pl: 'Polski',
+  no: 'Norsk',
+  fi: 'Suomi',
+  el: 'Ελληνικά',
+  ro: 'Română',
+  cs: 'Čeština',
+  hu: 'Magyar',
+  uk: 'Українська',
+  ne: 'नेपाली',
+  si: 'සිංහල',
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   'en',
-  'es',
+  'de',
   'fr',
+  'es',
   'it',
+  'pt',
+  'nl',
+  'da',
+  'sv',
+  'no',
+  'fi',
+  'tr',
+  'pl',
+  'el',
+  'ro',
+  'cs',
+  'hu',
+  'uk',
+  'ne',
+  'si',
   'zh',
   'ja',
   'ko',
@@ -147,6 +195,54 @@ export async function loadTranslations(lang: Language): Promise<TranslationData>
         break;
       case 'he':
         translations = (await import('@/locales/he/translations.json')).default;
+        break;
+      case 'de':
+        translations = (await import('@/locales/de/translations.json')).default;
+        break;
+      case 'da':
+        translations = (await import('@/locales/da/translations.json')).default;
+        break;
+      case 'sv':
+        translations = (await import('@/locales/sv/translations.json')).default;
+        break;
+      case 'tr':
+        translations = (await import('@/locales/tr/translations.json')).default;
+        break;
+      case 'pt':
+        translations = (await import('@/locales/pt/translations.json')).default;
+        break;
+      case 'nl':
+        translations = (await import('@/locales/nl/translations.json')).default;
+        break;
+      case 'pl':
+        translations = (await import('@/locales/pl/translations.json')).default;
+        break;
+      case 'no':
+        translations = (await import('@/locales/no/translations.json')).default;
+        break;
+      case 'fi':
+        translations = (await import('@/locales/fi/translations.json')).default;
+        break;
+      case 'el':
+        translations = (await import('@/locales/el/translations.json')).default;
+        break;
+      case 'ro':
+        translations = (await import('@/locales/ro/translations.json')).default;
+        break;
+      case 'cs':
+        translations = (await import('@/locales/cs/translations.json')).default;
+        break;
+      case 'hu':
+        translations = (await import('@/locales/hu/translations.json')).default;
+        break;
+      case 'uk':
+        translations = (await import('@/locales/uk/translations.json')).default;
+        break;
+      case 'ne':
+        translations = (await import('@/locales/ne/translations.json')).default;
+        break;
+      case 'si':
+        translations = (await import('@/locales/si/translations.json')).default;
         break;
       default:
         translations = en;

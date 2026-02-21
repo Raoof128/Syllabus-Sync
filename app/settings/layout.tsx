@@ -6,7 +6,7 @@ import { useHydration } from '@/lib/hooks/useHydration';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { SettingsSectionBoundary } from '@/features/settings/components/SettingsSectionBoundary';
 import { cn } from '@/lib/utils';
-import { Palette, Shield, Layout, Settings, Sparkles, LifeBuoy } from 'lucide-react';
+import { Palette, Shield, Layout, Settings, Sparkles, Info } from 'lucide-react';
 import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
@@ -48,11 +48,11 @@ const SECTIONS: {
     path: '/settings/experience',
   },
   {
-    id: 'support',
-    icon: LifeBuoy,
-    labelKey: 'settings_support',
+    id: 'about',
+    icon: Info,
+    labelKey: 'settings_about',
     color: 'text-slate-500',
-    path: '/settings/support',
+    path: '/settings/about',
   },
 ];
 

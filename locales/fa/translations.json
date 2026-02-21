@@ -266,7 +266,7 @@
   "hapticFeedbackDesc": "Vibration feedback during navigation (mobile only)",
   "privacySecurity": "حریم خصوصی و امنیت",
   "quickActions": "اقدامات سریع",
-  "helpSupport": "راهنمایی و پشتیبانی",
+  "helpSupport": "About Syllabus Sync",
   "deadlineReminders": "یادآورهای مهلت",
   "deadlineRemindersDesc": "در مورد مهلت‌های نزدیک اعلان دریافت کنید",
   "classReminders": "یادآورهای کلاس",
@@ -1990,5 +1990,10 @@
   "syncComplete": "همگام‌سازی کامل شد",
   "conflictsDetected": "تعارض‌ها شناسایی شدند",
   "modifiedOffline": "در حالت آفلاین تغییر یافت",
-  "modifiedOnServer": "در سرور تغییر یافت"
+  "modifiedOnServer": "در سرور تغییر یافت",
+  "backToToday": "Back to Today",
+  "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",
+  "pleaseSelectFaculty": "Please select your faculty",
+  "settings_about": "About",
+  "twoFactorAuthentication": "Two-Factor Authentication"
 }
