@@ -1,3 +1,27 @@
+### Raouf: Settings UI Consolidation & UX Refinement — 2026-02-21
+
+**Scope:** Settings / Security / UX
+**Type:** Enhancement / Bug Fix
+
+#### Changes
+
+1. **Unified Passkey & Biometric Section:**
+   - Merged "Biometric Login" and "Passkeys & Security Keys" into a single, professional "Passkey & Biometric Login" section.
+   - Combined the master biometric toggle with individual device/key management.
+   - Improved descriptions and added a dedicated `Fingerprint` header icon.
+   - Created `PasskeySecuritySection.tsx` and removed redundant `BiometricToggle.tsx` and `PasskeyManager.tsx`.
+2. **Fixed "Current:" Label Formatting:**
+   - Resolved a "double colon" bug (`Current:: dark`) by removing trailing colons from the `current` key in all 35 locale files.
+   - Standardized the separator usage in `AppearanceSettings.tsx` and `PositionEditorClient.tsx` to ensure clean `"Current: [Value]"` output.
+3. **MFA Instruction Polish:**
+   - Refined TOTP enrollment instructions to be more professional and clear.
+
+#### Verification
+
+- Visual audit of labels confirmed single colon formatting.
+- Components verified for functional parity.
+- All 35 locales updated via automated script.
+
 ### Raouf: Added 16 New Languages & Achieved 100% i18n Parity — 2026-02-21
 
 **Scope:** Internationalisation (i18n)

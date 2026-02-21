@@ -7,10 +7,9 @@ import { Shield, Loader2, LogIn, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { MagicCard } from '@/components/ui/MagicCard';
 import type { TranslationKey } from '@/lib/i18n/translations';
-import { BiometricToggle } from './security/BiometricToggle';
+import { PasskeySecuritySection } from './security/PasskeySecuritySection';
 import { TOTPSetup } from './security/TOTPSetup';
 import { SMSSetup } from './security/SMSSetup';
-import { PasskeyManager } from './security/PasskeyManager';
 import { API_ROUTES } from '@/lib/constants/config';
 import type { MFAFactor } from '@/lib/security/mfa';
 
@@ -64,11 +63,8 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
               {/* SMS Verification */}
               <SMSSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
-              {/* Passkey / WebAuthn Management */}
-              <PasskeyManager t={t} />
-
-              {/* Legacy Biometric Toggle (backwards compatibility) */}
-              <BiometricToggle t={t} />
+              {/* Passkeys & Biometric Login */}
+              <PasskeySecuritySection t={t} />
 
               {/* Account Security Actions */}
               <div className="pt-2 border-t border-mq-border space-y-3">

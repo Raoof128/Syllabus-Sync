@@ -9,10 +9,9 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { SessionsList } from './privacy/SessionsList';
 import { DataManagement } from './privacy/DataManagement';
-import { BiometricToggle } from './security/BiometricToggle';
+import { PasskeySecuritySection } from './security/PasskeySecuritySection';
 import { TOTPSetup } from './security/TOTPSetup';
 
-import { PasskeyManager } from './security/PasskeyManager';
 import { API_ROUTES } from '@/lib/constants/config';
 import type { MFAFactor } from '@/lib/security/mfa';
 
@@ -135,6 +134,9 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   {/* Authenticator App (TOTP) */}
                   <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
+                  {/* Passkeys & Biometric Login */}
+                  <PasskeySecuritySection t={t} />
+
                   {/* SMS Verification — coming soon */}
                   <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -152,12 +154,6 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                       </span>
                     </div>
                   </div>
-
-                  {/* Passkey / WebAuthn */}
-                  <PasskeyManager t={t} />
-
-                  {/* Biometric Authentication */}
-                  <BiometricToggle t={t} />
                 </div>
               )}
             </div>

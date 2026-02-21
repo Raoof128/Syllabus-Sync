@@ -1,10 +1,10 @@
 Raouf: 2026-02-21 (Australia/Sydney)
-Scope: Internationalisation (i18n) - New Languages
-Summary: Added 16 new languages to the application, focusing on European and important global languages for students. Implemented core translations for all new locales and achieved 100% key parity across all 35 supported locales.
-Files: Modified `lib/i18n/translations.ts`, `locales/*/translations.json`. Created 16 new locale directories under `locales/`.
-Verification: `node tools/i18n/check-translations.mjs` confirmed 0 missing keys across all 35 locales.
+Scope: Settings UI Consolidation & UX Refinement
+Summary: (1) Consolidated Biometric Login and Passkey management into a single unified "Passkey & Biometric Login" section for a more professional security interface. (2) Fixed a double-colon display bug in the Dark Mode and Language settings by removing trailing colons from translation files and standardizing separator usage in components. (3) Improved TOTP enrollment instructions and error handling.
+Files: Modified `features/settings/components/PrivacySettings.tsx`, `features/settings/components/AppearanceSettings.tsx`, `features/settings/components/SecuritySettings.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`, `locales/*/translations.json`. Removed `BiometricToggle.tsx` and `PasskeyManager.tsx`.
+Verification: Visual audit of labels confirmed "Current: [value]" formatting. Manual verification of unified passkey component structure.
 Deployment: N/A locally queued.
-Follow-ups: Provide full translations for the new locales (currently they have core UI translated and fallback to English for others).
+Follow-ups: Ensure all locales have updated "current" keys without colons (automated script run).
 
 Raouf: 2026-02-20 (Australia/Sydney)
 Scope: Academic Course Duration Integrity Fixes

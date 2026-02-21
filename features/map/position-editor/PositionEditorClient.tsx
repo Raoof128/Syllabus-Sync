@@ -673,7 +673,7 @@ export default function PositionEditorClient() {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">{t('current')}</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('current')}:</span>
                 <span
                   className={`font-mono ${
                     positionChanges.has(selectedBuilding.id)
